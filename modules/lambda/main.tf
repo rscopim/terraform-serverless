@@ -44,3 +44,29 @@ resource "aws_lambda_function" "this" {
     ManagedBy   = "Terraform"
   }
 }
+
+resource "aws_iam_role_policy" "lambda_sqs_policy" {
+  name = "${var.project_name}-${var.environment}-lambda-sqs-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ]
+        Effect   = "Allow"
+        Resource = var.sqs_queue_arn
+      }
+    ]
+  })
+}
+
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+  event_source_arn = var.sqs_queue_arn
+  function_name    = aws_lambda_function.this.arn
+  batch_size       = 1
+}

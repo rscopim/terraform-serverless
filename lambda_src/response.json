@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Lambda funcionando com logs!\", \"event_received\": {\"teste\": \"pwsh\"}}"}

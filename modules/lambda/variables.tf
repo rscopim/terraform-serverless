@@ -17,3 +17,8 @@ variable "lambda_output_path" {
   description = "Caminho do arquivo ZIP gerado"
   type        = string
 }
+
+variable "sqs_queue_arn" {
+  description = "ARN da fila SQS"
+  type        = string
+}

@@ -23,4 +23,12 @@ module "hello_lambda" {
   environment        = var.environment
   lambda_source_file = "${path.root}/../../lambda_src/hello_lambda/app.py"
   lambda_output_path = "${path.root}/hello_lambda.zip"
+  sqs_queue_arn      = module.sqs.queue_arn
+}
+
+module "sqs" {
+  source = "../../modules/sqs"
+
+  project_name = var.project_name
+  environment  = var.environment
 }
