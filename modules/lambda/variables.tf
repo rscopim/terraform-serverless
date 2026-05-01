@@ -22,3 +22,7 @@ variable "sqs_queue_arn" {
   description = "ARN da fila SQS"
   type        = string
 }
+
+variable "sns_topic_arn" {
+  type = string
+}

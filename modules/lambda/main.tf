@@ -38,6 +38,12 @@ resource "aws_lambda_function" "this" {
   timeout     = 10
   memory_size = 128
 
+  environment {
+    variables = {
+      SNS_TOPIC_ARN = var.sns_topic_arn
+    }
+  }
+
   tags = {
     Project     = var.project_name
     Environment = var.environment
@@ -69,4 +75,22 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = var.sqs_queue_arn
   function_name    = aws_lambda_function.this.arn
   batch_size       = 1
+}
+
+resource "aws_iam_role_policy" "lambda_sns_policy" {
+  name = "${var.project_name}-${var.environment}-lambda-sns-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sns:Publish"
+        ]
+        Effect   = "Allow"
+        Resource = var.sns_topic_arn
+      }
+    ]
+  })
 }
