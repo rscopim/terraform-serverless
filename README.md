@@ -20,35 +20,38 @@ O objetivo é simular um fluxo real de processamento desacoplado, resiliente e e
 
 # 🏗️ Arquitetura
 
+```text
 SQS (Fila de mensagens)
-↓
+   ↓
 AWS Lambda (processamento automático)
-↓
+   ↓
 CloudWatch Logs (monitoramento)
+```
 
 ---
 
 # ⚙️ Serviços utilizados
 
-AWS Lambda (execução serverless)
-Amazon SQS (fila de mensagens)
-AWS IAM (roles e permissões)
-Amazon CloudWatch Logs (monitoramento)
-Terraform (Infraestrutura como código)
+* AWS Lambda (execução serverless)
+* Amazon SQS (fila de mensagens)
+* AWS IAM (roles e permissões)
+* Amazon CloudWatch Logs (monitoramento)
+* Terraform (Infraestrutura como código)
 
 ---
 
 # 🔐 Segurança aplicada
 
-IAM Role com permissões mínimas para execução da Lambda
-Permissão restrita de acesso ao SQS
-Separação de responsabilidades entre serviços
-Execução sem uso de credenciais diretas
+* IAM Role com permissões mínimas para execução da Lambda
+* Permissão restrita de acesso ao SQS
+* Separação de responsabilidades entre serviços
+* Execução sem uso de credenciais diretas
 
 ---
 
 # 📁 Estrutura do projeto
 
+```text
 terraform-serverless/
 ├── docs/
 │   ├── arquitetura/
@@ -74,6 +77,7 @@ terraform-serverless/
 │
 ├── README.md
 ├── .gitignore
+```
 
 ---
 
@@ -81,11 +85,13 @@ terraform-serverless/
 
 ## 🌱 Ambiente DEV
 
+```bash
 cd environments/dev
 
 terraform init
 terraform plan
 terraform apply
+```
 
 ---
 
@@ -93,31 +99,37 @@ terraform apply
 
 ## Executar Lambda via CLI
 
-aws lambda invoke 
---function-name Terraform-Serverless-dev-hello-lambda 
---region us-west-2 
---payload '{"teste":"readme"}' 
---cli-binary-format raw-in-base64-out 
-response.json
+```bash
+aws lambda invoke \
+  --function-name Terraform-Serverless-dev-hello-lambda \
+  --region us-west-2 \
+  --payload '{"teste":"readme"}' \
+  --cli-binary-format raw-in-base64-out \
+  response.json
+```
+
+---
 
 ## Enviar mensagem para SQS
 
-aws sqs send-message 
---queue-url <QUEUE_URL> 
---message-body "Mensagem teste" 
---region us-west-2
+```bash
+aws sqs send-message \
+  --queue-url <QUEUE_URL> \
+  --message-body "Mensagem teste" \
+  --region us-west-2
+```
 
 ---
 
 # 🧪 Funcionalidades implementadas
 
-Criação de função Lambda via Terraform
-Empacotamento automático do código Python
-Execução da Lambda via AWS CLI
-Logs centralizados no CloudWatch
-Criação de fila SQS
-Dead Letter Queue (DLQ)
-Integração automática entre SQS e Lambda
+* Criação de função Lambda via Terraform
+* Empacotamento automático do código Python
+* Execução da Lambda via AWS CLI
+* Logs centralizados no CloudWatch
+* Criação de fila SQS
+* Dead Letter Queue (DLQ)
+* Integração automática entre SQS e Lambda
 
 ---
 
@@ -125,34 +137,36 @@ Integração automática entre SQS e Lambda
 
 ## 🌱 DEV
 
+```bash
 terraform destroy
+```
 
 ---
 
 # 🔒 Recursos mantidos
 
-Nenhum recurso persistente obrigatório
-Todos os recursos podem ser destruídos após uso
+* Nenhum recurso persistente obrigatório
+* Todos os recursos podem ser destruídos após uso
 
 ---
 
 # 📈 Evolução do projeto
 
-Fase 1 — Setup do projeto
-Fase 2 — Lambda
-Fase 3 — CloudWatch Logs
-Fase 4 — SQS
-Fase 5 — Integração Lambda com SQS
+* Fase 1 — Setup do projeto
+* Fase 2 — Lambda
+* Fase 3 — CloudWatch Logs
+* Fase 4 — SQS
+* Fase 5 — Integração Lambda com SQS
 
 ---
 
 # 🧩 Próximas melhorias
 
-Integração com SNS (notificações)
-Uso de EventBridge para eventos
-Criação de API Gateway
-Frontend estático com S3
-Arquitetura completa orientada a eventos
+* Integração com SNS (notificações)
+* Uso de EventBridge para eventos
+* Criação de API Gateway
+* Frontend estático com S3
+* Arquitetura completa orientada a eventos
 
 ---
 
