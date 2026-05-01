@@ -1,10 +1,27 @@
+![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?style=for-the-badge&logo=terraform)
+![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazonaws)
+![Serverless](https://img.shields.io/badge/Architecture-Serverless-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Em%20Evolução-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
+
 # 🚀 Terraform-Serverless — Arquitetura Serverless na AWS com Terraform
 
 Projeto de infraestrutura como código (IaC) utilizando Terraform para provisionar uma arquitetura serverless moderna, escalável e orientada a eventos na AWS.
 
-Este projeto demonstra, de ponta a ponta, a construção de um sistema distribuído baseado em eventos, utilizando serviços como AWS Lambda, SQS, SNS e EventBridge.
+Este projeto demonstra a construção de um sistema distribuído baseado em eventos, seguindo boas práticas utilizadas em ambientes reais de produção.
 
-Esse projeto está em constante evolução.
+---
+
+## ✨ Principais objetivos
+
+- Demonstrar arquitetura serverless com AWS
+- Aplicar Terraform de forma modular
+- Implementar processamento assíncrono com SQS
+- Evoluir para arquitetura orientada a eventos (Event-Driven)
+
+---
+
+> 🚧 Este projeto está em constante evolução.
 
 ---
 
@@ -21,12 +38,22 @@ O objetivo é simular um fluxo real de processamento desacoplado, resiliente e e
 # 🏗️ Arquitetura
 
 ```text
-SQS (Fila de mensagens)
-   ↓
-AWS Lambda (processamento automático)
-   ↓
-CloudWatch Logs (monitoramento)
-```
+                ┌──────────────────────┐
+                │     Amazon SQS       │
+                │  (Fila de mensagens) │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │     AWS Lambda       │
+                │ (Processamento async)│
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │  CloudWatch Logs     │
+                │   (Observabilidade)  │
+                └──────────────────────┘
 
 ---
 
@@ -177,6 +204,8 @@ Instrutor de Cloud Computing (AWS)
 
 ---
 
-# 📌 Observação
+# 📌 Observação - Objetivo educacional
 
-Este projeto foi desenvolvido com foco educacional e demonstra boas práticas de arquitetura serverless, modularização com Terraform e padrões utilizados no mercado.
+Este projeto foi desenvolvido com foco em aprendizado prático e simulação de cenários reais utilizados no mercado de Cloud Computing e DevOps.
+
+Cada fase do projeto representa uma evolução arquitetural, permitindo compreensão progressiva dos serviços AWS e do Terraform.
