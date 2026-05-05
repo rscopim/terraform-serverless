@@ -20,3 +20,24 @@ resource "aws_sqs_queue" "main" {
     Environment = var.environment
   }
 }
+
+resource "aws_sqs_queue_policy" "eventbridge_policy" {
+  queue_url = aws_sqs_queue.main.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowEventBridgeSendMessage"
+        Effect = "Allow"
+
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+
+        Action   = "sqs:SendMessage"
+        Resource = aws_sqs_queue.main.arn
+      }
+    ]
+  })
+}
