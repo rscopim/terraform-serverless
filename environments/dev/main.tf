@@ -44,9 +44,11 @@ module "sns" {
 module "eventbridge" {
   source = "../../modules/eventbridge"
 
-  project_name  = var.project_name
-  environment   = var.environment
-  sqs_queue_arn = module.sqs.queue_arn
+  project_name     = var.project_name
+  environment      = var.environment
+  sqs_queue_arn    = module.sqs.queue_arn
+  sns_topic_arn    = module.sns.topic_arn
+  site_bucket_name = module.s3_static_site.bucket_name
 }
 
 module "s3_static_site" {
@@ -58,4 +60,12 @@ module "s3_static_site" {
   index_file_path = "${path.root}/../../static_site/index.html"
   style_file_path = "${path.root}/../../static_site/style.css"
   materials_path  = "${path.root}/../../static_site/materiais"
+}
+
+module "cloudtrail" {
+  source = "../../modules/cloudtrail"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  target_bucket_arn = module.s3_static_site.bucket_arn
 }

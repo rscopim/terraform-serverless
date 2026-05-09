@@ -12,3 +12,7 @@ output "website_url" {
   description = "URL HTTP do site estático"
   value       = "http://${aws_s3_bucket_website_configuration.this.website_endpoint}"
 }
+
+output "bucket_arn" {
+  value = aws_s3_bucket.this.arn
+}
