@@ -134,3 +134,16 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+.single-card {
+  grid-template-columns: minmax(280px, 720px);
+  justify-content: center;
+}
+
+.featured-card {
+  text-align: center;
+}
+
+.featured-card p {
+  min-height: auto;
+}
