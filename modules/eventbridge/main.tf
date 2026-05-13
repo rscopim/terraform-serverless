@@ -40,3 +40,9 @@ resource "aws_cloudwatch_event_target" "pdf_sns" {
   target_id = "SendPdfNotification"
   arn       = var.sns_topic_arn
 }
+
+resource "aws_cloudwatch_event_target" "pdf_metrics_lambda" {
+  rule      = aws_cloudwatch_event_rule.pdf_download.name
+  target_id = "SendPdfDownloadToMetricsLambda"
+  arn       = var.download_metrics_lambda_arn
+}

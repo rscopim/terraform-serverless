@@ -6,18 +6,14 @@ variable "environment" {
   type = string
 }
 
-variable "sqs_queue_arn" {
+variable "lambda_source_file" {
   type = string
 }
 
-variable "sns_topic_arn" {
+variable "lambda_output_path" {
   type = string
 }
 
-variable "site_bucket_name" {
-  type = string
-}
-
-variable "download_metrics_lambda_arn" {
+variable "eventbridge_rule_arn" {
   type = string
 }

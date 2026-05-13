@@ -44,11 +44,12 @@ module "sns" {
 module "eventbridge" {
   source = "../../modules/eventbridge"
 
-  project_name     = var.project_name
-  environment      = var.environment
-  sqs_queue_arn    = module.sqs.queue_arn
-  sns_topic_arn    = module.sns.topic_arn
-  site_bucket_name = module.s3_static_site.bucket_name
+  project_name                = var.project_name
+  environment                 = var.environment
+  sqs_queue_arn               = module.sqs.queue_arn
+  sns_topic_arn               = module.sns.topic_arn
+  site_bucket_name            = module.s3_static_site.bucket_name
+  download_metrics_lambda_arn = module.download_metrics.lambda_function_arn
 }
 
 module "s3_static_site" {
@@ -68,4 +69,15 @@ module "cloudtrail" {
   project_name      = var.project_name
   environment       = var.environment
   target_bucket_arn = module.s3_static_site.bucket_arn
+}
+
+module "download_metrics" {
+  source = "../../modules/download_metrics"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  lambda_source_file = "${path.root}/../../lambda_src/download_metrics/app.py"
+  lambda_output_path = "${path.root}/download_metrics.zip"
+
+  eventbridge_rule_arn = module.eventbridge.pdf_download_rule_arn
 }
