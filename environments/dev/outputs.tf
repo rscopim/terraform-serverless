@@ -62,3 +62,23 @@ output "static_site_url" {
   description = "URL do portal de estudos"
   value       = module.s3_static_site.website_url
 }
+
+output "cloudwatch_dashboard_name" {
+  description = "Nome do dashboard de downloads no CloudWatch"
+  value       = module.cloudwatch_dashboard.dashboard_name
+}
+
+output "leads_table_name" {
+  description = "Nome da tabela DynamoDB de leads"
+  value       = module.dynamodb_leads.table_name
+}
+
+output "register_lead_lambda_name" {
+  description = "Nome da Lambda de registro de leads"
+  value       = module.register_lead_lambda.lambda_function_name
+}
+
+output "leads_api_endpoint" {
+  description = "Endpoint da API para cadastro de leads"
+  value       = module.api_gateway.leads_endpoint
+}

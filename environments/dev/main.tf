@@ -81,3 +81,44 @@ module "download_metrics" {
 
   eventbridge_rule_arn = module.eventbridge.pdf_download_rule_arn
 }
+
+module "cloudwatch_dashboard" {
+  source = "../../modules/cloudwatch_dashboard"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  bucket_name = module.s3_static_site.bucket_name
+}
+
+module "dynamodb_leads" {
+  source = "../../modules/dynamodb"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "register_lead_lambda" {
+  source = "../../modules/register_lead_lambda"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  lambda_source_file = "${path.root}/../../lambda_src/register_lead/app.py"
+  lambda_output_path = "${path.root}/register_lead.zip"
+
+  dynamodb_table_name = module.dynamodb_leads.table_name
+  dynamodb_table_arn  = module.dynamodb_leads.table_arn
+
+  pdf_url = "http://${module.s3_static_site.bucket_name}.s3-website-${var.aws_region}.amazonaws.com/materiais/orientacoes-gerais-aws-caf.pdf"
+}
+
+module "api_gateway" {
+  source = "../../modules/api_gateway"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_invoke_arn    = module.register_lead_lambda.lambda_invoke_arn
+  lambda_function_name = module.register_lead_lambda.lambda_function_name
+}

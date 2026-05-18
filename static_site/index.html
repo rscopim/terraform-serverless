@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Portal de Estudos Cloud & Terraform</title>
+  <title>Portal de Estudos Cloud</title>
 
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <header class="hero">
     <div class="container">
@@ -16,8 +17,8 @@
       <h1>Portal de Estudos Cloud</h1>
 
       <p class="subtitle">
-        Materiais gratuitos para apoiar seus estudos em AWS, computação em nuvem,
-        arquitetura e boas práticas de adoção cloud.
+        Baixe gratuitamente um material de apoio sobre o AWS Cloud Adoption Framework (CAF)
+        e acompanhe a evolução de um projeto serverless real com Terraform na AWS.
       </p>
 
       <div class="links">
@@ -30,7 +31,9 @@
   <main class="container">
     <section class="section-header">
       <h2>📚 Material disponível</h2>
-      <p>Baixe o documento de orientação para apoiar seus estudos.</p>
+      <p>
+        Preencha seus dados para baixar o PDF de orientações gerais sobre o AWS Cloud Adoption Framework.
+      </p>
     </section>
 
     <section class="cards single-card">
@@ -44,13 +47,39 @@
           abordando conceitos importantes para entender a adoção de cloud nas organizações.
         </p>
 
-        <a
-          class="button"
-          href="materiais/orientacoes-gerais-aws-caf.pdf"
-          download
-        >
-          Baixar PDF
-        </a>
+        <form id="leadForm" class="lead-form">
+          <label for="name">Nome</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Digite seu nome"
+            required
+          />
+
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Digite seu e-mail"
+            required
+          />
+
+          <label class="checkbox">
+            <input type="checkbox" id="consent" required />
+            <span>
+              Aceito compartilhar meu nome e e-mail para receber este material
+              e comunicações relacionadas a conteúdos educacionais sobre Cloud Computing.
+            </span>
+          </label>
+
+          <button type="submit" class="button">
+            Baixar material
+          </button>
+
+          <p id="formMessage" class="form-message"></p>
+        </form>
       </article>
     </section>
   </main>
@@ -58,5 +87,57 @@
   <footer>
     <p>Desenvolvido por Ricardo Simines Scopim • AWS + Terraform + S3</p>
   </footer>
+
+  <script>
+    const API_ENDPOINT = "https://5na1nncgjg.execute-api.us-west-2.amazonaws.com/leads";
+
+    const form = document.getElementById("leadForm");
+    const formMessage = document.getElementById("formMessage");
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      formMessage.textContent = "Enviando dados...";
+      formMessage.className = "form-message";
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const consent = document.getElementById("consent").checked;
+
+      const payload = {
+        name: name,
+        email: email,
+        consent: consent,
+        material: "orientacoes-gerais-aws-caf.pdf"
+      };
+
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          formMessage.textContent = data.message || "Erro ao registrar seus dados.";
+          formMessage.className = "form-message error";
+          return;
+        }
+
+        formMessage.textContent = "Cadastro realizado com sucesso. O download será iniciado.";
+        formMessage.className = "form-message success";
+
+        window.location.href = data.download_url;
+
+      } catch (error) {
+        formMessage.textContent = "Erro ao conectar com a API. Tente novamente.";
+        formMessage.className = "form-message error";
+      }
+    });
+  </script>
 </body>
 </html>

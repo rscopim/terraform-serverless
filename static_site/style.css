@@ -147,3 +147,57 @@ footer {
 .featured-card p {
   min-height: auto;
 }
+
+.lead-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  text-align: left;
+}
+
+.lead-form label {
+  color: #e2e8f0;
+  font-weight: bold;
+}
+
+.lead-form input[type="text"],
+.lead-form input[type="email"] {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.lead-form input::placeholder {
+  color: #94a3b8;
+}
+
+.checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.checkbox input {
+  margin-top: 4px;
+}
+
+.form-message {
+  min-height: 24px;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+
+.form-message.success {
+  color: #86efac;
+}
+
+.form-message.error {
+  color: #fca5a5;
+}
