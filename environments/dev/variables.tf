@@ -15,3 +15,9 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "domain_name" {
+  description = "Domínio principal do portal"
+  type        = string
+  default     = "cloudtrilhas.com.br"
+}

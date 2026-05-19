@@ -82,3 +82,18 @@ output "leads_api_endpoint" {
   description = "Endpoint da API para cadastro de leads"
   value       = module.api_gateway.leads_endpoint
 }
+
+output "route53_zone_id" {
+  description = "ID da Hosted Zone no Route 53"
+  value       = module.route53.zone_id
+}
+
+output "route53_name_servers" {
+  description = "Name servers gerados pelo Route 53"
+  value       = module.route53.name_servers
+}
+
+output "acm_certificate_arn" {
+  description = "ARN do certificado ACM validado em us-east-1"
+  value       = module.acm.certificate_arn
+}

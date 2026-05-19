@@ -16,6 +16,11 @@ provider "aws" {
   region = var.aws_region
 }
 
+provider "aws" {
+  alias  = "use1"
+  region = "us-east-1"
+}
+
 module "hello_lambda" {
   source = "../../modules/lambda"
 
@@ -121,4 +126,25 @@ module "api_gateway" {
 
   lambda_invoke_arn    = module.register_lead_lambda.lambda_invoke_arn
   lambda_function_name = module.register_lead_lambda.lambda_function_name
+}
+
+module "route53" {
+  source = "../../modules/route53"
+
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name  = var.domain_name
+}
+
+module "acm" {
+  source = "../../modules/acm"
+
+  providers = {
+    aws = aws.use1
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name  = var.domain_name
+  zone_id      = module.route53.zone_id
 }
