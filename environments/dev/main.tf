@@ -60,12 +60,14 @@ module "eventbridge" {
 module "s3_static_site" {
   source = "../../modules/s3_static_site"
 
-  project_name    = var.project_name
-  environment     = var.environment
-  bucket_name     = "materiais-e-trilhas-de-estudos"
-  index_file_path = "${path.root}/../../static_site/index.html"
-  style_file_path = "${path.root}/../../static_site/style.css"
-  materials_path  = "${path.root}/../../static_site/materiais"
+  project_name = var.project_name
+  environment  = var.environment
+  bucket_name  = "materiais-e-trilhas-de-estudos"
+
+  index_file_path             = "${path.root}/../../static_site/index.html"
+  style_file_path             = "${path.root}/../../static_site/style.css"
+  materials_path              = "${path.root}/../../static_site/materiais"
+  cloudfront_distribution_arn = module.cloudfront.cloudfront_distribution_arn
 }
 
 module "cloudtrail" {
@@ -156,7 +158,7 @@ module "cloudfront" {
   environment  = var.environment
   domain_name  = var.domain_name
 
-  s3_website_endpoint = module.s3_static_site.website_endpoint
-  acm_certificate_arn = module.acm.certificate_arn
-  route53_zone_id     = module.route53.zone_id
+  s3_bucket_regional_domain_name = module.s3_static_site.bucket_regional_domain_name
+  acm_certificate_arn            = module.acm.certificate_arn
+  route53_zone_id                = module.route53.zone_id
 }

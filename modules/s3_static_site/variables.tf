@@ -27,3 +27,8 @@ variable "materials_path" {
   description = "Caminho da pasta de materiais PDF"
   type        = string
 }
+
+variable "cloudfront_distribution_arn" {
+  description = "ARN da distribuição CloudFront"
+  type        = string
+}

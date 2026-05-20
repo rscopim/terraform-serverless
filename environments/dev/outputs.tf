@@ -17,3 +17,8 @@ output "cloudfront_domain_name" {
   description = "Domínio padrão do CloudFront"
   value       = module.cloudfront.cloudfront_domain_name
 }
+
+output "cloudfront_distribution_arn" {
+  description = "ARN da distribuição CloudFront"
+  value       = module.cloudfront.cloudfront_distribution_arn
+}

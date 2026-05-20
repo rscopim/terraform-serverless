@@ -13,8 +13,8 @@ resource "aws_s3_bucket_public_access_block" "this" {
 
   block_public_acls       = true
   ignore_public_acls      = true
-  block_public_policy     = false
-  restrict_public_buckets = false
+  block_public_policy     = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_website_configuration" "this" {
@@ -29,27 +29,29 @@ resource "aws_s3_bucket_website_configuration" "this" {
   }
 }
 
-resource "aws_s3_bucket_policy" "public_read" {
-  bucket = aws_s3_bucket.this.id
-
-  depends_on = [
-    aws_s3_bucket_public_access_block.this
-  ]
-
+resource "aws_s3_bucket_policy""cloudfront_private" {
+  bucket =  aws_s3_bucket.this.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "PublicReadForStaticWebsite"
+        Sid = "AllowCloudFront"
+
         Effect = "Allow"
 
-        Principal = "*"
+        Principal = {Service = "cloudfront.amazonaws.com"
+        }
 
         Action = [
           "s3:GetObject"
         ]
-
         Resource = "${aws_s3_bucket.this.arn}/*"
+
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = var.cloudfront_distribution_arn
+          }
+        }
       }
     ]
   })

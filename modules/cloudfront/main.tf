@@ -1,3 +1,11 @@
+resource "aws_cloudfront_origin_access_control" "this" {
+  name                              = "${var.project_name}-${var.environment}-s3-oac"
+  description                       = "OAC para acesso privado ao bucket S3 do portal CloudTrilhas"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 resource "aws_cloudfront_distribution" "this" {
   enabled             = true
   comment             = "CloudFront Distribution - ${var.domain_name}"
@@ -9,19 +17,13 @@ resource "aws_cloudfront_distribution" "this" {
   ]
 
   origin {
-    domain_name = var.s3_website_endpoint
-    origin_id   = "s3-static-website-origin"
-
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+    domain_name              = var.s3_bucket_regional_domain_name
+    origin_id                = "s3-private-origin"
+    origin_access_control_id = aws_cloudfront_origin_access_control.this.id
   }
 
   default_cache_behavior {
-    target_origin_id       = "s3-static-website-origin"
+    target_origin_id       = "s3-private-origin"
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
