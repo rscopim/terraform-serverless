@@ -1,78 +1,144 @@
 ![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?style=for-the-badge&logo=terraform)
 ![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazonaws)
 ![Serverless](https://img.shields.io/badge/Architecture-Serverless-blue?style=for-the-badge)
+![CloudFront](https://img.shields.io/badge/CloudFront-CDN-blue?style=for-the-badge)
+![Terraform](https://img.shields.io/badge/IaC-Terraform-purple?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Em%20Evolução-green?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-# 🚀 Terraform-Serverless — Arquitetura Serverless na AWS com Terraform
+# 🚀 CloudTrilhas — Plataforma Serverless AWS construída com Terraform
 
-Projeto de infraestrutura como código (IaC) utilizando Terraform para provisionar uma arquitetura serverless moderna, escalável e orientada a eventos na AWS.
+Projeto de Infraestrutura como Código (IaC) desenvolvido utilizando Terraform para provisionar uma arquitetura serverless moderna, escalável, segura e alinhada ao AWS Well-Architected Framework.
 
-Este projeto demonstra a construção de um sistema distribuído baseado em eventos, seguindo boas práticas utilizadas em ambientes reais de produção.
+O projeto evoluiu de um laboratório técnico para uma plataforma educacional cloud voltada ao compartilhamento de materiais de estudos sobre:
+
+- AWS
+- Terraform
+- Cloud Computing
+- Arquitetura Cloud
+- Serverless
+- Certificações AWS
+
+🌐 Portal:
+
+```text
+https://cloudtrilhas.com.br
+```
 
 ---
 
-## ✨ Principais objetivos
+## ✨ Objetivos do projeto
 
-- Demonstrar arquitetura serverless com AWS
-- Aplicar Terraform de forma modular
-- Implementar processamento assíncrono com SQS
-- Evoluir para arquitetura orientada a eventos (Event-Driven)
+- Aplicar Terraform em cenários reais
+- Construir arquitetura serverless moderna
+- Utilizar boas práticas AWS
+- Implementar segurança em camadas
+- Criar observabilidade operacional
+- Simular ambiente próximo ao mundo real
+- Evoluir continuamente utilizando AWS Well-Architected
 
 ---
 
-> 🚧 Este projeto está em constante evolução.
+> 🚧 Projeto em constante evolução.
 
 ---
 
 # 🧠 Visão geral
 
-A aplicação é baseada em uma arquitetura serverless, onde eventos são processados de forma assíncrona utilizando filas e funções Lambda.
+O CloudTrilhas utiliza uma arquitetura moderna baseada em serviços gerenciados AWS.
 
-As mensagens são enviadas para uma fila SQS, processadas automaticamente por funções Lambda e, posteriormente, podem gerar notificações ou novos eventos.
+A plataforma foi construída priorizando:
 
-O objetivo é simular um fluxo real de processamento desacoplado, resiliente e escalável.
+- Escalabilidade
+- Segurança
+- Baixo custo operacional
+- Infraestrutura modular
+- Observabilidade
+- Automação
 
 ---
 
 # 🏗️ Arquitetura
 
 ```text
-                ┌──────────────────────┐
-                │     Amazon SQS       │
-                │  (Fila de mensagens) │
-                └─────────┬────────────┘
-                          │
-                          ▼
-                ┌──────────────────────┐
-                │     AWS Lambda       │
-                │ (Processamento async)│
-                └─────────┬────────────┘
-                          │
-                          ▼
-                ┌──────────────────────┐
-                │  CloudWatch Logs     │
-                │   (Observabilidade)  │
-                └──────────────────────┘
+Usuário
+   ↓
+Route53
+   ↓
+CloudFront
+(Geo Restriction)
+   ↓
+Origin Access Control (OAC)
+   ↓
+Bucket S3 Privado
+
+Portal Web
+   ↓
+API Gateway
+   ↓
+Lambda
+   ↓
+DynamoDB
+
+Observabilidade
+
+CloudWatch
+CloudTrail
+SNS
+EventBridge
+Dashboard
+```
 
 ---
 
-# ⚙️ Serviços utilizados
+# ⚙️ Serviços AWS utilizados
 
-* AWS Lambda (execução serverless)
-* Amazon SQS (fila de mensagens)
-* AWS IAM (roles e permissões)
-* Amazon CloudWatch Logs (monitoramento)
-* Terraform (Infraestrutura como código)
+## Infraestrutura
+
+- Terraform
+- Route53
+- CloudFront
+- ACM
+- Amazon S3
+- IAM
+
+## Aplicação
+
+- API Gateway
+- Lambda
+- DynamoDB
+
+## Observabilidade
+
+- CloudWatch
+- CloudTrail
+- SNS
+
+## Eventos
+
+- EventBridge
+
+## Segurança
+
+- Origin Access Control (OAC)
+- Geo Restriction
+- HTTPS obrigatório
+- TLS 1.2+
+- Bucket privado
 
 ---
 
 # 🔐 Segurança aplicada
 
-* IAM Role com permissões mínimas para execução da Lambda
-* Permissão restrita de acesso ao SQS
-* Separação de responsabilidades entre serviços
-* Execução sem uso de credenciais diretas
+- Bucket S3 privado
+- Origin Access Control (OAC)
+- HTTPS obrigatório
+- TLS 1.2+
+- Geo Restriction
+- CloudFront
+- IAM mínimo privilégio
+- Block Public Access
+- Arquitetura serverless
 
 ---
 
@@ -80,89 +146,114 @@ O objetivo é simular um fluxo real de processamento desacoplado, resiliente e e
 
 ```text
 terraform-serverless/
+
 ├── docs/
-│   ├── arquitetura/
-│   ├── Fase_1_setup/
-│   ├── Fase_2_lambda/
-│   ├── Fase_3_logs/
-│   ├── Fase_4_sqs/
-│   └── Fase_5_lambda_sqs/
 │
+├── arquitetura/
+│
+├── Fase_1_setup/
+├── Fase_2_lambda/
+├── Fase_3_logs/
+├── Fase_4_sqs/
+├── Fase_5_lambda_sqs/
+├── Fase_6_sns/
+├── Fase_7_eventbridge/
+├── Fase_8_s3_static_site/
+├── Fase_9_download_monitoring/
+├── Fase_10_metrics/
+├── Fase_11_dashboard/
+├── Fase_12_api_gateway/
+├── Fase_13_register_lead_lambda/
+├── Fase_14_dynamodb/
+├── Fase_15_route53/
+├── Fase_16_acm/
+├── Fase_17_cloudfront/
+├── Fase_18_oac_geo_restriction/
+├── Fase_19_well_architected_review/
+
 ├── environments/
 │   └── dev/
-│       ├── main.tf
-│       ├── variables.tf
-│       └── outputs.tf
-│
-├── lambda_src/
-│   └── hello_lambda/
-│       └── app.py
-│
+
 ├── modules/
-│   ├── lambda/
-│   └── sqs/
-│
+
+├── static_site/
+
 ├── README.md
-├── .gitignore
-```
 
----
-
-# 🚀 Como executar o projeto
-
-## 🌱 Ambiente DEV
-
-```bash
-cd environments/dev
-
-terraform init
-terraform plan
-terraform apply
-```
-
----
-
-# 🧪 Como testar
-
-## Executar Lambda via CLI
-
-```bash
-aws lambda invoke \
-  --function-name Terraform-Serverless-dev-hello-lambda \
-  --region us-west-2 \
-  --payload '{"teste":"readme"}' \
-  --cli-binary-format raw-in-base64-out \
-  response.json
-```
-
----
-
-## Enviar mensagem para SQS
-
-```bash
-aws sqs send-message \
-  --queue-url <QUEUE_URL> \
-  --message-body "Mensagem teste" \
-  --region us-west-2
+└── .gitignore
 ```
 
 ---
 
 # 🧪 Funcionalidades implementadas
 
-* Criação de função Lambda via Terraform
-* Empacotamento automático do código Python
-* Execução da Lambda via AWS CLI
-* Logs centralizados no CloudWatch
-* Criação de fila SQS
-* Dead Letter Queue (DLQ)
-* Integração automática entre SQS e Lambda
+- Portal educacional Cloud
+- Distribuição global via CloudFront
+- Captura de leads
+- API Serverless
+- Registro DynamoDB
+- Dashboard operacional
+- HTTPS com ACM
+- DNS Route53
+- Restrição geográfica
+- Observabilidade completa
+- Infraestrutura modular Terraform
+
+---
+
+# 📈 Evolução arquitetural
+
+✅ Fase 1 — Setup
+
+✅ Fase 2 — Lambda
+
+✅ Fase 3 — Logs
+
+✅ Fase 4 — SQS
+
+✅ Fase 5 — Lambda + SQS
+
+✅ Fase 6 — SNS
+
+✅ Fase 7 — EventBridge
+
+✅ Fase 8 — S3 Static Website
+
+✅ Fase 9 — Downloads
+
+✅ Fase 10 — Métricas
+
+✅ Fase 11 — Dashboard
+
+✅ Fase 12 — API Gateway
+
+✅ Fase 13 — Register Lead Lambda
+
+✅ Fase 14 — DynamoDB
+
+✅ Fase 15 — Route53
+
+✅ Fase 16 — ACM
+
+✅ Fase 17 — CloudFront
+
+✅ Fase 18 — OAC + Geo Restriction
+
+✅ Fase 19 — Well Architected Review
 
 ---
 
 # 💰 Controle de custos
 
-## 🌱 DEV
+Ambiente otimizado para baixo custo utilizando:
+
+- Lambda sob demanda
+- DynamoDB PAY_PER_REQUEST
+- CloudFront
+- S3
+- API Gateway serverless
+
+Destruição ambiente:
 
 ```bash
 terraform destroy
@@ -170,42 +261,33 @@ terraform destroy
 
 ---
 
-# 🔒 Recursos mantidos
+# 🚀 Próximas melhorias
 
-* Nenhum recurso persistente obrigatório
-* Todos os recursos podem ser destruídos após uso
-
----
-
-# 📈 Evolução do projeto
-
-* Fase 1 — Setup do projeto
-* Fase 2 — Lambda
-* Fase 3 — CloudWatch Logs
-* Fase 4 — SQS
-* Fase 5 — Integração Lambda com SQS
-
----
-
-# 🧩 Próximas melhorias
-
-* Integração com SNS (notificações)
-* Uso de EventBridge para eventos
-* Criação de API Gateway
-* Frontend estático com S3
-* Arquitetura completa orientada a eventos
+- Dashboard operacional avançado
+- Alarmes CloudWatch + SNS
+- CI/CD GitHub Actions
+- AWS WAF
+- Analytics Educacional
+- Catálogo dinâmico de materiais
 
 ---
 
 # 👨‍💻 Autor
 
-Projeto desenvolvido por Ricardo Simines Scopim
-Instrutor de Cloud Computing (AWS)
+Ricardo Simines Scopim
+
+AWS Certified Solutions Architect – Associate
+
+AWS Cloud Practitioner
+
+Instrutor Cloud Computing (AWS)
 
 ---
 
-# 📌 Observação - Objetivo educacional
+# 📌 Objetivo educacional
 
-Este projeto foi desenvolvido com foco em aprendizado prático e simulação de cenários reais utilizados no mercado de Cloud Computing e DevOps.
+Este projeto foi criado com foco em aprendizado prático, arquitetura cloud moderna e simulação de cenários próximos ao mercado real.
 
-Cada fase do projeto representa uma evolução arquitetural, permitindo compreensão progressiva dos serviços AWS e do Terraform.
+Cada fase representa uma evolução arquitetural, permitindo aprendizado progressivo em AWS e Terraform.
+
+CloudTrilhas continua em evolução 🚀
