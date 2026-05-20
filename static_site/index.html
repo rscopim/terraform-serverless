@@ -3,89 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Portal de Estudos Cloud</title>
-
+  <title>CloudTrilhas — Materiais de Estudos Cloud</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <header class="hero">
-    <div class="container">
-      <p class="badge">Cloud Computing • AWS • Certificações</p>
+    <nav class="nav">
+      <div class="brand">CloudTrilhas</div>
+      <a href="#material" class="nav-link">Baixar material</a>
+    </nav>
 
-      <h1>Portal de Estudos Cloud</h1>
+    <section class="hero-content">
+      <span class="tag">Materiais gratuitos para estudos em Cloud</span>
 
-      <p class="subtitle">
-        Baixe gratuitamente um material de apoio sobre o AWS Cloud Adoption Framework (CAF)
-        e acompanhe a evolução de um projeto serverless real com Terraform na AWS.
+      <h1>Estude Cloud Computing com materiais práticos e objetivos.</h1>
+
+      <p>
+        Acesse conteúdos gratuitos para apoiar sua jornada em AWS, certificações,
+        arquitetura em nuvem e boas práticas de adoção cloud.
       </p>
 
-      <div class="links">
-        <a href="https://github.com/rscopim" target="_blank">GitHub</a>
-        <a href="https://www.linkedin.com/in/ricardo-simines-scopim/" target="_blank">LinkedIn</a>
-      </div>
-    </div>
+      <a href="#material" class="primary-button">Acessar material gratuito</a>
+    </section>
   </header>
 
-  <main class="container">
-    <section class="section-header">
-      <h2>📚 Material disponível</h2>
-      <p>
-        Preencha seus dados para baixar o PDF de orientações gerais sobre o AWS Cloud Adoption Framework.
-      </p>
+  <main>
+    <section class="intro">
+      <h2>O que você encontra aqui?</h2>
+
+      <div class="intro-grid">
+        <article>
+          <span>📚</span>
+          <h3>Materiais de apoio</h3>
+          <p>Conteúdos em PDF para reforçar estudos e aulas.</p>
+        </article>
+
+        <article>
+          <span>☁️</span>
+          <h3>Cloud Computing</h3>
+          <p>Conceitos importantes sobre AWS e adoção de nuvem.</p>
+        </article>
+
+        <article>
+          <span>🎯</span>
+          <h3>Foco em aprendizado</h3>
+          <p>Conteúdo direto, simples e voltado para evolução prática.</p>
+        </article>
+      </div>
     </section>
 
-    <section class="cards single-card">
-      <article class="card featured-card">
-        <span class="icon">☁️</span>
-
-        <h3>Orientações Gerais — AWS Cloud Adoption Framework (CAF)</h3>
-
-        <p>
-          Material de apoio com orientações gerais sobre o AWS Cloud Adoption Framework,
-          abordando conceitos importantes para entender a adoção de cloud nas organizações.
-        </p>
+    <section id="material" class="material-section">
+      <div class="material-card">
+        <div class="material-info">
+          <span class="material-badge">PDF gratuito</span>
+          <h2>AWS Cloud Adoption Framework</h2>
+          <p>
+            Baixe um material de orientações gerais sobre o AWS Cloud Adoption Framework
+            e entenda melhor como organizações planejam a adoção da nuvem.
+          </p>
+        </div>
 
         <form id="leadForm" class="lead-form">
           <label for="name">Nome</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Digite seu nome"
-            required
-          />
+          <input type="text" id="name" placeholder="Digite seu nome" required />
 
           <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Digite seu e-mail"
-            required
-          />
+          <input type="email" id="email" placeholder="Digite seu e-mail" required />
 
           <label class="checkbox">
             <input type="checkbox" id="consent" required />
             <span>
               Aceito compartilhar meu nome e e-mail para receber este material
-              e comunicações relacionadas a conteúdos educacionais sobre Cloud Computing.
+              e conteúdos educacionais relacionados a Cloud Computing.
             </span>
           </label>
 
-          <button type="submit" class="button">
-            Baixar material
-          </button>
+          <button type="submit">Baixar PDF</button>
 
           <p id="formMessage" class="form-message"></p>
         </form>
-      </article>
+      </div>
     </section>
   </main>
 
   <footer>
-    <p>Desenvolvido por Ricardo Simines Scopim • AWS + Terraform + S3</p>
+    <p>CloudTrilhas — Materiais de Estudos Cloud</p>
+    <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank">
+      LinkedIn
+    </a>
   </footer>
 
   <script>
@@ -98,16 +104,11 @@
       event.preventDefault();
 
       formMessage.textContent = "Enviando dados...";
-      formMessage.className = "form-message";
-
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const consent = document.getElementById("consent").checked;
 
       const payload = {
-        name: name,
-        email: email,
-        consent: consent,
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        consent: document.getElementById("consent").checked,
         material: "orientacoes-gerais-aws-caf.pdf"
       };
 
@@ -128,11 +129,10 @@
           return;
         }
 
-        formMessage.textContent = "Cadastro realizado com sucesso. O download será iniciado.";
+        formMessage.textContent = "Cadastro realizado. Iniciando download...";
         formMessage.className = "form-message success";
 
         window.location.href = data.download_url;
-
       } catch (error) {
         formMessage.textContent = "Erro ao conectar com a API. Tente novamente.";
         formMessage.className = "form-message error";

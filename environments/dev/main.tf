@@ -148,3 +148,15 @@ module "acm" {
   domain_name  = var.domain_name
   zone_id      = module.route53.zone_id
 }
+
+module "cloudfront" {
+  source = "../../modules/cloudfront"
+
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name  = var.domain_name
+
+  s3_website_endpoint = module.s3_static_site.website_endpoint
+  acm_certificate_arn = module.acm.certificate_arn
+  route53_zone_id     = module.route53.zone_id
+}
