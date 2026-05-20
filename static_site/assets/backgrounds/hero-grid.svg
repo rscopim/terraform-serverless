@@ -1,0 +1,13 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" stroke="#38BDF8" stroke-opacity="0.12"></path>
+    </pattern>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(900 120) rotate(90) scale(320)">
+      <stop stop-color="#38BDF8" stop-opacity="0.38"></stop>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#grid)"></rect>
+  <circle cx="900" cy="120" r="320" fill="url(#glow)"></circle>
+</svg>

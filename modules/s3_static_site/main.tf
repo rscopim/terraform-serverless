@@ -85,3 +85,22 @@ resource "aws_s3_object" "pdfs" {
 
   etag = filemd5("${var.materials_path}/${each.value}")
 }
+
+resource "aws_s3_object" "assets" {
+  for_each = fileset("${path.root}/../../static_site/assets", "**/*")
+
+  bucket = aws_s3_bucket.this.id
+  key    = "assets/${each.value}"
+  source = "${path.root}/../../static_site/assets/${each.value}"
+
+  etag = filemd5("${path.root}/../../static_site/assets/${each.value}")
+
+  content_type = lookup({
+    svg  = "image/svg+xml"
+    png  = "image/png"
+    jpg  = "image/jpeg"
+    jpeg = "image/jpeg"
+    ico  = "image/x-icon"
+    webp = "image/webp"
+  }, lower(element(split(".", each.value), length(split(".", each.value)) - 1)), "application/octet-stream")
+}

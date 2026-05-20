@@ -1,0 +1,7 @@
+<svg width="260" height="64" viewBox="0 0 260 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="18" fill="#0F172A"></rect>
+  <path d="M22 39H44C49.5 39 54 34.8 54 29.5C54 24.2 49.7 20 44.4 20C42.4 13.7 36.6 9.5 30 9.5C21.7 9.5 15 16.2 15 24.5C9.9 25.4 6 29.8 6 35C6 40.8 10.7 45.5 16.5 45.5H22" stroke="#38BDF8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M22 39C27 32 34 32 44 39" stroke="#22D3EE" stroke-width="4" stroke-linecap="round"></path>
+  <text x="82" y="38" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" fill="#0F172A">CloudTrilhas</text>
+  <text x="84" y="55" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="600" fill="#64748B">Materiais de estudos cloud</text>
+</svg>
