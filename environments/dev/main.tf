@@ -175,3 +175,27 @@ module "budget" {
     "ricardo.simines@gmail.com"
   ]
 }
+
+module "cloudwatch_operational" {
+  source = "../../modules/cloudwatch_operational"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  sns_topic_arn  = module.sns.topic_arn
+  sns_topic_name = module.sns.topic_name
+
+  register_lead_lambda_name    = module.register_lead_lambda.lambda_function_name
+  download_metrics_lambda_name = module.download_metrics.lambda_function_name
+
+  api_gateway_id = module.api_gateway.api_id
+
+  dynamodb_table_name = module.dynamodb_leads.table_name
+
+  sqs_queue_name = module.sqs.queue_name
+  sqs_dlq_name   = module.sqs.dlq_name
+
+  cloudfront_distribution_id = module.cloudfront.cloudfront_distribution_id
+}
+

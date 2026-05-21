@@ -1,11 +1,24 @@
 output "queue_url" {
-  value = aws_sqs_queue.main.id
+  description = "URL da fila SQS principal"
+  value       = aws_sqs_queue.main.id
 }
 
 output "queue_arn" {
-  value = aws_sqs_queue.main.arn
+  description = "ARN da fila SQS principal"
+  value       = aws_sqs_queue.main.arn
+}
+
+output "queue_name" {
+  description = "Nome da fila SQS principal"
+  value       = aws_sqs_queue.main.name
 }
 
 output "dlq_arn" {
-  value = aws_sqs_queue.dlq.arn
+  description = "ARN da Dead Letter Queue"
+  value       = aws_sqs_queue.dlq.arn
+}
+
+output "dlq_name" {
+  description = "Nome da Dead Letter Queue"
+  value       = aws_sqs_queue.dlq.name
 }

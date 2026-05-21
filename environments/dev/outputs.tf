@@ -22,3 +22,8 @@ output "cloudfront_distribution_arn" {
   description = "ARN da distribuição CloudFront"
   value       = module.cloudfront.cloudfront_distribution_arn
 }
+
+output "operational_dashboard_name" {
+  description = "Nome do dashboard operacional do CloudTrilhas"
+  value       = module.cloudwatch_operational.dashboard_name
+}
