@@ -162,3 +162,16 @@ module "cloudfront" {
   acm_certificate_arn            = module.acm.certificate_arn
   route53_zone_id                = module.route53.zone_id
 }
+
+module "budget" {
+  source = "../../modules/budget"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  limit_amount = "10"
+
+  notification_emails = [
+    "ricardo.simines@gmail.com"
+  ]
+}
