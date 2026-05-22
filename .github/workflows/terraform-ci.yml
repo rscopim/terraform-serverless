@@ -52,7 +52,7 @@ jobs:
         run: |
           cd environments/dev
           zip -r hello_lambda.zip ../../lambda_src/hello_lambda
-          zip -r register_lead.zip ../../lambda_src/register_lead_lambda
+          zip -r register_lead.zip ../../lambda_src/register_lead
           zip -r download_metrics.zip ../../lambda_src/download_metrics
 
       - name: Terraform Plan
