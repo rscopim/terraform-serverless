@@ -1,5 +1,7 @@
 # Fase 1 — Setup do Projeto Serverless
 
+
+
 ## 🎯 Objetivo
 
 Preparar a base do projeto Terraform para suportar uma arquitetura serverless utilizando serviços AWS.
