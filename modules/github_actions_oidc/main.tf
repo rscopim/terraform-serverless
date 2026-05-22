@@ -64,9 +64,9 @@ resource "aws_iam_role" "github_actions" {
   }
 }
 
-resource "aws_iam_policy" "terraform_plan_read_only" {
-  name        = "${var.project_name}-${var.environment}-terraform-plan-read-only"
-  description = "Permissoes para GitHub Actions executar terraform plan com leitura dos recursos AWS"
+resource "aws_iam_policy" "terraform_state_access" {
+  name        = "${var.project_name}-${var.environment}-terraform-state-access"
+  description = "Permite acesso ao bucket remoto do Terraform State"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -74,60 +74,29 @@ resource "aws_iam_policy" "terraform_plan_read_only" {
       {
         Effect = "Allow"
         Action = [
-          "apigateway:*GET*",
-          "apigateway:GET",
-
-          "lambda:Get*",
-          "lambda:List*",
-
-          "dynamodb:Describe*",
-          "dynamodb:List*",
-
-          "s3:Get*",
-          "s3:List*",
-
-          "cloudfront:Get*",
-          "cloudfront:List*",
-
-          "route53:Get*",
-          "route53:List*",
-
-          "acm:Describe*",
-          "acm:List*",
-
-          "cloudwatch:Describe*",
-          "cloudwatch:Get*",
-          "cloudwatch:List*",
-
-          "logs:Describe*",
-          "logs:Get*",
-          "logs:List*",
-
-          "events:Describe*",
-          "events:List*",
-
-          "sns:Get*",
-          "sns:List*",
-
-          "sqs:Get*",
-          "sqs:List*",
-
-          "cloudtrail:Get*",
-          "cloudtrail:List*",
-          "cloudtrail:Describe*",
-
-          "iam:Get*",
-          "iam:List*",
-
-          "budgets:ViewBudget"
+          "s3:ListBucket"
         ]
-        Resource = "*"
+        Resource = "arn:aws:s3:::terraform-serverless-tfstate-830286960930-us-west-2"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "arn:aws:s3:::terraform-serverless-tfstate-830286960930-us-west-2/*"
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "terraform_plan_read_only" {
+resource "aws_iam_role_policy_attachment" "terraform_state_access" {
   role       = aws_iam_role.github_actions.name
-  policy_arn = aws_iam_policy.terraform_plan_read_only.arn
+  policy_arn = aws_iam_policy.terraform_state_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_apply_admin" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
