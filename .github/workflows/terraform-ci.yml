@@ -14,18 +14,14 @@ env:
   TF_WORKING_DIR: environments/dev
 
 jobs:
-
   terraform-plan:
-
     name: Terraform Plan
-
     runs-on: ubuntu-latest
 
     outputs:
       plan_exists: true
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -52,29 +48,41 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
+      - name: Create Lambda ZIP files
+        run: |
+          cd environments/dev
+          zip -r hello_lambda.zip ../../lambda_src/hello_lambda
+          zip -r register_lead.zip ../../lambda_src/register_lead_lambda
+          zip -r download_metrics.zip ../../lambda_src/download_metrics
+
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -out=tfplan
 
-      - name: Upload Plan
+      - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
           path: environments/dev/tfplan
 
+      - name: Upload Lambda ZIP files
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-zips
+          path: |
+            environments/dev/hello_lambda.zip
+            environments/dev/register_lead.zip
+            environments/dev/download_metrics.zip
+
   terraform-apply:
-
     name: Terraform Apply
-
     needs: terraform-plan
-
     runs-on: ubuntu-latest
 
     environment:
       name: production
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -93,10 +101,16 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      - name: Download Plan
+      - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan
+          path: environments/dev
+
+      - name: Download Lambda ZIP files
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-zips
           path: environments/dev
 
       - name: Terraform Apply
