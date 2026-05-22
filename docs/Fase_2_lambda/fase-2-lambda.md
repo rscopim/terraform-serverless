@@ -35,6 +35,7 @@ A Lambda é criada com runtime Python e utiliza o handler `app.lambda_handler`.
 * https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file
 * https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html
 
+
 ## 🧪 Como testar
 
 1. Acessar a pasta `environments/dev`
