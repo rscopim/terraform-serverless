@@ -91,7 +91,7 @@ module "download_metrics" {
 
 module "cloudwatch_dashboard" {
   source = "../../modules/cloudwatch_dashboard"
-  
+
   project_name = var.project_name
   environment  = var.environment
   aws_region   = var.aws_region

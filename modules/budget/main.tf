@@ -13,7 +13,7 @@ resource "aws_budgets_budget" "this" {
     ]
   }
 
-notification {
+  notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 20
     threshold_type             = "PERCENTAGE"
