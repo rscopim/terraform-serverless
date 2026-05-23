@@ -258,7 +258,6 @@ Ambiente otimizado para baixo custo utilizando:
 - API Gateway serverless
 
 Destruição ambiente:
-
 ```bash
 terraform destroy
 ```
@@ -279,11 +278,8 @@ terraform destroy
 # 👨‍💻 Autor
 
 Ricardo Simines Scopim
-
 AWS Certified Solutions Architect – Associate
-
 AWS Cloud Practitioner
-
 Instrutor Cloud Computing (AWS)
 
 ---
