@@ -187,6 +187,26 @@ terraform-serverless/
 
 ---
 
+---
+
+## 🔄 Pipeline CI/CD
+
+Fluxo atual implementado:
+
+```text
+Feature Branch
+↓
+Pull Request
+↓
+Terraform Plan
+↓
+Merge Main
+↓
+Approval Production
+↓
+Terraform Apply
+
+
 # 🧪 Funcionalidades implementadas
 
 - Portal educacional Cloud
@@ -206,41 +226,23 @@ terraform-serverless/
 # 📈 Evolução arquitetural
 
 ✅ Fase 1 — Setup
-
 ✅ Fase 2 — Lambda
-
 ✅ Fase 3 — Logs
-
 ✅ Fase 4 — SQS
-
 ✅ Fase 5 — Lambda + SQS
-
 ✅ Fase 6 — SNS
-
 ✅ Fase 7 — EventBridge
-
 ✅ Fase 8 — S3 Static Website
-
 ✅ Fase 9 — Downloads
-
 ✅ Fase 10 — Métricas
-
 ✅ Fase 11 — Dashboard
-
 ✅ Fase 12 — API Gateway
-
 ✅ Fase 13 — Register Lead Lambda
-
 ✅ Fase 14 — DynamoDB
-
 ✅ Fase 15 — Route53
-
 ✅ Fase 16 — ACM
-
 ✅ Fase 17 — CloudFront
-
 ✅ Fase 18 — OAC + Geo Restriction
-
 ✅ Fase 19 — Well Architected Review
 
 ---
@@ -256,7 +258,6 @@ Ambiente otimizado para baixo custo utilizando:
 - API Gateway serverless
 
 Destruição ambiente:
-
 ```bash
 terraform destroy
 ```
@@ -277,11 +278,8 @@ terraform destroy
 # 👨‍💻 Autor
 
 Ricardo Simines Scopim
-
 AWS Certified Solutions Architect – Associate
-
 AWS Cloud Practitioner
-
 Instrutor Cloud Computing (AWS)
 
 ---
@@ -293,3 +291,4 @@ Este projeto foi criado com foco em aprendizado prático, arquitetura cloud mode
 Cada fase representa uma evolução arquitetural, permitindo aprendizado progressivo em AWS e Terraform.
 
 CloudTrilhas continua em evolução 🚀
+

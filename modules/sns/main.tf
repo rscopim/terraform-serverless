@@ -18,7 +18,7 @@ resource "aws_sns_topic_policy" "eventbridge_publish" {
         Principal = {
           Service = "events.amazonaws.com"
         }
-        Action = "sns:Publish"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.this.arn
       }
     ]

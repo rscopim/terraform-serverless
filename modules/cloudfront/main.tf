@@ -53,24 +53,24 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   restrictions {
-  geo_restriction {
-    restriction_type = "whitelist"
+    geo_restriction {
+      restriction_type = "whitelist"
 
-    locations = [
-      "BR", # Brasil
-      "AR", # Argentina
-      "BO", # Bolívia
-      "CL", # Chile
-      "CO", # Colômbia
-      "EC", # Equador
-      "PY", # Paraguai
-      "PE", # Peru
-      "UY", # Uruguai
-      "VE", # Venezuela
-      "PT"  # Portugal
-    ]
+      locations = [
+        "BR", # Brasil
+        "AR", # Argentina
+        "BO", # Bolívia
+        "CL", # Chile
+        "CO", # Colômbia
+        "EC", # Equador
+        "PY", # Paraguai
+        "PE", # Peru
+        "UY", # Uruguai
+        "VE", # Venezuela
+        "PT"  # Portugal
+      ]
+    }
   }
-}
 
   viewer_certificate {
     acm_certificate_arn      = var.acm_certificate_arn

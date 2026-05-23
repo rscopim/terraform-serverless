@@ -26,11 +26,11 @@ resource "aws_cloudwatch_event_rule" "pdf_download" {
       eventName   = ["GetObject"]
 
       requestParameters = {
-  bucketName = [var.site_bucket_name]
-  key = [{
-    prefix = "materiais/"
-  }]
-}
+        bucketName = [var.site_bucket_name]
+        key = [{
+          prefix = "materiais/"
+        }]
+      }
     }
   })
 }
