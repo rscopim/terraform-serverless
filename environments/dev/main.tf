@@ -117,7 +117,7 @@ module "register_lead_lambda" {
   dynamodb_table_name = module.dynamodb_leads.table_name
   dynamodb_table_arn  = module.dynamodb_leads.table_arn
 
-  pdf_url = "http://${module.s3_static_site.bucket_name}.s3-website-${var.aws_region}.amazonaws.com/materiais/orientacoes-gerais-aws-caf.pdf"
+  pdf_url = "https://cloudtrilhas.com.br/materiais/orientacoes-gerais-aws-caf.pdf"
 }
 
 module "api_gateway" {
