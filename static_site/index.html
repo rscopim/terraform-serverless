@@ -1,199 +1,563 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>CloudTrilhas — Materiais de Estudos Cloud</title>
+<meta charset="UTF-8" />
 
-  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css" />
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+/>
+
+<title>
+CloudTrilhas — Materiais de Estudos Cloud
+</title>
+
+<link
+rel="icon"
+href="assets/favicon/favicon.svg"
+type="image/svg+xml"
+/>
+
+<link
+rel="stylesheet"
+href="style.css"
+/>
+
 </head>
 
 <body>
-  <header class="header">
-    <nav class="nav container">
-      <a href="#" class="brand">
-        <img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" />
-      </a>
 
-      <div class="nav-actions">
-        <a href="#materiais" class="nav-link">Materiais</a>
-        <a href="#baixar" class="nav-button">Baixar PDF</a>
-      </div>
-    </nav>
-  </header>
+<header class="header">
 
-  <main>
-    <section class="hero">
-      <div class="hero-bg"></div>
+<nav class="nav container">
 
-      <div class="container hero-grid">
-        <div class="hero-content">
-          <span class="pill">Portal gratuito de estudos cloud</span>
+<a href="#" class="brand">
 
-          <h1>Materiais práticos para evoluir em Cloud Computing.</h1>
+<img
+src="assets/logo/cloudtrilhas-logo.svg"
+alt="CloudTrilhas"
+/>
 
-          <p>
-            O CloudTrilhas reúne conteúdos objetivos para apoiar seus estudos em AWS,
-            arquitetura cloud, certificações e boas práticas de adoção de nuvem.
-          </p>
+</a>
 
-          <div class="hero-actions">
-            <a href="#baixar" class="button primary">Baixar material gratuito</a>
-            <a href="#materiais" class="button secondary">Ver conteúdo</a>
-          </div>
-        </div>
+<div class="nav-actions">
 
-        <div class="hero-panel">
-          <span class="panel-label">Material em destaque</span>
-          <h2>AWS Cloud Adoption Framework</h2>
-          <p>
-            Um guia introdutório para entender como organizações planejam e estruturam
-            a adoção de cloud.
-          </p>
+<a
+href="#materiais"
+class="nav-link"
+>
+Materiais
+</a>
 
-          <div class="panel-list">
-            <span>☁️ Adoção de cloud</span>
-            <span>📚 Material de apoio</span>
-            <span>🎯 Conteúdo objetivo</span>
-          </div>
-        </div>
-      </div>
-    </section>
+<a
+href="#baixar"
+class="nav-button"
+>
+Baixar PDF
+</a>
 
-    <section id="materiais" class="section container">
-      <div class="section-heading">
-        <span class="eyebrow">Conteúdos</span>
-        <h2>Estude com materiais simples, diretos e aplicáveis.</h2>
-        <p>
-          A proposta do CloudTrilhas é compartilhar conteúdos de apoio para quem está
-          aprendendo cloud computing na prática.
-        </p>
-      </div>
+</div>
 
-      <div class="features">
-        <article class="feature-card">
-          <img src="assets/icons/study.svg" alt="" />
-          <h3>Materiais de estudo</h3>
-          <p>PDFs organizados para apoiar aulas, trilhas e revisões técnicas.</p>
-        </article>
+</nav>
 
-        <article class="feature-card">
-          <img src="assets/icons/cloud.svg" alt="" />
-          <h3>Cloud Computing</h3>
-          <p>Conteúdos voltados para AWS, arquitetura e boas práticas em nuvem.</p>
-        </article>
+</header>
 
-        <article class="feature-card">
-          <img src="assets/icons/download.svg" alt="" />
-          <h3>Acesso gratuito</h3>
-          <p>Baixe materiais de apoio e continue evoluindo nos estudos.</p>
-        </article>
+<main>
 
-        <article class="feature-card">
-          <img src="assets/icons/security.svg" alt="" />
-          <h3>Portal seguro</h3>
-          <p>Entrega por HTTPS, CloudFront e infraestrutura serverless na AWS.</p>
-        </article>
-      </div>
-    </section>
+<section class="hero">
 
-    <section id="baixar" class="download-section">
-      <div class="container download-grid">
-        <div class="download-copy">
-          <span class="eyebrow">PDF gratuito</span>
-          <h2>Orientações Gerais — AWS CAF</h2>
-          <p>
-            Preencha o formulário para baixar o material sobre AWS Cloud Adoption Framework.
-            O conteúdo é gratuito e foi criado para apoiar seus estudos.
-          </p>
+<div class="hero-bg"></div>
 
-          <ul>
-            <li>Visão geral sobre adoção de cloud</li>
-            <li>Material de apoio para estudos e aulas</li>
-            <li>Conteúdo introdutório e objetivo</li>
-          </ul>
-        </div>
+<div class="container hero-grid">
 
-        <form id="leadForm" class="form-card">
-          <h3>Baixar material</h3>
-          <p>Informe seus dados para receber acesso ao PDF.</p>
+<div class="hero-content">
 
-          <label for="name">Nome</label>
-          <input type="text" id="name" placeholder="Digite seu nome" required />
+<span class="pill">
+Portal gratuito de estudos cloud
+</span>
 
-          <label for="email">E-mail</label>
-          <input type="email" id="email" placeholder="Digite seu e-mail" required />
+<h1>
+Materiais práticos para evoluir em Cloud Computing.
+</h1>
 
-          <label class="checkbox">
-            <input type="checkbox" id="consent" required />
-            <span>
-              Aceito compartilhar meu nome e e-mail para receber este material
-              e conteúdos educacionais relacionados a Cloud Computing.
-            </span>
-          </label>
+<p>
 
-          <button type="submit">Baixar PDF</button>
+O CloudTrilhas reúne conteúdos objetivos
+para apoiar seus estudos em AWS,
+arquitetura cloud, certificações
+e boas práticas de adoção de nuvem.
 
-          <p id="formMessage" class="form-message"></p>
-        </form>
-      </div>
-    </section>
-  </main>
+</p>
 
-  <footer class="footer">
-    <p>CloudTrilhas — Materiais de Estudos Cloud</p>
-    <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank">
-      LinkedIn
-    </a>
-  </footer>
+<div class="hero-actions">
 
-  <script>
-    const API_ENDPOINT = "https://5na1nncgjg.execute-api.us-west-2.amazonaws.com/leads";
+<a
+href="#baixar"
+class="button primary"
+>
 
-    const form = document.getElementById("leadForm");
-    const formMessage = document.getElementById("formMessage");
+Baixar material gratuito
 
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
+</a>
 
-      formMessage.textContent = "Enviando dados...";
-      formMessage.className = "form-message";
+<a
+href="#materiais"
+class="button secondary"
+>
 
-      const payload = {
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        consent: document.getElementById("consent").checked,
-        material: "orientacoes-gerais-aws-caf.pdf"
-      };
+Ver conteúdo
 
-      try {
-        const response = await fetch(API_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
+</a>
 
-        const data = await response.json();
+</div>
 
-        if (!response.ok) {
-          formMessage.textContent = data.message || "Erro ao registrar seus dados.";
-          formMessage.className = "form-message error";
-          return;
-        }
+</div>
 
-        formMessage.textContent = "Cadastro realizado. Iniciando download...";
-        formMessage.className = "form-message success";
+<div class="hero-panel">
 
-        window.location.href = data.download_url;
-      } catch (error) {
-        formMessage.textContent = "Erro ao conectar com a API. Tente novamente.";
-        formMessage.className = "form-message error";
-      }
-    });
-  </script>
+<span class="panel-label">
+
+Material em destaque
+
+</span>
+
+<h2>
+
+AWS Cloud Adoption Framework
+
+</h2>
+
+<p>
+
+Um guia introdutório para entender
+como organizações planejam
+e estruturam a adoção de cloud.
+
+</p>
+
+<div class="panel-list">
+
+<span>
+☁️ Adoção de cloud
+</span>
+
+<span>
+📚 Material de apoio
+</span>
+
+<span>
+🎯 Conteúdo objetivo
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section
+id="materiais"
+class="section container"
+>
+
+<div class="section-heading">
+
+<span class="eyebrow">
+
+Conteúdos
+
+</span>
+
+<h2>
+
+Estude com materiais simples,
+diretos e aplicáveis.
+
+</h2>
+
+<p>
+
+A proposta do CloudTrilhas
+é compartilhar conteúdos
+de apoio para quem está
+aprendendo cloud computing
+na prática.
+
+</p>
+
+</div>
+
+<div class="features">
+
+<article class="feature-card">
+
+<img
+src="assets/icons/study.svg"
+alt=""
+>
+
+<h3>
+
+Materiais de estudo
+
+</h3>
+
+<p>
+
+PDFs organizados para apoiar aulas,
+trilhas e revisões técnicas.
+
+</p>
+
+</article>
+
+<article class="feature-card">
+
+<img
+src="assets/icons/cloud.svg"
+alt=""
+>
+
+<h3>
+
+Cloud Computing
+
+</h3>
+
+<p>
+
+Conteúdos voltados para AWS,
+arquitetura e boas práticas.
+
+</p>
+
+</article>
+
+<article class="feature-card">
+
+<img
+src="assets/icons/download.svg"
+alt=""
+>
+
+<h3>
+
+Acesso gratuito
+
+</h3>
+
+<p>
+
+Baixe materiais
+e continue evoluindo.
+
+</p>
+
+</article>
+
+<article class="feature-card">
+
+<img
+src="assets/icons/security.svg"
+alt=""
+>
+
+<h3>
+
+Portal seguro
+
+</h3>
+
+<p>
+
+HTTPS + CloudFront +
+Serverless AWS.
+
+</p>
+
+</article>
+
+</div>
+
+</section>
+
+<section
+id="baixar"
+class="download-section"
+>
+
+<div class="container download-grid">
+
+<div class="download-copy">
+
+<span class="eyebrow">
+
+PDF gratuito
+
+</span>
+
+<h2>
+
+Orientações Gerais — AWS CAF
+
+</h2>
+
+<p>
+
+Preencha o formulário
+para baixar gratuitamente.
+
+</p>
+
+<ul>
+
+<li>
+
+Visão geral de cloud
+
+</li>
+
+<li>
+
+Material de apoio
+
+</li>
+
+<li>
+
+Conteúdo introdutório
+
+</li>
+
+</ul>
+
+</div>
+
+<form
+id="leadForm"
+class="form-card"
+>
+
+<h3>
+
+Baixar material
+
+</h3>
+
+<p>
+
+Informe seus dados.
+
+</p>
+
+<label>
+
+Nome
+
+</label>
+
+<input
+id="name"
+type="text"
+placeholder="Digite seu nome"
+required
+/>
+
+<label>
+
+E-mail
+
+</label>
+
+<input
+id="email"
+type="email"
+placeholder="Digite seu e-mail"
+required
+/>
+
+<label class="checkbox">
+
+<input
+id="consent"
+type="checkbox"
+required
+/>
+
+<span>
+
+Aceito compartilhar
+meus dados para receber
+este material.
+
+</span>
+
+</label>
+
+<button type="submit">
+
+Baixar PDF
+
+</button>
+
+<p
+id="formMessage"
+class="form-message"
+>
+
+</p>
+
+</form>
+
+</div>
+
+</section>
+
+</main>
+
+<footer class="footer">
+
+<p>
+
+CloudTrilhas —
+Materiais de Estudos Cloud
+
+</p>
+
+<a
+target="_blank"
+href="https://www.linkedin.com/in/ricardosiminesscopim/"
+>
+
+LinkedIn
+
+</a>
+
+</footer>
+
+<script>
+
+const API_ENDPOINT =
+"https://5na1nncgjg.execute-api.us-west-2.amazonaws.com/leads";
+
+const form =
+document.getElementById(
+"leadForm"
+);
+
+const formMessage =
+document.getElementById(
+"formMessage"
+);
+
+form.addEventListener(
+"submit",
+
+async function(event){
+
+event.preventDefault();
+
+formMessage.textContent =
+"Enviando dados...";
+
+formMessage.className =
+"form-message";
+
+const payload={
+
+name:
+document
+.getElementById("name")
+.value
+.trim(),
+
+email:
+document
+.getElementById("email")
+.value
+.trim(),
+
+consent:
+document
+.getElementById("consent")
+.checked,
+
+material:
+"orientacoes-gerais-aws-caf.pdf"
+
+};
+
+try{
+
+const response =
+await fetch(
+API_ENDPOINT,
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify(payload)
+
+}
+);
+
+const data =
+await response.json();
+
+if(!response.ok){
+
+formMessage.textContent =
+data.message ||
+"Erro ao registrar.";
+
+formMessage.className =
+"form-message error";
+
+return;
+
+}
+
+formMessage.textContent =
+"Cadastro realizado. Abrindo material...";
+
+formMessage.className =
+"form-message success";
+
+window.open(
+data.download_url,
+"_blank"
+);
+
+form.reset();
+
+}
+catch(error){
+
+console.error(error);
+
+formMessage.textContent =
+"Erro ao conectar API.";
+
+formMessage.className =
+"form-message error";
+
+}
+
+}
+
+);
+
+</script>
+
 </body>
+
 </html>
