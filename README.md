@@ -187,6 +187,26 @@ terraform-serverless/
 
 ---
 
+---
+
+## 🔄 Pipeline CI/CD
+
+Fluxo atual implementado:
+
+```text
+Feature Branch
+↓
+Pull Request
+↓
+Terraform Plan
+↓
+Merge Main
+↓
+Approval Production
+↓
+Terraform Apply
+
+
 # 🧪 Funcionalidades implementadas
 
 - Portal educacional Cloud
@@ -293,3 +313,4 @@ Este projeto foi criado com foco em aprendizado prático, arquitetura cloud mode
 Cada fase representa uma evolução arquitetural, permitindo aprendizado progressivo em AWS e Terraform.
 
 CloudTrilhas continua em evolução 🚀
+
