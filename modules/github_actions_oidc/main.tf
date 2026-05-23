@@ -72,6 +72,7 @@ resource "aws_iam_policy" "terraform_state_access" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "TerraformStateBucketList"
         Effect = "Allow"
         Action = [
           "s3:ListBucket"
@@ -79,6 +80,7 @@ resource "aws_iam_policy" "terraform_state_access" {
         Resource = "arn:aws:s3:::terraform-serverless-tfstate-830286960930-us-west-2"
       },
       {
+        Sid    = "TerraformStateObjectAccess"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
@@ -91,12 +93,174 @@ resource "aws_iam_policy" "terraform_state_access" {
   })
 }
 
+resource "aws_iam_policy" "terraform_apply_cloudtrilhas" {
+  name        = "${var.project_name}-${var.environment}-terraform-apply-cloudtrilhas"
+  description = "Permissoes customizadas para GitHub Actions executar Terraform Apply do CloudTrilhas"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "LambdaManagement"
+        Effect = "Allow"
+        Action = [
+          "lambda:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "APIGatewayManagement"
+        Effect = "Allow"
+        Action = [
+          "apigateway:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "DynamoDBManagement"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "S3Management"
+        Effect = "Allow"
+        Action = [
+          "s3:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "CloudFrontManagement"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Route53Management"
+        Effect = "Allow"
+        Action = [
+          "route53:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "ACMManagement"
+        Effect = "Allow"
+        Action = [
+          "acm:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "CloudWatchManagement"
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:*",
+          "logs:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "EventBridgeManagement"
+        Effect = "Allow"
+        Action = [
+          "events:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "SNSManagement"
+        Effect = "Allow"
+        Action = [
+          "sns:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "SQSManagement"
+        Effect = "Allow"
+        Action = [
+          "sqs:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "CloudTrailManagement"
+        Effect = "Allow"
+        Action = [
+          "cloudtrail:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "BudgetsManagement"
+        Effect = "Allow"
+        Action = [
+          "budgets:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "IAMManagementForProject"
+        Effect = "Allow"
+        Action = [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:ListRoles",
+          "iam:UpdateAssumeRolePolicy",
+          "iam:TagRole",
+          "iam:UntagRole",
+          "iam:PassRole",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:GetRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
+          "iam:CreatePolicy",
+          "iam:DeletePolicy",
+          "iam:GetPolicy",
+          "iam:GetPolicyVersion",
+          "iam:ListPolicyVersions",
+          "iam:CreatePolicyVersion",
+          "iam:DeletePolicyVersion",
+          "iam:SetDefaultPolicyVersion",
+          "iam:TagPolicy",
+          "iam:UntagPolicy",
+          "iam:CreateOpenIDConnectProvider",
+          "iam:DeleteOpenIDConnectProvider",
+          "iam:GetOpenIDConnectProvider",
+          "iam:ListOpenIDConnectProviders",
+          "iam:TagOpenIDConnectProvider",
+          "iam:UntagOpenIDConnectProvider"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "STSRead"
+        Effect = "Allow"
+        Action = [
+          "sts:GetCallerIdentity"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "terraform_state_access" {
   role       = aws_iam_role.github_actions.name
   policy_arn = aws_iam_policy.terraform_state_access.arn
 }
 
-resource "aws_iam_role_policy_attachment" "terraform_apply_admin" {
+resource "aws_iam_role_policy_attachment" "terraform_apply_cloudtrilhas" {
   role       = aws_iam_role.github_actions.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  policy_arn = aws_iam_policy.terraform_apply_cloudtrilhas.arn
 }
