@@ -226,41 +226,23 @@ Terraform Apply
 # 📈 Evolução arquitetural
 
 ✅ Fase 1 — Setup
-
 ✅ Fase 2 — Lambda
-
 ✅ Fase 3 — Logs
-
 ✅ Fase 4 — SQS
-
 ✅ Fase 5 — Lambda + SQS
-
 ✅ Fase 6 — SNS
-
 ✅ Fase 7 — EventBridge
-
 ✅ Fase 8 — S3 Static Website
-
 ✅ Fase 9 — Downloads
-
 ✅ Fase 10 — Métricas
-
 ✅ Fase 11 — Dashboard
-
 ✅ Fase 12 — API Gateway
-
 ✅ Fase 13 — Register Lead Lambda
-
 ✅ Fase 14 — DynamoDB
-
 ✅ Fase 15 — Route53
-
 ✅ Fase 16 — ACM
-
 ✅ Fase 17 — CloudFront
-
 ✅ Fase 18 — OAC + Geo Restriction
-
 ✅ Fase 19 — Well Architected Review
 
 ---
