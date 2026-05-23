@@ -41,6 +41,7 @@ https://cloudtrilhas.com.br
 
 > 🚧 Projeto em constante evolução.
 
+
 ---
 
 # 🧠 Visão geral
@@ -59,6 +60,7 @@ A plataforma foi construída priorizando:
 ---
 
 # 🏗️ Arquitetura
+
 
 ```text
 Usuário
