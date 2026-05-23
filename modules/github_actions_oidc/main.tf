@@ -46,7 +46,8 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         "repo:${var.github_owner}/${var.github_repository}:ref:refs/heads/${var.github_branch}",
-        "repo:${var.github_owner}/${var.github_repository}:environment:production"
+        "repo:${var.github_owner}/${var.github_repository}:environment:production",
+        "repo:${var.github_owner}/${var.github_repository}:pull_request"
       ]
     }
   }
