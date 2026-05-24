@@ -13,7 +13,7 @@ resource "aws_iam_role" "lambda_role" {
         Effect = "Allow"
         Action = "sts:AssumeRole"
         Principal = {
-        Service = "lambda.amazonaws.com"
+          Service = "lambda.amazonaws.com"
         }
       }
     ]
@@ -43,14 +43,14 @@ resource "aws_iam_role_policy" "dynamodb_write" {
 }
 
 resource "aws_lambda_function" "this" {
-  function_name = "${var.project_name}-${var.environment}-register-lead"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "app.lambda_handler"
-  runtime       = "python3.12"
+  function_name    = "${var.project_name}-${var.environment}-register-lead"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "app.lambda_handler"
+  runtime          = "python3.12"
   filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  timeout     = 10
-  memory_size = 128
+  timeout          = 10
+  memory_size      = 128
 
   environment {
     variables = {
