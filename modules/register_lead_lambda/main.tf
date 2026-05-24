@@ -6,16 +6,14 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project_name}-${var.environment}-register-lead-role"
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
         Action = "sts:AssumeRole"
-
         Principal = {
-          Service = "lambda.amazonaws.com"
+        Service = "lambda.amazonaws.com"
         }
       }
     ]
@@ -30,7 +28,6 @@ resource "aws_iam_role_policy_attachment" "basic_execution" {
 resource "aws_iam_role_policy" "dynamodb_write" {
   name = "${var.project_name}-${var.environment}-register-lead-dynamodb-policy"
   role = aws_iam_role.lambda_role.id
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -50,10 +47,8 @@ resource "aws_lambda_function" "this" {
   role          = aws_iam_role.lambda_role.arn
   handler       = "app.lambda_handler"
   runtime       = "python3.12"
-
   filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-
   timeout     = 10
   memory_size = 128
 
