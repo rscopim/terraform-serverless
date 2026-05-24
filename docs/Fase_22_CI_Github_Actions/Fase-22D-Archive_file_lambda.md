@@ -10,6 +10,7 @@ Nesta fase, o empacotamento passou a ser controlado pelo Terraform utilizando o 
 
 # Cenário anterior
 
+
 Fluxo anterior:
 ```text
 GitHub Actions
