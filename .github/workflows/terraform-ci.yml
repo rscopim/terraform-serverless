@@ -108,6 +108,7 @@ jobs:
         with:
           name: lambda-zips
           path: environments/dev
+          
 
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
