@@ -4,3 +4,4 @@
 *.tfstate.*
 .terraform.lock.hcl
 *.zip
+dev-current.tfstate

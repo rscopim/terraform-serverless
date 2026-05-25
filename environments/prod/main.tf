@@ -48,7 +48,7 @@ module "s3_static_site" {
 
   project_name = var.project_name
   environment  = var.environment
-  bucket_name  = "materiais-e-trilhas-dev"
+  bucket_name = "materiais-e-trilhas-de-estudos"
 
   index_file_path             = "${path.root}/../../static_site/index.html"
   style_file_path             = "${path.root}/../../static_site/style.css"
@@ -103,7 +103,7 @@ module "register_lead_lambda" {
   dynamodb_table_name = module.dynamodb_leads.table_name
   dynamodb_table_arn  = module.dynamodb_leads.table_arn
 
-  pdf_url = "https://dev.cloudtrilhas.com.br/materiais/orientacoes-gerais-aws-caf.pdf"
+  pdf_url = "https://cloudtrilhas.com.br/materiais/orientacoes-gerais-aws-caf.pdf"
 }
 
 module "api_gateway" {
