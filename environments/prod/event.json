@@ -1,0 +1,8 @@
+[
+  {
+    "Source": "app.serverless",
+    "DetailType": "PedidoCriado",
+    "Detail": "{\"pedido\":\"123\"}",
+    "EventBusName": "default"
+  }
+]
