@@ -48,7 +48,7 @@ module "s3_static_site" {
 
   project_name = var.project_name
   environment  = var.environment
-  bucket_name = "materiais-e-trilhas-de-estudos"
+  bucket_name  = "materiais-e-trilhas-de-estudos"
 
   index_file_path             = "${path.root}/../../static_site/index.html"
   style_file_path             = "${path.root}/../../static_site/style.css"
@@ -119,9 +119,10 @@ module "api_gateway" {
 module "route53" {
   source = "../../modules/route53"
 
-  project_name = var.project_name
-  environment  = var.environment
-  domain_name  = var.domain_name
+  project_name     = var.project_name
+  environment      = var.environment
+  domain_name      = var.domain_name
+  hosted_zone_name = "cloudtrilhas.com.br"
 }
 
 module "acm" {

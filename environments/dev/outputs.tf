@@ -28,7 +28,7 @@ output "operational_dashboard_name" {
   value       = module.cloudwatch_operational.dashboard_name
 }
 
-output "github_actions_role_arn" {
-  description = "ARN da role IAM usada pelo GitHub Actions"
-  value       = module.github_actions_oidc.github_actions_role_arn
-}
+# output "github_actions_role_arn" {
+#  description = "ARN da role IAM usada pelo GitHub Actions"
+#  value       = module.github_actions_oidc.github_actions_role_arn
+# }
