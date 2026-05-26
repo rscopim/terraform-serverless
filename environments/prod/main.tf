@@ -122,6 +122,7 @@ module "route53" {
   project_name = var.project_name
   environment  = var.environment
   domain_name  = var.domain_name
+  hosted_zone_name  = "cloudtrilhas.com.br"
 }
 
 module "acm" {
