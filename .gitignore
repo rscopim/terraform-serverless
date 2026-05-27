@@ -5,3 +5,7 @@
 .terraform.lock.hcl
 *.zip
 dev-current.tfstate
+*.tfplan
+plan*.txt
+**/plan*.txt
+*.log
