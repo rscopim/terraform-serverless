@@ -1,294 +1,359 @@
-![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?style=for-the-badge&logo=terraform)
-![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazonaws)
-![Serverless](https://img.shields.io/badge/Architecture-Serverless-blue?style=for-the-badge)
-![CloudFront](https://img.shields.io/badge/CloudFront-CDN-blue?style=for-the-badge)
-![Terraform](https://img.shields.io/badge/IaC-Terraform-purple?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Em%20Evolução-green?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
+# 🚀 Terraform Serverless — CloudTrilhas
 
-# 🚀 CloudTrilhas — Plataforma Serverless AWS construída com Terraform
+Projeto educacional focado em Terraform, AWS, DevOps, CI/CD e Arquitetura Cloud.
 
-Projeto de Infraestrutura como Código (IaC) desenvolvido utilizando Terraform para provisionar uma arquitetura serverless moderna, escalável, segura e alinhada ao AWS Well-Architected Framework.
+O objetivo do projeto é construir uma aplicação serverless completa utilizando boas práticas reais de engenharia cloud, separação de ambientes, automação e governança.
 
-O projeto evoluiu de um laboratório técnico para uma plataforma educacional cloud voltada ao compartilhamento de materiais de estudos sobre:
+---
 
-- AWS
-- Terraform
-- Cloud Computing
-- Arquitetura Cloud
-- Serverless
-- Certificações AWS
+# 🌎 CloudTrilhas
 
-🌐 Portal:
+O CloudTrilhas é uma plataforma voltada para disponibilização de materiais e trilhas de estudo utilizando arquitetura serverless na AWS.
+
+O projeto evoluiu de um laboratório inicial de Terraform para uma arquitetura próxima de ambientes corporativos reais.
+
+---
+
+# 🏗️ Arquitetura Atual
 
 ```text
-https://cloudtrilhas.com.br
-```
-
----
-
-## ✨ Objetivos do projeto
-
-- Aplicar Terraform em cenários reais
-- Construir arquitetura serverless moderna
-- Utilizar boas práticas AWS
-- Implementar segurança em camadas
-- Criar observabilidade operacional
-- Simular ambiente próximo ao mundo real
-- Evoluir continuamente utilizando AWS Well-Architected
-
----
-
-> 🚧 Projeto em constante evolução.
-
-
----
-
-# 🧠 Visão geral
-
-O CloudTrilhas utiliza uma arquitetura moderna baseada em serviços gerenciados AWS.
-
-A plataforma foi construída priorizando:
-
-- Escalabilidade
-- Segurança
-- Baixo custo operacional
-- Infraestrutura modular
-- Observabilidade
-- Automação
-
----
-
-# 🏗️ Arquitetura
-
-
-```text
-Usuário
-   ↓
-Route53
+Internet
    ↓
 CloudFront
-(Geo Restriction)
    ↓
-Origin Access Control (OAC)
-   ↓
-Bucket S3 Privado
-
-Portal Web
+S3 Static Site
    ↓
 API Gateway
    ↓
 Lambda
    ↓
 DynamoDB
+```
 
-Observabilidade
+Serviços auxiliares:
 
+```text
+SNS
+SQS
+EventBridge
 CloudWatch
 CloudTrail
-SNS
-EventBridge
-Dashboard
+AWS Budget
+GitHub Actions
+OIDC
 ```
 
 ---
 
-# ⚙️ Serviços AWS utilizados
+# 🌍 Ambientes
 
-## Infraestrutura
+O projeto está organizado em três camadas principais:
 
-- Terraform
-- Route53
-- CloudFront
-- ACM
-- Amazon S3
-- IAM
-
-## Aplicação
-
-- API Gateway
-- Lambda
-- DynamoDB
-
-## Observabilidade
-
-- CloudWatch
-- CloudTrail
-- SNS
-
-## Eventos
-
-- EventBridge
-
-## Segurança
-
-- Origin Access Control (OAC)
-- Geo Restriction
-- HTTPS obrigatório
-- TLS 1.2+
-- Bucket privado
+```text
+environments/
+├── dev/      # Ambiente de desenvolvimento
+├── prod/     # Ambiente de produção
+└── shared/   # Recursos compartilhados da conta AWS
+```
 
 ---
 
-# 🔐 Segurança aplicada
+## 🧪 DEV
 
-- Bucket S3 privado
-- Origin Access Control (OAC)
-- HTTPS obrigatório
-- TLS 1.2+
-- Geo Restriction
-- CloudFront
-- IAM mínimo privilégio
-- Block Public Access
-- Arquitetura serverless
+Ambiente utilizado para:
+
+```text
+Testes
+Validações
+Evolução da aplicação
+Experimentos controlados
+```
+
+Domínio:
+
+```text
+https://dev.cloudtrilhas.com.br
+```
+
+Fluxo:
+
+```text
+terraform apply DEV
+↓
+validação
+↓
+promoção para PROD
+```
 
 ---
 
-# 📁 Estrutura do projeto
+## 🌐 PROD
+
+Ambiente oficial de produção.
+
+Domínio:
+
+```text
+https://cloudtrilhas.com.br
+```
+
+Objetivo:
+
+```text
+Disponibilidade
+Estabilidade
+Segurança
+```
+
+---
+
+## 🏛️ SHARED
+
+Responsável por recursos compartilhados da conta AWS.
+
+Atualmente:
+
+```text
+GitHub Actions OIDC
+AWS Budget
+```
+
+Conceito:
+
+```text
+Recursos globais
+↓
+não pertencem DEV/PROD
+↓
+pertencem conta AWS
+```
+
+---
+
+# 📂 Estrutura do Projeto
 
 ```text
 terraform-serverless/
-
+│
+├── .github/
+│   └── workflows/
+│
 ├── docs/
 │
-├── arquitetura/
-│
-├── Fase_1_setup/
-├── Fase_2_lambda/
-├── Fase_3_logs/
-├── Fase_4_sqs/
-├── Fase_5_lambda_sqs/
-├── Fase_6_sns/
-├── Fase_7_eventbridge/
-├── Fase_8_s3_static_site/
-├── Fase_9_download_monitoring/
-├── Fase_10_metrics/
-├── Fase_11_dashboard/
-├── Fase_12_api_gateway/
-├── Fase_13_register_lead_lambda/
-├── Fase_14_dynamodb/
-├── Fase_15_route53/
-├── Fase_16_acm/
-├── Fase_17_cloudfront/
-├── Fase_18_oac_geo_restriction/
-├── Fase_19_well_architected_review/
-
 ├── environments/
-│   └── dev/
-
+│   ├── dev/
+│   ├── prod/
+│   └── shared/
+│
+├── lambda_src/
+│
 ├── modules/
-
+│
 ├── static_site/
-
-├── README.md
-
-└── .gitignore
+│
+└── README.md
 ```
 
 ---
 
+# ⚙️ Tecnologias Utilizadas
+
+## ☁️ AWS
+
+```text
+Lambda
+API Gateway
+DynamoDB
+S3
+CloudFront
+SNS
+SQS
+EventBridge
+CloudWatch
+CloudTrail
+IAM
+Route53
+ACM
+AWS Budgets
+```
+
 ---
 
-## 🔄 Pipeline CI/CD
+## 🧰 DevOps
 
-Fluxo atual implementado:
+```text
+Terraform
+GitHub Actions
+OIDC
+Remote State
+CI/CD
+```
+
+---
+
+# 🔐 Segurança
+
+O projeto utiliza:
+
+```text
+OIDC GitHub Actions
+IAM Roles
+Least Privilege
+Remote State S3
+Separação DEV/PROD
+```
+
+---
+
+# 🔄 CI/CD
+
+Pipeline automatizada utilizando GitHub Actions.
+
+Fluxo atual:
 
 ```text
 Feature Branch
 ↓
-Pull Request
-↓
 Terraform Plan
 ↓
-Merge Main
+Pull Request
 ↓
-Approval Production
+Review
+↓
+Merge
 ↓
 Terraform Apply
+```
 
+Objetivo futuro:
 
-# 🧪 Funcionalidades implementadas
-
-- Portal educacional Cloud
-- Distribuição global via CloudFront
-- Captura de leads
-- API Serverless
-- Registro DynamoDB
-- Dashboard operacional
-- HTTPS com ACM
-- DNS Route53
-- Restrição geográfica
-- Observabilidade completa
-- Infraestrutura modular Terraform
-
----
-
-# 📈 Evolução arquitetural
-
-✅ Fase 1 — Setup
-✅ Fase 2 — Lambda
-✅ Fase 3 — Logs
-✅ Fase 4 — SQS
-✅ Fase 5 — Lambda + SQS
-✅ Fase 6 — SNS
-✅ Fase 7 — EventBridge
-✅ Fase 8 — S3 Static Website
-✅ Fase 9 — Downloads
-✅ Fase 10 — Métricas
-✅ Fase 11 — Dashboard
-✅ Fase 12 — API Gateway
-✅ Fase 13 — Register Lead Lambda
-✅ Fase 14 — DynamoDB
-✅ Fase 15 — Route53
-✅ Fase 16 — ACM
-✅ Fase 17 — CloudFront
-✅ Fase 18 — OAC + Geo Restriction
-✅ Fase 19 — Well Architected Review
-
----
-
-# 💰 Controle de custos
-
-Ambiente otimizado para baixo custo utilizando:
-
-- Lambda sob demanda
-- DynamoDB PAY_PER_REQUEST
-- CloudFront
-- S3
-- API Gateway serverless
-
-Destruição ambiente:
-```bash
-terraform destroy
+```text
+DEV Pipeline
+↓
+Approval
+↓
+PROD Pipeline
 ```
 
 ---
 
-# 🚀 Próximas melhorias
+# 🧠 Conceitos Aplicados
 
-- Dashboard operacional avançado
-- Alarmes CloudWatch + SNS
-- CI/CD GitHub Actions
-- AWS WAF
-- Analytics Educacional
-- Catálogo dinâmico de materiais
+## Terraform State
+
+```text
+State remoto S3
+Separação por ambiente
+Import Strategy
+terraform state rm
+terraform import
+```
+
+---
+
+## Shared Resources
+
+```text
+OIDC
+Budget
+Governança centralizada
+```
+
+---
+
+## Arquitetura Evolutiva
+
+O projeto foi evoluindo por fases:
+
+```text
+Laboratório Terraform
+↓
+Serverless
+↓
+CI/CD
+↓
+DEV/PROD
+↓
+Shared Resources
+↓
+Arquitetura próxima do mercado
+```
+
+---
+
+# 📘 Documentação
+
+Toda evolução do projeto é documentada por fases.
+
+Exemplo:
+
+```text
+docs/
+├── Fase_22_CI_CD/
+├── Fase_23_DEV_PROD/
+└── Fase_24_Shared_Resources/
+```
+
+---
+
+# 🎯 Objetivos do Projeto
+
+```text
+Aprendizado Terraform
+Arquitetura AWS
+Boas práticas DevOps
+CI/CD
+Serverless
+Governança Cloud
+Portfolio profissional
+```
+
+---
+
+# 📈 Roadmap
+
+## Próximas evoluções
+
+```text
+CI/CD Multiambiente
+CloudTrail Shared
+Observabilidade avançada
+IAM modularizado
+Least Privilege
+Catálogo dinâmico de materiais
+WAF
+Governança avançada
+```
+
+---
+
+# 🏆 Principais Aprendizados
+
+```text
+Terraform avançado
+Separação ambientes
+State Strategy
+Cloud Governance
+CI/CD real
+OIDC
+CloudFront
+Route53
+Serverless AWS
+Refatoração sem downtime
+```
+
+---
+
+# 📄 Licença
+
+Projeto licenciado sob MIT License.
 
 ---
 
 # 👨‍💻 Autor
 
 Ricardo Simines Scopim
-AWS Certified Solutions Architect – Associate
+
+AWS Solutions Architect Associate
 AWS Cloud Practitioner
-Instrutor Cloud Computing (AWS)
-
----
-
-# 📌 Objetivo educacional
-
-Este projeto foi criado com foco em aprendizado prático, arquitetura cloud moderna e simulação de cenários próximos ao mercado real.
-
-Cada fase representa uma evolução arquitetural, permitindo aprendizado progressivo em AWS e Terraform.
-
-CloudTrilhas continua em evolução 🚀
-
+Instrutor AWS re/Start
