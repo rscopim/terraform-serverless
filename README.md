@@ -1,31 +1,41 @@
 # 🚀 Terraform Serverless — CloudTrilhas
 
-Projeto educacional focado em Terraform, AWS, DevOps, CI/CD e Arquitetura Cloud.
+<p align="center">
 
-O objetivo do projeto é construir uma aplicação serverless completa utilizando boas práticas reais de engenharia cloud, separação de ambientes, automação e governança.
+Terraform • AWS • Serverless • CI/CD • DevOps • Cloud Architecture
 
----
-
-# 🌎 CloudTrilhas
-
-O CloudTrilhas é uma plataforma voltada para disponibilização de materiais e trilhas de estudo utilizando arquitetura serverless na AWS.
-
-O projeto evoluiu de um laboratório inicial de Terraform para uma arquitetura próxima de ambientes corporativos reais.
+</p>
 
 ---
 
-# 🏗️ Arquitetura Atual
+# ☁️ Sobre o Projeto
+
+O **CloudTrilhas** é um projeto focado em arquitetura serverless utilizando AWS e Terraform.
+
+O objetivo é construir uma aplicação real aplicando:
+
+* Infraestrutura como Código (IaC)
+* Arquitetura Serverless
+* CI/CD
+* Multiambiente
+* Governança Cloud
+* Shared Resources
+* Boas práticas DevOps
+
+---
+
+# 🏗️ Arquitetura
 
 ```text
 Internet
    ↓
 CloudFront
    ↓
-S3 Static Site
+S3 Static Website
    ↓
 API Gateway
    ↓
-Lambda
+Lambda Functions
    ↓
 DynamoDB
 ```
@@ -45,15 +55,15 @@ OIDC
 
 ---
 
-# 🌍 Ambientes
+# 🌎 Ambientes
 
-O projeto está organizado em três camadas principais:
+O projeto está separado em três ambientes principais:
 
 ```text
 environments/
-├── dev/      # Ambiente de desenvolvimento
-├── prod/     # Ambiente de produção
-└── shared/   # Recursos compartilhados da conta AWS
+├── dev/
+├── prod/
+└── shared/
 ```
 
 ---
@@ -65,24 +75,14 @@ Ambiente utilizado para:
 ```text
 Testes
 Validações
-Evolução da aplicação
-Experimentos controlados
+Experimentos
+Novas funcionalidades
 ```
 
-Domínio:
+URL:
 
 ```text
 https://dev.cloudtrilhas.com.br
-```
-
-Fluxo:
-
-```text
-terraform apply DEV
-↓
-validação
-↓
-promoção para PROD
 ```
 
 ---
@@ -91,25 +91,17 @@ promoção para PROD
 
 Ambiente oficial de produção.
 
-Domínio:
+URL:
 
 ```text
 https://cloudtrilhas.com.br
-```
-
-Objetivo:
-
-```text
-Disponibilidade
-Estabilidade
-Segurança
 ```
 
 ---
 
 ## 🏛️ SHARED
 
-Responsável por recursos compartilhados da conta AWS.
+Ambiente responsável pelos recursos compartilhados da conta AWS.
 
 Atualmente:
 
@@ -126,32 +118,6 @@ Recursos globais
 não pertencem DEV/PROD
 ↓
 pertencem conta AWS
-```
-
----
-
-# 📂 Estrutura do Projeto
-
-```text
-terraform-serverless/
-│
-├── .github/
-│   └── workflows/
-│
-├── docs/
-│
-├── environments/
-│   ├── dev/
-│   ├── prod/
-│   └── shared/
-│
-├── lambda_src/
-│
-├── modules/
-│
-├── static_site/
-│
-└── README.md
 ```
 
 ---
@@ -191,20 +157,6 @@ CI/CD
 
 ---
 
-# 🔐 Segurança
-
-O projeto utiliza:
-
-```text
-OIDC GitHub Actions
-IAM Roles
-Least Privilege
-Remote State S3
-Separação DEV/PROD
-```
-
----
-
 # 🔄 CI/CD
 
 Pipeline automatizada utilizando GitHub Actions.
@@ -225,58 +177,44 @@ Merge
 Terraform Apply
 ```
 
-Objetivo futuro:
+---
+
+# 🔐 Segurança
+
+O projeto utiliza:
 
 ```text
-DEV Pipeline
-↓
-Approval
-↓
-PROD Pipeline
+OIDC GitHub Actions
+IAM Roles
+Least Privilege
+Remote State S3
+Separação DEV/PROD
 ```
 
 ---
 
-# 🧠 Conceitos Aplicados
-
-## Terraform State
+# 📂 Estrutura do Projeto
 
 ```text
-State remoto S3
-Separação por ambiente
-Import Strategy
-terraform state rm
-terraform import
-```
-
----
-
-## Shared Resources
-
-```text
-OIDC
-Budget
-Governança centralizada
-```
-
----
-
-## Arquitetura Evolutiva
-
-O projeto foi evoluindo por fases:
-
-```text
-Laboratório Terraform
-↓
-Serverless
-↓
-CI/CD
-↓
-DEV/PROD
-↓
-Shared Resources
-↓
-Arquitetura próxima do mercado
+terraform-serverless/
+│
+├── .github/
+│   └── workflows/
+│
+├── docs/
+│
+├── environments/
+│   ├── dev/
+│   ├── prod/
+│   └── shared/
+│
+├── lambda_src/
+│
+├── modules/
+│
+├── static_site/
+│
+└── README.md
 ```
 
 ---
@@ -285,13 +223,44 @@ Arquitetura próxima do mercado
 
 Toda evolução do projeto é documentada por fases.
 
-Exemplo:
-
 ```text
 docs/
 ├── Fase_22_CI_CD/
 ├── Fase_23_DEV_PROD/
 └── Fase_24_Shared_Resources/
+```
+
+---
+
+# 🧠 Conceitos Aplicados
+
+```text
+Terraform State
+Remote State
+Import Strategy
+terraform import
+terraform state rm
+Shared Resources
+Cloud Governance
+CI/CD
+Serverless
+OIDC
+```
+
+---
+
+# 🚀 Roadmap
+
+Próximas evoluções planejadas:
+
+```text
+CI/CD Multiambiente
+CloudTrail Shared
+Observabilidade avançada
+IAM modularizado
+Least Privilege
+WAF
+Governança avançada
 ```
 
 ---
@@ -306,23 +275,6 @@ CI/CD
 Serverless
 Governança Cloud
 Portfolio profissional
-```
-
----
-
-# 📈 Roadmap
-
-## Próximas evoluções
-
-```text
-CI/CD Multiambiente
-CloudTrail Shared
-Observabilidade avançada
-IAM modularizado
-Least Privilege
-Catálogo dinâmico de materiais
-WAF
-Governança avançada
 ```
 
 ---
@@ -346,7 +298,7 @@ Refatoração sem downtime
 
 # 📄 Licença
 
-Projeto licenciado sob MIT License.
+MIT License.
 
 ---
 
@@ -357,3 +309,4 @@ Ricardo Simines Scopim
 AWS Solutions Architect Associate
 AWS Cloud Practitioner
 Instrutor AWS re/Start
+
