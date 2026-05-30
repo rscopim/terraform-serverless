@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 05: Migração e Modernização</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-04.html" class="nav-link">← Anterior</a>
+        <a href="modulo-06.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 05</span>
+        <h1>Migração e Modernização (20%)</h1>
+        <p>Estratégias de migração (6 Rs), serviços de migração, transferência de dados e modernização de workloads para a nuvem AWS.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- 6 Rs -->
+        <div class="topic-block">
+          <h2>6 Rs de Migração</h2>
+          <p>Estratégias para migrar workloads para a nuvem, ordenadas por complexidade crescente:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estratégia</th><th>Descrição</th><th>Esforço</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Rehost (Lift & Shift)</strong></td><td>Mover para a nuvem sem modificações. Mesmo OS, mesmo app.</td><td>Baixo</td><td>Migração rápida, deadline apertado, apps legados</td></tr>
+              <tr><td><strong>Replatform (Lift & Reshape)</strong></td><td>Pequenas otimizações sem mudar a arquitetura core. Ex: migrar DB para RDS.</td><td>Médio-Baixo</td><td>Ganhos rápidos sem refactoring completo</td></tr>
+              <tr><td><strong>Repurchase (Drop & Shop)</strong></td><td>Substituir por SaaS. Ex: CRM on-prem → Salesforce.</td><td>Médio</td><td>Software comercial com equivalente SaaS melhor</td></tr>
+              <tr><td><strong>Refactor (Re-architect)</strong></td><td>Redesenhar a aplicação para ser cloud-native (microserviços, serverless).</td><td>Alto</td><td>Necessidade de escala, agilidade, features cloud-native</td></tr>
+              <tr><td><strong>Retire</strong></td><td>Desligar aplicações que não são mais necessárias.</td><td>Baixo</td><td>Apps redundantes, sem uso, ou substituídos</td></tr>
+              <tr><td><strong>Retain (Revisit)</strong></td><td>Manter on-premises por enquanto. Migrar depois.</td><td>Nenhum</td><td>Compliance, dependências complexas, não pronto</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Rehost</code><span class="cmd-tag">Lift & Shift</span></div>
+              <pre><code>Ferramentas:
+• AWS Application Migration Service (MGN)
+  → Replicação contínua de servidores
+  → Cutover com mínimo downtime
+  → Suporta Windows e Linux
+• VM Import/Export
+• CloudEndure Migration (predecessor do MGN)
+
+Processo:
+1. Instalar agente no servidor source
+2. Replicação contínua para AWS
+3. Test instances (validação)
+4. Cutover (migração final)
+5. Desligar source
+
+Vantagens:
+• Mais rápido de executar
+• Menor risco (sem mudanças no app)
+• Pode otimizar depois (replatform/refactor)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Replatform</code><span class="cmd-tag">Lift & Reshape</span></div>
+              <pre><code>Exemplos comuns:
+• MySQL on-prem → Amazon RDS MySQL
+• Self-managed Redis → ElastiCache
+• Apache on EC2 → Elastic Beanstalk
+• Monolith on EC2 → ECS (containerizar)
+• Cron jobs → EventBridge + Lambda
+
+Benefícios sem refactoring completo:
+• Managed services (menos operação)
+• Auto-scaling, backups automáticos
+• Multi-AZ (alta disponibilidade)
+• Patching automático
+
+Quando escolher:
+• App funciona bem mas infra é pesada
+• Quer benefícios de managed services
+• Não tem tempo/budget para refactor completo</code></pre>
+            </div>
+            <div class="command-card">
+              <div name="command-header"><code>Refactor</code><span class="cmd-tag">Re-architect</span></div>
+              <pre><code>Padrões de modernização:
+• Monolith → Microserviços
+• Synchronous → Event-driven (SQS, SNS, EventBridge)
+• Relational → Purpose-built databases
+• Batch → Real-time streaming (Kinesis)
+• On-prem storage → S3 data lake
+
+Tecnologias cloud-native:
+• Containers: ECS/EKS + Fargate
+• Serverless: Lambda + API Gateway + DynamoDB
+• Event-driven: EventBridge + Step Functions
+• CI/CD: CodePipeline + CodeBuild + CodeDeploy
+
+Quando escolher:
+• Necessidade de escala massiva
+• Time-to-market é prioridade
+• Custos operacionais muito altos
+• Features que só existem na cloud</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Migration Services -->
+        <div class="topic-block">
+          <h2>Serviços de Migração</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Migration Hub</code><span class="cmd-tag">Central</span></div>
+              <p>Painel centralizado para rastrear o progresso de migrações de múltiplas ferramentas.</p>
+              <pre><code>Funcionalidades:
+• Dashboard unificado de migração
+• Rastreia progresso de múltiplas ferramentas
+• Integra com: MGN, DMS, Application Discovery
+• Strategy Recommendations: sugere estratégia (6 Rs)
+• Refactor Spaces: gerencia refactoring incremental
+
+Migration Hub Orchestrator:
+• Workflows pré-definidos para migração
+• Templates para SAP, SQL Server, etc.
+• Automação de steps comuns</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Application Discovery Service</code><span class="cmd-tag">Descoberta</span></div>
+              <p>Descobre servidores on-premises, dependências e padrões de uso para planejar migração.</p>
+              <pre><code>Modos:
+• Agentless (via VMware vCenter):
+  → Informações básicas: CPU, memória, disco, rede
+  → Sem instalar nada nos servidores
+  → Bom para inventário inicial
+
+• Agent-based:
+  → Informações detalhadas + dependências
+  → Processos rodando, conexões de rede
+  → Mapa de dependências entre servidores
+  → Necessário para planejamento detalhado
+
+Integração:
+• Migration Hub (visualização)
+• Athena (queries nos dados coletados)
+• QuickSight (dashboards de inventário)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS DMS</code><span class="cmd-tag">Database Migration</span></div>
+              <p>Migra bancos de dados para AWS com mínimo downtime. Suporta migrações homogêneas e heterogêneas.</p>
+              <pre><code>Tipos de migração:
+• Homogênea: MySQL → RDS MySQL (mesmo engine)
+• Heterogênea: Oracle → Aurora PostgreSQL (diferente)
+  → Requer SCT (Schema Conversion Tool) primeiro
+
+Modos:
+• Full Load: copia todos os dados uma vez
+• CDC (Change Data Capture): replicação contínua
+• Full Load + CDC: copia tudo + mantém sincronizado
+
+Características:
+• Replication Instance: EC2 que executa a migração
+• Source e Target endpoints
+• Suporta: Oracle, SQL Server, MySQL, PostgreSQL,
+  MongoDB, DynamoDB, S3, Redshift, Kinesis
+• Multi-AZ para alta disponibilidade
+
+AWS SCT (Schema Conversion Tool):
+• Converte schema entre engines diferentes
+• Identifica incompatibilidades
+• Gera relatório de assessment
+• Converte stored procedures, views, triggers</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Transfer -->
+        <div class="topic-block">
+          <h2>Transferência de Dados</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS DataSync</code><span class="cmd-tag">Transferência</span></div>
+              <p>Transferência de dados automatizada e acelerada entre on-premises e AWS (ou entre serviços AWS).</p>
+              <pre><code>Características:
+• Até 10x mais rápido que ferramentas open-source
+• Agente on-premises (VM ou EC2)
+• Criptografia em trânsito (TLS)
+• Verificação de integridade automática
+• Scheduling (transferências periódicas)
+• Bandwidth throttling
+
+Origens/Destinos:
+• NFS, SMB, HDFS, self-managed object storage
+• S3, EFS, FSx (Windows, Lustre, ONTAP, OpenZFS)
+• Transferência entre serviços AWS (S3 → EFS)
+
+Quando usar:
+• Migração de dados para AWS
+• Replicação periódica (backup)
+• Transferência entre regiões/contas
+• Mover dados entre storage services
+
+vs Storage Gateway:
+• DataSync: transferência/migração (mover dados)
+• Storage Gateway: acesso híbrido contínuo (usar dados)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS Transfer Family</code><span class="cmd-tag">Protocolos</span></div>
+              <p>Transferência de arquivos gerenciada via SFTP, FTPS, FTP e AS2 diretamente para S3 ou EFS.</p>
+              <pre><code>Protocolos suportados:
+• SFTP (SSH File Transfer Protocol)
+• FTPS (FTP over SSL)
+• FTP (File Transfer Protocol)
+• AS2 (Applicability Statement 2)
+
+Características:
+• Endpoint público ou VPC
+• Autenticação: service-managed, AD, custom (Lambda)
+• Integra com S3 e EFS como backend
+• IP estático (Elastic IP)
+• Managed workflows (post-upload processing)
+
+Quando usar:
+• Parceiros/clientes enviam arquivos via SFTP
+• Substituir servidor SFTP on-premises
+• Compliance requer protocolos específicos
+• B2B file exchange (AS2 para EDI)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS Snow Family</code><span class="cmd-tag">Offline</span></div>
+              <p>Dispositivos físicos para transferência massiva de dados quando a rede não é viável.</p>
+              <pre><code>Dispositivos:
+┌─────────────────────────────────────────────────┐
+│ Snowcone       │ 8 TB (HDD) ou 14 TB (SSD)     │
+│                │ Portátil, edge computing        │
+│                │ DataSync agent integrado        │
+├─────────────────────────────────────────────────┤
+│ Snowball Edge  │ Storage Optimized: 80 TB       │
+│                │ Compute Optimized: 42 TB + GPU  │
+│                │ Edge computing (EC2, Lambda)    │
+├─────────────────────────────────────────────────┤
+│ Snowmobile     │ 100 PB (caminhão)              │
+│                │ Para migrações &gt;10 PB          │
+│                │ Segurança física extrema        │
+└─────────────────────────────────────────────────┘
+
+Regra de decisão:
+• &lt;10 TB ou boa conectividade → DataSync/Internet
+• 10 TB - 10 PB → Snowball Edge
+• &gt;10 PB → Snowmobile
+• Edge computing remoto → Snowcone/Snowball Edge
+
+Processo:
+1. Solicitar dispositivo no console
+2. AWS envia o dispositivo
+3. Copiar dados para o dispositivo
+4. Enviar de volta para AWS
+5. AWS carrega dados no S3</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Direct Connect para Migração</code><span class="cmd-tag">Rede Dedicada</span></div>
+              <pre><code>Quando usar DX para migração:
+• Transferência contínua de grandes volumes
+• Latência consistente necessária
+• Migração de longa duração (meses)
+• Workloads híbridos permanentes
+
+Combinação com outros serviços:
+• DX + DataSync: transferência acelerada via DX
+• DX + DMS: migração de banco via conexão dedicada
+• DX + Storage Gateway: acesso híbrido contínuo
+
+Limitações para migração:
+• Lead time: semanas a meses para provisionar
+• Custo fixo mensal (porta + transferência)
+• Não resolve migração inicial urgente
+  → Use VPN como bridge temporária
+  → Snow Family para bulk data inicial
+  → DX para operação contínua depois</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modernization -->
+        <div class="topic-block">
+          <h2>Modernização</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Containerização</code><span class="cmd-tag">Containers</span></div>
+              <pre><code>Estratégia de containerização:
+1. Containerizar monolith (lift & shift para container)
+2. Extrair serviços gradualmente
+3. Migrar para orquestrador (ECS/EKS)
+4. Adotar Fargate (serverless containers)
+
+AWS App2Container:
+• Ferramenta que containeriza apps Java/.NET
+• Analisa dependências automaticamente
+• Gera Dockerfile e task definitions
+• Cria pipeline CI/CD
+
+AWS Copilot:
+• CLI para deploy de containers no ECS/Fargate
+• Abstrai complexidade de ECS
+• Environments, services, pipelines
+
+Padrão Strangler Fig:
+• Migrar funcionalidades incrementalmente
+• Novo código em microserviços
+• Roteamento gradual (API Gateway, ALB)
+• Monolith diminui até ser desligado</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Serverless</code><span class="cmd-tag">Modernização</span></div>
+              <pre><code>Padrão serverless completo:
+• API: API Gateway + Lambda
+• Data: DynamoDB ou Aurora Serverless
+• Auth: Cognito
+• Storage: S3
+• Events: EventBridge + Step Functions
+• Messaging: SQS + SNS
+
+Benefícios:
+• Zero gerenciamento de servidores
+• Escala automática (0 → milhões)
+• Paga apenas por uso
+• Alta disponibilidade built-in
+
+Quando modernizar para serverless:
+• APIs com tráfego variável
+• Event processing
+• Scheduled tasks (cron)
+• Data processing pipelines
+• Microserviços com baixo tráfego</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Decomposição de Microserviços</code><span class="cmd-tag">Arquitetura</span></div>
+              <pre><code>Padrões de decomposição:
+• Por domínio de negócio (DDD - Bounded Contexts)
+• Por subdomain (core, supporting, generic)
+• Por verbo/ação (checkout, inventory, shipping)
+
+Comunicação entre serviços:
+• Síncrona: REST/gRPC (API Gateway, ALB)
+• Assíncrona: eventos (SQS, SNS, EventBridge)
+• Orquestração: Step Functions (workflow central)
+• Coreografia: cada serviço reage a eventos
+
+Padrões importantes:
+• Saga Pattern: transações distribuídas
+  → Orquestração (Step Functions)
+  → Coreografia (eventos + compensação)
+• CQRS: separar leitura de escrita
+• Event Sourcing: estado como sequência de eventos
+• Circuit Breaker: evitar cascading failures
+
+Service Mesh (App Mesh):
+• Comunicação service-to-service
+• Observabilidade, retry, circuit breaker
+• mTLS entre serviços</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> "Migrar com mínimo downtime" → DMS com CDC + MGN. "Transferir petabytes" → Snow Family. "Migrar servidores" → Application Migration Service (MGN). "Descobrir dependências" → Application Discovery Service. "Modernizar monolith" → Strangler Fig + containers/serverless.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-06.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

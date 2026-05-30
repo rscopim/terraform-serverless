@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Developer Domínio 01: Desenvolvimento com Serviços AWS</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../developer.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">💻 Developer — Domínio 01</span>
+        <h1>Desenvolvimento com Serviços AWS</h1>
+        <p>Lambda, API Gateway, DynamoDB, S3, SQS, SNS, Step Functions e arquitetura event-driven. Este domínio representa 32% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- AWS Lambda -->
+        <div class="topic-block">
+          <h2>AWS Lambda</h2>
+          <p>Serviço de computação serverless que executa código em resposta a eventos sem provisionar ou gerenciar servidores.</p>
+
+          <h3>Conceitos Fundamentais</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Handler</code><span class="cmd-tag">Entry Point</span></div>
+              <p>Função que o Lambda chama para iniciar a execução. Recebe o evento e o contexto.</p>
+              <pre><code># Python
+def handler(event, context):
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello')
+    }
+
+# Node.js
+exports.handler = async (event, context) => {
+    return { statusCode: 200, body: 'Hello' };
+};</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Configurações</code><span class="cmd-tag">Limites</span></div>
+              <pre><code>• Timeout: 1s a 15 min (padrão: 3s)
+• Memória: 128 MB a 10.240 MB (64 MB increments)
+• CPU: proporcional à memória alocada
+• Disco (/tmp): 512 MB a 10.240 MB
+• Pacote deploy: 50 MB (zip) / 250 MB (unzipped)
+• Variáveis de ambiente: 4 KB total
+• Payload síncrono: 6 MB
+• Payload assíncrono: 256 KB
+• Concurrent executions: 1000 (padrão por região)</code></pre>
+            </div>
+          </div>
+
+          <h3>Tipos de Invocação</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Comportamento</th><th>Retry</th><th>Exemplos</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Síncrono</strong></td><td>Espera resposta. Caller gerencia erros.</td><td>Nenhum (caller decide)</td><td>API Gateway, ALB, CloudFront, Cognito</td></tr>
+              <tr><td><strong>Assíncrono</strong></td><td>Retorna 202 imediatamente. Lambda gerencia retry.</td><td>2 retries (total 3 tentativas)</td><td>S3, SNS, EventBridge, CloudWatch Events</td></tr>
+              <tr><td><strong>Event Source Mapping</strong></td><td>Lambda faz polling da source. Processa em batches.</td><td>Retry até expirar ou sucesso</td><td>SQS, Kinesis, DynamoDB Streams, Kafka</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Concorrência</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Reserved Concurrency</code><span class="cmd-tag">Limite</span></div>
+              <p>Reserva um número fixo de instâncias para a função. Garante capacidade mas também limita.</p>
+              <pre><code>• Garante que a função sempre terá X instâncias disponíveis
+• Limita a função a no máximo X execuções simultâneas
+• Throttling (429) se exceder o limite
+• Definir como 0 = desabilita a função</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Provisioned Concurrency</code><span class="cmd-tag">Warm</span></div>
+              <p>Mantém instâncias pré-inicializadas (warm). Elimina cold starts.</p>
+              <pre><code>• Instâncias sempre prontas (sem cold start)
+• Custo adicional (paga por instância provisionada)
+• Pode usar Auto Scaling para ajustar
+• Ideal para funções com latência crítica
+• Funciona com aliases e versões publicadas</code></pre>
+            </div>
+          </div>
+
+          <h3>Layers, DLQ, Destinations, Versions e Aliases</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Lambda Layers</code><span class="cmd-tag">Compartilhamento</span></div>
+              <p>Pacotes de código/bibliotecas compartilhados entre funções.</p>
+              <pre><code>• Até 5 layers por função
+• Tamanho total (função + layers): 250 MB unzipped
+• Montado em /opt
+• Versionado independentemente
+• Pode ser compartilhado entre contas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DLQ e Destinations</code><span class="cmd-tag">Erro Handling</span></div>
+              <p>Tratamento de falhas em invocações assíncronas.</p>
+              <pre><code>DLQ (Dead Letter Queue):
+• SQS ou SNS como destino de falhas
+• Apenas para invocações assíncronas
+• Envia após todos os retries falharem
+
+Destinations (recomendado):
+• Suporta sucesso E falha
+• Destinos: SQS, SNS, Lambda, EventBridge
+• Mais informações no payload que DLQ
+• Pode encadear funções</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Versions & Aliases</code><span class="cmd-tag">Deploy</span></div>
+              <p>Controle de versão e roteamento de tráfego.</p>
+              <pre><code>Versions:
+• Snapshot imutável (código + config)
+• $LATEST = versão mutável (dev)
+• Cada publish cria v1, v2, v3...
+
+Aliases:
+• Ponteiro nomeado para uma versão
+• Ex: "prod" → v3, "dev" → $LATEST
+• Weighted alias: split traffic (canary)
+  - prod: 90% → v3, 10% → v4
+• Não pode referenciar outro alias</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Destinations > DLQ (mais flexível). Provisioned Concurrency elimina cold starts. Event Source Mapping faz polling (SQS, Kinesis, DynamoDB Streams). Weighted aliases permitem canary deployments.</p>
+          </div>
+        </div>
+
+        <!-- API Gateway -->
+        <div class="topic-block">
+          <h2>Amazon API Gateway</h2>
+          <p>Serviço gerenciado para criar, publicar e gerenciar APIs em qualquer escala.</p>
+
+          <h3>Tipos de API</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Protocolo</th><th>Características</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>REST API</strong></td><td>HTTP/HTTPS</td><td>Mais recursos (caching, API keys, usage plans, WAF, resource policies)</td><td>APIs complexas que precisam de todos os recursos</td></tr>
+              <tr><td><strong>HTTP API</strong></td><td>HTTP/HTTPS</td><td>Mais barato (~70% menos), menor latência, OIDC/OAuth2 nativo</td><td>APIs simples, proxies para Lambda/HTTP, custo menor</td></tr>
+              <tr><td><strong>WebSocket API</strong></td><td>WebSocket</td><td>Conexão bidirecional persistente, real-time</td><td>Chat, streaming, notificações em tempo real</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Stages, Throttling e Caching</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Stages</code><span class="cmd-tag">Ambientes</span></div>
+              <p>Ambientes de deploy da API (dev, staging, prod).</p>
+              <pre><code>• Cada stage = URL diferente
+  https://api-id.execute-api.region.amazonaws.com/prod
+• Stage variables: variáveis por stage
+  - Referenciar Lambda aliases: ${stageVariables.alias}
+• Canary deployments no stage
+  - % do tráfego para nova versão
+• Deploy history com rollback</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Throttling</code><span class="cmd-tag">Rate Limit</span></div>
+              <p>Proteção contra excesso de requisições.</p>
+              <pre><code>Limites padrão (por região):
+• 10.000 requests/segundo (steady-state)
+• 5.000 requests burst
+
+Níveis de throttling:
+1. Account level (regional)
+2. Stage level (usage plan)
+3. Method level (per-method)
+
+Resposta: HTTP 429 Too Many Requests</code></pre>
+            </div>
+          </div>
+
+          <h3>Authorizers</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Como Funciona</th><th>Caching</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Lambda Authorizer (Token)</strong></td><td>Recebe token, retorna IAM policy</td><td>Sim (até 1h)</td><td>Tokens customizados, OAuth, SAML, lógica complexa</td></tr>
+              <tr><td><strong>Lambda Authorizer (Request)</strong></td><td>Recebe headers, query strings, context</td><td>Sim</td><td>Múltiplos parâmetros de autenticação</td></tr>
+              <tr><td><strong>Cognito User Pool</strong></td><td>Valida JWT token do Cognito</td><td>Não (validação local)</td><td>Autenticação com Cognito, sem lógica custom</td></tr>
+              <tr><td><strong>IAM Authorization</strong></td><td>SigV4 signing</td><td>N/A</td><td>Chamadas entre serviços AWS, cross-account</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Integration Types e CORS</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Integration Types</code><span class="cmd-tag">Backend</span></div>
+              <pre><code>• LAMBDA_PROXY (mais comum):
+  - Request inteiro passado ao Lambda
+  - Lambda retorna statusCode + headers + body
+  - Sem mapping templates
+
+• LAMBDA (custom):
+  - Usa mapping templates (VTL)
+  - Transforma request/response
+  - Mais controle, mais complexo
+
+• HTTP_PROXY:
+  - Passa request direto ao HTTP endpoint
+  - Sem transformação
+
+• HTTP (custom):
+  - Com mapping templates
+
+• AWS_PROXY:
+  - Integração direta com serviços AWS
+
+• MOCK:
+  - Retorna resposta sem backend</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CORS</code><span class="cmd-tag">Cross-Origin</span></div>
+              <p>Cross-Origin Resource Sharing para chamadas de browsers.</p>
+              <pre><code>Headers necessários:
+• Access-Control-Allow-Origin
+• Access-Control-Allow-Methods
+• Access-Control-Allow-Headers
+
+REST API:
+• Habilitar CORS no console
+• OPTIONS method (preflight)
+• Configurar nos Integration Response
+
+HTTP API:
+• Configuração simplificada
+• Suporte nativo a CORS
+
+⚠️ LAMBDA_PROXY:
+• Lambda DEVE retornar os headers CORS
+• API Gateway não adiciona automaticamente</code></pre>
+            </div>
+          </div>
+
+          <h3>API Gateway Caching</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Cache</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>• Disponível apenas em REST API
+• Cache por stage (0.5 GB a 237 GB)
+• TTL: 0 a 3600 segundos (padrão: 300s)
+• Pode invalidar com header:
+  Cache-Control: max-age=0
+• Custo adicional por hora
+• Pode ser por método específico
+• Encrypt cache data: opcional</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> HTTP API é mais barato e rápido que REST API, mas REST API tem mais recursos (caching, API keys, WAF). LAMBDA_PROXY é o tipo de integração mais usado. Com LAMBDA_PROXY, o Lambda deve retornar headers CORS manualmente.</p>
+          </div>
+        </div>
+
+        <!-- DynamoDB -->
+        <div class="topic-block">
+          <h2>Amazon DynamoDB</h2>
+          <p>Banco de dados NoSQL serverless, totalmente gerenciado, com latência de milissegundos em qualquer escala.</p>
+
+          <h3>Modelo de Dados</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Chaves</code><span class="cmd-tag">Primary Key</span></div>
+              <pre><code>Partition Key (PK):
+• Obrigatória
+• Determina a partição física
+• Deve ter alta cardinalidade
+• Hash function distribui dados
+
+Sort Key (SK) — opcional:
+• Permite múltiplos itens por PK
+• Ordenação dentro da partição
+• Permite range queries (begins_with, between)
+
+Composite Key = PK + SK
+• Combinação deve ser única
+• Ex: PK=UserId, SK=OrderDate</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Índices Secundários</code><span class="cmd-tag">GSI / LSI</span></div>
+              <pre><code>GSI (Global Secondary Index):
+• PK e SK diferentes da tabela base
+• Pode ser criado a qualquer momento
+• Tem própria capacidade (RCU/WCU)
+• Eventually consistent apenas
+• Até 20 GSIs por tabela
+• Projeção: ALL, KEYS_ONLY, INCLUDE
+
+LSI (Local Secondary Index):
+• Mesma PK, SK diferente
+• Deve ser criado na criação da tabela
+• Compartilha capacidade da tabela
+• Suporta strongly consistent reads
+• Até 5 LSIs por tabela
+• Limite: 10 GB por partition key</code></pre>
+            </div>
+          </div>
+
+          <h3>Capacity Modes</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Modo</th><th>Cobrança</th><th>Quando Usar</th><th>Características</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Provisioned</strong></td><td>RCU/WCU definidos</td><td>Tráfego previsível</td><td>Auto Scaling disponível, Reserved Capacity para desconto</td></tr>
+              <tr><td><strong>On-Demand</strong></td><td>Pay-per-request</td><td>Tráfego imprevisível, novo app</td><td>Sem planejamento de capacidade, 2.5x mais caro por request</td></tr>
+            </tbody>
+          </table>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>RCU / WCU</code><span class="cmd-tag">Cálculo</span></div>
+              <pre><code>RCU (Read Capacity Unit):
+• 1 RCU = 1 strongly consistent read/s (até 4 KB)
+• 1 RCU = 2 eventually consistent reads/s (até 4 KB)
+• Transactional: 2 RCUs por read (4 KB)
+
+WCU (Write Capacity Unit):
+• 1 WCU = 1 write/s (até 1 KB)
+• Transactional: 2 WCUs por write (1 KB)
+
+Exemplo: Item de 6 KB
+• Strong read: ceil(6/4) = 2 RCUs
+• Eventually: ceil(6/4) / 2 = 1 RCU
+• Write: ceil(6/1) = 6 WCUs</code></pre>
+            </div>
+          </div>
+
+          <h3>DynamoDB Streams, TTL, DAX e Transactions</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>DynamoDB Streams</code><span class="cmd-tag">CDC</span></div>
+              <p>Captura mudanças na tabela em tempo real (Change Data Capture).</p>
+              <pre><code>Stream Views:
+• KEYS_ONLY: apenas as chaves
+• NEW_IMAGE: item após a mudança
+• OLD_IMAGE: item antes da mudança
+• NEW_AND_OLD_IMAGES: ambos
+
+• Retém dados por 24 horas
+• Processado por Lambda ou Kinesis
+• Garante ordem por partition key
+• Ideal para: replicação, triggers, analytics</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>TTL</code><span class="cmd-tag">Expiração</span></div>
+              <p>Remove itens automaticamente após timestamp expirar.</p>
+              <pre><code>• Atributo com epoch timestamp (seconds)
+• Sem custo adicional (não consome WCU)
+• Deletado em até 48h após expiração
+• Item expirado aparece em queries até deletar
+• Pode filtrar com FilterExpression
+• Deletions aparecem no DynamoDB Streams
+• Ideal para: sessões, logs temporários, cache</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DAX</code><span class="cmd-tag">Cache</span></div>
+              <p>DynamoDB Accelerator — cache in-memory para DynamoDB.</p>
+              <pre><code>• Latência de microssegundos (vs ms)
+• Compatível com API do DynamoDB
+• Write-through cache
+• Item cache: GetItem, BatchGetItem
+• Query cache: Query, Scan results
+• TTL padrão: 5 minutos
+• Multi-AZ (mínimo 3 nodes recomendado)
+• Não suporta: strongly consistent reads
+• Ideal para: read-heavy, hot keys</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Transactions</code><span class="cmd-tag">ACID</span></div>
+              <p>Operações ACID em múltiplos itens/tabelas.</p>
+              <pre><code>• TransactWriteItems: até 100 itens
+• TransactGetItems: até 100 itens
+• All-or-nothing (atomicidade)
+• Consome 2x capacidade (RCU/WCU)
+• Idempotent com ClientRequestToken
+• Casos: transferências, pedidos, inventário
+
+PartiQL:
+• SQL-compatible query language
+• SELECT, INSERT, UPDATE, DELETE
+• Funciona com console, CLI e SDK
+• Suporta transactions</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> GSI pode ser criado depois, LSI apenas na criação. DAX = cache de leitura (microssegundos). Streams retém 24h. TTL não consome WCU. Transactions consomem 2x capacidade. On-Demand é mais caro mas sem planejamento.</p>
+          </div>
+        </div>
+
+        <!-- Amazon S3 -->
+        <div class="topic-block">
+          <h2>Amazon S3</h2>
+          <p>Armazenamento de objetos com durabilidade de 99.999999999% (11 noves) e escalabilidade ilimitada.</p>
+
+          <h3>Storage Classes</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Classe</th><th>Disponibilidade</th><th>Caso de Uso</th><th>Retrieval</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>S3 Standard</strong></td><td>99.99%</td><td>Dados acessados frequentemente</td><td>Imediato</td></tr>
+              <tr><td><strong>S3 Intelligent-Tiering</strong></td><td>99.9%</td><td>Padrão de acesso desconhecido</td><td>Imediato</td></tr>
+              <tr><td><strong>S3 Standard-IA</strong></td><td>99.9%</td><td>Acesso infrequente, acesso rápido</td><td>Imediato (custo por retrieval)</td></tr>
+              <tr><td><strong>S3 One Zone-IA</strong></td><td>99.5%</td><td>Dados recriáveis, 1 AZ</td><td>Imediato (custo por retrieval)</td></tr>
+              <tr><td><strong>S3 Glacier Instant</strong></td><td>99.9%</td><td>Arquivo com acesso imediato</td><td>Milissegundos</td></tr>
+              <tr><td><strong>S3 Glacier Flexible</strong></td><td>99.99%</td><td>Arquivo, acesso em minutos/horas</td><td>1-5 min (Expedited) a 3-5h (Bulk)</td></tr>
+              <tr><td><strong>S3 Glacier Deep Archive</strong></td><td>99.99%</td><td>Arquivo de longo prazo</td><td>12h (Standard) a 48h (Bulk)</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Lifecycle, Versioning, Presigned URLs</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Lifecycle Rules</code><span class="cmd-tag">Automação</span></div>
+              <pre><code>Transition Actions:
+• Mover entre storage classes
+• Ex: Standard → IA após 30 dias
+• Ex: IA → Glacier após 90 dias
+
+Expiration Actions:
+• Deletar objetos após X dias
+• Deletar versões antigas
+• Deletar incomplete multipart uploads
+
+Filtros:
+• Por prefixo (pasta)
+• Por tags
+• Por tamanho do objeto</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Versioning</code><span class="cmd-tag">Histórico</span></div>
+              <pre><code>• Habilitado no nível do bucket
+• Cada versão tem ID único
+• Delete = adiciona "delete marker"
+• Recuperar: deletar o delete marker
+• Não pode ser desabilitado (apenas suspenso)
+• MFA Delete: proteção extra
+• Integra com Lifecycle (versões antigas)
+• Custo: armazena todas as versões</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Presigned URLs</code><span class="cmd-tag">Acesso Temporário</span></div>
+              <pre><code>• URL com credenciais temporárias
+• Upload ou download
+• Expira após tempo definido
+  - Console: até 12h
+  - CLI: até 7 dias (168h)
+• Herda permissões de quem gerou
+• Ideal para: conteúdo privado, uploads diretos
+
+# Gerar presigned URL (CLI)
+aws s3 presign s3://bucket/key \
+  --expires-in 3600</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Event Notifications</code><span class="cmd-tag">Triggers</span></div>
+              <pre><code>Eventos:
+• s3:ObjectCreated:*
+• s3:ObjectRemoved:*
+• s3:ObjectRestore:*
+
+Destinos:
+• SNS Topic
+• SQS Queue
+• Lambda Function
+• EventBridge (todos os eventos)
+
+• Filtro por prefixo e sufixo
+• EventBridge: mais flexível, mais destinos
+• Pode ter múltiplas notificações por bucket</code></pre>
+            </div>
+          </div>
+
+          <h3>Transfer Acceleration</h3>
+          <div class="command-card">
+            <div class="command-header"><code>S3 Transfer Acceleration</code><span class="cmd-tag">Performance</span></div>
+            <pre><code>• Usa CloudFront edge locations para acelerar uploads
+• Endpoint: bucketname.s3-accelerate.amazonaws.com
+• Custo adicional por GB transferido
+• Ideal para: uploads de longa distância, grandes arquivos
+• Multipart upload: recomendado para arquivos > 100 MB (obrigatório > 5 GB)</code></pre>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Presigned URLs herdam permissões do criador. Event Notifications → SNS, SQS, Lambda ou EventBridge. Versioning não pode ser desabilitado após habilitado. Multipart upload obrigatório acima de 5 GB.</p>
+          </div>
+        </div>
+
+        <!-- SQS -->
+        <div class="topic-block">
+          <h2>Amazon SQS</h2>
+          <p>Serviço de filas de mensagens totalmente gerenciado para desacoplamento de componentes.</p>
+
+          <h3>Standard vs FIFO</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>Standard</th><th>FIFO</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Throughput</strong></td><td>Ilimitado</td><td>300 msg/s (3000 com batching)</td></tr>
+              <tr><td><strong>Ordenação</strong></td><td>Best-effort (pode desordenar)</td><td>Garantida (FIFO)</td></tr>
+              <tr><td><strong>Duplicatas</strong></td><td>At-least-once (pode duplicar)</td><td>Exactly-once (deduplication)</td></tr>
+              <tr><td><strong>Nome da fila</strong></td><td>Qualquer nome</td><td>Deve terminar com .fifo</td></tr>
+              <tr><td><strong>Message Group ID</strong></td><td>N/A</td><td>Obrigatório (ordena dentro do grupo)</td></tr>
+              <tr><td><strong>Deduplication ID</strong></td><td>N/A</td><td>Obrigatório (ou content-based dedup)</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Configurações Importantes</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Visibility Timeout</code><span class="cmd-tag">Lock</span></div>
+              <pre><code>• Tempo que mensagem fica "invisível" após ser lida
+• Padrão: 30 segundos
+• Mínimo: 0s | Máximo: 12 horas
+• Se consumer não deletar a tempo → mensagem reaparece
+• ChangeMessageVisibility: estender timeout
+• Deve ser > tempo de processamento
+
+⚠️ Se mensagens são processadas 2x:
+   → Aumentar visibility timeout</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DLQ</code><span class="cmd-tag">Dead Letter Queue</span></div>
+              <pre><code>• Fila para mensagens que falharam N vezes
+• maxReceiveCount: tentativas antes do DLQ
+• Redrive policy: configuração do DLQ
+• Mesmo tipo (Standard DLQ para Standard, FIFO para FIFO)
+• Retention: até 14 dias
+• Redrive to source: reprocessar mensagens do DLQ
+
+Boas práticas:
+• Alarme no DLQ (CloudWatch)
+• Retention do DLQ > retention da fila original</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Long Polling</code><span class="cmd-tag">Eficiência</span></div>
+              <pre><code>Short Polling (padrão):
+• Retorna imediatamente (mesmo vazio)
+• Mais requests = mais custo
+
+Long Polling (recomendado):
+• Espera até ter mensagem (ou timeout)
+• WaitTimeSeconds: 1-20 segundos
+• Reduz requests vazios
+• Reduz custo
+• Configurar na fila ou no ReceiveMessage
+
+⚠️ Sempre usar Long Polling em produção</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Batch Operations</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>• SendMessageBatch: até 10 mensagens
+• ReceiveMessage: até 10 mensagens (MaxNumberOfMessages)
+• DeleteMessageBatch: até 10 mensagens
+• Tamanho máximo por mensagem: 256 KB
+• Batch total: 256 KB
+• Reduz custos (cobrado por request)
+• Extended Client Library: mensagens > 256 KB (usa S3)
+
+Delay Queue:
+• DelaySeconds: 0-900s (15 min)
+• Mensagem invisível por X segundos após envio
+• Diferente de visibility timeout</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> FIFO garante ordem e exactly-once. Long Polling reduz custo. Visibility Timeout deve ser maior que o tempo de processamento. DLQ deve ser do mesmo tipo da fila. Extended Client Library para mensagens > 256 KB.</p>
+          </div>
+        </div>
+
+        <!-- SNS -->
+        <div class="topic-block">
+          <h2>Amazon SNS</h2>
+          <p>Serviço de mensagens pub/sub para comunicação entre serviços e notificações.</p>
+
+          <h3>Topics, Subscriptions e Fan-Out</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Topics & Subscriptions</code><span class="cmd-tag">Pub/Sub</span></div>
+              <pre><code>Tipos de Topic:
+• Standard: alta throughput, best-effort ordering
+• FIFO: ordenação garantida, deduplication
+
+Protocolos de Subscription:
+• HTTP/HTTPS (webhooks)
+• Email / Email-JSON
+• SQS (fan-out pattern)
+• Lambda
+• SMS
+• Kinesis Data Firehose
+• Platform application (push mobile)
+
+• Até 12.5M subscriptions por topic
+• Até 100.000 topics por conta</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Fan-Out Pattern</code><span class="cmd-tag">Arquitetura</span></div>
+              <p>SNS + SQS para processar a mesma mensagem de formas diferentes.</p>
+              <pre><code>SNS Topic
+  ├── SQS Queue A → Service A (email)
+  ├── SQS Queue B → Service B (analytics)
+  └── SQS Queue C → Service C (archive)
+
+Benefícios:
+• Desacoplamento total
+• Cada consumer processa independentemente
+• Retry independente por fila
+• Adicionar consumers sem alterar publisher
+
+SNS FIFO + SQS FIFO:
+• Ordenação end-to-end garantida
+• Fan-out com ordem</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Message Filtering</code><span class="cmd-tag">Filtro</span></div>
+              <p>Filtrar mensagens por subscription usando filter policies.</p>
+              <pre><code>Filter Policy (JSON):
+{
+  "eventType": ["order_placed"],
+  "store": ["store-a", "store-b"],
+  "price": [{"numeric": [">=", 100]}]
+}
+
+• Aplicado por subscription
+• Sem filtro = recebe tudo
+• Reduz processamento desnecessário
+• Filtro por atributos da mensagem
+• Suporta: exact match, prefix, numeric,
+  exists, anything-but, IP address</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> SNS = push (entrega imediata). SQS = pull (consumer busca). Fan-out = SNS → múltiplas SQS. Message Filtering evita processamento desnecessário nos subscribers.</p>
+          </div>
+        </div>
+
+        <!-- Step Functions -->
+        <div class="topic-block">
+          <h2>AWS Step Functions</h2>
+          <p>Orquestração visual de workflows serverless usando state machines.</p>
+
+          <h3>Standard vs Express</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>Standard</th><th>Express</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Duração máxima</strong></td><td>1 ano</td><td>5 minutos</td></tr>
+              <tr><td><strong>Execução</strong></td><td>Exactly-once</td><td>At-least-once (async) / At-most-once (sync)</td></tr>
+              <tr><td><strong>Taxa de execução</strong></td><td>2.000/s</td><td>100.000/s</td></tr>
+              <tr><td><strong>Preço</strong></td><td>Por transição de estado</td><td>Por execução + duração + memória</td></tr>
+              <tr><td><strong>Histórico</strong></td><td>90 dias no console</td><td>CloudWatch Logs</td></tr>
+              <tr><td><strong>Caso de uso</strong></td><td>Workflows longos, orquestração</td><td>Alto volume, IoT, streaming, ETL rápido</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Tipos de Estado</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>States</code><span class="cmd-tag">Tipos</span></div>
+              <pre><code>• Task: executa trabalho (Lambda, ECS, etc.)
+• Choice: decisão condicional (if/else)
+• Parallel: execução paralela de branches
+• Map: iteração sobre array (loop)
+• Wait: pausa por tempo definido
+• Pass: passa input para output (debug/transform)
+• Succeed: finaliza com sucesso
+• Fail: finaliza com erro</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Error Handling</code><span class="cmd-tag">Resiliência</span></div>
+              <pre><code>Retry:
+• ErrorEquals: tipos de erro
+• IntervalSeconds: tempo entre retries
+• MaxAttempts: máximo de tentativas
+• BackoffRate: multiplicador exponencial
+
+Catch:
+• ErrorEquals: tipos de erro para capturar
+• Next: estado de fallback
+• ResultPath: onde colocar o erro
+
+Erros predefinidos:
+• States.ALL: qualquer erro
+• States.Timeout: timeout
+• States.TaskFailed: falha na task
+• States.Permissions: sem permissão</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Service Integrations</code><span class="cmd-tag">Integrações</span></div>
+              <pre><code>Padrões de integração:
+• Request Response: chama e espera resposta
+• Run a Job (.sync): espera job completar
+  - ECS, Glue, Batch, CodeBuild
+• Wait for Callback (.waitForTaskToken):
+  - Pausa até receber token de callback
+  - Ideal para aprovações humanas
+
+Serviços integrados:
+• Lambda, ECS, Fargate, Batch
+• DynamoDB, SQS, SNS
+• Glue, SageMaker, EMR
+• API Gateway, EventBridge</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Standard = workflows longos (até 1 ano). Express = alto volume e curta duração (até 5 min). Retry + Catch para error handling. .waitForTaskToken para aprovações humanas. Map state para processar arrays.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../developer.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

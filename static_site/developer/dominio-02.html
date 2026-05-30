@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Developer Domínio 02: Segurança</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../developer.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-01.html" class="nav-link">← Anterior</a>
+        <a href="dominio-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">💻 Developer — Domínio 02</span>
+        <h1>Segurança</h1>
+        <p>IAM, Cognito, KMS, Secrets Manager, SSM Parameter Store, criptografia, autenticação e autorização. Este domínio representa 26% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- IAM -->
+        <div class="topic-block">
+          <h2>AWS IAM (Identity and Access Management)</h2>
+          <p>Controle de acesso granular para recursos AWS. Fundamento de segurança para todo o ecossistema.</p>
+
+          <h3>Tipos de Policy</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Onde é Anexada</th><th>Gerenciamento</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>AWS Managed</strong></td><td>Users, Groups, Roles</td><td>AWS mantém</td><td>Permissões comuns (ReadOnlyAccess, AdminAccess)</td></tr>
+              <tr><td><strong>Customer Managed</strong></td><td>Users, Groups, Roles</td><td>Você mantém</td><td>Permissões customizadas da organização</td></tr>
+              <tr><td><strong>Inline</strong></td><td>Diretamente no principal</td><td>Você mantém</td><td>Relação 1:1 estrita (não reutilizável)</td></tr>
+              <tr><td><strong>Resource-based</strong></td><td>No recurso (S3, SQS, Lambda)</td><td>Você mantém</td><td>Cross-account access, acesso direto ao recurso</td></tr>
+              <tr><td><strong>Permission Boundary</strong></td><td>Users, Roles</td><td>Você mantém</td><td>Limitar permissões máximas (delegação segura)</td></tr>
+              <tr><td><strong>SCP (Service Control Policy)</strong></td><td>AWS Organizations (OU/Account)</td><td>Org admin</td><td>Guardrails para toda a organização</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Policy Evaluation Logic</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Evaluation Order</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>1. Explicit Deny → DENY (sempre vence)
+2. SCP → se não permite, DENY
+3. Resource-based policy → se permite, ALLOW
+4. Permission Boundary → se não permite, DENY
+5. Session Policy → se não permite, DENY
+6. Identity-based policy → se permite, ALLOW
+7. Implicit Deny (padrão)
+
+Regra de ouro:
+• Deny SEMPRE vence Allow
+• Sem permissão explícita = Deny implícito
+• Resource-based pode conceder cross-account</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Policy Structure</code><span class="cmd-tag">JSON</span></div>
+              <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "AllowS3Read",
+    "Effect": "Allow",
+    "Action": [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ],
+    "Resource": [
+      "arn:aws:s3:::my-bucket",
+      "arn:aws:s3:::my-bucket/*"
+    ],
+    "Condition": {
+      "StringEquals": {
+        "aws:RequestedRegion": "us-east-1"
+      }
+    }
+  }]
+}</code></pre>
+            </div>
+          </div>
+
+          <h3>IAM Roles, STS e Cross-Account</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IAM Roles</code><span class="cmd-tag">Assume Role</span></div>
+              <pre><code>• Credenciais temporárias (não permanentes)
+• Trust Policy: quem pode assumir a role
+• Permission Policy: o que a role pode fazer
+• Duração: 1h a 12h (padrão: 1h)
+
+Casos de uso:
+• EC2 Instance Profile
+• Lambda Execution Role
+• Cross-account access
+• Federation (SAML, OIDC)
+• Service-linked roles</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS STS</code><span class="cmd-tag">Tokens</span></div>
+              <pre><code>Security Token Service — credenciais temporárias:
+
+• AssumeRole: assume role na mesma ou outra conta
+• AssumeRoleWithSAML: federation com SAML
+• AssumeRoleWithWebIdentity: federation com OIDC
+  (Cognito Identity Pool é preferido)
+• GetSessionToken: MFA para usuário IAM
+• GetCallerIdentity: "quem sou eu?"
+
+Retorna:
+• AccessKeyId
+• SecretAccessKey
+• SessionToken (obrigatório nas chamadas)
+• Expiration</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cross-Account Access</code><span class="cmd-tag">Multi-conta</span></div>
+              <pre><code>Opção 1: Resource-based Policy
+• Adicionar conta B na policy do recurso
+• Não precisa assumir role
+• Principal mantém suas permissões originais
+
+Opção 2: AssumeRole (recomendado)
+1. Conta A cria role com trust policy para conta B
+2. Conta B assume a role via STS
+3. Recebe credenciais temporárias da conta A
+
+⚠️ Resource-based: não perde permissões originais
+⚠️ AssumeRole: assume APENAS as permissões da role</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Permission Boundaries</code><span class="cmd-tag">Limite</span></div>
+              <pre><code>• Define o MÁXIMO de permissões que um user/role pode ter
+• Effective permissions = Identity policy ∩ Boundary
+• Não concede permissões por si só
+• Ideal para delegação segura:
+  - Admin cria boundary
+  - Dev cria roles dentro do boundary
+  - Dev não pode escalar privilégios
+
+Exemplo:
+• Boundary permite: s3:*, dynamodb:*
+• Identity policy permite: s3:*, ec2:*
+• Effective: apenas s3:* (interseção)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Explicit Deny sempre vence. Permission Boundary = interseção com identity policy. Cross-account com resource-based policy mantém permissões originais. STS retorna credenciais temporárias.</p>
+          </div>
+        </div>
+
+        <!-- Cognito -->
+        <div class="topic-block">
+          <h2>Amazon Cognito</h2>
+          <p>Serviço de identidade para aplicações web e mobile — autenticação, autorização e gerenciamento de usuários.</p>
+
+          <h3>User Pools vs Identity Pools</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>User Pools</th><th>Identity Pools (Federated Identities)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Função</strong></td><td>Autenticação (quem é você?)</td><td>Autorização (o que você pode fazer na AWS?)</td></tr>
+              <tr><td><strong>Retorna</strong></td><td>JWT Tokens (ID, Access, Refresh)</td><td>Credenciais AWS temporárias (STS)</td></tr>
+              <tr><td><strong>Caso de uso</strong></td><td>Sign-up, sign-in, MFA, social login</td><td>Acesso direto a serviços AWS (S3, DynamoDB)</td></tr>
+              <tr><td><strong>Providers</strong></td><td>Próprio, Google, Facebook, SAML, OIDC</td><td>Cognito User Pool, Google, Facebook, SAML, OIDC</td></tr>
+              <tr><td><strong>Integração</strong></td><td>API Gateway (Cognito Authorizer), ALB</td><td>IAM Roles para acesso a recursos AWS</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Authentication Flows e Tokens</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Auth Flows</code><span class="cmd-tag">Fluxos</span></div>
+              <pre><code>USER_SRP_AUTH:
+• Secure Remote Password (recomendado)
+• Senha nunca trafega pela rede
+
+USER_PASSWORD_AUTH:
+• Envia username + password diretamente
+• Menos seguro, mais simples
+
+CUSTOM_AUTH:
+• Lambda triggers para lógica customizada
+• Desafios personalizados (CAPTCHA, OTP)
+
+ADMIN_USER_PASSWORD_AUTH:
+• Server-side (backend)
+• Requer credenciais admin
+
+Refresh Token:
+• Obtém novos ID/Access tokens
+• Sem re-autenticação do usuário
+• Validade: 1 dia a 3650 dias</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Tokens</code><span class="cmd-tag">JWT</span></div>
+              <pre><code>ID Token:
+• Identidade do usuário
+• Claims: email, name, phone, custom attributes
+• Usado para personalização no frontend
+• Validade: 5 min a 1 dia
+
+Access Token:
+• Autorização para APIs
+• Claims: scopes, groups
+• Usado no header Authorization: Bearer
+• Validade: 5 min a 1 dia
+
+Refresh Token:
+• Obtém novos tokens sem re-login
+• Validade: 1 dia a 10 anos
+• Pode ser revogado
+
+⚠️ ID Token = quem é | Access Token = o que pode</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>MFA & Security</code><span class="cmd-tag">Proteção</span></div>
+              <pre><code>MFA:
+• TOTP (Google Authenticator)
+• SMS (menos seguro)
+• Pode ser obrigatório ou opcional
+
+Advanced Security:
+• Adaptive authentication
+• Compromised credentials detection
+• Account takeover protection
+• Risk-based MFA
+
+Lambda Triggers:
+• Pre sign-up: validação customizada
+• Post confirmation: welcome email
+• Pre token generation: custom claims
+• Custom message: personalizar emails
+• Migrate user: migração de legacy</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> User Pool = autenticação (JWT). Identity Pool = autorização (credenciais AWS). Fluxo comum: User Pool autentica → Identity Pool fornece credenciais AWS. API Gateway usa Cognito Authorizer com User Pool tokens.</p>
+          </div>
+        </div>
+
+        <!-- KMS -->
+        <div class="topic-block">
+          <h2>AWS KMS (Key Management Service)</h2>
+          <p>Gerenciamento centralizado de chaves de criptografia para proteger dados em repouso e em trânsito.</p>
+
+          <h3>Tipos de CMK (Customer Master Key)</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Gerenciamento</th><th>Rotação</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>AWS Owned</strong></td><td>AWS (invisível)</td><td>Varia</td><td>Serviços AWS internamente (SSE-S3)</td></tr>
+              <tr><td><strong>AWS Managed</strong></td><td>AWS (visível, aws/service)</td><td>Automática (1 ano)</td><td>Serviços AWS com sua chave (aws/s3, aws/ebs)</td></tr>
+              <tr><td><strong>Customer Managed</strong></td><td>Você gerencia</td><td>Configurável (opcional)</td><td>Controle total, cross-account, auditoria</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Envelope Encryption e Key Policies</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Envelope Encryption</code><span class="cmd-tag">Padrão</span></div>
+              <p>Padrão usado para criptografar dados maiores que 4 KB.</p>
+              <pre><code>Processo:
+1. GenerateDataKey → retorna:
+   • Plaintext data key (para criptografar)
+   • Encrypted data key (para armazenar)
+2. Criptografa dados com plaintext data key
+3. Descarta plaintext data key da memória
+4. Armazena encrypted data key junto aos dados
+
+Decrypt:
+1. Envia encrypted data key ao KMS
+2. KMS retorna plaintext data key
+3. Usa plaintext data key para decriptar dados
+
+⚠️ KMS só criptografa até 4 KB diretamente
+⚠️ Para dados maiores: SEMPRE envelope encryption</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Key Policies & Grants</code><span class="cmd-tag">Acesso</span></div>
+              <pre><code>Key Policy (obrigatória):
+• Toda CMK tem uma key policy
+• Define quem pode usar/gerenciar a chave
+• Sem key policy = ninguém acessa (nem root)
+• Default: permite root account gerenciar
+
+Grants:
+• Permissões temporárias e granulares
+• Programáticas (via API)
+• Não precisam alterar key policy
+• Ideal para: acesso temporário, delegação
+• Podem ser revogados (RevokeGrant)
+
+IAM Policy + Key Policy:
+• Ambos devem permitir para funcionar
+• Key policy deve permitir IAM policies
+  (statement com "Enable IAM User Permissions")</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Data Key Caching</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>AWS Encryption SDK:
+• Cache de data keys para reutilização
+• Reduz chamadas ao KMS (custo + latência)
+• LocalCryptoMaterialsCache
+
+Configurações:
+• Max age: tempo máximo no cache
+• Max bytes encrypted: limite de dados
+• Max messages encrypted: limite de mensagens
+
+Quando usar:
+• Alto volume de encrypt/decrypt
+• Latência é crítica
+• Custo de KMS API calls é relevante
+
+⚠️ Trade-off: segurança vs performance</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Dados > 4 KB = Envelope Encryption (GenerateDataKey). Key Policy é obrigatória. Customer Managed Key para controle total e cross-account. AWS Encryption SDK para data key caching.</p>
+          </div>
+        </div>
+
+        <!-- Secrets Manager vs SSM Parameter Store -->
+        <div class="topic-block">
+          <h2>Secrets Manager vs SSM Parameter Store</h2>
+          <p>Dois serviços para armazenar configurações e segredos, com características diferentes.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>Secrets Manager</th><th>SSM Parameter Store</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Propósito</strong></td><td>Segredos (senhas, API keys, tokens)</td><td>Configurações e segredos</td></tr>
+              <tr><td><strong>Rotação automática</strong></td><td>Sim (Lambda built-in para RDS, Redshift, DocumentDB)</td><td>Não nativo (precisa Lambda + EventBridge)</td></tr>
+              <tr><td><strong>Criptografia</strong></td><td>Sempre criptografado (KMS)</td><td>Opcional (SecureString com KMS)</td></tr>
+              <tr><td><strong>Versionamento</strong></td><td>Sim (automático)</td><td>Sim (labels: latest, v1, v2)</td></tr>
+              <tr><td><strong>Cross-account</strong></td><td>Sim (resource policy)</td><td>Não nativo (precisa assumir role)</td></tr>
+              <tr><td><strong>Custo</strong></td><td>$0.40/segredo/mês + $0.05/10K API calls</td><td>Standard: gratuito | Advanced: $0.05/parâmetro/mês</td></tr>
+              <tr><td><strong>Tamanho máximo</strong></td><td>64 KB</td><td>Standard: 4 KB | Advanced: 8 KB</td></tr>
+              <tr><td><strong>Hierarquia</strong></td><td>Não</td><td>Sim (/app/prod/db/password)</td></tr>
+              <tr><td><strong>Integração CloudFormation</strong></td><td>Dynamic reference</td><td>Dynamic reference + resolve</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Secrets Manager</code><span class="cmd-tag">Rotação</span></div>
+              <pre><code>Rotação automática:
+• Lambda function rotaciona o segredo
+• Built-in para: RDS, Redshift, DocumentDB
+• Custom Lambda para outros serviços
+• Schedule: dias ou cron expression
+
+Uso no código:
+import boto3
+client = boto3.client('secretsmanager')
+response = client.get_secret_value(
+    SecretId='prod/myapp/database'
+)
+secret = json.loads(response['SecretString'])
+
+⚠️ Cache o segredo no código (não buscar a cada request)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Parameter Store</code><span class="cmd-tag">Hierarquia</span></div>
+              <pre><code>Tipos de parâmetro:
+• String: texto simples
+• StringList: lista separada por vírgula
+• SecureString: criptografado com KMS
+
+Hierarquia:
+/myapp/
+  /prod/
+    /db/host
+    /db/password (SecureString)
+    /api/key (SecureString)
+  /dev/
+    /db/host
+    /db/password
+
+GetParametersByPath:
+• Busca todos os parâmetros de um path
+• Recursive: busca subpaths
+• WithDecryption: decripta SecureStrings
+
+Tiers:
+• Standard: 4 KB, 10K params, gratuito
+• Advanced: 8 KB, 100K params, policies</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Precisa de rotação automática → Secrets Manager. Configurações simples e gratuitas → Parameter Store. Hierarquia de parâmetros → Parameter Store. Segredos de banco com rotação → Secrets Manager.</p>
+          </div>
+        </div>
+
+        <!-- Encryption Patterns -->
+        <div class="topic-block">
+          <h2>Criptografia em Repouso e em Trânsito</h2>
+          <p>Padrões de criptografia para proteger dados em diferentes estados.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Encryption at Rest</code><span class="cmd-tag">Armazenamento</span></div>
+              <pre><code>S3:
+• SSE-S3: chave gerenciada pela AWS (padrão)
+• SSE-KMS: chave KMS (auditoria, controle)
+• SSE-C: chave fornecida pelo cliente
+• Client-side: criptografa antes de enviar
+
+DynamoDB:
+• AWS owned key (padrão, gratuito)
+• AWS managed key (aws/dynamodb)
+• Customer managed key (CMK)
+
+EBS:
+• AES-256 (aws/ebs ou CMK)
+• Snapshots criptografados automaticamente
+
+RDS:
+• AES-256 com KMS
+• Deve ser habilitado na criação
+• Read replicas herdam criptografia</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Encryption in Transit</code><span class="cmd-tag">Rede</span></div>
+              <pre><code>TLS/SSL:
+• HTTPS para APIs AWS (obrigatório)
+• TLS 1.2+ recomendado
+• Certificate Manager (ACM) para certificados
+
+VPN:
+• Site-to-Site VPN (IPSec)
+• Client VPN
+
+Serviços específicos:
+• S3: bucket policy para forçar HTTPS
+  "aws:SecureTransport": "false" → Deny
+• RDS: rds.force_ssl = 1
+• ElastiCache: in-transit encryption
+• DynamoDB: sempre HTTPS (endpoint)
+
+⚠️ Sempre forçar HTTPS via policies
+⚠️ SSE-C requer HTTPS obrigatoriamente</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Gateway Authorizers -->
+        <div class="topic-block">
+          <h2>API Gateway Authorizers (Detalhado)</h2>
+          <p>Mecanismos de autenticação e autorização para APIs.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Lambda Authorizer</code><span class="cmd-tag">Custom</span></div>
+              <pre><code>Fluxo:
+1. Client envia request com token/params
+2. API Gateway invoca Lambda Authorizer
+3. Lambda valida e retorna IAM Policy
+4. API Gateway cacheia policy (opcional)
+5. Request é permitido ou negado
+
+Retorno da Lambda:
+{
+  "principalId": "user123",
+  "policyDocument": {
+    "Statement": [{
+      "Effect": "Allow",
+      "Action": "execute-api:Invoke",
+      "Resource": "arn:aws:execute-api:..."
+    }]
+  },
+  "context": { "org": "acme" }
+}
+
+• Cache: 0 a 3600 segundos
+• Custo: Lambda invocation + API Gateway</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cognito Authorizer</code><span class="cmd-tag">JWT</span></div>
+              <pre><code>Fluxo:
+1. Client autentica no Cognito User Pool
+2. Recebe JWT tokens (ID + Access)
+3. Envia token no header Authorization
+4. API Gateway valida JWT automaticamente
+5. Sem invocação de Lambda
+
+Configuração:
+• Especificar User Pool ID
+• Token source: header Authorization
+• Validação: signature, expiration, issuer
+
+Vantagens:
+• Sem custo adicional (sem Lambda)
+• Validação automática de JWT
+• Integração nativa
+
+Limitações:
+• Apenas Cognito User Pool tokens
+• Sem lógica customizada
+• Sem acesso a headers/query params</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>IAM Authorization</code><span class="cmd-tag">SigV4</span></div>
+              <pre><code>Fluxo:
+1. Client assina request com SigV4
+2. API Gateway valida assinatura
+3. Verifica IAM policy do caller
+4. Verifica resource policy da API
+
+Quando usar:
+• Chamadas entre serviços AWS
+• Cross-account access
+• Usuários IAM/Roles
+• Não precisa de token externo
+
+Configuração:
+• Authorization: AWS4-HMAC-SHA256
+• SDK assina automaticamente
+• Resource policy para cross-account
+
+⚠️ Melhor para service-to-service
+⚠️ Não ideal para usuários finais (web/mobile)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Lambda Authorizer = lógica customizada, tokens de terceiros. Cognito Authorizer = JWT do Cognito, sem Lambda. IAM Auth = service-to-service, SigV4. Para OAuth/OIDC de terceiros → Lambda Authorizer.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-01.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-03.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
