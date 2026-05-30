@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Terraform: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Terraform com 15 perguntas técnicas sobre HCL, state, modules e Infrastructure as Code." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../terraform.html" class="nav-link">← Terraform</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../terraform.html">Terraform</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Terraform — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre Terraform. Teste seus conhecimentos em HCL, gerenciamento de state, modules e workflows de IaC.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../terraform.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual comando Terraform inicializa o diretório de trabalho, baixando providers e módulos?",
+        options: ["A) terraform start", "B) terraform init", "C) terraform setup", "D) terraform configure"],
+        correct: 1,
+        explanation: "'terraform init' inicializa o diretório: baixa providers, módulos, configura o backend de state. Deve ser executado antes de plan/apply e após mudanças em providers ou backend."
+      },
+      {
+        question: "Qual é a função do arquivo terraform.tfstate?",
+        options: ["A) Armazenar variáveis de entrada", "B) Mapear os recursos declarados no código com os recursos reais na infraestrutura", "C) Guardar credenciais do provider", "D) Definir outputs do módulo"],
+        correct: 1,
+        explanation: "O state file é o mapeamento entre o código HCL e a infraestrutura real. Terraform usa ele para saber o que existe, planejar mudanças e detectar drift."
+      },
+      {
+        question: "Qual bloco HCL define uma variável de entrada com valor padrão?",
+        options: ["A) resource \"var\" { default = \"value\" }", "B) variable \"name\" { type = string  default = \"value\" }", "C) input \"name\" { value = \"value\" }", "D) param \"name\" { default = \"value\" }"],
+        correct: 1,
+        explanation: "O bloco 'variable' define inputs com type, default, description e validation. Variáveis sem default são obrigatórias e devem ser fornecidas via -var, .tfvars ou variável de ambiente."
+      },
+      {
+        question: "Qual é a diferença entre 'terraform plan' e 'terraform apply'?",
+        options: ["A) plan executa mudanças; apply apenas mostra", "B) plan mostra o que será alterado sem executar; apply executa as mudanças", "C) Não há diferença, ambos aplicam mudanças", "D) plan é para módulos; apply é para resources"],
+        correct: 1,
+        explanation: "'terraform plan' gera um plano de execução mostrando o que será criado, alterado ou destruído — sem fazer mudanças. 'terraform apply' executa as mudanças (opcionalmente com confirmação)."
+      },
+      {
+        question: "Qual bloco é usado para consultar dados de recursos existentes que NÃO são gerenciados pelo Terraform?",
+        options: ["A) resource", "B) data", "C) module", "D) locals"],
+        correct: 1,
+        explanation: "O bloco 'data' (data source) consulta informações de recursos existentes (AMIs, VPCs, DNS zones) sem gerenciá-los. Útil para referenciar infraestrutura criada fora do Terraform."
+      },
+      {
+        question: "Qual meta-argumento impede que o Terraform destrua um recurso acidentalmente?",
+        options: ["A) prevent_destroy = true no bloco resource", "B) lifecycle { prevent_destroy = true }", "C) depends_on = [\"nodelete\"]", "D) protection = true"],
+        correct: 1,
+        explanation: "lifecycle { prevent_destroy = true } faz o Terraform rejeitar qualquer plan que tente destruir o recurso. Útil para bancos de dados e recursos críticos em produção."
+      },
+      {
+        question: "Como você referencia o output 'vpc_id' de um módulo chamado 'network'?",
+        options: ["A) var.network.vpc_id", "B) module.network.vpc_id", "C) output.network.vpc_id", "D) data.network.vpc_id"],
+        correct: 1,
+        explanation: "Outputs de módulos são acessados via 'module.<nome_modulo>.<output_name>'. Variáveis (var.) são inputs, data sources (data.) consultam recursos externos."
+      },
+      {
+        question: "Qual backend é recomendado para armazenar o state de forma remota e segura em equipes na AWS?",
+        options: ["A) local", "B) consul", "C) S3 com DynamoDB para locking", "D) git"],
+        correct: 2,
+        explanation: "S3 armazena o state com versionamento e encryption. DynamoDB fornece state locking para evitar conflitos quando múltiplos usuários executam apply simultaneamente."
+      },
+      {
+        question: "Qual comando importa um recurso existente na AWS para o state do Terraform?",
+        options: ["A) terraform get <resource>", "B) terraform import <address> <id>", "C) terraform add <resource> <id>", "D) terraform sync <address>"],
+        correct: 1,
+        explanation: "'terraform import aws_instance.web i-1234567890' importa o recurso existente para o state. Você ainda precisa escrever o bloco resource correspondente no código HCL."
+      },
+      {
+        question: "Qual é a função do bloco 'terraform { required_providers {} }'?",
+        options: ["A) Instalar providers automaticamente", "B) Declarar quais providers e versões são necessários para o projeto", "C) Configurar credenciais dos providers", "D) Definir outputs obrigatórios"],
+        correct: 1,
+        explanation: "required_providers declara os providers necessários com source e version constraints. Garante que todos usem versões compatíveis e permite 'terraform init' baixar os corretos."
+      },
+      {
+        question: "Qual expressão HCL cria uma lista de IDs a partir de múltiplas instâncias criadas com count?",
+        options: ["A) aws_instance.web.id", "B) aws_instance.web[*].id", "C) aws_instance.web.*.id", "D) list(aws_instance.web.id)"],
+        correct: 1,
+        explanation: "O splat expression [*].id retorna uma lista com o atributo 'id' de todas as instâncias criadas com count ou for_each. É equivalente a [for i in aws_instance.web : i.id]."
+      },
+      {
+        question: "Qual é a diferença entre 'count' e 'for_each' para criar múltiplos recursos?",
+        options: ["A) count usa índices numéricos; for_each usa chaves de map/set permitindo identificação estável", "B) for_each é mais antigo e deprecado", "C) count suporta maps; for_each apenas números", "D) Não há diferença funcional"],
+        correct: 0,
+        explanation: "count usa índices (0,1,2) — remover um item do meio reordena todos. for_each usa chaves estáveis de map/set — remover um item não afeta os outros. for_each é preferido."
+      },
+      {
+        question: "Qual comando Terraform mostra os recursos atualmente gerenciados no state?",
+        options: ["A) terraform show", "B) terraform state list", "C) terraform resources", "D) terraform inventory"],
+        correct: 1,
+        explanation: "'terraform state list' lista todos os recursos no state. 'terraform state show <address>' mostra detalhes de um recurso específico. 'terraform show' mostra o state completo ou um plan."
+      },
+      {
+        question: "Qual workspace do Terraform é usado por padrão quando nenhum workspace é criado?",
+        options: ["A) production", "B) main", "C) default", "D) master"],
+        correct: 2,
+        explanation: "O workspace 'default' é criado automaticamente. Workspaces permitem manter múltiplos states (dev, staging, prod) com o mesmo código. Cada workspace tem seu próprio state file."
+      },
+      {
+        question: "Um recurso foi modificado manualmente no console AWS. Qual comando detecta essa diferença (drift) entre o state e a realidade?",
+        options: ["A) terraform validate", "B) terraform plan", "C) terraform fmt", "D) terraform refresh"],
+        correct: 3,
+        explanation: "'terraform refresh' (ou plan com -refresh-only) atualiza o state com o estado real da infraestrutura, detectando drift. 'terraform plan' também mostra drift ao comparar desired vs actual."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>

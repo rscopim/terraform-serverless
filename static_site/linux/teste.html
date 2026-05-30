@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Linux: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Linux com 15 perguntas técnicas sobre comandos, permissões, processos e administração de sistemas." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../linux.html" class="nav-link">← Linux</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../linux.html">Linux</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Linux — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre administração Linux. Teste seus conhecimentos em comandos, permissões, processos e shell scripting.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../linux.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual comando exibe o conteúdo de um arquivo com numeração de linhas?",
+        options: ["A) cat -n arquivo.txt", "B) less -n arquivo.txt", "C) head -l arquivo.txt", "D) tail -n arquivo.txt"],
+        correct: 0,
+        explanation: "O comando 'cat -n' exibe o conteúdo do arquivo com cada linha numerada. O 'less' é um paginador, 'head' mostra as primeiras linhas e 'tail' as últimas."
+      },
+      {
+        question: "Qual permissão numérica (octal) representa rwxr-xr-- ?",
+        options: ["A) 755", "B) 754", "C) 764", "D) 744"],
+        correct: 1,
+        explanation: "rwx = 4+2+1 = 7, r-x = 4+0+1 = 5, r-- = 4+0+0 = 4. Portanto, rwxr-xr-- = 754."
+      },
+      {
+        question: "Você precisa encontrar todos os arquivos .log maiores que 100MB no diretório /var. Qual comando usar?",
+        options: ["A) find /var -name '*.log' -size +100M", "B) grep -r '*.log' /var --size 100M", "C) locate /var/*.log -size +100M", "D) ls -la /var/*.log | grep 100M"],
+        correct: 0,
+        explanation: "O comando 'find' com -name para filtrar por extensão e -size +100M para arquivos maiores que 100MB é a forma correta. O grep busca conteúdo, não arquivos por tamanho."
+      },
+      {
+        question: "Qual é a função do comando 'chmod u+s /usr/bin/programa'?",
+        options: ["A) Remove permissão de execução do usuário", "B) Define o bit SUID — o programa executa com permissões do dono do arquivo", "C) Define o bit sticky no arquivo", "D) Altera o dono do arquivo para root"],
+        correct: 1,
+        explanation: "O bit SUID (Set User ID) faz com que o programa execute com as permissões do dono do arquivo, não do usuário que o executou. Exemplo clássico: /usr/bin/passwd."
+      },
+      {
+        question: "Qual comando redireciona tanto stdout quanto stderr para um arquivo?",
+        options: ["A) comando > arquivo 2>&1", "B) comando > arquivo 1>&2", "C) comando >> arquivo &1", "D) comando 2> arquivo 1>"],
+        correct: 0,
+        explanation: "'comando > arquivo 2>&1' redireciona stdout (1) para o arquivo e depois redireciona stderr (2) para onde stdout está apontando (o arquivo). Forma moderna: 'comando &> arquivo'."
+      },
+      {
+        question: "Um processo está consumindo muita CPU. Qual comando envia o sinal para encerrá-lo de forma graciosa?",
+        options: ["A) kill -9 PID", "B) kill -15 PID", "C) kill -1 PID", "D) kill -19 PID"],
+        correct: 1,
+        explanation: "O sinal 15 (SIGTERM) solicita encerramento gracioso, permitindo que o processo libere recursos. O sinal 9 (SIGKILL) força o encerramento imediato sem cleanup."
+      },
+      {
+        question: "Qual comando exibe as conexões de rede ativas e portas em escuta no Linux moderno?",
+        options: ["A) ifconfig -a", "B) netstat -tulpn", "C) ss -tulpn", "D) ip link show"],
+        correct: 2,
+        explanation: "O 'ss' (socket statistics) é o substituto moderno do netstat. As flags -tulpn mostram: TCP, UDP, listening, processos e números de porta. O netstat está deprecado."
+      },
+      {
+        question: "Qual é a diferença entre um hard link e um soft link (symlink)?",
+        options: ["A) Hard link funciona entre sistemas de arquivos diferentes, symlink não", "B) Symlink aponta para o nome do arquivo; hard link aponta para o inode diretamente", "C) Hard link pode apontar para diretórios, symlink não", "D) Não há diferença prática entre eles"],
+        correct: 1,
+        explanation: "Hard link aponta diretamente para o inode (dados no disco) — se o arquivo original for deletado, o hard link ainda funciona. Symlink aponta para o caminho/nome e quebra se o original for removido."
+      },
+      {
+        question: "Você precisa agendar um script para executar todo dia às 3:30 da manhã. Qual entrada no crontab está correta?",
+        options: ["A) 30 3 * * * /opt/scripts/backup.sh", "B) 3 30 * * * /opt/scripts/backup.sh", "C) * * 3 30 * /opt/scripts/backup.sh", "D) 30 3 1 * * /opt/scripts/backup.sh"],
+        correct: 0,
+        explanation: "O formato do crontab é: minuto hora dia-do-mês mês dia-da-semana. '30 3 * * *' significa minuto 30, hora 3, todos os dias, todos os meses, todos os dias da semana."
+      },
+      {
+        question: "Qual comando mostra o espaço em disco utilizado por cada diretório em /home, ordenado por tamanho?",
+        options: ["A) df -h /home | sort", "B) du -sh /home/* | sort -h", "C) ls -lhS /home", "D) stat /home/*"],
+        correct: 1,
+        explanation: "'du -sh /home/*' mostra o tamanho de cada subdiretório em formato legível, e 'sort -h' ordena considerando sufixos humanos (K, M, G). O 'df' mostra espaço de partições, não diretórios."
+      },
+      {
+        question: "Qual comando do systemd reinicia um serviço e o habilita para iniciar automaticamente no boot?",
+        options: ["A) systemctl start --enable nginx", "B) systemctl restart nginx && systemctl enable nginx", "C) service nginx restart --boot", "D) systemctl reload-and-enable nginx"],
+        correct: 1,
+        explanation: "'systemctl restart' reinicia o serviço imediatamente e 'systemctl enable' cria os symlinks para inicialização automática no boot. São dois comandos separados."
+      },
+      {
+        question: "Em um script bash, qual é a diferença entre $@ e $* quando usados entre aspas duplas?",
+        options: ["A) Não há diferença", "B) \"$@\" expande cada argumento como string separada; \"$*\" junta todos em uma única string", "C) \"$*\" expande cada argumento separadamente; \"$@\" junta todos", "D) Ambos sempre expandem como uma única string"],
+        correct: 1,
+        explanation: "\"$@\" preserva cada argumento como elemento individual (ideal para loops). \"$*\" concatena todos os argumentos em uma única string separada pelo primeiro caractere de IFS."
+      },
+      {
+        question: "Um servidor Linux não resolve nomes DNS. Qual arquivo você verifica primeiro para identificar os servidores DNS configurados?",
+        options: ["A) /etc/hosts", "B) /etc/resolv.conf", "C) /etc/nsswitch.conf", "D) /etc/hostname"],
+        correct: 1,
+        explanation: "/etc/resolv.conf contém os servidores DNS (nameserver) usados pelo sistema. /etc/hosts é para resolução local estática, /etc/nsswitch.conf define a ordem de resolução."
+      },
+      {
+        question: "Qual comando extrai a terceira coluna de um arquivo CSV usando ',' como delimitador?",
+        options: ["A) awk -F',' '{print $3}' arquivo.csv", "B) cut -f3 arquivo.csv", "C) sed -n '3p' arquivo.csv", "D) grep -o ',[^,]*' arquivo.csv"],
+        correct: 0,
+        explanation: "'awk -F\",\" \"{print $3}\"' define a vírgula como separador de campos (-F) e imprime o terceiro campo ($3). O 'cut -f3' usa tab como delimitador padrão (precisaria de -d',')."
+      },
+      {
+        question: "Você precisa monitorar em tempo real quais processos estão consumindo mais I/O de disco. Qual ferramenta utilizar?",
+        options: ["A) top", "B) htop", "C) iotop", "D) vmstat"],
+        correct: 2,
+        explanation: "'iotop' mostra em tempo real o I/O de disco por processo (leitura/escrita). 'top' e 'htop' focam em CPU/memória. 'vmstat' mostra estatísticas gerais do sistema."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>

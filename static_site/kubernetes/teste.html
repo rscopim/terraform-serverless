@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Kubernetes: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Kubernetes com 15 perguntas técnicas sobre pods, deployments, services e orquestração." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../kubernetes.html" class="nav-link">← Kubernetes</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../kubernetes.html">Kubernetes</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Kubernetes — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre Kubernetes. Teste seus conhecimentos em pods, deployments, services, networking e administração de clusters.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../kubernetes.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual é a menor unidade deployável no Kubernetes?",
+        options: ["A) Container", "B) Pod", "C) Deployment", "D) Node"],
+        correct: 1,
+        explanation: "O Pod é a menor unidade no Kubernetes. Ele encapsula um ou mais containers que compartilham rede e storage. Containers dentro de um Pod se comunicam via localhost."
+      },
+      {
+        question: "Qual tipo de Service expõe a aplicação externamente com um IP público fornecido pelo cloud provider?",
+        options: ["A) ClusterIP", "B) NodePort", "C) LoadBalancer", "D) ExternalName"],
+        correct: 2,
+        explanation: "LoadBalancer provisiona um load balancer externo do cloud provider com IP público. ClusterIP é interno, NodePort expõe em uma porta do node, ExternalName mapeia para DNS externo."
+      },
+      {
+        question: "Qual comando kubectl mostra os logs de um container específico em um Pod multi-container?",
+        options: ["A) kubectl logs pod-name", "B) kubectl logs pod-name -c container-name", "C) kubectl describe pod pod-name --logs", "D) kubectl get logs pod-name/container-name"],
+        correct: 1,
+        explanation: "'kubectl logs pod-name -c container-name' especifica qual container ver os logs em um Pod com múltiplos containers. Sem -c, mostra o container padrão."
+      },
+      {
+        question: "Qual recurso do Kubernetes armazena dados de configuração não-sensíveis como pares chave-valor?",
+        options: ["A) Secret", "B) ConfigMap", "C) PersistentVolume", "D) ServiceAccount"],
+        correct: 1,
+        explanation: "ConfigMap armazena configurações não-sensíveis (variáveis de ambiente, arquivos de config). Secrets são para dados sensíveis (senhas, tokens) e são armazenados em base64."
+      },
+      {
+        question: "Qual é a função do Horizontal Pod Autoscaler (HPA)?",
+        options: ["A) Aumentar o tamanho dos nodes automaticamente", "B) Escalar o número de réplicas de Pods baseado em métricas (CPU/memória)", "C) Distribuir Pods entre diferentes namespaces", "D) Fazer backup automático dos Pods"],
+        correct: 1,
+        explanation: "HPA monitora métricas (CPU, memória, custom metrics) e ajusta automaticamente o número de réplicas de um Deployment/ReplicaSet para atender a demanda."
+      },
+      {
+        question: "Qual recurso é necessário para expor múltiplos serviços HTTP/HTTPS através de um único IP externo com roteamento por path ou hostname?",
+        options: ["A) Service NodePort", "B) Ingress", "C) NetworkPolicy", "D) Endpoint"],
+        correct: 1,
+        explanation: "Ingress gerencia acesso externo HTTP/HTTPS ao cluster, oferecendo roteamento baseado em hostname e path, terminação TLS e load balancing — tudo com um único IP externo."
+      },
+      {
+        question: "Qual comando aplica um manifesto YAML e cria/atualiza os recursos definidos nele?",
+        options: ["A) kubectl create -f manifest.yaml", "B) kubectl apply -f manifest.yaml", "C) kubectl run -f manifest.yaml", "D) kubectl deploy -f manifest.yaml"],
+        correct: 1,
+        explanation: "'kubectl apply -f' é declarativo — cria o recurso se não existir ou atualiza se já existir. 'kubectl create' é imperativo e falha se o recurso já existir."
+      },
+      {
+        question: "Qual é a diferença entre um Deployment e um StatefulSet?",
+        options: ["A) Deployment é para aplicações stateless; StatefulSet garante identidade persistente e ordem para aplicações stateful", "B) StatefulSet é mais antigo e deprecado", "C) Deployment não suporta rolling updates", "D) Não há diferença, são sinônimos"],
+        correct: 0,
+        explanation: "StatefulSet garante: nomes de Pod estáveis (pod-0, pod-1), storage persistente por Pod, e criação/deleção ordenada. Ideal para bancos de dados e aplicações que precisam de identidade."
+      },
+      {
+        question: "Como você limita um Pod para usar no máximo 256Mi de memória e 500m de CPU?",
+        options: ["A) Definindo 'resources.limits' no spec do container", "B) Configurando um ResourceQuota no namespace", "C) Usando um LimitRange no cluster", "D) Definindo 'capacity' no PersistentVolume"],
+        correct: 0,
+        explanation: "resources.limits no spec do container define o máximo de recursos. Se exceder memória, o Pod é OOMKilled. ResourceQuota limita o namespace inteiro, LimitRange define defaults."
+      },
+      {
+        question: "Qual recurso do Kubernetes permite armazenar senhas e tokens de forma mais segura que ConfigMaps?",
+        options: ["A) PersistentVolumeClaim", "B) Secret", "C) ServiceAccount", "D) Role"],
+        correct: 1,
+        explanation: "Secrets armazenam dados sensíveis codificados em base64. Podem ser montados como volumes ou expostos como variáveis de ambiente. Em produção, use encryption at rest e external secret managers."
+      },
+      {
+        question: "Qual componente do control plane é responsável por agendar Pods nos nodes disponíveis?",
+        options: ["A) kube-apiserver", "B) etcd", "C) kube-scheduler", "D) kube-controller-manager"],
+        correct: 2,
+        explanation: "kube-scheduler seleciona o node ideal para cada Pod baseado em recursos disponíveis, afinidade, taints/tolerations e outras restrições. Não executa o Pod, apenas decide onde."
+      },
+      {
+        question: "Qual é a função de um PersistentVolumeClaim (PVC)?",
+        options: ["A) Criar storage físico no node", "B) Solicitar storage de um PersistentVolume disponível no cluster", "C) Fazer backup de volumes", "D) Compartilhar volumes entre namespaces"],
+        correct: 1,
+        explanation: "PVC é uma solicitação de storage pelo usuário. O Kubernetes vincula o PVC a um PV disponível que atenda os requisitos (tamanho, access mode, storage class)."
+      },
+      {
+        question: "Qual recurso RBAC define um conjunto de permissões (verbs em resources) dentro de um namespace?",
+        options: ["A) ClusterRole", "B) Role", "C) RoleBinding", "D) ServiceAccount"],
+        correct: 1,
+        explanation: "Role define permissões (get, list, create, delete em resources) dentro de um namespace específico. ClusterRole é para permissões cluster-wide. RoleBinding associa Role a um sujeito."
+      },
+      {
+        question: "Qual comando Helm instala um chart chamado 'nginx-ingress' do repositório oficial com release name 'my-ingress'?",
+        options: ["A) helm deploy my-ingress nginx-ingress", "B) helm install my-ingress ingress-nginx/ingress-nginx", "C) helm create my-ingress --chart nginx-ingress", "D) helm apply my-ingress nginx-ingress"],
+        correct: 1,
+        explanation: "'helm install [release-name] [chart]' instala um chart. O formato é repositório/chart. Helm gerencia releases com versionamento, rollback e templates parametrizáveis."
+      },
+      {
+        question: "Um Pod está em estado 'CrashLoopBackOff'. O que isso indica?",
+        options: ["A) O Pod está aguardando recursos de CPU", "B) O container está falhando repetidamente e o Kubernetes está aumentando o intervalo entre reinicializações", "C) O node onde o Pod está não tem rede", "D) O PersistentVolume não foi encontrado"],
+        correct: 1,
+        explanation: "CrashLoopBackOff indica que o container inicia e falha repetidamente. O Kubernetes aplica backoff exponencial entre tentativas. Verifique logs com 'kubectl logs' para diagnosticar."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>

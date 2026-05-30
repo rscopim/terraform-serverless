@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Docker com 15 perguntas técnicas sobre containers, imagens, volumes e orquestração." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../docker.html" class="nav-link">← Docker</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../docker.html">Docker</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Docker — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre Docker. Teste seus conhecimentos em containers, imagens, Dockerfile e docker-compose.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../docker.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual instrução do Dockerfile define o comando padrão executado quando o container inicia?",
+        options: ["A) RUN", "B) ENTRYPOINT", "C) CMD", "D) EXEC"],
+        correct: 2,
+        explanation: "CMD define o comando padrão que pode ser sobrescrito na execução. ENTRYPOINT define o executável principal (mais difícil de sobrescrever). RUN executa comandos durante o build."
+      },
+      {
+        question: "Qual a diferença entre COPY e ADD no Dockerfile?",
+        options: ["A) Não há diferença, são sinônimos", "B) ADD pode extrair arquivos tar e baixar URLs; COPY apenas copia arquivos locais", "C) COPY suporta URLs remotas, ADD não", "D) ADD é mais seguro que COPY"],
+        correct: 1,
+        explanation: "ADD tem funcionalidades extras: extrai automaticamente arquivos .tar e pode baixar de URLs. COPY é mais simples e previsível — recomendado na maioria dos casos por boas práticas."
+      },
+      {
+        question: "Qual comando remove todos os containers parados, redes não utilizadas e imagens dangling?",
+        options: ["A) docker clean --all", "B) docker system prune", "C) docker rm --force $(docker ps -aq)", "D) docker rmi --all"],
+        correct: 1,
+        explanation: "'docker system prune' limpa containers parados, redes não usadas, imagens dangling e cache de build. Com -a remove também imagens sem container associado."
+      },
+      {
+        question: "Qual tipo de volume Docker persiste dados mesmo após o container ser removido?",
+        options: ["A) tmpfs mount", "B) bind mount ou named volume", "C) Anonymous volume apenas", "D) Container layer"],
+        correct: 1,
+        explanation: "Named volumes e bind mounts persistem dados independentemente do ciclo de vida do container. tmpfs é armazenado em memória e perdido ao parar o container."
+      },
+      {
+        question: "Em um Dockerfile multi-stage build, qual é o principal benefício?",
+        options: ["A) Executar múltiplos processos no mesmo container", "B) Reduzir o tamanho da imagem final separando build de runtime", "C) Permitir múltiplos FROM apenas para compatibilidade", "D) Criar múltiplos containers automaticamente"],
+        correct: 1,
+        explanation: "Multi-stage build permite usar uma imagem grande para compilação e copiar apenas os artefatos necessários para uma imagem mínima de runtime, reduzindo drasticamente o tamanho final."
+      },
+      {
+        question: "Qual flag do 'docker run' limita o container a usar no máximo 512MB de memória?",
+        options: ["A) --memory 512m", "B) --ram 512MB", "C) --mem-limit 512", "D) --max-memory 512m"],
+        correct: 0,
+        explanation: "'--memory 512m' (ou -m 512m) limita a memória do container. Se exceder, o OOM killer pode encerrar o processo. Use --memory-swap para incluir swap."
+      },
+      {
+        question: "Qual rede Docker permite que containers se comuniquem usando nomes de serviço como hostname?",
+        options: ["A) bridge (padrão)", "B) host", "C) User-defined bridge network", "D) none"],
+        correct: 2,
+        explanation: "Redes bridge definidas pelo usuário (docker network create) oferecem DNS automático — containers podem se comunicar pelo nome. A bridge padrão não oferece resolução DNS entre containers."
+      },
+      {
+        question: "No docker-compose.yml, qual diretiva garante que o serviço 'app' só inicia após o serviço 'db' estar rodando?",
+        options: ["A) links: db", "B) depends_on: db", "C) needs: db", "D) after: db"],
+        correct: 1,
+        explanation: "'depends_on' define a ordem de inicialização. Porém, não garante que o serviço esteja 'pronto' (apenas que o container iniciou). Para readiness, use healthcheck + condition."
+      },
+      {
+        question: "Qual instrução do Dockerfile define um health check para monitorar se o container está saudável?",
+        options: ["A) CHECK", "B) HEALTHCHECK", "C) MONITOR", "D) PROBE"],
+        correct: 1,
+        explanation: "HEALTHCHECK define um comando que o Docker executa periodicamente para verificar a saúde do container. Ex: HEALTHCHECK CMD curl -f http://localhost/ || exit 1"
+      },
+      {
+        question: "Qual é a melhor prática para o usuário que executa processos dentro de um container em produção?",
+        options: ["A) Sempre usar root para evitar problemas de permissão", "B) Usar um usuário não-root definido com a instrução USER no Dockerfile", "C) Usar --privileged para acesso total", "D) Não importa, containers são isolados"],
+        correct: 1,
+        explanation: "Executar como non-root (USER no Dockerfile) é uma best practice de segurança. Se o container for comprometido, o atacante não terá privilégios de root no host."
+      },
+      {
+        question: "Qual comando exibe os logs em tempo real de um container chamado 'api'?",
+        options: ["A) docker logs api", "B) docker logs -f api", "C) docker inspect api --logs", "D) docker attach api"],
+        correct: 1,
+        explanation: "'docker logs -f' (follow) exibe os logs em tempo real, similar ao 'tail -f'. Sem -f, mostra apenas os logs existentes. 'docker attach' conecta ao stdin/stdout do processo principal."
+      },
+      {
+        question: "Qual é a diferença entre 'docker stop' e 'docker kill'?",
+        options: ["A) Não há diferença prática", "B) 'stop' envia SIGTERM e aguarda graceful shutdown; 'kill' envia SIGKILL imediatamente", "C) 'kill' remove o container; 'stop' apenas pausa", "D) 'stop' funciona apenas em containers Linux"],
+        correct: 1,
+        explanation: "'docker stop' envia SIGTERM e aguarda (padrão 10s) o processo encerrar graciosamente. Se não encerrar, envia SIGKILL. 'docker kill' envia SIGKILL imediatamente sem espera."
+      },
+      {
+        question: "Como você faz push de uma imagem para um registry privado em registry.empresa.com:5000?",
+        options: ["A) docker push minha-app:latest --registry registry.empresa.com:5000", "B) docker tag minha-app:latest registry.empresa.com:5000/minha-app:latest && docker push registry.empresa.com:5000/minha-app:latest", "C) docker upload minha-app registry.empresa.com:5000", "D) docker commit minha-app registry.empresa.com:5000"],
+        correct: 1,
+        explanation: "Primeiro faz tag da imagem com o endereço completo do registry, depois push. O Docker usa o prefixo do nome da imagem para determinar o registry de destino."
+      },
+      {
+        question: "Qual instrução do Dockerfile é executada APENAS durante o build e não persiste como layer de metadados?",
+        options: ["A) ENV", "B) LABEL", "C) RUN", "D) ARG"],
+        correct: 3,
+        explanation: "ARG define variáveis disponíveis apenas durante o build (docker build --build-arg). ENV persiste como variável de ambiente no container. RUN cria layers com resultado de comandos."
+      },
+      {
+        question: "Um container precisa acessar o Docker daemon do host para criar outros containers. Qual volume montar?",
+        options: ["A) /var/run/docker.sock:/var/run/docker.sock", "B) /usr/bin/docker:/usr/bin/docker", "C) /etc/docker:/etc/docker", "D) /var/lib/docker:/var/lib/docker"],
+        correct: 0,
+        explanation: "Montar o Docker socket (/var/run/docker.sock) permite que o container se comunique com o Docker daemon do host (Docker-in-Docker pattern). Atenção: isso é um risco de segurança."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>
