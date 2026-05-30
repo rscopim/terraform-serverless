@@ -1,0 +1,55 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rocketBg2" x1="0" y1="0" x2="64" y2="64">
+      <stop offset="0%" stop-color="#fef2f2"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="rocketBody" x1="28" y1="8" x2="36" y2="44">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="28" y1="42" x2="36" y2="56">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <filter id="rocketGlow">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#6366f1" flood-opacity="0.25"/>
+    </filter>
+    <filter id="flameGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+      <feComposite in="SourceGraphic" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="64" height="64" rx="18" fill="url(#rocketBg2)"/>
+
+  <!-- Rastro de fumaça -->
+  <circle cx="32" cy="54" r="4" fill="#d4d4d8" opacity="0.3"/>
+  <circle cx="28" cy="56" r="3" fill="#e4e4e7" opacity="0.2"/>
+  <circle cx="36" cy="57" r="2.5" fill="#d4d4d8" opacity="0.2"/>
+
+  <!-- Chama -->
+  <path d="M28 44C28 44 30 52 32 54C34 52 36 44 36 44" fill="url(#flame)" filter="url(#flameGlow)"/>
+  <path d="M30 44C30 44 31 49 32 50C33 49 34 44 34 44" fill="#fbbf24" opacity="0.8"/>
+
+  <!-- Corpo do foguete -->
+  <path d="M32 10C32 10 24 20 24 32C24 38 27 42 32 42C37 42 40 38 40 32C40 20 32 10 32 10Z" 
+    fill="url(#rocketBody)" stroke="white" stroke-width="1" stroke-opacity="0.3" filter="url(#rocketGlow)"/>
+
+  <!-- Janela -->
+  <circle cx="32" cy="26" r="4.5" fill="white" opacity="0.9"/>
+  <circle cx="32" cy="26" r="3" fill="#bfdbfe" opacity="0.6"/>
+  <circle cx="30.5" cy="24.5" r="1.2" fill="white" opacity="0.8"/>
+
+  <!-- Aletas -->
+  <path d="M24 34L18 40L22 36" fill="#818cf8" stroke="#6366f1" stroke-width="1"/>
+  <path d="M40 34L46 40L42 36" fill="#818cf8" stroke="#6366f1" stroke-width="1"/>
+
+  <!-- Estrelas ao redor -->
+  <path d="M12 18L13 16L14 18L13 20Z" fill="#f59e0b" opacity="0.6"/>
+  <path d="M50 14L51 12L52 14L51 16Z" fill="#6366f1" opacity="0.5"/>
+  <circle cx="48" cy="44" r="1.5" fill="#06b6d4" opacity="0.4"/>
+  <circle cx="14" cy="40" r="1.5" fill="#a855f7" opacity="0.3"/>
+  <circle cx="52" cy="28" r="1" fill="#f0abfc" opacity="0.4"/>
+</svg>

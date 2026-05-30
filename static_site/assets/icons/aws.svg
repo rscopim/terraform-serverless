@@ -1,0 +1,33 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="awsBg2" x1="0" y1="0" x2="64" y2="64">
+      <stop offset="0%" stop-color="#fef9c3"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <linearGradient id="awsSmile" x1="16" y1="36" x2="50" y2="42">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="awsGlow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#f59e0b" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="64" height="64" rx="18" fill="url(#awsBg2)"/>
+
+  <!-- AWS logo estilizado -->
+  <!-- Letras A W S -->
+  <text x="32" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="900" fill="#92400e" letter-spacing="1">AWS</text>
+
+  <!-- Smile arrow icônico -->
+  <path d="M16 38C22 44 30 46 40 46C44 46 47 45 50 43" stroke="url(#awsSmile)" stroke-width="3" stroke-linecap="round" filter="url(#awsGlow)"/>
+  <path d="M47 40L50 43L47 46" stroke="url(#awsSmile)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Nuvem sutil no fundo -->
+  <path d="M20 22H40C42 22 44 20 44 18C44 16 42 14 40 14C39 12 37 11 34 11C30 11 28 13 28 15.5C26 16 25 17 25 18.5C25 20 26 21 27 22" stroke="#d97706" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Sparkles -->
+  <circle cx="12" cy="14" r="2" fill="#f59e0b" opacity="0.4"/>
+  <circle cx="54" cy="12" r="1.5" fill="#d97706" opacity="0.3"/>
+  <path d="M52 52L53 50L54 52L53 54Z" fill="#f59e0b" opacity="0.5"/>
+</svg>

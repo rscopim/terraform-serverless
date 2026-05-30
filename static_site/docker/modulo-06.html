@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker Módulo 06: Otimização, Segurança e Boas Práticas</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-05.html" class="nav-link">← Anterior</a>
+        <a href="modulo-07.html" class="nav-link">Próximo →</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker — Módulo 06</span>
+        <h1>Otimização, Segurança e Boas Práticas</h1>
+        <p>Construa imagens menores, mais seguras e eficientes. Domine multi-stage builds, hardening de containers e monitoramento de recursos.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Multi-stage Build -->
+        <div class="topic-block">
+          <h3>Multi-stage Build</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>Conceito</code>
+                <span class="cmd-tag">otimização</span>
+              </div>
+              <p>Multi-stage build usa múltiplos FROM no mesmo Dockerfile. Cada estágio pode copiar artefatos do anterior, resultando em imagens finais muito menores — sem ferramentas de build, sem código-fonte, apenas o binário/artefato necessário.</p>
+              <pre><code># Benefícios:
+# ✓ Imagem final contém APENAS o necessário para execução
+# ✓ Ferramentas de build ficam no estágio intermediário
+# ✓ Redução drástica de tamanho (ex: Go 1.2GB → 10MB)
+# ✓ Menor superfície de ataque
+# ✓ Um único Dockerfile para build + runtime</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Node.js Multi-stage</code>
+                <span class="cmd-tag">exemplo</span>
+              </div>
+              <p>Build com dependências de dev, runtime apenas com produção.</p>
+              <pre><code># Estágio 1: Build
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Estágio 2: Runtime
+FROM node:20-alpine AS runtime
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --from=builder /app/dist ./dist
+EXPOSE 3000
+USER node
+CMD ["node", "dist/server.js"]</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Go com scratch (~10MB)</code>
+                <span class="cmd-tag">exemplo</span>
+              </div>
+              <p>Compilação estática em Go resulta em imagem mínima com scratch.</p>
+              <pre><code># Estágio 1: Compilação
+FROM golang:1.22-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux \
+    go build -ldflags="-s -w" \
+    -o /app/server ./cmd/main.go
+
+# Estágio 2: Imagem mínima
+FROM scratch
+COPY --from=builder /app/server /server
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt \
+     /etc/ssl/certs/
+EXPOSE 8080
+ENTRYPOINT ["/server"]
+# Resultado: ~10MB!</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>React + Nginx</code>
+                <span class="cmd-tag">exemplo</span>
+              </div>
+              <p>Build do React no Node, serve estático com Nginx.</p>
+              <pre><code># Estágio 1: Build React
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Estágio 2: Nginx serve os estáticos
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+# Resultado: ~25MB</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Otimização de Cache -->
+        <div class="topic-block">
+          <h3>Otimização de Cache e Layers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>Ordem das Layers</code>
+                <span class="cmd-tag">cache</span>
+              </div>
+              <p>A ordem importa! Coloque o que muda menos primeiro para maximizar cache hits.</p>
+              <pre><code># ❌ RUIM — qualquer mudança no código
+# invalida cache do npm install
+COPY . .
+RUN npm install
+
+# ✅ BOM — package.json muda raramente
+# npm install usa cache na maioria dos builds
+COPY package*.json ./
+RUN npm ci
+COPY . .</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Combine RUN + Alpine</code>
+                <span class="cmd-tag">cache</span>
+              </div>
+              <p>Reduza layers combinando comandos e use imagens Alpine.</p>
+              <pre><code># ❌ RUIM — 3 layers, cache de apt desnecessário
+RUN apt-get update
+RUN apt-get install -y curl
+RUN rm -rf /var/lib/apt/lists/*
+
+# ✅ BOM — 1 layer, limpa cache
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# ✅ MELHOR — use Alpine (5MB base)
+FROM node:20-alpine
+# Alpine usa apk ao invés de apt</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>.dockerignore</code>
+                <span class="cmd-tag">otimização</span>
+              </div>
+              <p>Exclua arquivos desnecessários do build context para builds mais rápidos.</p>
+              <pre><code># .dockerignore
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.*
+Dockerfile
+docker-compose*.yml
+.dockerignore
+README.md
+docs/
+tests/
+coverage/
+.vscode/
+*.md</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Comparação de Tamanhos</code>
+                <span class="cmd-tag">referência</span>
+              </div>
+              <p>Escolha a imagem base adequada para seu caso de uso.</p>
+              <pre><code># Tamanhos aproximados de imagens base:
+# node:20          → ~1.1GB
+# node:20-slim     → ~200MB
+# node:20-alpine   → ~130MB
+# golang:1.22      → ~800MB
+# golang:1.22-alpine → ~250MB
+# scratch          → 0MB (vazio)
+# alpine           → ~5MB
+# ubuntu:24.04     → ~78MB
+# debian:bookworm-slim → ~75MB
+# nginx:alpine     → ~40MB</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segurança -->
+        <div class="topic-block">
+          <h3>Segurança de Containers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>Usuário não-root</code>
+                <span class="cmd-tag">segurança</span>
+              </div>
+              <p>Nunca execute containers como root em produção. Crie um usuário dedicado.</p>
+              <pre><code># Criar grupo e usuário sem privilégios
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+
+# Copiar arquivos com ownership correto
+COPY --chown=appuser:appgroup . /app
+
+# Mudar para usuário não-root
+USER appuser
+
+# Verificar: docker exec container whoami
+# Resultado: appuser (não root!)</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Vulnerability Scanning</code>
+                <span class="cmd-tag">segurança</span>
+              </div>
+              <p>Escaneie imagens para vulnerabilidades conhecidas antes de deploy.</p>
+              <pre><code># Docker Scout (integrado ao Docker Desktop)
+docker scout cves minha-imagem:latest
+docker scout recommendations minha-imagem:latest
+
+# Trivy (open source, CI/CD friendly)
+trivy image minha-imagem:latest
+trivy image --severity HIGH,CRITICAL app:v1
+trivy image --exit-code 1 app:v1  # Falha no CI
+
+# Snyk
+docker scan minha-imagem:latest</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Boas Práticas de Segurança</code>
+                <span class="cmd-tag">segurança</span>
+              </div>
+              <p>Checklist de segurança para imagens e containers em produção.</p>
+              <pre><code># ✓ Use tags específicas (NUNCA :latest)
+FROM node:20.11.0-alpine
+
+# ✓ Não coloque secrets na imagem
+# Use env vars ou secrets manager
+
+# ✓ Filesystem read-only
+docker run --read-only app:v1
+
+# ✓ Drop ALL capabilities
+docker run --cap-drop ALL app:v1
+
+# ✓ Nunca monte o Docker socket
+# ❌ -v /var/run/docker.sock:/var/run/docker.sock
+
+# ✓ Docker Content Trust (assinatura)
+export DOCKER_CONTENT_TRUST=1
+docker pull nginx  # Verifica assinatura</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Runtime Hardening</code>
+                <span class="cmd-tag">segurança</span>
+              </div>
+              <p>Restrições adicionais ao executar containers.</p>
+              <pre><code># Combinação completa de segurança
+docker run -d \
+  --name app-secure \
+  --read-only \
+  --cap-drop ALL \
+  --cap-add NET_BIND_SERVICE \
+  --security-opt no-new-privileges \
+  --tmpfs /tmp:rw,noexec,nosuid \
+  --memory 256m \
+  --cpus 0.5 \
+  --pids-limit 100 \
+  --user 1000:1000 \
+  app:v1</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monitoramento e Debug -->
+        <div class="topic-block">
+          <h3>Monitoramento e Debug</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker stats</code>
+                <span class="cmd-tag">monitorar</span>
+              </div>
+              <p>Monitore CPU, memória, rede e I/O em tempo real.</p>
+              <pre><code># Tempo real (atualiza a cada segundo)
+docker stats
+
+# Snapshot único (para scripts)
+docker stats --no-stream
+
+# Container específico
+docker stats meu-app
+
+# Formato customizado
+docker stats --format \
+  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker system df</code>
+                <span class="cmd-tag">disco</span>
+              </div>
+              <p>Verifique uso de disco por tipo de objeto Docker.</p>
+              <pre><code># Resumo de uso de disco
+docker system df
+
+# Detalhado por objeto
+docker system df -v
+
+# Saída exemplo:
+# TYPE          TOTAL   ACTIVE  SIZE    RECLAIMABLE
+# Images        15      5       4.2GB   2.8GB (66%)
+# Containers    8       3       120MB   85MB (70%)
+# Volumes       12      4       1.5GB   900MB (60%)
+# Build Cache   -       -       2.1GB   2.1GB</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker system prune</code>
+                <span class="cmd-tag danger">limpeza</span>
+              </div>
+              <p>Limpe recursos não utilizados para liberar espaço.</p>
+              <pre><code># Limpar containers parados + imagens dangling
+docker system prune
+
+# Limpar TUDO não utilizado (cuidado!)
+docker system prune -a
+
+# Incluir volumes (dados persistentes!)
+docker system prune -a --volumes
+
+# Sem confirmação (scripts)
+docker system prune -af</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker events / top / diff</code>
+                <span class="cmd-tag">debug</span>
+              </div>
+              <p>Ferramentas avançadas de debug e inspeção.</p>
+              <pre><code># Eventos em tempo real do daemon
+docker events
+docker events --filter type=container
+
+# Processos dentro do container
+docker top meu-app
+docker top meu-app aux
+
+# Mudanças no filesystem do container
+docker diff meu-app
+# A = adicionado, C = modificado, D = deletado
+
+# Salvar estado atual como nova imagem
+docker commit meu-app debug-snapshot:v1
+
+# Exportar filesystem como tar
+docker export meu-app > app-fs.tar</code></pre>
+            </div>
+
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>Resource Limits</code>
+                <span class="cmd-tag">recursos</span>
+              </div>
+              <p>Limite recursos para evitar que um container consuma toda a máquina.</p>
+              <pre><code># Limite de memória (container é killed se exceder)
+docker run --memory 512m --memory-swap 1g app:v1
+
+# Limite de CPU
+docker run --cpus 1.5 app:v1          # 1.5 cores
+docker run --cpu-shares 512 app:v1     # Peso relativo
+
+# Limite de I/O de disco
+docker run --device-read-bps /dev/sda:10mb app:v1
+docker run --device-write-bps /dev/sda:5mb app:v1
+
+# Verificar limites aplicados
+docker inspect --format '{{.HostConfig.Memory}}' meu-app
+docker stats --no-stream meu-app</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-05.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-07.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

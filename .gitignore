@@ -9,3 +9,10 @@ dev-current.tfstate
 plan*.txt
 **/plan*.txt
 *.log
+
+# Node.js (PDF generation)
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/

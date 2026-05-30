@@ -55,7 +55,7 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = {
       LEADS_TABLE_NAME = var.dynamodb_table_name
-      PDF_URL          = var.pdf_url
+      PDF_BASE_URL     = var.pdf_base_url
     }
   }
 

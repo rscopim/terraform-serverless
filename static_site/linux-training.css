@@ -1,0 +1,78 @@
+/* =========================================
+   Linux Training Page — Styles
+========================================= */
+
+/* Progress Track */
+.module-progress{padding:40px 0 20px}
+.progress-track{display:flex;align-items:center;justify-content:space-between;position:relative;padding:0 20px}
+.progress-track::before{content:'';position:absolute;top:50%;left:40px;right:40px;height:3px;background:linear-gradient(90deg,var(--primary-500),var(--accent-500));opacity:0.2;transform:translateY(-12px)}
+.progress-node{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;transition:all 0.3s}
+.progress-node span{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--gray-100);border:2px solid var(--gray-200);font-weight:800;font-size:0.9rem;color:var(--gray-500);transition:all 0.3s}
+.progress-node small{font-size:0.72rem;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.05em}
+.progress-node:hover span,.progress-node.active span{background:linear-gradient(135deg,var(--primary-600),var(--accent-500));color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(99,102,241,0.3)}
+.progress-node:hover small,.progress-node.active small{color:var(--primary-600)}
+
+/* Module Sections */
+.module-section{padding:80px 0}
+.module-section.alt-bg{background:var(--gray-100)}
+.module-header{margin-bottom:48px;max-width:720px}
+.module-badge{display:inline-flex;padding:6px 14px;border-radius:var(--radius-full);background:linear-gradient(135deg,var(--primary-600),var(--accent-500));color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase}
+.module-header h2{margin:16px 0 12px;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:800;letter-spacing:-0.03em}
+.module-header p{color:var(--gray-500);font-size:1rem;line-height:1.7}
+
+/* Topic Blocks */
+.topic-block{margin-bottom:48px}
+.topic-block h3{font-size:1.3rem;font-weight:700;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--gray-200)}
+
+/* Command Grid */
+.command-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+.command-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:22px;transition:all 0.3s;overflow:hidden}
+.command-card:hover{border-color:rgba(99,102,241,0.25);box-shadow:0 8px 30px rgba(99,102,241,0.08)}
+.command-card.wide{grid-column:1/-1}
+.command-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.command-header code{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700;color:var(--primary-600)}
+.cmd-tag{padding:3px 8px;border-radius:var(--radius-full);background:rgba(99,102,241,0.08);color:var(--primary-600);font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.cmd-tag.danger{background:rgba(239,68,68,0.08);color:var(--error)}
+.command-card p{color:var(--gray-500);font-size:0.88rem;line-height:1.6;margin-bottom:12px}
+.command-card pre{background:var(--surface-dark);border-radius:var(--radius-sm);padding:16px;overflow-x:auto;margin:0}
+.command-card pre code{font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.7;color:#e2e8f0;font-weight:400}
+
+.module-section.alt-bg .command-card{background:#fff}
+
+/* Info Box */
+.info-box{background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.12);border-radius:var(--radius-sm);padding:16px 20px;font-size:0.88rem;line-height:1.7;color:var(--gray-700)}
+.info-box.highlight{background:var(--surface-dark);border-color:rgba(99,102,241,0.2);color:#e2e8f0}
+.info-box.highlight pre{background:transparent;padding:12px 0;margin:8px 0 0}
+.info-box.highlight code{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:#a5b4fc}
+.info-box strong{color:var(--primary-600)}
+.info-box.highlight strong{color:var(--accent-300)}
+.info-box code{font-family:'JetBrains Mono',monospace;background:rgba(99,102,241,0.08);padding:2px 6px;border-radius:4px;font-size:0.82rem}
+
+/* Tables */
+.options-table,.permissions-table,.interview-table{margin-top:14px;overflow-x:auto}
+.options-table table,.permissions-table table,.interview-table table{width:100%;border-collapse:collapse;font-size:0.84rem}
+.options-table th,.permissions-table th,.interview-table th{background:var(--gray-100);padding:10px 14px;text-align:left;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--gray-600)}
+.options-table td,.permissions-table td,.interview-table td{padding:9px 14px;border-bottom:1px solid var(--gray-200)}
+.options-table td:first-child,.permissions-table td:first-child,.interview-table td:first-child{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--primary-600);white-space:nowrap}
+.interview-table td:last-child code{font-size:0.78rem;background:rgba(99,102,241,0.06);padding:2px 5px;border-radius:4px}
+
+/* Checklist Grid */
+.checklist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.checklist-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:22px;transition:all 0.3s}
+.checklist-card:hover{border-color:rgba(99,102,241,0.2);box-shadow:var(--shadow-md)}
+.checklist-card h4{font-size:1.05rem;margin-bottom:14px}
+.checklist-card ol{padding-left:20px;display:grid;gap:8px}
+.checklist-card li{font-size:0.84rem;color:var(--gray-600);line-height:1.5}
+.checklist-card li code{font-family:'JetBrains Mono',monospace;font-size:0.76rem;background:rgba(99,102,241,0.06);padding:2px 5px;border-radius:4px;color:var(--primary-600)}
+
+/* kbd */
+kbd{display:inline-block;padding:2px 6px;border:1px solid var(--gray-300);border-radius:4px;background:var(--gray-100);font-family:'JetBrains Mono',monospace;font-size:0.75rem;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+
+/* Responsive */
+@media(max-width:768px){
+  .command-grid{grid-template-columns:1fr}
+  .command-card.wide{grid-column:1}
+  .progress-track{gap:4px;padding:0}
+  .progress-node small{display:none}
+  .checklist-grid{grid-template-columns:1fr}
+}

@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker Módulo 07: Docker em Produção e CI/CD</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-06.html" class="nav-link">← Anterior</a>
+        <a href="../docker.html" class="nav-link">Voltar ao Curso</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker — Módulo 07</span>
+        <h1>Docker em Produção e CI/CD</h1>
+        <p>Leve seus containers para produção com registries privados, pipelines CI/CD automatizados, Docker Swarm e estratégias de troubleshooting.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Private Registry -->
+        <div class="topic-block">
+          <h3>Registry Privado</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker login / push / pull</code>
+                <span class="cmd-tag">registry</span>
+              </div>
+              <p>Autentique e publique imagens em registries privados (ECR, ACR, GCR, Docker Hub).</p>
+              <pre><code># Login no Docker Hub
+docker login
+
+# Login em registry privado (AWS ECR)
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin \
+  123456789.dkr.ecr.us-east-1.amazonaws.com
+
+# Tag para o registry
+docker tag app:v1 \
+  123456789.dkr.ecr.us-east-1.amazonaws.com/app:v1
+
+# Push para o registry
+docker push \
+  123456789.dkr.ecr.us-east-1.amazonaws.com/app:v1
+
+# Pull do registry
+docker pull \
+  123456789.dkr.ecr.us-east-1.amazonaws.com/app:v1</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Estratégias de Tagging</code>
+                <span class="cmd-tag">versionamento</span>
+              </div>
+              <p>Use tags semânticas para rastreabilidade e rollback.</p>
+              <pre><code># Semantic Versioning (recomendado)
+docker tag app:latest registry/app:1.2.3
+docker tag app:latest registry/app:1.2
+docker tag app:latest registry/app:1
+
+# Git SHA (rastreabilidade exata)
+GIT_SHA=$(git rev-parse --short HEAD)
+docker tag app:latest registry/app:${GIT_SHA}
+
+# Data + Build number
+docker tag app:latest registry/app:2024.01.15-42
+
+# Combinação (melhor prática)
+docker tag app:latest registry/app:1.2.3
+docker tag app:latest registry/app:1.2.3-abc1234
+docker tag app:latest registry/app:latest
+
+# ⚠️ NUNCA use apenas :latest em produção!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Docker Compose para Produção -->
+        <div class="topic-block">
+          <h3>Docker Compose para Produção</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>docker-compose.prod.yml</code>
+                <span class="cmd-tag">produção</span>
+              </div>
+              <p>Compose otimizado para produção com imagens do registry, healthchecks e limites de recursos.</p>
+              <pre><code>services:
+  api:
+    image: 123456789.dkr.ecr.us-east-1.amazonaws.com/app:1.2.3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "4000:4000"
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "10"
+
+volumes:
+  pgdata:</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logging em Produção -->
+        <div class="topic-block">
+          <h3>Logging em Produção</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>Logging Drivers</code>
+                <span class="cmd-tag">observabilidade</span>
+              </div>
+              <p>Configure drivers de log para centralizar e gerenciar logs em produção.</p>
+              <pre><code># json-file (padrão) — com rotação
+docker run -d \
+  --log-driver json-file \
+  --log-opt max-size=10m \
+  --log-opt max-file=5 \
+  app:v1
+
+# syslog — enviar para servidor syslog
+docker run -d \
+  --log-driver syslog \
+  --log-opt syslog-address=tcp://logserver:514 \
+  --log-opt tag="{{.Name}}" \
+  app:v1
+
+# fluentd — agregação com Fluentd/Fluent Bit
+docker run -d \
+  --log-driver fluentd \
+  --log-opt fluentd-address=localhost:24224 \
+  --log-opt tag="docker.{{.Name}}" \
+  app:v1
+
+# awslogs — direto para CloudWatch
+docker run -d \
+  --log-driver awslogs \
+  --log-opt awslogs-region=us-east-1 \
+  --log-opt awslogs-group=/ecs/app \
+  --log-opt awslogs-stream-prefix=prod \
+  app:v1</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- CI/CD com GitHub Actions -->
+        <div class="topic-block">
+          <h3>CI/CD com GitHub Actions</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>.github/workflows/docker.yml</code>
+                <span class="cmd-tag">CI/CD</span>
+              </div>
+              <p>Pipeline completo: build, scan, push para registry com cache otimizado.</p>
+              <pre><code>name: Docker Build & Push
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=
+            type=ref,event=branch
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- CI/CD com GitLab CI -->
+        <div class="topic-block">
+          <h3>CI/CD com GitLab CI</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>.gitlab-ci.yml</code>
+                <span class="cmd-tag">CI/CD</span>
+              </div>
+              <p>Pipeline GitLab com build, test e deploy para registry.</p>
+              <pre><code>stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+
+build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build --cache-from $IMAGE_LATEST -t $IMAGE_TAG -t $IMAGE_LATEST .
+    - docker push $IMAGE_TAG
+    - docker push $IMAGE_LATEST
+  only:
+    - main
+    - tags
+
+test:
+  stage: test
+  image: $IMAGE_TAG
+  script:
+    - npm run test
+  needs: [build]
+
+scan:
+  stage: test
+  image: aquasec/trivy:latest
+  script:
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_TAG
+  needs: [build]
+  allow_failure: true
+
+deploy:
+  stage: deploy
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $IMAGE_TAG
+    - docker tag $IMAGE_TAG $CI_REGISTRY_IMAGE:production
+    - docker push $CI_REGISTRY_IMAGE:production
+  only:
+    - tags
+  when: manual</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Docker Swarm -->
+        <div class="topic-block">
+          <h3>Docker Swarm</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>Inicialização e Nodes</code>
+                <span class="cmd-tag">cluster</span>
+              </div>
+              <p>Configure um cluster Swarm para orquestração nativa do Docker.</p>
+              <pre><code># Inicializar Swarm (no manager)
+docker swarm init --advertise-addr 192.168.1.10
+
+# Token para workers se juntarem
+docker swarm join-token worker
+
+# Listar nodes do cluster
+docker node ls
+
+# Promover worker a manager
+docker node promote worker-01
+
+# Remover node do cluster
+docker node rm worker-02</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Services</code>
+                <span class="cmd-tag">deploy</span>
+              </div>
+              <p>Crie e gerencie serviços distribuídos no cluster.</p>
+              <pre><code># Criar serviço com réplicas
+docker service create \
+  --name api \
+  --replicas 3 \
+  --publish 8080:4000 \
+  --env NODE_ENV=production \
+  registry/app:1.2.3
+
+# Listar serviços
+docker service ls
+
+# Ver tasks (containers) do serviço
+docker service ps api
+
+# Escalar réplicas
+docker service scale api=5
+
+# Logs do serviço
+docker service logs -f api</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Updates e Rollback</code>
+                <span class="cmd-tag">deploy</span>
+              </div>
+              <p>Rolling updates e rollback automático em caso de falha.</p>
+              <pre><code># Update da imagem (rolling update)
+docker service update \
+  --image registry/app:1.3.0 \
+  --update-parallelism 1 \
+  --update-delay 10s \
+  --update-failure-action rollback \
+  api
+
+# Rollback manual
+docker service rollback api
+
+# Remover serviço
+docker service rm api</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Stacks</code>
+                <span class="cmd-tag">deploy</span>
+              </div>
+              <p>Deploy de aplicações completas via compose file no Swarm.</p>
+              <pre><code># Deploy stack a partir de compose file
+docker stack deploy -c docker-compose.yml myapp
+
+# Listar stacks
+docker stack ls
+
+# Serviços da stack
+docker stack services myapp
+
+# Tasks da stack
+docker stack ps myapp
+
+# Remover stack
+docker stack rm myapp</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cleanup -->
+        <div class="topic-block">
+          <h3>Cleanup e Manutenção</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>Comandos de Limpeza</code>
+                <span class="cmd-tag danger">manutenção</span>
+              </div>
+              <p>Mantenha o ambiente limpo removendo recursos não utilizados.</p>
+              <pre><code># Ver uso de disco
+docker system df
+
+# Limpar containers parados
+docker container prune
+
+# Limpar imagens sem tag (dangling)
+docker image prune
+
+# Limpar imagens não utilizadas por nenhum container
+docker image prune -a
+
+# Limpar volumes órfãos
+docker volume prune
+
+# Limpar redes não utilizadas
+docker network prune
+
+# Limpar build cache
+docker builder prune
+
+# NUCLEAR: limpar TUDO não utilizado + volumes
+docker system prune -a --volumes
+# ⚠️ Cuidado: remove dados persistentes!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="topic-block">
+          <h3>Troubleshooting</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>Container Crashando</code>
+                <span class="cmd-tag">debug</span>
+              </div>
+              <p>Diagnostique containers que reiniciam ou falham ao iniciar.</p>
+              <pre><code># Ver logs do container que crashou
+docker logs --tail 100 meu-app
+docker logs --since 5m meu-app
+
+# Inspecionar exit code
+docker inspect meu-app --format='{{.State.ExitCode}}'
+# ExitCode 137 = OOM Killed (falta memória)
+# ExitCode 1   = Erro da aplicação
+# ExitCode 0   = Saiu normalmente
+
+# Ver estado detalhado
+docker inspect meu-app --format='{{json .State}}' | jq
+
+# Eventos do daemon
+docker events --filter container=meu-app
+
+# Ver se foi OOM killed
+docker inspect meu-app --format='{{.State.OOMKilled}}'</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Debug de Rede</code>
+                <span class="cmd-tag">debug</span>
+              </div>
+              <p>Diagnostique problemas de conectividade entre containers.</p>
+              <pre><code># Container de debug na mesma rede
+docker run --rm -it --network app_default \
+  nicolaka/netshoot sh
+
+# Testar DNS interno
+nslookup api
+nslookup db
+
+# Testar conectividade
+ping api
+curl -v http://api:4000/health
+
+# Inspecionar rede
+docker network inspect app_default
+
+# Ver portas mapeadas
+docker port meu-app</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Health Status</code>
+                <span class="cmd-tag">debug</span>
+              </div>
+              <p>Verifique o status de saúde dos containers.</p>
+              <pre><code># Ver health status
+docker inspect meu-app \
+  --format='{{.State.Health.Status}}'
+# healthy | unhealthy | starting
+
+# Histórico de health checks
+docker inspect meu-app \
+  --format='{{json .State.Health}}' | jq
+
+# Filtrar containers unhealthy
+docker ps --filter health=unhealthy
+
+# Ver logs do healthcheck
+docker inspect meu-app \
+  --format='{{range .State.Health.Log}}{{.Output}}{{end}}'</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Inspect com jq</code>
+                <span class="cmd-tag">debug</span>
+              </div>
+              <p>Use jq para extrair informações específicas do inspect.</p>
+              <pre><code># IP do container
+docker inspect meu-app | \
+  jq -r '.[0].NetworkSettings.IPAddress'
+
+# Variáveis de ambiente
+docker inspect meu-app | \
+  jq '.[0].Config.Env'
+
+# Mounts/Volumes
+docker inspect meu-app | \
+  jq '.[0].Mounts'
+
+# Port bindings
+docker inspect meu-app | \
+  jq '.[0].NetworkSettings.Ports'
+
+# Restart count
+docker inspect meu-app | \
+  jq '.[0].RestartCount'</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela Resumo -->
+        <div class="topic-block">
+          <h3>Resumo: Checklist de Produção</h3>
+          <div class="command-card wide">
+            <div class="options-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Área</th>
+                    <th>Prática</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Imagem</td><td>Multi-stage build, Alpine, tag específica (nunca :latest)</td></tr>
+                  <tr><td>Segurança</td><td>Non-root user, --read-only, --cap-drop ALL, scan de vulnerabilidades</td></tr>
+                  <tr><td>Recursos</td><td>Limites de CPU e memória definidos (deploy.resources.limits)</td></tr>
+                  <tr><td>Healthcheck</td><td>Endpoint /health, interval 30s, retries 3</td></tr>
+                  <tr><td>Logging</td><td>Driver json-file com max-size e max-file configurados</td></tr>
+                  <tr><td>Restart</td><td>restart: unless-stopped para serviços críticos</td></tr>
+                  <tr><td>Registry</td><td>Imagens versionadas no registry privado (ECR/GCR/ACR)</td></tr>
+                  <tr><td>CI/CD</td><td>Build automatizado, scan, push e deploy via pipeline</td></tr>
+                  <tr><td>Backup</td><td>Volumes com backup regular, named volumes para dados</td></tr>
+                  <tr><td>Cleanup</td><td>Prune agendado, monitorar docker system df</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-06.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../docker.html" class="button primary">Voltar ao Curso →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

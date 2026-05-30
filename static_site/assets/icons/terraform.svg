@@ -1,0 +1,38 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tfBg2" x1="0" y1="0" x2="64" y2="64">
+      <stop offset="0%" stop-color="#ede9fe"/>
+      <stop offset="100%" stop-color="#ddd6fe"/>
+    </linearGradient>
+    <filter id="tfGlow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#7c3aed" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="64" height="64" rx="18" fill="url(#tfBg2)"/>
+
+  <!-- Terraform blocks estilizados com profundidade -->
+  <!-- Bloco superior esquerdo -->
+  <path d="M14 20L24 25V35L14 30V20Z" fill="#7c3aed" opacity="0.9" filter="url(#tfGlow)"/>
+
+  <!-- Bloco superior direito -->
+  <path d="M26 14L36 19V29L26 24V14Z" fill="#6366f1" filter="url(#tfGlow)"/>
+
+  <!-- Bloco central -->
+  <path d="M26 26L36 31V41L26 36V26Z" fill="#06b6d4" filter="url(#tfGlow)"/>
+
+  <!-- Bloco direito -->
+  <path d="M38 19L48 24V34L38 29V19Z" fill="#818cf8" opacity="0.8" filter="url(#tfGlow)"/>
+
+  <!-- Bloco inferior -->
+  <path d="M38 31L48 36V46L38 41V31Z" fill="#a855f7" opacity="0.7" filter="url(#tfGlow)"/>
+
+  <!-- Reflexos de luz -->
+  <path d="M26 14L36 19" stroke="white" stroke-width="0.8" opacity="0.4"/>
+  <path d="M26 26L36 31" stroke="white" stroke-width="0.8" opacity="0.3"/>
+
+  <!-- Partículas -->
+  <circle cx="52" cy="12" r="2" fill="#7c3aed" opacity="0.3"/>
+  <circle cx="10" cy="48" r="1.5" fill="#06b6d4" opacity="0.4"/>
+  <circle cx="54" cy="52" r="1.5" fill="#a855f7" opacity="0.3"/>
+</svg>
