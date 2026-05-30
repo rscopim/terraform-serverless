@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Terraform Módulo 04: VPC + EC2 + RDS + S3 (Avançado II)</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../terraform.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="../terraform.html" class="nav-link">Voltar ao Curso →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏗️ Terraform — Módulo 04</span>
+        <h1>VPC + EC2 + RDS + S3</h1>
+        <p>Complete a arquitetura com S3 Bucket, IAM Role para EC2, Bucket Policy, Lifecycle Rules. Aprenda terraform import e conceitos de produção.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- S3 Bucket -->
+        <div class="topic-block">
+          <h2>S3 Bucket — Configuração Segura</h2>
+          <p>O S3 armazena objetos (arquivos, backups, assets). Configuramos versionamento, criptografia e bloqueio de acesso público seguindo as melhores práticas.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_s3_bucket</code><span class="cmd-tag">s3.tf</span></div>
+              <p>Cria o bucket base. No Terraform AWS Provider v4+, configurações são recursos separados.</p>
+              <pre><code>resource "aws_s3_bucket" "app" {
+  bucket = "${var.project_name}-${var.environment}-assets"
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-${var.environment}-assets"
+    Role = "storage"
+  })
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aws_s3_bucket_versioning</code><span class="cmd-tag">Versionamento</span></div>
+              <p>Habilita versionamento para manter histórico de alterações e permitir recuperação.</p>
+              <pre><code>resource "aws_s3_bucket_versioning" "app" {
+  bucket = aws_s3_bucket.app.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aws_s3_bucket_server_side_encryption_configuration</code><span class="cmd-tag">Criptografia</span></div>
+              <p>Criptografia at-rest com AES256 (SSE-S3). Todos os objetos são criptografados automaticamente.</p>
+              <pre><code>resource "aws_s3_bucket_server_side_encryption_configuration" "app" {
+  bucket = aws_s3_bucket.app.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+    bucket_key_enabled = true
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aws_s3_bucket_public_access_block</code><span class="cmd-tag">Bloqueio Público</span></div>
+              <p>Bloqueia todo acesso público ao bucket — todas as 4 opções habilitadas.</p>
+              <pre><code>resource "aws_s3_bucket_public_access_block" "app" {
+  bucket = aws_s3_bucket.app.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- S3 Lifecycle Rules -->
+        <div class="topic-block">
+          <h2>S3 Lifecycle Rules — Otimização de Custos</h2>
+          <p>Lifecycle Rules movem objetos automaticamente entre classes de armazenamento e expiram dados antigos, reduzindo custos significativamente.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_s3_bucket_lifecycle_configuration</code><span class="cmd-tag">lifecycle.tf</span></div>
+              <p>Transições automáticas: Standard → Standard-IA (30d) → Glacier (90d) → Expiração (365d).</p>
+              <pre><code>resource "aws_s3_bucket_lifecycle_configuration" "app" {
+  bucket = aws_s3_bucket.app.id
+
+  rule {
+    id     = "transition-and-expire"
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 90
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 365
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Classes de Armazenamento</code><span class="cmd-tag">Referência</span></div>
+              <table class="styled-table">
+                <thead><tr><th>Classe</th><th>Uso</th><th>Custo</th></tr></thead>
+                <tbody>
+                  <tr><td><code>STANDARD</code></td><td>Acesso frequente</td><td>$$$$</td></tr>
+                  <tr><td><code>STANDARD_IA</code></td><td>Acesso infrequente</td><td>$$$</td></tr>
+                  <tr><td><code>GLACIER</code></td><td>Arquivo de longo prazo</td><td>$$</td></tr>
+                  <tr><td><code>DEEP_ARCHIVE</code></td><td>Raramente acessado</td><td>$</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- IAM Role for EC2 -->
+        <div class="topic-block">
+          <h2>IAM Role para EC2 — Acesso ao S3</h2>
+          <p>Em vez de usar Access Keys na EC2, criamos uma <strong>IAM Role</strong> com Instance Profile. A EC2 assume a role automaticamente via metadata service.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_iam_role</code><span class="cmd-tag">iam.tf</span></div>
+              <p>Role com trust policy permitindo que o serviço EC2 assuma esta role.</p>
+              <pre><code>resource "aws_iam_role" "ec2_s3_role" {
+  name = "${var.project_name}-ec2-s3-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aws_iam_role_policy</code><span class="cmd-tag">Permissões S3</span></div>
+              <p>Policy inline com permissões específicas para o bucket da aplicação.</p>
+              <pre><code>resource "aws_iam_role_policy" "ec2_s3_policy" {
+  name = "${var.project_name}-ec2-s3-policy"
+  role = aws_iam_role.ec2_s3_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          aws_s3_bucket.app.arn,
+          "${aws_s3_bucket.app.arn}/*"
+        ]
+      }
+    ]
+  })
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aws_iam_instance_profile</code><span class="cmd-tag">Instance Profile</span></div>
+              <p>O Instance Profile é o "wrapper" que conecta a IAM Role à instância EC2.</p>
+              <pre><code>resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "${var.project_name}-ec2-profile"
+  role = aws_iam_role.ec2_s3_role.name
+
+  tags = local.common_tags
+}
+
+# Uso na EC2:
+resource "aws_instance" "web" {
+  # ... outras configurações ...
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bucket Policy -->
+        <div class="topic-block">
+          <h2>Bucket Policy — Controle de Acesso</h2>
+          <p>A Bucket Policy define regras de acesso no nível do bucket. Combinamos permissão para a EC2 Role com negação de transporte inseguro (HTTP).</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_s3_bucket_policy</code><span class="cmd-tag">s3-policy.tf</span></div>
+              <p>Permite acesso da EC2 Role e nega requisições sem HTTPS (transporte inseguro).</p>
+              <pre><code>resource "aws_s3_bucket_policy" "app" {
+  bucket = aws_s3_bucket.app.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowEC2RoleAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.ec2_s3_role.arn
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.app.arn,
+          "${aws_s3_bucket.app.arn}/*"
+        ]
+      },
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.app.arn,
+          "${aws_s3_bucket.app.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced Commands -->
+        <div class="topic-block">
+          <h2>Comandos Avançados do Terraform</h2>
+          <p>Comandos essenciais para gerenciar infraestrutura em cenários reais: planejamento, importação e workspaces.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform plan -out</code><span class="cmd-tag">Planejamento</span></div>
+              <p>Salva o plano em arquivo binário para aplicar exatamente o que foi revisado.</p>
+              <pre><code># Gerar plano e salvar em arquivo
+terraform plan -out=plan.tfplan
+
+# Aplicar exatamente o plano salvo (sem re-calcular)
+terraform apply plan.tfplan</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform output -json</code><span class="cmd-tag">Outputs</span></div>
+              <p>Exporta outputs em formato JSON para integração com scripts e CI/CD.</p>
+              <pre><code># Ver todos os outputs em JSON
+terraform output -json
+
+# Output específico (sem aspas)
+terraform output -raw db_endpoint
+
+# Usar em scripts bash
+DB_HOST=$(terraform output -raw db_endpoint)
+echo "Conectando em: $DB_HOST"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform import</code><span class="cmd-tag">Importação</span></div>
+              <p>Importa recursos existentes (criados manualmente) para o state do Terraform.</p>
+              <pre><code># Sintaxe: terraform import RECURSO_TF ID_AWS
+terraform import aws_s3_bucket.app meu-bucket-existente
+
+terraform import aws_db_instance.main meu-rds-identifier
+
+terraform import aws_vpc.main vpc-0abc123def456
+
+# Após importar, escreva o código .tf correspondente
+# e execute terraform plan para verificar drift</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform state mv</code><span class="cmd-tag">State</span></div>
+              <p>Move recursos no state — útil ao refatorar código sem destruir infraestrutura.</p>
+              <pre><code># Renomear recurso no state
+terraform state mv aws_instance.web aws_instance.app_server
+
+# Mover para módulo
+terraform state mv aws_s3_bucket.app module.storage.aws_s3_bucket.main
+
+# Listar recursos no state
+terraform state list
+
+# Ver detalhes de um recurso
+terraform state show aws_s3_bucket.app</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform workspace</code><span class="cmd-tag">Workspaces</span></div>
+              <p>Workspaces permitem múltiplos states no mesmo código — útil para ambientes dev/staging/prod.</p>
+              <pre><code># Criar novo workspace
+terraform workspace new dev
+terraform workspace new staging
+terraform workspace new prod
+
+# Listar workspaces
+terraform workspace list
+
+# Selecionar workspace
+terraform workspace select dev
+
+# Usar no código
+locals {
+  environment = terraform.workspace
+}
+
+resource "aws_instance" "web" {
+  instance_type = terraform.workspace == "prod" ? "t3.medium" : "t3.micro"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lab vs Production -->
+        <div class="topic-block">
+          <h2>Lab vs Produção — Diferenças Críticas</h2>
+          <p>O código de lab é simplificado para aprendizado. Em produção, diversas configurações adicionais são necessárias para segurança, disponibilidade e compliance.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Comparação Lab × Produção</code><span class="cmd-tag">Referência</span></div>
+              <table class="styled-table">
+                <thead><tr><th>Aspecto</th><th>Lab</th><th>Produção</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Multi-AZ (RDS)</strong></td><td>false</td><td>true (alta disponibilidade)</td></tr>
+                  <tr><td><strong>Deletion Protection</strong></td><td>Desabilitado</td><td>Habilitado em RDS e S3</td></tr>
+                  <tr><td><strong>Backup Retention</strong></td><td>1-7 dias</td><td>14-35 dias</td></tr>
+                  <tr><td><strong>Instance Types</strong></td><td>t3.micro / db.t3.micro</td><td>t3.medium+ / db.r6g.large+</td></tr>
+                  <tr><td><strong>State Backend</strong></td><td>Local</td><td>S3 + DynamoDB (remoto)</td></tr>
+                  <tr><td><strong>Final Snapshot</strong></td><td>skip_final_snapshot = true</td><td>skip_final_snapshot = false</td></tr>
+                  <tr><td><strong>Logs</strong></td><td>Básico</td><td>CloudWatch + VPC Flow Logs</td></tr>
+                  <tr><td><strong>Secrets</strong></td><td>TF_VAR ou .tfvars</td><td>AWS Secrets Manager / SSM</td></tr>
+                  <tr><td><strong>Monitoring</strong></td><td>Opcional</td><td>CloudWatch Alarms + SNS</td></tr>
+                  <tr><td><strong>WAF</strong></td><td>Não</td><td>AWS WAF no ALB/CloudFront</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remote Backend -->
+        <div class="topic-block">
+          <h2>Remote Backend — State Compartilhado</h2>
+          <p>Em equipe ou CI/CD, o state deve ser armazenado remotamente com locking para evitar conflitos. O backend S3 + DynamoDB é o padrão na AWS.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform backend "s3"</code><span class="cmd-tag">backend.tf</span></div>
+              <p>Configuração do backend remoto com criptografia e locking via DynamoDB.</p>
+              <pre><code>terraform {
+  backend "s3" {
+    bucket         = "cloudtrilhas-terraform-state"
+    key            = "vpc-ec2-rds-s3/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Pré-requisitos do Backend</code><span class="cmd-tag">Setup</span></div>
+              <p>O bucket S3 e a tabela DynamoDB devem existir ANTES de configurar o backend.</p>
+              <pre><code># Criar bucket para state (via AWS CLI ou console)
+aws s3api create-bucket \
+  --bucket cloudtrilhas-terraform-state \
+  --region us-east-1
+
+# Habilitar versionamento
+aws s3api put-bucket-versioning \
+  --bucket cloudtrilhas-terraform-state \
+  --versioning-configuration Status=Enabled
+
+# Criar tabela DynamoDB para locking
+aws dynamodb create-table \
+  --table-name terraform-state-lock \
+  --attribute-definitions AttributeName=LockID,AttributeType=S \
+  --key-schema AttributeName=LockID,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST
+
+# Após criar, inicialize o backend
+terraform init -migrate-state</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p>💡 <strong>Dica:</strong> O DynamoDB table usa <code>LockID</code> como partition key. Quando alguém executa <code>terraform apply</code>, um lock é criado impedindo execuções simultâneas.</p>
+          </div>
+        </div>
+
+        <!-- File Structure -->
+        <div class="topic-block">
+          <h2>Estrutura Completa do Projeto</h2>
+          <p>Organização recomendada dos arquivos <code>.tf</code> para o projeto VPC + EC2 + RDS + S3.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Árvore de Arquivos</code><span class="cmd-tag">Estrutura</span></div>
+              <pre><code>terraform-vpc-ec2-rds-s3/
+├── main.tf                  # Provider e configurações gerais
+├── backend.tf               # Backend remoto S3 + DynamoDB
+├── variables.tf             # Declaração de todas as variáveis
+├── locals.tf                # Locals (common_tags, etc.)
+├── outputs.tf               # Outputs exportados
+│
+├── vpc.tf                   # VPC, Subnets, IGW, Route Tables
+├── security-groups.tf       # SGs para EC2 e RDS
+├── ec2.tf                   # EC2 Instance + User Data
+├── rds.tf                   # DB Subnet Group + RDS Instance
+├── s3.tf                    # S3 Bucket + Versioning + Encryption
+├── s3-lifecycle.tf          # Lifecycle Rules
+├── s3-policy.tf             # Bucket Policy
+├── iam.tf                   # IAM Role + Policy + Instance Profile
+│
+├── terraform.tfvars         # Valores das variáveis (NÃO commitar secrets!)
+├── secrets.tfvars           # Variáveis sensíveis (no .gitignore)
+│
+├── .gitignore               # *.tfvars, .terraform/, *.tfstate*
+└── README.md                # Documentação do projeto</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>.gitignore recomendado</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Variáveis sensíveis
+secrets.tfvars
+*.auto.tfvars
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# OS
+.DS_Store
+Thumbs.db</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../terraform.html" class="button primary">Voltar ao Curso →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

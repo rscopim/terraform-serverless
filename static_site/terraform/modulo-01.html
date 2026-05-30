@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Terraform Módulo 01: VPC Completa</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../terraform.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏗️ Terraform — Módulo 01</span>
+        <h1>VPC Completa</h1>
+        <p>Crie uma VPC completa na AWS com subnets públicas e privadas, Internet Gateway, NAT Gateway e Route Tables. Aprenda a estrutura de arquivos Terraform e os comandos essenciais.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Estrutura de Arquivos Terraform -->
+        <div class="topic-block">
+          <h2>Estrutura de Arquivos Terraform</h2>
+          <p>Um projeto Terraform bem organizado separa responsabilidades em arquivos distintos. Essa convenção facilita a manutenção e colaboração em equipe.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>File Tree</code><span class="cmd-tag">Estrutura</span></div>
+              <pre><code>vpc-project/
+├── main.tf            # Recursos principais (VPC, subnets, gateways)
+├── variables.tf       # Declaração de variáveis de entrada
+├── outputs.tf         # Valores de saída após apply
+├── providers.tf       # Configuração do provider AWS
+└── terraform.tfvars   # Valores das variáveis (não commitar secrets)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Responsabilidades</code><span class="cmd-tag">Convenção</span></div>
+              <table class="styled-table">
+                <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>main.tf</strong></td><td>Recursos de infraestrutura (resource blocks)</td></tr>
+                  <tr><td><strong>variables.tf</strong></td><td>Inputs do módulo com tipo, descrição e default</td></tr>
+                  <tr><td><strong>outputs.tf</strong></td><td>Valores exportados para uso externo ou referência</td></tr>
+                  <tr><td><strong>providers.tf</strong></td><td>Provider, versão do Terraform e backend</td></tr>
+                  <tr><td><strong>terraform.tfvars</strong></td><td>Valores concretos das variáveis para o ambiente</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Provider AWS -->
+        <div class="topic-block">
+          <h2>Provider AWS</h2>
+          <p>O bloco <code>terraform</code> define a versão mínima e os providers necessários. O bloco <code>provider</code> configura a região e credenciais.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>providers.tf</code><span class="cmd-tag">Configuração</span></div>
+              <pre><code>terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      ManagedBy   = "Terraform"
+      Environment = "dev"
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variables -->
+        <div class="topic-block">
+          <h2>Variables</h2>
+          <p>Variáveis tornam o código reutilizável. Defina tipo, descrição e valores padrão para cada input.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>variables.tf</code><span class="cmd-tag">Inputs</span></div>
+              <pre><code>variable "project_name" {
+  description = "Nome do projeto para tags e nomenclatura"
+  type        = string
+  default     = "cloudtrilhas"
+}
+
+variable "region" {
+  description = "Região AWS para deploy dos recursos"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block da VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "public_subnet_cidrs" {
+  description = "Lista de CIDRs para subnets públicas"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+
+variable "private_subnet_cidrs" {
+  description = "Lista de CIDRs para subnets privadas"
+  type        = list(string)
+  default     = ["10.0.10.0/24", "10.0.20.0/24"]
+}
+
+variable "availability_zones" {
+  description = "Lista de AZs para distribuir as subnets"
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b"]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- VPC Resources -->
+        <div class="topic-block">
+          <h2>VPC Resources</h2>
+          <p>O <code>main.tf</code> contém todos os recursos da VPC. Usamos <code>count</code> para criar múltiplas subnets de forma dinâmica.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>VPC + Internet Gateway</code><span class="cmd-tag">Rede Base</span></div>
+              <pre><code>resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "${var.project_name}-vpc"
+  }
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.project_name}-igw"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Subnets Públicas</code><span class="cmd-tag">count</span></div>
+              <pre><code>resource "aws_subnet" "public" {
+  count = length(var.public_subnet_cidrs)
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.public_subnet_cidrs[count.index]
+  availability_zone       = var.availability_zones[count.index]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-${count.index + 1}"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Subnets Privadas</code><span class="cmd-tag">count</span></div>
+              <pre><code>resource "aws_subnet" "private" {
+  count = length(var.private_subnet_cidrs)
+
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_subnet_cidrs[count.index]
+  availability_zone = var.availability_zones[count.index]
+
+  tags = {
+    Name = "${var.project_name}-private-${count.index + 1}"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>NAT Gateway</code><span class="cmd-tag">Saída Privada</span></div>
+              <pre><code>resource "aws_eip" "nat" {
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.project_name}-nat-eip"
+  }
+}
+
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
+
+  depends_on = [aws_internet_gateway.main]
+
+  tags = {
+    Name = "${var.project_name}-nat-gw"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Route Tables — Pública</code><span class="cmd-tag">Roteamento</span></div>
+              <pre><code>resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name = "${var.project_name}-public-rt"
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  count = length(var.public_subnet_cidrs)
+
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Route Tables — Privada</code><span class="cmd-tag">Roteamento</span></div>
+              <pre><code>resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main.id
+  }
+
+  tags = {
+    Name = "${var.project_name}-private-rt"
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count = length(var.private_subnet_cidrs)
+
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Outputs -->
+        <div class="topic-block">
+          <h2>Outputs</h2>
+          <p>Outputs exportam valores importantes após o <code>terraform apply</code>. Úteis para referência e integração com outros módulos.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>outputs.tf</code><span class="cmd-tag">Saídas</span></div>
+              <pre><code>output "vpc_id" {
+  description = "ID da VPC criada"
+  value       = aws_vpc.main.id
+}
+
+output "public_subnet_ids" {
+  description = "IDs das subnets públicas"
+  value       = aws_subnet.public[*].id
+}
+
+output "private_subnet_ids" {
+  description = "IDs das subnets privadas"
+  value       = aws_subnet.private[*].id
+}
+
+output "nat_gateway_ip" {
+  description = "IP público do NAT Gateway"
+  value       = aws_eip.nat.public_ip
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comandos do Módulo -->
+        <div class="topic-block">
+          <h2>Comandos do Módulo</h2>
+          <p>Workflow completo do Terraform — da inicialização à destruição dos recursos.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicializar</span></div>
+              <p>Baixa providers, inicializa backend e prepara o diretório de trabalho.</p>
+              <pre><code>terraform init</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform fmt</code><span class="cmd-tag">Formatar</span></div>
+              <p>Formata os arquivos .tf seguindo o estilo canônico do Terraform.</p>
+              <pre><code>terraform fmt -recursive</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform validate</code><span class="cmd-tag">Validar</span></div>
+              <p>Verifica a sintaxe e consistência da configuração sem acessar APIs.</p>
+              <pre><code>terraform validate</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Planejar</span></div>
+              <p>Mostra o que será criado, alterado ou destruído — sem executar nada.</p>
+              <pre><code>terraform plan</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Aplicar</span></div>
+              <p>Executa as mudanças planejadas e cria/atualiza os recursos na AWS.</p>
+              <pre><code>terraform apply
+
+# Auto-approve (sem confirmação)
+terraform apply -auto-approve</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform output</code><span class="cmd-tag">Saídas</span></div>
+              <p>Exibe os valores definidos nos outputs após o apply.</p>
+              <pre><code>terraform output
+
+# Output específico
+terraform output vpc_id</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform state list</code><span class="cmd-tag">Estado</span></div>
+              <p>Lista todos os recursos gerenciados no state file.</p>
+              <pre><code>terraform state list</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform state show</code><span class="cmd-tag">Detalhe</span></div>
+              <p>Mostra atributos detalhados de um recurso específico no state.</p>
+              <pre><code>terraform state show aws_vpc.main</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform destroy</code><span class="cmd-tag">Destruir</span></div>
+              <p>Remove todos os recursos gerenciados pelo Terraform. Use com cuidado!</p>
+              <pre><code>terraform destroy
+
+# Auto-approve
+terraform destroy -auto-approve</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diagrama de Arquitetura -->
+        <div class="topic-block">
+          <h2>Diagrama de Arquitetura</h2>
+          <p>Visão geral da VPC completa criada neste módulo:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>VPC Architecture</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                        VPC 10.0.0.0/16                      │
+│                                                             │
+│  ┌─────────────────────────┐  ┌─────────────────────────┐  │
+│  │   Public Subnet (AZ-a)  │  │   Public Subnet (AZ-b)  │  │
+│  │      10.0.1.0/24        │  │      10.0.2.0/24        │  │
+│  │                         │  │                         │  │
+│  │  ┌───────────────────┐  │  │                         │  │
+│  │  │   NAT Gateway     │  │  │                         │  │
+│  │  └───────────────────┘  │  │                         │  │
+│  └────────────┬────────────┘  └─────────────────────────┘  │
+│               │                                             │
+│  ┌────────────┼────────────┐  ┌─────────────────────────┐  │
+│  │  Private Subnet (AZ-a)  │  │  Private Subnet (AZ-b)  │  │
+│  │      10.0.10.0/24       │  │      10.0.20.0/24       │  │
+│  │               │         │  │                         │  │
+│  │         (via NAT)       │  │       (via NAT)         │  │
+│  └─────────────────────────┘  └─────────────────────────┘  │
+│                                                             │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                  ┌────────┴────────┐
+                  │ Internet Gateway │
+                  └────────┬────────┘
+                           │
+                      ┌────┴────┐
+                      │ Internet │
+                      └─────────┘</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../terraform.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

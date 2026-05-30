@@ -237,6 +237,17 @@ resource "aws_s3_object" "docker_modules" {
   etag = filemd5("${path.root}/../../static_site/docker/${each.value}")
 }
 
+resource "aws_s3_object" "terraform_modules" {
+  for_each = fileset("${path.root}/../../static_site/terraform", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "terraform/${each.value}"
+  source       = "${path.root}/../../static_site/terraform/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/terraform/${each.value}")
+}
+
 resource "aws_s3_object" "github_page" {
   bucket       = aws_s3_bucket.this.id
   key          = "github.html"
