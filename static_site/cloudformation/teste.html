@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — CloudFormation: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em AWS CloudFormation com 15 perguntas técnicas sobre templates, intrinsic functions e stacks." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../cloudformation.html" class="nav-link">← CloudFormation</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../cloudformation.html">CloudFormation</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>CloudFormation — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre AWS CloudFormation. Teste seus conhecimentos em templates, intrinsic functions, stacks e IaC na AWS.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../cloudformation.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual é a única seção obrigatória em um template CloudFormation?",
+        options: ["A) Parameters", "B) Outputs", "C) Resources", "D) Mappings"],
+        correct: 2,
+        explanation: "Resources é a única seção obrigatória — define os recursos AWS a serem criados. Parameters, Outputs, Mappings, Conditions e Metadata são opcionais."
+      },
+      {
+        question: "Qual intrinsic function retorna o valor de um parâmetro ou o ID de um recurso?",
+        options: ["A) Fn::GetAtt", "B) !Ref", "C) Fn::Sub", "D) Fn::ImportValue"],
+        correct: 1,
+        explanation: "!Ref (ou Fn::Ref) retorna o valor de um parâmetro ou o identificador principal de um recurso (ex: ID de uma instância EC2, ARN de um role). Fn::GetAtt retorna atributos específicos."
+      },
+      {
+        question: "Qual intrinsic function permite substituir variáveis dentro de uma string?",
+        options: ["A) Fn::Join", "B) Fn::Replace", "C) Fn::Sub", "D) Fn::Format"],
+        correct: 2,
+        explanation: "Fn::Sub (ou !Sub) substitui variáveis ${Variable} em uma string. Exemplo: !Sub 'arn:aws:s3:::${BucketName}/*'. Mais legível que Fn::Join para construir strings complexas."
+      },
+      {
+        question: "Qual seção do template define valores reutilizáveis baseados em chaves (ex: AMI por região)?",
+        options: ["A) Parameters", "B) Conditions", "C) Mappings", "D) Locals"],
+        correct: 2,
+        explanation: "Mappings define tabelas de lookup estáticas. Exemplo: mapear região para AMI ID. Acessado via Fn::FindInMap. Diferente de Parameters (input do usuário) e Conditions (lógica condicional)."
+      },
+      {
+        question: "Qual é a função de um Change Set no CloudFormation?",
+        options: ["A) Reverter uma stack para versão anterior", "B) Visualizar as mudanças que serão feitas antes de executá-las", "C) Criar uma cópia da stack", "D) Exportar o template atual"],
+        correct: 1,
+        explanation: "Change Sets mostram exatamente quais recursos serão adicionados, modificados ou deletados antes de aplicar. Similar ao 'terraform plan' — permite revisão antes da execução."
+      },
+      {
+        question: "Qual propriedade de um recurso impede que ele seja deletado quando a stack é removida?",
+        options: ["A) Condition: NeverDelete", "B) DeletionPolicy: Retain", "C) Protection: true", "D) Lifecycle: prevent_destroy"],
+        correct: 1,
+        explanation: "DeletionPolicy: Retain mantém o recurso quando a stack é deletada. Outras opções: Delete (padrão), Snapshot (cria snapshot antes de deletar — para RDS, EBS)."
+      },
+      {
+        question: "Qual intrinsic function concatena uma lista de valores com um delimitador?",
+        options: ["A) Fn::Concat", "B) Fn::Join", "C) Fn::Merge", "D) Fn::Append"],
+        correct: 1,
+        explanation: "Fn::Join concatena valores com delimitador. Exemplo: !Join ['-', ['stack', !Ref 'AWS::StackName', 'bucket']] produz 'stack-mystack-bucket'."
+      },
+      {
+        question: "Qual pseudo-parâmetro retorna a região onde a stack está sendo criada?",
+        options: ["A) AWS::AccountId", "B) AWS::Region", "C) AWS::StackName", "D) AWS::URLSuffix"],
+        correct: 1,
+        explanation: "AWS::Region retorna a região atual (ex: us-east-1). Pseudo-parâmetros são predefinidos pelo CloudFormation: AWS::AccountId, AWS::Region, AWS::StackName, AWS::StackId, etc."
+      },
+      {
+        question: "Qual recurso permite criar stacks dentro de stacks para modularizar templates grandes?",
+        options: ["A) AWS::CloudFormation::Module", "B) AWS::CloudFormation::Stack", "C) AWS::CloudFormation::Import", "D) AWS::CloudFormation::Include"],
+        correct: 1,
+        explanation: "AWS::CloudFormation::Stack (Nested Stacks) permite referenciar outros templates como recursos. Ideal para modularizar: rede em um template, compute em outro, database em outro."
+      },
+      {
+        question: "Qual seção permite criar recursos condicionalmente baseado em parâmetros de entrada?",
+        options: ["A) Rules", "B) Conditions", "C) Metadata", "D) Transform"],
+        correct: 1,
+        explanation: "Conditions define condições lógicas (ex: IsProduction: !Equals [!Ref Env, 'prod']). Recursos usam 'Condition: IsProduction' para serem criados apenas quando a condição é true."
+      },
+      {
+        question: "Qual é a função de Fn::GetAtt e como difere de !Ref?",
+        options: ["A) São idênticos em funcionalidade", "B) GetAtt retorna atributos específicos de um recurso (ex: ARN, DNS); Ref retorna o identificador principal", "C) Ref retorna atributos; GetAtt retorna o ID", "D) GetAtt funciona apenas com Parameters"],
+        correct: 1,
+        explanation: "!Ref retorna o ID principal (ex: instance ID). Fn::GetAtt retorna atributos específicos: !GetAtt MyInstance.PublicIp, !GetAtt MyBucket.Arn, !GetAtt MyLB.DNSName."
+      },
+      {
+        question: "O que é Drift Detection no CloudFormation?",
+        options: ["A) Detectar erros de sintaxe no template", "B) Identificar diferenças entre o estado real dos recursos e o que está definido na stack", "C) Monitorar custos da stack", "D) Verificar permissões IAM"],
+        correct: 1,
+        explanation: "Drift Detection compara o estado atual dos recursos na AWS com a configuração definida na stack. Identifica mudanças manuais feitas fora do CloudFormation (ex: via console)."
+      },
+      {
+        question: "Qual seção Outputs permite que outras stacks importem valores usando Fn::ImportValue?",
+        options: ["A) Qualquer output é importável automaticamente", "B) Outputs com a propriedade Export definida", "C) Outputs com Condition: Shared", "D) Outputs na seção CrossStack"],
+        correct: 1,
+        explanation: "Outputs com Export: Name: 'valor' podem ser importados por outras stacks via Fn::ImportValue. Isso permite compartilhar VPC IDs, subnet IDs, etc. entre stacks independentes."
+      },
+      {
+        question: "Qual é o comportamento padrão do CloudFormation quando um recurso falha durante a criação da stack?",
+        options: ["A) Continua criando os outros recursos", "B) Faz rollback automático — deleta todos os recursos criados", "C) Pausa e aguarda intervenção manual", "D) Cria a stack parcialmente e marca como FAILED"],
+        correct: 1,
+        explanation: "Por padrão, CloudFormation faz rollback completo em caso de falha (ROLLBACK_COMPLETE). Todos os recursos criados são deletados. Pode ser desabilitado com --disable-rollback para debugging."
+      },
+      {
+        question: "Qual Transform permite usar sintaxe simplificada do SAM (Serverless Application Model) em templates CloudFormation?",
+        options: ["A) AWS::Include", "B) AWS::Serverless-2016-10-31", "C) AWS::SAM", "D) AWS::Lambda::Transform"],
+        correct: 1,
+        explanation: "Transform: AWS::Serverless-2016-10-31 habilita recursos SAM (AWS::Serverless::Function, API, etc.) que são expandidos em recursos CloudFormation padrão durante o deploy."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>

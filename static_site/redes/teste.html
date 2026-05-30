@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Redes com 15 perguntas técnicas sobre modelo OSI, TCP/IP, subnetting e troubleshooting." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../redes.html" class="nav-link">← Redes</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../redes.html">Redes</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Redes — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre redes de computadores. Teste seus conhecimentos em protocolos, subnetting e troubleshooting.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../redes.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Em qual camada do modelo OSI opera um switch de rede (Layer 2)?",
+        options: ["A) Camada de Rede", "B) Camada de Enlace de Dados", "C) Camada de Transporte", "D) Camada Física"],
+        correct: 1,
+        explanation: "Switches operam na Camada 2 (Enlace de Dados), usando endereços MAC para encaminhar frames. Roteadores operam na Camada 3 (Rede) usando endereços IP."
+      },
+      {
+        question: "Qual é a principal diferença entre TCP e UDP?",
+        options: ["A) TCP é mais rápido que UDP", "B) UDP garante entrega ordenada dos pacotes", "C) TCP é orientado a conexão com garantia de entrega; UDP é connectionless sem garantia", "D) UDP usa portas, TCP não"],
+        correct: 2,
+        explanation: "TCP estabelece conexão (3-way handshake), garante entrega e ordem. UDP é mais leve, sem conexão e sem garantias — ideal para streaming, DNS queries e jogos online."
+      },
+      {
+        question: "Uma rede usa o endereço 192.168.10.0/26. Quantos hosts utilizáveis existem nessa sub-rede?",
+        options: ["A) 64", "B) 62", "C) 30", "D) 126"],
+        correct: 1,
+        explanation: "/26 significa 6 bits para hosts (32-26=6). 2^6 = 64 endereços totais, menos 2 (rede e broadcast) = 62 hosts utilizáveis."
+      },
+      {
+        question: "Qual protocolo é responsável por traduzir nomes de domínio em endereços IP?",
+        options: ["A) DHCP", "B) ARP", "C) DNS", "D) NAT"],
+        correct: 2,
+        explanation: "DNS (Domain Name System) resolve nomes de domínio para endereços IP. DHCP atribui IPs automaticamente, ARP resolve IP para MAC, e NAT traduz endereços entre redes."
+      },
+      {
+        question: "Qual porta padrão é utilizada pelo protocolo HTTPS?",
+        options: ["A) 80", "B) 8080", "C) 443", "D) 8443"],
+        correct: 2,
+        explanation: "HTTPS usa a porta 443 por padrão (HTTP sobre TLS/SSL). HTTP usa porta 80. As portas 8080 e 8443 são alternativas comuns mas não são padrão."
+      },
+      {
+        question: "Um administrador precisa isolar o tráfego de dois departamentos na mesma rede física. Qual tecnologia utilizar?",
+        options: ["A) NAT", "B) VPN", "C) VLAN", "D) Proxy"],
+        correct: 2,
+        explanation: "VLANs (Virtual LANs) segmentam logicamente uma rede física em domínios de broadcast separados, isolando o tráfego entre departamentos sem necessidade de hardware adicional."
+      },
+      {
+        question: "Qual comando identifica o caminho (hops) que um pacote percorre até o destino?",
+        options: ["A) ping", "B) nslookup", "C) traceroute", "D) netstat"],
+        correct: 2,
+        explanation: "traceroute (Linux) / tracert (Windows) mostra cada roteador (hop) no caminho até o destino, com tempos de resposta. Útil para identificar onde ocorre perda ou latência."
+      },
+      {
+        question: "O que é CIDR e qual a notação para uma máscara 255.255.255.128?",
+        options: ["A) CIDR é um protocolo de roteamento; notação /26", "B) CIDR é um método de alocação de IPs sem classes; notação /25", "C) CIDR é um tipo de firewall; notação /24", "D) CIDR é um protocolo de DNS; notação /27"],
+        correct: 1,
+        explanation: "CIDR (Classless Inter-Domain Routing) permite alocação flexível de IPs. 255.255.255.128 = 25 bits de rede (11111111.11111111.11111111.10000000) = /25."
+      },
+      {
+        question: "Qual é a função do protocolo ARP?",
+        options: ["A) Atribuir endereços IP automaticamente", "B) Resolver endereços IP para endereços MAC na rede local", "C) Criptografar tráfego de rede", "D) Rotear pacotes entre sub-redes"],
+        correct: 1,
+        explanation: "ARP (Address Resolution Protocol) mapeia endereços IP para endereços MAC (físicos) na mesma rede local. É essencial para a comunicação na camada de enlace."
+      },
+      {
+        question: "Um firewall com regra 'DENY ALL' no final e 'ALLOW TCP 443 FROM 10.0.0.0/8' antes. O que acontece com tráfego HTTP (porta 80) vindo de 10.0.1.5?",
+        options: ["A) É permitido porque vem da rede 10.0.0.0/8", "B) É bloqueado pela regra DENY ALL", "C) É permitido porque HTTP é sempre liberado", "D) Gera um erro de configuração"],
+        correct: 1,
+        explanation: "A regra ALLOW libera apenas porta 443 (HTTPS). Tráfego na porta 80 (HTTP) não corresponde a nenhuma regra ALLOW, então é bloqueado pela regra final DENY ALL."
+      },
+      {
+        question: "Qual tipo de NAT permite que múltiplos hosts internos compartilhem um único IP público?",
+        options: ["A) Static NAT", "B) Dynamic NAT", "C) PAT (Port Address Translation)", "D) NAT Loopback"],
+        correct: 2,
+        explanation: "PAT (também chamado NAT Overload) usa diferentes portas de origem para mapear múltiplos IPs privados para um único IP público. É o tipo mais comum em roteadores domésticos."
+      },
+      {
+        question: "Qual ferramenta captura e analisa pacotes de rede em tempo real na linha de comando?",
+        options: ["A) nmap", "B) tcpdump", "C) iptables", "D) dig"],
+        correct: 1,
+        explanation: "tcpdump captura pacotes na interface de rede e permite análise detalhada do tráfego. Wireshark é a versão gráfica. nmap faz port scanning, iptables configura firewall."
+      },
+      {
+        question: "Em uma rede 172.16.0.0/20, qual é o endereço de broadcast?",
+        options: ["A) 172.16.0.255", "B) 172.16.15.255", "C) 172.16.16.255", "D) 172.16.31.255"],
+        correct: 1,
+        explanation: "/20 = 12 bits de host. 172.16.0.0 com 12 bits de host todos em 1: 172.16.00001111.11111111 = 172.16.15.255. O próximo bloco começa em 172.16.16.0."
+      },
+      {
+        question: "Qual protocolo da camada de transporte é usado pelo DNS por padrão para consultas simples?",
+        options: ["A) TCP porta 53", "B) UDP porta 53", "C) TCP porta 953", "D) UDP porta 5353"],
+        correct: 1,
+        explanation: "DNS usa UDP porta 53 para consultas normais (rápido, sem overhead de conexão). TCP porta 53 é usado para transferências de zona (AXFR) e respostas maiores que 512 bytes."
+      },
+      {
+        question: "Um host recebe o IP 169.254.x.x automaticamente. O que isso indica?",
+        options: ["A) O DHCP atribuiu um IP válido da rede", "B) O host está usando um IP estático configurado", "C) O host não conseguiu obter IP do servidor DHCP (APIPA)", "D) O host está em uma VLAN isolada"],
+        correct: 2,
+        explanation: "169.254.0.0/16 é o range APIPA (Automatic Private IP Addressing). Indica que o cliente DHCP não conseguiu contatar um servidor DHCP e atribuiu um IP link-local automaticamente."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Python com 15 perguntas técnicas sobre tipos de dados, OOP, funções e automação." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../python.html" class="nav-link">← Python</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../python.html">Python</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Python — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre Python. Teste seus conhecimentos em tipos de dados, OOP, funções, módulos e automação com boto3.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../python.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual é a diferença entre uma lista e uma tupla em Python?",
+        options: ["A) Listas usam () e tuplas usam []", "B) Listas são mutáveis e tuplas são imutáveis", "C) Tuplas são mais lentas que listas", "D) Não há diferença, são sinônimos"],
+        correct: 1,
+        explanation: "Listas são mutáveis (podem ser alteradas após criação) e usam []. Tuplas são imutáveis (não podem ser modificadas) e usam (). Tuplas são mais rápidas e podem ser usadas como chaves de dict."
+      },
+      {
+        question: "Qual é o resultado de: [x**2 for x in range(5) if x % 2 == 0]?",
+        options: ["A) [0, 4, 16]", "B) [1, 9, 25]", "C) [0, 2, 4]", "D) [0, 1, 4, 9, 16]"],
+        correct: 0,
+        explanation: "range(5) gera 0,1,2,3,4. O filtro 'if x % 2 == 0' seleciona pares: 0,2,4. Elevando ao quadrado: 0²=0, 2²=4, 4²=16. Resultado: [0, 4, 16]."
+      },
+      {
+        question: "Qual keyword é usada para definir uma função geradora em Python?",
+        options: ["A) return", "B) yield", "C) generate", "D) async"],
+        correct: 1,
+        explanation: "'yield' transforma uma função em generator. Ao invés de retornar todos os valores de uma vez, yield produz um valor por vez sob demanda (lazy evaluation), economizando memória."
+      },
+      {
+        question: "Qual é a forma correta de tratar múltiplas exceções em Python?",
+        options: ["A) try: ... catch (TypeError, ValueError): ...", "B) try: ... except (TypeError, ValueError) as e: ...", "C) try: ... handle TypeError, ValueError: ...", "D) try: ... error (TypeError, ValueError): ..."],
+        correct: 1,
+        explanation: "Python usa 'except' (não catch). Múltiplas exceções são agrupadas em tupla: except (TypeError, ValueError) as e. O 'as e' captura a instância da exceção para inspeção."
+      },
+      {
+        question: "O que faz o decorator @staticmethod em uma classe Python?",
+        options: ["A) Torna o método acessível apenas dentro da classe", "B) Define um método que não recebe self nem cls — funciona como função regular dentro da classe", "C) Impede que o método seja sobrescrito por herança", "D) Torna o método assíncrono"],
+        correct: 1,
+        explanation: "@staticmethod define um método que não acessa a instância (self) nem a classe (cls). É uma função utilitária agrupada na classe por organização. @classmethod recebe cls como primeiro argumento."
+      },
+      {
+        question: "Qual é a saída de: print(type({}))?",
+        options: ["A) <class 'set'>", "B) <class 'dict'>", "C) <class 'list'>", "D) <class 'tuple'>"],
+        correct: 1,
+        explanation: "{} cria um dicionário vazio, não um set vazio. Para criar um set vazio, use set(). {1, 2, 3} é um set, mas {} sem elementos é sempre dict."
+      },
+      {
+        question: "Qual módulo Python é usado para criar ambientes virtuais isolados?",
+        options: ["A) pip", "B) virtualenv ou venv", "C) conda apenas", "D) pyenv"],
+        correct: 1,
+        explanation: "'python -m venv' (built-in desde Python 3.3) ou 'virtualenv' criam ambientes isolados com suas próprias dependências. pip instala pacotes, pyenv gerencia versões do Python."
+      },
+      {
+        question: "Qual é a diferença entre '==' e 'is' em Python?",
+        options: ["A) Não há diferença", "B) '==' compara valores; 'is' compara identidade (mesmo objeto na memória)", "C) 'is' compara valores; '==' compara tipos", "D) '==' funciona apenas com números"],
+        correct: 1,
+        explanation: "'==' verifica igualdade de valor (chama __eq__). 'is' verifica se são o mesmo objeto na memória (mesma referência). Use 'is' apenas para None: 'if x is None'."
+      },
+      {
+        question: "Como você lê um arquivo JSON e converte para dicionário Python?",
+        options: ["A) open('data.json').read_json()", "B) import json; data = json.load(open('data.json'))", "C) from file import json_read; json_read('data.json')", "D) import os; os.read_json('data.json')"],
+        correct: 1,
+        explanation: "O módulo 'json' da stdlib oferece json.load(file_object) para ler de arquivo e json.loads(string) para parsear string. json.dump() e json.dumps() fazem o inverso."
+      },
+      {
+        question: "Qual é a função de um decorator em Python?",
+        options: ["A) Compilar a função para código nativo", "B) Envolver uma função com lógica adicional sem modificar seu código original", "C) Tornar a função privada", "D) Converter a função em classe"],
+        correct: 1,
+        explanation: "Decorators são funções que recebem uma função e retornam uma versão modificada. Usados para logging, caching, autenticação, timing — sem alterar o código da função original."
+      },
+      {
+        question: "Qual método HTTP o código 'requests.post(url, json=payload)' utiliza e qual header define automaticamente?",
+        options: ["A) GET com Accept: application/json", "B) POST com Content-Type: application/json", "C) PUT com Content-Type: text/plain", "D) POST com Content-Type: multipart/form-data"],
+        correct: 1,
+        explanation: "requests.post() com json=payload serializa o dict para JSON e define automaticamente o header Content-Type: application/json. Com data= envia form-encoded."
+      },
+      {
+        question: "Qual é a forma correta de listar todos os buckets S3 usando boto3?",
+        options: ["A) boto3.s3.list_buckets()", "B) import boto3; s3 = boto3.client('s3'); s3.list_buckets()", "C) from aws import s3; s3.get_buckets()", "D) boto3.resource('s3').all_buckets()"],
+        correct: 1,
+        explanation: "boto3.client('s3') cria um client de baixo nível. list_buckets() retorna um dict com 'Buckets' contendo nome e data de criação. boto3.resource('s3') é a interface de alto nível."
+      },
+      {
+        question: "O que é o GIL (Global Interpreter Lock) no CPython?",
+        options: ["A) Um mecanismo de segurança para imports", "B) Um lock que permite apenas uma thread executar bytecode Python por vez", "C) Um garbage collector global", "D) Um sistema de cache de módulos"],
+        correct: 1,
+        explanation: "O GIL impede que múltiplas threads executem bytecode Python simultaneamente. Para paralelismo real com CPU-bound, use multiprocessing. Para I/O-bound, threading ainda é eficaz."
+      },
+      {
+        question: "Qual é a saída de: list(map(lambda x: x*2, filter(lambda x: x > 2, [1, 2, 3, 4, 5])))?",
+        options: ["A) [2, 4, 6, 8, 10]", "B) [6, 8, 10]", "C) [3, 4, 5]", "D) [4, 6, 8, 10]"],
+        correct: 1,
+        explanation: "filter seleciona x > 2: [3, 4, 5]. map multiplica por 2: [6, 8, 10]. Equivalente a: [x*2 for x in [1,2,3,4,5] if x > 2]."
+      },
+      {
+        question: "Qual context manager garante que um arquivo seja fechado corretamente mesmo se ocorrer uma exceção?",
+        options: ["A) try/finally com f.close()", "B) with open('file.txt') as f:", "C) Ambas as opções A e B garantem o fechamento", "D) Nenhuma, Python fecha automaticamente"],
+        correct: 2,
+        explanation: "Tanto 'with' (context manager) quanto try/finally garantem o fechamento. 'with' é preferido por ser mais limpo e pythônico. O garbage collector eventualmente fecha, mas não é garantido."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub: Teste de Conhecimento</title>
+  <meta name="description" content="Teste prático de conhecimento em Git e GitHub com 15 perguntas técnicas sobre branching, merging, workflows e CI/CD." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../github.html" class="nav-link">← GitHub</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../github.html">GitHub</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Teste de Conhecimento</span>
+        <h1>Git & GitHub — Teste de Conhecimento</h1>
+        <p>15 perguntas práticas sobre Git e GitHub. Teste seus conhecimentos em branching, merging, workflows e GitHub Actions.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 15</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 6.66%"></div>
+            </div>
+          </div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Teste Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/15</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer teste</button>
+            <a href="../github.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual comando cria uma nova branch e muda para ela imediatamente?",
+        options: ["A) git branch feature && git checkout feature", "B) git checkout -b feature", "C) git new-branch feature", "D) git switch --new feature"],
+        correct: 1,
+        explanation: "'git checkout -b feature' cria e muda para a branch em um comando. Equivalente moderno: 'git switch -c feature'. A opção A funciona mas são dois comandos separados."
+      },
+      {
+        question: "Qual é a diferença entre 'git merge' e 'git rebase'?",
+        options: ["A) merge é mais rápido que rebase", "B) merge cria um commit de merge preservando histórico; rebase reescreve o histórico aplicando commits sobre a branch alvo", "C) rebase é mais seguro para branches compartilhadas", "D) Não há diferença no resultado final"],
+        correct: 1,
+        explanation: "Merge preserva o histórico completo com um merge commit. Rebase reescreve commits sobre a branch alvo, criando histórico linear. Nunca faça rebase em branches públicas/compartilhadas."
+      },
+      {
+        question: "Você fez commit de um arquivo sensível (.env) por engano. Qual comando remove ele do histórico?",
+        options: ["A) git rm .env && git commit", "B) git filter-branch ou git filter-repo para reescrever o histórico", "C) git reset .env", "D) git delete .env --history"],
+        correct: 1,
+        explanation: "'git rm' remove do working tree mas o arquivo permanece no histórico. Para remover completamente, use 'git filter-repo' (recomendado) ou 'git filter-branch' para reescrever todo o histórico."
+      },
+      {
+        question: "Qual comando salva alterações não commitadas temporariamente para trocar de branch?",
+        options: ["A) git save", "B) git stash", "C) git cache", "D) git temp"],
+        correct: 1,
+        explanation: "'git stash' salva mudanças do working directory e staging area em uma pilha temporária. 'git stash pop' restaura as mudanças. Útil para trocar de branch sem commitar trabalho incompleto."
+      },
+      {
+        question: "Qual é a diferença entre 'git reset --hard HEAD~1' e 'git revert HEAD'?",
+        options: ["A) Ambos fazem a mesma coisa", "B) reset remove o commit do histórico (destrutivo); revert cria um novo commit que desfaz as mudanças (seguro)", "C) revert é mais rápido", "D) reset funciona apenas localmente, revert apenas remotamente"],
+        correct: 1,
+        explanation: "reset --hard apaga o commit e as mudanças (perigoso em branches compartilhadas). revert cria um novo commit que inverte as mudanças, preservando o histórico — seguro para branches públicas."
+      },
+      {
+        question: "Qual comando aplica um commit específico de outra branch na branch atual?",
+        options: ["A) git merge --commit <hash>", "B) git cherry-pick <hash>", "C) git apply <hash>", "D) git copy-commit <hash>"],
+        correct: 1,
+        explanation: "'git cherry-pick <hash>' aplica as mudanças de um commit específico na branch atual, criando um novo commit. Útil para trazer hotfixes sem fazer merge completo."
+      },
+      {
+        question: "No .gitignore, qual padrão ignora todos os arquivos .log em qualquer subdiretório?",
+        options: ["A) .log", "B) *.log", "C) **/*.log", "D) /.log"],
+        correct: 2,
+        explanation: "'**/*.log' ignora arquivos .log em qualquer nível de subdiretório. '*.log' ignora apenas no diretório raiz. '**/' é o glob pattern para 'qualquer caminho de diretórios'."
+      },
+      {
+        question: "Qual seção do arquivo de workflow do GitHub Actions define QUANDO o workflow é executado?",
+        options: ["A) jobs:", "B) on:", "C) trigger:", "D) when:"],
+        correct: 1,
+        explanation: "'on:' define os eventos que disparam o workflow (push, pull_request, schedule, workflow_dispatch). 'jobs:' define O QUE executar. Exemplo: on: push: branches: [main]"
+      },
+      {
+        question: "Como resolver um conflito de merge no Git?",
+        options: ["A) git resolve --auto", "B) Editar manualmente os arquivos com marcadores <<<<<<<, resolver, git add e git commit", "C) git merge --force", "D) Deletar a branch e recriar"],
+        correct: 1,
+        explanation: "Conflitos são marcados com <<<<<<< HEAD, =======, >>>>>>> branch. Você edita o arquivo escolhendo o código correto, remove os marcadores, faz 'git add' e 'git commit' para finalizar."
+      },
+      {
+        question: "Qual comando mostra o histórico de commits de forma compacta com grafo de branches?",
+        options: ["A) git log --oneline --graph --all", "B) git history --visual", "C) git show --branches", "D) git tree --all"],
+        correct: 0,
+        explanation: "'git log --oneline --graph --all' mostra cada commit em uma linha, com representação visual das branches e merges, incluindo todas as branches (não apenas a atual)."
+      },
+      {
+        question: "Qual é a função de 'git fetch' comparado com 'git pull'?",
+        options: ["A) fetch e pull são idênticos", "B) fetch baixa as mudanças remotas sem fazer merge; pull faz fetch + merge automaticamente", "C) pull apenas baixa; fetch faz merge", "D) fetch funciona apenas com tags"],
+        correct: 1,
+        explanation: "'git fetch' baixa commits, branches e tags do remote sem alterar seu working directory. 'git pull' = fetch + merge (ou rebase com --rebase). Fetch é mais seguro para revisar antes de integrar."
+      },
+      {
+        question: "Qual estratégia de merge no GitHub cria um histórico linear sem merge commits?",
+        options: ["A) Create a merge commit", "B) Squash and merge", "C) Rebase and merge", "D) Fast-forward merge"],
+        correct: 2,
+        explanation: "Rebase and merge reaplica os commits sobre a branch base, criando histórico linear sem merge commits. Squash combina todos em um único commit. Merge commit preserva a estrutura de branches."
+      },
+      {
+        question: "Qual comando cria uma tag anotada para marcar uma release?",
+        options: ["A) git tag v1.0.0", "B) git tag -a v1.0.0 -m 'Release 1.0.0'", "C) git release v1.0.0", "D) git mark v1.0.0"],
+        correct: 1,
+        explanation: "'git tag -a' cria uma tag anotada com mensagem, autor e data (recomendado para releases). Tags leves (sem -a) são apenas ponteiros para commits, sem metadados adicionais."
+      },
+      {
+        question: "Em GitHub Actions, qual keyword permite reutilizar steps definidos em outro repositório?",
+        options: ["A) import:", "B) uses:", "C) include:", "D) from:"],
+        correct: 1,
+        explanation: "'uses:' referencia uma action reutilizável. Exemplo: uses: actions/checkout@v4. Pode ser de repositório público, mesmo repositório, ou Docker container."
+      },
+      {
+        question: "Qual comando desfaz o último 'git add' (unstage) sem perder as alterações no arquivo?",
+        options: ["A) git reset HEAD arquivo.txt", "B) git checkout -- arquivo.txt", "C) git rm --cached arquivo.txt", "D) git undo add arquivo.txt"],
+        correct: 0,
+        explanation: "'git reset HEAD arquivo.txt' (ou 'git restore --staged arquivo.txt') remove o arquivo da staging area mas mantém as alterações no working directory. checkout descartaria as mudanças."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>
