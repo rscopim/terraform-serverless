@@ -1,5 +1,5 @@
 const API_ENDPOINT =
-  "https://5na1nncgjg.execute-api.us-west-2.amazonaws.com/leads";
+  "https://22uljugfhf.execute-api.us-west-2.amazonaws.com/leads";
 
 function setMessage(element, message, type = "") {
   element.textContent = message;
