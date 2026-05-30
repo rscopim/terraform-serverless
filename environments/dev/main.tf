@@ -28,8 +28,9 @@ module "sqs" {
 module "sns" {
   source = "../../modules/sns"
 
-  project_name = var.project_name
-  environment  = var.environment
+  project_name       = var.project_name
+  environment        = var.environment
+  notification_email = "ricardo.simines@gmail.com"
 }
 
 module "eventbridge" {
@@ -103,7 +104,7 @@ module "register_lead_lambda" {
   dynamodb_table_name = module.dynamodb_leads.table_name
   dynamodb_table_arn  = module.dynamodb_leads.table_arn
 
-  pdf_base_url = "https://dev.cloudtrilhas.com.br/materiais"
+  pdf_base_url = "https://www.dev.cloudtrilhas.com.br/materiais"
 }
 
 module "api_gateway" {
