@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Developer Domínio 04: Troubleshooting e Otimização</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../developer.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-03.html" class="nav-link">← Anterior</a>
+        <a href="../developer.html" class="nav-link">Voltar ao Curso →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">💻 Developer — Domínio 04</span>
+        <h1>Troubleshooting e Otimização</h1>
+        <p>CloudWatch, X-Ray, CloudTrail, caching, performance, debugging e observabilidade. Este domínio representa 18% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- CloudWatch -->
+        <div class="topic-block">
+          <h2>Amazon CloudWatch</h2>
+          <p>Serviço de monitoramento e observabilidade — métricas, logs, alarmes e dashboards.</p>
+
+          <h3>Metrics e Custom Metrics</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Métricas Padrão</code><span class="cmd-tag">Built-in</span></div>
+              <pre><code>EC2 (a cada 5 min, detailed: 1 min):
+• CPUUtilization, NetworkIn/Out
+• DiskReadOps, DiskWriteOps
+• StatusCheckFailed
+⚠️ NÃO inclui: memória, disco (precisa agent)
+
+Lambda:
+• Invocations, Duration, Errors
+• Throttles, ConcurrentExecutions
+• IteratorAge (streams)
+
+API Gateway:
+• Count, Latency, IntegrationLatency
+• 4XXError, 5XXError, CacheHitCount
+
+DynamoDB:
+• ConsumedReadCapacityUnits
+• ConsumedWriteCapacityUnits
+• ThrottledRequests
+• SystemErrors</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Custom Metrics</code><span class="cmd-tag">PutMetricData</span></div>
+              <pre><code>• Enviar métricas customizadas via API
+• PutMetricData API
+• Resolução: Standard (60s) ou High (1s)
+• Dimensões: até 30 por métrica
+• Namespace customizado
+
+import boto3
+cw = boto3.client('cloudwatch')
+cw.put_metric_data(
+    Namespace='MyApp',
+    MetricData=[{
+        'MetricName': 'OrdersProcessed',
+        'Value': 42,
+        'Unit': 'Count',
+        'Dimensions': [{
+            'Name': 'Environment',
+            'Value': 'prod'
+        }]
+    }]
+)
+
+Embedded Metric Format (EMF):
+• Métricas dentro de logs estruturados
+• Automaticamente extraídas como métricas
+• Sem chamada PutMetricData separada
+• Ideal para Lambda (custo menor)</code></pre>
+            </div>
+          </div>
+
+          <h3>CloudWatch Logs</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Logs Structure</code><span class="cmd-tag">Organização</span></div>
+              <pre><code>Hierarquia:
+• Log Group: /aws/lambda/my-function
+  └── Log Stream: 2024/01/15/[$LATEST]abc123
+      └── Log Events: timestamp + message
+
+Retention: 1 dia a 10 anos (ou never expire)
+Encryption: KMS opcional
+
+Fontes comuns:
+• Lambda (automático)
+• ECS (awslogs driver)
+• EC2 (CloudWatch Agent)
+• API Gateway (access/execution logs)
+• VPC Flow Logs
+• Route 53 DNS queries
+
+Export:
+• S3 (batch, até 12h delay)
+• Kinesis Data Firehose (near real-time)
+• Subscription Filters → Lambda, Kinesis, Firehose</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Logs Insights</code><span class="cmd-tag">Query</span></div>
+              <pre><code>• Query language para análise de logs
+• Busca em múltiplos log groups
+• Visualizações (bar, line, stacked)
+
+Exemplos de queries:
+# Top 20 erros
+fields @timestamp, @message
+| filter @message like /ERROR/
+| sort @timestamp desc
+| limit 20
+
+# Latência média por endpoint
+filter @type = "REPORT"
+| stats avg(@duration) as avgDuration
+  by bin(5m)
+
+# Requests por status code
+fields @timestamp
+| filter ispresent(status)
+| stats count(*) by status
+
+Campos automáticos:
+• @timestamp, @message, @logStream
+• @log (log group)
+• Lambda: @duration, @billedDuration,
+  @memorySize, @maxMemoryUsed</code></pre>
+            </div>
+          </div>
+
+          <h3>Alarms e Dashboards</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>CloudWatch Alarms</code><span class="cmd-tag">Alertas</span></div>
+              <pre><code>Estados:
+• OK: métrica dentro do threshold
+• ALARM: métrica excedeu threshold
+• INSUFFICIENT_DATA: dados insuficientes
+
+Configuração:
+• Metric + Statistic (Average, Sum, Max, p99)
+• Period: 10s, 30s, 60s, ou múltiplos de 60s
+• Evaluation Periods: quantos períodos avaliar
+• Datapoints to Alarm: quantos devem violar
+
+Actions:
+• SNS notification (email, SMS, Lambda)
+• Auto Scaling action (scale out/in)
+• EC2 action (stop, terminate, reboot)
+• Systems Manager action
+
+Composite Alarms:
+• Combina múltiplos alarms (AND/OR)
+• Reduz alarm noise
+• Ex: CPU HIGH AND Memory HIGH</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Dashboards</code><span class="cmd-tag">Visualização</span></div>
+              <pre><code>• Visualização customizada de métricas
+• Cross-account e cross-region
+• Auto-refresh (10s, 1m, 5m, 15m, 1h)
+• Widgets: line, stacked area, number, gauge, text
+
+Custo:
+• 3 dashboards gratuitos (até 50 métricas)
+• $3/dashboard/mês adicional
+
+Boas práticas:
+• Dashboard por serviço/aplicação
+• Incluir métricas de negócio
+• Alarmes visíveis no dashboard
+• Annotations para eventos importantes</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> EC2 não monitora memória/disco nativamente (precisa CloudWatch Agent). EMF para métricas em Lambda (custo menor). Logs Insights para queries ad-hoc. Subscription Filters para streaming de logs. Composite Alarms para reduzir noise.</p>
+          </div>
+        </div>
+
+        <!-- X-Ray -->
+        <div class="topic-block">
+          <h2>AWS X-Ray</h2>
+          <p>Distributed tracing para análise e debug de aplicações distribuídas e microservices.</p>
+
+          <h3>Conceitos Fundamentais</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tracing Components</code><span class="cmd-tag">Estrutura</span></div>
+              <pre><code>Trace:
+• Representa uma request end-to-end
+• Composto por múltiplos segments
+• Trace ID: identificador único
+
+Segment:
+• Representa um serviço/recurso
+• Contém: nome, ID, start/end time
+• Status: OK, error, fault, throttle
+
+Subsegment:
+• Detalhe dentro de um segment
+• Chamadas a AWS services, HTTP, SQL
+• Permite granularidade fina
+• Pode ser remoto (downstream service)
+
+Service Map:
+• Visualização gráfica dos serviços
+• Mostra latência e erros entre serviços
+• Identifica gargalos automaticamente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Annotations & Metadata</code><span class="cmd-tag">Dados</span></div>
+              <pre><code>Annotations:
+• Key-value pairs INDEXADOS
+• Podem ser usados para filtrar traces
+• Tipos: string, number, boolean
+• Ideal para: user_id, order_id, environment
+
+xray_recorder.put_annotation('user_id', '12345')
+xray_recorder.put_annotation('payment', 'credit')
+
+Metadata:
+• Key-value pairs NÃO indexados
+• Qualquer tipo de dado (objetos, arrays)
+• Não podem ser usados para filtrar
+• Ideal para: request body, response, debug info
+
+xray_recorder.put_metadata('response', data)
+
+⚠️ Annotations = filtráveis (busca)
+⚠️ Metadata = apenas visualização (debug)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Sampling Rules</code><span class="cmd-tag">Custo</span></div>
+              <pre><code>• Controla quantas requests são traced
+• Reduz custo e overhead
+
+Regra padrão:
+• Reservoir: 1 request/segundo (garantido)
+• Rate: 5% das requests adicionais
+
+Custom rules:
+• Por service name, HTTP method, URL path
+• Prioridade (menor número = maior prioridade)
+• Pode ter reservoir e rate diferentes
+
+Exemplo:
+• /health: 0 reservoir, 0% rate (não traçar)
+• /api/payments: 10 reservoir, 100% rate
+• Default: 1 reservoir, 5% rate
+
+⚠️ Sampling reduz custo mas pode perder traces
+⚠️ Aumentar sampling para debugging</code></pre>
+            </div>
+          </div>
+
+          <h3>Integração com Serviços</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Lambda + X-Ray</code><span class="cmd-tag">Serverless</span></div>
+              <pre><code>Habilitar:
+• Active tracing na configuração da função
+• Ou via SAM: Tracing: Active
+
+Permissões necessárias:
+• AWSXRayDaemonWriteAccess na execution role
+
+Variáveis de ambiente (automáticas):
+• _X_AMZN_TRACE_ID: trace header
+• AWS_XRAY_DAEMON_ADDRESS: daemon endpoint
+
+SDK:
+from aws_xray_sdk.core import patch_all
+patch_all()  # instrumenta boto3, requests, etc.
+
+⚠️ Lambda cria segment automaticamente
+⚠️ Você adiciona subsegments para detalhes</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EC2 / ECS + X-Ray</code><span class="cmd-tag">Daemon</span></div>
+              <pre><code>EC2:
+• Instalar X-Ray Daemon (UDP port 2000)
+• Daemon envia traces para X-Ray API
+• IAM role com permissões de X-Ray
+
+ECS:
+• X-Ray daemon como sidecar container
+• Ou como daemon service (1 por host)
+• Task role com permissões de X-Ray
+
+Fargate:
+• Sidecar container obrigatório
+• Não tem acesso ao host
+
+API Gateway:
+• Habilitar X-Ray tracing no stage
+• Cria segment para cada request
+• Mostra latência de integração
+
+⚠️ Daemon coleta e envia em batch
+⚠️ Sidecar pattern para containers</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Annotations são indexadas (filtráveis). Metadata não são indexadas. Sampling controla custo. Lambda: Active Tracing + execution role. ECS: sidecar container. Service Map mostra gargalos visualmente.</p>
+          </div>
+        </div>
+
+        <!-- CloudTrail -->
+        <div class="topic-block">
+          <h2>AWS CloudTrail</h2>
+          <p>Auditoria e governança — registra todas as chamadas de API feitas na conta AWS.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tipos de Eventos</code><span class="cmd-tag">Auditoria</span></div>
+              <pre><code>Management Events (padrão):
+• Operações de gerenciamento de recursos
+• CreateBucket, RunInstances, CreateUser
+• Sempre habilitado (90 dias gratuito)
+• Read events + Write events
+
+Data Events (custo adicional):
+• Operações nos dados dos recursos
+• S3: GetObject, PutObject, DeleteObject
+• Lambda: Invoke
+• DynamoDB: GetItem, PutItem
+• Alto volume → custo significativo
+
+CloudTrail Insights:
+• Detecta atividade incomum automaticamente
+• Baseline de uso normal
+• Alerta quando há desvio
+• Ex: pico de API calls, erros incomuns</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Configuração</code><span class="cmd-tag">Trail</span></div>
+              <pre><code>Trail:
+• Entrega logs para S3 bucket
+• Pode enviar para CloudWatch Logs
+• Multi-region trail (recomendado)
+• Organization trail (todas as contas)
+
+Log File:
+• JSON com detalhes da API call
+• eventTime, eventSource, eventName
+• userIdentity (quem fez)
+• sourceIPAddress
+• requestParameters
+• responseElements
+
+Integridade:
+• Log file validation (digest files)
+• Detecta se logs foram alterados/deletados
+• S3 Object Lock para imutabilidade
+
+⚠️ CloudTrail = quem fez o quê e quando
+⚠️ CloudWatch = métricas e performance
+⚠️ X-Ray = tracing de requests distribuídas</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> CloudTrail = auditoria de API calls (quem, quando, o quê). Management events gratuitos (90 dias). Data events têm custo adicional. Insights detecta anomalias. Diferente de CloudWatch (performance) e X-Ray (tracing).</p>
+          </div>
+        </div>
+
+        <!-- Caching Strategies -->
+        <div class="topic-block">
+          <h2>Estratégias de Caching</h2>
+          <p>Diferentes camadas de cache para melhorar performance e reduzir custos.</p>
+
+          <h3>ElastiCache: Redis vs Memcached</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>Redis</th><th>Memcached</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Estruturas de dados</strong></td><td>Strings, Lists, Sets, Hashes, Sorted Sets, Streams</td><td>Apenas strings (key-value simples)</td></tr>
+              <tr><td><strong>Persistência</strong></td><td>Sim (RDB snapshots, AOF)</td><td>Não (apenas memória)</td></tr>
+              <tr><td><strong>Replicação</strong></td><td>Sim (read replicas, Multi-AZ)</td><td>Não</td></tr>
+              <tr><td><strong>Cluster Mode</strong></td><td>Sim (sharding automático)</td><td>Sim (multi-node)</td></tr>
+              <tr><td><strong>Pub/Sub</strong></td><td>Sim</td><td>Não</td></tr>
+              <tr><td><strong>Backup/Restore</strong></td><td>Sim</td><td>Não</td></tr>
+              <tr><td><strong>Multi-threaded</strong></td><td>Não (single-threaded)</td><td>Sim</td></tr>
+              <tr><td><strong>Caso de uso</strong></td><td>Sessions, leaderboards, real-time analytics, queues</td><td>Cache simples, objetos grandes, multi-threaded</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Caching Patterns</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Lazy Loading (Cache-Aside)</code><span class="cmd-tag">Read</span></div>
+              <pre><code>Fluxo:
+1. App verifica cache
+2. Cache hit → retorna dados
+3. Cache miss → busca no DB
+4. Armazena no cache
+5. Retorna dados
+
+Vantagens:
+• Apenas dados requisitados são cacheados
+• Node failure não é fatal (busca do DB)
+• Cache se preenche naturalmente
+
+Desvantagens:
+• Cache miss = 3 round trips (penalty)
+• Dados podem ficar stale (desatualizados)
+• Cold start: cache vazio inicialmente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Write-Through</code><span class="cmd-tag">Write</span></div>
+              <pre><code>Fluxo:
+1. App escreve no cache E no DB
+2. Cache sempre atualizado
+3. Reads sempre do cache (fresh data)
+
+Vantagens:
+• Dados nunca stale no cache
+• Sem cache miss penalty (dados já estão lá)
+
+Desvantagens:
+• Write penalty (2 writes por operação)
+• Dados no cache podem nunca ser lidos
+• Node failure = dados perdidos até re-write
+
+Combinação ideal:
+• Write-Through + Lazy Loading
+• TTL para expirar dados não acessados</code></pre>
+            </div>
+          </div>
+
+          <h3>Outras Camadas de Cache</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>DAX</code><span class="cmd-tag">DynamoDB</span></div>
+              <pre><code>• Cache in-memory para DynamoDB
+• Latência de microssegundos
+• API compatível com DynamoDB
+• Write-through (automático)
+• Item cache + Query cache
+• Ideal para: read-heavy, hot partitions
+• Não suporta strongly consistent reads</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>API Gateway Cache</code><span class="cmd-tag">API</span></div>
+              <pre><code>• Cache de responses no API Gateway
+• Apenas REST API (não HTTP API)
+• TTL: 0-3600s (padrão: 300s)
+• Tamanho: 0.5 GB a 237 GB
+• Por stage, pode ser por method
+• Invalidar: Cache-Control: max-age=0
+• Custo por hora (não por request)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CloudFront</code><span class="cmd-tag">CDN</span></div>
+              <pre><code>• Cache na edge (global)
+• TTL controlado por headers:
+  - Cache-Control: max-age
+  - Expires
+• Invalidation: criar invalidation request
+• Behaviors: cache por path pattern
+• Origin Shield: camada extra de cache
+• Ideal para: conteúdo estático, APIs globais</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Redis = mais recursos (persistência, replicação, pub/sub). Memcached = simples, multi-threaded. Lazy Loading = cache miss penalty. Write-Through = dados sempre fresh. DAX = DynamoDB cache (microssegundos).</p>
+          </div>
+        </div>
+
+        <!-- Lambda Optimization -->
+        <div class="topic-block">
+          <h2>Lambda Optimization</h2>
+          <p>Técnicas para otimizar performance, custo e cold starts em funções Lambda.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Memory & Performance</code><span class="cmd-tag">Tuning</span></div>
+              <pre><code>Memória (128 MB - 10.240 MB):
+• CPU é proporcional à memória
+• Mais memória = mais CPU = execução mais rápida
+• Pode ser mais barato com mais memória
+  (executa mais rápido, cobra menos tempo)
+
+AWS Lambda Power Tuning:
+• Ferramenta open-source (Step Functions)
+• Testa função com diferentes memórias
+• Encontra melhor custo-benefício
+• Gráfico de custo vs duração
+
+Boas práticas:
+• Minimizar tamanho do pacote de deploy
+• Usar layers para dependências compartilhadas
+• Reutilizar conexões (keep-alive)
+• Processar em batch quando possível</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cold Starts</code><span class="cmd-tag">Latência</span></div>
+              <pre><code>Cold Start = primeira invocação (ou após inatividade):
+1. Download do código
+2. Inicializar runtime
+3. Executar código de inicialização (fora do handler)
+4. Executar handler
+
+Fatores que aumentam cold start:
+• Pacote grande (mais download)
+• VPC (ENI attachment: +1-2s)
+• Runtime pesado (Java > Python > Node)
+• Muitas dependências
+
+Soluções:
+• Provisioned Concurrency (elimina cold start)
+• Manter funções "warm" (ping periódico)
+• Reduzir tamanho do pacote
+• Inicializar SDK fora do handler
+• Usar SnapStart (Java only)
+• Evitar VPC se não necessário</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Best Practices</code><span class="cmd-tag">Código</span></div>
+              <pre><code># FORA do handler (reutilizado entre invocações)
+import boto3
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table(os.environ['TABLE_NAME'])
+
+def handler(event, context):
+    # DENTRO do handler (executado a cada invocação)
+    item = table.get_item(Key={'id': event['id']})
+    return item
+
+Boas práticas:
+• Conexões DB/SDK FORA do handler
+• Variáveis de ambiente para config
+• /tmp para cache de arquivos (512 MB - 10 GB)
+• Idempotência (mesma request = mesmo resultado)
+• Timeout < 30s para APIs (API Gateway limit)
+• Usar X-Ray para identificar gargalos
+• Async para operações não-críticas</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Inicializar SDK/conexões FORA do handler. Provisioned Concurrency elimina cold starts. Mais memória = mais CPU. SnapStart para Java. VPC aumenta cold start. Lambda Power Tuning para encontrar memória ideal.</p>
+          </div>
+        </div>
+
+        <!-- DynamoDB Optimization -->
+        <div class="topic-block">
+          <h2>DynamoDB Optimization</h2>
+          <p>Técnicas avançadas de design de tabelas e otimização de performance.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Partition Key Design</code><span class="cmd-tag">Distribuição</span></div>
+              <pre><code>Boa partition key:
+• Alta cardinalidade (muitos valores únicos)
+• Distribuição uniforme de requests
+• Evitar "hot partitions"
+
+Exemplos bons:
+• user_id (milhões de valores)
+• order_id (UUID)
+• device_id + timestamp
+
+Exemplos ruins:
+• status ("active"/"inactive" — 2 valores)
+• date (todos acessam "hoje")
+• country (poucos valores, distribuição desigual)
+
+Capacidade por partição:
+• 3000 RCU + 1000 WCU por partição
+• Hot partition = throttling mesmo com capacidade sobrando</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Write Sharding</code><span class="cmd-tag">Anti-pattern</span></div>
+              <pre><code>Problema: hot partition (muitos writes na mesma PK)
+
+Solução: Write Sharding
+• Adicionar sufixo aleatório à partition key
+• Distribui writes entre múltiplas partições
+
+Exemplo:
+• Original PK: "2024-01-15" (hot!)
+• Sharded PK: "2024-01-15_0", "2024-01-15_1", ..., "2024-01-15_9"
+• 10x mais throughput
+
+Trade-off:
+• Reads precisam fazer Scatter-Gather
+  (query em todas as shards e agregar)
+• Mais complexidade no código
+• Ideal para: write-heavy com PK previsível</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>GSI Overloading</code><span class="cmd-tag">Single Table</span></div>
+              <pre><code>Single Table Design:
+• Múltiplas entidades na mesma tabela
+• GSI com atributos genéricos (SK, GSI1PK, GSI1SK)
+• Reduz número de tabelas e queries
+
+Exemplo:
+PK          | SK           | GSI1PK      | GSI1SK
+USER#123    | PROFILE      | EMAIL#a@b   | USER#123
+USER#123    | ORDER#001    | STATUS#open | 2024-01-15
+USER#123    | ORDER#002    | STATUS#done | 2024-01-14
+ORG#abc     | MEMBER#123   | USER#123    | ORG#abc
+
+Access patterns:
+• Get user profile: PK=USER#123, SK=PROFILE
+• Get user orders: PK=USER#123, SK begins_with ORDER#
+• Get orders by status: GSI1PK=STATUS#open
+• Get user's orgs: GSI1PK=USER#123, GSI1SK begins_with ORG#
+
+⚠️ Complexo mas muito eficiente
+⚠️ Planeje access patterns ANTES de criar a tabela</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Alta cardinalidade na partition key evita hot partitions. Write Sharding para distribuir writes. GSI Overloading para single-table design. Planejar access patterns antes de criar a tabela. DAX para hot keys de leitura.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-03.html" class="button secondary">← Domínio Anterior</a>
+        <a href="../developer.html" class="button primary">Voltar ao Curso →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

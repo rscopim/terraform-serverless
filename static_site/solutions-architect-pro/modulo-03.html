@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 03: Design para Novas Soluções</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">← Anterior</a>
+        <a href="modulo-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 03</span>
+        <h1>Design para Novas Soluções (29%)</h1>
+        <p>Projetar arquiteturas para novos workloads: compute, storage, databases, integração de aplicações, analytics e estratégias de Disaster Recovery.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Compute -->
+        <div class="topic-block">
+          <h2>Compute</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Lambda</code><span class="cmd-tag">Serverless</span></div>
+              <p>Execução de código sem gerenciar servidores. Escala automaticamente de 0 a milhares de execuções concorrentes.</p>
+              <pre><code>Limites importantes:
+• Timeout: máximo 15 minutos
+• Memória: 128 MB a 10 GB
+• Payload: 6 MB (síncrono), 256 KB (assíncrono)
+• Concorrência: 1000 (padrão, pode aumentar)
+• /tmp storage: até 10 GB
+• Deployment package: 50 MB (zip), 250 MB (descompactado)
+
+Invocação:
+• Síncrona: API Gateway, ALB, SDK
+• Assíncrona: S3, SNS, EventBridge
+• Event Source Mapping: SQS, Kinesis, DynamoDB Streams
+
+Quando usar:
+• Processamento event-driven
+• APIs com tráfego variável
+• Processamento de dados em tempo real
+• Automação de tarefas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ECS / EKS / Fargate</code><span class="cmd-tag">Containers</span></div>
+              <p>Orquestração de containers na AWS com diferentes níveis de controle.</p>
+              <pre><code>ECS (Elastic Container Service):
+• Orquestrador proprietário AWS
+• Mais simples que Kubernetes
+• Integração nativa com ALB, IAM, CloudWatch
+• Launch types: EC2 ou Fargate
+
+EKS (Elastic Kubernetes Service):
+• Kubernetes gerenciado
+• Compatível com ecossistema K8s
+• Quando: equipe já usa K8s, multi-cloud
+• Launch types: EC2, Fargate, ou Outposts
+
+Fargate:
+• Serverless para containers
+• Sem gerenciar EC2 instances
+• Paga por vCPU + memória usada
+• Quando: não quer gerenciar infraestrutura
+
+Decisão:
+• Simples + AWS-native → ECS + Fargate
+• K8s expertise + portabilidade → EKS
+• Controle total de instâncias → ECS/EKS + EC2</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EC2 Auto Scaling</code><span class="cmd-tag">Elasticidade</span></div>
+              <p>Escala automática de instâncias EC2 baseada em métricas ou schedules.</p>
+              <pre><code>Tipos de scaling:
+• Target Tracking: mantém métrica no target
+  (ex: CPU em 50%)
+• Step Scaling: ações baseadas em thresholds
+• Scheduled: horários pré-definidos
+• Predictive: ML prevê demanda futura
+
+Políticas avançadas:
+• Warm Pools: instâncias pré-aquecidas
+• Instance Refresh: rolling update do ASG
+• Mixed Instances: On-Demand + Spot
+• Capacity Rebalancing: substitui Spot antes de interrupção
+
+Launch Template vs Launch Configuration:
+• Launch Template: versioning, múltiplos instance types
+• Launch Configuration: legado, sem versioning
+• Sempre use Launch Template!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EC2 Spot Instances</code><span class="cmd-tag">Economia</span></div>
+              <p>Capacidade EC2 não utilizada com até 90% de desconto. Pode ser interrompida com 2 min de aviso.</p>
+              <pre><code>Estratégias:
+• Spot Fleet: pool de Spot + On-Demand
+• Diversificação: múltiplos instance types e AZs
+• Capacity Optimized: escolhe pool com mais capacidade
+• Lowest Price: escolhe mais barato (risco maior)
+
+Quando usar:
+• Workloads tolerantes a interrupção
+• Batch processing, CI/CD, rendering
+• Big data (EMR, Spark)
+• Containers com ECS/EKS
+
+Quando NÃO usar:
+• Databases
+• Aplicações stateful críticas
+• Workloads que não podem ser interrompidos</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Storage -->
+        <div class="topic-block">
+          <h2>Storage</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>S3 Storage Classes</code><span class="cmd-tag">Objeto</span></div>
+              <p>Classes de armazenamento com diferentes trade-offs de custo, disponibilidade e acesso.</p>
+              <pre><code>Classes (custo crescente de armazenamento → acesso):
+┌─────────────────────────────────────────────────┐
+│ S3 Standard          │ Acesso frequente, 3+ AZs │
+│ S3 Intelligent-Tier  │ Automático por padrão    │
+│ S3 Standard-IA       │ Infrequente, 3+ AZs     │
+│ S3 One Zone-IA       │ Infrequente, 1 AZ       │
+│ S3 Glacier Instant   │ Arquivo, ms de acesso    │
+│ S3 Glacier Flexible  │ Arquivo, min-hrs         │
+│ S3 Glacier Deep Arch │ Arquivo, 12-48 hrs       │
+└─────────────────────────────────────────────────┘
+
+Lifecycle Rules:
+• Transition: mover entre classes automaticamente
+• Expiration: deletar objetos após N dias
+• Pode combinar com versionamento
+
+S3 Intelligent-Tiering:
+• Move automaticamente entre tiers
+• Sem taxa de retrieval
+• Ideal quando padrão de acesso é desconhecido</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EFS / FSx</code><span class="cmd-tag">File System</span></div>
+              <p>Sistemas de arquivos gerenciados para diferentes workloads.</p>
+              <pre><code>Amazon EFS:
+• NFS gerenciado (Linux)
+• Multi-AZ por padrão
+• Escala automaticamente (petabytes)
+• Performance modes: General Purpose, Max I/O
+• Throughput modes: Bursting, Provisioned, Elastic
+• Quando: compartilhar arquivos entre EC2/containers Linux
+
+Amazon FSx for Windows:
+• SMB + NTFS gerenciado
+• Integra com Active Directory
+• Quando: workloads Windows, SQL Server
+
+Amazon FSx for Lustre:
+• File system de alta performance
+• Integra com S3 (hot/cold data)
+• Quando: HPC, ML training, rendering
+
+Amazon FSx for NetApp ONTAP:
+• Multi-protocolo (NFS, SMB, iSCSI)
+• Quando: migrar NetApp on-premises</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Storage Gateway</code><span class="cmd-tag">Híbrido</span></div>
+              <p>Ponte entre armazenamento on-premises e cloud storage (S3, FSx, EBS).</p>
+              <pre><code>Tipos:
+• S3 File Gateway:
+  → NFS/SMB → S3 (com cache local)
+  → Quando: backup de arquivos para S3
+
+• FSx File Gateway:
+  → SMB → FSx for Windows (com cache local)
+  → Quando: acesso local a FSx
+
+• Volume Gateway:
+  → iSCSI → EBS Snapshots em S3
+  → Cached: dados em S3, cache local
+  → Stored: dados locais, backup em S3
+
+• Tape Gateway:
+  → iSCSI VTL → S3 Glacier
+  → Quando: substituir fitas físicas de backup</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database -->
+        <div class="topic-block">
+          <h2>Database</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Amazon Aurora</code><span class="cmd-tag">Relacional</span></div>
+              <p>Banco relacional gerenciado compatível com MySQL e PostgreSQL, até 5x mais rápido.</p>
+              <pre><code>Características:
+• Storage auto-scaling (até 128 TB)
+• 6 cópias dos dados em 3 AZs
+• Failover automático (&lt;30 segundos)
+• Até 15 read replicas (baixa latência)
+
+Aurora Global Database:
+• Replicação cross-region (&lt;1 segundo lag)
+• Failover cross-region (RPO ~1s, RTO ~1min)
+• Até 5 regiões secundárias
+
+Aurora Serverless v2:
+• Escala automaticamente (0.5 a 128 ACUs)
+• Paga por uso (sem instâncias ociosas)
+• Quando: tráfego imprevisível, dev/test
+
+Aurora Multi-Master:
+• Múltiplos nós de escrita
+• Alta disponibilidade de escrita
+• Quando: zero downtime para escritas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DynamoDB</code><span class="cmd-tag">NoSQL</span></div>
+              <p>Banco NoSQL serverless com latência de milissegundos em qualquer escala.</p>
+              <pre><code>Características:
+• Key-value e document store
+• Single-digit millisecond latency
+• Auto-scaling ou on-demand capacity
+• Global Tables: multi-região active-active
+• DynamoDB Streams: CDC (Change Data Capture)
+• TTL: expiração automática de itens
+
+Capacidade:
+• Provisioned: RCU/WCU definidos (mais barato se previsível)
+• On-Demand: paga por request (imprevisível)
+
+DAX (DynamoDB Accelerator):
+• Cache in-memory para DynamoDB
+• Microsegundos de latência
+• Compatível com API DynamoDB (drop-in)
+
+Quando usar:
+• Alta escala, baixa latência
+• Schema flexível
+• Gaming, IoT, session store
+• Não usar: queries complexas, joins, transações ACID complexas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ElastiCache</code><span class="cmd-tag">Cache</span></div>
+              <p>Cache in-memory gerenciado (Redis ou Memcached) para reduzir latência de leitura.</p>
+              <pre><code>Redis vs Memcached:
+┌──────────────┬──────────────────┬────────────────┐
+│ Feature      │ Redis            │ Memcached      │
+├──────────────┼──────────────────┼────────────────┤
+│ Estruturas   │ Strings, Lists,  │ Strings apenas │
+│              │ Sets, Hashes,    │                │
+│              │ Sorted Sets      │                │
+│ Replicação   │ Sim (Multi-AZ)   │ Não            │
+│ Persistência │ Sim (AOF, RDB)   │ Não            │
+│ Cluster      │ Sim (sharding)   │ Sim            │
+│ Pub/Sub      │ Sim              │ Não            │
+│ Lua Scripts  │ Sim              │ Não            │
+└──────────────┴──────────────────┴────────────────┘
+
+Padrões de caching:
+• Lazy Loading: carrega no cache apenas quando solicitado
+• Write-Through: escreve no cache junto com o DB
+• TTL: expiração para evitar dados stale
+
+Quando usar Redis:
+• Session store, leaderboards, real-time analytics
+• Pub/Sub, geospatial, rate limiting</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Bancos Especializados</code><span class="cmd-tag">Purpose-built</span></div>
+              <pre><code>Amazon Neptune:
+• Graph database (relações complexas)
+• Social networks, fraud detection, knowledge graphs
+• Suporta Gremlin e SPARQL
+
+Amazon Timestream:
+• Time-series database
+• IoT, DevOps metrics, industrial telemetry
+• 1000x mais rápido que bancos relacionais para time-series
+
+Amazon QLDB:
+• Ledger database (imutável, verificável)
+• Histórico completo de mudanças (cryptographic verification)
+• Supply chain, financial transactions, registros regulatórios
+
+Amazon Keyspaces:
+• Cassandra-compatible (wide-column)
+• Quando: migrar workloads Cassandra
+
+Amazon DocumentDB:
+• MongoDB-compatible
+• Quando: migrar workloads MongoDB</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Application Integration -->
+        <div class="topic-block">
+          <h2>Integração de Aplicações</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Amazon SQS</code><span class="cmd-tag">Queue</span></div>
+              <p>Fila de mensagens totalmente gerenciada para desacoplamento de componentes.</p>
+              <pre><code>Tipos:
+• Standard: throughput ilimitado, at-least-once, sem ordem
+• FIFO: 300 msg/s (3000 com batching), exactly-once, ordenado
+
+Características:
+• Retention: 1 min a 14 dias (default 4 dias)
+• Message size: até 256 KB
+• Visibility Timeout: tempo que msg fica invisível após leitura
+• Dead Letter Queue (DLQ): msgs que falharam N vezes
+• Long Polling: reduz chamadas vazias (WaitTimeSeconds)
+
+Padrões:
+• Fan-out: SNS → múltiplas SQS queues
+• Request buffering: absorver picos de tráfego
+• Decoupling: separar producer de consumer</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon SNS</code><span class="cmd-tag">Pub/Sub</span></div>
+              <p>Serviço de pub/sub para enviar mensagens a múltiplos subscribers simultaneamente.</p>
+              <pre><code>Subscribers:
+• SQS, Lambda, HTTP/S, Email, SMS
+• Kinesis Data Firehose
+• Mobile push notifications
+
+Características:
+• Fan-out: 1 mensagem → N subscribers
+• Message filtering: filtrar por atributos
+• FIFO topics: ordenação e deduplicação
+• Cross-account subscriptions
+
+Padrão SNS + SQS Fan-out:
+• SNS Topic publica mensagem
+• Múltiplas SQS queues subscrevem
+• Cada queue processa independentemente
+• Desacoplamento total entre consumers</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon EventBridge</code><span class="cmd-tag">Event Bus</span></div>
+              <p>Barramento de eventos serverless para construir arquiteturas event-driven.</p>
+              <pre><code>Características:
+• Event Bus: recebe eventos de múltiplas fontes
+• Rules: filtram e roteiam eventos para targets
+• Schema Registry: descoberta automática de schemas
+• Archive & Replay: re-processar eventos passados
+• Cross-account / cross-region delivery
+
+Fontes de eventos:
+• Serviços AWS (100+)
+• SaaS partners (Zendesk, Datadog, Auth0)
+• Custom applications
+
+vs SNS:
+• EventBridge: content-based filtering avançado,
+  schema discovery, SaaS integration, archive/replay
+• SNS: fan-out simples, alta throughput, mobile push
+
+Quando usar EventBridge:
+• Arquitetura event-driven complexa
+• Integração com SaaS
+• Roteamento baseado em conteúdo do evento</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Step Functions / AppSync</code><span class="cmd-tag">Orquestração</span></div>
+              <pre><code>AWS Step Functions:
+• Orquestração visual de workflows
+• State machines (JSON/YAML)
+• Integra com 200+ serviços AWS
+• Standard: longa duração (até 1 ano), exactly-once
+• Express: alta throughput, curta duração (5 min)
+• Quando: coordenar múltiplos Lambda/serviços
+
+AWS AppSync:
+• GraphQL gerenciado
+• Real-time subscriptions (WebSocket)
+• Offline sync (mobile)
+• Resolvers: DynamoDB, Lambda, HTTP, RDS
+• Quando: APIs GraphQL, real-time, mobile offline
+
+Amazon MQ:
+• Message broker gerenciado (ActiveMQ, RabbitMQ)
+• Quando: migrar de brokers on-premises
+• Suporta protocolos: AMQP, MQTT, STOMP, OpenWire
+• NÃO é serverless (instâncias gerenciadas)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics -->
+        <div class="topic-block">
+          <h2>Analytics</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Amazon Kinesis</code><span class="cmd-tag">Streaming</span></div>
+              <p>Plataforma para processamento de dados em streaming em tempo real.</p>
+              <pre><code>Kinesis Data Streams:
+• Ingestão de dados em tempo real
+• Shards: unidade de throughput (1 MB/s in, 2 MB/s out)
+• Retention: 24h (default) até 365 dias
+• Consumers: Lambda, KCL, Kinesis Analytics
+• Quando: processamento customizado em real-time
+
+Kinesis Data Firehose:
+• Entrega de dados para destinos (near real-time)
+• Destinos: S3, Redshift, OpenSearch, Splunk, HTTP
+• Transformação com Lambda
+• Buffer: 60s-900s ou 1-128 MB
+• Quando: ETL simples para S3/Redshift
+
+Kinesis Data Analytics:
+• SQL ou Apache Flink em streaming data
+• Quando: analytics em tempo real
+
+vs SQS:
+• Kinesis: múltiplos consumers, replay, ordering
+• SQS: desacoplamento simples, delete após processar</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Athena / Redshift</code><span class="cmd-tag">Query</span></div>
+              <pre><code>Amazon Athena:
+• Query SQL serverless sobre S3
+• Paga por dados escaneados
+• Formatos: Parquet, ORC, JSON, CSV
+• Integra com Glue Data Catalog
+• Quando: queries ad-hoc, data lake analytics
+• Otimização: Parquet/ORC + particionamento
+
+Amazon Redshift:
+• Data warehouse petabyte-scale
+• Columnar storage, MPP (Massively Parallel)
+• Redshift Spectrum: query S3 sem carregar dados
+• Redshift Serverless: sem gerenciar clusters
+• Quando: BI, reporting complexo, joins pesados
+
+Decisão:
+• Queries ad-hoc, serverless → Athena
+• BI complexo, dashboards, joins → Redshift
+• Ambos podem consultar S3 (data lake)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EMR / Glue</code><span class="cmd-tag">ETL</span></div>
+              <pre><code>Amazon EMR:
+• Hadoop/Spark gerenciado
+• Frameworks: Spark, Hive, Presto, HBase, Flink
+• EC2, EKS, ou Serverless
+• Quando: big data processing, ML em escala
+
+AWS Glue:
+• ETL serverless
+• Glue Data Catalog: metadados centralizados
+• Glue Crawlers: descoberta automática de schema
+• Glue Jobs: Spark ETL (Python/Scala)
+• Glue Studio: visual ETL
+• Quando: ETL para data lake, catalogação
+
+Amazon QuickSight:
+• BI serverless (dashboards e visualizações)
+• SPICE: in-memory engine
+• ML Insights: anomaly detection, forecasting
+• Embedding: dashboards em aplicações
+• Quando: visualização de dados, reporting</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DR Strategies -->
+        <div class="topic-block">
+          <h2>Estratégias de Disaster Recovery</h2>
+          <p>Estratégias ordenadas por custo (menor → maior) e RTO/RPO (maior → menor):</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estratégia</th><th>RTO</th><th>RPO</th><th>Custo</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Backup & Restore</strong></td><td>Horas</td><td>Horas</td><td>$</td><td>Backups em S3/outra região. Restaura quando necessário. Sem infraestrutura ativa na DR.</td></tr>
+              <tr><td><strong>Pilot Light</strong></td><td>10s min</td><td>Minutos</td><td>$$</td><td>Core mínimo rodando (DB replicado). Compute desligado, liga sob demanda.</td></tr>
+              <tr><td><strong>Warm Standby</strong></td><td>Minutos</td><td>Segundos</td><td>$$$</td><td>Versão reduzida do ambiente completo rodando. Scale up quando ativado.</td></tr>
+              <tr><td><strong>Multi-Site Active-Active</strong></td><td>~0 (real-time)</td><td>~0</td><td>$$$$</td><td>Ambiente completo em 2+ regiões. Tráfego distribuído. Failover instantâneo.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Backup & Restore</code><span class="cmd-tag">$</span></div>
+              <pre><code>Implementação:
+• AWS Backup: backups automatizados cross-region
+• S3 Cross-Region Replication
+• RDS/Aurora snapshots copiados para outra região
+• AMIs copiadas para outra região
+
+Recuperação:
+• Restaurar backups na região DR
+• Provisionar infraestrutura (CloudFormation)
+• Atualizar DNS
+
+Quando usar:
+• Workloads não-críticos
+• Budget limitado
+• RTO de horas é aceitável</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Pilot Light</code><span class="cmd-tag">$$</span></div>
+              <pre><code>Implementação:
+• DB replicado continuamente (Aurora Global, DynamoDB Global)
+• Infraestrutura definida em IaC (pronta para deploy)
+• Compute DESLIGADO (AMIs prontas)
+• Route 53 health checks
+
+Ativação:
+• Promover DB replica para primary
+• Iniciar instâncias EC2 / scale up ASG
+• Atualizar DNS (Route 53 failover)
+
+Quando usar:
+• Core business com RTO de ~10 minutos
+• Custo moderado aceitável
+• DB é o componente mais crítico</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Warm Standby</code><span class="cmd-tag">$$$</span></div>
+              <pre><code>Implementação:
+• Ambiente completo rodando em escala REDUZIDA
+• DB: Aurora Global Database (read replica)
+• Compute: ASG com min capacity baixo
+• Load Balancer ativo
+• Route 53 weighted/failover routing
+
+Ativação:
+• Scale up ASG (aumentar min/desired)
+• Promover DB replica
+• Shift DNS traffic (Route 53)
+
+Quando usar:
+• Aplicações business-critical
+• RTO de minutos
+• Pode justificar custo de infra reduzida 24/7</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Multi-Site Active-Active</code><span class="cmd-tag">$$$$</span></div>
+              <pre><code>Implementação:
+• Ambiente COMPLETO em 2+ regiões
+• Tráfego distribuído (Route 53 latency/weighted)
+• DynamoDB Global Tables (multi-region writes)
+• Aurora Global Database (multi-master)
+• CloudFront com múltiplas origins
+
+Failover:
+• Automático via Route 53 health checks
+• Sem intervenção manual
+• Zero downtime
+
+Quando usar:
+• Aplicações mission-critical
+• Zero tolerance para downtime
+• Compliance com requisitos de DR rigorosos
+• Budget não é restrição principal</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Identifique RTO/RPO no enunciado → escolha a estratégia adequada. "Menor custo com RTO de horas" → Backup & Restore. "RTO próximo de zero" → Multi-Site. "Custo-efetivo com RTO de minutos" → Warm Standby. AWS Elastic Disaster Recovery (DRS) automatiza Pilot Light/Warm Standby.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
