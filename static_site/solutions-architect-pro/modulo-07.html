@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 07: Cenários Práticos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-06.html" class="nav-link">← Anterior</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 07</span>
+        <h1>Cenários Práticos</h1>
+        <p>Cenários no estilo do exame cobrindo os 4 domínios, com análise de requisitos e justificativa detalhada da resposta correta.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Cenário 1 - Domínio 1: Complexidade Organizacional -->
+        <div class="topic-block">
+          <h2>Cenário 1 — Complexidade Organizacional</h2>
+          <div class="command-card" style="margin-bottom:24px">
+            <div class="command-header"><code>Situação</code><span class="cmd-tag">Domínio 1</span></div>
+            <p>Uma empresa multinacional possui 200+ contas AWS em 5 regiões. A equipe de rede precisa conectar todas as VPCs entre si e com 3 data centers on-premises via Direct Connect. Atualmente usam VPC Peering, mas a complexidade de gerenciamento está insustentável. Precisam de segmentação entre ambientes (prod, dev, staging) e visibilidade centralizada do tráfego.</p>
+          </div>
+
+          <h3>Requisitos identificados:</h3>
+          <ul>
+            <li>Conectividade transitiva entre 200+ VPCs</li>
+            <li>Integração com Direct Connect (3 data centers)</li>
+            <li>Segmentação de tráfego por ambiente</li>
+            <li>Visibilidade e monitoramento centralizado</li>
+            <li>Escala multi-região</li>
+          </ul>
+
+          <h3>Opções:</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>A</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Manter VPC Peering e adicionar mais conexões conforme necessário. Usar VPC Flow Logs para monitoramento.</p>
+              <pre><code>❌ Por que está errada:
+• VPC Peering não é transitivo (200 VPCs = ~20.000 conexões)
+• Não escala para este cenário
+• Sem segmentação nativa
+• Gerenciamento impossível nesta escala</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>B</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Usar Transit Gateway em cada região com peering inter-região. Criar route tables separadas para segmentação.</p>
+              <pre><code>❌ Por que está errada:
+• Transit Gateway resolve parcialmente
+• Mas gerenciar TGW peering entre 5 regiões manualmente
+  é complexo e não oferece política centralizada
+• Falta visibilidade unificada
+• Não é a solução mais operacionalmente eficiente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>C ✓</code><span class="cmd-tag">Correta</span></div>
+              <p>Implementar AWS Cloud WAN com network policy centralizada. Definir segmentos (prod, dev, staging) na política. Integrar Direct Connect via Transit Gateway attachments.</p>
+              <pre><code>✅ Por que está correta:
+• Cloud WAN: rede global gerenciada como serviço
+• Política centralizada define segmentação
+• Integra automaticamente com DX via TGW
+• Dashboard unificado de monitoramento
+• Escala para centenas de VPCs em múltiplas regiões
+• Menor esforço operacional para este cenário</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>D</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Criar uma VPC compartilhada (shared VPC) usando AWS RAM e colocar todos os recursos nela.</p>
+              <pre><code>❌ Por que está errada:
+• Shared VPC não resolve conectividade entre VPCs existentes
+• Não é viável migrar 200+ contas para shared subnets
+• Não resolve conectividade com on-premises
+• Viola princípio de isolamento entre contas</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cenário 2 - Domínio 2: Novas Soluções -->
+        <div class="topic-block">
+          <h2>Cenário 2 — Design para Novas Soluções</h2>
+          <div class="command-card" style="margin-bottom:24px">
+            <div class="command-header"><code>Situação</code><span class="cmd-tag">Domínio 2</span></div>
+            <p>Uma fintech precisa projetar um sistema de processamento de transações que recebe milhões de eventos por dia de múltiplas fontes (mobile, web, parceiros). Os dados precisam ser processados em tempo real para detecção de fraude, armazenados em um data lake para analytics, e disponibilizados em dashboards para a equipe de negócios. O sistema deve ter alta disponibilidade e custo otimizado.</p>
+          </div>
+
+          <h3>Requisitos identificados:</h3>
+          <ul>
+            <li>Ingestão de milhões de eventos/dia em tempo real</li>
+            <li>Processamento em tempo real (detecção de fraude)</li>
+            <li>Armazenamento em data lake para analytics</li>
+            <li>Dashboards para equipe de negócios</li>
+            <li>Alta disponibilidade e custo otimizado</li>
+          </ul>
+
+          <h3>Opções:</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>A</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Usar SQS para ingestão, Lambda para processamento, RDS para armazenamento e QuickSight para dashboards.</p>
+              <pre><code>❌ Por que está errada:
+• SQS não permite múltiplos consumers lerem mesmos dados
+• Mensagem é deletada após consumo (sem replay)
+• RDS não é ideal para data lake (escala limitada)
+• Não atende requisito de analytics em escala
+• Funciona para desacoplamento, não para streaming</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>B ✓</code><span class="cmd-tag">Correta</span></div>
+              <p>Kinesis Data Streams para ingestão, Lambda/Kinesis Analytics para detecção de fraude em real-time, Kinesis Data Firehose para entregar dados no S3 (data lake), Glue para catalogação, Athena para queries ad-hoc, e QuickSight para dashboards.</p>
+              <pre><code>✅ Por que está correta:
+• Kinesis Streams: ingestão real-time, múltiplos consumers
+• Lambda/Analytics: processamento em tempo real (fraude)
+• Firehose → S3: entrega automática para data lake
+• Glue Catalog + Athena: analytics serverless
+• QuickSight: dashboards para negócios
+• Tudo serverless = custo otimizado + HA built-in
+• Arquitetura completa de streaming + data lake</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>C</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Usar Apache Kafka em EC2 (MSK) para ingestão, EMR com Spark Streaming para processamento, HDFS para armazenamento e Kibana para dashboards.</p>
+              <pre><code>❌ Por que está errada:
+• MSK + EMR + EC2: alto esforço operacional
+• HDFS não é ideal (S3 é melhor para data lake na AWS)
+• Kibana não é serviço AWS nativo (OpenSearch Dashboards)
+• Over-engineered para o cenário
+• Custo mais alto (instâncias 24/7)
+• Não segue princípio de "menor esforço operacional"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>D</code><span class="cmd-tag">Incorreta</span></div>
+              <p>API Gateway + Lambda para ingestão, DynamoDB Streams para processamento, DynamoDB para armazenamento e QuickSight para dashboards.</p>
+              <pre><code>❌ Por que está errada:
+• API Gateway tem limite de 10.000 req/s (throttling)
+• DynamoDB não é ideal para data lake analytics
+• DynamoDB Streams tem retenção de apenas 24h
+• Não escala para milhões de eventos/dia de forma custo-efetiva
+• Analytics em DynamoDB é limitado e caro (scans)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cenário 3 - Domínio 3: Melhoria Contínua -->
+        <div class="topic-block">
+          <h2>Cenário 3 — Melhoria Contínua</h2>
+          <div class="command-card" style="margin-bottom:24px">
+            <div class="command-header"><code>Situação</code><span class="cmd-tag">Domínio 3</span></div>
+            <p>Uma empresa de e-commerce tem uma aplicação rodando em EC2 com RDS MySQL. Durante a Black Friday, o banco de dados fica sobrecarregado com leituras (catálogo de produtos consultado milhões de vezes). A equipe quer melhorar a performance sem mudar a aplicação significativamente, mantendo custos controlados. O catálogo muda apenas a cada 5 minutos.</p>
+          </div>
+
+          <h3>Requisitos identificados:</h3>
+          <ul>
+            <li>Reduzir carga de leitura no RDS MySQL</li>
+            <li>Dados mudam a cada 5 minutos (tolerância a stale data)</li>
+            <li>Mínima mudança na aplicação</li>
+            <li>Custo controlado</li>
+            <li>Suportar picos de Black Friday</li>
+          </ul>
+
+          <h3>Opções:</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>A</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Migrar para Aurora MySQL com 15 read replicas e usar o Reader Endpoint para distribuir leituras.</p>
+              <pre><code>❌ Por que está errada:
+• Resolve parcialmente (mais capacidade de leitura)
+• Mas 15 replicas é caro (paga por instância)
+• Ainda atinge o banco para cada request
+• Não aproveita o fato de dados mudarem a cada 5 min
+• Mudança significativa (migração de banco)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>B ✓</code><span class="cmd-tag">Correta</span></div>
+              <p>Adicionar ElastiCache Redis na frente do RDS com TTL de 5 minutos. Implementar lazy loading: verificar cache primeiro, se miss, consultar RDS e popular cache.</p>
+              <pre><code>✅ Por que está correta:
+• Cache absorve 95%+ das leituras repetitivas
+• TTL de 5 min alinhado com frequência de mudança
+• Lazy loading: mudança mínima na aplicação
+• Redis escala horizontalmente (cluster mode)
+• Custo muito menor que 15 read replicas
+• Latência de microsegundos vs milissegundos do RDS
+• Padrão comprovado para catálogos de produtos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>C</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Escalar verticalmente o RDS para uma instância maior (db.r6g.16xlarge) e habilitar Performance Insights.</p>
+              <pre><code>❌ Por que está errada:
+• Scaling vertical tem limite (maior instância disponível)
+• Custo muito alto para instância máxima
+• Não resolve o problema fundamental (mesmas queries repetidas)
+• Performance Insights é monitoramento, não solução
+• Downtime durante resize (se não Multi-AZ)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>D</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Migrar o catálogo para DynamoDB com DAX para cache automático.</p>
+              <pre><code>❌ Por que está errada:
+• Migrar de MySQL para DynamoDB é mudança significativa
+• Requer reescrever queries (SQL → NoSQL API)
+• Catálogo pode ter relações complexas (categorias, variações)
+• Viola requisito de "mínima mudança na aplicação"
+• DAX é excelente, mas a migração é o problema</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cenário 4 - Domínio 4: Migração -->
+        <div class="topic-block">
+          <h2>Cenário 4 — Migração e Modernização</h2>
+          <div class="command-card" style="margin-bottom:24px">
+            <div class="command-header"><code>Situação</code><span class="cmd-tag">Domínio 4</span></div>
+            <p>Uma empresa precisa migrar um banco Oracle on-premises (5 TB) para AWS. O banco usa stored procedures complexas, triggers e packages específicos do Oracle. A empresa quer reduzir custos de licenciamento e adotar um banco open-source. O downtime máximo aceitável é de 2 horas durante a migração final.</p>
+          </div>
+
+          <h3>Requisitos identificados:</h3>
+          <ul>
+            <li>Migração heterogênea: Oracle → open-source (PostgreSQL)</li>
+            <li>5 TB de dados</li>
+            <li>Stored procedures, triggers e packages Oracle-specific</li>
+            <li>Downtime máximo: 2 horas</li>
+            <li>Reduzir custos de licenciamento</li>
+          </ul>
+
+          <h3>Opções:</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>A</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Usar apenas AWS DMS com full load para migrar os dados do Oracle para Aurora PostgreSQL em uma janela de manutenção.</p>
+              <pre><code>❌ Por que está errada:
+• Full load de 5 TB pode levar mais de 2 horas
+• DMS sozinho NÃO converte stored procedures/triggers
+• Schema incompatível (Oracle → PostgreSQL)
+• Sem CDC, qualquer dado escrito durante migração é perdido
+• Não aborda a conversão de código PL/SQL → PL/pgSQL</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>B ✓</code><span class="cmd-tag">Correta</span></div>
+              <p>1) Usar AWS SCT para converter schema, stored procedures e triggers de Oracle para PostgreSQL. 2) Resolver incompatibilidades manualmente identificadas pelo SCT. 3) Usar DMS com Full Load + CDC para replicar dados continuamente. 4) Cutover final (parar writes no Oracle, aguardar CDC sync, apontar app para Aurora PostgreSQL) dentro da janela de 2h.</p>
+              <pre><code>✅ Por que está correta:
+• SCT converte schema + identifica incompatibilidades
+• Conversão manual apenas do que SCT não consegue
+• DMS Full Load + CDC: replica dados continuamente
+• Durante CDC, Oracle continua operando normalmente
+• Cutover final é rápido (apenas parar writes + sync final)
+• 2h é suficiente para cutover com CDC ativo
+• Abordagem padrão AWS para migração heterogênea</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>C</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Migrar para RDS Oracle primeiro (rehost), depois converter para Aurora PostgreSQL usando DMS.</p>
+              <pre><code>❌ Por que está errada:
+• Duas migrações = mais risco e mais tempo
+• RDS Oracle ainda tem custo de licenciamento
+• Não resolve o problema de conversão de stored procedures
+• DMS entre RDS Oracle e Aurora ainda precisa de SCT
+• Abordagem desnecessariamente complexa</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>D</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Exportar o banco Oracle para dump files, transferir via Snowball Edge para S3, e importar no Aurora PostgreSQL.</p>
+              <pre><code>❌ Por que está errada:
+• Dump Oracle não é compatível com PostgreSQL diretamente
+• Snowball Edge: lead time de dias (envio físico)
+• Não resolve conversão de stored procedures
+• Downtime seria muito maior que 2 horas
+• Sem CDC = dados escritos durante transferência são perdidos
+• Abordagem offline não atende requisito de downtime</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cenário 5 - Domínio 2: DR -->
+        <div class="topic-block">
+          <h2>Cenário 5 — Disaster Recovery (Domínio 2)</h2>
+          <div class="command-card" style="margin-bottom:24px">
+            <div class="command-header"><code>Situação</code><span class="cmd-tag">Domínio 2</span></div>
+            <p>Um banco digital tem sua aplicação principal em us-east-1. Regulamentação exige que em caso de desastre regional, o sistema deve estar operacional em outra região em no máximo 5 minutos (RTO) com perda de dados máxima de 1 segundo (RPO). O banco processa transações financeiras 24/7 e não pode ter inconsistência de dados. O custo é secundário em relação à disponibilidade.</p>
+          </div>
+
+          <h3>Requisitos identificados:</h3>
+          <ul>
+            <li>RTO: 5 minutos</li>
+            <li>RPO: 1 segundo</li>
+            <li>Transações financeiras (consistência crítica)</li>
+            <li>Operação 24/7</li>
+            <li>Custo é secundário</li>
+          </ul>
+
+          <h3>Opções:</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>A</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Warm Standby em us-west-2 com Aurora read replica cross-region e ASG com capacidade mínima. Route 53 failover com health checks.</p>
+              <pre><code>❌ Por que está errada:
+• Warm Standby pode atender RTO de 5 min
+• MAS Aurora cross-region replica tem lag de ~1s (OK para RPO)
+• Problema: scale up do ASG pode levar mais de 5 min
+• Promoção de Aurora replica + DNS propagation
+• Risco de não atender RTO consistentemente
+• Não é a opção mais segura para requisitos tão rigorosos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>B ✓</code><span class="cmd-tag">Correta</span></div>
+              <p>Multi-Site Active-Active em us-east-1 e us-west-2. Aurora Global Database com write forwarding. DynamoDB Global Tables para session/state. Route 53 latency-based routing com health checks. Infraestrutura completa em ambas as regiões.</p>
+              <pre><code>✅ Por que está correta:
+• Active-Active: ambas regiões processam tráfego
+• RTO ~0: failover é apenas redirecionar tráfego (DNS)
+• RPO &lt;1s: Aurora Global Database replica em &lt;1s
+• DynamoDB Global Tables: multi-region active-active
+• Route 53 health checks: failover automático
+• Sem scale up necessário (infra já está rodando)
+• Custo alto, mas requisito diz "custo é secundário"
+• Atende todos os requisitos com margem de segurança</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>C</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Pilot Light em us-west-2 com Aurora Global Database e AMIs pré-configuradas. Usar AWS Elastic Disaster Recovery para orquestrar failover.</p>
+              <pre><code>❌ Por que está errada:
+• Pilot Light: compute está DESLIGADO
+• Iniciar instâncias + load balancer + warm up > 5 min
+• Elastic DRS ajuda mas não garante RTO de 5 min
+• Para banco digital 24/7, Pilot Light é arriscado
+• RPO pode ser atendido (Aurora Global), mas RTO não</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>D</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Backup & Restore com AWS Backup cross-region. RDS snapshots copiados a cada hora. CloudFormation para recriar infraestrutura na região DR.</p>
+              <pre><code>❌ Por que está errada:
+• RTO de horas (restaurar backups + provisionar infra)
+• RPO de 1 hora (snapshots a cada hora)
+• Completamente inadequado para os requisitos
+• Backup & Restore é para workloads não-críticos
+• Não atende nem RTO nem RPO exigidos</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cenário 6 - Domínio 1: Governança -->
+        <div class="topic-block">
+          <h2>Cenário 6 — Governança Multi-Conta (Domínio 1)</h2>
+          <div class="command-card" style="margin-bottom:24px">
+            <div class="command-header"><code>Situação</code><span class="cmd-tag">Domínio 1</span></div>
+            <p>Uma empresa está expandindo rapidamente e precisa criar novas contas AWS para cada equipe de produto. Requisitos: todas as contas devem ter CloudTrail habilitado, não podem criar recursos fora de us-east-1 e eu-west-1, Security Groups não podem ter ingress 0.0.0.0/0, e novas contas devem ser provisionadas com configuração padronizada automaticamente.</p>
+          </div>
+
+          <h3>Requisitos identificados:</h3>
+          <ul>
+            <li>Criação padronizada de contas (automática)</li>
+            <li>CloudTrail obrigatório em todas as contas</li>
+            <li>Restrição de regiões (us-east-1 e eu-west-1 apenas)</li>
+            <li>Bloquear Security Groups abertos (0.0.0.0/0)</li>
+            <li>Compliance contínuo e detectivo</li>
+          </ul>
+
+          <h3>Opções:</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>A</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Usar AWS Organizations com SCPs para restringir regiões. Criar contas manualmente e configurar CloudTrail e Config em cada uma via CloudFormation StackSets.</p>
+              <pre><code>❌ Por que está errada:
+• Criação manual de contas não é padronizada
+• StackSets resolve parcialmente, mas sem automação
+• Falta Account Factory para padronização
+• Falta guardrails detectivos automáticos
+• Funciona, mas não é a solução mais completa/eficiente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>B ✓</code><span class="cmd-tag">Correta</span></div>
+              <p>Implementar AWS Control Tower com: Account Factory para criação padronizada, Guardrails preventivos (SCPs) para restrição de regiões e bloqueio de desabilitar CloudTrail, Guardrails detectivos (Config Rules) para Security Groups abertos, e Organization Trail para CloudTrail centralizado.</p>
+              <pre><code>✅ Por que está correta:
+• Control Tower: solução completa para governança
+• Account Factory: criação padronizada e automatizada
+• Preventive Guardrails (SCPs):
+  → Deny criar recursos fora de regiões permitidas
+  → Deny desabilitar CloudTrail
+• Detective Guardrails (Config Rules):
+  → Detectar SGs com 0.0.0.0/0
+  → Auto-remediation possível
+• Organization Trail: CloudTrail em todas as contas
+• Tudo integrado e gerenciado centralmente
+• Novas contas herdam guardrails automaticamente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>C</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Criar um Lambda que monitora CloudTrail events e reverte ações não-compliance. Usar EventBridge para trigger quando recursos são criados fora das regiões permitidas.</p>
+              <pre><code>❌ Por que está errada:
+• Abordagem reativa (permite e depois reverte)
+• Janela de não-compliance entre criação e remediação
+• Complexo de manter (Lambda custom code)
+• Não padroniza criação de contas
+• Não escala bem (cada regra = mais código)
+• Reinventa o que Control Tower + SCPs já fazem</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>D</code><span class="cmd-tag">Incorreta</span></div>
+              <p>Usar IAM Policies em cada conta para restringir regiões e configurações. Criar um pipeline CI/CD que aplica as policies em novas contas.</p>
+              <pre><code>❌ Por que está errada:
+• IAM Policies podem ser modificadas por admins da conta
+• SCPs são mais fortes (não podem ser overridden pela conta)
+• Pipeline CI/CD é frágil (pode falhar, ser ignorado)
+• Não há garantia de enforcement
+• Falta visibilidade centralizada de compliance
+• Não é a abordagem AWS recomendada</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top:32px">
+          <p><strong>🎯 Resumo dos padrões de resposta:</strong></p>
+          <p>• Cenários de rede complexa → Cloud WAN ou Transit Gateway (depende da escala)</p>
+          <p>• Streaming + analytics → Kinesis + S3 data lake + Athena/QuickSight</p>
+          <p>• Performance de leitura → ElastiCache/DAX (cache é quase sempre a resposta)</p>
+          <p>• Migração heterogênea de banco → SCT + DMS com CDC</p>
+          <p>• DR com RTO ~0 → Multi-Site Active-Active</p>
+          <p>• Governança multi-conta → Control Tower + SCPs + Config Rules</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-06.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../solutions-architect-pro.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

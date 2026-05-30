@@ -3,46 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — AWS Solutions Architect</title>
-  <meta name="description" content="Trilha AWS Solutions Architect: arquitetura, VPC, EC2, Well-Architected." />
+  <title>CloudTrilhas — AWS Solutions Architect Associate (SAA-C03)</title>
+  <meta name="description" content="Treinamento completo para a certificação AWS Certified Solutions Architect Associate. 4 domínios organizados conforme o guia oficial do exame." />
   <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
 </head>
 <body>
   <header class="header">
     <nav class="nav container" aria-label="Navegação principal">
       <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
-      <div class="nav-actions"><a href="aws.html" class="nav-link">AWS</a><a href="cloud-practitioner.html" class="nav-button">Cloud Practitioner</a></div>
+      <div class="nav-actions">
+        <a href="#modulos" class="nav-link">Domínios</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
+        <a href="index.html" class="nav-button">Início</a>
+      </div>
     </nav>
   </header>
+
   <main>
-    <section class="training-hero"><div class="container training-hero-content"><span class="pill">Em construção</span><h1>AWS Solutions Architect</h1><p>Trilha sobre arquitetura AWS, alta disponibilidade, redes, segurança, escalabilidade e Well-Architected Framework.</p></div></section>
-    <section class="section container">
-      <div class="learning-box">
-        <div>
-          <span class="eyebrow">Conteúdo em preparação</span>
-          <h2>A trilha estará disponível em breve.</h2>
-          <p>Conteúdos sobre VPC, EC2, Auto Scaling, Load Balancer, S3, bancos de dados, CloudFront, Route 53, resiliência e segurança.</p>
-          <div class="panel-list" style="margin-top:20px">
-            <span>🏗️ Arquiteturas resilientes e escaláveis</span>
-            <span>🌐 VPC, redes, DNS e distribuição de conteúdo</span>
-            <span>🛡️ Segurança, IAM e boas práticas</span>
-            <span>📝 Simulados e laboratórios</span>
-          </div>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏗️ Solutions Architect</span>
+        <h1>AWS Solutions Architect Associate (SAA-C03)</h1>
+        <p>Treinamento completo para a certificação AWS Certified Solutions Architect Associate. 4 domínios organizados conforme o guia oficial do exame.</p>
+        <div class="hero-actions" style="margin-top:28px">
+          <a href="solutions-architect/dominio-01.html" class="button primary">Começar pelo Domínio 01</a>
+          <a href="#materiais" class="button secondary">Baixar PDF Completo</a>
         </div>
-        <a href="aws.html" class="button primary">Voltar para AWS</a>
+      </div>
+    </section>
+
+    <!-- PROGRESS BAR -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="solutions-architect/dominio-01.html" class="progress-node active"><span>01</span><small>Segurança (30%)</small></a>
+        <a href="solutions-architect/dominio-02.html" class="progress-node"><span>02</span><small>Resiliência (26%)</small></a>
+        <a href="solutions-architect/dominio-03.html" class="progress-node"><span>03</span><small>Performance (24%)</small></a>
+        <a href="solutions-architect/dominio-04.html" class="progress-node"><span>04</span><small>Custos (20%)</small></a>
+      </div>
+    </section>
+
+    <!-- ESTRUTURA DO CURSO -->
+    <section id="modulos" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📚 Estrutura do Curso</span>
+          <h2>4 Domínios do Exame</h2>
+          <p>Siga os domínios na ordem. Cada domínio cobre uma área específica conforme o guia oficial da certificação SAA-C03.</p>
+        </div>
+
+        <div class="command-grid">
+          <a href="solutions-architect/dominio-01.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 01</code><span class="cmd-tag">30% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Design de Arquiteturas Seguras</h3>
+            <p>IAM, VPC, Security Groups, NACLs, WAF, Shield, KMS, certificados, endpoints privados.</p>
+          </a>
+
+          <a href="solutions-architect/dominio-02.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 02</code><span class="cmd-tag">26% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Design de Arquiteturas Resilientes</h3>
+            <p>Multi-AZ, Auto Scaling, ELB, Route 53 failover, backup, DR strategies, SQS, decoupling.</p>
+          </a>
+
+          <a href="solutions-architect/dominio-03.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 03</code><span class="cmd-tag">24% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Design de Arquiteturas de Alta Performance</h3>
+            <p>EC2 instance types, EBS, EFS, S3, CloudFront, ElastiCache, DAX, Global Accelerator.</p>
+          </a>
+
+          <a href="solutions-architect/dominio-04.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 04</code><span class="cmd-tag">20% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Design de Arquiteturas com Otimização de Custos</h3>
+            <p>Reserved, Spot, Savings Plans, S3 classes, right-sizing, Cost Explorer, Budgets.</p>
+          </a>
+        </div>
+
+        <div class="info-box" style="margin-top:32px">
+          <strong>Sobre o Exame:</strong> 65 questões | 130 minutos | Nota: 720/1000 | Custo: USD $150. Domínio 1 (Segurança) é o mais pesado com 30%.
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD DE VÍDEO -->
+    <section class="module-section">
+      <div class="container">
+        <div class="command-grid">
+          <article class="resource-card" style="background:linear-gradient(135deg,#1e1b4b,#312e81);color:#fff;padding:28px;border-radius:16px">
+            <span class="resource-type" style="background:rgba(255,255,255,0.15);color:#fff">🎬 Vídeo</span>
+            <h3 style="color:#fff;margin-top:12px">Acompanhe em Vídeo</h3>
+            <p style="color:rgba(255,255,255,0.8)">Assista as aulas completas no YouTube com explicações detalhadas de cada domínio.</p>
+            <a href="#" class="button primary" style="margin-top:12px;display:inline-block">Assistir no YouTube →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE MATERIAIS PARA DOWNLOAD -->
+    <section id="materiais" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📥 Materiais</span>
+          <h2>Baixe o conteúdo completo em PDF</h2>
+          <p>Todo o conteúdo dos 4 domínios organizado em um PDF para estudar offline, imprimir ou consultar quando precisar.</p>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span class="resource-type">PDF</span>
+            <h3>AWS Solutions Architect: Do Zero ao Avançado</h3>
+            <p>Guia completo com todos os 4 domínios — Segurança, Resiliência, Performance e Otimização de Custos.</p>
+            <form class="inline-download-form" data-material="aws-solutions-architect-do-zero-ao-avancado.pdf">
+              <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+              <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+              <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+              <button type="submit">Baixar PDF gratuito</button>
+              <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🚀 Pronto para começar?</span>
+          <h2>Comece pelo Domínio 01</h2>
+          <p>Siga os domínios na ordem, domine cada área do exame e conquiste sua certificação AWS Solutions Architect Associate.</p>
+        </div>
+        <a href="solutions-architect/dominio-01.html" class="button primary">Iniciar Domínio 01</a>
       </div>
     </section>
   </main>
+
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>
