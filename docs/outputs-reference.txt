@@ -2,46 +2,90 @@
 CLOUDTRILHAS — OUTPUTS REFERENCE
 ==================================================
 
-Portal Principal:
-https://cloudtrilhas.com.br
+Portal DEV:
+https://www.dev.cloudtrilhas.com.br
 
-Portal WWW:
+Portal PROD:
 https://www.cloudtrilhas.com.br
 
-CloudFront:
-d5w26g2pq9zax.cloudfront.net
+API Gateway (DEV):
+https://22uljugfhf.execute-api.us-west-2.amazonaws.com/leads
 
-API Gateway:
-https://5na1nncgjg.execute-api.us-west-2.amazonaws.com/leads
+Bucket S3 (DEV):
+materiais-e-trilhas-dev
 
-Bucket S3:
+Bucket S3 (PROD):
 materiais-e-trilhas-de-estudos
 
 ==================================================
-SERVIÇOS AWS UTILIZADOS
+SERVIÇOS AWS UTILIZADOS (17)
 ==================================================
 
-- Amazon S3
-- CloudFront
-- Route 53
-- ACM
-- API Gateway
-- Lambda
-- DynamoDB
-- EventBridge
-- SNS
-- CloudWatch
-- CloudTrail
+- Amazon S3 (site estático + PDFs)
+- CloudFront (CDN + OAC + Geo Restriction)
+- Route 53 (DNS gerenciado)
+- ACM (certificado SSL/TLS)
+- API Gateway v2 (HTTP API)
+- Lambda (3 funções: register_lead, download_metrics, hello_lambda)
+- DynamoDB (tabela de leads, PITR habilitado)
+- EventBridge (roteamento de eventos)
+- SQS (fila + DLQ)
+- SNS (notificações por email)
+- CloudWatch (dashboard + 8 alarmes)
+- CloudTrail (auditoria S3 data events)
+- IAM (roles, policies, OIDC)
+- AWS Budgets (controle financeiro $10/mês)
 
 ==================================================
-AMBIENTE
+AMBIENTES
 ==================================================
 
 Projeto:
 Terraform-Serverless
 
-Environment:
-dev
+Environments:
+- dev (testes e validações)
+- prod (produção)
+- shared (OIDC + Budget)
 
 Region:
 us-west-2
+
+Terraform Version:
+1.10.5
+
+CI/CD:
+GitHub Actions + OIDC (zero access keys)
+
+==================================================
+MÓDULOS TERRAFORM (17)
+==================================================
+
+- modules/acm
+- modules/api_gateway
+- modules/budget
+- modules/cloudfront
+- modules/cloudtrail
+- modules/cloudwatch_dashboard
+- modules/cloudwatch_operational
+- modules/download_metrics
+- modules/dynamodb
+- modules/eventbridge
+- modules/github_actions_oidc
+- modules/lambda
+- modules/register_lead_lambda
+- modules/route53
+- modules/s3_static_site
+- modules/sns
+- modules/sqs
+
+==================================================
+CONTEÚDO DO PORTAL
+==================================================
+
+Cursos: 13
+Módulos: 93
+PDFs: 13
+Páginas HTML: 96
+
+==================================================

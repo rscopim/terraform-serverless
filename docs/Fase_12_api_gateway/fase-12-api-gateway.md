@@ -1,73 +1,126 @@
-# Fase 12 — API Gateway
+# Fase 12 — API Gateway (HTTP API)
 
 ## 🎯 Objetivo
 
-Criar uma API HTTP utilizando Amazon API Gateway para receber requisições do frontend do portal de estudos antes da liberação do download dos materiais.
+Criar uma API HTTP serverless utilizando Amazon API Gateway v2 para receber dados do formulário de cadastro do portal CloudTrilhas, servindo como ponto de entrada para o backend de captura de leads.
 
 ---
 
 ## 🏗️ O que foi criado
 
-* API HTTP (API Gateway v2)
-* Endpoint `/leads`
-* Integração API Gateway → Lambda
-* Configuração CORS
-* Permissão para invocação da Lambda
+- HTTP API (API Gateway v2) com stage `$default` e auto-deploy
+- Rota `POST /leads` para recebimento de dados
+- Integração AWS_PROXY com Lambda `register_lead`
+- Configuração CORS para permitir chamadas do frontend
+- Permissão para API Gateway invocar a Lambda
+- Módulo Terraform (`modules/api_gateway/`)
 
 ---
 
 ## 🧠 Conceitos importantes
 
-### API Gateway
-Serviço gerenciado utilizado para criação e gerenciamento de APIs serverless.
+### API Gateway HTTP API (v2)
 
-### HTTP API
-Versão simplificada e otimizada do API Gateway para aplicações modernas.
+Versão otimizada do API Gateway para APIs modernas. Comparado ao REST API (v1):
+- **70% mais barato**
+- **Latência menor** (~10ms overhead vs ~30ms)
+- **Auto-deploy** habilitado por padrão
+- **CORS nativo** sem necessidade de OPTIONS manual
 
-### AWS_PROXY
-Modelo de integração onde o API Gateway encaminha o payload completo para a Lambda.
+### Integração AWS_PROXY
 
-### CORS
-Configuração necessária para permitir chamadas do frontend para a API.
+Modelo onde o API Gateway encaminha o request completo (headers, body, path, query) para a Lambda como um evento JSON. A Lambda retorna um objeto com statusCode, headers e body.
+
+### CORS (Cross-Origin Resource Sharing)
+
+Configuração obrigatória quando o frontend (hospedado em `cloudtrilhas.com.br`) faz requisições para a API (hospedada em `execute-api.amazonaws.com`). Sem CORS, o navegador bloqueia a requisição.
+
+Configuração aplicada:
+- `allow_origins`: domínio do portal
+- `allow_methods`: POST
+- `allow_headers`: Content-Type
+
+### Stage e Auto-Deploy
+
+O stage `$default` com auto-deploy garante que qualquer alteração na API seja publicada automaticamente, sem necessidade de deploy manual.
 
 ---
 
 ## ⚙️ Como funciona
 
-Quando o usuário preenche o formulário no portal:
+```
+Usuário preenche formulário no portal
+        ↓
+JavaScript (app.js) envia POST /leads
+        ↓
+API Gateway recebe a requisição
+        ↓
+Valida CORS headers
+        ↓
+Encaminha payload para Lambda (AWS_PROXY)
+        ↓
+Lambda processa e retorna resposta
+        ↓
+API Gateway retorna response ao frontend
+```
 
-1. O frontend envia uma requisição HTTP POST
-2. O API Gateway recebe a requisição
-3. A API encaminha os dados para a Lambda
-4. A Lambda processa os dados
-5. A resposta é retornada ao frontend
+---
+
+## 📁 Arquivos principais
+
+| Arquivo | Função |
+|---------|--------|
+| `modules/api_gateway/main.tf` | API + Route + Integration + CORS |
+| `modules/api_gateway/variables.tf` | Lambda ARN e nome |
+| `modules/api_gateway/outputs.tf` | Endpoint URL, API ID |
+| `static_site/app.js` | Frontend que consome a API |
 
 ---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_route
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_integration
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_route
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_integration
+- https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
 
 ---
 
 ## 🧪 Como testar
 
-### Obter endpoint da API
-
-```bash
+```powershell
+# Obter endpoint
 terraform output leads_api_endpoint
 
+# Testar via PowerShell
 $body = @{
   name = "Teste Usuario"
   email = "teste@example.com"
   consent = $true
-  material = "orientacoes-gerais-aws-caf.pdf"
+  material = "docker-do-zero-ao-avancado.pdf"
 } | ConvertTo-Json
 
 Invoke-RestMethod `
-  -Uri "<ENDPOINT_API>" `
+  -Uri "<ENDPOINT>/leads" `
   -Method POST `
   -Body $body `
   -ContentType "application/json"
+```
+
+Resposta esperada:
+```json
+{
+  "message": "Lead registrado com sucesso",
+  "download_url": "https://www.dev.cloudtrilhas.com.br/materiais/docker-do-zero-ao-avancado.pdf"
+}
+```
+
+---
+
+## 📈 Resultado esperado
+
+- API acessível publicamente via HTTPS
+- CORS configurado para o domínio do portal
+- Requisições POST processadas pela Lambda
+- Resposta com URL de download retornada ao frontend
+- Latência < 100ms para o endpoint

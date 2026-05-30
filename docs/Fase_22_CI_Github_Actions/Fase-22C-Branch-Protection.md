@@ -1,300 +1,118 @@
 # Fase 22C — Branch Protection + Pull Request Workflow
 
-## Objetivo
+## 🎯 Objetivo
 
-Evoluir a pipeline CI/CD do CloudTrilhas para um modelo corporativo de controle de mudanças.
-
-Nesta fase foram implementados:
-
-- Proteção da branch principal (main)
-- Pull Request obrigatório
-- Terraform Plan obrigatório antes do Merge
-- Bloqueio de Push direto na Main
-- Exigência de branch atualizada
-- Terraform Apply apenas após Merge
-- Aprovação manual para produção
-- Ajustes OIDC para Pull Request
+Implementar proteção da branch `main` e fluxo obrigatório de Pull Request, garantindo que toda alteração passe por validação automática e revisão antes de ser aplicada na infraestrutura.
 
 ---
 
-# Cenário anterior
+## 🏗️ O que foi implementado
 
-Fluxo anterior:
-VSCode
-↓
-git push main
-↓
-Terraform Plan
-↓
-Approval
-↓
-Terraform Apply
-
-Problema:
-Alterações poderiam seguir diretamente para produção.
-Mesmo com Approval no Apply ainda existia:
-- Push direto na Main
-- Sem revisão intermediária
-- Sem fluxo corporativo de Pull Request
+- Branch Ruleset protegendo a `main`
+- Push direto bloqueado
+- Pull Request obrigatório antes do merge
+- Terraform Plan como status check obrigatório
+- Require branch up-to-date antes do merge
+- Block force push e restrict delete
+- Ajuste OIDC para suportar Pull Requests
 
 ---
 
-# Objetivo técnico
+## 🧠 Conceitos importantes
 
-Novo fluxo desejado:
-Feature Branch
-↓
-Push Branch
-↓
-Pull Request
-↓
-Terraform Plan
-↓
-Validação
-↓
-Merge Main
-↓
-Approval Production
-↓
-Terraform Apply
+### Branch Protection
 
----
+Regras que impedem alterações diretas na branch principal:
+- Nenhum push direto permitido
+- Alterações apenas via Pull Request
+- Status checks devem passar antes do merge
+- Force push bloqueado
 
-# Etapa 1 — Proteção da Main
+### Pull Request Workflow
 
-GitHub:
-Settings
-↓
-Rules
-↓
-Branch Ruleset
+Fluxo corporativo padrão:
+```
+Feature Branch → Push → PR criado → CI executa → Review → Merge → CD executa
+```
 
-Criada regra:
-Protect Main Branch
+### Required Status Checks
 
-Proteções aplicadas:
-✅ Require Pull Request before merging
-✅ Require Status Checks
-✅ Require Branch Up To Date
-✅ Block Force Push
-✅ Restrict Delete
+O job `Terraform Plan` é configurado como check obrigatório. Se o plan falhar, o merge é bloqueado automaticamente.
 
-Resultado:
-Push direto bloqueado.
+### Require Branch Up-to-Date
 
-Teste realizado:
-git push origin main
-
-Resultado:
-remote:
-Changes must be made through a pull request.
-Proteção validada.
+Garante que a feature branch está sincronizada com a main antes do merge, evitando conflitos e plans desatualizados.
 
 ---
 
-# Etapa 2 — Terraform Plan obrigatório
+## ⚙️ Fluxo final
 
-Configurado:
-Terraform Plan
-Como Status Check obrigatório.
-
-Resultado:
-Antes do Merge:
-Terraform Plan precisa executar.
-
-Fluxo:
-Pull Request
-↓
-Terraform CI/CD
-↓
-Terraform Plan
-↓
-Success
-↓
-Merge permitido
-
----
-
-# Etapa 3 — Terraform Apply bloqueado em Pull Request
-
-Ajuste workflow:
-
-terraform-apply:
-if:
-github.event_name == 'push'
-github.ref == 'refs/heads/main'
-Resultado:
-Pull Request:
-Terraform Apply
-
-SKIPPED
-
-Merge Main:
-Terraform Apply
-EXECUTA
-Comportamento corporativo validado.
+```
+Developer cria feature branch
+        ↓
+git push origin feature/nova-funcionalidade
+        ↓
+Pull Request criado automaticamente
+        ↓
+GitHub Actions executa:
+  ├── terraform fmt -check
+  ├── terraform init
+  ├── terraform validate
+  └── terraform plan
+        ↓
+Status Check: ✅ Terraform Plan passed
+        ↓
+Review do plan + código
+        ↓
+Merge para main
+        ↓
+GitHub Actions executa:
+  └── terraform apply (com aprovação)
+        ↓
+Infraestrutura atualizada
+```
 
 ---
 
-# Etapa 4 — OIDC Pull Request
+## 🧪 Erros encontrados e correções
 
-Problema encontrado:
-Erro:
-Could not assume role with OIDC:
-Not authorized to perform:
-sts:AssumeRoleWithWebIdentity
+### Erro: OIDC falhou em Pull Request
+- **Causa**: Trust policy não incluía claim `pull_request`
+- **Correção**: Adicionar `repo:rscopim/terraform-serverless:pull_request`
 
-Causa:
-Trust Policy contemplava:
+### Erro: Branch desatualizada
+- **Causa**: Feature branch criada antes de commits recentes na main
+- **Correção**: `git pull origin main` ou botão "Update Branch" no GitHub
 
-Main:
-repo:rscopim/terraform-serverless:ref:refs/heads/main
+### Erro: Terraform Format
+- **Causa**: Arquivo não formatado bloqueou o pipeline
+- **Correção**: `terraform fmt -recursive` antes do push
 
-Environment:
-repo:rscopim/terraform-serverless:environment:production
-
-Mas não contemplava:
-Pull Request
-
-Correção:
-Adicionado:
-repo:rscopim/terraform-serverless:pull_request
-
-Resultado:
-OIDC funcionando:
-Main
-Pull Request
-Environment Production
+### Erro: Non Fast Forward
+- **Causa**: Branch remota tinha commits mais recentes
+- **Correção**: `git pull --rebase` antes do push
 
 ---
 
-# Etapa 5 — Branch desatualizada
+## 📁 Configuração aplicada
 
-Erro:
-This branch is out-of-date with base branch.
+**GitHub → Settings → Rules → Branch Ruleset:**
 
-Causa:
-Feature Branch criada antes de alterações recentes.
-
-Correção:
-Update Branch
-
-ou:
-git pull origin main
-
-Resultado:
-Branch sincronizada.
+| Regra | Status |
+|-------|--------|
+| Require Pull Request | ✅ |
+| Require Status Checks (Terraform Plan) | ✅ |
+| Require Branch Up To Date | ✅ |
+| Block Force Push | ✅ |
+| Restrict Delete | ✅ |
 
 ---
 
-# Etapa 6 — Terraform Format
+## 📈 Resultado esperado
 
-Erro:
-Terraform Format
-terraform fmt -recursive -check
-main.tf
-
-Erro:
-Terraform exited with code 3
-
-Causa:
-Arquivo não formatado.
-
-Correção:
-terraform fmt -recursive
-
-Commit:
-Aplica terraform fmt
-
-Resultado:
-Pipeline aprovada.
-
----
-
-# Etapa 7 — Non Fast Forward
-
-Erro:
-Updates were rejected because tip is behind remote branch.
-Causa:
-Branch remota possuía commits mais recentes.
-Correção:
-git pull origin feature/teste-real-pipeline --rebase
-Resultado:
-Push realizado.
-
----
-
-# Teste operacional realizado
-
-Alteração simples:
-README.md
-
-Fluxo validado:
-Feature Branch
-↓
-Push
-↓
-Terraform Plan
-↓
-Pull Request
-↓
-Merge Main
-↓
-Approval Production
-↓
-Terraform Apply
-
-Resultado:
-Pipeline operacional validada.
-
----
-
-# Fluxo final CloudTrilhas
-
-Feature Branch
-↓
-Pull Request
-↓
-Terraform Plan
-↓
-Branch atualizada
-↓
-Merge Main
-↓
-Approval Production
-↓
-Terraform Apply
-↓
-AWS
-
----
-
-# Benefícios obtidos
-
-✅ Main protegida
-✅ Pull Request obrigatório
-✅ Menor risco operacional
-✅ Terraform Plan obrigatório
-✅ Aprovação produção
-✅ OIDC seguro
-✅ Pipeline corporativa
-✅ Processo DevOps próximo ao mercado real
-
----
-
-# Próximos passos
-
-Fase 22D
-Empacotamento Lambda via archive_file
-
-Fase 23
-Separação DEV / PROD
-
-Fase 24
-IAM Modularizado
-
----
-
-CloudTrilhas
-
-Projeto educacional construído para estudo prático de Cloud Computing, DevOps e Arquitetura AWS.
+- Main protegida contra alterações diretas
+- Toda mudança passa por PR + validação automática
+- Plan visível antes do merge (review de infraestrutura)
+- Menor risco operacional
+- Fluxo próximo de ambientes corporativos reais
+- Auditoria completa de quem alterou o quê

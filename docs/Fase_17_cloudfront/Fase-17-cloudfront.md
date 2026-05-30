@@ -1,116 +1,121 @@
-# Fase 17 — CloudFront
+# Fase 17 — CloudFront (CDN Global)
 
 ## 🎯 Objetivo
 
-Criar uma distribuição Amazon CloudFront para entregar o portal CloudTrilhas com melhor performance, cache global e acesso seguro via HTTPS.
+Criar uma distribuição Amazon CloudFront para entregar o portal CloudTrilhas com baixa latência global, cache em edge locations, HTTPS obrigatório e domínio personalizado.
 
 ---
 
 ## 🏗️ O que foi criado
 
-* Distribuição CloudFront
-* Origem apontando para o site estático no S3
-* Configuração de domínio personalizado
-* Alias para `cloudtrilhas.com.br`
-* Alias para `www.cloudtrilhas.com.br`
-* Integração com certificado ACM
-* Redirecionamento HTTP para HTTPS
-* Registros DNS no Route 53 apontando para o CloudFront
+- Distribuição CloudFront com origin no S3
+- Domínios alternativos (aliases): `cloudtrilhas.com.br` e `www.cloudtrilhas.com.br`
+- Certificado ACM associado (viewer certificate)
+- Redirecionamento HTTP → HTTPS
+- Cache policy otimizada para conteúdo estático
+- Registros DNS ALIAS no Route 53 apontando para CloudFront
+- Default root object: `index.html`
+- Módulo Terraform (`modules/cloudfront/`)
 
 ---
 
 ## 🧠 Conceitos importantes
 
-### CloudFront
-Serviço de CDN da AWS utilizado para distribuir conteúdo com baixa latência e alta disponibilidade.
+### Amazon CloudFront
 
-### CDN
-Rede de distribuição de conteúdo que entrega arquivos a partir de pontos de presença próximos ao usuário.
+CDN (Content Delivery Network) global da AWS com mais de 450 pontos de presença. Entrega conteúdo com latência mínima armazenando cópias em cache próximas ao usuário.
+
+### Edge Locations
+
+Pontos de presença distribuídos globalmente onde o CloudFront armazena cache do conteúdo. Quando um usuário acessa o site, o conteúdo é servido pela edge location mais próxima.
 
 ### Origin
-Origem do conteúdo entregue pelo CloudFront. Neste projeto, a origem é o site estático hospedado no Amazon S3.
 
-### Alias
-Nome de domínio personalizado associado à distribuição CloudFront.
+Fonte do conteúdo original. Neste projeto, a origin é o bucket S3. O CloudFront busca conteúdo na origin apenas quando não está em cache (cache miss).
 
 ### Viewer Certificate
-Certificado SSL/TLS utilizado pelo CloudFront para permitir acesso HTTPS.
 
-### Redirect to HTTPS
-Configuração que redireciona automaticamente requisições HTTP para HTTPS.
+Certificado SSL/TLS apresentado ao usuário final. Utiliza o certificado ACM criado na Fase 16 para habilitar HTTPS no domínio personalizado.
+
+### Cache Behavior
+
+Define como o CloudFront trata requisições:
+- **TTL**: Tempo que o conteúdo permanece em cache
+- **Viewer Protocol Policy**: `redirect-to-https` força HTTPS
+- **Compress**: Habilita compressão gzip/brotli automaticamente
+
+### Invalidation
+
+Processo de limpar o cache do CloudFront quando o conteúdo é atualizado no S3. Necessário após cada deploy de novas páginas.
 
 ---
 
 ## ⚙️ Como funciona
 
-Quando o usuário acessa o portal pelo domínio:
+```
+Usuário digita cloudtrilhas.com.br
+        ↓
+Route 53 resolve DNS → CloudFront
+        ↓
+CloudFront verifica cache na edge location
+        ↓
+┌───────┴───────┐
+↓               ↓
+Cache HIT       Cache MISS
+(resposta       (busca no S3)
+ imediata)           ↓
+        ↓       Armazena em cache
+        ↓           ↓
+Conteúdo entregue via HTTPS
+```
 
-1. O domínio `cloudtrilhas.com.br` é resolvido pelo Route 53
-2. O Route 53 direciona a requisição para o CloudFront
-3. O CloudFront verifica o cache nos edge locations
-4. Caso o conteúdo não esteja em cache, o CloudFront busca o conteúdo no S3
-5. O conteúdo é entregue ao usuário com HTTPS
-6. O acesso ao portal ocorre pelo domínio personalizado
+---
+
+## 📁 Arquivos principais
+
+| Arquivo | Função |
+|---------|--------|
+| `modules/cloudfront/main.tf` | Distribution + DNS records |
+| `modules/cloudfront/variables.tf` | Domain, S3 origin, ACM ARN |
+| `modules/cloudfront/outputs.tf` | Distribution ID, domain name |
 
 ---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution
-* https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html
-* https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cnames-and-https-requirements.html
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution
+- https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html
+- https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html
 
 ---
 
 ## 🧪 Como testar
 
-### Aplicar infraestrutura
+```bash
+# Verificar distribuição
+terraform output cloudfront_domain_name
 
-Executar `terraform apply`.
+# Testar acesso HTTPS
+curl -I https://www.cloudtrilhas.com.br
+curl -I https://cloudtrilhas.com.br
 
-### Obter domínio do CloudFront
+# Verificar redirecionamento HTTP → HTTPS
+curl -I http://cloudtrilhas.com.br
+# Deve retornar 301 → https://
 
-Executar `terraform output cloudfront_domain_name`.
-
-### Validar URL principal
-
-Acessar `https://cloudtrilhas.com.br`.
-
-### Validar URL com www
-
-Acessar `https://www.cloudtrilhas.com.br`.
-
-### Validar DNS
-
-Executar `nslookup cloudtrilhas.com.br`.
-
-Executar `nslookup www.cloudtrilhas.com.br`.
-
-### Invalidar cache após alterações no site
-
-Executar `aws cloudfront create-invalidation --distribution-id <DISTRIBUTION_ID> --paths "/*"`.
+# Invalidar cache após alterações
+aws cloudfront create-invalidation \
+  --distribution-id <DIST_ID> \
+  --paths "/*"
+```
 
 ---
 
 ## 📈 Resultado esperado
 
-Ao final da fase:
-
-* portal acessível por `https://cloudtrilhas.com.br`
-* portal acessível por `https://www.cloudtrilhas.com.br`
-* distribuição CloudFront ativa
-* HTTPS funcionando corretamente
-* conteúdo do S3 entregue pela CDN
-
----
-
-## 🔐 Segurança aplicada
-
-* Acesso HTTPS com certificado SSL/TLS
-* Redirecionamento automático de HTTP para HTTPS
-* Certificado gerenciado pelo ACM
-* DNS gerenciado pelo Route 53
-* Entrega de conteúdo por CDN gerenciada
-
----
+- Portal acessível via `https://cloudtrilhas.com.br` e `https://www.cloudtrilhas.com.br`
+- HTTPS funcionando com certificado válido
+- Redirecionamento automático de HTTP para HTTPS
+- Conteúdo servido com baixa latência via CDN
+- Compressão automática reduzindo tamanho das respostas
+- Cache otimizado para conteúdo estático

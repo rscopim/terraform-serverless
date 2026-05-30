@@ -20,9 +20,13 @@
 
 ## 📋 Sobre o Projeto
 
-O **CloudTrilhas** é uma plataforma educacional completa com **13 cursos**, **96 páginas** e **13 PDFs** para download, construída inteiramente sobre uma arquitetura serverless na AWS.
+O **CloudTrilhas** nasceu como um laboratório pessoal para estudar Terraform e serviços AWS. O que começou como exercícios simples de Infrastructure as Code — criar uma Lambda, configurar uma fila SQS — evoluiu organicamente para uma **aplicação real em produção**, com domínio próprio, CI/CD, observabilidade e usuários reais acessando conteúdo.
 
-O projeto não é apenas um site estático — é uma **aplicação real de produção** que demonstra:
+Essa evolução não foi planejada desde o início. Cada fase do projeto resolveu um problema real: "preciso de HTTPS" levou ao ACM + CloudFront, "preciso saber quem baixou o PDF" levou ao CloudTrail + EventBridge + SNS, "preciso parar de fazer deploy manual" levou ao GitHub Actions + OIDC. O resultado é um projeto que demonstra não apenas conhecimento técnico, mas a capacidade de **evoluir uma arquitetura incrementalmente** — exatamente como acontece em ambientes corporativos.
+
+Hoje o CloudTrilhas é uma plataforma educacional completa com **13 cursos**, **96 páginas** e **13 PDFs** para download, servindo conteúdo real para estudantes de Cloud e DevOps.
+
+O projeto demonstra na prática:
 
 - Infraestrutura como Código com **Terraform** (17 módulos)
 - Pipeline CI/CD com **GitHub Actions** + OIDC (zero access keys)

@@ -1,45 +1,122 @@
-# Fase 16 — ACM
+# Fase 16 — ACM (Certificado SSL/TLS)
 
 ## 🎯 Objetivo
 
-Criar e validar um certificado SSL/TLS utilizando AWS Certificate Manager para permitir HTTPS no domínio CloudTrilhas.
+Provisionar e validar automaticamente um certificado SSL/TLS via AWS Certificate Manager para habilitar HTTPS no domínio CloudTrilhas, com validação DNS integrada ao Route 53.
+
+---
 
 ## 🏗️ O que foi criado
 
-* Certificado SSL/TLS
-* Domínio principal `cloudtrilhas.com.br`
-* Subdomínio `www.cloudtrilhas.com.br`
-* Validação DNS automática
-* Integração com Route 53
+- Certificado ACM com Subject Alternative Names (SANs)
+- Domínio principal: `cloudtrilhas.com.br` (ou `dev.cloudtrilhas.com.br`)
+- SAN: `www.cloudtrilhas.com.br` (ou `www.dev.cloudtrilhas.com.br`)
+- Registros DNS de validação criados automaticamente no Route 53
+- Recurso `aws_acm_certificate_validation` para aguardar emissão
+- Módulo Terraform (`modules/acm/`)
+
+---
 
 ## 🧠 Conceitos importantes
 
-* ACM: serviço da AWS utilizado para gerenciamento de certificados SSL/TLS
-* SSL/TLS: tecnologia responsável pela criptografia HTTPS
-* DNS Validation: método de validação do certificado utilizando registros DNS
-* us-east-1: região obrigatória para certificados utilizados no CloudFront
-* HTTPS: protocolo seguro utilizado para tráfego criptografado na web
+### AWS Certificate Manager (ACM)
+
+Serviço que provisiona, gerencia e renova certificados SSL/TLS gratuitamente. Certificados ACM são renovados automaticamente antes da expiração.
+
+### Validação DNS
+
+Método de validação onde o ACM gera registros CNAME que devem existir no DNS do domínio. O Terraform cria esses registros automaticamente no Route 53, tornando o processo totalmente automatizado.
+
+### Região us-east-1 (Obrigatória)
+
+Certificados utilizados pelo CloudFront **devem** ser criados na região `us-east-1` (N. Virginia). Por isso, o módulo ACM utiliza um provider com alias apontando para essa região.
+
+```hcl
+provider "aws" {
+  alias  = "use1"
+  region = "us-east-1"
+}
+```
+
+### Subject Alternative Names (SANs)
+
+Permite que um único certificado cubra múltiplos domínios. Neste projeto, o certificado cobre tanto o domínio raiz quanto o subdomínio `www`.
+
+### Certificate Validation Resource
+
+O recurso `aws_acm_certificate_validation` faz o Terraform aguardar até que o certificado seja emitido (status `ISSUED`) antes de prosseguir com recursos dependentes (CloudFront).
+
+---
 
 ## ⚙️ Como funciona
 
-O Terraform cria um certificado no AWS Certificate Manager para o domínio `cloudtrilhas.com.br` e para o subdomínio `www.cloudtrilhas.com.br`.
+```
+Terraform solicita certificado ao ACM (us-east-1)
+        ↓
+ACM gera registros CNAME de validação
+        ↓
+Terraform cria registros no Route 53
+        ↓
+ACM verifica existência dos registros DNS
+        ↓
+Validação concluída → Status: ISSUED
+        ↓
+Certificado pronto para uso no CloudFront
+```
 
-Como o certificado será usado futuramente no CloudFront, ele precisa ser criado na região `us-east-1`.
+---
 
-O ACM gera registros DNS de validação, e o Terraform cria esses registros automaticamente na Hosted Zone do Route 53.
+## 📁 Arquivos principais
 
-Quando a validação DNS é concluída, o certificado muda para o status `Issued`.
+| Arquivo | Função |
+|---------|--------|
+| `modules/acm/main.tf` | Certificate + Validation + DNS records |
+| `modules/acm/variables.tf` | Domain name, Zone ID |
+| `modules/acm/outputs.tf` | Certificate ARN |
+
+---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation
-* https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation
+- https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html
+
+---
 
 ## 🧪 Como testar
 
-1. Executar `terraform apply`
-2. Acessar o console AWS na região `us-east-1`
-3. Entrar em ACM
-4. Localizar o certificado do domínio `cloudtrilhas.com.br`
-5. Validar se o status está como `Issued`
+```bash
+# Verificar status do certificado
+aws acm describe-certificate \
+  --certificate-arn <CERT_ARN> \
+  --region us-east-1 \
+  --query 'Certificate.Status'
+
+# Resultado esperado: "ISSUED"
+
+# Verificar domínios cobertos
+aws acm describe-certificate \
+  --certificate-arn <CERT_ARN> \
+  --region us-east-1 \
+  --query 'Certificate.SubjectAlternativeNames'
+```
+
+---
+
+## ⚠️ Observações importantes
+
+- A validação DNS pode levar de 2 a 30 minutos
+- Se o `terraform apply` ficar aguardando, é normal — está esperando a validação
+- O certificado é renovado automaticamente pela AWS (sem ação manual)
+- Custo: **gratuito** para certificados públicos no ACM
+
+---
+
+## 📈 Resultado esperado
+
+- Certificado emitido com status `ISSUED`
+- Cobre domínio raiz e www
+- Validação 100% automatizada via DNS
+- Pronto para associação ao CloudFront (próxima fase)
+- Renovação automática sem intervenção

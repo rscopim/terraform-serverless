@@ -1,36 +1,105 @@
-# Fase 3 — Observabilidade com CloudWatch
+# Fase 3 — Observabilidade com CloudWatch Logs
 
 ## 🎯 Objetivo
 
-Visualizar e monitorar a execução da função Lambda utilizando logs no CloudWatch.
+Implementar observabilidade básica da função Lambda utilizando CloudWatch Logs, garantindo visibilidade sobre execuções, erros e comportamento da aplicação serverless.
 
-## 🏗️ O que foi utilizado
+---
 
-* AWS CloudWatch Logs
-* AWS Lambda
-* IAM Role com permissões de log
+## 🏗️ O que foi criado
+
+- Log Group dedicado no CloudWatch para a Lambda
+- Retenção de logs configurada (14 dias)
+- Permissões IAM para escrita de logs (`AWSLambdaBasicExecutionRole`)
+- Estrutura de observabilidade base para o projeto
+
+---
 
 ## 🧠 Conceitos importantes
 
-* Log Group: agrupamento de logs da Lambda
-* Log Stream: execução individual da função
-* Observabilidade: capacidade de entender o comportamento do sistema
+### CloudWatch Logs
+
+Serviço gerenciado da AWS para coleta, armazenamento e consulta de logs. Cada serviço AWS pode enviar logs para o CloudWatch, permitindo análise centralizada do comportamento da aplicação.
+
+### Log Group
+
+Agrupamento lógico de logs. Cada função Lambda possui seu próprio Log Group no formato `/aws/lambda/<function-name>`. Dentro dele, cada execução gera um Log Stream individual.
+
+### Log Stream
+
+Sequência de eventos de log de uma única execução. Cada invocação da Lambda cria um novo stream com timestamp, facilitando a análise de execuções específicas.
+
+### Retenção de Logs
+
+Por padrão, logs no CloudWatch são retidos indefinidamente (gerando custos). Configurar retenção (ex: 14 dias) é uma prática de otimização de custos e governança.
+
+### Observabilidade
+
+Capacidade de entender o estado interno de um sistema a partir de suas saídas externas. Os três pilares são: **Logs** (eventos), **Métricas** (números) e **Traces** (fluxos). Esta fase implementa o primeiro pilar.
+
+---
 
 ## ⚙️ Como funciona
 
-A Lambda envia automaticamente logs para o CloudWatch utilizando a policy AWSLambdaBasicExecutionRole.
+```
+Lambda é invocada
+        ↓
+Código executa print() ou logging
+        ↓
+CloudWatch Agent captura stdout/stderr
+        ↓
+Eventos são gravados no Log Stream
+        ↓
+Log Stream é armazenado no Log Group
+        ↓
+Logs disponíveis para consulta e alarmes
+```
 
-Cada execução da função gera um novo log stream dentro do log group correspondente.
+A policy `AWSLambdaBasicExecutionRole` concede automaticamente as permissões `logs:CreateLogGroup`, `logs:CreateLogStream` e `logs:PutLogEvents`.
+
+---
+
+## 📁 Arquivos principais
+
+| Arquivo | Função |
+|---------|--------|
+| `modules/lambda/main.tf` | Criação do Log Group com retenção |
+| `lambda_src/hello_lambda/app.py` | Código com prints para log |
+
+---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group
-* https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group
+- https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs.html
+- https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
+
+---
 
 ## 🧪 Como testar
 
-1. Executar a Lambda via AWS CLI
-2. Acessar CloudWatch
-3. Navegar até Log Groups
-4. Selecionar o log da Lambda
-5. Validar os logs da execução
+```bash
+# Invocar a Lambda
+aws lambda invoke \
+  --function-name Terraform-Serverless-dev-hello-lambda \
+  --payload '{}' \
+  response.json
+
+# Consultar logs via CLI
+aws logs tail /aws/lambda/Terraform-Serverless-dev-hello-lambda --follow
+```
+
+Ou via Console:
+1. CloudWatch → Log Groups
+2. Selecionar `/aws/lambda/Terraform-Serverless-dev-hello-lambda`
+3. Abrir o Log Stream mais recente
+4. Validar eventos de execução
+
+---
+
+## 📈 Resultado esperado
+
+- Log Group criado automaticamente pelo Terraform
+- Cada invocação gera um novo Log Stream
+- Logs contêm: START, END, REPORT e outputs do código
+- Retenção configurada para controle de custos
