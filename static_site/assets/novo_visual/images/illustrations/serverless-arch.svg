@@ -1,0 +1,110 @@
+<svg width="500" height="340" viewBox="0 0 500 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="archBorder" x1="0" y1="0" x2="500" y2="340">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="flowLine" x1="0" y1="170" x2="500" y2="170">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="archNodeGlow">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#6366f1" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background card -->
+  <rect x="2" y="2" width="496" height="336" rx="24" fill="white" stroke="url(#archBorder)" stroke-width="2"/>
+
+  <!-- Título -->
+  <text x="250" y="35" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#3f3f46" letter-spacing="2" opacity="0.7">ARQUITETURA SERVERLESS</text>
+
+  <!-- Linha de fluxo principal -->
+  <path d="M60 170H440" stroke="url(#flowLine)" stroke-width="2" stroke-dasharray="6 4" opacity="0.3"/>
+
+  <!-- USUÁRIO -->
+  <g filter="url(#archNodeGlow)">
+    <circle cx="60" cy="170" r="28" fill="white" stroke="#71717a" stroke-width="2"/>
+    <circle cx="60" cy="162" r="8" stroke="#52525b" stroke-width="2" fill="none"/>
+    <path d="M46 186C46 178 52 173 60 173C68 173 74 178 74 186" stroke="#52525b" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <text x="60" y="212" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#52525b">Usuário</text>
+
+  <!-- CLOUDFRONT -->
+  <g filter="url(#archNodeGlow)">
+    <rect x="120" y="80" width="60" height="60" rx="16" fill="white" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="150" cy="105" r="14" stroke="#f59e0b" stroke-width="2" fill="none"/>
+    <circle cx="150" cy="105" r="6" fill="#f59e0b" opacity="0.2"/>
+    <path d="M142 105H158" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+    <path d="M150 97V113" stroke="#f59e0b" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="150" cy="105" r="3" fill="#f59e0b"/>
+  </g>
+  <text x="150" y="155" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#f59e0b">CloudFront</text>
+
+  <!-- API GATEWAY -->
+  <g filter="url(#archNodeGlow)">
+    <rect x="120" y="200" width="60" height="60" rx="16" fill="white" stroke="#06b6d4" stroke-width="2"/>
+    <path d="M138 220H162" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M138 230H162" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <path d="M138 240H155" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+    <circle cx="168" cy="215" r="4" fill="#06b6d4" opacity="0.2"/>
+    <text x="168" y="218" text-anchor="middle" font-size="6" fill="#06b6d4" font-weight="700">API</text>
+  </g>
+  <text x="150" y="275" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#06b6d4">API Gateway</text>
+
+  <!-- LAMBDA -->
+  <g filter="url(#archNodeGlow)">
+    <rect x="240" y="140" width="60" height="60" rx="16" fill="white" stroke="#6366f1" stroke-width="2"/>
+    <text x="270" y="178" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#6366f1">λ</text>
+  </g>
+  <text x="270" y="215" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#6366f1">Lambda</text>
+
+  <!-- DYNAMODB -->
+  <g filter="url(#archNodeGlow)">
+    <rect x="350" y="100" width="60" height="60" rx="16" fill="white" stroke="#a855f7" stroke-width="2"/>
+    <ellipse cx="380" cy="120" rx="16" ry="6" stroke="#a855f7" stroke-width="2" fill="rgba(168,85,247,0.05)"/>
+    <path d="M364 120V140C364 144 371 147 380 147C389 147 396 144 396 140V120" stroke="#a855f7" stroke-width="2"/>
+    <path d="M364 130C364 134 371 136 380 136C389 136 396 134 396 130" stroke="#a855f7" stroke-width="1.2" opacity="0.5"/>
+  </g>
+  <text x="380" y="175" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#a855f7">DynamoDB</text>
+
+  <!-- S3 -->
+  <g filter="url(#archNodeGlow)">
+    <rect x="350" y="210" width="60" height="60" rx="16" fill="white" stroke="#10b981" stroke-width="2"/>
+    <path d="M368 230C368 225 373 222 380 222C387 222 392 225 392 230V250C392 255 387 258 380 258C373 258 368 255 368 250V230Z" stroke="#10b981" stroke-width="2" fill="rgba(16,185,129,0.05)"/>
+    <path d="M368 235C368 238 373 240 380 240C387 240 392 238 392 235" stroke="#10b981" stroke-width="1.2" opacity="0.5"/>
+  </g>
+  <text x="380" y="285" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#10b981">S3 Bucket</text>
+
+  <!-- SNS -->
+  <g filter="url(#archNodeGlow)">
+    <rect x="430" y="140" width="50" height="50" rx="14" fill="white" stroke="#ef4444" stroke-width="2"/>
+    <path d="M448 158L462 165L448 172" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="455" cy="165" r="8" stroke="#ef4444" stroke-width="1.5" fill="none" opacity="0.3"/>
+  </g>
+  <text x="455" y="205" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#ef4444">SNS</text>
+
+  <!-- SETAS DE CONEXÃO -->
+  <!-- User → CloudFront -->
+  <path d="M88 155C105 145 115 130 120 120" stroke="#71717a" stroke-width="1.5" fill="none" marker-end="none" opacity="0.5"/>
+  <!-- User → API GW -->
+  <path d="M88 185C105 195 115 210 120 220" stroke="#71717a" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- CloudFront → S3 (via Lambda) -->
+  <path d="M180 110C210 110 230 130 240 150" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+  <!-- API GW → Lambda -->
+  <path d="M180 230C210 230 230 200 240 185" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+  <!-- Lambda → DynamoDB -->
+  <path d="M300 160C320 150 340 140 350 135" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+  <!-- Lambda → S3 -->
+  <path d="M300 180C320 200 340 220 350 230" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+  <!-- Lambda → SNS -->
+  <path d="M300 170C340 170 400 165 430 165" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
+
+  <!-- Decoração -->
+  <circle cx="30" cy="50" r="3" fill="#6366f1" opacity="0.15"/>
+  <circle cx="470" cy="50" r="2.5" fill="#06b6d4" opacity="0.15"/>
+  <circle cx="30" cy="300" r="2" fill="#a855f7" opacity="0.15"/>
+  <circle cx="480" cy="300" r="3" fill="#10b981" opacity="0.15"/>
+</svg>

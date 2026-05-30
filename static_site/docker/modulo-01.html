@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker Módulo 01: Conceitos Fundamentais e Instalação</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker — Módulo 01</span>
+        <h1>Conceitos Fundamentais e Instalação</h1>
+        <p>Entenda o que é Docker, por que ele revolucionou o desenvolvimento de software, instale no seu sistema e execute seus primeiros containers.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- O que é Docker -->
+        <div class="topic-block">
+          <h2>O que é Docker?</h2>
+          <p>Docker é uma plataforma de containerização que permite empacotar aplicações e suas dependências em unidades padronizadas chamadas <strong>containers</strong>. Diferente de máquinas virtuais, containers compartilham o kernel do sistema operacional host, tornando-os extremamente leves e rápidos.</p>
+        </div>
+
+        <!-- Por que Docker importa -->
+        <div class="topic-block">
+          <h2>Por que Docker importa?</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Consistência</code><span class="cmd-tag">Dev → Prod</span></div>
+              <p>"Funciona na minha máquina" deixa de ser problema. O container é idêntico em qualquer ambiente.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Isolamento</code><span class="cmd-tag">Segurança</span></div>
+              <p>Cada container tem seu próprio filesystem, rede e processos isolados do host e de outros containers.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Velocidade</code><span class="cmd-tag">Performance</span></div>
+              <p>Containers iniciam em segundos (vs minutos de uma VM). Ideal para CI/CD e microserviços.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Portabilidade</code><span class="cmd-tag">Multi-cloud</span></div>
+              <p>Execute em qualquer lugar: laptop, servidor on-premises, AWS, Azure, GCP — sem alterações.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conceitos-chave -->
+        <div class="topic-block">
+          <h2>Conceitos-chave</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Conceito</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Imagem</strong></td><td>Template somente-leitura com o sistema de arquivos e configurações. É o "blueprint" do container.</td></tr>
+              <tr><td><strong>Container</strong></td><td>Instância em execução de uma imagem. Possui estado próprio e pode ser iniciado, parado e removido.</td></tr>
+              <tr><td><strong>Dockerfile</strong></td><td>Arquivo de texto com instruções para construir uma imagem customizada passo a passo.</td></tr>
+              <tr><td><strong>Registry</strong></td><td>Repositório de imagens (Docker Hub, ECR, GCR). Permite compartilhar e versionar imagens.</td></tr>
+              <tr><td><strong>Volume</strong></td><td>Mecanismo para persistir dados além do ciclo de vida do container.</td></tr>
+              <tr><td><strong>Network</strong></td><td>Rede virtual que permite comunicação entre containers e com o mundo externo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Instalação -->
+        <div class="topic-block">
+          <h2>Instalação do Docker</h2>
+
+          <h3>Linux (Ubuntu/Debian)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Remover versões antigas</code><span class="cmd-tag">Limpeza</span></div>
+              <pre><code>sudo apt-get remove docker docker-engine docker.io containerd runc</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Instalar dependências</code><span class="cmd-tag">Pré-requisitos</span></div>
+              <pre><code>sudo apt-get update
+sudo apt-get install -y \
+  ca-certificates \
+  curl \
+  gnupg \
+  lsb-release</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Adicionar chave GPG oficial</code><span class="cmd-tag">Repositório</span></div>
+              <pre><code>sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Adicionar repositório Docker</code><span class="cmd-tag">APT</span></div>
+              <pre><code>echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Instalar Docker Engine</code><span class="cmd-tag">Instalação</span></div>
+              <pre><code>sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Pós-instalação (sem sudo)</code><span class="cmd-tag">Permissões</span></div>
+              <pre><code>sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+            </div>
+          </div>
+
+          <h3>Windows</h3>
+          <div class="info-box">
+            <p>Baixe e instale o <strong>Docker Desktop for Windows</strong> em <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">docker.com</a>. Requisitos: Windows 10/11 64-bit com WSL 2 habilitado ou Hyper-V.</p>
+          </div>
+
+          <h3>macOS</h3>
+          <div class="info-box">
+            <p>Baixe e instale o <strong>Docker Desktop for Mac</strong> em <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">docker.com</a>. Disponível para chips Intel e Apple Silicon (M1/M2/M3).</p>
+          </div>
+        </div>
+
+        <!-- Verificação -->
+        <div class="topic-block">
+          <h2>Verificação da Instalação</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker --version</code><span class="cmd-tag">Versão</span></div>
+              <p>Exibe a versão instalada do Docker CLI.</p>
+              <pre><code>docker --version
+# Docker version 24.0.7, build afdd53b</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker info</code><span class="cmd-tag">Detalhes</span></div>
+              <p>Mostra informações detalhadas do Docker Engine: storage driver, runtime, plugins, etc.</p>
+              <pre><code>docker info</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker run hello-world</code><span class="cmd-tag">Teste</span></div>
+              <p>Baixa e executa a imagem de teste oficial. Se funcionar, sua instalação está correta.</p>
+              <pre><code>docker run hello-world</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primeiros Comandos -->
+        <div class="topic-block">
+          <h2>Primeiros Comandos Essenciais</h2>
+
+          <h3>docker run — Criar e executar containers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker run</code><span class="cmd-tag">Básico</span></div>
+              <p>Cria e inicia um container a partir de uma imagem.</p>
+              <pre><code># Execução simples
+docker run nginx
+
+# Modo interativo com terminal
+docker run -it ubuntu bash
+
+# Modo detached (background)
+docker run -d nginx
+
+# Mapear porta host:container
+docker run -d -p 8080:80 nginx
+
+# Nomear o container
+docker run -d --name meu-nginx -p 8080:80 nginx
+
+# Remover automaticamente ao parar
+docker run --rm -it alpine sh</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Flags importantes</code><span class="cmd-tag">Referência</span></div>
+              <table class="styled-table">
+                <thead><tr><th>Flag</th><th>Descrição</th></tr></thead>
+                <tbody>
+                  <tr><td><code>-it</code></td><td>Interativo + pseudo-TTY (terminal)</td></tr>
+                  <tr><td><code>-d</code></td><td>Detached — executa em background</td></tr>
+                  <tr><td><code>-p host:container</code></td><td>Mapeia porta do host para o container</td></tr>
+                  <tr><td><code>--name</code></td><td>Define um nome para o container</td></tr>
+                  <tr><td><code>--rm</code></td><td>Remove o container ao finalizar</td></tr>
+                  <tr><td><code>-e VAR=valor</code></td><td>Define variável de ambiente</td></tr>
+                  <tr><td><code>-v host:container</code></td><td>Monta volume ou bind mount</td></tr>
+                  <tr><td><code>--network</code></td><td>Conecta a uma rede específica</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3>docker ps — Listar containers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker ps</code><span class="cmd-tag">Listar</span></div>
+              <p>Lista containers em execução. Use flags para ver todos ou filtrar.</p>
+              <pre><code># Containers em execução
+docker ps
+
+# Todos os containers (incluindo parados)
+docker ps -a
+
+# Apenas IDs dos containers
+docker ps -q
+
+# Todos os IDs (para scripts)
+docker ps -aq</code></pre>
+            </div>
+          </div>
+
+          <h3>docker stop / start / restart — Controlar containers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker stop</code><span class="cmd-tag">Parar</span></div>
+              <p>Envia SIGTERM e depois SIGKILL (após timeout) para parar o container graciosamente.</p>
+              <pre><code># Parar um container
+docker stop meu-nginx
+
+# Parar múltiplos containers
+docker stop container1 container2
+
+# Parar todos os containers em execução
+docker stop $(docker ps -q)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker start / restart</code><span class="cmd-tag">Iniciar</span></div>
+              <p>Inicia um container parado ou reinicia um container em execução.</p>
+              <pre><code># Iniciar container parado
+docker start meu-nginx
+
+# Reiniciar container
+docker restart meu-nginx</code></pre>
+            </div>
+          </div>
+
+          <h3>docker rm — Remover containers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker rm</code><span class="cmd-tag">Remover</span></div>
+              <p>Remove containers parados. Use <code>-f</code> para forçar remoção de containers em execução.</p>
+              <pre><code># Remover container parado
+docker rm meu-nginx
+
+# Forçar remoção (mesmo em execução)
+docker rm -f meu-nginx
+
+# Remover todos os containers parados
+docker container prune
+
+# Remover todos os containers (forçado)
+docker rm -f $(docker ps -aq)</code></pre>
+            </div>
+          </div>
+
+          <h3>docker logs — Ver logs do container</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker logs</code><span class="cmd-tag">Logs</span></div>
+              <p>Exibe a saída (stdout/stderr) de um container. Essencial para debugging.</p>
+              <pre><code># Ver todos os logs
+docker logs meu-nginx
+
+# Seguir logs em tempo real (like tail -f)
+docker logs -f meu-nginx
+
+# Últimas N linhas
+docker logs --tail 50 meu-nginx
+
+# Com timestamps
+docker logs -t meu-nginx
+
+# Combinar flags
+docker logs -f --tail 100 -t meu-nginx</code></pre>
+            </div>
+          </div>
+
+          <h3>docker exec — Executar comandos em container ativo</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker exec</code><span class="cmd-tag">Executar</span></div>
+              <p>Executa um comando dentro de um container em execução. Ideal para debugging e administração.</p>
+              <pre><code># Abrir shell interativo
+docker exec -it meu-nginx bash
+
+# Executar comando único
+docker exec meu-nginx cat /etc/nginx/nginx.conf
+
+# Executar como root
+docker exec -u root meu-nginx apt-get update
+
+# Definir variável de ambiente
+docker exec -e MY_VAR=teste meu-nginx env</code></pre>
+            </div>
+          </div>
+
+          <h3>docker inspect — Detalhes do container</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker inspect</code><span class="cmd-tag">Inspecionar</span></div>
+              <p>Retorna informações detalhadas em JSON sobre um container, imagem, volume ou rede.</p>
+              <pre><code># Inspecionar container (JSON completo)
+docker inspect meu-nginx
+
+# Obter IP do container
+docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' meu-nginx
+
+# Ver mounts/volumes
+docker inspect --format '{{json .Mounts}}' meu-nginx
+
+# Ver variáveis de ambiente
+docker inspect --format '{{json .Config.Env}}' meu-nginx
+
+# Ver status
+docker inspect --format '{{.State.Status}}' meu-nginx</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../docker.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

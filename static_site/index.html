@@ -1,563 +1,163 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
-<meta charset="UTF-8" />
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-/>
-
-<title>
-CloudTrilhas — Materiais de Estudos Cloud - DEV
-</title>
-
-<link
-rel="icon"
-href="assets/favicon/favicon.svg"
-type="image/svg+xml"
-/>
-
-<link
-rel="stylesheet"
-href="style.css"
-/>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Trilhas e Materiais Cloud</title>
+  <meta name="description" content="Portal de estudos com trilhas para AWS, Linux, Docker, Kubernetes, Terraform, Python e Redes." />
+  <meta name="keywords" content="AWS, Cloud, Linux, Docker, Kubernetes, Terraform, Python, Redes, DevOps" />
+  <meta name="author" content="Ricardo Simines Scopim" />
+  <meta property="og:title" content="CloudTrilhas — Trilhas e Materiais Cloud" />
+  <meta property="og:description" content="Materiais, simulados e trilhas de estudo para Cloud, DevOps e Certificações." />
+  <meta property="og:image" content="https://cloudtrilhas.com.br/assets/logo/cloudtrilhas-logo.svg" />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-
-<header class="header">
-
-<nav class="nav container">
-
-<a href="#" class="brand">
-
-<img
-src="assets/logo/cloudtrilhas-logo.svg"
-alt="CloudTrilhas"
-/>
-
-</a>
-
-<div class="nav-actions">
-
-<a
-href="#materiais"
-class="nav-link"
->
-Materiais
-</a>
-
-<a
-href="#baixar"
-class="nav-button"
->
-Baixar PDF
-</a>
-
-</div>
-
-</nav>
-
-</header>
-
-<main>
-
-<section class="hero">
-
-<div class="hero-bg"></div>
-
-<div class="container hero-grid">
-
-<div class="hero-content">
-
-<span class="pill">
-Ambiente DEV — Teste de alteração
-</span>
-
-<h1>
-Materiais práticos para evoluir em Cloud Computing.
-</h1>
-
-<p>
-
-O CloudTrilhas reúne conteúdos objetivos
-para apoiar seus estudos em AWS,
-arquitetura cloud, certificações
-e boas práticas de adoção de nuvem.
-
-</p>
-
-<div class="hero-actions">
-
-<a
-href="#baixar"
-class="button primary"
->
-
-Baixar material gratuito
-
-</a>
-
-<a
-href="#materiais"
-class="button secondary"
->
-
-Ver conteúdo
-
-</a>
-
-</div>
-
-</div>
-
-<div class="hero-panel">
-
-<span class="panel-label">
-
-Material em destaque
-
-</span>
-
-<h2>
-
-AWS Cloud Adoption Framework
-
-</h2>
-
-<p>
-
-Um guia introdutório para entender
-como organizações planejam
-e estruturam a adoção de cloud.
-
-</p>
-
-<div class="panel-list">
-
-<span>
-☁️ Adoção de cloud
-</span>
-
-<span>
-📚 Material de apoio
-</span>
-
-<span>
-🎯 Conteúdo objetivo
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-<section
-id="materiais"
-class="section container"
->
-
-<div class="section-heading">
-
-<span class="eyebrow">
-
-Conteúdos
-
-</span>
-
-<h2>
-
-Estude com materiais simples,
-diretos e aplicáveis.
-
-</h2>
-
-<p>
-
-A proposta do CloudTrilhas
-é compartilhar conteúdos
-de apoio para quem está
-aprendendo cloud computing
-na prática.
-
-</p>
-
-</div>
-
-<div class="features">
-
-<article class="feature-card">
-
-<img
-src="assets/icons/study.svg"
-alt=""
->
-
-<h3>
-
-Materiais de estudo
-
-</h3>
-
-<p>
-
-PDFs organizados para apoiar aulas,
-trilhas e revisões técnicas.
-
-</p>
-
-</article>
-
-<article class="feature-card">
-
-<img
-src="assets/icons/cloud.svg"
-alt=""
->
-
-<h3>
-
-Cloud Computing
-
-</h3>
-
-<p>
-
-Conteúdos voltados para AWS,
-arquitetura e boas práticas.
-
-</p>
-
-</article>
-
-<article class="feature-card">
-
-<img
-src="assets/icons/download.svg"
-alt=""
->
-
-<h3>
-
-Acesso gratuito
-
-</h3>
-
-<p>
-
-Baixe materiais
-e continue evoluindo.
-
-</p>
-
-</article>
-
-<article class="feature-card">
-
-<img
-src="assets/icons/security.svg"
-alt=""
->
-
-<h3>
-
-Portal seguro
-
-</h3>
-
-<p>
-
-HTTPS + CloudFront +
-Serverless AWS.
-
-</p>
-
-</article>
-
-</div>
-
-</section>
-
-<section
-id="baixar"
-class="download-section"
->
-
-<div class="container download-grid">
-
-<div class="download-copy">
-
-<span class="eyebrow">
-
-PDF gratuito
-
-</span>
-
-<h2>
-
-Orientações Gerais — AWS CAF
-
-</h2>
-
-<p>
-
-Preencha o formulário
-para baixar gratuitamente.
-
-</p>
-
-<ul>
-
-<li>
-
-Visão geral de cloud
-
-</li>
-
-<li>
-
-Material de apoio
-
-</li>
-
-<li>
-
-Conteúdo introdutório
-
-</li>
-
-</ul>
-
-</div>
-
-<form
-id="leadForm"
-class="form-card"
->
-
-<h3>
-
-Baixar material
-
-</h3>
-
-<p>
-
-Informe seus dados.
-
-</p>
-
-<label>
-
-Nome
-
-</label>
-
-<input
-id="name"
-type="text"
-placeholder="Digite seu nome"
-required
-/>
-
-<label>
-
-E-mail
-
-</label>
-
-<input
-id="email"
-type="email"
-placeholder="Digite seu e-mail"
-required
-/>
-
-<label class="checkbox">
-
-<input
-id="consent"
-type="checkbox"
-required
-/>
-
-<span>
-
-Aceito compartilhar
-meus dados para receber
-este material.
-
-</span>
-
-</label>
-
-<button type="submit">
-
-Baixar PDF
-
-</button>
-
-<p
-id="formMessage"
-class="form-message"
->
-
-</p>
-
-</form>
-
-</div>
-
-</section>
-
-</main>
-
-<footer class="footer">
-
-<p>
-
-CloudTrilhas —
-Materiais de Estudos Cloud
-
-</p>
-
-<a
-target="_blank"
-href="https://www.linkedin.com/in/ricardosiminesscopim/"
->
-
-LinkedIn
-
-</a>
-
-</footer>
-
-<script>
-
-const API_ENDPOINT =
-"https://5na1nncgjg.execute-api.us-west-2.amazonaws.com/leads";
-
-const form =
-document.getElementById(
-"leadForm"
-);
-
-const formMessage =
-document.getElementById(
-"formMessage"
-);
-
-form.addEventListener(
-"submit",
-
-async function(event){
-
-event.preventDefault();
-
-formMessage.textContent =
-"Enviando dados...";
-
-formMessage.className =
-"form-message";
-
-const payload={
-
-name:
-document
-.getElementById("name")
-.value
-.trim(),
-
-email:
-document
-.getElementById("email")
-.value
-.trim(),
-
-consent:
-document
-.getElementById("consent")
-.checked,
-
-material:
-"orientacoes-gerais-aws-caf.pdf"
-
-};
-
-try{
-
-const response =
-await fetch(
-API_ENDPOINT,
-{
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:
-JSON.stringify(payload)
-
-}
-);
-
-const data =
-await response.json();
-
-if(!response.ok){
-
-formMessage.textContent =
-data.message ||
-"Erro ao registrar.";
-
-formMessage.className =
-"form-message error";
-
-return;
-
-}
-
-formMessage.textContent =
-"Cadastro realizado. Abrindo material...";
-
-formMessage.className =
-"form-message success";
-
-window.open(
-data.download_url,
-"_blank"
-);
-
-form.reset();
-
-}
-catch(error){
-
-console.error(error);
-
-formMessage.textContent =
-"Erro ao conectar API.";
-
-formMessage.className =
-"form-message error";
-
-}
-
-}
-
-);
-
-</script>
-
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="#trilhas" class="nav-link">Trilhas</a>
+        <a href="aws.html" class="nav-link">AWS</a>
+        <a href="linux.html" class="nav-link">Linux</a>
+        <a href="about.html" class="nav-link">Sobre</a>
+        <a href="aws.html" class="nav-button">Começar</a>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="pill">☁️ CloudTrilhas</span>
+          <h1 id="hero-title">Sua jornada em Cloud e DevOps começa aqui.</h1>
+          <p>Trilhas organizadas, materiais práticos e conteúdos focados em AWS, Linux, Docker, Kubernetes, Terraform, Python e Redes.</p>
+          <div class="hero-actions">
+            <a href="#trilhas" class="button primary">Explorar trilhas</a>
+            <a href="about.html" class="button secondary">Sobre o projeto</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Destaque">
+          <span class="panel-label">🚀 Projeto em evolução</span>
+          <h2>+7 trilhas de estudo</h2>
+          <p>Conteúdos organizados por área para acelerar seu aprendizado em tecnologia cloud.</p>
+          <div class="panel-list">
+            <span>☁️ AWS Certifications</span>
+            <span>🐧 Linux & Redes</span>
+            <span>🐳 Docker & Kubernetes</span>
+            <span>🏗️ Terraform & Python</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="trilhas" class="section container" aria-labelledby="tracks-title">
+      <div class="section-heading">
+        <span class="eyebrow">Trilhas</span>
+        <h2 id="tracks-title">Escolha sua área de estudo.</h2>
+        <p>Cada trilha possui materiais, guias e conteúdos organizados para facilitar seu aprendizado.</p>
+      </div>
+      <div class="features">
+        <article class="feature-card">
+          <img src="assets/icons/cloud.svg" alt="" aria-hidden="true" />
+          <h3>AWS</h3>
+          <p>Cloud Practitioner, AI Practitioner, Developer, Solutions Architect e Professional.</p>
+          <a href="aws.html" class="card-link">Acessar</a>
+        </article>
+        <article class="feature-card">
+          <img src="assets/icons/study.svg" alt="" aria-hidden="true" />
+          <h3>Linux</h3>
+          <p>Fundamentos, administração de sistemas, shell scripting e certificações.</p>
+          <a href="linux.html" class="card-link">Acessar</a>
+        </article>
+        <article class="feature-card">
+          <img src="assets/icons/security.svg" alt="" aria-hidden="true" />
+          <h3>Docker & Kubernetes</h3>
+          <p>Containers, orquestração, microserviços e deploy em produção.</p>
+          <a href="docker.html" class="card-link">Acessar</a>
+        </article>
+        <article class="feature-card">
+          <img src="assets/icons/download.svg" alt="" aria-hidden="true" />
+          <h3>Terraform</h3>
+          <p>Infraestrutura como código, módulos, state e boas práticas.</p>
+          <a href="terraform.html" class="card-link">Acessar</a>
+        </article>
+      </div>
+      <div class="features" style="margin-top:20px">
+        <article class="feature-card">
+          <img src="assets/icons/cloud.svg" alt="" aria-hidden="true" />
+          <h3>Python</h3>
+          <p>Automação, scripting, boto3, Lambda functions e data engineering.</p>
+          <a href="python.html" class="card-link">Acessar</a>
+        </article>
+        <article class="feature-card">
+          <img src="assets/icons/security.svg" alt="" aria-hidden="true" />
+          <h3>Redes</h3>
+          <p>TCP/IP, DNS, VPN, firewalls, VPC e fundamentos de networking.</p>
+          <a href="redes.html" class="card-link">Acessar</a>
+        </article>
+        <article class="feature-card">
+          <img src="assets/icons/study.svg" alt="" aria-hidden="true" />
+          <h3>Materiais PDF</h3>
+          <p>Downloads gratuitos de guias, resumos e materiais de apoio.</p>
+          <a href="cloud-practitioner.html" class="card-link">Baixar</a>
+        </article>
+        <article class="feature-card">
+          <img src="assets/icons/download.svg" alt="" aria-hidden="true" />
+          <h3>Sobre o Projeto</h3>
+          <p>Conheça a arquitetura serverless por trás do CloudTrilhas.</p>
+          <a href="about.html" class="card-link">Conhecer</a>
+        </article>
+      </div>
+    </section>
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">CloudTrilhas</span>
+          <h2>Um portal preparado para crescer.</h2>
+          <p>Infraestrutura 100% serverless na AWS com Terraform, CI/CD via GitHub Actions e arquitetura escalável.</p>
+        </div>
+        <a href="aws.html" class="button primary">Começar pela AWS</a>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" />
+        <p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p>
+      </div>
+      <div class="footer-column">
+        <h2>Cloud</h2>
+        <a href="aws.html">AWS</a>
+        <a href="cloud-practitioner.html">Cloud Practitioner</a>
+        <a href="ai-practitioner.html">AI Practitioner</a>
+        <a href="developer.html">Developer</a>
+        <a href="solutions-architect.html">Solutions Architect</a>
+      </div>
+      <div class="footer-column">
+        <h2>DevOps</h2>
+        <a href="linux.html">Linux</a>
+        <a href="docker.html">Docker & Kubernetes</a>
+        <a href="terraform.html">Terraform</a>
+        <a href="python.html">Python</a>
+        <a href="redes.html">Redes</a>
+      </div>
+      <div class="footer-column">
+        <h2>Projeto</h2>
+        <a href="about.html">Sobre</a>
+        <a href="contact.html">Contato</a>
+        <a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="app.js"></script>
 </body>
-
 </html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker Módulo 05: Docker Compose</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-04.html" class="nav-link">← Anterior</a>
+        <a href="modulo-06.html" class="nav-link">Próximo →</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker — Módulo 05</span>
+        <h1>Docker Compose</h1>
+        <p>Orquestre múltiplos containers de forma declarativa, reproduzível e versionável. Defina toda a infraestrutura da sua aplicação em um único arquivo YAML.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- O que é Docker Compose -->
+        <div class="topic-block">
+          <h3>O que é Docker Compose e Por que Usar</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>Orquestração Local</code>
+                <span class="cmd-tag">conceito</span>
+              </div>
+              <p>Docker Compose é uma ferramenta para definir e executar aplicações multi-container. Com um único arquivo YAML você descreve todos os serviços, redes e volumes da sua aplicação.</p>
+              <pre><code># Vantagens principais:
+# ✓ Declarativo — infraestrutura como código
+# ✓ Reproduzível — mesmo resultado em qualquer máquina
+# ✓ Versionável — arquivo YAML no Git
+# ✓ Um comando — sobe toda a stack
+# ✓ Isolamento — cada projeto em sua rede</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estrutura do docker-compose.yml -->
+        <div class="topic-block">
+          <h3>Estrutura do docker-compose.yml</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>docker-compose.yml</code>
+                <span class="cmd-tag">estrutura</span>
+              </div>
+              <p>Anatomia completa de um arquivo Compose com todas as diretivas principais.</p>
+              <pre><code>services:
+  nome-servico:
+    image: imagem:tag           # Imagem do Docker Hub ou registry
+    build:                      # OU build a partir de Dockerfile
+      context: ./dir
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    container_name: meu-app     # Nome fixo do container
+    ports:
+      - "8080:80"               # host:container
+      - "443:443"
+    volumes:
+      - ./src:/app/src          # Bind mount (dev)
+      - dados:/var/lib/data     # Named volume (persistência)
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    env_file:
+      - .env                    # Variáveis de arquivo externo
+    depends_on:
+      - db
+      - cache
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped     # Política de reinício
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  dados:
+    driver: local</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exemplo Completo -->
+        <div class="topic-block">
+          <h3>Exemplo Completo: Web + API + DB + Cache</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header">
+                <code>docker-compose.yml</code>
+                <span class="cmd-tag">exemplo</span>
+              </div>
+              <p>Stack completa com frontend React, API Node.js, PostgreSQL e Redis.</p>
+              <pre><code>services:
+  web:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - frontend
+
+  api:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/app
+      - REDIS_URL=redis://cache:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  pgdata:
+  redisdata:</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comandos Essenciais -->
+        <div class="topic-block">
+          <h3>Comandos Essenciais</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose up</code>
+                <span class="cmd-tag">iniciar</span>
+              </div>
+              <p>Cria e inicia todos os containers definidos no compose.</p>
+              <pre><code># Modo detached (background)
+docker compose up -d
+
+# Forçar rebuild das imagens
+docker compose up --build
+
+# Rebuild + detached
+docker compose up -d --build
+
+# Subir serviço específico
+docker compose up -d api</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose down</code>
+                <span class="cmd-tag danger">parar</span>
+              </div>
+              <p>Para e remove containers, redes criadas pelo compose.</p>
+              <pre><code># Parar e remover containers + redes
+docker compose down
+
+# Remover também os volumes
+docker compose down -v
+
+# Remover imagens locais criadas
+docker compose down --rmi local
+
+# Remover TODAS as imagens usadas
+docker compose down --rmi all</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose ps</code>
+                <span class="cmd-tag">status</span>
+              </div>
+              <p>Lista o status de todos os containers do projeto.</p>
+              <pre><code># Listar containers do projeto
+docker compose ps
+
+# Formato compacto
+docker compose ps --format "table {{.Name}}\t{{.Status}}"
+
+# Incluir containers parados
+docker compose ps -a</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose logs</code>
+                <span class="cmd-tag">debug</span>
+              </div>
+              <p>Visualiza logs dos containers do projeto.</p>
+              <pre><code># Logs de todos os serviços
+docker compose logs
+
+# Follow (tempo real)
+docker compose logs -f
+
+# Logs de serviço específico
+docker compose logs -f api
+
+# Últimas 50 linhas
+docker compose logs --tail 50 api</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose stop/start/restart</code>
+                <span class="cmd-tag">controle</span>
+              </div>
+              <p>Controla o ciclo de vida sem remover containers.</p>
+              <pre><code># Parar sem remover
+docker compose stop
+
+# Iniciar containers parados
+docker compose start
+
+# Reiniciar todos
+docker compose restart
+
+# Reiniciar serviço específico
+docker compose restart api</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose exec</code>
+                <span class="cmd-tag">executar</span>
+              </div>
+              <p>Executa comando em container já em execução.</p>
+              <pre><code># Shell interativo
+docker compose exec api sh
+
+# Comando direto
+docker compose exec db psql -U user -d app
+
+# Como root
+docker compose exec -u root api sh</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose run</code>
+                <span class="cmd-tag">executar</span>
+              </div>
+              <p>Cria container temporário para executar comando único.</p>
+              <pre><code># Executar e remover ao final
+docker compose run --rm api npm test
+
+# Executar migrations
+docker compose run --rm api npx prisma migrate deploy
+
+# Sem iniciar dependências
+docker compose run --rm --no-deps api npm run lint</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>docker compose scale / build / pull</code>
+                <span class="cmd-tag">gerenciar</span>
+              </div>
+              <p>Escalar réplicas, buildar imagens e baixar atualizações.</p>
+              <pre><code># Escalar serviço (múltiplas réplicas)
+docker compose up -d --scale api=3
+
+# Build sem iniciar
+docker compose build
+
+# Build sem cache
+docker compose build --no-cache
+
+# Baixar imagens atualizadas
+docker compose pull</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recursos Avançados -->
+        <div class="topic-block">
+          <h3>Recursos Avançados</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header">
+                <code>depends_on + healthcheck</code>
+                <span class="cmd-tag">dependência</span>
+              </div>
+              <p>Garanta que serviços só iniciem quando dependências estiverem saudáveis.</p>
+              <pre><code>services:
+  api:
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>.env + Variáveis</code>
+                <span class="cmd-tag">config</span>
+              </div>
+              <p>Use arquivos .env para substituição de variáveis no compose.</p>
+              <pre><code># .env
+POSTGRES_VERSION=16-alpine
+APP_PORT=4000
+DB_PASSWORD=supersecret
+
+# docker-compose.yml
+services:
+  db:
+    image: postgres:${POSTGRES_VERSION}
+  api:
+    ports:
+      - "${APP_PORT}:4000"
+    environment:
+      - DB_PASS=${DB_PASSWORD}</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Profiles</code>
+                <span class="cmd-tag">avançado</span>
+              </div>
+              <p>Agrupe serviços em perfis para ativar sob demanda.</p>
+              <pre><code>services:
+  web:
+    build: ./frontend
+    # Sempre ativo (sem profile)
+
+  debug:
+    image: busybox
+    profiles: ["debug"]
+
+  monitoring:
+    image: grafana/grafana
+    profiles: ["monitoring"]
+
+# Uso:
+# docker compose up -d
+# docker compose --profile debug up -d
+# docker compose --profile monitoring up -d</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Múltiplos Compose Files</code>
+                <span class="cmd-tag">avançado</span>
+              </div>
+              <p>Combine arquivos para diferentes ambientes (override pattern).</p>
+              <pre><code># docker-compose.yml (base)
+# docker-compose.override.yml (dev - auto-carregado)
+# docker-compose.prod.yml (produção)
+
+# Dev (carrega base + override automaticamente)
+docker compose up -d
+
+# Produção (especificar arquivos)
+docker compose -f docker-compose.yml \
+  -f docker-compose.prod.yml up -d
+
+# Override desabilita volumes de dev
+# e usa imagens do registry</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Restart Policies</code>
+                <span class="cmd-tag">resiliência</span>
+              </div>
+              <p>Defina como containers devem se comportar após falhas.</p>
+              <pre><code>services:
+  api:
+    restart: "no"            # Nunca reinicia (padrão)
+
+  web:
+    restart: always          # Sempre reinicia
+
+  worker:
+    restart: on-failure      # Só se exit code != 0
+
+  db:
+    restart: unless-stopped  # Sempre, exceto se
+                             # parado manualmente</code></pre>
+            </div>
+
+            <div class="command-card">
+              <div class="command-header">
+                <code>Resource Limits</code>
+                <span class="cmd-tag">recursos</span>
+              </div>
+              <p>Limite CPU e memória por serviço para evitar consumo excessivo.</p>
+              <pre><code>services:
+  api:
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  worker:
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela Resumo -->
+        <div class="topic-block">
+          <h3>Resumo de Comandos</h3>
+          <div class="command-card wide">
+            <div class="options-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Comando</th>
+                    <th>Descrição</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>docker compose up -d</td><td>Criar e iniciar containers em background</td></tr>
+                  <tr><td>docker compose up --build</td><td>Rebuild + iniciar</td></tr>
+                  <tr><td>docker compose down</td><td>Parar e remover containers + redes</td></tr>
+                  <tr><td>docker compose down -v</td><td>Down + remover volumes</td></tr>
+                  <tr><td>docker compose down --rmi all</td><td>Down + remover imagens</td></tr>
+                  <tr><td>docker compose ps</td><td>Listar status dos containers</td></tr>
+                  <tr><td>docker compose logs -f</td><td>Logs em tempo real</td></tr>
+                  <tr><td>docker compose stop</td><td>Parar sem remover</td></tr>
+                  <tr><td>docker compose start</td><td>Iniciar containers parados</td></tr>
+                  <tr><td>docker compose restart</td><td>Reiniciar serviços</td></tr>
+                  <tr><td>docker compose exec &lt;svc&gt; sh</td><td>Shell em container ativo</td></tr>
+                  <tr><td>docker compose run --rm &lt;svc&gt; cmd</td><td>Comando único em container temporário</td></tr>
+                  <tr><td>docker compose up --scale api=3</td><td>Escalar réplicas</td></tr>
+                  <tr><td>docker compose build</td><td>Build das imagens</td></tr>
+                  <tr><td>docker compose pull</td><td>Baixar imagens atualizadas</td></tr>
+                  <tr><td>docker compose config</td><td>Validar e exibir compose final</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-06.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

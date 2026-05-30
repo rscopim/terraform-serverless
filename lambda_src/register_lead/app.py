@@ -8,7 +8,7 @@ import boto3
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["LEADS_TABLE_NAME"])
 
-PDF_URL = os.environ["PDF_URL"]
+PDF_BASE_URL = os.environ["PDF_BASE_URL"]
 
 def response(status_code, body):
     return {
@@ -60,9 +60,12 @@ def lambda_handler(event, context):
             }
         )
 
+        # Build download URL based on requested material
+        download_url = f"{PDF_BASE_URL}/{material}"
+
         return response(200, {
             "message": "Cadastro realizado com sucesso.",
-            "download_url": PDF_URL
+            "download_url": download_url
         })
 
     except Exception as error:

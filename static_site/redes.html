@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes de Computadores: Do Zero ao Avançado</title>
+  <meta name="description" content="Trilha completa com 12 módulos — de fundamentos de redes à automação e design. Alinhado com certificações CompTIA Network+, CCNA e CCNP." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="#modulo01" class="nav-link">Fundamentos</a>
+        <a href="#modulo04" class="nav-link">Diagnóstico</a>
+        <a href="#modulo07" class="nav-link">Segurança</a>
+        <a href="#modulo10" class="nav-link">Especialista</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
+        <a href="index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes</span>
+        <h1>Redes de Computadores: Do Zero ao Avançado</h1>
+        <p>Trilha completa com 12 módulos — de fundamentos de redes à automação e design. Alinhado com certificações CompTIA Network+, CCNA e CCNP.</p>
+        <div class="hero-actions" style="margin-top:28px">
+          <a href="#modulo01" class="button primary">Começar pelo Módulo 01</a>
+          <a href="#modulo10" class="button secondary">Ir para Especialista</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS BAR -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="#modulo01" class="progress-node active"><span>01</span><small>Fundamentos</small></a>
+        <a href="#modulo02" class="progress-node"><span>02</span><small>OSI/TCP-IP</small></a>
+        <a href="#modulo03" class="progress-node"><span>03</span><small>IP/Sub-redes</small></a>
+        <a href="#modulo04" class="progress-node"><span>04</span><small>Diagnóstico</small></a>
+        <a href="#modulo05" class="progress-node"><span>05</span><small>Switching</small></a>
+        <a href="#modulo06" class="progress-node"><span>06</span><small>Roteamento</small></a>
+        <a href="#modulo07" class="progress-node"><span>07</span><small>Segurança</small></a>
+        <a href="#modulo08" class="progress-node"><span>08</span><small>Serviços</small></a>
+        <a href="#modulo09" class="progress-node"><span>09</span><small>Automação</small></a>
+        <a href="#modulo10" class="progress-node"><span>10</span><small>SD-WAN</small></a>
+        <a href="#modulo11" class="progress-node"><span>11</span><small>Monitoramento</small></a>
+        <a href="#modulo12" class="progress-node"><span>12</span><small>Design</small></a>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 01 ==================== -->
+    <section id="modulo01" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 01</span>
+          <h2>Fundamentos de Redes</h2>
+          <p>Conceitos essenciais de comunicação de dados, tipos de redes, topologias e meios de transmissão.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Conceitos Básicos</h3>
+          <div class="info-box highlight">
+            <strong>O que é uma rede?</strong> Um conjunto de dispositivos interconectados que compartilham recursos e trocam dados usando protocolos padronizados.
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Tipos de Rede</code><span class="cmd-tag">Conceito</span></div>
+              <p>Classificação por abrangência geográfica.</p>
+              <pre><code>LAN  — Local Area Network    (escritório, casa)
+MAN  — Metropolitan Area     (cidade, campus)
+WAN  — Wide Area Network     (países, continentes)
+WLAN — Wireless LAN          (Wi-Fi)
+PAN  — Personal Area Network (Bluetooth, NFC)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Topologias</code><span class="cmd-tag">Conceito</span></div>
+              <p>Forma como os dispositivos são conectados.</p>
+              <pre><code>Estrela  — Hub/Switch central (mais comum)
+Barramento — Cabo compartilhado (legado)
+Anel     — Token Ring (legado)
+Malha    — Full/Partial mesh (alta disponibilidade)
+Árvore   — Hierárquica (redes corporativas)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Meios de Transmissão</code><span class="cmd-tag">Físico</span></div>
+              <p>Cabos e conexões físicas.</p>
+              <pre><code>Par trançado (UTP/STP):
+  Cat5e — 1 Gbps, 100m
+  Cat6  — 10 Gbps, 55m
+  Cat6a — 10 Gbps, 100m
+
+Fibra óptica:
+  Monomodo — longa distância (km)
+  Multimodo — curta distância (campus)
+
+Wireless: 802.11ac (Wi-Fi 5), 802.11ax (Wi-Fi 6)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Dispositivos de Rede</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Switch</code><span class="cmd-tag">Camada 2</span></div>
+              <p>Encaminha frames baseado em endereços MAC. Opera na camada de enlace.</p>
+              <pre><code>Funcionalidades:
+- Tabela MAC (CAM table)
+- VLANs
+- Spanning Tree (STP)
+- Port Security
+- PoE (Power over Ethernet)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Roteador</code><span class="cmd-tag">Camada 3</span></div>
+              <p>Encaminha pacotes entre redes diferentes usando endereços IP.</p>
+              <pre><code>Funcionalidades:
+- Tabela de rotas
+- NAT/PAT
+- ACLs (Access Control Lists)
+- DHCP Server
+- VPN Gateway
+- QoS (Quality of Service)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Firewall</code><span class="cmd-tag">Segurança</span></div>
+              <p>Filtra tráfego entre redes com base em regras.</p>
+              <pre><code>Tipos:
+- Stateless (filtro de pacotes simples)
+- Stateful (rastreia conexões)
+- NGFW (Next-Gen: DPI, IPS, App Control)
+- WAF (Web Application Firewall)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Access Point</code><span class="cmd-tag">Wireless</span></div>
+              <p>Fornece conectividade Wi-Fi aos dispositivos.</p>
+              <pre><code>Conceitos:
+- SSID (nome da rede)
+- Canais (2.4 GHz / 5 GHz / 6 GHz)
+- WPA3 (segurança)
+- Roaming (transição entre APs)
+- Controller-based vs Autonomous</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 02 ==================== -->
+    <section id="modulo02" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 02</span>
+          <h2>Modelo OSI e TCP/IP</h2>
+          <p>Os modelos de referência que definem como a comunicação em rede é organizada em camadas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Modelo OSI — 7 Camadas</h3>
+          <div class="info-box highlight">
+            <strong>Mnemônico:</strong> "<strong>A</strong>ll <strong>P</strong>eople <strong>S</strong>eem <strong>T</strong>o <strong>N</strong>eed <strong>D</strong>ata <strong>P</strong>rocessing" (de cima para baixo)
+          </div>
+          <div class="command-card wide" style="margin-top:16px">
+            <div class="command-header"><code>Camadas OSI</code><span class="cmd-tag">Modelo</span></div>
+            <pre><code>Camada 7 — Aplicação     | HTTP, HTTPS, FTP, DNS, SMTP, SSH
+Camada 6 — Apresentação  | SSL/TLS, JPEG, ASCII, criptografia
+Camada 5 — Sessão        | NetBIOS, RPC, controle de sessão
+Camada 4 — Transporte    | TCP (confiável), UDP (rápido)
+Camada 3 — Rede          | IP, ICMP, ARP, roteamento
+Camada 2 — Enlace        | Ethernet, MAC, switches, frames
+Camada 1 — Física        | Cabos, sinais elétricos, conectores
+
+PDU por camada:
+  Camada 4: Segmento (TCP) / Datagrama (UDP)
+  Camada 3: Pacote
+  Camada 2: Frame
+  Camada 1: Bits</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Modelo TCP/IP — 4 Camadas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>TCP/IP vs OSI</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code>TCP/IP              OSI Equivalente         Protocolos
+─────────────────────────────────────────────────────────
+Aplicação           7 + 6 + 5               HTTP, DNS, FTP, SSH
+Transporte          4                       TCP, UDP
+Internet            3                       IP, ICMP, ARP
+Acesso à Rede      2 + 1                   Ethernet, Wi-Fi</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>TCP vs UDP</code><span class="cmd-tag">Transporte</span></div>
+              <p>Dois protocolos de transporte com características distintas.</p>
+              <pre><code>TCP (Transmission Control Protocol):
+- Orientado a conexão (3-way handshake)
+- Confiável (ACK, retransmissão)
+- Controle de fluxo e congestionamento
+- Uso: HTTP, SSH, FTP, SMTP
+
+UDP (User Datagram Protocol):
+- Sem conexão (connectionless)
+- Sem garantia de entrega
+- Menor overhead, mais rápido
+- Uso: DNS, DHCP, VoIP, streaming</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>3-Way Handshake</code><span class="cmd-tag">TCP</span></div>
+              <p>Estabelecimento de conexão TCP.</p>
+              <pre><code>Cliente → Servidor: SYN (seq=100)
+Servidor → Cliente: SYN-ACK (seq=300, ack=101)
+Cliente → Servidor: ACK (seq=101, ack=301)
+
+Encerramento (4-way):
+Cliente → FIN
+Servidor → ACK
+Servidor → FIN
+Cliente → ACK</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Portas e Protocolos Importantes</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Portas Conhecidas</code><span class="cmd-tag">Referência</span></div>
+            <div class="options-table">
+              <table>
+                <thead><tr><th>Porta</th><th>Protocolo</th><th>Serviço</th></tr></thead>
+                <tbody>
+                  <tr><td><code>20/21</code></td><td>TCP</td><td>FTP (dados/controle)</td></tr>
+                  <tr><td><code>22</code></td><td>TCP</td><td>SSH</td></tr>
+                  <tr><td><code>23</code></td><td>TCP</td><td>Telnet (inseguro)</td></tr>
+                  <tr><td><code>25</code></td><td>TCP</td><td>SMTP (e-mail)</td></tr>
+                  <tr><td><code>53</code></td><td>TCP/UDP</td><td>DNS</td></tr>
+                  <tr><td><code>67/68</code></td><td>UDP</td><td>DHCP</td></tr>
+                  <tr><td><code>80</code></td><td>TCP</td><td>HTTP</td></tr>
+                  <tr><td><code>443</code></td><td>TCP</td><td>HTTPS</td></tr>
+                  <tr><td><code>161/162</code></td><td>UDP</td><td>SNMP</td></tr>
+                  <tr><td><code>3389</code></td><td>TCP</td><td>RDP</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 03 ==================== -->
+    <section id="modulo03" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 03</span>
+          <h2>Endereçamento IP e Sub-redes</h2>
+          <p>IPv4, IPv6, CIDR, cálculo de sub-redes e planejamento de endereçamento.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Endereçamento IPv4</h3>
+          <div class="info-box highlight">
+            <strong>IPv4:</strong> 32 bits divididos em 4 octetos. Formato: <code>192.168.1.100</code>. Total: ~4,3 bilhões de endereços.
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Classes de IP (legado)</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code>Classe A: 1.0.0.0   – 126.255.255.255   /8   (16M hosts)
+Classe B: 128.0.0.0 – 191.255.255.255   /16  (65K hosts)
+Classe C: 192.0.0.0 – 223.255.255.255   /24  (254 hosts)
+Classe D: 224.0.0.0 – 239.255.255.255   (Multicast)
+Classe E: 240.0.0.0 – 255.255.255.255   (Reservado)
+
+⚠️ Classful é legado — hoje usamos CIDR (Classless)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>IPs Privados (RFC 1918)</code><span class="cmd-tag">Importante</span></div>
+              <p>Não roteáveis na internet. Usados em redes internas.</p>
+              <pre><code>10.0.0.0/8       — 10.0.0.0 a 10.255.255.255
+172.16.0.0/12    — 172.16.0.0 a 172.31.255.255
+192.168.0.0/16   — 192.168.0.0 a 192.168.255.255
+
+Outros reservados:
+127.0.0.0/8      — Loopback
+169.254.0.0/16   — Link-local (APIPA)
+0.0.0.0          — Default route</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>IPs Públicos</code><span class="cmd-tag">Internet</span></div>
+              <p>Roteáveis na internet. Atribuídos por ISPs/RIRs.</p>
+              <pre><code>Características:
+- Únicos globalmente
+- Atribuídos por IANA → RIRs → ISPs
+- Necessários para servidores públicos
+- Escassos (IPv4 esgotado)
+
+RIRs regionais:
+  ARIN    — América do Norte
+  LACNIC  — América Latina
+  RIPE    — Europa
+  APNIC   — Ásia-Pacífico
+  AFRINIC — África</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Sub-redes (Subnetting) e CIDR</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>CIDR — Classless Inter-Domain Routing</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code>Notação CIDR: IP/prefixo → 192.168.1.0/24
+
+Máscara de sub-rede:
+/8  = 255.0.0.0       → 16.777.214 hosts
+/16 = 255.255.0.0     → 65.534 hosts
+/24 = 255.255.255.0   → 254 hosts
+/25 = 255.255.255.128 → 126 hosts
+/26 = 255.255.255.192 → 62 hosts
+/27 = 255.255.255.224 → 30 hosts
+/28 = 255.255.255.240 → 14 hosts
+/30 = 255.255.255.252 → 2 hosts (ponto-a-ponto)
+/32 = 255.255.255.255 → 1 host (host route)
+
+Fórmula: Hosts = 2^(32 - prefixo) - 2</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Exemplo de Subnetting</code><span class="cmd-tag">Prática</span></div>
+              <pre><code>Rede: 192.168.10.0/24 → dividir em 4 sub-redes
+
+Novo prefixo: /26 (emprestamos 2 bits → 2² = 4 sub-redes)
+
+Sub-rede 1: 192.168.10.0/26   (hosts: .1 a .62,   broadcast: .63)
+Sub-rede 2: 192.168.10.64/26  (hosts: .65 a .126, broadcast: .127)
+Sub-rede 3: 192.168.10.128/26 (hosts: .129 a .190, broadcast: .191)
+Sub-rede 4: 192.168.10.192/26 (hosts: .193 a .254, broadcast: .255)
+
+Cada sub-rede: 62 hosts utilizáveis</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. IPv6 — Visão Geral</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>IPv6</code><span class="cmd-tag">Futuro</span></div>
+            <pre><code>Formato: 128 bits em 8 grupos hexadecimais
+Exemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+Abreviado: 2001:db8:85a3::8a2e:370:7334
+
+Tipos de endereço:
+  ::1/128          — Loopback
+  fe80::/10        — Link-local (auto-configuração)
+  2000::/3         — Global Unicast (público)
+  fc00::/7         — Unique Local (privado)
+  ff00::/8         — Multicast
+
+Vantagens sobre IPv4:
+- Espaço praticamente ilimitado (3.4 × 10³⁸)
+- Sem necessidade de NAT
+- Auto-configuração (SLAAC)
+- IPSec nativo
+- Header simplificado</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 04 ==================== -->
+    <section id="modulo04" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 04</span>
+          <h2>Comandos de Diagnóstico</h2>
+          <p>Ferramentas essenciais para troubleshooting e análise de conectividade em redes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Conectividade e Resolução</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ping</code><span class="cmd-tag">ICMP</span></div>
+              <p>Testa conectividade usando pacotes ICMP Echo Request/Reply.</p>
+              <pre><code>ping 8.8.8.8              # teste básico
+ping -c 4 google.com      # 4 pacotes (Linux)
+ping -t google.com         # contínuo (Windows)
+ping -s 1472 -M do host   # testa MTU
+
+Interpretação:
+- Reply: conectividade OK
+- Request timed out: host/firewall bloqueando
+- Destination unreachable: rota inexistente
+- TTL expired: muitos saltos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>traceroute / tracert</code><span class="cmd-tag">Rota</span></div>
+              <p>Mostra o caminho (saltos) até o destino.</p>
+              <pre><code>traceroute google.com       # Linux (UDP)
+tracert google.com          # Windows (ICMP)
+traceroute -I google.com    # Linux com ICMP
+mtr google.com              # traceroute + ping
+
+Cada linha = um roteador no caminho
+* * * = roteador não responde (filtrado)
+Latência alta = possível gargalo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>nslookup / dig</code><span class="cmd-tag">DNS</span></div>
+              <p>Consulta registros DNS.</p>
+              <pre><code>nslookup google.com
+nslookup -type=MX gmail.com
+nslookup google.com 8.8.8.8  # DNS específico
+
+dig google.com +short
+dig google.com A              # registro A
+dig google.com MX             # registro MX
+dig google.com NS             # nameservers
+dig @8.8.8.8 google.com      # consulta DNS específico
+dig google.com +trace         # resolução completa</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>host / whois</code><span class="cmd-tag">DNS</span></div>
+              <p>Consultas rápidas de DNS e registro de domínio.</p>
+              <pre><code>host google.com
+host -t AAAA google.com    # IPv6
+host 8.8.8.8               # reverso
+
+whois google.com           # info do domínio
+whois 200.160.2.3          # info do IP</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Conexões e Portas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>netstat / ss</code><span class="cmd-tag">Essencial</span></div>
+              <p>Exibe conexões de rede, portas em escuta e estatísticas.</p>
+              <pre><code># ss (moderno, substitui netstat)
+ss -tuln                    # portas TCP/UDP em escuta
+ss -tunap                   # com PID e nome do processo
+ss -s                       # estatísticas resumidas
+ss state established        # conexões ativas
+ss -tuln | grep :443        # quem escuta na 443
+
+# netstat (legado, ainda útil)
+netstat -tuln               # portas em escuta
+netstat -an                 # todas as conexões
+netstat -rn                 # tabela de rotas
+netstat -i                  # estatísticas de interface</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>nmap</code><span class="cmd-tag">Scanner</span></div>
+              <p>Scanner de portas e descoberta de rede.</p>
+              <pre><code>nmap 192.168.1.1            # scan básico
+nmap -sV 192.168.1.1        # versão dos serviços
+nmap -O 192.168.1.1         # detecção de OS
+nmap -p 80,443 192.168.1.0/24  # portas específicas
+nmap -sn 192.168.1.0/24     # ping sweep (hosts ativos)
+nmap -A 192.168.1.1         # scan agressivo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tcpdump</code><span class="cmd-tag">Captura</span></div>
+              <p>Captura e analisa pacotes em tempo real.</p>
+              <pre><code>sudo tcpdump -i eth0              # todo tráfego
+sudo tcpdump -i eth0 port 80      # apenas porta 80
+sudo tcpdump -i eth0 host 10.0.0.1  # host específico
+sudo tcpdump -i eth0 -c 100       # 100 pacotes
+sudo tcpdump -i eth0 -w captura.pcap  # salva arquivo
+sudo tcpdump -r captura.pcap      # lê arquivo
+
+# Filtros combinados
+sudo tcpdump -i eth0 'tcp port 443 and host 10.0.0.5'</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Configuração de Interface</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ip (iproute2)</code><span class="cmd-tag">Linux</span></div>
+              <pre><code># Interfaces
+ip addr show                      # listar interfaces e IPs
+ip link show                      # status das interfaces
+ip link set eth0 up               # ativar interface
+ip link set eth0 down             # desativar interface
+
+# Endereços
+ip addr add 192.168.1.10/24 dev eth0    # adicionar IP
+ip addr del 192.168.1.10/24 dev eth0    # remover IP
+
+# Rotas
+ip route show                     # tabela de rotas
+ip route add 10.0.0.0/8 via 192.168.1.1  # adicionar rota
+ip route add default via 192.168.1.1      # default gateway
+ip route del 10.0.0.0/8 via 192.168.1.1  # remover rota
+
+# ARP / Vizinhos
+ip neigh show                     # tabela ARP</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 05 ==================== -->
+    <section id="modulo05" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 05</span>
+          <h2>Switches e VLANs</h2>
+          <p>Switching na camada 2, segmentação com VLANs, trunking e Spanning Tree Protocol.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Fundamentos de Switching</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Funcionamento do Switch</code><span class="cmd-tag">Camada 2</span></div>
+              <pre><code>Processo de encaminhamento:
+1. Frame chega na porta → switch lê MAC de origem
+2. Aprende: associa MAC à porta (tabela CAM/MAC)
+3. Verifica MAC de destino na tabela
+4. Se encontra → encaminha para porta específica (unicast)
+5. Se não encontra → flood para todas as portas (exceto origem)
+
+Modos de switching:
+- Store-and-Forward: recebe frame completo, verifica CRC, encaminha
+- Cut-Through: encaminha após ler MAC destino (mais rápido)
+- Fragment-Free: lê 64 bytes antes de encaminhar</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. VLANs (Virtual LANs)</h3>
+          <div class="info-box highlight">
+            <strong>VLAN:</strong> Segmenta logicamente uma rede física em múltiplos domínios de broadcast. Melhora segurança, performance e gerenciamento.
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Configuração de VLANs (Cisco IOS)</code><span class="cmd-tag">Config</span></div>
+              <pre><code># Criar VLANs
+Switch(config)# vlan 10
+Switch(config-vlan)# name FINANCEIRO
+Switch(config)# vlan 20
+Switch(config-vlan)# name TI
+Switch(config)# vlan 30
+Switch(config-vlan)# name GUEST
+
+# Atribuir porta a uma VLAN (Access)
+Switch(config)# interface fa0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+
+# Verificação
+Switch# show vlan brief
+Switch# show interfaces trunk
+Switch# show mac address-table</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Trunking (802.1Q)</code><span class="cmd-tag">Inter-Switch</span></div>
+              <pre><code># Trunk carrega múltiplas VLANs entre switches
+Switch(config)# interface gi0/1
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk allowed vlan 10,20,30
+Switch(config-if)# switchport trunk native vlan 99
+
+# 802.1Q: adiciona tag de 4 bytes ao frame
+# Native VLAN: frames sem tag (segurança: não usar VLAN 1)
+
+# Inter-VLAN Routing (Router-on-a-Stick)
+Router(config)# interface gi0/0.10
+Router(config-subif)# encapsulation dot1Q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config)# interface gi0/0.20
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Spanning Tree Protocol (STP)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>STP / RSTP</code><span class="cmd-tag">Redundância</span></div>
+            <pre><code>Problema: loops em topologias redundantes → broadcast storm
+Solução: STP bloqueia portas redundantes, mantém caminho livre de loops
+
+Eleição:
+1. Root Bridge: switch com menor Bridge ID (prioridade + MAC)
+2. Root Port: melhor caminho até o Root Bridge
+3. Designated Port: melhor porta por segmento
+4. Blocked Port: portas redundantes bloqueadas
+
+Versões:
+- STP (802.1D): convergência lenta (~50s)
+- RSTP (802.1w): convergência rápida (~1-2s)
+- PVST+: STP por VLAN (Cisco)
+
+Switch(config)# spanning-tree mode rapid-pvst
+Switch(config)# spanning-tree vlan 10 root primary</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 06 ==================== -->
+    <section id="modulo06" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 06</span>
+          <h2>Roteamento</h2>
+          <p>Roteamento estático, dinâmico (OSPF, BGP), e conceitos de encaminhamento de pacotes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Roteamento Estático</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Rotas Estáticas</code><span class="cmd-tag">Config</span></div>
+              <pre><code># Conceito: administrador define manualmente as rotas
+# Uso: redes pequenas, rotas específicas, backup
+
+# Cisco IOS
+Router(config)# ip route 10.0.0.0 255.255.255.0 192.168.1.1
+Router(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1    # default route
+
+# Linux
+ip route add 10.0.0.0/24 via 192.168.1.1
+ip route add default via 203.0.113.1
+
+# Verificação
+Router# show ip route
+Router# show ip route static
+
+Vantagens: simples, sem overhead, previsível
+Desvantagens: não escala, sem failover automático</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. OSPF (Open Shortest Path First)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>OSPF</code><span class="cmd-tag">IGP</span></div>
+              <pre><code># Protocolo Link-State, usa algoritmo Dijkstra (SPF)
+# Métrica: custo (baseado em bandwidth)
+# AD (Administrative Distance): 110
+
+# Conceitos:
+# - Áreas (Area 0 = backbone, obrigatória)
+# - LSA (Link-State Advertisements)
+# - DR/BDR (Designated Router em redes multi-acesso)
+# - Hello packets (10s em broadcast, 40s dead)
+
+# Configuração básica
+Router(config)# router ospf 1
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)# network 10.0.0.0 0.0.0.255 area 1
+Router(config-router)# passive-interface gi0/0
+
+# Verificação
+Router# show ip ospf neighbor
+Router# show ip ospf interface brief
+Router# show ip route ospf</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. BGP (Border Gateway Protocol)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>BGP</code><span class="cmd-tag">EGP</span></div>
+              <pre><code># Protocolo Path-Vector, usado entre Sistemas Autônomos (AS)
+# "O protocolo da Internet" — conecta ISPs e grandes redes
+# AD: eBGP = 20, iBGP = 200
+
+# Conceitos:
+# - AS (Autonomous System): rede sob administração única
+# - eBGP: entre ASes diferentes
+# - iBGP: dentro do mesmo AS
+# - Prefixos e AS-PATH
+# - Políticas de roteamento (route-maps, prefix-lists)
+
+# Configuração básica
+Router(config)# router bgp 65001
+Router(config-router)# neighbor 203.0.113.1 remote-as 65002
+Router(config-router)# network 192.168.0.0 mask 255.255.0.0
+Router(config-router)# address-family ipv4 unicast
+
+# Verificação
+Router# show ip bgp summary
+Router# show ip bgp
+Router# show ip bgp neighbors</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Comparação de Protocolos</code><span class="cmd-tag">Referência</span></div>
+              <div class="options-table">
+                <table>
+                  <thead><tr><th>Protocolo</th><th>Tipo</th><th>Algoritmo</th><th>Métrica</th><th>Uso</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>RIP</code></td><td>Distance-Vector</td><td>Bellman-Ford</td><td>Hop count (max 15)</td><td>Redes pequenas</td></tr>
+                    <tr><td><code>OSPF</code></td><td>Link-State</td><td>Dijkstra (SPF)</td><td>Custo (bandwidth)</td><td>Redes corporativas</td></tr>
+                    <tr><td><code>EIGRP</code></td><td>Hybrid</td><td>DUAL</td><td>Bandwidth + delay</td><td>Cisco (proprietário)</td></tr>
+                    <tr><td><code>BGP</code></td><td>Path-Vector</td><td>Best path</td><td>AS-PATH + atributos</td><td>Internet / ISPs</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 07 ==================== -->
+    <section id="modulo07" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 07</span>
+          <h2>Segurança de Redes e Firewalls</h2>
+          <p>Proteção de redes com firewalls, ACLs, IDS/IPS e boas práticas de segurança.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Access Control Lists (ACLs)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ACLs — Cisco IOS</code><span class="cmd-tag">Filtro</span></div>
+              <pre><code># ACL Standard (filtra apenas por IP de origem)
+Router(config)# access-list 10 permit 192.168.1.0 0.0.0.255
+Router(config)# access-list 10 deny any
+Router(config)# interface gi0/0
+Router(config-if)# ip access-group 10 in
+
+# ACL Extended (filtra por origem, destino, porta, protocolo)
+Router(config)# access-list 100 permit tcp 192.168.1.0 0.0.0.255 any eq 80
+Router(config)# access-list 100 permit tcp 192.168.1.0 0.0.0.255 any eq 443
+Router(config)# access-list 100 deny ip any any log
+
+# Named ACL
+Router(config)# ip access-list extended INTERNET-ACCESS
+Router(config-ext-nacl)# permit tcp any any eq 80
+Router(config-ext-nacl)# permit tcp any any eq 443
+Router(config-ext-nacl)# permit udp any any eq 53
+Router(config-ext-nacl)# deny ip any any log
+
+# Verificação
+Router# show access-lists
+Router# show ip interface gi0/0 | include access</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Firewalls Linux (iptables / ufw)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>iptables</code><span class="cmd-tag">Linux</span></div>
+              <pre><code># Chains: INPUT (entrada), OUTPUT (saída), FORWARD (encaminhamento)
+# Targets: ACCEPT, DROP, REJECT, LOG
+
+# Política padrão: bloquear tudo
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
+
+# Permitir loopback
+sudo iptables -A INPUT -i lo -j ACCEPT
+
+# Permitir conexões estabelecidas
+sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Permitir SSH, HTTP, HTTPS
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Bloquear IP específico
+sudo iptables -A INPUT -s 10.0.0.50 -j DROP
+
+# Listar e salvar
+sudo iptables -L -n -v
+sudo iptables-save > /etc/iptables/rules.v4</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>ufw (Uncomplicated Firewall)</code><span class="cmd-tag">Simples</span></div>
+              <pre><code># Frontend simplificado para iptables
+sudo ufw enable
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Regras
+sudo ufw allow 22/tcp                    # SSH
+sudo ufw allow 80,443/tcp                # Web
+sudo ufw allow from 192.168.1.0/24       # rede interna
+sudo ufw allow from 10.0.0.5 to any port 3306  # MySQL de IP específico
+sudo ufw deny from 203.0.113.0/24        # bloquear rede
+
+# Gerenciamento
+sudo ufw status verbose
+sudo ufw status numbered
+sudo ufw delete 3                        # remove regra 3
+sudo ufw reset                           # limpa tudo</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. IDS/IPS e Segurança Avançada</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IDS vs IPS</code><span class="cmd-tag">Detecção</span></div>
+              <pre><code>IDS (Intrusion Detection System):
+- Monitora e alerta (passivo)
+- Não bloqueia tráfego
+- Ferramentas: Snort, Suricata, OSSEC
+
+IPS (Intrusion Prevention System):
+- Monitora e bloqueia (ativo)
+- Inline no tráfego
+- Ferramentas: Suricata, Snort (inline)
+
+Tipos de detecção:
+- Signature-based (padrões conhecidos)
+- Anomaly-based (desvio do normal)
+- Heuristic (comportamento)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Boas Práticas</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>Defense in Depth:
+1. Segmentação (VLANs, subnets)
+2. Firewall perimetral + interno
+3. IDS/IPS
+4. Autenticação forte (802.1X)
+5. Criptografia (TLS, IPSec)
+6. Monitoramento contínuo
+7. Patch management
+8. Princípio do menor privilégio
+
+Ataques comuns:
+- ARP Spoofing → DAI (Dynamic ARP Inspection)
+- MAC Flooding → Port Security
+- VLAN Hopping → Desabilitar DTP
+- DDoS → Rate limiting, CDN</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 08 ==================== -->
+    <section id="modulo08" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 08</span>
+          <h2>Serviços de Rede: DNS, DHCP, NAT e VPN</h2>
+          <p>Serviços fundamentais que sustentam a operação de redes modernas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. DNS (Domain Name System)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Registros DNS</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code>Tipos de registro:
+  A      — Nome → IPv4           (example.com → 93.184.216.34)
+  AAAA   — Nome → IPv6           (example.com → 2606:2800:...)
+  CNAME  — Alias → outro nome    (www → example.com)
+  MX     — Mail Exchange          (prioridade + servidor de e-mail)
+  NS     — Nameserver             (ns1.example.com)
+  TXT    — Texto livre            (SPF, DKIM, verificação)
+  SOA    — Start of Authority     (info da zona)
+  PTR    — IP → Nome (reverso)    (34.216.184.93 → example.com)
+  SRV    — Serviço + porta        (_sip._tcp.example.com)
+
+Hierarquia: Root (.) → TLD (.com) → Domain (google) → Subdomain (www)
+
+Resolução:
+1. Cache local → 2. Resolver recursivo → 3. Root → 4. TLD → 5. Autoritativo</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. DHCP (Dynamic Host Configuration Protocol)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>DHCP — Processo DORA</code><span class="cmd-tag">Automático</span></div>
+              <pre><code>Processo de obtenção de IP (DORA):
+1. Discover — Cliente envia broadcast buscando servidor DHCP
+2. Offer    — Servidor oferece IP disponível
+3. Request  — Cliente aceita a oferta
+4. Acknowledge — Servidor confirma e entrega configuração
+
+Informações fornecidas:
+- Endereço IP
+- Máscara de sub-rede
+- Default Gateway
+- Servidores DNS
+- Lease time (tempo de concessão)
+
+# Configuração (Cisco IOS)
+Router(config)# ip dhcp pool LAN
+Router(dhcp-config)# network 192.168.1.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.1.1
+Router(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
+Router(dhcp-config)# lease 7
+Router(config)# ip dhcp excluded-address 192.168.1.1 192.168.1.10</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. NAT/PAT (Network Address Translation)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>NAT e PAT</code><span class="cmd-tag">Tradução</span></div>
+              <pre><code>Tipos de NAT:
+- Static NAT: 1 IP privado → 1 IP público (servidores)
+- Dynamic NAT: pool de IPs públicos compartilhados
+- PAT/NAT Overload: múltiplos IPs privados → 1 IP público (mais comum!)
+
+PAT usa portas para diferenciar conexões:
+  192.168.1.10:5001 → 203.0.113.1:40001
+  192.168.1.20:5002 → 203.0.113.1:40002
+  192.168.1.30:5003 → 203.0.113.1:40003
+
+# Configuração PAT (Cisco)
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 interface gi0/1 overload
+Router(config)# interface gi0/0
+Router(config-if)# ip nat inside
+Router(config)# interface gi0/1
+Router(config-if)# ip nat outside
+
+# Verificação
+Router# show ip nat translations
+Router# show ip nat statistics</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. VPN (Virtual Private Network)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IPSec VPN</code><span class="cmd-tag">Site-to-Site</span></div>
+              <pre><code>Fases IPSec:
+Fase 1 (IKE): estabelece canal seguro
+  - Autenticação (PSK ou certificado)
+  - Algoritmos (AES, SHA, DH group)
+  - Resultado: IKE SA
+
+Fase 2 (IPSec): túnel de dados
+  - Transform set (ESP/AH)
+  - Tráfego interessante (ACL)
+  - Resultado: IPSec SA
+
+Modos:
+- Tunnel: encapsula pacote inteiro (site-to-site)
+- Transport: apenas payload (host-to-host)
+
+Protocolos:
+- ESP: criptografia + autenticação
+- AH: apenas autenticação (sem criptografia)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>WireGuard</code><span class="cmd-tag">Moderno</span></div>
+              <p>VPN moderna, simples e de alta performance.</p>
+              <pre><code># Instalação
+sudo apt install wireguard
+
+# Gerar chaves
+wg genkey | tee privatekey | wg pubkey > publickey
+
+# /etc/wireguard/wg0.conf (Servidor)
+[Interface]
+PrivateKey = &lt;server_private_key&gt;
+Address = 10.0.0.1/24
+ListenPort = 51820
+
+[Peer]
+PublicKey = &lt;client_public_key&gt;
+AllowedIPs = 10.0.0.2/32
+
+# Ativar
+sudo wg-quick up wg0
+sudo systemctl enable wg-quick@wg0</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 09 ==================== -->
+    <section id="modulo09" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 09</span>
+          <h2>Automação de Redes com Python e Ansible</h2>
+          <p>Automatize configurações, coleta de dados e gerenciamento de dispositivos de rede.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Python para Redes — Netmiko</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Netmiko</code><span class="cmd-tag">Python</span></div>
+              <p>Biblioteca para conexão SSH com dispositivos de rede (Cisco, Juniper, Arista, etc.).</p>
+              <pre><code>from netmiko import ConnectHandler
+
+# Conexão com switch/router
+device = {
+    "device_type": "cisco_ios",
+    "host": "192.168.1.1",
+    "username": "admin",
+    "password": "senha123",
+}
+
+# Comandos show
+with ConnectHandler(**device) as conn:
+    output = conn.send_command("show ip interface brief")
+    print(output)
+
+    # Configuração
+    commands = [
+        "interface loopback 99",
+        "ip address 10.99.99.1 255.255.255.0",
+        "description Criado via Python",
+    ]
+    conn.send_config_set(commands)
+    conn.save_config()</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Paramiko</code><span class="cmd-tag">Python</span></div>
+              <p>Biblioteca SSH de baixo nível. Base do Netmiko.</p>
+              <pre><code>import paramiko
+
+# Conexão SSH direta
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect("192.168.1.1", username="admin", password="senha123")
+
+# Executar comando
+stdin, stdout, stderr = client.exec_command("show version")
+print(stdout.read().decode())
+client.close()
+
+# Automação em massa
+devices = ["192.168.1.1", "192.168.1.2", "192.168.1.3"]
+for ip in devices:
+    client.connect(ip, username="admin", password="senha123")
+    stdin, stdout, stderr = client.exec_command("show running-config")
+    with open(f"backup_{ip}.txt", "w") as f:
+        f.write(stdout.read().decode())
+    client.close()</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Ansible para Redes</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Ansible Network Automation</code><span class="cmd-tag">IaC</span></div>
+              <pre><code># inventory.yml
+all:
+  children:
+    switches:
+      hosts:
+        sw01:
+          ansible_host: 192.168.1.10
+        sw02:
+          ansible_host: 192.168.1.11
+      vars:
+        ansible_network_os: cisco.ios.ios
+        ansible_connection: ansible.netcommon.network_cli
+        ansible_user: admin
+        ansible_password: senha123
+
+---
+# playbook-vlan.yml
+- name: Configurar VLANs nos switches
+  hosts: switches
+  gather_facts: no
+  tasks:
+    - name: Criar VLAN 100
+      cisco.ios.ios_vlans:
+        config:
+          - vlan_id: 100
+            name: PRODUCAO
+            state: active
+        state: merged
+
+    - name: Backup da configuração
+      cisco.ios.ios_config:
+        backup: yes
+
+    - name: Coletar informações
+      cisco.ios.ios_facts:
+        gather_subset: all
+      register: facts
+
+    - name: Exibir hostname
+      debug:
+        msg: "{{ facts.ansible_facts.ansible_net_hostname }}"</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Execução Ansible</code><span class="cmd-tag">CLI</span></div>
+              <pre><code># Instalar collections de rede
+ansible-galaxy collection install cisco.ios
+ansible-galaxy collection install ansible.netcommon
+
+# Executar playbook
+ansible-playbook -i inventory.yml playbook-vlan.yml
+
+# Comandos ad-hoc
+ansible switches -i inventory.yml -m cisco.ios.ios_command \
+  -a "commands='show vlan brief'"
+
+# Verificar conectividade
+ansible switches -i inventory.yml -m ping</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 10 ==================== -->
+    <section id="modulo10" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 10</span>
+          <h2>SD-WAN</h2>
+          <p>Software-Defined WAN: arquitetura moderna para conectar filiais com inteligência e automação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Conceitos de SD-WAN</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>SD-WAN — Visão Geral</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code>O que é SD-WAN?
+Abstração da WAN tradicional usando software para gerenciar
+conectividade, políticas e segurança de forma centralizada.
+
+Componentes:
+- vManage: console de gerenciamento centralizado
+- vSmart: controlador de políticas e rotas
+- vBond: orquestrador (autenticação de dispositivos)
+- vEdge/cEdge: roteadores nas filiais
+
+Benefícios vs WAN tradicional:
+✓ Múltiplos links (MPLS + Internet + 4G/5G)
+✓ Seleção inteligente de caminho (por aplicação)
+✓ Gerenciamento centralizado (zero-touch provisioning)
+✓ Criptografia end-to-end (IPSec automático)
+✓ Visibilidade de aplicações (DPI)
+✓ Redução de custo (substitui MPLS por internet)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Políticas SD-WAN</code><span class="cmd-tag">QoS</span></div>
+              <pre><code>Application-Aware Routing:
+- Mede latência, jitter, perda por link
+- Direciona apps críticas pelo melhor caminho
+
+Exemplo de política:
+  VoIP/Video → Link MPLS (baixa latência)
+  ERP/CRM → Link Internet (backup: MPLS)
+  YouTube → Link Internet (rate-limited)
+  Backup → Link mais barato
+
+SLA Classes:
+  Latência < 150ms
+  Jitter < 30ms
+  Perda < 1%</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Vendors SD-WAN</code><span class="cmd-tag">Mercado</span></div>
+              <pre><code>Principais soluções:
+- Cisco Viptela/Meraki
+- VMware VeloCloud
+- Fortinet Secure SD-WAN
+- Palo Alto Prisma SD-WAN
+- Aruba EdgeConnect (HPE)
+- Versa Networks
+
+SASE (Secure Access Service Edge):
+SD-WAN + Segurança na nuvem
+- CASB, SWG, ZTNA, FWaaS
+- Vendors: Zscaler, Netskope, Cato Networks</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 11 ==================== -->
+    <section id="modulo11" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 11</span>
+          <h2>Observabilidade e Monitoramento</h2>
+          <p>SNMP, Prometheus, Grafana e ferramentas para monitorar a saúde e performance da rede.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. SNMP (Simple Network Management Protocol)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>SNMP</code><span class="cmd-tag">Protocolo</span></div>
+              <pre><code>Componentes:
+- Manager (NMS): coleta dados dos dispositivos
+- Agent: software no dispositivo que responde queries
+- MIB: banco de dados hierárquico de objetos gerenciáveis
+- OID: identificador único de cada objeto
+
+Operações:
+- GET: consulta valor de um OID
+- SET: altera valor de um OID
+- TRAP: dispositivo envia alerta ao manager
+- WALK: percorre toda a árvore MIB
+
+Versões:
+- SNMPv1: community strings (texto plano) — inseguro
+- SNMPv2c: melhorias, mas ainda sem criptografia
+- SNMPv3: autenticação + criptografia (recomendado!)
+
+# Configuração (Cisco)
+Router(config)# snmp-server community READONLY ro
+Router(config)# snmp-server community READWRITE rw
+Router(config)# snmp-server host 10.0.0.100 version 2c READONLY
+Router(config)# snmp-server enable traps
+
+# Consulta via Linux
+snmpwalk -v2c -c READONLY 192.168.1.1 system
+snmpget -v2c -c READONLY 192.168.1.1 sysUpTime.0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Prometheus + Grafana</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Prometheus</code><span class="cmd-tag">Métricas</span></div>
+              <pre><code># Prometheus: coleta e armazena métricas time-series
+# Modelo pull: Prometheus busca métricas nos targets
+
+# prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'network-devices'
+    static_configs:
+      - targets:
+          - '192.168.1.1:9116'  # SNMP Exporter
+          - '192.168.1.2:9116'
+
+  - job_name: 'snmp'
+    metrics_path: /snmp
+    params:
+      module: [if_mib]
+    static_configs:
+      - targets:
+          - 192.168.1.1
+          - 192.168.1.2
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+
+# Queries PromQL
+rate(ifHCInOctets{ifDescr="GigabitEthernet0/0"}[5m]) * 8  # bps
+ifOperStatus == 2  # interfaces down
+increase(ifInErrors[1h])  # erros na última hora</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Grafana</code><span class="cmd-tag">Dashboards</span></div>
+              <pre><code># Grafana: visualização de métricas com dashboards
+
+Dashboards de rede típicos:
+- Utilização de banda por interface
+- Status de interfaces (up/down)
+- Latência e perda de pacotes
+- Top talkers (hosts com mais tráfego)
+- Erros e descartes por porta
+- Uptime dos dispositivos
+
+Alertas:
+- Interface down → Slack/PagerDuty
+- Utilização > 80% → E-mail
+- Latência > 100ms → Ticket
+- Erros crescentes → Investigar
+
+Ferramentas complementares:
+- SNMP Exporter: bridge Prometheus ↔ SNMP
+- Blackbox Exporter: probes ICMP/HTTP/TCP
+- Node Exporter: métricas de servidores Linux</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Outras Ferramentas de Monitoramento</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Zabbix</code><span class="cmd-tag">NMS</span></div>
+              <pre><code>Plataforma completa de monitoramento:
+- SNMP, ICMP, agentes
+- Auto-discovery de dispositivos
+- Templates prontos (Cisco, Linux, etc.)
+- Mapas de rede visuais
+- Alertas e escalation
+- Relatórios e SLA</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Netflow / sFlow</code><span class="cmd-tag">Fluxo</span></div>
+              <pre><code>Análise de tráfego por fluxo:
+- Quem está comunicando com quem
+- Quais aplicações consomem banda
+- Detecção de anomalias
+
+Ferramentas:
+- ntopng
+- Elastiflow
+- PRTG
+- SolarWinds NTA
+
+# Cisco NetFlow config
+Router(config)# flow exporter EXPORT
+Router(config-flow-exporter)# destination 10.0.0.100
+Router(config-flow-exporter)# transport udp 2055</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 12 ==================== -->
+    <section id="modulo12" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 12</span>
+          <h2>Design de Redes</h2>
+          <p>Arquiteturas corporativas, modelos hierárquicos, spine-leaf e boas práticas de design.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Modelo Hierárquico de 3 Camadas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>3-Tier Architecture</code><span class="cmd-tag">Tradicional</span></div>
+              <pre><code>┌─────────────────────────────────────────────┐
+│              CORE (Núcleo)                  │
+│  Alta velocidade, redundância, sem filtros  │
+│  Equipamentos: Switches L3 de alta porta    │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────┴──────────────────────────┐
+│          DISTRIBUTION (Distribuição)         │
+│  Políticas, ACLs, QoS, inter-VLAN routing   │
+│  Equipamentos: Switches L3, Firewalls       │
+└──────────────────┬──────────────────────────┘
+                   │
+┌──────────────────┴──────────────────────────┐
+│             ACCESS (Acesso)                  │
+│  Conexão de endpoints, VLANs, PoE, 802.1X  │
+│  Equipamentos: Switches L2, Access Points   │
+└─────────────────────────────────────────────┘
+
+Princípios:
+- Cada camada tem função específica
+- Redundância em core e distribution
+- Escalabilidade horizontal no access
+- Separação de responsabilidades</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Spine-Leaf (Data Center)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Spine-Leaf Architecture</code><span class="cmd-tag">Moderno</span></div>
+              <pre><code>     [Spine 1]    [Spine 2]    [Spine 3]
+       / | \ \    / | \ \    / | \ \
+      /  |  \ \  /  |  \ \  /  |  \ \
+[Leaf1] [Leaf2] [Leaf3] [Leaf4] [Leaf5] [Leaf6]
+  |       |       |       |       |       |
+Servers Servers Servers Servers Servers Servers
+
+Características:
+- Cada leaf conecta a TODOS os spines
+- Máximo 2 saltos entre quaisquer servidores
+- Latência previsível e consistente
+- Escalabilidade: adicione mais leafs ou spines
+- Sem Spanning Tree (usa ECMP)
+
+Protocolos:
+- VXLAN: overlay para estender L2 sobre L3
+- EVPN: control plane para VXLAN
+- BGP: underlay routing (eBGP entre spine/leaf)
+
+Quando usar:
+- Data centers com tráfego East-West intenso
+- Ambientes cloud e virtualização
+- Redes que precisam escalar horizontalmente</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Boas Práticas de Design</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Alta Disponibilidade</code><span class="cmd-tag">Resiliência</span></div>
+              <pre><code>Redundância:
+- Links redundantes (LAG/LACP)
+- Equipamentos redundantes (HSRP/VRRP)
+- Caminhos múltiplos (ECMP)
+- Fontes de energia redundantes
+
+HSRP/VRRP:
+- Virtual IP compartilhado entre routers
+- Failover automático (< 3s)
+- Active/Standby
+
+Link Aggregation (LACP):
+- Múltiplos links físicos = 1 lógico
+- Balanceamento de carga
+- Tolerância a falha de link</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Documentação</code><span class="cmd-tag">Operação</span></div>
+              <pre><code>Documentação essencial:
+1. Diagrama de topologia (L1, L2, L3)
+2. Plano de endereçamento IP
+3. Inventário de equipamentos
+4. Mapa de VLANs
+5. Políticas de segurança
+6. Runbooks de troubleshooting
+7. Plano de disaster recovery
+
+Ferramentas:
+- Draw.io / Lucidchart (diagramas)
+- NetBox (IPAM + DCIM)
+- Nautobot (automação + docs)
+- Git (versionamento de configs)</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Checklist de Design</code><span class="cmd-tag">Planejamento</span></div>
+              <pre><code>Antes de implementar, responda:
+□ Quantos usuários/dispositivos? (escala)
+□ Quais aplicações críticas? (QoS)
+□ Requisitos de disponibilidade? (SLA: 99.9%? 99.99%?)
+□ Orçamento disponível? (CAPEX vs OPEX)
+□ Crescimento previsto em 3-5 anos?
+□ Requisitos de segurança e compliance?
+□ Integração com cloud (hybrid/multi-cloud)?
+□ Equipe disponível para operar?
+□ Ferramentas de monitoramento e automação?
+□ Plano de migração e rollback?</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE MATERIAIS PARA DOWNLOAD -->
+    <section id="materiais" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📥 Materiais</span>
+          <h2>Baixe o conteúdo completo em PDF</h2>
+          <p>Todo o conteúdo dos 12 módulos organizado em PDF para estudar offline, imprimir ou consultar quando precisar.</p>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span class="resource-type">PDF</span>
+            <h3>Redes: Do Zero ao Avançado</h3>
+            <p>Guia completo com todos os 12 módulos — fundamentos, OSI, subnetting, switching, roteamento, segurança, serviços, automação, SD-WAN e design.</p>
+            <form class="inline-download-form" data-material="redes-do-zero-ao-avancado.pdf">
+              <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+              <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+              <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+              <button type="submit">Baixar PDF gratuito</button>
+              <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article class="resource-card disabled">
+            <span class="resource-type">PDF</span>
+            <h3>Preparação CompTIA Network+</h3>
+            <p>Simulados e resumos alinhados ao exame CompTIA Network+ (N10-009).</p>
+            <a href="#" class="training-button">Em breve</a>
+          </article>
+
+          <article class="resource-card disabled">
+            <span class="resource-type">PDF</span>
+            <h3>Preparação CCNA 200-301</h3>
+            <p>Resumos, labs e simulados para a certificação Cisco CCNA.</p>
+            <a href="#" class="training-button">Em breve</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🎉 Parabéns!</span>
+          <h2>Trilha de Redes completa.</h2>
+          <p>O próximo passo é praticar com labs. Use Packet Tracer, GNS3 ou EVE-NG para simular topologias reais. A prática constante transforma conhecimento em habilidade.</p>
+        </div>
+        <a href="index.html" class="button primary">Explorar outras trilhas</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

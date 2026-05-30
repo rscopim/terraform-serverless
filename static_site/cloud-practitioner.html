@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — AWS Cloud Practitioner</title>
+  <meta name="description" content="Materiais, simulados e vídeos da trilha AWS Cloud Practitioner." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="aws.html" class="nav-link">AWS</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
+        <a href="#simulados" class="nav-link">Simulados</a>
+        <a href="#videos" class="nav-button">Vídeos</a>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <section class="training-hero"><div class="container training-hero-content"><span class="pill">AWS Cloud Practitioner</span><h1>Trilha de estudos para fundamentos de Cloud e AWS.</h1><p>Conteúdos organizados para apoiar seus estudos em cloud computing, fundamentos da AWS e certificação Cloud Practitioner.</p></div></section>
+
+    <section id="materiais" class="section container">
+      <div class="section-heading"><span class="eyebrow">Materiais PDF</span><h2>Materiais gratuitos da trilha.</h2><p>PDFs para apoiar seus estudos sobre conceitos de cloud, AWS CAF, segurança e precificação.</p></div>
+      <div class="resource-grid">
+        <article class="resource-card">
+          <span class="resource-type">PDF</span>
+          <h3>AWS Cloud Adoption Framework</h3>
+          <p>Material introdutório sobre adoção de cloud e organização da jornada para nuvem.</p>
+          <form class="inline-download-form" data-material="orientacoes-gerais-aws-caf.pdf">
+            <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+            <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+            <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+            <button type="submit">Baixar PDF</button>
+            <p class="form-message" role="status" aria-live="polite"></p>
+          </form>
+        </article>
+        <article class="resource-card disabled"><span class="resource-type">PDF</span><h3>Cloud Concepts</h3><p>Conceitos de cloud computing, modelos de implantação e benefícios da nuvem.</p><a href="#" class="training-button">Em breve</a></article>
+        <article class="resource-card disabled"><span class="resource-type">PDF</span><h3>AWS Pricing e Billing</h3><p>Custos, billing, modelos de preço e otimização financeira na AWS.</p><a href="#" class="training-button">Em breve</a></article>
+      </div>
+    </section>
+
+    <section id="simulados" class="section container">
+      <div class="section-heading"><span class="eyebrow">Simulados</span><h2>Pratique com questões no estilo exame.</h2><p>Simulados organizados por tema para revisar conceitos e testar seu conhecimento.</p></div>
+      <div class="resource-grid">
+        <article class="resource-card disabled"><span class="resource-type">Simulado</span><h3>Simulado 01 — Fundamentos</h3><p>Conceitos iniciais de nuvem, responsabilidade compartilhada e serviços AWS.</p><a href="#" class="training-button">Em breve</a></article>
+        <article class="resource-card disabled"><span class="resource-type">Simulado</span><h3>Simulado 02 — Segurança e Billing</h3><p>IAM, segurança, custos, suporte e modelos de cobrança.</p><a href="#" class="training-button">Em breve</a></article>
+      </div>
+    </section>
+
+    <section id="videos" class="section container">
+      <div class="section-heading"><span class="eyebrow">Vídeos</span><h2>Aulas e conteúdos recomendados.</h2><p>Vídeos organizados por trilha de estudo.</p></div>
+      <div class="resource-grid">
+        <article class="resource-card"><span class="resource-type">YouTube</span><h3>Introdução à AWS Cloud Practitioner</h3><p>Primeira aula ou vídeo recomendado da trilha.</p><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="training-button">Assistir no YouTube</a></article>
+        <article class="resource-card disabled"><span class="resource-type">YouTube</span><h3>Responsabilidade Compartilhada</h3><p>Segurança e responsabilidades entre AWS e cliente.</p><a href="#" class="training-button">Em breve</a></article>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

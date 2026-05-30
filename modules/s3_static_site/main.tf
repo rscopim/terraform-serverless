@@ -57,6 +57,22 @@ resource "aws_s3_bucket_policy" "cloudfront_private" {
   })
 }
 
+resource "aws_s3_object" "app_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "app.js"
+  source       = "${path.root}/../../static_site/app.js"
+  etag         = filemd5("${path.root}/../../static_site/app.js")
+  content_type = "application/javascript"
+}
+
+resource "aws_s3_object" "linux_training_css" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "linux-training.css"
+  source       = "${path.root}/../../static_site/linux-training.css"
+  etag         = filemd5("${path.root}/../../static_site/linux-training.css")
+  content_type = "text/css"
+}
+
 resource "aws_s3_object" "index" {
   bucket       = aws_s3_bucket.this.id
   key          = "index.html"
@@ -64,6 +80,110 @@ resource "aws_s3_object" "index" {
   content_type = "text/html"
 
   etag = filemd5(var.index_file_path)
+}
+
+resource "aws_s3_object" "aws_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "aws.html"
+  source       = "${path.root}/../../static_site/aws.html"
+  etag         = filemd5("${path.root}/../../static_site/aws.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "cloud_practitioner_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "cloud-practitioner.html"
+  source       = "${path.root}/../../static_site/cloud-practitioner.html"
+  etag         = filemd5("${path.root}/../../static_site/cloud-practitioner.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "ai_practitioner_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "ai-practitioner.html"
+  source       = "${path.root}/../../static_site/ai-practitioner.html"
+  etag         = filemd5("${path.root}/../../static_site/ai-practitioner.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "solutions_architect_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "solutions-architect.html"
+  source       = "${path.root}/../../static_site/solutions-architect.html"
+  etag         = filemd5("${path.root}/../../static_site/solutions-architect.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "about_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "about.html"
+  source       = "${path.root}/../../static_site/about.html"
+  etag         = filemd5("${path.root}/../../static_site/about.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "contact_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "contact.html"
+  source       = "${path.root}/../../static_site/contact.html"
+  etag         = filemd5("${path.root}/../../static_site/contact.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "linux_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "linux.html"
+  source       = "${path.root}/../../static_site/linux.html"
+  etag         = filemd5("${path.root}/../../static_site/linux.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "docker_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "docker.html"
+  source       = "${path.root}/../../static_site/docker.html"
+  etag         = filemd5("${path.root}/../../static_site/docker.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "terraform_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "terraform.html"
+  source       = "${path.root}/../../static_site/terraform.html"
+  etag         = filemd5("${path.root}/../../static_site/terraform.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "python_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "python.html"
+  source       = "${path.root}/../../static_site/python.html"
+  etag         = filemd5("${path.root}/../../static_site/python.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "redes_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "redes.html"
+  source       = "${path.root}/../../static_site/redes.html"
+  etag         = filemd5("${path.root}/../../static_site/redes.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "developer_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "developer.html"
+  source       = "${path.root}/../../static_site/developer.html"
+  etag         = filemd5("${path.root}/../../static_site/developer.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "solutions_architect_pro_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "solutions-architect-pro.html"
+  source       = "${path.root}/../../static_site/solutions-architect-pro.html"
+  etag         = filemd5("${path.root}/../../static_site/solutions-architect-pro.html")
+  content_type = "text/html"
 }
 
 resource "aws_s3_object" "style" {

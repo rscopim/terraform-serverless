@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Linux: Do Zero ao Avançado</title>
+  <meta name="description" content="Trilha completa de Linux: terminal, permissões, shell script, redes, serviços e automação." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="#modulo01" class="nav-link">Iniciante</a>
+        <a href="#modulo02" class="nav-link">Básico</a>
+        <a href="#modulo03" class="nav-link">Intermediário</a>
+        <a href="#modulo04" class="nav-link">Avançado</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
+        <a href="index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐧 Linux</span>
+        <h1>Linux: Do Zero ao Avançado</h1>
+        <p>Trilha completa com 5 módulos — do terminal básico à automação profissional. Domine o sistema operacional mais usado em servidores, cloud e DevOps.</p>
+        <div class="hero-actions" style="margin-top:28px">
+          <a href="#modulo01" class="button primary">Começar pelo Módulo 01</a>
+          <a href="#modulo05" class="button secondary">Ir para Avançado</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS BAR -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="#modulo01" class="progress-node active"><span>01</span><small>Iniciante</small></a>
+        <a href="#modulo02" class="progress-node"><span>02</span><small>Básico</small></a>
+        <a href="#modulo03" class="progress-node"><span>03</span><small>Intermediário</small></a>
+        <a href="#modulo04" class="progress-node"><span>04</span><small>Avançado</small></a>
+        <a href="#modulo05" class="progress-node"><span>05</span><small>Profissional</small></a>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 01 ==================== -->
+    <section id="modulo01" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 01</span>
+          <h2>Iniciante: Navegação, Arquivos e Diretórios</h2>
+          <p>O terminal é a interface de linha de comando do Linux. Dominar o terminal é essencial para administração de servidores, DevOps e cloud computing.</p>
+        </div>
+
+        <!-- Primeiros Comandos -->
+        <div class="topic-block">
+          <h3>1. Primeiros Comandos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>pwd</code><span class="cmd-tag">Navegação</span></div>
+              <p>Mostra o caminho completo do diretório atual.</p>
+              <pre><code>$ pwd
+/home/usuario</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>whoami</code><span class="cmd-tag">Info</span></div>
+              <p>Mostra o nome do usuário logado.</p>
+              <pre><code>$ whoami
+joao</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>clear</code><span class="cmd-tag">Utilidade</span></div>
+              <p>Limpa a tela do terminal. Atalho: <kbd>Ctrl+L</kbd></p>
+              <pre><code>$ clear</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>history</code><span class="cmd-tag">Utilidade</span></div>
+              <p>Mostra todos os comandos digitados. Use <code>!numero</code> para repetir.</p>
+              <pre><code>$ history
+  1  ls -la
+  2  cd /var/log
+$ !1  # repete "ls -la"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navegação -->
+        <div class="topic-block">
+          <h3>2. Navegação entre Diretórios</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ls</code><span class="cmd-tag">Essencial</span></div>
+              <p>Lista conteúdo de diretórios.</p>
+              <pre><code>ls              # Lista arquivos e pastas
+ls -l           # Formato detalhado (permissões, dono, tamanho)
+ls -la          # Inclui arquivos ocultos (começam com .)
+ls -lh          # Tamanhos legíveis (KB, MB, GB)
+ls -ltr         # Ordenado por data (mais antigo primeiro)</code></pre>
+              <div class="options-table">
+                <table>
+                  <tr><td><code>-l</code></td><td>Formato longo</td></tr>
+                  <tr><td><code>-a</code></td><td>Arquivos ocultos</td></tr>
+                  <tr><td><code>-h</code></td><td>Tamanhos legíveis</td></tr>
+                  <tr><td><code>-t</code></td><td>Ordena por data</td></tr>
+                  <tr><td><code>-R</code></td><td>Recursivo</td></tr>
+                  <tr><td><code>-S</code></td><td>Ordena por tamanho</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>cd</code><span class="cmd-tag">Essencial</span></div>
+              <p>Muda de diretório.</p>
+              <pre><code>cd /home/usuario     # Caminho absoluto
+cd Documents         # Caminho relativo
+cd ..                # Volta um nível
+cd ~                 # Vai para o home
+cd -                 # Volta ao último diretório</code></pre>
+              <div class="info-box">
+                <strong>Conceitos:</strong> Caminho absoluto começa com <code>/</code>. Caminho relativo é a partir de onde você está. <code>~</code> = home, <code>.</code> = atual, <code>..</code> = pai.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Criação e Manipulação -->
+        <div class="topic-block">
+          <h3>3. Criação e Manipulação de Arquivos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>touch</code><span class="cmd-tag">Criar</span></div>
+              <p>Cria arquivo vazio ou atualiza timestamp.</p>
+              <pre><code>touch arquivo.txt
+touch file1.txt file2.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>mkdir</code><span class="cmd-tag">Criar</span></div>
+              <p>Cria diretórios. Use <code>-p</code> para criar estrutura completa.</p>
+              <pre><code>mkdir projetos
+mkdir -p pai/filho/neto</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>cp</code><span class="cmd-tag">Copiar</span></div>
+              <p>Copia arquivos e diretórios.</p>
+              <pre><code>cp arquivo.txt copia.txt
+cp -r pasta/ destino/
+cp -i arquivo.txt destino/  # confirmação</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>mv</code><span class="cmd-tag">Mover</span></div>
+              <p>Move ou renomeia arquivos.</p>
+              <pre><code>mv arquivo.txt /tmp/
+mv antigo.txt novo.txt  # renomeia</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>rm</code><span class="cmd-tag danger">Remover</span></div>
+              <p>Remove permanentemente. <strong>Não existe lixeira!</strong></p>
+              <pre><code>rm arquivo.txt
+rm -r pasta/       # recursivo
+rm -rf pasta/      # forçado (PERIGOSO!)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>find</code><span class="cmd-tag">Busca</span></div>
+              <p>Busca arquivos no sistema de arquivos.</p>
+              <pre><code>find /home -name "*.txt"
+find . -type f -size +100M
+find . -mtime -7  # últimos 7 dias</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualização -->
+        <div class="topic-block">
+          <h3>4. Visualização de Conteúdo</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>cat</code><span class="cmd-tag">Leitura</span></div>
+              <p>Exibe conteúdo completo do arquivo.</p>
+              <pre><code>cat arquivo.txt
+cat -n arquivo.txt  # com números</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>less</code><span class="cmd-tag">Leitura</span></div>
+              <p>Visualiza com paginação. Ideal para arquivos grandes.</p>
+              <pre><code>less arquivo_grande.txt
+# Espaço=avança, b=volta, /=busca, q=sai</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>head / tail</code><span class="cmd-tag">Leitura</span></div>
+              <p>Mostra início ou final do arquivo.</p>
+              <pre><code>head -20 arquivo.txt   # 20 primeiras
+tail -f /var/log/syslog  # tempo real!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tar</code><span class="cmd-tag">Compactação</span></div>
+              <p>Empacota e compacta arquivos.</p>
+              <pre><code>tar -czvf backup.tar.gz pasta/
+tar -xzvf backup.tar.gz</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 02 ==================== -->
+    <section id="modulo02" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 02</span>
+          <h2>Básico: Permissões, Usuários e Processos</h2>
+          <p>O Linux é multiusuário. Cada arquivo tem dono, grupo e permissões que controlam quem pode ler, escrever ou executar.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Sistema de Permissões</h3>
+          <div class="info-box highlight">
+            <strong>Entendendo <code>ls -l</code>:</strong>
+            <pre><code>-rwxr-xr-- 1 joao devs 4096 Jan 15 10:30 script.sh
+│ │   │   │        │         │
+│ │   │   │        │         └─ Nome
+│ │   │   └─ Outros (r--)    └─ Grupo dono
+│ │   └─ Grupo (r-x)
+│ └─ Dono (rwx)
+└─ Tipo (- arquivo, d diretório, l link)</code></pre>
+          </div>
+          <div class="permissions-table">
+            <table>
+              <thead><tr><th>Octal</th><th>Permissões</th><th>Uso típico</th></tr></thead>
+              <tbody>
+                <tr><td><code>755</code></td><td>rwxr-xr-x</td><td>Scripts, diretórios</td></tr>
+                <tr><td><code>644</code></td><td>rw-r--r--</td><td>Arquivos de texto, configs</td></tr>
+                <tr><td><code>700</code></td><td>rwx------</td><td>Arquivos privados</td></tr>
+                <tr><td><code>600</code></td><td>rw-------</td><td>Chaves SSH, senhas</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>chmod</code><span class="cmd-tag">Permissões</span></div>
+              <p>Altera permissões de arquivos e diretórios.</p>
+              <pre><code>chmod 755 script.sh        # dono=rwx, grupo=r-x, outros=r-x
+chmod 600 chave_privada    # apenas dono lê/escreve
+chmod u+x script.sh        # adiciona execução ao dono
+chmod -R 755 pasta/        # recursivo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>chown</code><span class="cmd-tag">Propriedade</span></div>
+              <p>Altera dono e grupo.</p>
+              <pre><code>chown joao arquivo.txt
+chown joao:devs arquivo.txt
+chown -R joao:devs pasta/</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Gerenciamento de Usuários</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>useradd</code><span class="cmd-tag">Usuários</span></div>
+              <pre><code>sudo useradd -m -s /bin/bash joao
+sudo useradd -m -G sudo,docker joao</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>usermod</code><span class="cmd-tag">Usuários</span></div>
+              <pre><code>sudo usermod -aG docker joao  # SEMPRE -aG!
+sudo usermod -aG sudo joao</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>passwd</code><span class="cmd-tag">Senha</span></div>
+              <pre><code>passwd              # sua senha
+sudo passwd joao    # senha de outro</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>id / groups</code><span class="cmd-tag">Consulta</span></div>
+              <pre><code>id joao
+groups joao
+who     # quem está logado</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Gerenciamento de Processos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ps aux</code><span class="cmd-tag">Essencial</span></div>
+              <p>Lista todos os processos do sistema.</p>
+              <pre><code>ps aux                    # todos os processos
+ps aux | grep nginx       # filtra por nome
+ps aux --sort=-%cpu | head -10  # top 10 CPU</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>kill</code><span class="cmd-tag danger">Processos</span></div>
+              <pre><code>kill 1234       # TERM (gracioso)
+kill -9 1234    # KILL (forçado)
+killall nginx   # mata por nome</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>top / htop</code><span class="cmd-tag">Monitor</span></div>
+              <p>Monitor em tempo real. <kbd>q</kbd>=sair, <kbd>M</kbd>=memória, <kbd>P</kbd>=CPU.</p>
+              <pre><code>top
+htop  # versão melhorada</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Background</code><span class="cmd-tag">Jobs</span></div>
+              <pre><code>comando &        # executa em background
+jobs             # lista jobs
+fg %1            # traz para frente
+nohup ./script.sh &  # sobrevive ao logout</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 03 ==================== -->
+    <section id="modulo03" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 03</span>
+          <h2>Intermediário: Pipes, Filtros e Shell Script</h2>
+          <p>Redirecionamento, pipes e processamento de texto são os conceitos mais poderosos do Linux.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Redirecionamento e Pipes</h3>
+          <div class="info-box">
+            <strong>3 canais:</strong> stdin (0) = entrada, stdout (1) = saída, stderr (2) = erros
+          </div>
+          <div class="command-card wide" style="margin-top:16px">
+            <div class="command-header"><code>Redirecionamento</code><span class="cmd-tag">Core</span></div>
+            <pre><code>echo "Hello" > arquivo.txt       # sobrescreve
+echo "World" >> arquivo.txt      # adiciona ao final
+find / -name "*.conf" 2>/dev/null  # descarta erros
+comando > saida.txt 2>&1          # stdout + stderr no arquivo
+ls -la | less                     # pipe: saída vira entrada
+ps aux | grep nginx | wc -l      # encadeia múltiplos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Filtros de Texto</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>grep</code><span class="cmd-tag">Essencial</span></div>
+              <p>Busca padrões em texto. O comando mais usado no dia a dia.</p>
+              <pre><code>grep "erro" /var/log/syslog        # busca texto
+grep -i "error" log.txt            # ignora case
+grep -r "TODO" /projeto/           # recursivo
+grep -n "function" script.js       # com número da linha
+grep -v "debug" log.txt            # inverte (NÃO contém)
+grep -c "error" log.txt            # conta ocorrências
+grep -E "error|warning" log.txt    # múltiplos padrões</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>sed</code><span class="cmd-tag">Edição</span></div>
+              <p>Editor de fluxo — substitui texto.</p>
+              <pre><code>sed 's/antigo/novo/g' arquivo.txt
+sed -i 's/localhost/192.168.1.100/g' config.conf
+sed '/^#/d' config.conf  # remove comentários
+sed -n '10,20p' arquivo.txt  # linhas 10-20</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>awk</code><span class="cmd-tag">Processamento</span></div>
+              <p>Processamento avançado por colunas.</p>
+              <pre><code>awk '{print $1}' arquivo.txt       # coluna 1
+awk -F: '{print $1}' /etc/passwd   # separador :
+ps aux | awk '{print $1, $2, $11}' # user, PID, cmd
+df -h | awk '{print $1, $5}'       # filesystem e %</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>sort / uniq / cut</code><span class="cmd-tag">Filtros</span></div>
+              <pre><code>sort -n numeros.txt         # ordena numérico
+sort arquivo.txt | uniq -c  # conta duplicatas
+cut -d: -f1 /etc/passwd     # recorta campo 1
+du -sh * | sort -rh | head  # top maiores</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Shell Script — Introdução</h3>
+          <div class="command-card wide" style="margin-bottom:16px">
+            <div class="command-header"><code>Variáveis e Estrutura</code><span class="cmd-tag">Script</span></div>
+            <pre><code>#!/bin/bash
+NOME="João"
+DATA=$(date +%Y-%m-%d)
+echo "Olá $NOME, hoje é $DATA"
+echo "Argumentos: $1 $2 (total: $#)"</code></pre>
+          </div>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>if / else</code><span class="cmd-tag">Condicional</span></div>
+              <pre><code>if [ -f "/etc/passwd" ]; then
+    echo "Arquivo existe!"
+elif [ -d "/tmp" ]; then
+    echo "Diretório existe"
+else
+    echo "Não encontrado"
+fi
+
+# Comparações numéricas:
+# -eq -ne -gt -lt -ge -le</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>for / while</code><span class="cmd-tag">Loops</span></div>
+              <pre><code>for f in /var/log/*.log; do
+    echo "Processando: $f"
+    wc -l "$f"
+done
+
+CONT=1
+while [ $CONT -le 5 ]; do
+    echo "Contagem: $CONT"
+    CONT=$((CONT + 1))
+done</code></pre>
+            </div>
+          </div>
+          <div class="command-card wide" style="margin-top:16px">
+            <div class="command-header"><code>Script Prático: Backup</code><span class="cmd-tag">Exemplo Real</span></div>
+            <pre><code>#!/bin/bash
+# backup.sh - Backup automatizado
+ORIGEM=${1:-"/home"}
+DESTINO=${2:-"/backup"}
+DATA=$(date +%Y%m%d_%H%M%S)
+
+log() { echo "[$(date '+%H:%M:%S')] $1"; }
+
+[ ! -d "$DESTINO" ] && mkdir -p "$DESTINO"
+
+log "Iniciando backup de $ORIGEM"
+tar -czvf "${DESTINO}/backup_${DATA}.tar.gz" "$ORIGEM"
+
+if [ $? -eq 0 ]; then
+    log "✅ Backup concluído!"
+else
+    log "❌ Falha no backup!"
+    exit 1
+fi
+
+# Remove backups > 7 dias
+find "$DESTINO" -name "backup_*.tar.gz" -mtime +7 -delete</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 04 ==================== -->
+    <section id="modulo04" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 04</span>
+          <h2>Avançado: Redes, Serviços e Pacotes</h2>
+          <p>Configuração de rede, gerenciamento de serviços com systemd, SSH e gerenciamento de pacotes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Rede e Diagnóstico</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ip addr / ip route</code><span class="cmd-tag">Rede</span></div>
+              <pre><code>ip addr show          # interfaces e IPs
+ip route show         # tabela de rotas
+ip link set eth0 up   # ativa interface</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ping / traceroute</code><span class="cmd-tag">Diagnóstico</span></div>
+              <pre><code>ping -c 4 google.com
+traceroute google.com
+# ttl, latência, saltos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ss / netstat</code><span class="cmd-tag">Conexões</span></div>
+              <pre><code>ss -tuln              # portas em escuta
+ss -tunap             # com PID do processo
+ss -tuln | grep :80   # quem usa porta 80</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>curl</code><span class="cmd-tag">HTTP</span></div>
+              <pre><code>curl https://api.github.com
+curl -I https://google.com   # headers
+curl -X POST -d "data" url
+curl -H "Auth: Bearer TOKEN" url</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>nslookup / dig</code><span class="cmd-tag">DNS</span></div>
+              <pre><code>nslookup google.com
+dig google.com +short
+dig google.com MX     # registros email</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ufw (Firewall)</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>sudo ufw enable
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw status</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Serviços (systemd)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>systemctl</code><span class="cmd-tag">Essencial</span></div>
+            <pre><code>sudo systemctl status nginx       # status detalhado
+sudo systemctl start nginx        # inicia
+sudo systemctl stop nginx         # para
+sudo systemctl restart nginx      # reinicia
+sudo systemctl reload nginx       # recarrega config
+sudo systemctl enable nginx       # inicia no boot
+sudo systemctl enable --now nginx # habilita E inicia
+
+# Logs do serviço
+sudo journalctl -u nginx -f       # tempo real
+sudo journalctl -u nginx --since "1 hour ago"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. SSH e Transferência</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ssh</code><span class="cmd-tag">Remoto</span></div>
+              <pre><code>ssh usuario@192.168.1.100
+ssh -p 2222 user@servidor.com
+ssh -i ~/.ssh/chave user@host</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ssh-keygen</code><span class="cmd-tag">Chaves</span></div>
+              <pre><code>ssh-keygen -t ed25519 -C "email"
+ssh-copy-id usuario@servidor
+# Login sem senha!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>scp / rsync</code><span class="cmd-tag">Transferência</span></div>
+              <pre><code>scp arquivo.txt user@srv:/home/
+scp -r pasta/ user@srv:/opt/
+rsync -avz pasta/ user@srv:/backup/
+rsync -avz --delete origem/ destino/</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cron</code><span class="cmd-tag">Agendamento</span></div>
+              <pre><code>crontab -e    # editar
+crontab -l    # listar
+# min hora dia mês semana comando
+30 2 * * * /scripts/backup.sh
+*/5 * * * * /scripts/monitor.sh
+0 8 * * 1-5 /scripts/relatorio.sh</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Gerenciamento de Pacotes</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>APT (Debian/Ubuntu)</code><span class="cmd-tag">Pacotes</span></div>
+              <pre><code>sudo apt update
+sudo apt upgrade
+sudo apt install nginx
+sudo apt remove nginx
+sudo apt autoremove
+apt search nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DNF/YUM (RHEL)</code><span class="cmd-tag">Pacotes</span></div>
+              <pre><code>sudo dnf update
+sudo dnf install nginx
+sudo dnf remove nginx
+sudo dnf search nginx
+sudo dnf list installed</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 05 ==================== -->
+    <section id="modulo05" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 05</span>
+          <h2>Profissional: Automação, Monitoramento e Troubleshooting</h2>
+          <p>Ferramentas de performance, análise de logs, Docker, segurança e automação de nível profissional.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Monitoramento de Performance</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>vmstat / iostat</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>vmstat 2          # a cada 2s
+iostat -x 2       # I/O detalhado
+# %util > 80% = gargalo de disco</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>lsof</code><span class="cmd-tag">Diagnóstico</span></div>
+              <pre><code>lsof -i :80       # quem usa porta 80
+lsof -u joao      # arquivos do user
+lsof -p 1234      # arquivos do PID</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tcpdump</code><span class="cmd-tag">Rede</span></div>
+              <pre><code>sudo tcpdump -i eth0 port 80
+sudo tcpdump -i any -c 100
+sudo tcpdump -w captura.pcap</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>dmesg</code><span class="cmd-tag">Kernel</span></div>
+              <pre><code>dmesg -T | grep -i error
+dmesg -w  # tempo real</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Troubleshooting — Checklists</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>🌐 Servidor não responde</h4>
+              <ol>
+                <li><code>ip link show</code> — interface UP?</li>
+                <li><code>ping gateway</code> — conectividade local?</li>
+                <li><code>nslookup</code> — DNS funciona?</li>
+                <li><code>ip route show</code> — rotas OK?</li>
+                <li><code>ufw status</code> — firewall bloqueando?</li>
+                <li><code>ss -tuln</code> — serviço escutando?</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>🐌 Servidor lento</h4>
+              <ol>
+                <li><code>uptime</code> — load average</li>
+                <li><code>top</code> — CPU/memória</li>
+                <li><code>iostat -x 2</code> — disco</li>
+                <li><code>free -h</code> — swap em uso?</li>
+                <li><code>ps aux --sort=-%cpu | head</code></li>
+                <li><code>iotop</code> — I/O por processo</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>💾 Disco cheio</h4>
+              <ol>
+                <li><code>df -h</code> — uso geral</li>
+                <li><code>du -sh /* | sort -rh | head</code></li>
+                <li><code>find / -size +100M</code></li>
+                <li><code>du -sh /var/log/*</code></li>
+                <li><code>sudo apt clean</code></li>
+                <li><code>df -i</code> — inodes</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Docker Essencial</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Docker</code><span class="cmd-tag">Containers</span></div>
+            <pre><code># Imagens e Containers
+docker pull nginx
+docker run -d --name web -p 8080:80 nginx
+docker ps                    # containers rodando
+docker ps -a                 # todos
+docker exec -it web bash     # shell dentro do container
+docker logs -f web           # logs em tempo real
+docker stop web && docker rm web
+
+# Docker Compose
+docker compose up -d         # inicia serviços
+docker compose down          # para tudo
+docker compose logs -f       # logs
+
+# Limpeza
+docker system prune -a       # remove tudo não usado</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Segurança do Servidor</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>SSH Hardening</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+Port 2222
+MaxAuthTries 3
+AllowUsers deploy admin</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Fail2ban</code><span class="cmd-tag">Proteção</span></div>
+              <pre><code>sudo apt install fail2ban
+sudo systemctl enable --now fail2ban
+sudo fail2ban-client status sshd
+# Bane IPs após 3 tentativas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Auditoria</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>find / -perm -4000 -type f  # SUID
+find / -perm -777 -type f  # 777 (inseguro)
+last -10                   # últimos logins
+lastb -10                  # logins falhados</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tmux</code><span class="cmd-tag">Produtividade</span></div>
+              <pre><code>tmux new -s deploy    # nova sessão
+tmux ls               # lista sessões
+tmux attach -t deploy # reconecta
+# Ctrl+B, D = desconecta
+# Ctrl+B, % = divide vertical</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5. Comandos Mais Cobrados em Entrevistas</h3>
+          <div class="interview-table">
+            <table>
+              <thead><tr><th>Categoria</th><th>Comandos</th></tr></thead>
+              <tbody>
+                <tr><td>Navegação</td><td><code>cd, ls, pwd, find, locate</code></td></tr>
+                <tr><td>Arquivos</td><td><code>cp, mv, rm, mkdir, touch, tar</code></td></tr>
+                <tr><td>Texto</td><td><code>cat, grep, sed, awk, cut, sort, uniq</code></td></tr>
+                <tr><td>Permissões</td><td><code>chmod, chown, chgrp</code></td></tr>
+                <tr><td>Processos</td><td><code>ps, top, kill, systemctl, journalctl</code></td></tr>
+                <tr><td>Rede</td><td><code>ip, ss, ping, curl, nmap, tcpdump</code></td></tr>
+                <tr><td>SSH</td><td><code>ssh, scp, rsync, ssh-keygen</code></td></tr>
+                <tr><td>Docker</td><td><code>docker run, ps, exec, compose</code></td></tr>
+                <tr><td>Disco</td><td><code>df, du, mount, lsblk</code></td></tr>
+                <tr><td>Scripting</td><td><code>bash, if, for, while, funções</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE MATERIAIS PARA DOWNLOAD -->
+    <section id="materiais" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📥 Materiais</span>
+          <h2>Baixe o conteúdo completo em PDF</h2>
+          <p>Todo o conteúdo dos 5 módulos organizado em um PDF para estudar offline, imprimir ou consultar quando precisar.</p>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span class="resource-type">PDF</span>
+            <h3>Linux: Do Zero ao Avançado</h3>
+            <p>Guia completo com todos os 5 módulos — terminal, permissões, shell script, redes, serviços, Docker, segurança e troubleshooting.</p>
+            <form class="inline-download-form" data-material="linux-do-zero-ao-avancado.pdf">
+              <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+              <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+              <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+              <button type="submit">Baixar PDF gratuito</button>
+              <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article class="resource-card disabled">
+            <span class="resource-type">PDF</span>
+            <h3>Shell Script — Receitas Prontas</h3>
+            <p>Coleção de scripts prontos para backup, monitoramento, deploy e automação do dia a dia.</p>
+            <a href="#" class="training-button">Em breve</a>
+          </article>
+
+          <article class="resource-card disabled">
+            <span class="resource-type">PDF</span>
+            <h3>Preparação LPIC-1</h3>
+            <p>Simulados e resumos alinhados ao exame LPIC-1 / CompTIA Linux+.</p>
+            <a href="#" class="training-button">Em breve</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🎉 Parabéns!</span>
+          <h2>Trilha Linux completa.</h2>
+          <p>O próximo passo é praticar diariamente. Monte um servidor (VM ou VPS) e use como laboratório. A prática constante transforma conhecimento em habilidade.</p>
+        </div>
+        <a href="index.html" class="button primary">Explorar outras trilhas</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -22,6 +22,6 @@ variable "dynamodb_table_arn" {
   type = string
 }
 
-variable "pdf_url" {
+variable "pdf_base_url" {
   type = string
 }

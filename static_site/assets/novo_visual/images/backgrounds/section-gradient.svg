@@ -1,0 +1,16 @@
+<svg width="1400" height="400" viewBox="0 0 1400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="sectionOrb1" cx="0.2" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sectionOrb2" cx="0.8" cy="0.3" r="0.4">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1400" height="400" fill="#f4f4f5"/>
+  <ellipse cx="280" cy="200" rx="400" ry="250" fill="url(#sectionOrb1)"/>
+  <ellipse cx="1100" cy="150" rx="350" ry="200" fill="url(#sectionOrb2)"/>
+</svg>

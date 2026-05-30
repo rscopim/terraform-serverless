@@ -1,0 +1,81 @@
+<svg width="500" height="360" viewBox="0 0 500 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lpTrail" x1="40" y1="180" x2="460" y2="180">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="25%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="75%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="lpGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
+      <feComposite in="SourceGraphic" operator="over"/>
+    </filter>
+    <filter id="nodeGlow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#6366f1" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Trilha principal curvada -->
+  <path d="M50 280C100 280 120 180 170 180C220 180 220 260 270 260C320 260 320 140 370 140C420 140 440 80 470 60" 
+    stroke="url(#lpTrail)" stroke-width="4" stroke-linecap="round" fill="none" filter="url(#lpGlow)"/>
+
+  <!-- Trilha fantasma (sombra) -->
+  <path d="M50 280C100 280 120 180 170 180C220 180 220 260 270 260C320 260 320 140 370 140C420 140 440 80 470 60" 
+    stroke="url(#lpTrail)" stroke-width="12" stroke-linecap="round" fill="none" opacity="0.06"/>
+
+  <!-- NODE 1: Início -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="50" cy="280" r="22" fill="white" stroke="#a855f7" stroke-width="2.5"/>
+    <circle cx="50" cy="280" r="8" fill="#a855f7" opacity="0.15"/>
+    <text x="50" y="284" text-anchor="middle" font-size="16">🚀</text>
+  </g>
+  <text x="50" y="315" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#a855f7">Início</text>
+  <text x="50" y="328" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#71717a">Fundamentos</text>
+
+  <!-- NODE 2: Cloud Practitioner -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="170" cy="180" r="26" fill="white" stroke="#6366f1" stroke-width="2.5"/>
+    <circle cx="170" cy="180" r="10" fill="#6366f1" opacity="0.1"/>
+    <text x="170" y="185" text-anchor="middle" font-size="18">☁️</text>
+  </g>
+  <text x="170" y="220" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#6366f1">Cloud</text>
+  <text x="170" y="233" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#71717a">Practitioner</text>
+
+  <!-- NODE 3: AI Practitioner -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="270" cy="260" r="26" fill="white" stroke="#06b6d4" stroke-width="2.5"/>
+    <circle cx="270" cy="260" r="10" fill="#06b6d4" opacity="0.1"/>
+    <text x="270" y="265" text-anchor="middle" font-size="18">🤖</text>
+  </g>
+  <text x="270" y="300" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#06b6d4">AI</text>
+  <text x="270" y="313" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#71717a">Practitioner</text>
+
+  <!-- NODE 4: Solutions Architect -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="370" cy="140" r="28" fill="white" stroke="#10b981" stroke-width="2.5"/>
+    <circle cx="370" cy="140" r="11" fill="#10b981" opacity="0.1"/>
+    <text x="370" y="145" text-anchor="middle" font-size="18">🏗️</text>
+  </g>
+  <text x="370" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#10b981">Solutions</text>
+  <text x="370" y="193" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#71717a">Architect</text>
+
+  <!-- NODE 5: Expert -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="470" cy="60" r="30" fill="white" stroke="#f59e0b" stroke-width="3"/>
+    <circle cx="470" cy="60" r="14" fill="#f59e0b" opacity="0.08"/>
+    <text x="470" y="66" text-anchor="middle" font-size="22">⭐</text>
+  </g>
+  <text x="470" y="104" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="800" fill="#f59e0b">Expert</text>
+
+  <!-- Partículas ao longo da trilha -->
+  <circle cx="110" cy="230" r="3" fill="#a855f7" opacity="0.3"/>
+  <circle cx="220" cy="220" r="2.5" fill="#6366f1" opacity="0.3"/>
+  <circle cx="320" cy="200" r="3" fill="#06b6d4" opacity="0.3"/>
+  <circle cx="420" cy="100" r="2.5" fill="#10b981" opacity="0.3"/>
+
+  <!-- Sparkles decorativos -->
+  <path d="M130 140L131.5 143L135 143.5L132.5 146L133 149L130 147.5L127 149L127.5 146L125 143.5L128.5 143Z" fill="#6366f1" opacity="0.3"/>
+  <path d="M430 40L431 42L433 42.5L431.5 44L432 46L430 45L428 46L428.5 44L427 42.5L429 42Z" fill="#f59e0b" opacity="0.5"/>
+  <path d="M310 300L311 302L313 302.5L311.5 304L312 306L310 305L308 306L308.5 304L307 302.5L309 302Z" fill="#06b6d4" opacity="0.3"/>
+</svg>

@@ -1,0 +1,133 @@
+<svg width="560" height="480" viewBox="0 0 560 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="heroOrb1" x1="200" y1="100" x2="400" y2="380">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="heroOrb2" x1="100" y1="200" x2="460" y2="300">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#f0abfc" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="mainCloud" x1="180" y1="120" x2="380" y2="260">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+    <linearGradient id="cloudStroke" x1="180" y1="140" x2="380" y2="240">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="trailMain" x1="120" y1="320" x2="440" y2="320">
+      <stop offset="0%" stop-color="#f0abfc"/>
+      <stop offset="30%" stop-color="#6366f1"/>
+      <stop offset="70%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <filter id="heroGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="bigGlow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dy="4"/>
+      <feFlood flood-color="#6366f1" flood-opacity="0.15"/>
+      <feComposite in2="SourceAlpha" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Orbs de fundo -->
+  <ellipse cx="280" cy="240" rx="220" ry="200" fill="url(#heroOrb1)"/>
+  <ellipse cx="320" cy="200" rx="180" ry="160" fill="url(#heroOrb2)"/>
+
+  <!-- Órbitas -->
+  <ellipse cx="280" cy="220" rx="240" ry="180" stroke="#6366f1" stroke-width="0.6" stroke-dasharray="8 12" opacity="0.12" fill="none"/>
+  <ellipse cx="280" cy="220" rx="180" ry="130" stroke="#06b6d4" stroke-width="0.6" stroke-dasharray="6 10" opacity="0.1" fill="none"/>
+  <ellipse cx="280" cy="220" rx="120" ry="85" stroke="#a855f7" stroke-width="0.6" stroke-dasharray="4 8" opacity="0.08" fill="none"/>
+
+  <!-- Nuvem principal grande -->
+  <path d="M180 240H380C400 240 416 224 416 204C416 184 400 168 380 168C372 148 352 136 328 136C296 136 270 160 268 190C248 192 234 208 234 226C234 234 240 240 250 240" 
+    fill="url(#mainCloud)" stroke="url(#cloudStroke)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#bigGlow)"/>
+
+  <!-- Reflexo na nuvem -->
+  <path d="M270 170C280 160 310 155 340 165" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Serviços AWS como nodes flutuantes -->
+  <!-- Lambda -->
+  <g filter="url(#heroGlow)">
+    <rect x="140" y="280" width="50" height="50" rx="14" fill="white" stroke="#6366f1" stroke-width="1.5"/>
+    <text x="165" y="312" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#6366f1">λ</text>
+  </g>
+
+  <!-- API -->
+  <g filter="url(#heroGlow)">
+    <rect x="220" y="300" width="50" height="50" rx="14" fill="white" stroke="#06b6d4" stroke-width="1.5"/>
+    <path d="M237 318H253M237 325H253M237 332H248" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Database -->
+  <g filter="url(#heroGlow)">
+    <rect x="310" y="290" width="50" height="50" rx="14" fill="white" stroke="#a855f7" stroke-width="1.5"/>
+    <ellipse cx="335" cy="308" rx="12" ry="5" stroke="#a855f7" stroke-width="1.5" fill="none"/>
+    <path d="M323 308V322C323 325 328 327 335 327C342 327 347 325 347 322V308" stroke="#a855f7" stroke-width="1.5"/>
+    <path d="M323 315C323 318 328 320 335 320C342 320 347 318 347 315" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- S3 -->
+  <g filter="url(#heroGlow)">
+    <rect x="390" y="260" width="50" height="50" rx="14" fill="white" stroke="#10b981" stroke-width="1.5"/>
+    <path d="M407 278H433M407 285H433M407 292H425" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="410" cy="278" r="2" fill="#10b981"/>
+    <circle cx="410" cy="285" r="2" fill="#10b981"/>
+    <circle cx="410" cy="292" r="2" fill="#10b981"/>
+  </g>
+
+  <!-- Conexões entre nodes -->
+  <path d="M190 305C205 305 210 320 220 325" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+  <path d="M270 325C285 325 300 315 310 315" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+  <path d="M360 310C375 305 380 290 390 285" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+
+  <!-- Conexões da nuvem para os nodes -->
+  <path d="M220 240C200 260 170 270 165 280" stroke="#6366f1" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+  <path d="M280 240C270 270 255 290 245 300" stroke="#06b6d4" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+  <path d="M340 240C340 260 335 280 335 290" stroke="#a855f7" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+  <path d="M380 240C390 255 400 265 415 260" stroke="#10b981" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+
+  <!-- Trilha luminosa na base -->
+  <path d="M80 400C140 380 200 390 260 370C320 350 380 360 440 380C480 390 500 400 520 395" 
+    stroke="url(#trailMain)" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#heroGlow)"/>
+
+  <!-- Pontos de energia na trilha -->
+  <circle cx="140" cy="385" r="5" fill="#f0abfc" opacity="0.7"/>
+  <circle cx="140" cy="385" r="9" fill="#f0abfc" opacity="0.15"/>
+
+  <circle cx="260" cy="370" r="6" fill="#6366f1" opacity="0.8"/>
+  <circle cx="260" cy="370" r="11" fill="#6366f1" opacity="0.12"/>
+
+  <circle cx="380" cy="362" r="5" fill="#06b6d4" opacity="0.8"/>
+  <circle cx="380" cy="362" r="9" fill="#06b6d4" opacity="0.15"/>
+
+  <circle cx="480" cy="388" r="5" fill="#67e8f9" opacity="0.7"/>
+  <circle cx="480" cy="388" r="9" fill="#67e8f9" opacity="0.12"/>
+
+  <!-- Partículas flutuantes -->
+  <circle cx="100" cy="140" r="3" fill="#6366f1" opacity="0.25"/>
+  <circle cx="460" cy="120" r="4" fill="#06b6d4" opacity="0.2"/>
+  <circle cx="80" cy="300" r="2.5" fill="#a855f7" opacity="0.3"/>
+  <circle cx="500" cy="340" r="3" fill="#67e8f9" opacity="0.25"/>
+  <circle cx="450" cy="180" r="2" fill="#f0abfc" opacity="0.3"/>
+  <circle cx="120" cy="220" r="2.5" fill="#818cf8" opacity="0.2"/>
+
+  <!-- Estrelas/sparks -->
+  <path d="M420 130L422 134L426 135L423 137L424 141L420 139L416 141L417 137L414 135L418 134Z" fill="#f59e0b" opacity="0.5"/>
+  <path d="M130 170L131.5 173L135 173.5L132.5 176L133 179L130 177.5L127 179L127.5 176L125 173.5L128.5 173Z" fill="#06b6d4" opacity="0.4"/>
+  <path d="M480 200L481 202L483 202.5L481.5 204L482 206L480 205L478 206L478.5 204L477 202.5L479 202Z" fill="#a855f7" opacity="0.4"/>
+
+  <!-- Labels nos nodes -->
+  <text x="165" y="345" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#6366f1" opacity="0.8">Lambda</text>
+  <text x="245" y="365" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#06b6d4" opacity="0.8">API</text>
+  <text x="335" y="355" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#a855f7" opacity="0.8">DynamoDB</text>
+  <text x="415" y="325" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#10b981" opacity="0.8">Storage</text>
+</svg>

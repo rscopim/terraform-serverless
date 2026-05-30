@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker Módulo 02: Imagens e Dockerfile</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker — Módulo 02</span>
+        <h1>Imagens e Dockerfile</h1>
+        <p>Domine o gerenciamento de imagens Docker e aprenda a construir imagens customizadas com Dockerfile — a base para containerizar qualquer aplicação.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- O que é uma imagem -->
+        <div class="topic-block">
+          <h2>O que é uma Imagem Docker?</h2>
+          <p>Uma imagem Docker é um pacote somente-leitura composto por <strong>camadas (layers)</strong>. Cada instrução no Dockerfile cria uma nova camada. Camadas são compartilhadas entre imagens, economizando espaço e acelerando downloads.</p>
+          <div class="info-box">
+            <strong>Cache de camadas:</strong> O Docker reutiliza camadas que não mudaram. Se você alterar apenas a última instrução do Dockerfile, todas as camadas anteriores vêm do cache — tornando builds subsequentes muito mais rápidos.
+          </div>
+        </div>
+
+        <!-- Comandos de imagem -->
+        <div class="topic-block">
+          <h2>Comandos para Gerenciar Imagens</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker images</code><span class="cmd-tag">Listar</span></div>
+              <p>Lista todas as imagens locais com tamanho, tag e ID.</p>
+              <pre><code># Listar imagens
+docker images
+
+# Filtrar por nome
+docker images nginx
+
+# Mostrar apenas IDs
+docker images -q</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker pull</code><span class="cmd-tag">Baixar</span></div>
+              <p>Baixa uma imagem do registry (Docker Hub por padrão).</p>
+              <pre><code># Baixar última versão
+docker pull nginx
+
+# Baixar versão específica
+docker pull nginx:1.25-alpine
+
+# Baixar de registry privado
+docker pull meu-registry.com/app:v2.0</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker rmi</code><span class="cmd-tag">Remover</span></div>
+              <p>Remove imagens locais. Falha se houver containers usando a imagem.</p>
+              <pre><code># Remover imagem
+docker rmi nginx:1.25-alpine
+
+# Forçar remoção
+docker rmi -f nginx
+
+# Remover imagens sem tag (dangling)
+docker image prune
+
+# Remover TODAS as imagens não utilizadas
+docker image prune -a</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker tag</code><span class="cmd-tag">Taguear</span></div>
+              <p>Cria uma nova tag (alias) para uma imagem existente.</p>
+              <pre><code># Taguear para push
+docker tag minha-app:latest meu-user/minha-app:v1.0
+
+# Taguear para registry privado
+docker tag minha-app:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/minha-app:v1.0</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker push</code><span class="cmd-tag">Enviar</span></div>
+              <p>Envia uma imagem local para um registry remoto.</p>
+              <pre><code># Login no Docker Hub
+docker login
+
+# Push para Docker Hub
+docker push meu-user/minha-app:v1.0
+
+# Push para ECR (AWS)
+docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/minha-app:v1.0</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker history</code><span class="cmd-tag">Histórico</span></div>
+              <p>Mostra as camadas de uma imagem e os comandos que as criaram.</p>
+              <pre><code># Ver camadas da imagem
+docker history nginx
+
+# Sem truncar comandos
+docker history --no-trunc nginx</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dockerfile -->
+        <div class="topic-block">
+          <h2>Estrutura do Dockerfile</h2>
+          <p>O Dockerfile é um arquivo de texto com instruções sequenciais para construir uma imagem. Cada instrução cria uma camada.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>FROM</code><span class="cmd-tag">Obrigatório</span></div>
+              <p>Define a imagem base. Sempre é a primeira instrução.</p>
+              <pre><code>FROM node:20-alpine
+FROM python:3.12-slim
+FROM ubuntu:22.04
+FROM scratch  # imagem vazia</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>WORKDIR</code><span class="cmd-tag">Diretório</span></div>
+              <p>Define o diretório de trabalho para instruções subsequentes (RUN, CMD, COPY, etc.).</p>
+              <pre><code>WORKDIR /app
+# Cria o diretório se não existir</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>COPY</code><span class="cmd-tag">Copiar</span></div>
+              <p>Copia arquivos/diretórios do contexto de build para a imagem.</p>
+              <pre><code># Copiar arquivo específico
+COPY package.json .
+
+# Copiar tudo
+COPY . .
+
+# Copiar com permissões
+COPY --chown=node:node . .</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ADD</code><span class="cmd-tag">Adicionar</span></div>
+              <p>Similar ao COPY, mas também extrai arquivos .tar e aceita URLs. Prefira COPY na maioria dos casos.</p>
+              <pre><code># Extrair tar automaticamente
+ADD app.tar.gz /app/
+
+# Baixar de URL (evite — prefira curl no RUN)
+ADD https://example.com/file.txt /app/</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>RUN</code><span class="cmd-tag">Executar</span></div>
+              <p>Executa comandos durante o build. Cada RUN cria uma nova camada.</p>
+              <pre><code># Instalar dependências
+RUN apt-get update && apt-get install -y \
+    curl \
+    vim \
+  && rm -rf /var/lib/apt/lists/*
+
+# Instalar pacotes Node.js
+RUN npm ci --only=production</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CMD</code><span class="cmd-tag">Comando padrão</span></div>
+              <p>Define o comando padrão ao iniciar o container. Pode ser sobrescrito no <code>docker run</code>.</p>
+              <pre><code># Forma exec (recomendada)
+CMD ["node", "server.js"]
+
+# Forma shell
+CMD npm start</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ENTRYPOINT</code><span class="cmd-tag">Ponto de entrada</span></div>
+              <p>Define o executável principal do container. Não é facilmente sobrescrito.</p>
+              <pre><code># Container como executável
+ENTRYPOINT ["python", "app.py"]
+
+# Combinado com CMD (args padrão)
+ENTRYPOINT ["python", "app.py"]
+CMD ["--port", "8000"]</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EXPOSE</code><span class="cmd-tag">Porta</span></div>
+              <p>Documenta a porta que o container escuta. Não publica a porta — é apenas metadata.</p>
+              <pre><code>EXPOSE 3000
+EXPOSE 8080/tcp
+EXPOSE 8443/udp</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ENV</code><span class="cmd-tag">Variável</span></div>
+              <p>Define variáveis de ambiente disponíveis no build E no container em execução.</p>
+              <pre><code>ENV NODE_ENV=production
+ENV PORT=3000
+ENV APP_HOME=/app</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ARG</code><span class="cmd-tag">Build arg</span></div>
+              <p>Define variáveis disponíveis apenas durante o build. Não persiste no container final.</p>
+              <pre><code>ARG NODE_VERSION=20
+FROM node:${NODE_VERSION}-alpine
+
+ARG BUILD_DATE
+LABEL build-date=$BUILD_DATE</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>VOLUME</code><span class="cmd-tag">Volume</span></div>
+              <p>Cria um ponto de montagem para dados persistentes.</p>
+              <pre><code>VOLUME /data
+VOLUME ["/var/log", "/data"]</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>USER</code><span class="cmd-tag">Segurança</span></div>
+              <p>Define o usuário para executar instruções subsequentes e o container. Evite rodar como root.</p>
+              <pre><code># Criar e usar usuário não-root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>LABEL</code><span class="cmd-tag">Metadata</span></div>
+              <p>Adiciona metadados à imagem (autor, versão, descrição).</p>
+              <pre><code>LABEL maintainer="dev@example.com"
+LABEL version="1.0"
+LABEL description="API de pagamentos"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>HEALTHCHECK</code><span class="cmd-tag">Saúde</span></div>
+              <p>Define como verificar se o container está saudável.</p>
+              <pre><code>HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRYPOINT vs CMD -->
+        <div class="topic-block">
+          <h2>ENTRYPOINT vs CMD</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>CMD</th><th>ENTRYPOINT</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Sobrescrito por</td><td>Argumentos no <code>docker run</code></td><td>Flag <code>--entrypoint</code></td></tr>
+              <tr><td>Uso típico</td><td>Argumentos padrão</td><td>Executável principal</td></tr>
+              <tr><td>Combinação</td><td colspan="2">ENTRYPOINT define o comando, CMD define argumentos padrão</td></tr>
+            </tbody>
+          </table>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Exemplo combinado</code><span class="cmd-tag">Padrão</span></div>
+              <pre><code>ENTRYPOINT ["python", "manage.py"]
+CMD ["runserver", "0.0.0.0:8000"]
+
+# docker run app → python manage.py runserver 0.0.0.0:8000
+# docker run app migrate → python manage.py migrate</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARG vs ENV -->
+        <div class="topic-block">
+          <h2>ARG vs ENV</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>ARG</th><th>ENV</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Disponível no build</td><td>✅ Sim</td><td>✅ Sim</td></tr>
+              <tr><td>Disponível no container</td><td>❌ Não</td><td>✅ Sim</td></tr>
+              <tr><td>Definido via CLI</td><td><code>--build-arg</code></td><td><code>-e</code> no run</td></tr>
+              <tr><td>Persiste na imagem</td><td>❌ Não</td><td>✅ Sim</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- HEALTHCHECK -->
+        <div class="topic-block">
+          <h2>HEALTHCHECK — Exemplo Completo</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>HEALTHCHECK</code><span class="cmd-tag">Monitoramento</span></div>
+              <p>O Docker verifica periodicamente a saúde do container. Status: <code>healthy</code>, <code>unhealthy</code>, <code>starting</code>.</p>
+              <pre><code>FROM node:20-alpine
+WORKDIR /app
+COPY . .
+RUN npm ci --only=production
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s \
+  --timeout=10s \
+  --start-period=10s \
+  --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+CMD ["node", "server.js"]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER Security -->
+        <div class="topic-block">
+          <h2>USER — Segurança com Usuário Não-Root</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>USER</code><span class="cmd-tag">Segurança</span></div>
+              <p>Nunca execute containers como root em produção. Crie um usuário dedicado.</p>
+              <pre><code>FROM node:20-alpine
+
+# Criar usuário não-root
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup
+
+WORKDIR /app
+COPY --chown=appuser:appgroup . .
+RUN npm ci --only=production
+
+# Trocar para usuário não-root
+USER appuser
+
+EXPOSE 3000
+CMD ["node", "server.js"]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- docker build -->
+        <div class="topic-block">
+          <h2>docker build — Construir Imagens</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker build</code><span class="cmd-tag">Build</span></div>
+              <p>Constrói uma imagem a partir de um Dockerfile e um contexto de build.</p>
+              <pre><code># Build básico (Dockerfile no diretório atual)
+docker build -t minha-app:v1.0 .
+
+# Especificar Dockerfile diferente
+docker build -f Dockerfile.prod -t minha-app:prod .
+
+# Passar build arguments
+docker build --build-arg NODE_VERSION=20 -t minha-app .
+
+# Build sem cache (forçar rebuild completo)
+docker build --no-cache -t minha-app .
+
+# Ver output detalhado do build
+docker build --progress=plain -t minha-app .
+
+# Múltiplas tags
+docker build -t minha-app:latest -t minha-app:v1.0 .</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- .dockerignore -->
+        <div class="topic-block">
+          <h2>.dockerignore</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>.dockerignore</code><span class="cmd-tag">Otimização</span></div>
+              <p>Exclui arquivos do contexto de build. Reduz tamanho, acelera build e evita copiar dados sensíveis.</p>
+              <pre><code># Dependências (serão instaladas no build)
+node_modules/
+__pycache__/
+venv/
+
+# Controle de versão
+.git/
+.gitignore
+
+# IDE e editor
+.vscode/
+.idea/
+*.swp
+
+# Ambiente e segredos
+.env
+.env.*
+*.pem
+*.key
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exemplo Node.js -->
+        <div class="topic-block">
+          <h2>Exemplo Completo — Dockerfile Node.js</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Dockerfile</code><span class="cmd-tag">Node.js</span></div>
+              <pre><code># Imagem base leve
+FROM node:20-alpine
+
+# Metadados
+LABEL maintainer="dev@example.com"
+LABEL version="1.0"
+
+# Criar usuário não-root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Copiar apenas package files primeiro (cache de dependências)
+COPY package.json package-lock.json ./
+
+# Instalar dependências
+RUN npm ci --only=production && npm cache clean --force
+
+# Copiar código da aplicação
+COPY --chown=appuser:appgroup . .
+
+# Variáveis de ambiente
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Trocar para usuário não-root
+USER appuser
+
+# Documentar porta
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Comando de inicialização
+CMD ["node", "server.js"]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exemplo Python -->
+        <div class="topic-block">
+          <h2>Exemplo Completo — Dockerfile Python</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Dockerfile</code><span class="cmd-tag">Python</span></div>
+              <pre><code># Imagem base slim
+FROM python:3.12-slim
+
+# Metadados
+LABEL maintainer="dev@example.com"
+
+# Evitar criação de .pyc e buffering
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
+
+# Criar usuário não-root
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Copiar e instalar dependências Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copiar código
+COPY --chown=appuser:appgroup . .
+
+# Trocar para usuário não-root
+USER appuser
+
+# Porta
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+# Iniciar aplicação
+ENTRYPOINT ["python"]
+CMD ["app.py", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

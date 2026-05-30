@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Kubernetes: Do Zero ao Avançado</title>
+  <meta name="description" content="Trilha completa de Kubernetes: Pods, Deployments, Services, Helm, HPA, Segurança e Produção." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="#modulo01" class="nav-link">Fundamentos</a>
+        <a href="#modulo02" class="nav-link">Intermediário</a>
+        <a href="#modulo03" class="nav-link">Avançado</a>
+        <a href="#modulo04" class="nav-link">Produção</a>
+        <a href="index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☸️ Kubernetes</span>
+        <h1>Kubernetes: Do Zero ao Avançado</h1>
+        <p>Trilha completa com 4 módulos — de Pods básicos à orquestração em produção. Domine o padrão da indústria para gerenciamento de containers.</p>
+        <div class="hero-actions" style="margin-top:28px">
+          <a href="#modulo01" class="button primary">Começar pelo Módulo 01</a>
+          <a href="#modulo04" class="button secondary">Ir para Produção</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="#modulo01" class="progress-node active"><span>01</span><small>Fundamentos</small></a>
+        <a href="#modulo02" class="progress-node"><span>02</span><small>Intermediário</small></a>
+        <a href="#modulo03" class="progress-node"><span>03</span><small>Avançado</small></a>
+        <a href="#modulo04" class="progress-node"><span>04</span><small>Produção</small></a>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 01 ==================== -->
+    <section id="modulo01" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 01</span>
+          <h2>Fundamentos do Kubernetes</h2>
+          <p>Kubernetes (K8s) é uma plataforma open-source de orquestração de containers que automatiza deploy, escalonamento e gerenciamento de aplicações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Arquitetura</h3>
+          <div class="info-box highlight">
+            <pre><code>CONTROL PLANE: API Server | etcd | Scheduler | Controller Manager
+WORKER NODES:  kubelet | kube-proxy | Container Runtime | Pods</code></pre>
+          </div>
+          <div class="command-card wide" style="margin-top:18px">
+            <div class="command-header"><code>Componentes</code><span class="cmd-tag">Arquitetura</span></div>
+            <table style="width:100%;font-size:0.84rem;border-collapse:collapse">
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">API Server</td><td style="padding:6px">Ponto de entrada para todos os comandos (kubectl)</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">etcd</td><td style="padding:6px">Banco chave-valor com todo o estado do cluster</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">Scheduler</td><td style="padding:6px">Decide em qual Node um Pod será executado</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">kubelet</td><td style="padding:6px">Agente em cada Node que garante containers rodando</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">kube-proxy</td><td style="padding:6px">Gerencia regras de rede entre Pods</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Instalação Local (Minikube)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>kubectl</code><span class="cmd-tag">CLI</span></div>
+              <pre><code># Linux
+curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+# Windows (PowerShell)
+curl.exe -LO "https://dl.k8s.io/release/v1.29.0/bin/windows/amd64/kubectl.exe"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>minikube</code><span class="cmd-tag">Cluster Local</span></div>
+              <pre><code>minikube start --driver=docker
+minikube status
+kubectl cluster-info
+kubectl get nodes</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Comandos Essenciais</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>kubectl get</code><span class="cmd-tag">Listar</span></div>
+              <pre><code>kubectl get pods
+kubectl get pods -o wide
+kubectl get pods -l app=nginx
+kubectl get nodes
+kubectl get namespaces</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>kubectl run / apply</code><span class="cmd-tag">Criar</span></div>
+              <pre><code>kubectl run meu-nginx --image=nginx
+kubectl apply -f meu-pod.yaml
+kubectl delete -f meu-pod.yaml
+kubectl create namespace dev</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>kubectl describe / logs</code><span class="cmd-tag">Debug</span></div>
+              <pre><code>kubectl describe pod meu-nginx
+kubectl logs meu-nginx
+kubectl logs -f meu-nginx
+kubectl exec -it meu-nginx -- /bin/bash</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Pod YAML</code><span class="cmd-tag">Declarativo</span></div>
+              <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: meu-nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Jobs, CronJobs e DaemonSets</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Job</code><span class="cmd-tag">Batch</span></div>
+              <p>Executa tarefa até conclusão.</p>
+              <pre><code>apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-backup
+spec:
+  completions: 3
+  parallelism: 2
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+      - name: worker
+        image: busybox
+        command: ["sh", "-c", "echo done"]
+      restartPolicy: Never</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CronJob</code><span class="cmd-tag">Agendado</span></div>
+              <p>Job em horários agendados (cron).</p>
+              <pre><code>apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-diario
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: busybox
+            command: ["sh", "-c", "echo backup"]
+          restartPolicy: OnFailure</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 02 ==================== -->
+    <section id="modulo02" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 02</span>
+          <h2>Intermediário: Deployments, Services e Configuração</h2>
+          <p>Recursos mais usados no dia a dia: Deployments para gerenciar aplicações, Services para rede, ConfigMaps/Secrets para configuração.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Deployments</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Deployment YAML</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Comandos</code><span class="cmd-tag">Deploy</span></div>
+              <pre><code>kubectl apply -f deployment.yaml
+kubectl get deploy
+kubectl scale deployment app-web --replicas=5
+kubectl set image deployment/app-web nginx=nginx:1.26
+kubectl rollout status deployment/app-web
+kubectl rollout undo deployment/app-web
+kubectl rollout history deployment/app-web</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Probes</code><span class="cmd-tag">Health Check</span></div>
+              <pre><code># livenessProbe → container vivo? (reinicia se falhar)
+# readinessProbe → pronto para tráfego?
+# startupProbe → app iniciou? (apps lentas)
+
+# Tipos: httpGet, tcpSocket, exec
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 3</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Services</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tipos de Service</code><span class="cmd-tag">Rede</span></div>
+              <table style="width:100%;font-size:0.84rem;border-collapse:collapse">
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">ClusterIP</td><td style="padding:6px">IP interno (padrão) — entre serviços</td></tr>
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">NodePort</td><td style="padding:6px">Porta no Node (30000-32767) — dev</td></tr>
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">LoadBalancer</td><td style="padding:6px">LB externo — produção em cloud</td></tr>
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">ExternalName</td><td style="padding:6px">Mapeia para DNS externo</td></tr>
+              </table>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Service YAML</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: svc-web
+spec:
+  type: NodePort
+  selector:
+    app: web
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+
+# DNS interno:
+# svc-web.default.svc.cluster.local</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. ConfigMaps e Secrets</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ConfigMap</code><span class="cmd-tag">Config</span></div>
+              <pre><code>kubectl create configmap app-config \
+  --from-literal=APP_ENV=production \
+  --from-literal=APP_PORT=8080
+
+# Usar no Pod:
+envFrom:
+- configMapRef:
+    name: app-config</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Secret</code><span class="cmd-tag">Sensível</span></div>
+              <pre><code>kubectl create secret generic db-creds \
+  --from-literal=username=admin \
+  --from-literal=password=senha123
+
+# Usar no Pod:
+env:
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: db-creds
+      key: password</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 03 ==================== -->
+    <section id="modulo03" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 03</span>
+          <h2>Avançado: Storage, RBAC, Ingress e Helm</h2>
+          <p>Persistência de dados, controle de acesso, roteamento HTTP e gerenciamento de pacotes com Helm.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. RBAC e Segurança</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>RBAC</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># ServiceAccount → Role → RoleBinding
+kubectl create sa app-sa
+kubectl auth can-i get pods \
+  --as=system:serviceaccount:default:app-sa
+
+# Role (namespace) vs ClusterRole (cluster)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Network Policies</code><span class="cmd-tag">Rede</span></div>
+              <pre><code># Deny all por padrão
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+
+# Permitir frontend → backend
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - port: 80</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Ingress</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Ingress com TLS</code><span class="cmd-tag">HTTP Routing</span></div>
+            <pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts: [app.local]
+    secretName: tls-secret
+  rules:
+  - host: app.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 80</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Helm — Gerenciador de Pacotes</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Comandos Helm</code><span class="cmd-tag">Pacotes</span></div>
+              <pre><code>helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo nginx
+helm install meu-nginx bitnami/nginx
+helm install app bitnami/nginx -f values.yaml
+helm upgrade app bitnami/nginx --set replicas=3
+helm rollback app 1
+helm list
+helm uninstall app</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>HPA</code><span class="cmd-tag">Autoscaling</span></div>
+              <pre><code>apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Taints, Tolerations e Affinity</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Taints + Tolerations</code><span class="cmd-tag">Scheduling</span></div>
+              <pre><code># Taint no Node (repele pods)
+kubectl taint nodes node1 gpu=true:NoSchedule
+
+# Toleration no Pod (permite rodar)
+tolerations:
+- key: "gpu"
+  operator: "Equal"
+  value: "true"
+  effect: "NoSchedule"
+
+# Efeitos: NoSchedule, PreferNoSchedule, NoExecute</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Node Affinity</code><span class="cmd-tag">Scheduling</span></div>
+              <pre><code>affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: disktype
+          operator: In
+          values: [ssd]
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchLabels:
+          app: web
+      topologyKey: kubernetes.io/hostname</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 04 ==================== -->
+    <section id="modulo04" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Módulo 04</span>
+          <h2>Produção: Observabilidade, GitOps e Troubleshooting</h2>
+          <p>Monitoramento com Prometheus, GitOps com ArgoCD, backup do etcd, segurança e resolução de problemas em produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Observabilidade</h3>
+          <div class="info-box">
+            <strong>3 Pilares:</strong> Métricas (Prometheus + Grafana) | Logs (EFK Stack) | Traces (Jaeger / OpenTelemetry)
+          </div>
+          <div class="command-card wide" style="margin-top:18px">
+            <div class="command-header"><code>Prometheus + Alertas</code><span class="cmd-tag">Monitoramento</span></div>
+            <pre><code># ServiceMonitor — Prometheus descobre serviços
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app-monitor
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  endpoints:
+  - port: metrics
+    interval: 15s
+
+# PrometheusRule — Alertas
+- alert: HighErrorRate
+  expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+  for: 5m
+  labels:
+    severity: critical</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Troubleshooting</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>🔄 CrashLoopBackOff</h4>
+              <ol>
+                <li><code>kubectl logs pod --previous</code></li>
+                <li><code>kubectl describe pod</code> → Events</li>
+                <li>ExitCode 137 = OOM killed</li>
+                <li>ExitCode 1 = erro da aplicação</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>⏳ Pod em Pending</h4>
+              <ol>
+                <li><code>kubectl describe pod</code></li>
+                <li>Recursos insuficientes (CPU/RAM)</li>
+                <li>PVC não encontrado</li>
+                <li>Taint sem toleration</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>🌐 Service não conecta</h4>
+              <ol>
+                <li><code>kubectl get endpoints svc</code></li>
+                <li>Verificar labels/selector</li>
+                <li><code>kubectl exec pod -- nslookup svc</code></li>
+                <li><code>kubectl exec pod -- curl svc:port</code></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. GitOps com ArgoCD</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>ArgoCD Application</code><span class="cmd-tag">GitOps</span></div>
+            <pre><code># Git como fonte de verdade → ArgoCD detecta mudança → aplica no cluster
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minha-app
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/user/repo.git
+    targetRevision: main
+    path: kubernetes/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Boas Práticas de Produção</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Segurança</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># Security Context
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  containers:
+  - securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: [ALL]
+
+# Pod Security Standards
+metadata:
+  labels:
+    pod-security.kubernetes.io/enforce: restricted</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>etcd Backup</code><span class="cmd-tag">Disaster Recovery</span></div>
+              <pre><code># Backup
+ETCDCTL_API=3 etcdctl snapshot save /tmp/backup.db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+
+# Verificar
+ETCDCTL_API=3 etcdctl snapshot status /tmp/backup.db
+
+# Restore
+ETCDCTL_API=3 etcdctl snapshot restore /tmp/backup.db \
+  --data-dir=/var/lib/etcd-restored</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5. Comandos Mais Usados</h3>
+          <div class="interview-table">
+            <table>
+              <thead><tr><th>Categoria</th><th>Comandos</th></tr></thead>
+              <tbody>
+                <tr><td>Pods</td><td><code>get, describe, logs, exec, delete, top</code></td></tr>
+                <tr><td>Deploy</td><td><code>apply, scale, set image, rollout, undo</code></td></tr>
+                <tr><td>Services</td><td><code>expose, get svc, get endpoints</code></td></tr>
+                <tr><td>Config</td><td><code>create configmap, create secret</code></td></tr>
+                <tr><td>Debug</td><td><code>describe, logs --previous, get events</code></td></tr>
+                <tr><td>Cluster</td><td><code>get nodes, top nodes, drain, cordon</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🎉 Parabéns!</span>
+          <h2>Trilha Kubernetes completa.</h2>
+          <p>O próximo passo é praticar com clusters reais. Monte labs com Minikube, explore EKS/AKS/GKE e prepare-se para certificações CKA/CKAD.</p>
+        </div>
+        <a href="index.html" class="button primary">Explorar outras trilhas</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

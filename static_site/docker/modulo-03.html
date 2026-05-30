@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker Módulo 03: Volumes e Persistência de Dados</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">← Anterior</a>
+        <a href="modulo-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker — Módulo 03</span>
+        <h1>Volumes e Persistência de Dados</h1>
+        <p>Containers são efêmeros por natureza. Aprenda a persistir dados com volumes, bind mounts e tmpfs — e domine backup, restauração e transferência de dados.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- O Problema -->
+        <div class="topic-block">
+          <h2>O Problema: Containers são Efêmeros</h2>
+          <p>Quando um container é removido, todos os dados escritos dentro dele são perdidos. Isso é por design — containers devem ser descartáveis e recriáveis. Mas aplicações reais precisam persistir dados: bancos de dados, uploads de usuários, logs, configurações.</p>
+          <div class="info-box">
+            <strong>Regra de ouro:</strong> Nunca armazene dados importantes apenas dentro do filesystem do container. Use volumes ou bind mounts para qualquer dado que precisa sobreviver à remoção do container.
+          </div>
+        </div>
+
+        <!-- Tipos de Storage -->
+        <div class="topic-block">
+          <h2>Tipos de Armazenamento</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Localização</th><th>Gerenciado por</th><th>Uso Ideal</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Volume</strong></td>
+                <td><code>/var/lib/docker/volumes/</code></td>
+                <td>Docker</td>
+                <td>Dados de produção, bancos de dados, dados compartilhados entre containers</td>
+              </tr>
+              <tr>
+                <td><strong>Bind Mount</strong></td>
+                <td>Qualquer caminho no host</td>
+                <td>Usuário</td>
+                <td>Desenvolvimento (código-fonte), configurações do host</td>
+              </tr>
+              <tr>
+                <td><strong>tmpfs</strong></td>
+                <td>Memória RAM do host</td>
+                <td>Kernel</td>
+                <td>Dados temporários sensíveis, cache em memória</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Comandos de Volume -->
+        <div class="topic-block">
+          <h2>Comandos para Gerenciar Volumes</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker volume create</code><span class="cmd-tag">Criar</span></div>
+              <p>Cria um volume nomeado gerenciado pelo Docker.</p>
+              <pre><code># Criar volume
+docker volume create meu-volume
+
+# Criar com driver específico
+docker volume create --driver local \
+  --opt type=nfs \
+  --opt o=addr=192.168.1.100,rw \
+  --opt device=:/path/to/dir \
+  nfs-volume</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker volume ls</code><span class="cmd-tag">Listar</span></div>
+              <p>Lista todos os volumes existentes no host.</p>
+              <pre><code># Listar volumes
+docker volume ls
+
+# Filtrar por driver
+docker volume ls --filter driver=local
+
+# Filtrar volumes não utilizados (dangling)
+docker volume ls --filter dangling=true</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker volume inspect</code><span class="cmd-tag">Inspecionar</span></div>
+              <p>Mostra detalhes do volume: driver, mountpoint, labels, etc.</p>
+              <pre><code>docker volume inspect meu-volume
+
+# Saída:
+# [{ "CreatedAt": "...",
+#    "Driver": "local",
+#    "Mountpoint": "/var/lib/docker/volumes/meu-volume/_data",
+#    "Name": "meu-volume" }]</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker volume rm</code><span class="cmd-tag">Remover</span></div>
+              <p>Remove um ou mais volumes. Falha se o volume estiver em uso.</p>
+              <pre><code># Remover volume específico
+docker volume rm meu-volume
+
+# Remover múltiplos
+docker volume rm vol1 vol2 vol3</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker volume prune</code><span class="cmd-tag">Limpar</span></div>
+              <p>Remove TODOS os volumes não utilizados por nenhum container. Use com cuidado!</p>
+              <pre><code># Remover volumes órfãos
+docker volume prune
+
+# Sem confirmação
+docker volume prune -f</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Usando Volumes -->
+        <div class="topic-block">
+          <h2>Usando Volumes com Containers</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>-v (volume)</code><span class="cmd-tag">Sintaxe curta</span></div>
+              <p>Monta um volume nomeado no container. Cria o volume automaticamente se não existir.</p>
+              <pre><code># Montar volume nomeado
+docker run -d -v meu-volume:/app/data nginx
+
+# Volume anônimo (Docker gera nome aleatório)
+docker run -d -v /app/data nginx
+
+# Volume somente-leitura
+docker run -d -v meu-volume:/app/data:ro nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>--mount (volume)</code><span class="cmd-tag">Sintaxe explícita</span></div>
+              <p>Sintaxe mais verbosa e clara. Recomendada para scripts e documentação.</p>
+              <pre><code># Montar volume nomeado
+docker run -d \
+  --mount type=volume,source=meu-volume,target=/app/data \
+  nginx
+
+# Volume somente-leitura
+docker run -d \
+  --mount type=volume,source=meu-volume,target=/app/data,readonly \
+  nginx</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demonstração de Persistência -->
+        <div class="topic-block">
+          <h2>Demonstração de Persistência — MySQL</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>MySQL com Volume</code><span class="cmd-tag">Exemplo prático</span></div>
+              <p>Dados do MySQL persistem mesmo após remover e recriar o container.</p>
+              <pre><code># Criar volume para dados do MySQL
+docker volume create mysql-data
+
+# Iniciar MySQL com volume
+docker run -d \
+  --name meu-mysql \
+  -e MYSQL_ROOT_PASSWORD=senha123 \
+  -e MYSQL_DATABASE=app_db \
+  -v mysql-data:/var/lib/mysql \
+  -p 3306:3306 \
+  mysql:8.0
+
+# Criar dados no banco
+docker exec -it meu-mysql mysql -uroot -psenha123 -e \
+  "CREATE TABLE app_db.users (id INT, name VARCHAR(50)); \
+   INSERT INTO app_db.users VALUES (1, 'João');"
+
+# Remover o container
+docker rm -f meu-mysql
+
+# Recriar — dados ainda estão lá!
+docker run -d \
+  --name meu-mysql \
+  -e MYSQL_ROOT_PASSWORD=senha123 \
+  -v mysql-data:/var/lib/mysql \
+  -p 3306:3306 \
+  mysql:8.0
+
+# Verificar dados
+docker exec -it meu-mysql mysql -uroot -psenha123 -e \
+  "SELECT * FROM app_db.users;"
+# → 1 | João ✓</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bind Mounts -->
+        <div class="topic-block">
+          <h2>Bind Mounts</h2>
+          <p>Bind mounts mapeiam um diretório do host diretamente no container. Ideal para desenvolvimento — alterações no código são refletidas instantaneamente.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Linux / macOS</code><span class="cmd-tag">Bind Mount</span></div>
+              <pre><code># Montar diretório atual
+docker run -d -v $(pwd):/app -p 3000:3000 node:20-alpine
+
+# Caminho absoluto
+docker run -d -v /home/user/projeto:/app nginx
+
+# Somente-leitura
+docker run -d -v $(pwd)/config:/etc/nginx/conf.d:ro nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Windows PowerShell</code><span class="cmd-tag">Bind Mount</span></div>
+              <pre><code># Montar diretório atual (PowerShell)
+docker run -d -v ${PWD}:/app -p 3000:3000 node:20-alpine
+
+# Caminho absoluto
+docker run -d -v C:\Users\dev\projeto:/app nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Windows CMD</code><span class="cmd-tag">Bind Mount</span></div>
+              <pre><code># Montar diretório atual (CMD)
+docker run -d -v %cd%:/app -p 3000:3000 node:20-alpine</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>--mount (bind)</code><span class="cmd-tag">Sintaxe explícita</span></div>
+              <p>Sintaxe --mount para bind mounts. Falha se o diretório source não existir (mais seguro).</p>
+              <pre><code>docker run -d \
+  --mount type=bind,source=$(pwd)/src,target=/app/src \
+  --mount type=bind,source=$(pwd)/config,target=/app/config,readonly \
+  -p 3000:3000 \
+  node:20-alpine</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- tmpfs -->
+        <div class="topic-block">
+          <h2>tmpfs — Armazenamento em Memória</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>--tmpfs</code><span class="cmd-tag">Memória</span></div>
+              <p>Monta um filesystem temporário em RAM. Dados são perdidos ao parar o container. Ideal para dados sensíveis temporários.</p>
+              <pre><code># tmpfs simples
+docker run -d --tmpfs /app/temp nginx
+
+# Com --mount (mais opções)
+docker run -d \
+  --mount type=tmpfs,target=/app/temp,tmpfs-size=100m,tmpfs-mode=1770 \
+  nginx
+
+# Uso: cache de sessão, tokens temporários, dados sensíveis</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backup e Restore -->
+        <div class="topic-block">
+          <h2>Backup e Restauração de Volumes</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Backup</code><span class="cmd-tag">tar</span></div>
+              <p>Cria um arquivo tar com o conteúdo do volume usando um container auxiliar.</p>
+              <pre><code># Backup de volume para arquivo tar
+docker run --rm \
+  -v meu-volume:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/meu-volume-backup.tar.gz -C /data .
+
+# Explicação:
+# - Monta o volume em /data (leitura)
+# - Monta diretório atual em /backup (escrita)
+# - Cria tar.gz com conteúdo de /data</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Restore</code><span class="cmd-tag">tar</span></div>
+              <p>Restaura dados de um arquivo tar para um volume.</p>
+              <pre><code># Criar volume de destino
+docker volume create meu-volume-restaurado
+
+# Restaurar backup
+docker run --rm \
+  -v meu-volume-restaurado:/data \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/meu-volume-backup.tar.gz -C /data
+
+# Verificar
+docker run --rm -v meu-volume-restaurado:/data alpine ls -la /data</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- docker cp -->
+        <div class="topic-block">
+          <h2>docker cp — Copiar Arquivos</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker cp</code><span class="cmd-tag">Copiar</span></div>
+              <p>Copia arquivos entre o host e um container (em execução ou parado). Útil para debugging e extração de dados.</p>
+              <pre><code># Host → Container
+docker cp ./config.json meu-container:/app/config.json
+docker cp ./src/ meu-container:/app/src/
+
+# Container → Host
+docker cp meu-container:/app/logs/error.log ./error.log
+docker cp meu-container:/var/log/ ./logs-extraidos/
+
+# Funciona com container parado também
+docker cp container-parado:/data/dump.sql ./backup.sql</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

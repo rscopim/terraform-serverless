@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Docker: Do Zero ao Avançado</title>
+  <meta name="description" content="Trilha completa de Docker: containers, imagens, volumes, redes, Compose, segurança e CI/CD." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="#modulos" class="nav-link">Módulos</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
+        <a href="index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐳 Docker</span>
+        <h1>Docker: Do Zero ao Avançado</h1>
+        <p>Curso prático e progressivo de Docker, cobrindo desde conceitos básicos até orquestração em produção. Alinhado com as demandas reais do mercado de trabalho.</p>
+        <div class="hero-actions" style="margin-top:28px">
+          <a href="docker/modulo-01.html" class="button primary">Começar pelo Módulo 01</a>
+          <a href="#materiais" class="button secondary">Baixar PDF Completo</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS BAR -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="docker/modulo-01.html" class="progress-node active"><span>01</span><small>Conceitos</small></a>
+        <a href="docker/modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="docker/modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="docker/modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="docker/modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="docker/modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="docker/modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+    <!-- ESTRUTURA DO CURSO -->
+    <section id="modulos" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📚 Estrutura do Curso</span>
+          <h2>7 Módulos + 2 Labs Práticos</h2>
+          <p>Siga os módulos na ordem. Execute todos os comandos no seu terminal. Ao final, realize os laboratórios práticos.</p>
+        </div>
+
+        <div class="command-grid">
+          <a href="docker/modulo-01.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 01</code><span class="cmd-tag">Iniciante</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Conceitos Fundamentais e Instalação</h3>
+            <p>O que é Docker, conceitos-chave (imagem, container, Dockerfile, registry), instalação e primeiros comandos essenciais.</p>
+          </a>
+
+          <a href="docker/modulo-02.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 02</code><span class="cmd-tag">Iniciante/Intermediário</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Imagens e Dockerfile</h3>
+            <p>Gerenciar imagens, construir imagens customizadas com Dockerfile, instruções, build, .dockerignore e boas práticas.</p>
+          </a>
+
+          <a href="docker/modulo-03.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 03</code><span class="cmd-tag">Intermediário</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Volumes e Persistência de Dados</h3>
+            <p>Volumes nomeados, bind mounts, tmpfs, backup/restauração e transferência de dados entre host e container.</p>
+          </a>
+
+          <a href="docker/modulo-04.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 04</code><span class="cmd-tag">Intermediário</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Redes no Docker</h3>
+            <p>Drivers de rede (bridge, host, none, overlay), comunicação entre containers, DNS interno, portas e aliases.</p>
+          </a>
+
+          <a href="docker/modulo-05.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 05</code><span class="cmd-tag">Intermediário/Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Docker Compose</h3>
+            <p>Aplicações multi-container, docker-compose.yml, comandos, healthcheck, profiles, variáveis de ambiente e scaling.</p>
+          </a>
+
+          <a href="docker/modulo-06.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 06</code><span class="cmd-tag">Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Otimização, Segurança e Boas Práticas</h3>
+            <p>Multi-stage build, cache de camadas, segurança (usuário não-root, scan de vulnerabilidades), monitoramento e limites de recursos.</p>
+          </a>
+
+          <a href="docker/modulo-07.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 07</code><span class="cmd-tag">Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Docker em Produção e CI/CD</h3>
+            <p>Registry privado, estratégias de tagging, GitHub Actions, GitLab CI, Docker Swarm, troubleshooting e manutenção.</p>
+          </a>
+        </div>
+
+        <div class="info-box" style="margin-top:32px">
+          <strong>Pré-requisitos:</strong> Computador com Windows 10+, macOS ou Linux. Acesso à internet. Vontade de aprender!
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE MATERIAIS PARA DOWNLOAD -->
+    <section id="materiais" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📥 Materiais</span>
+          <h2>Baixe o conteúdo completo em PDF</h2>
+          <p>Todo o conteúdo dos 7 módulos organizado em um PDF para estudar offline, imprimir ou consultar quando precisar.</p>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span class="resource-type">PDF</span>
+            <h3>Docker: Do Zero ao Avançado</h3>
+            <p>Guia completo com todos os 7 módulos — conceitos, Dockerfile, volumes, redes, Compose, segurança, produção e CI/CD.</p>
+            <form class="inline-download-form" data-material="docker-do-zero-ao-avancado.pdf">
+              <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+              <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+              <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+              <button type="submit">Baixar PDF gratuito</button>
+              <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🚀 Pronto para começar?</span>
+          <h2>Comece pelo Módulo 01</h2>
+          <p>Siga os módulos na ordem, execute todos os comandos e ao final containerize suas próprias aplicações.</p>
+        </div>
+        <a href="docker/modulo-01.html" class="button primary">Iniciar Módulo 01</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
