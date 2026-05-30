@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.cloudtrilhas.com.br/</loc><priority>1.0</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/aws.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/linux.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/docker.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/kubernetes.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/terraform.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/python.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/redes.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/github.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/cloudformation.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/cloud-practitioner.html</loc><priority>0.8</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/ai-practitioner.html</loc><priority>0.8</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/developer.html</loc><priority>0.8</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/solutions-architect.html</loc><priority>0.8</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/solutions-architect-pro.html</loc><priority>0.8</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/about.html</loc><priority>0.5</priority></url>
+  <url><loc>https://www.cloudtrilhas.com.br/contact.html</loc><priority>0.5</priority></url>
+</urlset>
