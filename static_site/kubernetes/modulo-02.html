@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Kubernetes Módulo 02: Deployments, Services e Configuração</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../kubernetes.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☸️ Kubernetes — Módulo 02</span>
+        <h1>Deployments, Services e Configuração</h1>
+        <p>Recursos mais usados no dia a dia: Deployments para gerenciar aplicações, Services para rede, ConfigMaps/Secrets para configuração.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Deployments</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Deployment YAML</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Comandos</code><span class="cmd-tag">Deploy</span></div>
+              <pre><code>kubectl apply -f deployment.yaml
+kubectl get deploy
+kubectl scale deployment app-web --replicas=5
+kubectl set image deployment/app-web nginx=nginx:1.26
+kubectl rollout status deployment/app-web
+kubectl rollout undo deployment/app-web
+kubectl rollout history deployment/app-web</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Probes</code><span class="cmd-tag">Health Check</span></div>
+              <pre><code># livenessProbe → container vivo? (reinicia se falhar)
+# readinessProbe → pronto para tráfego?
+# startupProbe → app iniciou? (apps lentas)
+
+# Tipos: httpGet, tcpSocket, exec
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 3</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Services</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tipos de Service</code><span class="cmd-tag">Rede</span></div>
+              <table style="width:100%;font-size:0.84rem;border-collapse:collapse">
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">ClusterIP</td><td style="padding:6px">IP interno (padrão) — entre serviços</td></tr>
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">NodePort</td><td style="padding:6px">Porta no Node (30000-32767) — dev</td></tr>
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">LoadBalancer</td><td style="padding:6px">LB externo — produção em cloud</td></tr>
+                <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">ExternalName</td><td style="padding:6px">Mapeia para DNS externo</td></tr>
+              </table>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Service YAML</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: svc-web
+spec:
+  type: NodePort
+  selector:
+    app: web
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+
+# DNS interno:
+# svc-web.default.svc.cluster.local</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>3. ConfigMaps e Secrets</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ConfigMap</code><span class="cmd-tag">Config</span></div>
+              <pre><code>kubectl create configmap app-config \
+  --from-literal=APP_ENV=production \
+  --from-literal=APP_PORT=8080
+
+# Usar no Pod:
+envFrom:
+- configMapRef:
+    name: app-config</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Secret</code><span class="cmd-tag">Sensível</span></div>
+              <pre><code>kubectl create secret generic db-creds \
+  --from-literal=username=admin \
+  --from-literal=password=senha123
+
+# Usar no Pod:
+env:
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: db-creds
+      key: password</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 07: Segurança de Redes</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-06.html" class="nav-link">← Anterior</a>
+        <a href="modulo-08.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 07</span>
+        <h1>Segurança de Redes e Firewalls</h1>
+        <p>Proteção de redes com firewalls, ACLs, IDS/IPS e boas práticas de segurança.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Access Control Lists (ACLs)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ACLs — Cisco IOS</code><span class="cmd-tag">Filtro</span></div>
+              <pre><code># ACL Standard (filtra apenas por IP de origem)
+Router(config)# access-list 10 permit 192.168.1.0 0.0.0.255
+Router(config)# access-list 10 deny any
+Router(config)# interface gi0/0
+Router(config-if)# ip access-group 10 in
+
+# ACL Extended (filtra por origem, destino, porta, protocolo)
+Router(config)# access-list 100 permit tcp 192.168.1.0 0.0.0.255 any eq 80
+Router(config)# access-list 100 permit tcp 192.168.1.0 0.0.0.255 any eq 443
+Router(config)# access-list 100 deny ip any any log
+
+# Named ACL
+Router(config)# ip access-list extended INTERNET-ACCESS
+Router(config-ext-nacl)# permit tcp any any eq 80
+Router(config-ext-nacl)# permit tcp any any eq 443
+Router(config-ext-nacl)# permit udp any any eq 53
+Router(config-ext-nacl)# deny ip any any log
+
+# Verificação
+Router# show access-lists
+Router# show ip interface gi0/0 | include access</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Firewalls Linux (iptables / ufw)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>iptables</code><span class="cmd-tag">Linux</span></div>
+              <pre><code># Chains: INPUT (entrada), OUTPUT (saída), FORWARD (encaminhamento)
+# Targets: ACCEPT, DROP, REJECT, LOG
+
+# Política padrão: bloquear tudo
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
+
+# Permitir loopback
+sudo iptables -A INPUT -i lo -j ACCEPT
+
+# Permitir conexões estabelecidas
+sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Permitir SSH, HTTP, HTTPS
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Bloquear IP específico
+sudo iptables -A INPUT -s 10.0.0.50 -j DROP
+
+# Listar e salvar
+sudo iptables -L -n -v
+sudo iptables-save > /etc/iptables/rules.v4</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>ufw (Uncomplicated Firewall)</code><span class="cmd-tag">Simples</span></div>
+              <pre><code># Frontend simplificado para iptables
+sudo ufw enable
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Regras
+sudo ufw allow 22/tcp                    # SSH
+sudo ufw allow 80,443/tcp                # Web
+sudo ufw allow from 192.168.1.0/24       # rede interna
+sudo ufw allow from 10.0.0.5 to any port 3306  # MySQL de IP específico
+sudo ufw deny from 203.0.113.0/24        # bloquear rede
+
+# Gerenciamento
+sudo ufw status verbose
+sudo ufw status numbered
+sudo ufw delete 3                        # remove regra 3
+sudo ufw reset                           # limpa tudo</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. IDS/IPS e Segurança Avançada</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IDS vs IPS</code><span class="cmd-tag">Detecção</span></div>
+              <pre><code>IDS (Intrusion Detection System):
+- Monitora e alerta (passivo)
+- Não bloqueia tráfego
+- Ferramentas: Snort, Suricata, OSSEC
+
+IPS (Intrusion Prevention System):
+- Monitora e bloqueia (ativo)
+- Inline no tráfego
+- Ferramentas: Suricata, Snort (inline)
+
+Tipos de detecção:
+- Signature-based (padrões conhecidos)
+- Anomaly-based (desvio do normal)
+- Heuristic (comportamento)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Boas Práticas</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>Defense in Depth:
+1. Segmentação (VLANs, subnets)
+2. Firewall perimetral + interno
+3. IDS/IPS
+4. Autenticação forte (802.1X)
+5. Criptografia (TLS, IPSec)
+6. Monitoramento contínuo
+7. Patch management
+8. Princípio do menor privilégio
+
+Ataques comuns:
+- ARP Spoofing → DAI (Dynamic ARP Inspection)
+- MAC Flooding → Port Security
+- VLAN Hopping → Desabilitar DTP
+- DDoS → Rate limiting, CDN</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-06.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-08.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

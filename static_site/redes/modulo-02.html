@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 02: Modelo OSI e TCP/IP</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 02</span>
+        <h1>Modelo OSI e TCP/IP</h1>
+        <p>Os modelos de referência que definem como a comunicação em rede é organizada em camadas.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Modelo OSI — 7 Camadas</h3>
+          <div class="info-box highlight">
+            <strong>Mnemônico:</strong> "<strong>A</strong>ll <strong>P</strong>eople <strong>S</strong>eem <strong>T</strong>o <strong>N</strong>eed <strong>D</strong>ata <strong>P</strong>rocessing" (de cima para baixo)
+          </div>
+          <div class="command-card wide" style="margin-top:16px">
+            <div class="command-header"><code>Camadas OSI</code><span class="cmd-tag">Modelo</span></div>
+            <pre><code>Camada 7 — Aplicação     | HTTP, HTTPS, FTP, DNS, SMTP, SSH
+Camada 6 — Apresentação  | SSL/TLS, JPEG, ASCII, criptografia
+Camada 5 — Sessão        | NetBIOS, RPC, controle de sessão
+Camada 4 — Transporte    | TCP (confiável), UDP (rápido)
+Camada 3 — Rede          | IP, ICMP, ARP, roteamento
+Camada 2 — Enlace        | Ethernet, MAC, switches, frames
+Camada 1 — Física        | Cabos, sinais elétricos, conectores
+
+PDU por camada:
+  Camada 4: Segmento (TCP) / Datagrama (UDP)
+  Camada 3: Pacote
+  Camada 2: Frame
+  Camada 1: Bits</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Modelo TCP/IP — 4 Camadas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>TCP/IP vs OSI</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code>TCP/IP              OSI Equivalente         Protocolos
+─────────────────────────────────────────────────────────
+Aplicação           7 + 6 + 5               HTTP, DNS, FTP, SSH
+Transporte          4                       TCP, UDP
+Internet            3                       IP, ICMP, ARP
+Acesso à Rede      2 + 1                   Ethernet, Wi-Fi</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>TCP vs UDP</code><span class="cmd-tag">Transporte</span></div>
+              <p>Dois protocolos de transporte com características distintas.</p>
+              <pre><code>TCP (Transmission Control Protocol):
+- Orientado a conexão (3-way handshake)
+- Confiável (ACK, retransmissão)
+- Controle de fluxo e congestionamento
+- Uso: HTTP, SSH, FTP, SMTP
+
+UDP (User Datagram Protocol):
+- Sem conexão (connectionless)
+- Sem garantia de entrega
+- Menor overhead, mais rápido
+- Uso: DNS, DHCP, VoIP, streaming</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>3-Way Handshake</code><span class="cmd-tag">TCP</span></div>
+              <p>Estabelecimento de conexão TCP.</p>
+              <pre><code>Cliente → Servidor: SYN (seq=100)
+Servidor → Cliente: SYN-ACK (seq=300, ack=101)
+Cliente → Servidor: ACK (seq=101, ack=301)
+
+Encerramento (4-way):
+Cliente → FIN
+Servidor → ACK
+Servidor → FIN
+Cliente → ACK</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Portas e Protocolos Importantes</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Portas Conhecidas</code><span class="cmd-tag">Referência</span></div>
+            <div class="options-table">
+              <table>
+                <thead><tr><th>Porta</th><th>Protocolo</th><th>Serviço</th></tr></thead>
+                <tbody>
+                  <tr><td><code>20/21</code></td><td>TCP</td><td>FTP (dados/controle)</td></tr>
+                  <tr><td><code>22</code></td><td>TCP</td><td>SSH</td></tr>
+                  <tr><td><code>23</code></td><td>TCP</td><td>Telnet (inseguro)</td></tr>
+                  <tr><td><code>25</code></td><td>TCP</td><td>SMTP (e-mail)</td></tr>
+                  <tr><td><code>53</code></td><td>TCP/UDP</td><td>DNS</td></tr>
+                  <tr><td><code>67/68</code></td><td>UDP</td><td>DHCP</td></tr>
+                  <tr><td><code>80</code></td><td>TCP</td><td>HTTP</td></tr>
+                  <tr><td><code>443</code></td><td>TCP</td><td>HTTPS</td></tr>
+                  <tr><td><code>161/162</code></td><td>UDP</td><td>SNMP</td></tr>
+                  <tr><td><code>3389</code></td><td>TCP</td><td>RDP</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

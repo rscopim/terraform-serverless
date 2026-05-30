@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Kubernetes Módulo 04: Observabilidade, GitOps e Troubleshooting</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../kubernetes.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☸️ Kubernetes — Módulo 04</span>
+        <h1>Observabilidade, GitOps e Troubleshooting</h1>
+        <p>Monitoramento com Prometheus, GitOps com ArgoCD, backup do etcd, segurança e resolução de problemas em produção.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Observabilidade</h2>
+          <div class="info-box">
+            <strong>3 Pilares:</strong> Métricas (Prometheus + Grafana) | Logs (EFK Stack) | Traces (Jaeger / OpenTelemetry)
+          </div>
+          <div class="command-card wide" style="margin-top:18px">
+            <div class="command-header"><code>Prometheus + Alertas</code><span class="cmd-tag">Monitoramento</span></div>
+            <pre><code># ServiceMonitor — Prometheus descobre serviços
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app-monitor
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  endpoints:
+  - port: metrics
+    interval: 15s
+
+# PrometheusRule — Alertas
+- alert: HighErrorRate
+  expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+  for: 5m
+  labels:
+    severity: critical</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Troubleshooting</h2>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>🔄 CrashLoopBackOff</h4>
+              <ol>
+                <li><code>kubectl logs pod --previous</code></li>
+                <li><code>kubectl describe pod</code> → Events</li>
+                <li>ExitCode 137 = OOM killed</li>
+                <li>ExitCode 1 = erro da aplicação</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>⏳ Pod em Pending</h4>
+              <ol>
+                <li><code>kubectl describe pod</code></li>
+                <li>Recursos insuficientes (CPU/RAM)</li>
+                <li>PVC não encontrado</li>
+                <li>Taint sem toleration</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>🌐 Service não conecta</h4>
+              <ol>
+                <li><code>kubectl get endpoints svc</code></li>
+                <li>Verificar labels/selector</li>
+                <li><code>kubectl exec pod -- nslookup svc</code></li>
+                <li><code>kubectl exec pod -- curl svc:port</code></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>3. GitOps com ArgoCD</h2>
+          <div class="command-card wide">
+            <div class="command-header"><code>ArgoCD Application</code><span class="cmd-tag">GitOps</span></div>
+            <pre><code># Git como fonte de verdade → ArgoCD detecta mudança → aplica no cluster
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minha-app
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/user/repo.git
+    targetRevision: main
+    path: kubernetes/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>4. Boas Práticas de Produção</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Segurança</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># Security Context
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  containers:
+  - securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: [ALL]
+
+# Pod Security Standards
+metadata:
+  labels:
+    pod-security.kubernetes.io/enforce: restricted</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>etcd Backup</code><span class="cmd-tag">Disaster Recovery</span></div>
+              <pre><code># Backup
+ETCDCTL_API=3 etcdctl snapshot save /tmp/backup.db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+
+# Verificar
+ETCDCTL_API=3 etcdctl snapshot status /tmp/backup.db
+
+# Restore
+ETCDCTL_API=3 etcdctl snapshot restore /tmp/backup.db \
+  --data-dir=/var/lib/etcd-restored</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>5. Comandos Mais Usados</h2>
+          <div class="interview-table">
+            <table>
+              <thead><tr><th>Categoria</th><th>Comandos</th></tr></thead>
+              <tbody>
+                <tr><td>Pods</td><td><code>get, describe, logs, exec, delete, top</code></td></tr>
+                <tr><td>Deploy</td><td><code>apply, scale, set image, rollout, undo</code></td></tr>
+                <tr><td>Services</td><td><code>expose, get svc, get endpoints</code></td></tr>
+                <tr><td>Config</td><td><code>create configmap, create secret</code></td></tr>
+                <tr><td>Debug</td><td><code>describe, logs --previous, get events</code></td></tr>
+                <tr><td>Cluster</td><td><code>get nodes, top nodes, drain, cordon</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../kubernetes.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

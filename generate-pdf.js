@@ -10,6 +10,8 @@ const COURSES = {
   'ai-practitioner': { modules: 5, title: 'AWS AI Practitioner (AIF-C01)', emoji: '🤖', subtitle: 'Fundamentos IA/ML • IA Generativa • Modelos de Fundação • IA Responsável • Segurança', prefix: 'dominio' },
   linux: { modules: 5, title: 'Linux: Do Zero ao Avançado', emoji: '🐧', subtitle: 'Terminal • Permissões • Shell Script • Redes • Automação' },
   github: { modules: 9, title: 'Git & GitHub: Do Zero ao Avançado', emoji: '🐙', subtitle: 'Configuração • Branches • Colaboração • Rebase • Actions • Segurança', startAt: 0 },
+  kubernetes: { modules: 4, title: 'Kubernetes: Do Zero ao Avançado', emoji: '☸️', subtitle: 'Pods • Deployments • Services • Helm • HPA • GitOps • Produção' },
+  redes: { modules: 12, title: 'Redes de Computadores: Do Zero ao Avançado', emoji: '🌐', subtitle: 'Fundamentos • OSI • IP • Switching • Roteamento • Segurança • Automação • Design' },
 };
 
 async function generatePDF(courseName) {
@@ -99,7 +101,7 @@ async function generatePDF(courseName) {
   console.log(`Generating PDF for: ${config.title}`);
   const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
-  await page.setContent(combinedHTML, { waitUntil: 'networkidle0', timeout: 60000 });
+  await page.setContent(combinedHTML, { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.pdf({
     path: outputFileFinal,
     format: 'A4',

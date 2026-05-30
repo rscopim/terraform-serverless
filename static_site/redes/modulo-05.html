@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 05: Switches e VLANs</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-04.html" class="nav-link">← Anterior</a>
+        <a href="modulo-06.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 05</span>
+        <h1>Switches e VLANs</h1>
+        <p>Switching na camada 2, segmentação com VLANs, trunking e Spanning Tree Protocol.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Fundamentos de Switching</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Funcionamento do Switch</code><span class="cmd-tag">Camada 2</span></div>
+              <pre><code>Processo de encaminhamento:
+1. Frame chega na porta → switch lê MAC de origem
+2. Aprende: associa MAC à porta (tabela CAM/MAC)
+3. Verifica MAC de destino na tabela
+4. Se encontra → encaminha para porta específica (unicast)
+5. Se não encontra → flood para todas as portas (exceto origem)
+
+Modos de switching:
+- Store-and-Forward: recebe frame completo, verifica CRC, encaminha
+- Cut-Through: encaminha após ler MAC destino (mais rápido)
+- Fragment-Free: lê 64 bytes antes de encaminhar</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. VLANs (Virtual LANs)</h3>
+          <div class="info-box highlight">
+            <strong>VLAN:</strong> Segmenta logicamente uma rede física em múltiplos domínios de broadcast. Melhora segurança, performance e gerenciamento.
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Configuração de VLANs (Cisco IOS)</code><span class="cmd-tag">Config</span></div>
+              <pre><code># Criar VLANs
+Switch(config)# vlan 10
+Switch(config-vlan)# name FINANCEIRO
+Switch(config)# vlan 20
+Switch(config-vlan)# name TI
+Switch(config)# vlan 30
+Switch(config-vlan)# name GUEST
+
+# Atribuir porta a uma VLAN (Access)
+Switch(config)# interface fa0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+
+# Verificação
+Switch# show vlan brief
+Switch# show interfaces trunk
+Switch# show mac address-table</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Trunking (802.1Q)</code><span class="cmd-tag">Inter-Switch</span></div>
+              <pre><code># Trunk carrega múltiplas VLANs entre switches
+Switch(config)# interface gi0/1
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk allowed vlan 10,20,30
+Switch(config-if)# switchport trunk native vlan 99
+
+# 802.1Q: adiciona tag de 4 bytes ao frame
+# Native VLAN: frames sem tag (segurança: não usar VLAN 1)
+
+# Inter-VLAN Routing (Router-on-a-Stick)
+Router(config)# interface gi0/0.10
+Router(config-subif)# encapsulation dot1Q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config)# interface gi0/0.20
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Spanning Tree Protocol (STP)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>STP / RSTP</code><span class="cmd-tag">Redundância</span></div>
+            <pre><code>Problema: loops em topologias redundantes → broadcast storm
+Solução: STP bloqueia portas redundantes, mantém caminho livre de loops
+
+Eleição:
+1. Root Bridge: switch com menor Bridge ID (prioridade + MAC)
+2. Root Port: melhor caminho até o Root Bridge
+3. Designated Port: melhor porta por segmento
+4. Blocked Port: portas redundantes bloqueadas
+
+Versões:
+- STP (802.1D): convergência lenta (~50s)
+- RSTP (802.1w): convergência rápida (~1-2s)
+- PVST+: STP por VLAN (Cisco)
+
+Switch(config)# spanning-tree mode rapid-pvst
+Switch(config)# spanning-tree vlan 10 root primary</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-06.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

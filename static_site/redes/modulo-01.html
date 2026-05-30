@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 01: Fundamentos de Redes</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../redes.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 01</span>
+        <h1>Fundamentos de Redes</h1>
+        <p>Conceitos essenciais de comunicação de dados, tipos de redes, topologias e meios de transmissão.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Conceitos Básicos</h3>
+          <div class="info-box highlight">
+            <strong>O que é uma rede?</strong> Um conjunto de dispositivos interconectados que compartilham recursos e trocam dados usando protocolos padronizados.
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Tipos de Rede</code><span class="cmd-tag">Conceito</span></div>
+              <p>Classificação por abrangência geográfica.</p>
+              <pre><code>LAN  — Local Area Network    (escritório, casa)
+MAN  — Metropolitan Area     (cidade, campus)
+WAN  — Wide Area Network     (países, continentes)
+WLAN — Wireless LAN          (Wi-Fi)
+PAN  — Personal Area Network (Bluetooth, NFC)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Topologias</code><span class="cmd-tag">Conceito</span></div>
+              <p>Forma como os dispositivos são conectados.</p>
+              <pre><code>Estrela  — Hub/Switch central (mais comum)
+Barramento — Cabo compartilhado (legado)
+Anel     — Token Ring (legado)
+Malha    — Full/Partial mesh (alta disponibilidade)
+Árvore   — Hierárquica (redes corporativas)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Meios de Transmissão</code><span class="cmd-tag">Físico</span></div>
+              <p>Cabos e conexões físicas.</p>
+              <pre><code>Par trançado (UTP/STP):
+  Cat5e — 1 Gbps, 100m
+  Cat6  — 10 Gbps, 55m
+  Cat6a — 10 Gbps, 100m
+
+Fibra óptica:
+  Monomodo — longa distância (km)
+  Multimodo — curta distância (campus)
+
+Wireless: 802.11ac (Wi-Fi 5), 802.11ax (Wi-Fi 6)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Dispositivos de Rede</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Switch</code><span class="cmd-tag">Camada 2</span></div>
+              <p>Encaminha frames baseado em endereços MAC. Opera na camada de enlace.</p>
+              <pre><code>Funcionalidades:
+- Tabela MAC (CAM table)
+- VLANs
+- Spanning Tree (STP)
+- Port Security
+- PoE (Power over Ethernet)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Roteador</code><span class="cmd-tag">Camada 3</span></div>
+              <p>Encaminha pacotes entre redes diferentes usando endereços IP.</p>
+              <pre><code>Funcionalidades:
+- Tabela de rotas
+- NAT/PAT
+- ACLs (Access Control Lists)
+- DHCP Server
+- VPN Gateway
+- QoS (Quality of Service)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Firewall</code><span class="cmd-tag">Segurança</span></div>
+              <p>Filtra tráfego entre redes com base em regras.</p>
+              <pre><code>Tipos:
+- Stateless (filtro de pacotes simples)
+- Stateful (rastreia conexões)
+- NGFW (Next-Gen: DPI, IPS, App Control)
+- WAF (Web Application Firewall)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Access Point</code><span class="cmd-tag">Wireless</span></div>
+              <p>Fornece conectividade Wi-Fi aos dispositivos.</p>
+              <pre><code>Conceitos:
+- SSID (nome da rede)
+- Canais (2.4 GHz / 5 GHz / 6 GHz)
+- WPA3 (segurança)
+- Roaming (transição entre APs)
+- Controller-based vs Autonomous</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../redes.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

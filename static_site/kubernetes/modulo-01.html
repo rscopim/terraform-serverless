@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Kubernetes Módulo 01: Fundamentos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../kubernetes.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☸️ Kubernetes — Módulo 01</span>
+        <h1>Fundamentos do Kubernetes</h1>
+        <p>Kubernetes (K8s) é uma plataforma open-source de orquestração de containers que automatiza deploy, escalonamento e gerenciamento de aplicações.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Arquitetura</h2>
+          <div class="info-box highlight">
+            <pre><code>CONTROL PLANE: API Server | etcd | Scheduler | Controller Manager
+WORKER NODES:  kubelet | kube-proxy | Container Runtime | Pods</code></pre>
+          </div>
+          <div class="command-card wide" style="margin-top:18px">
+            <div class="command-header"><code>Componentes</code><span class="cmd-tag">Arquitetura</span></div>
+            <table style="width:100%;font-size:0.84rem;border-collapse:collapse">
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">API Server</td><td style="padding:6px">Ponto de entrada para todos os comandos (kubectl)</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">etcd</td><td style="padding:6px">Banco chave-valor com todo o estado do cluster</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">Scheduler</td><td style="padding:6px">Decide em qual Node um Pod será executado</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">kubelet</td><td style="padding:6px">Agente em cada Node que garante containers rodando</td></tr>
+              <tr><td style="padding:6px;font-weight:700;color:var(--primary-600)">kube-proxy</td><td style="padding:6px">Gerencia regras de rede entre Pods</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Instalação Local (Minikube)</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>kubectl</code><span class="cmd-tag">CLI</span></div>
+              <pre><code># Linux
+curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+# Windows (PowerShell)
+curl.exe -LO "https://dl.k8s.io/release/v1.29.0/bin/windows/amd64/kubectl.exe"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>minikube</code><span class="cmd-tag">Cluster Local</span></div>
+              <pre><code>minikube start --driver=docker
+minikube status
+kubectl cluster-info
+kubectl get nodes</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>3. Comandos Essenciais</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>kubectl get</code><span class="cmd-tag">Listar</span></div>
+              <pre><code>kubectl get pods
+kubectl get pods -o wide
+kubectl get pods -l app=nginx
+kubectl get nodes
+kubectl get namespaces</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>kubectl run / apply</code><span class="cmd-tag">Criar</span></div>
+              <pre><code>kubectl run meu-nginx --image=nginx
+kubectl apply -f meu-pod.yaml
+kubectl delete -f meu-pod.yaml
+kubectl create namespace dev</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>kubectl describe / logs</code><span class="cmd-tag">Debug</span></div>
+              <pre><code>kubectl describe pod meu-nginx
+kubectl logs meu-nginx
+kubectl logs -f meu-nginx
+kubectl exec -it meu-nginx -- /bin/bash</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Pod YAML</code><span class="cmd-tag">Declarativo</span></div>
+              <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: meu-nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>4. Jobs, CronJobs e DaemonSets</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Job</code><span class="cmd-tag">Batch</span></div>
+              <p>Executa tarefa até conclusão.</p>
+              <pre><code>apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-backup
+spec:
+  completions: 3
+  parallelism: 2
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+      - name: worker
+        image: busybox
+        command: ["sh", "-c", "echo done"]
+      restartPolicy: Never</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CronJob</code><span class="cmd-tag">Agendado</span></div>
+              <p>Job em horários agendados (cron).</p>
+              <pre><code>apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-diario
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: busybox
+            command: ["sh", "-c", "echo backup"]
+          restartPolicy: OnFailure</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../kubernetes.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

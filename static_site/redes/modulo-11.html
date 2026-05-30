@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 11: Observabilidade e Monitoramento</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-10.html" class="nav-link">← Anterior</a>
+        <a href="modulo-12.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 11</span>
+        <h1>Observabilidade e Monitoramento</h1>
+        <p>SNMP, Prometheus, Grafana e ferramentas para monitorar a saúde e performance da rede.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. SNMP (Simple Network Management Protocol)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>SNMP</code><span class="cmd-tag">Protocolo</span></div>
+              <pre><code>Componentes:
+- Manager (NMS): coleta dados dos dispositivos
+- Agent: software no dispositivo que responde queries
+- MIB: banco de dados hierárquico de objetos gerenciáveis
+- OID: identificador único de cada objeto
+
+Operações:
+- GET: consulta valor de um OID
+- SET: altera valor de um OID
+- TRAP: dispositivo envia alerta ao manager
+- WALK: percorre toda a árvore MIB
+
+Versões:
+- SNMPv1: community strings (texto plano) — inseguro
+- SNMPv2c: melhorias, mas ainda sem criptografia
+- SNMPv3: autenticação + criptografia (recomendado!)
+
+# Configuração (Cisco)
+Router(config)# snmp-server community READONLY ro
+Router(config)# snmp-server community READWRITE rw
+Router(config)# snmp-server host 10.0.0.100 version 2c READONLY
+Router(config)# snmp-server enable traps
+
+# Consulta via Linux
+snmpwalk -v2c -c READONLY 192.168.1.1 system
+snmpget -v2c -c READONLY 192.168.1.1 sysUpTime.0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Prometheus + Grafana</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Prometheus</code><span class="cmd-tag">Métricas</span></div>
+              <pre><code># Prometheus: coleta e armazena métricas time-series
+# Modelo pull: Prometheus busca métricas nos targets
+
+# prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'network-devices'
+    static_configs:
+      - targets:
+          - '192.168.1.1:9116'  # SNMP Exporter
+          - '192.168.1.2:9116'
+
+  - job_name: 'snmp'
+    metrics_path: /snmp
+    params:
+      module: [if_mib]
+    static_configs:
+      - targets:
+          - 192.168.1.1
+          - 192.168.1.2
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+
+# Queries PromQL
+rate(ifHCInOctets{ifDescr="GigabitEthernet0/0"}[5m]) * 8  # bps
+ifOperStatus == 2  # interfaces down
+increase(ifInErrors[1h])  # erros na última hora</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Grafana</code><span class="cmd-tag">Dashboards</span></div>
+              <pre><code># Grafana: visualização de métricas com dashboards
+
+Dashboards de rede típicos:
+- Utilização de banda por interface
+- Status de interfaces (up/down)
+- Latência e perda de pacotes
+- Top talkers (hosts com mais tráfego)
+- Erros e descartes por porta
+- Uptime dos dispositivos
+
+Alertas:
+- Interface down → Slack/PagerDuty
+- Utilização > 80% → E-mail
+- Latência > 100ms → Ticket
+- Erros crescentes → Investigar
+
+Ferramentas complementares:
+- SNMP Exporter: bridge Prometheus ↔ SNMP
+- Blackbox Exporter: probes ICMP/HTTP/TCP
+- Node Exporter: métricas de servidores Linux</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Outras Ferramentas de Monitoramento</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Zabbix</code><span class="cmd-tag">NMS</span></div>
+              <pre><code>Plataforma completa de monitoramento:
+- SNMP, ICMP, agentes
+- Auto-discovery de dispositivos
+- Templates prontos (Cisco, Linux, etc.)
+- Mapas de rede visuais
+- Alertas e escalation
+- Relatórios e SLA</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Netflow / sFlow</code><span class="cmd-tag">Fluxo</span></div>
+              <pre><code>Análise de tráfego por fluxo:
+- Quem está comunicando com quem
+- Quais aplicações consomem banda
+- Detecção de anomalias
+
+Ferramentas:
+- ntopng
+- Elastiflow
+- PRTG
+- SolarWinds NTA
+
+# Cisco NetFlow config
+Router(config)# flow exporter EXPORT
+Router(config-flow-exporter)# destination 10.0.0.100
+Router(config-flow-exporter)# transport udp 2055</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-10.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-12.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
