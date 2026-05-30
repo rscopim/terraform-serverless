@@ -16,6 +16,8 @@ const COURSES = {
   cloudformation: { modules: 4, title: 'AWS CloudFormation: Do Zero ao Avançado', emoji: '☁️', subtitle: 'Templates • VPC • EC2 • RDS • S3 • Nested Stacks' },
   developer: { modules: 4, title: 'AWS Developer Associate (DVA-C02)', emoji: '💻', subtitle: 'Desenvolvimento • Segurança • Implantação • Troubleshooting', prefix: 'dominio' },
   'solutions-architect-pro': { modules: 7, title: 'AWS SA Professional (SAP-C02)', emoji: '🏛️', subtitle: 'Complexidade • Novas Soluções • Melhoria • Migração • Cenários' },
+  'cloud-practitioner': { modules: 4, title: 'AWS Cloud Practitioner (CLF-C02)', emoji: '☁️', subtitle: 'Conceitos Cloud • Segurança • Tecnologia • Cobrança', prefix: 'dominio' },
+  'solutions-architect': { modules: 4, title: 'AWS Solutions Architect Associate (SAA-C03)', emoji: '🏗️', subtitle: 'Segurança • Resiliência • Performance • Custos', prefix: 'dominio' },
 };
 
 async function generatePDF(courseName) {
@@ -35,6 +37,10 @@ async function generatePDF(courseName) {
     var outputFileFinal = path.join(outputDir, 'aws-developer-associate-do-zero-ao-avancado.pdf');
   } else if (courseName === 'solutions-architect-pro') {
     var outputFileFinal = path.join(outputDir, 'aws-sa-professional-do-zero-ao-avancado.pdf');
+  } else if (courseName === 'cloud-practitioner') {
+    var outputFileFinal = path.join(outputDir, 'aws-cloud-practitioner-do-zero-ao-avancado.pdf');
+  } else if (courseName === 'solutions-architect') {
+    var outputFileFinal = path.join(outputDir, 'aws-solutions-architect-do-zero-ao-avancado.pdf');
   } else {
     var outputFileFinal = outputFile;
   }
