@@ -103,7 +103,7 @@ module "register_lead_lambda" {
   dynamodb_table_name = module.dynamodb_leads.table_name
   dynamodb_table_arn  = module.dynamodb_leads.table_arn
 
-  pdf_base_url = "https://cloudtrilhas.com.br/materiais"
+  pdf_base_url = "https://www.cloudtrilhas.com.br/materiais"
 }
 
 module "api_gateway" {
