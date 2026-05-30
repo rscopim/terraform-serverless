@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — AI Practitioner Domínio 01: Fundamentos de IA e ML</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../ai-practitioner.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🤖 AI Practitioner — Domínio 01</span>
+        <h1>Fundamentos de IA e ML</h1>
+        <p>Conceitos fundamentais de Inteligência Artificial, Machine Learning, Deep Learning e IA Generativa. Tipos de aprendizado, ciclo de vida do ML e serviços AWS.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Hierarquia de Conceitos -->
+        <div class="topic-block">
+          <h2>Hierarquia de Conceitos</h2>
+          <p>A Inteligência Artificial é o campo mais amplo, com subcampos progressivamente mais específicos:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Nível</th><th>Conceito</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Inteligência Artificial (IA)</strong></td><td>Campo amplo que busca criar máquinas capazes de simular inteligência humana</td></tr>
+              <tr><td>2</td><td><strong>Machine Learning (ML)</strong></td><td>Subconjunto de IA — algoritmos que aprendem padrões a partir de dados sem programação explícita</td></tr>
+              <tr><td>3</td><td><strong>Deep Learning (DL)</strong></td><td>Subconjunto de ML — redes neurais com múltiplas camadas que aprendem representações complexas</td></tr>
+              <tr><td>4</td><td><strong>IA Generativa (GenAI)</strong></td><td>Subconjunto de DL — modelos que geram novo conteúdo (texto, imagem, código, áudio)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Dica para o exame:</strong> GenAI ⊂ Deep Learning ⊂ Machine Learning ⊂ Inteligência Artificial. Toda GenAI é DL, mas nem todo DL é GenAI.</p>
+          </div>
+        </div>
+
+        <!-- Tipos de Aprendizado -->
+        <div class="topic-block">
+          <h2>Tipos de Aprendizado</h2>
+
+          <h3>Aprendizado Supervisionado</h3>
+          <p>O modelo aprende a partir de dados <strong>rotulados</strong> (input → output conhecido). É o tipo mais comum em produção.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Classificação</code><span class="cmd-tag">Categorias</span></div>
+              <p>Prever uma <strong>categoria/classe</strong> discreta.</p>
+              <pre><code>Exemplos:
+• Spam ou não-spam (binária)
+• Análise de sentimento (positivo/negativo/neutro)
+• Diagnóstico médico (doença A, B ou C)
+• Detecção de fraude (fraude/legítimo)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Regressão</code><span class="cmd-tag">Valores</span></div>
+              <p>Prever um <strong>valor numérico contínuo</strong>.</p>
+              <pre><code>Exemplos:
+• Preço de imóvel
+• Temperatura amanhã
+• Receita do próximo trimestre
+• Tempo de entrega estimado</code></pre>
+            </div>
+          </div>
+
+          <h3>Aprendizado Não-Supervisionado</h3>
+          <p>O modelo encontra padrões em dados <strong>sem rótulos</strong>. Não há resposta "certa" — o modelo descobre estruturas ocultas.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Clustering</code><span class="cmd-tag">Agrupamento</span></div>
+              <p>Agrupa dados similares sem categorias pré-definidas.</p>
+              <pre><code>Exemplos:
+• Segmentação de clientes
+• Agrupamento de documentos por tema
+• Detecção de anomalias
+• Compressão de dados</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Redução de Dimensionalidade</code><span class="cmd-tag">Simplificação</span></div>
+              <p>Reduz o número de features mantendo informações relevantes.</p>
+              <pre><code>Exemplos:
+• PCA (Principal Component Analysis)
+• Visualização de dados complexos
+• Remoção de ruído</code></pre>
+            </div>
+          </div>
+
+          <h3>Aprendizado por Reforço</h3>
+          <p>O agente aprende por <strong>tentativa e erro</strong>, recebendo recompensas ou penalidades por suas ações em um ambiente.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Recompensa / Penalidade</code><span class="cmd-tag">Feedback</span></div>
+              <p>O agente maximiza recompensas acumuladas ao longo do tempo.</p>
+              <pre><code>Exemplos:
+• Jogos (AlphaGo, Atari)
+• Robótica (navegação autônoma)
+• Recomendação de conteúdo
+• AWS DeepRacer (carros autônomos)
+• Otimização de recursos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Componentes</code><span class="cmd-tag">Estrutura</span></div>
+              <pre><code>• Agente: quem toma decisões
+• Ambiente: onde o agente atua
+• Estado: situação atual
+• Ação: o que o agente faz
+• Recompensa: feedback do ambiente
+• Política: estratégia do agente</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Dicas para o exame:</strong></p>
+            <p>• "Dados rotulados" → Supervisionado | "Sem rótulos" → Não-supervisionado | "Recompensa" → Reforço</p>
+            <p>• Classificação = categorias discretas | Regressão = valores contínuos</p>
+            <p>• AWS DeepRacer = Aprendizado por Reforço</p>
+          </div>
+        </div>
+
+        <!-- Ciclo de Vida do ML -->
+        <div class="topic-block">
+          <h2>Ciclo de Vida do ML Pipeline</h2>
+          <p>O desenvolvimento de modelos de ML segue um pipeline estruturado com etapas iterativas:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Etapa</th><th>Descrição</th><th>Palavras-chave / Serviços AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>1. Definição do Problema</strong></td><td>Identificar o problema de negócio e definir métricas de sucesso</td><td>Business understanding, KPIs, viabilidade</td></tr>
+              <tr><td><strong>2. Coleta de Dados</strong></td><td>Reunir dados relevantes de diversas fontes</td><td>S3, Kinesis, Glue, Data Pipeline</td></tr>
+              <tr><td><strong>3. Preparação dos Dados</strong></td><td>Limpar, transformar e preparar dados para treinamento</td><td>SageMaker Data Wrangler, Glue ETL, Feature Store</td></tr>
+              <tr><td><strong>4. Feature Engineering</strong></td><td>Criar e selecionar features relevantes para o modelo</td><td>Feature Store, transformações, normalização</td></tr>
+              <tr><td><strong>5. Treinamento</strong></td><td>Treinar o modelo com algoritmos e hiperparâmetros</td><td>SageMaker Training Jobs, algoritmos built-in</td></tr>
+              <tr><td><strong>6. Avaliação</strong></td><td>Avaliar performance com métricas e dados de teste</td><td>Accuracy, Precision, Recall, F1, AUC-ROC</td></tr>
+              <tr><td><strong>7. Deploy (Implantação)</strong></td><td>Disponibilizar o modelo para inferência em produção</td><td>SageMaker Endpoints, Batch Transform</td></tr>
+              <tr><td><strong>8. Monitoramento</strong></td><td>Monitorar performance e detectar degradação (drift)</td><td>SageMaker Model Monitor, CloudWatch</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Conceito importante:</strong> O pipeline é <strong>iterativo</strong> — se o modelo não atinge as métricas desejadas, volta-se a etapas anteriores (mais dados, features diferentes, outro algoritmo).</p>
+          </div>
+        </div>
+
+        <!-- Tipos de Dados -->
+        <div class="topic-block">
+          <h2>Tipos de Dados</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Descrição</th><th>Exemplos</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Estruturado</strong></td><td>Dados organizados em tabelas com schema definido</td><td>Bancos relacionais, CSV, planilhas</td></tr>
+              <tr><td><strong>Não-estruturado</strong></td><td>Dados sem formato pré-definido</td><td>Imagens, vídeos, áudio, texto livre</td></tr>
+              <tr><td><strong>Semi-estruturado</strong></td><td>Dados com alguma organização mas sem schema rígido</td><td>JSON, XML, logs, e-mails</td></tr>
+              <tr><td><strong>Rotulado (Labeled)</strong></td><td>Dados com a resposta correta associada</td><td>Imagem + "gato", e-mail + "spam"</td></tr>
+              <tr><td><strong>Não-rotulado (Unlabeled)</strong></td><td>Dados sem resposta associada</td><td>Fotos sem descrição, textos sem categoria</td></tr>
+              <tr><td><strong>Dados de Séries Temporais</strong></td><td>Dados ordenados no tempo</td><td>Preços de ações, métricas de servidor, IoT</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Dados rotulados → Supervisionado | Dados não-rotulados → Não-supervisionado | SageMaker Ground Truth é usado para rotular dados.</p>
+          </div>
+        </div>
+
+        <!-- Métricas de Avaliação -->
+        <div class="topic-block">
+          <h2>Métricas de Avaliação de Modelos</h2>
+
+          <h3>Métricas de Classificação</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Accuracy</code><span class="cmd-tag">Acurácia</span></div>
+              <p>Proporção de previsões corretas sobre o total. Boa quando classes são balanceadas.</p>
+              <pre><code>Accuracy = (TP + TN) / Total
+⚠️ Pode ser enganosa com classes desbalanceadas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Precision</code><span class="cmd-tag">Precisão</span></div>
+              <p>Dos que o modelo disse "positivo", quantos realmente são? Importante quando falso positivo é custoso.</p>
+              <pre><code>Precision = TP / (TP + FP)
+Exemplo: Detecção de spam — não quero perder e-mails legítimos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Recall</code><span class="cmd-tag">Sensibilidade</span></div>
+              <p>Dos que realmente são positivos, quantos o modelo encontrou? Importante quando falso negativo é custoso.</p>
+              <pre><code>Recall = TP / (TP + FN)
+Exemplo: Diagnóstico de câncer — não quero perder nenhum caso</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>F1-Score</code><span class="cmd-tag">Equilíbrio</span></div>
+              <p>Média harmônica entre Precision e Recall. Útil quando ambos são importantes.</p>
+              <pre><code>F1 = 2 × (Precision × Recall) / (Precision + Recall)
+Bom para classes desbalanceadas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AUC-ROC</code><span class="cmd-tag">Curva</span></div>
+              <p>Área sob a curva ROC. Mede a capacidade do modelo de distinguir entre classes. Valor de 0.5 = aleatório, 1.0 = perfeito.</p>
+              <pre><code>AUC = 1.0 → Modelo perfeito
+AUC = 0.5 → Modelo aleatório (inútil)
+Independente do threshold escolhido</code></pre>
+            </div>
+          </div>
+
+          <h3>Métricas de Regressão</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>RMSE</code><span class="cmd-tag">Root Mean Squared Error</span></div>
+              <p>Raiz da média dos erros ao quadrado. Penaliza erros grandes mais fortemente.</p>
+              <pre><code>RMSE = √(Σ(yi - ŷi)² / n)
+Mesma unidade da variável alvo
+Sensível a outliers</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>MAE</code><span class="cmd-tag">Mean Absolute Error</span></div>
+              <p>Média dos erros absolutos. Mais robusto a outliers que RMSE.</p>
+              <pre><code>MAE = Σ|yi - ŷi| / n
+Mesma unidade da variável alvo
+Menos sensível a outliers</code></pre>
+            </div>
+          </div>
+
+          <h3>Overfitting vs Underfitting</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Overfitting</code><span class="cmd-tag">Sobreajuste</span></div>
+              <p>Modelo "decorou" os dados de treino mas não generaliza para dados novos.</p>
+              <pre><code>Sintomas:
+• Alta performance no treino, baixa no teste
+• Modelo muito complexo para os dados
+
+Soluções:
+• Mais dados de treinamento
+• Regularização (L1, L2)
+• Dropout (redes neurais)
+• Early stopping
+• Cross-validation</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Underfitting</code><span class="cmd-tag">Subajuste</span></div>
+              <p>Modelo é simples demais e não captura os padrões dos dados.</p>
+              <pre><code>Sintomas:
+• Baixa performance tanto no treino quanto no teste
+• Modelo muito simples
+
+Soluções:
+• Modelo mais complexo
+• Mais features
+• Menos regularização
+• Treinar por mais tempo
+• Feature engineering</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Serviços AWS de IA Pré-treinados -->
+        <div class="topic-block">
+          <h2>Serviços AWS de IA Pré-treinados</h2>
+          <p>Serviços gerenciados que oferecem modelos prontos via API — sem necessidade de treinar modelos do zero:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>Casos de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon Comprehend</strong></td><td>NLP — análise de texto</td><td>Sentimento, entidades, idioma, tópicos, PII detection</td></tr>
+              <tr><td><strong>Amazon Rekognition</strong></td><td>Visão computacional</td><td>Faces, objetos, texto em imagens, moderação de conteúdo, celebridades</td></tr>
+              <tr><td><strong>Amazon Textract</strong></td><td>Extração de texto de documentos</td><td>OCR avançado, formulários, tabelas, documentos de identidade</td></tr>
+              <tr><td><strong>Amazon Transcribe</strong></td><td>Speech-to-Text</td><td>Transcrição de áudio, legendas, call analytics</td></tr>
+              <tr><td><strong>Amazon Polly</strong></td><td>Text-to-Speech</td><td>Narração, acessibilidade, assistentes de voz</td></tr>
+              <tr><td><strong>Amazon Translate</strong></td><td>Tradução de idiomas</td><td>Tradução em tempo real, localização de conteúdo</td></tr>
+              <tr><td><strong>Amazon Lex</strong></td><td>Chatbots conversacionais</td><td>Bots de atendimento, IVR, assistentes virtuais (mesma tech do Alexa)</td></tr>
+              <tr><td><strong>Amazon Kendra</strong></td><td>Busca inteligente empresarial</td><td>Busca em documentos internos, FAQ, knowledge base</td></tr>
+              <tr><td><strong>Amazon Personalize</strong></td><td>Recomendações personalizadas</td><td>Produtos, conteúdo, marketing personalizado</td></tr>
+              <tr><td><strong>Amazon Forecast</strong></td><td>Previsão de séries temporais</td><td>Demanda, inventário, receita, tráfego</td></tr>
+              <tr><td><strong>Amazon Fraud Detector</strong></td><td>Detecção de fraude</td><td>Fraude em pagamentos, contas falsas, abuso de promoções</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Serviços AWS de ML -->
+        <div class="topic-block">
+          <h2>Serviços AWS de ML (SageMaker)</h2>
+          <p>Para quem precisa treinar, customizar e gerenciar modelos próprios:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon SageMaker</strong></td><td>Plataforma completa de ML</td><td>Treinar, tunar e implantar modelos customizados end-to-end</td></tr>
+              <tr><td><strong>SageMaker Ground Truth</strong></td><td>Rotulagem de dados</td><td>Criar datasets rotulados com humanos + ML (active learning)</td></tr>
+              <tr><td><strong>SageMaker Autopilot</strong></td><td>AutoML</td><td>ML automatizado — gera modelos automaticamente a partir de dados tabulares</td></tr>
+              <tr><td><strong>SageMaker Canvas</strong></td><td>ML no-code</td><td>Interface visual para analistas de negócio criarem modelos sem código</td></tr>
+              <tr><td><strong>SageMaker Data Wrangler</strong></td><td>Preparação de dados</td><td>Interface visual para limpeza e transformação de dados</td></tr>
+              <tr><td><strong>SageMaker Feature Store</strong></td><td>Repositório de features</td><td>Armazenar e compartilhar features entre equipes e modelos</td></tr>
+              <tr><td><strong>SageMaker Model Monitor</strong></td><td>Monitoramento de modelos</td><td>Detectar data drift, model drift e degradação de qualidade</td></tr>
+              <tr><td><strong>SageMaker Clarify</strong></td><td>Explicabilidade e viés</td><td>Detectar viés nos dados/modelo e explicar previsões (XAI)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Hierarquia SageMaker:</strong> Canvas (no-code) → Autopilot (low-code/AutoML) → SageMaker Studio (full-code). Escolha baseada no nível técnico do usuário.</p>
+          </div>
+        </div>
+
+        <!-- Confusões Comuns -->
+        <div class="topic-block">
+          <h2>Confusões Comuns no Exame</h2>
+          <p>Serviços que são frequentemente confundidos nas questões:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Confusão</th><th>Serviço A</th><th>Serviço B</th><th>Diferença-chave</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Texto/NLP</td><td><strong>Comprehend</strong></td><td><strong>Kendra</strong></td><td>Comprehend = análise (sentimento, entidades) | Kendra = busca inteligente em documentos</td></tr>
+              <tr><td>Imagem/Documento</td><td><strong>Rekognition</strong></td><td><strong>Textract</strong></td><td>Rekognition = objetos, faces, cenas | Textract = extrair texto/tabelas de documentos</td></tr>
+              <tr><td>Áudio</td><td><strong>Transcribe</strong></td><td><strong>Polly</strong></td><td>Transcribe = áudio → texto | Polly = texto → áudio</td></tr>
+              <tr><td>Chatbot</td><td><strong>Lex</strong></td><td><strong>Bedrock Agents</strong></td><td>Lex = chatbot rule-based/NLU | Bedrock Agents = agentes com LLM + ações</td></tr>
+              <tr><td>ML Platform</td><td><strong>SageMaker</strong></td><td><strong>Bedrock</strong></td><td>SageMaker = treinar modelos próprios | Bedrock = usar Foundation Models prontos</td></tr>
+              <tr><td>Recomendação</td><td><strong>Personalize</strong></td><td><strong>Kendra</strong></td><td>Personalize = recomendação de produtos/conteúdo | Kendra = busca em documentos</td></tr>
+              <tr><td>No-code ML</td><td><strong>Canvas</strong></td><td><strong>Autopilot</strong></td><td>Canvas = interface visual drag-and-drop | Autopilot = AutoML programático</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tipos de Inferência -->
+        <div class="topic-block">
+          <h2>Tipos de Inferência</h2>
+          <p>Como o modelo treinado faz previsões em produção:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Real-time (Online)</code><span class="cmd-tag">Síncrono</span></div>
+              <p>Endpoint sempre ativo, resposta em milissegundos. Para aplicações que precisam de resposta imediata.</p>
+              <pre><code>• SageMaker Real-time Endpoints
+• Latência baixa (ms)
+• Custo: paga enquanto endpoint está ativo
+• Uso: chatbots, recomendações, detecção de fraude</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Batch (Lote)</code><span class="cmd-tag">Assíncrono</span></div>
+              <p>Processa grandes volumes de dados de uma vez. Sem necessidade de resposta imediata.</p>
+              <pre><code>• SageMaker Batch Transform
+• Processa dataset inteiro
+• Custo: paga apenas durante processamento
+• Uso: scoring mensal, relatórios, ETL</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Async (Assíncrono)</code><span class="cmd-tag">Fila</span></div>
+              <p>Para payloads grandes ou processamento demorado. Requisição entra em fila.</p>
+              <pre><code>• SageMaker Async Inference
+• Timeout de até 1 hora
+• Escala para zero quando ocioso
+• Uso: processamento de vídeo, documentos grandes</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Serverless</code><span class="cmd-tag">On-demand</span></div>
+              <p>Escala automaticamente para zero. Paga apenas por uso. Cold start possível.</p>
+              <pre><code>• SageMaker Serverless Inference
+• Escala para zero automaticamente
+• Cold start (latência inicial maior)
+• Uso: tráfego imprevisível, baixo volume</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- MLOps -->
+        <div class="topic-block">
+          <h2>MLOps — Operações de Machine Learning</h2>
+          <p>Práticas de DevOps aplicadas ao ciclo de vida de ML:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Conceito</th><th>Descrição</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>CI/CD para ML</strong></td><td>Automação de treinamento, teste e deploy de modelos</td><td>SageMaker Pipelines, CodePipeline</td></tr>
+              <tr><td><strong>Versionamento de Modelos</strong></td><td>Rastrear versões de modelos, dados e código</td><td>SageMaker Model Registry</td></tr>
+              <tr><td><strong>Monitoramento</strong></td><td>Detectar degradação de performance em produção</td><td>SageMaker Model Monitor, CloudWatch</td></tr>
+              <tr><td><strong>Data Drift</strong></td><td>Mudança na distribuição dos dados de entrada ao longo do tempo</td><td>Model Monitor (data quality)</td></tr>
+              <tr><td><strong>Model Drift</strong></td><td>Degradação da performance do modelo ao longo do tempo</td><td>Model Monitor (model quality)</td></tr>
+              <tr><td><strong>Feature Store</strong></td><td>Repositório centralizado de features reutilizáveis</td><td>SageMaker Feature Store</td></tr>
+              <tr><td><strong>Experiment Tracking</strong></td><td>Registrar hiperparâmetros, métricas e artefatos de cada experimento</td><td>SageMaker Experiments</td></tr>
+              <tr><td><strong>Governança</strong></td><td>Controle de acesso, auditoria e compliance de modelos</td><td>SageMaker Role Manager, Model Cards</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> MLOps = DevOps + ML. Foco em automação, reprodutibilidade, monitoramento e governança. SageMaker Pipelines é a resposta para "automatizar o pipeline de ML na AWS".</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../ai-practitioner.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

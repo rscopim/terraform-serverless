@@ -3,45 +3,143 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — AWS AI Practitioner</title>
-  <meta name="description" content="Trilha AWS AI Practitioner: IA, ML, Bedrock e SageMaker." />
+  <title>CloudTrilhas — AWS AI Practitioner (AIF-C01)</title>
+  <meta name="description" content="Treinamento completo para a certificação AWS Certified AI Practitioner. 5 domínios organizados conforme o guia oficial do exame." />
   <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
 </head>
 <body>
   <header class="header">
     <nav class="nav container" aria-label="Navegação principal">
       <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
-      <div class="nav-actions"><a href="aws.html" class="nav-link">AWS</a><a href="index.html" class="nav-button">Início</a></div>
+      <div class="nav-actions">
+        <a href="#modulos" class="nav-link">Domínios</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
+        <a href="index.html" class="nav-button">Início</a>
+      </div>
     </nav>
   </header>
+
   <main>
-    <section class="training-hero"><div class="container training-hero-content"><span class="pill">Em construção</span><h1>AWS AI Practitioner</h1><p>Trilha focada em IA, Machine Learning, IA Generativa, Bedrock, SageMaker e preparação para o exame.</p></div></section>
-    <section class="construction-page">
-      <div class="container construction-container">
-        <div class="construction-icon">🚧</div>
-        <span class="pill">Em construção</span>
-        <h1 style="margin:16px 0;font-size:1.8rem;font-weight:800">Conteúdo em preparação</h1>
-        <p style="color:var(--gray-500);margin-bottom:20px">Esta trilha receberá em breve:</p>
-        <ul class="construction-list">
-          <li>Materiais PDF sobre IA/ML</li>
-          <li>Simulados comentados</li>
-          <li>Mapas mentais</li>
-          <li>Conteúdo alinhado ao exame AWS AI Practitioner</li>
-        </ul>
-        <a href="aws.html" class="button primary">Voltar para AWS</a>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🤖 AI Practitioner</span>
+        <h1>AWS AI Practitioner (AIF-C01)</h1>
+        <p>Treinamento completo para a certificação AWS Certified AI Practitioner. 5 domínios organizados conforme o guia oficial do exame.</p>
+        <div class="hero-actions" style="margin-top:28px">
+          <a href="ai-practitioner/dominio-01.html" class="button primary">Começar pelo Domínio 01</a>
+          <a href="#materiais" class="button secondary">Baixar PDF Completo</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS BAR -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="ai-practitioner/dominio-01.html" class="progress-node active"><span>01</span><small>Fundamentos IA/ML (20%)</small></a>
+        <a href="ai-practitioner/dominio-02.html" class="progress-node"><span>02</span><small>IA Generativa (24%)</small></a>
+        <a href="ai-practitioner/dominio-03.html" class="progress-node"><span>03</span><small>Modelos de Fundação (28%)</small></a>
+        <a href="ai-practitioner/dominio-04.html" class="progress-node"><span>04</span><small>IA Responsável (14%)</small></a>
+        <a href="ai-practitioner/dominio-05.html" class="progress-node"><span>05</span><small>Segurança (14%)</small></a>
+      </div>
+    </section>
+
+    <!-- ESTRUTURA DO CURSO -->
+    <section id="modulos" class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📚 Estrutura do Curso</span>
+          <h2>5 Domínios do Exame</h2>
+          <p>Siga os domínios na ordem. Cada domínio cobre uma área específica conforme o guia oficial da certificação AIF-C01.</p>
+        </div>
+
+        <div class="command-grid">
+          <a href="ai-practitioner/dominio-01.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 01</code><span class="cmd-tag">20% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Fundamentos de IA e ML</h3>
+            <p>Conceitos de IA/ML/DL, tipos de aprendizado (supervisionado, não-supervisionado, reforço), ciclo de vida do ML, métricas de avaliação e serviços AWS de IA/ML.</p>
+          </a>
+
+          <a href="ai-practitioner/dominio-02.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 02</code><span class="cmd-tag">24% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Fundamentos de IA Generativa</h3>
+            <p>Foundation Models, LLMs, tokens, embeddings, context window, limitações (alucinações), Amazon Bedrock, Amazon Q e serviços de IA generativa.</p>
+          </a>
+
+          <a href="ai-practitioner/dominio-03.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 03</code><span class="cmd-tag">28% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Aplicações de Modelos de Fundação</h3>
+            <p>Prompt Engineering (zero-shot, few-shot, chain-of-thought), parâmetros de inferência, RAG, fine-tuning, Bedrock Agents e métricas de avaliação.</p>
+          </a>
+
+          <a href="ai-practitioner/dominio-04.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 04</code><span class="cmd-tag">14% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Diretrizes para IA Responsável</h3>
+            <p>Princípios de IA responsável, viés (bias), SageMaker Clarify, Bedrock Guardrails, Human-in-the-Loop e riscos éticos/legais.</p>
+          </a>
+
+          <a href="ai-practitioner/dominio-05.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Domínio 05</code><span class="cmd-tag">14% do exame</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Segurança, Conformidade e Governança</h3>
+            <p>Modelo de responsabilidade compartilhada, IAM, KMS, PrivateLink, CloudTrail, Macie, compliance (GDPR, HIPAA, LGPD) e ameaças de segurança.</p>
+          </a>
+        </div>
+
+        <div class="info-box" style="margin-top:32px">
+          <strong>Sobre o Exame:</strong> 65 questões (50 pontuadas + 15 não pontuadas) | 90 minutos | Nota de aprovação: 700/1000 | Custo: USD $75. Domínios 2 e 3 juntos representam 52% do exame. Amazon Bedrock é o serviço mais cobrado.
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE MATERIAIS PARA DOWNLOAD -->
+    <section id="materiais" class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">📥 Materiais</span>
+          <h2>Baixe o conteúdo completo em PDF</h2>
+          <p>Todo o conteúdo dos 5 domínios organizado em um PDF para estudar offline, imprimir ou consultar quando precisar.</p>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span class="resource-type">PDF</span>
+            <h3>AWS AI Practitioner: Do Zero ao Avançado</h3>
+            <p>Guia completo com todos os 5 domínios — Fundamentos IA/ML, IA Generativa, Modelos de Fundação, IA Responsável e Segurança.</p>
+            <form class="inline-download-form" data-material="aws-ai-practitioner-do-zero-ao-avancado.pdf">
+              <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+              <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+              <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+              <button type="submit">Baixar PDF gratuito</button>
+              <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="learning-section">
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🚀 Pronto para começar?</span>
+          <h2>Comece pelo Domínio 01</h2>
+          <p>Siga os domínios na ordem, domine cada área do exame e conquiste sua certificação AWS AI Practitioner.</p>
+        </div>
+        <a href="ai-practitioner/dominio-01.html" class="button primary">Iniciar Domínio 01</a>
       </div>
     </section>
   </main>
+
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker & K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>

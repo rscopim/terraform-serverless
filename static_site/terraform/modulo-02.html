@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Terraform Módulo 02: VPC + EC2</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../terraform.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏗️ Terraform — Módulo 02</span>
+        <h1>VPC + EC2</h1>
+        <p>Adicione instâncias EC2 à sua VPC com Security Groups, Key Pairs e User Data. Aprenda Data Sources e funções Terraform.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Data Source AMI -->
+        <div class="topic-block">
+          <h2>Data Source AMI</h2>
+          <p>Data Sources permitem buscar informações da AWS sem criar recursos. Aqui buscamos a AMI mais recente do Amazon Linux 2023 dinamicamente.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>data "aws_ami"</code><span class="cmd-tag">Data Source</span></div>
+              <pre><code>data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Referência</code><span class="cmd-tag">Uso</span></div>
+              <p>Use <code>data.aws_ami.amazon_linux.id</code> para referenciar o ID da AMI encontrada. Isso garante que sempre usamos a versão mais recente sem hardcoding.</p>
+              <pre><code># Acessar atributos do data source
+data.aws_ami.amazon_linux.id
+data.aws_ami.amazon_linux.name
+data.aws_ami.amazon_linux.description</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Group -->
+        <div class="topic-block">
+          <h2>Security Group</h2>
+          <p>Security Groups atuam como firewall virtual para suas instâncias EC2. Defina regras de ingress (entrada) e egress (saída).</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_security_group</code><span class="cmd-tag">Firewall</span></div>
+              <pre><code>variable "my_ip" {
+  description = "Seu IP público para acesso SSH (formato: x.x.x.x/32)"
+  type        = string
+}
+
+resource "aws_security_group" "web" {
+  name        = "${var.project_name}-web-sg"
+  description = "Security Group para instancia web"
+  vpc_id      = aws_vpc.main.id
+
+  # HTTP
+  ingress {
+    description = "HTTP from anywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTPS
+  ingress {
+    description = "HTTPS from anywhere"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # SSH - restrito ao seu IP
+  ingress {
+    description = "SSH from my IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
+  # Egress - permitir todo tráfego de saída
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-web-sg"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Pair -->
+        <div class="topic-block">
+          <h2>Key Pair</h2>
+          <p>Key Pairs permitem acesso SSH às instâncias EC2. Use a função <code>file()</code> para ler a chave pública do disco.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_key_pair</code><span class="cmd-tag">SSH</span></div>
+              <pre><code># Gerar key pair localmente (se ainda não tiver):
+# ssh-keygen -t ed25519 -f ~/.ssh/terraform-key -C "terraform"
+
+resource "aws_key_pair" "main" {
+  key_name   = "${var.project_name}-key"
+  public_key = file("~/.ssh/terraform-key.pub")
+
+  tags = {
+    Name = "${var.project_name}-key"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Função file()</code><span class="cmd-tag">Built-in</span></div>
+              <p>A função <code>file(path)</code> lê o conteúdo de um arquivo no disco local durante o plan/apply. Ideal para chaves públicas, scripts e templates.</p>
+              <pre><code># Exemplos de uso da função file()
+file("~/.ssh/id_rsa.pub")
+file("${path.module}/scripts/init.sh")
+file("${path.root}/configs/policy.json")</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- EC2 Instance -->
+        <div class="topic-block">
+          <h2>EC2 Instance</h2>
+          <p>O recurso <code>aws_instance</code> cria uma instância EC2 na subnet pública com todas as configurações de rede e inicialização.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_instance</code><span class="cmd-tag">Compute</span></div>
+              <pre><code>resource "aws_instance" "web" {
+  ami                    = data.aws_ami.amazon_linux.id
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public[0].id
+  key_name               = aws_key_pair.main.key_name
+  vpc_security_group_ids = [aws_security_group.web.id]
+
+  user_data = file("${path.module}/scripts/user-data.sh")
+
+  tags = {
+    Name = "${var.project_name}-web-server"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Alternativa: Heredoc</code><span class="cmd-tag">Inline</span></div>
+              <p>Para scripts curtos, você pode usar heredoc diretamente no user_data:</p>
+              <pre><code>resource "aws_instance" "web" {
+  ami                    = data.aws_ami.amazon_linux.id
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public[0].id
+  key_name               = aws_key_pair.main.key_name
+  vpc_security_group_ids = [aws_security_group.web.id]
+
+  user_data = &lt;&lt;-EOF
+    #!/bin/bash
+    yum update -y
+    yum install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    echo "&lt;h1&gt;Hello from Terraform!&lt;/h1&gt;" > /var/www/html/index.html
+  EOF
+
+  tags = {
+    Name = "${var.project_name}-web-server"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Data Script -->
+        <div class="topic-block">
+          <h2>User Data Script</h2>
+          <p>O User Data é executado automaticamente na primeira inicialização da instância (como root). Ideal para instalar pacotes e configurar serviços.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>scripts/user-data.sh</code><span class="cmd-tag">Bootstrap</span></div>
+              <pre><code>#!/bin/bash
+set -euxo pipefail
+
+# Atualizar pacotes do sistema
+yum update -y
+
+# Instalar Apache HTTP Server
+yum install -y httpd
+
+# Iniciar e habilitar o serviço
+systemctl start httpd
+systemctl enable httpd
+
+# Criar página inicial
+cat &lt;&lt;'HTML' > /var/www/html/index.html
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;CloudTrilhas - EC2 com Terraform&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: sans-serif; text-align: center; padding: 50px; }
+    h1 { color: #2563eb; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;🚀 EC2 provisionada com Terraform!&lt;/h1&gt;
+  &lt;p&gt;Hostname: $(hostname)&lt;/p&gt;
+  &lt;p&gt;IP Privado: $(hostname -I | awk '{print $1}')&lt;/p&gt;
+  &lt;p&gt;Data: $(date)&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+HTML
+
+echo "User data script completed successfully"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Outputs -->
+        <div class="topic-block">
+          <h2>Outputs</h2>
+          <p>Outputs da instância EC2 para acesso e referência rápida.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>outputs.tf</code><span class="cmd-tag">Saídas</span></div>
+              <pre><code>output "instance_id" {
+  description = "ID da instância EC2"
+  value       = aws_instance.web.id
+}
+
+output "public_ip" {
+  description = "IP público da instância"
+  value       = aws_instance.web.public_ip
+}
+
+output "public_dns" {
+  description = "DNS público da instância"
+  value       = aws_instance.web.public_dns
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Acessar a instância</code><span class="cmd-tag">Uso</span></div>
+              <pre><code># Após terraform apply, acesse via SSH:
+ssh -i ~/.ssh/terraform-key ec2-user@$(terraform output -raw public_ip)
+
+# Ou acesse o web server no navegador:
+# http://$(terraform output -raw public_dns)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Novos Comandos -->
+        <div class="topic-block">
+          <h2>Novos Comandos Aprendidos</h2>
+          <p>Comandos avançados para controle granular do Terraform.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform plan -out</code><span class="cmd-tag">Salvar Plano</span></div>
+              <p>Salva o plano de execução em um arquivo binário. Garante que o apply executará exatamente o que foi revisado.</p>
+              <pre><code># Salvar plano em arquivo
+terraform plan -out=plan.tfplan
+
+# Visualizar plano salvo
+terraform show plan.tfplan</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform apply plan.tfplan</code><span class="cmd-tag">Aplicar Plano</span></div>
+              <p>Aplica um plano salvo anteriormente. Não pede confirmação pois o plano já foi revisado.</p>
+              <pre><code># Aplicar plano salvo (sem prompt de confirmação)
+terraform apply plan.tfplan</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform apply -target</code><span class="cmd-tag">Recurso Específico</span></div>
+              <p>Aplica mudanças apenas em um recurso específico. Útil para debugging e deploys parciais.</p>
+              <pre><code># Aplicar apenas a instância EC2
+terraform apply -target=aws_instance.web
+
+# Aplicar apenas o security group
+terraform apply -target=aws_security_group.web
+
+# Múltiplos targets
+terraform apply \
+  -target=aws_security_group.web \
+  -target=aws_instance.web</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p>⚠️ <strong>Atenção:</strong> O uso de <code>-target</code> deve ser temporário. Em produção, sempre aplique o plano completo para manter o state consistente com a configuração.</p>
+          </div>
+        </div>
+
+        <!-- Diagrama de Arquitetura -->
+        <div class="topic-block">
+          <h2>Diagrama de Arquitetura</h2>
+          <p>Visão geral da VPC com instância EC2 na subnet pública:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>VPC + EC2 Architecture</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                        VPC 10.0.0.0/16                      │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              Public Subnet (AZ-a) 10.0.1.0/24       │   │
+│  │                                                     │   │
+│  │   ┌─────────────────────────────────────────────┐   │   │
+│  │   │           EC2 Instance (t3.micro)           │   │   │
+│  │   │                                             │   │   │
+│  │   │  AMI: Amazon Linux 2023                     │   │   │
+│  │   │  Security Group:                            │   │   │
+│  │   │    ✓ HTTP  (80)  ← 0.0.0.0/0              │   │   │
+│  │   │    ✓ HTTPS (443) ← 0.0.0.0/0              │   │   │
+│  │   │    ✓ SSH   (22)  ← seu_ip/32              │   │   │
+│  │   │                                             │   │   │
+│  │   │  User Data: Apache + index.html             │   │   │
+│  │   └─────────────────────────────────────────────┘   │   │
+│  │                                                     │   │
+│  └──────────────────────────┬──────────────────────────┘   │
+│                             │                               │
+│  ┌──────────────────────────┴──────────────────────────┐   │
+│  │            Private Subnet (AZ-a) 10.0.10.0/24       │   │
+│  │                  (recursos futuros)                  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                      ┌────────┴────────┐
+                      │ Internet Gateway │
+                      └────────┬────────┘
+                               │
+                          ┌────┴────┐
+                          │ Internet │
+                          └─────────┘
+
+  Usuário → Internet → IGW → Public Subnet → EC2 (porta 80/443)
+  Admin  → Internet → IGW → Public Subnet → EC2 (porta 22/SSH)</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

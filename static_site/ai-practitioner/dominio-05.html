@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — AI Practitioner Domínio 05: Segurança, Conformidade e Governança</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../ai-practitioner.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-04.html" class="nav-link">← Anterior</a>
+        <a href="../ai-practitioner.html" class="nav-link">Voltar ao Curso →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🤖 AI Practitioner — Domínio 05</span>
+        <h1>Segurança, Conformidade e Governança</h1>
+        <p>Modelo de responsabilidade compartilhada, serviços de segurança AWS para IA, criptografia, privacidade, compliance e ameaças específicas de IA.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Shared Responsibility Model -->
+        <div class="topic-block">
+          <h2>1. Modelo de Responsabilidade Compartilhada para IA</h2>
+          <p>O modelo de responsabilidade compartilhada da AWS se estende para workloads de IA/ML. A divisão depende do nível de abstração do serviço utilizado.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Responsabilidade Compartilhada</code><span class="cmd-tag">Modelo</span></div>
+              <pre><code>══════════════════════════════════════════════════════════
+         MODELO DE RESPONSABILIDADE COMPARTILHADA — IA
+══════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────┐
+│              RESPONSABILIDADE DO CLIENTE             │
+├─────────────────────────────────────────────────────┤
+│  • Dados de treinamento (qualidade, viés, PII)      │
+│  • Prompts e inputs dos usuários                    │
+│  • Outputs e decisões baseadas no modelo            │
+│  • IAM policies e access control                    │
+│  • Encryption keys (CMK via KMS)                    │
+│  • Network configuration (VPC, Security Groups)     │
+│  • Compliance e governança do uso                   │
+│  • Monitoramento de viés e fairness                 │
+│  • Guardrails e content filtering                   │
+│  • Logging e auditoria de uso                       │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│                RESPONSABILIDADE DA AWS               │
+├─────────────────────────────────────────────────────┤
+│  • Infraestrutura física (data centers, rede)       │
+│  • Hardware (GPUs, Inferentia, Trainium)            │
+│  • Hypervisor e isolamento de compute               │
+│  • Patching do OS e runtime dos serviços            │
+│  • Disponibilidade e durabilidade dos serviços      │
+│  • Segurança física dos data centers                │
+│  • Foundation Models hosting (no Bedrock)           │
+│  • Encryption at rest padrão                        │
+└─────────────────────────────────────────────────────┘
+
+Regra: Quanto mais gerenciado o serviço, MENOS
+       responsabilidade do cliente.
+       Bedrock > SageMaker > EC2 com ML frameworks</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- AWS Security Services -->
+        <div class="topic-block">
+          <h2>2. Serviços de Segurança AWS para IA</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>Aplicação em IA</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>IAM</strong></td>
+                <td>Controle de acesso (quem pode fazer o quê)</td>
+                <td>Restringir acesso a modelos, endpoints, dados de treino</td>
+              </tr>
+              <tr>
+                <td><strong>KMS</strong></td>
+                <td>Gerenciamento de chaves de criptografia</td>
+                <td>Criptografar dados de treino, modelos, logs de inferência</td>
+              </tr>
+              <tr>
+                <td><strong>VPC</strong></td>
+                <td>Isolamento de rede</td>
+                <td>SageMaker em VPC privada, endpoints isolados</td>
+              </tr>
+              <tr>
+                <td><strong>PrivateLink</strong></td>
+                <td>Acesso privado a serviços sem internet</td>
+                <td>Chamar Bedrock sem tráfego pela internet pública</td>
+              </tr>
+              <tr>
+                <td><strong>Macie</strong></td>
+                <td>Descoberta e proteção de dados sensíveis</td>
+                <td>Encontrar PII em datasets de treinamento no S3</td>
+              </tr>
+              <tr>
+                <td><strong>CloudTrail</strong></td>
+                <td>Auditoria de API calls (QUEM fez O QUÊ)</td>
+                <td>Auditar quem invocou modelos, quando, de onde</td>
+              </tr>
+              <tr>
+                <td><strong>CloudWatch</strong></td>
+                <td>Monitoramento de métricas e logs (COMO está performando)</td>
+                <td>Latência de inferência, erros, throughput, alarmes</td>
+              </tr>
+              <tr>
+                <td><strong>Model Monitor</strong></td>
+                <td>Monitoramento de qualidade do modelo em produção</td>
+                <td>Detectar data drift, model drift, viés emergente</td>
+              </tr>
+              <tr>
+                <td><strong>Invocation Logging</strong></td>
+                <td>Log de inputs/outputs do Bedrock</td>
+                <td>Registrar prompts e respostas para auditoria e debug</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left-color: #f59e0b;">
+            <strong>⭐ Diferenciação Crítica:</strong><br><br>
+            <strong>CloudTrail</strong> = QUEM fez O QUÊ e QUANDO (auditoria de ações/API calls)<br>
+            <strong>CloudWatch</strong> = COMO está performando (métricas, logs operacionais, alarmes)<br><br>
+            Pergunta sobre "auditar acesso" ou "compliance" → CloudTrail<br>
+            Pergunta sobre "monitorar latência" ou "alarme de erros" → CloudWatch
+          </div>
+        </div>
+
+        <!-- Encryption -->
+        <div class="topic-block">
+          <h2>3. Criptografia</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>At Rest vs In Transit</code><span class="cmd-tag">Encryption</span></div>
+              <pre><code>Criptografia para Workloads de IA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AT REST (dados armazenados):
+• S3: SSE-S3, SSE-KMS, SSE-C
+• EBS volumes: AES-256
+• SageMaker: notebooks, training jobs, models
+• Bedrock: dados de fine-tuning, knowledge bases
+• Chaves: AWS managed key ou Customer managed key (CMK)
+
+IN TRANSIT (dados em movimento):
+• TLS 1.2+ para todas as API calls
+• HTTPS obrigatório para endpoints
+• VPC PrivateLink: tráfego nunca sai da rede AWS
+• Certificate Manager (ACM) para certificados
+
+Bedrock específico:
+• Dados de inferência criptografados em trânsito (TLS)
+• Dados de customização criptografados at rest (KMS)
+• Opção de CMK para controle total das chaves
+• Dados NÃO são usados para treinar modelos da AWS</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy and Data Protection -->
+        <div class="topic-block">
+          <h2>4. Privacidade e Proteção de Dados</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Proteção de Dados</code><span class="cmd-tag">Privacy</span></div>
+              <pre><code>Privacidade em Workloads de IA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TIPOS DE DADOS SENSÍVEIS:
+• PII (Personally Identifiable Information)
+  - Nome, CPF, RG, endereço, telefone, email
+• PHI (Protected Health Information)
+  - Diagnósticos, tratamentos, histórico médico
+• Dados financeiros
+  - Cartão de crédito, conta bancária, renda
+
+PRINCÍPIOS DE PROTEÇÃO:
+1. Data Classification
+   → Classificar dados por sensibilidade
+   → Macie para descoberta automática
+
+2. Data Minimization
+   → Coletar apenas o necessário
+   → Reter apenas pelo tempo necessário
+
+3. Least Privilege
+   → Acesso mínimo necessário (IAM)
+   → Segregação de duties
+
+4. Data Residency
+   → Dados ficam na região escolhida
+   → Compliance com leis locais (LGPD, GDPR)
+
+5. PII Handling
+   → Bedrock Guardrails: PII redaction
+   → Macie: descoberta em S3
+   → Comprehend: detecção de PII em texto</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Governance and Compliance -->
+        <div class="topic-block">
+          <h2>5. Governança e Compliance</h2>
+          <p>Regulamentações que impactam workloads de IA e os serviços AWS que ajudam a manter conformidade.</p>
+
+          <h3>Regulamentações Relevantes</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Regulamentação</th><th>Escopo</th><th>Requisitos para IA</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>GDPR</strong></td>
+                <td>União Europeia — dados pessoais</td>
+                <td>Right to explanation, data portability, right to be forgotten</td>
+              </tr>
+              <tr>
+                <td><strong>HIPAA</strong></td>
+                <td>EUA — dados de saúde (PHI)</td>
+                <td>Encryption, access controls, audit trails, BAA com AWS</td>
+              </tr>
+              <tr>
+                <td><strong>LGPD</strong></td>
+                <td>Brasil — dados pessoais</td>
+                <td>Consentimento, finalidade, minimização, transparência</td>
+              </tr>
+              <tr>
+                <td><strong>PCI-DSS</strong></td>
+                <td>Global — dados de cartão de crédito</td>
+                <td>Encryption, network segmentation, access control</td>
+              </tr>
+              <tr>
+                <td><strong>SOC 2</strong></td>
+                <td>Global — controles de segurança</td>
+                <td>Security, availability, processing integrity, confidentiality</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 2rem;">Serviços AWS para Compliance</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Compliance Services</code><span class="cmd-tag">Governança</span></div>
+              <pre><code>Serviços AWS para Compliance:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AWS Artifact
+→ Acesso a relatórios de compliance da AWS
+→ SOC reports, PCI, ISO certifications
+
+AWS Config
+→ Avalia configuração de recursos contra regras
+→ Detecta non-compliance automaticamente
+
+AWS Audit Manager
+→ Coleta evidências de compliance automaticamente
+→ Frameworks: SOC 2, GDPR, HIPAA, PCI-DSS
+
+Amazon Inspector
+→ Scan de vulnerabilidades em EC2, Lambda, ECR
+→ Segurança de containers e workloads
+
+AWS Trusted Advisor
+→ Recomendações de segurança, custo, performance
+→ Checks de security groups, IAM, MFA
+
+AWS Secrets Manager
+→ Armazena e rotaciona secrets (API keys, passwords)
+→ Integra com RDS, Redshift, DocumentDB</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI-specific Governance -->
+        <div class="topic-block">
+          <h2>6. Governança Específica para IA</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AI Governance</code><span class="cmd-tag">Lineage & Policies</span></div>
+              <pre><code>Governança Específica para IA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DATA LINEAGE (Linhagem de Dados):
+• Rastrear origem e transformações dos dados
+• De onde vieram os dados de treinamento?
+• Quais transformações foram aplicadas?
+• Quem teve acesso e quando?
+• SageMaker ML Lineage Tracking
+
+MODEL LINEAGE (Linhagem de Modelos):
+• Versionar modelos e seus artefatos
+• Qual dataset treinou qual versão?
+• Quais hiperparâmetros foram usados?
+• Resultados de avaliação por versão
+• SageMaker Model Registry
+
+ACCEPTABLE USE POLICIES:
+• Definir usos permitidos e proibidos
+• Quem pode acessar quais modelos?
+• Quais dados podem ser enviados ao modelo?
+• Limites de uso (rate limiting, budget)
+• Processo de aprovação para novos use cases
+
+AUDIT & MONITORING:
+• CloudTrail: quem invocou o modelo
+• Invocation Logging: o que foi enviado/recebido
+• CloudWatch: métricas operacionais
+• Alertas para uso anômalo</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bedrock Security -->
+        <div class="topic-block">
+          <h2>7. Segurança do Amazon Bedrock</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Bedrock Security</code><span class="cmd-tag">Features</span></div>
+              <pre><code>Segurança do Amazon Bedrock:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────────┐
+│         GARANTIAS DE SEGURANÇA              │
+├─────────────────────────────────────────────┤
+│                                             │
+│  🔒 DADOS NÃO USADOS PARA TREINAMENTO      │
+│     Seus dados de inferência e fine-tuning  │
+│     NÃO são usados para treinar modelos     │
+│     base da AWS ou de terceiros.            │
+│                                             │
+│  🔐 ENCRYPTION                              │
+│     • At rest: AWS KMS (default ou CMK)     │
+│     • In transit: TLS 1.2+                  │
+│     • Fine-tuning data: encrypted           │
+│                                             │
+│  🌐 PRIVATELINK                             │
+│     • VPC Endpoint para Bedrock             │
+│     • Tráfego nunca sai da rede AWS         │
+│     • Sem necessidade de internet gateway   │
+│                                             │
+│  👤 IAM                                     │
+│     • Policies granulares por modelo        │
+│     • Condition keys (região, modelo, etc.) │
+│     • Service-linked roles                  │
+│                                             │
+│  📋 LOGGING                                 │
+│     • CloudTrail: API calls                 │
+│     • Invocation Logging: prompts/responses │
+│     • Destino: S3 ou CloudWatch Logs        │
+│                                             │
+│  🛡️ GUARDRAILS                              │
+│     • Content filtering                     │
+│     • PII redaction                         │
+│     • Topic denial                          │
+│     • Grounding check                       │
+│                                             │
+└─────────────────────────────────────────────┘</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>🎯 Dica de Exame:</strong> A garantia mais importante do Bedrock: "seus dados NÃO são usados para treinar modelos base". Isso é fundamental para compliance e confiança empresarial. PrivateLink garante que dados nunca trafegam pela internet pública.
+          </div>
+        </div>
+
+        <!-- AI Security Threats -->
+        <div class="topic-block">
+          <h2>8. Ameaças de Segurança Específicas de IA</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Ameaça</th><th>Descrição</th><th>Mitigação</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Prompt Injection</strong></td>
+                <td>Inserir instruções maliciosas no input para manipular o modelo</td>
+                <td>Guardrails, input validation, separação de system/user prompt</td>
+              </tr>
+              <tr>
+                <td><strong>Data Leakage</strong></td>
+                <td>Modelo expõe dados sensíveis do treinamento ou contexto</td>
+                <td>PII redaction, data minimization, output filtering</td>
+              </tr>
+              <tr>
+                <td><strong>Model Poisoning</strong></td>
+                <td>Contaminar dados de treinamento para alterar comportamento</td>
+                <td>Data validation, provenance tracking, anomaly detection</td>
+              </tr>
+              <tr>
+                <td><strong>Adversarial Attacks</strong></td>
+                <td>Inputs crafted para enganar o modelo (imperceptíveis a humanos)</td>
+                <td>Adversarial training, input preprocessing, ensemble models</td>
+              </tr>
+              <tr>
+                <td><strong>Toxicity</strong></td>
+                <td>Modelo gera conteúdo ofensivo, prejudicial ou inapropriado</td>
+                <td>Guardrails content filters, RLHF, output moderation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Grounding Techniques -->
+        <div class="topic-block">
+          <h2>9. Técnicas de Grounding</h2>
+          <p>Grounding é o processo de ancorar respostas do modelo em fatos verificáveis, reduzindo alucinações.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Grounding</code><span class="cmd-tag">Anti-Hallucination</span></div>
+              <pre><code>Técnicas de Grounding:
+━━━━━━━━━━━━━━━━━━━━━━
+
+1. RAG GROUNDING
+   • Buscar informações em fontes confiáveis
+   • Incluir contexto verificável no prompt
+   • Bedrock Knowledge Bases para implementação
+   • Instrução: "Responda APENAS com base no contexto"
+
+2. OUTPUT VALIDATION
+   • Verificar claims contra fontes conhecidas
+   • Cross-reference com databases
+   • Bedrock Guardrails Grounding Check
+   • Rejeitar respostas sem suporte factual
+
+3. CONFIDENCE SCORING
+   • Modelo indica nível de certeza
+   • Threshold para aceitar/rejeitar respostas
+   • Encaminhar baixa confiança para humanos
+   • Calibração de confidence scores
+
+4. SOURCE CITATION
+   • Modelo cita fontes específicas
+   • Verificável pelo usuário
+   • Aumenta transparência e confiança
+   • RAG com metadata de fonte
+
+Bedrock Guardrails — Grounding Check:
+• Compara resposta com contexto fornecido
+• Score de 0-1 (quanto está "grounded")
+• Threshold configurável
+• Bloqueia respostas não fundamentadas</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>🎯 Dica de Exame:</strong> Se a pergunta menciona "reduzir alucinações" → RAG + Grounding Check. Se menciona "verificar se resposta é baseada em fatos" → Bedrock Guardrails Grounding Check. Grounding = ancorar em fatos verificáveis.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-04.html" class="button secondary">← Domínio Anterior</a>
+        <a href="../ai-practitioner.html" class="button primary">Voltar ao Curso →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

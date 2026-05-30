@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Terraform Módulo 03: VPC + EC2 + RDS (Avançado I)</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../terraform.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">← Anterior</a>
+        <a href="modulo-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏗️ Terraform — Módulo 03</span>
+        <h1>VPC + EC2 + RDS</h1>
+        <p>Adicione um banco de dados RDS MySQL à infraestrutura. Aprenda DB Subnet Groups, Security Groups com referência cruzada, variáveis sensíveis e Locals.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Locals -->
+        <div class="topic-block">
+          <h2>Locals — Tags Reutilizáveis</h2>
+          <p>O bloco <code>locals</code> permite definir valores reutilizáveis dentro do módulo. Ideal para tags comuns que serão aplicadas em todos os recursos.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>locals { }</code><span class="cmd-tag">locals.tf</span></div>
+              <p>Defina um mapa de tags comuns para manter consistência em toda a infraestrutura.</p>
+              <pre><code>locals {
+  common_tags = {
+    Project     = "cloudtrilhas"
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Uso das Tags</code><span class="cmd-tag">Referência</span></div>
+              <p>Aplique as tags em qualquer recurso usando <code>merge()</code> para combinar com tags específicas.</p>
+              <pre><code># Uso direto
+tags = local.common_tags
+
+# Merge com tags adicionais
+tags = merge(local.common_tags, {
+  Name = "meu-recurso"
+  Role = "database"
+})</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DB Subnet Group -->
+        <div class="topic-block">
+          <h2>DB Subnet Group</h2>
+          <p>O RDS exige um <strong>DB Subnet Group</strong> que define em quais subnets o banco pode ser provisionado. Para segurança, usamos as subnets privadas.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_db_subnet_group</code><span class="cmd-tag">rds.tf</span></div>
+              <p>Agrupa as subnets privadas para que o RDS seja lançado em uma rede isolada sem acesso público.</p>
+              <pre><code>resource "aws_db_subnet_group" "main" {
+  name       = "${var.project_name}-db-subnet-group"
+  subnet_ids = [
+    aws_subnet.private_a.id,
+    aws_subnet.private_b.id
+  ]
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-db-subnet-group"
+  })
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- RDS Security Group -->
+        <div class="topic-block">
+          <h2>RDS Security Group — Referência Cruzada</h2>
+          <p>O Security Group do RDS permite tráfego <strong>apenas</strong> da instância EC2, usando <code>source_security_group_id</code> em vez de CIDR blocks. Isso garante que somente a EC2 autorizada acesse o banco.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_security_group</code><span class="cmd-tag">sg-rds.tf</span></div>
+              <p>Permite porta 3306 (MySQL) apenas do Security Group da EC2 — referência cruzada entre SGs.</p>
+              <pre><code>resource "aws_security_group" "rds" {
+  name        = "${var.project_name}-rds-sg"
+  description = "Security group for RDS MySQL"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description              = "MySQL from EC2"
+    from_port                = 3306
+    to_port                  = 3306
+    protocol                 = "tcp"
+    source_security_group_id = aws_security_group.ec2.id
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-rds-sg"
+  })
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Referência Cruzada</code><span class="cmd-tag">Conceito</span></div>
+              <p>Em vez de abrir para um CIDR, referenciamos o SG da EC2 diretamente. Se o IP da EC2 mudar, a regra continua válida.</p>
+              <pre><code># ❌ Evite — IP pode mudar
+cidr_blocks = ["10.0.1.50/32"]
+
+# ✅ Correto — referência ao SG
+source_security_group_id = aws_security_group.ec2.id</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- RDS Instance -->
+        <div class="topic-block">
+          <h2>RDS Instance — MySQL 8.0</h2>
+          <p>O recurso <code>aws_db_instance</code> provisiona o banco de dados gerenciado. Configuramos criptografia, backup e isolamento de rede.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>aws_db_instance</code><span class="cmd-tag">rds.tf</span></div>
+              <p>Instância RDS MySQL com todas as boas práticas de segurança e isolamento.</p>
+              <pre><code>resource "aws_db_instance" "main" {
+  identifier     = "${var.project_name}-mysql"
+  engine         = "mysql"
+  engine_version = "8.0"
+  instance_class = var.db_instance_class
+
+  allocated_storage = var.db_allocated_storage
+  storage_type      = "gp3"
+
+  db_name  = var.db_name
+  username = var.db_username
+  password = var.db_password
+
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.rds.id]
+
+  multi_az            = false
+  publicly_accessible = false
+  skip_final_snapshot = true
+
+  backup_retention_period = var.db_backup_retention
+  storage_encrypted       = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-mysql"
+    Role = "database"
+  })
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Parâmetros Importantes</code><span class="cmd-tag">Referência</span></div>
+              <table class="styled-table">
+                <thead><tr><th>Parâmetro</th><th>Descrição</th></tr></thead>
+                <tbody>
+                  <tr><td><code>storage_type = "gp3"</code></td><td>SSD de nova geração, melhor custo-benefício</td></tr>
+                  <tr><td><code>multi_az = false</code></td><td>Lab: single AZ. Produção: use true</td></tr>
+                  <tr><td><code>publicly_accessible = false</code></td><td>Sem IP público — acesso apenas via VPC</td></tr>
+                  <tr><td><code>skip_final_snapshot = true</code></td><td>Lab: sem snapshot ao destruir. Produção: false</td></tr>
+                  <tr><td><code>storage_encrypted = true</code></td><td>Criptografia at-rest com KMS padrão</td></tr>
+                  <tr><td><code>backup_retention_period</code></td><td>Dias de retenção de backups automáticos</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensitive Variables -->
+        <div class="topic-block">
+          <h2>Variáveis Sensíveis</h2>
+          <p>Senhas e segredos <strong>nunca</strong> devem ser commitados no código. O Terraform oferece o atributo <code>sensitive = true</code> para proteger valores no output.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>variable "db_password"</code><span class="cmd-tag">variables.tf</span></div>
+              <p>Declare a variável como sensível para que o Terraform oculte seu valor nos logs e outputs.</p>
+              <pre><code>variable "db_password" {
+  description = "Password for the RDS MySQL instance"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.db_password) >= 8
+    error_message = "A senha deve ter no mínimo 8 caracteres."
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Formas de Passar o Valor</code><span class="cmd-tag">Segurança</span></div>
+              <p>Existem várias formas seguras de fornecer variáveis sensíveis sem expor no código.</p>
+              <pre><code># Opção 1: Variável de ambiente (recomendado em CI/CD)
+export TF_VAR_db_password="MinhaSenhaSegura123!"
+terraform apply
+
+# Opção 2: Arquivo .tfvars (NÃO commitar!)
+# secrets.tfvars
+db_password = "MinhaSenhaSegura123!"
+
+terraform apply -var-file="secrets.tfvars"
+
+# Opção 3: Prompt interativo
+terraform apply
+# var.db_password
+#   Enter a value: ********
+
+# Opção 4: AWS Secrets Manager (produção)
+data "aws_secretsmanager_secret_version" "db" {
+  secret_id = "prod/db/password"
+}
+# Uso: data.aws_secretsmanager_secret_version.db.secret_string</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p>⚠️ <strong>Importante:</strong> Adicione <code>*.tfvars</code> e <code>.terraform/</code> ao seu <code>.gitignore</code>. Nunca commite arquivos com senhas no repositório.</p>
+          </div>
+        </div>
+
+        <!-- Outputs -->
+        <div class="topic-block">
+          <h2>Outputs — Endpoint e Porta</h2>
+          <p>Outputs exportam valores úteis após o <code>terraform apply</code>. O endpoint do RDS é essencial para configurar a aplicação na EC2.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>output</code><span class="cmd-tag">outputs.tf</span></div>
+              <p>Exporte o endpoint e a porta do banco para uso na configuração da aplicação.</p>
+              <pre><code>output "db_endpoint" {
+  description = "RDS MySQL endpoint address"
+  value       = aws_db_instance.main.endpoint
+}
+
+output "db_port" {
+  description = "RDS MySQL port"
+  value       = aws_db_instance.main.port
+}
+
+output "db_name" {
+  description = "Database name"
+  value       = aws_db_instance.main.db_name
+}
+
+# Exemplo de uso na EC2 (user_data):
+# mysql -h ${output.db_endpoint} -P ${output.db_port} \
+#   -u ${var.db_username} -p${var.db_password} ${var.db_name}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="topic-block">
+          <h2>Diagrama de Arquitetura</h2>
+          <p>Visão geral da comunicação entre EC2 (subnet pública) e RDS (subnet privada) dentro da VPC.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Arquitetura VPC + EC2 + RDS</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                         VPC (10.0.0.0/16)                   │
+│                                                             │
+│  ┌─────────────────────────┐  ┌─────────────────────────┐  │
+│  │   Public Subnet A       │  │   Public Subnet B       │  │
+│  │   10.0.1.0/24           │  │   10.0.2.0/24           │  │
+│  │                         │  │                         │  │
+│  │  ┌───────────────────┐  │  │                         │  │
+│  │  │     EC2 Instance  │  │  │                         │  │
+│  │  │   (Web Server)    │  │  │                         │  │
+│  │  │   SG: porta 80,22 │  │  │                         │  │
+│  │  └────────┬──────────┘  │  │                         │  │
+│  └───────────┼─────────────┘  └─────────────────────────┘  │
+│              │ porta 3306                                    │
+│              │ (source_security_group_id)                    │
+│  ┌───────────┼─────────────┐  ┌─────────────────────────┐  │
+│  │   Private Subnet A      │  │   Private Subnet B      │  │
+│  │   10.0.3.0/24           │  │   10.0.4.0/24           │  │
+│  │           ▼             │  │                         │  │
+│  │  ┌───────────────────┐  │  │  ┌───────────────────┐  │  │
+│  │  │   RDS MySQL       │  │  │  │   RDS (standby)   │  │  │
+│  │  │   (Primary)       │  │  │  │   (Multi-AZ)      │  │  │
+│  │  │   SG: porta 3306  │  │  │  │                   │  │  │
+│  │  └───────────────────┘  │  │  └───────────────────┘  │  │
+│  └─────────────────────────┘  └─────────────────────────┘  │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              DB Subnet Group                         │    │
+│  │         (Private Subnet A + Private Subnet B)       │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+         │
+    Internet Gateway
+         │
+      Internet</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

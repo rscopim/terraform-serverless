@@ -224,3 +224,61 @@ resource "aws_s3_object" "assets" {
     webp = "image/webp"
   }, lower(element(split(".", each.value), length(split(".", each.value)) - 1)), "application/octet-stream")
 }
+
+
+resource "aws_s3_object" "docker_modules" {
+  for_each = fileset("${path.root}/../../static_site/docker", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "docker/${each.value}"
+  source       = "${path.root}/../../static_site/docker/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/docker/${each.value}")
+}
+
+resource "aws_s3_object" "terraform_modules" {
+  for_each = fileset("${path.root}/../../static_site/terraform", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "terraform/${each.value}"
+  source       = "${path.root}/../../static_site/terraform/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/terraform/${each.value}")
+}
+
+resource "aws_s3_object" "ai_practitioner_modules" {
+  for_each = fileset("${path.root}/../../static_site/ai-practitioner", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "ai-practitioner/${each.value}"
+  source       = "${path.root}/../../static_site/ai-practitioner/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/ai-practitioner/${each.value}")
+}
+
+resource "aws_s3_object" "github_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "github.html"
+  source       = "${path.root}/../../static_site/github.html"
+  etag         = filemd5("${path.root}/../../static_site/github.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "kubernetes_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "kubernetes.html"
+  source       = "${path.root}/../../static_site/kubernetes.html"
+  etag         = filemd5("${path.root}/../../static_site/kubernetes.html")
+  content_type = "text/html"
+}
+
+resource "aws_s3_object" "cloudformation_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "cloudformation.html"
+  source       = "${path.root}/../../static_site/cloudformation.html"
+  etag         = filemd5("${path.root}/../../static_site/cloudformation.html")
+  content_type = "text/html"
+}

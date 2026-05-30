@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — AI Practitioner Domínio 02: Fundamentos de IA Generativa</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../ai-practitioner.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-01.html" class="nav-link">← Anterior</a>
+        <a href="dominio-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🤖 AI Practitioner — Domínio 02</span>
+        <h1>Fundamentos de IA Generativa</h1>
+        <p>Foundation Models, LLMs, conceitos técnicos (tokens, embeddings, context window), limitações, Amazon Bedrock e serviços AWS de IA generativa.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- IA Generativa vs ML Tradicional -->
+        <div class="topic-block">
+          <h2>IA Generativa vs ML Tradicional</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>ML Tradicional</th><th>IA Generativa</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Objetivo</strong></td><td>Prever, classificar, detectar padrões</td><td>Gerar novo conteúdo (texto, imagem, código, áudio)</td></tr>
+              <tr><td><strong>Output</strong></td><td>Rótulo, número, probabilidade</td><td>Texto, imagem, código, música, vídeo</td></tr>
+              <tr><td><strong>Treinamento</strong></td><td>Dataset específico para a tarefa</td><td>Grandes volumes de dados (internet-scale)</td></tr>
+              <tr><td><strong>Modelo</strong></td><td>Modelo específico por tarefa (task-specific)</td><td>Foundation Model — um modelo, múltiplas tarefas</td></tr>
+              <tr><td><strong>Customização</strong></td><td>Treinar do zero ou transfer learning</td><td>Prompt engineering, fine-tuning, RAG</td></tr>
+              <tr><td><strong>Dados necessários</strong></td><td>Centenas a milhares de exemplos rotulados</td><td>Bilhões de tokens (pré-treinamento) + poucos exemplos (few-shot)</td></tr>
+              <tr><td><strong>Custo de treinamento</strong></td><td>Moderado (horas a dias)</td><td>Altíssimo (milhões de dólares para pré-treinar)</td></tr>
+              <tr><td><strong>Exemplo AWS</strong></td><td>SageMaker (treinar modelo próprio)</td><td>Bedrock (usar Foundation Models prontos)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Foundation Models e Tipos -->
+        <div class="topic-block">
+          <h2>Foundation Models e Tipos de Modelos</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Foundation Models (FMs)</code><span class="cmd-tag">Base</span></div>
+              <p>Modelos massivos pré-treinados em grandes volumes de dados que podem ser adaptados para múltiplas tarefas.</p>
+              <pre><code>Características:
+• Pré-treinados em dados internet-scale
+• Adaptáveis via prompt, fine-tuning ou RAG
+• Um modelo → múltiplas tarefas
+• Exemplos: Claude, Llama, Titan, Jurassic</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Large Language Models (LLMs)</code><span class="cmd-tag">Texto</span></div>
+              <p>Foundation Models especializados em linguagem natural. Processam e geram texto.</p>
+              <pre><code>Características:
+• Treinados em corpus de texto massivo
+• Entendem e geram linguagem natural
+• Bilhões de parâmetros
+• Exemplos: Claude (Anthropic), GPT, Llama (Meta)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Modelos Multimodais</code><span class="cmd-tag">Multi-input</span></div>
+              <p>Processam e geram múltiplos tipos de conteúdo (texto + imagem + áudio + vídeo).</p>
+              <pre><code>Características:
+• Input/output em múltiplas modalidades
+• Entendem contexto cross-modal
+• Exemplos: Claude 3 (texto+imagem), Amazon Nova</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Diffusion Models</code><span class="cmd-tag">Imagem</span></div>
+              <p>Geram imagens a partir de texto (text-to-image). Aprendem a remover ruído progressivamente.</p>
+              <pre><code>Características:
+• Text-to-image, image-to-image
+• Processo iterativo de denoising
+• Exemplos: Stable Diffusion, DALL-E, Amazon Titan Image</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Agentic AI</code><span class="cmd-tag">Agentes</span></div>
+              <p>Sistemas de IA que podem planejar, executar ações e usar ferramentas autonomamente para completar tarefas complexas.</p>
+              <pre><code>Características:
+• Planejamento e raciocínio multi-step
+• Uso de ferramentas (APIs, databases)
+• Tomada de decisão autônoma
+• AWS: Bedrock Agents, Strands Agents SDK</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conceitos Técnicos -->
+        <div class="topic-block">
+          <h2>Conceitos Técnicos Fundamentais</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tokens</code><span class="cmd-tag">Unidade</span></div>
+              <p>Unidade básica de processamento de texto em LLMs. Não é exatamente uma palavra.</p>
+              <pre><code>• 1 token ≈ 4 caracteres em inglês
+• 1 token ≈ ¾ de uma palavra
+• "Inteligência" pode ser 2-3 tokens
+• Impacta: custo, latência, context window
+• Tokenização varia por modelo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Embeddings</code><span class="cmd-tag">Vetores</span></div>
+              <p>Representação numérica (vetor) de texto/imagem em espaço multidimensional. Captura significado semântico.</p>
+              <pre><code>• Texto → vetor de números [0.2, -0.5, 0.8, ...]
+• Textos similares = vetores próximos
+• Base para busca semântica
+• Usado em RAG e recomendações
+• Amazon Titan Embeddings</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Context Window</code><span class="cmd-tag">Limite</span></div>
+              <p>Quantidade máxima de tokens que o modelo pode processar em uma única interação (input + output).</p>
+              <pre><code>• Medido em tokens (ex: 200K tokens)
+• Inclui: prompt + contexto + resposta
+• Maior window = mais contexto disponível
+• Trade-off: custo e latência aumentam
+• Claude: até 200K tokens</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Vector Databases</code><span class="cmd-tag">Armazenamento</span></div>
+              <p>Bancos de dados otimizados para armazenar e buscar embeddings (vetores) por similaridade.</p>
+              <pre><code>• Busca por similaridade (não por keyword)
+• Essencial para RAG
+• AWS: OpenSearch Serverless, Aurora, Neptune
+• Operação: nearest neighbor search
+• Índices: HNSW, IVF, etc.</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Inferência em GenAI</code><span class="cmd-tag">Geração</span></div>
+              <p>Processo de gerar output a partir de um prompt. Controlado por parâmetros de geração.</p>
+              <pre><code>Parâmetros importantes:
+• Temperature: criatividade (0=determinístico, 1=criativo)
+• Top-p: nucleus sampling (diversidade)
+• Top-k: limita vocabulário considerado
+• Max tokens: tamanho máximo da resposta
+• Stop sequences: quando parar de gerar</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Token-Based Pricing</code><span class="cmd-tag">Custo</span></div>
+              <p>Modelo de cobrança baseado no número de tokens processados (input + output).</p>
+              <pre><code>• Input tokens: custo por token enviado
+• Output tokens: custo por token gerado
+• Output geralmente mais caro que input
+• Bedrock: pay-per-use ou Provisioned Throughput
+• Otimização: prompts concisos, max_tokens</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Limitações de LLMs -->
+        <div class="topic-block">
+          <h2>Capacidades e Limitações de LLMs</h2>
+          <p>Entender as limitações é crucial para o exame e para uso responsável:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Limitação</th><th>Descrição</th><th>Mitigação</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Alucinações (Hallucinations)</strong></td><td>Modelo gera informações falsas com alta confiança, inventando fatos, citações ou dados</td><td>RAG (grounding com dados reais), Guardrails, validação humana, citação de fontes</td></tr>
+              <tr><td><strong>Knowledge Cutoff</strong></td><td>Modelo só conhece dados até a data de treinamento — não sabe eventos recentes</td><td>RAG com dados atualizados, Knowledge Bases, busca em tempo real</td></tr>
+              <tr><td><strong>Comportamento Estocástico</strong></td><td>Mesma pergunta pode gerar respostas diferentes (não-determinístico)</td><td>Temperature = 0, seed fixo (quando disponível), validação de output</td></tr>
+              <tr><td><strong>Viés (Bias)</strong></td><td>Modelo reflete vieses presentes nos dados de treinamento (gênero, raça, cultura)</td><td>SageMaker Clarify, Bedrock Guardrails, avaliação de fairness, dados diversos</td></tr>
+              <tr><td><strong>Limite de Contexto</strong></td><td>Não pode processar mais tokens que o context window permite</td><td>Chunking, summarização, RAG seletivo, modelos com window maior</td></tr>
+              <tr><td><strong>Raciocínio Matemático</strong></td><td>Pode errar cálculos complexos e raciocínio lógico multi-step</td><td>Chain-of-thought prompting, ferramentas externas (calculadora), validação</td></tr>
+              <tr><td><strong>Falta de Conhecimento Proprietário</strong></td><td>Não conhece dados internos da empresa (documentos, políticas, produtos)</td><td>RAG com Knowledge Bases, fine-tuning com dados corporativos</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> "Como reduzir alucinações?" → RAG (Retrieval-Augmented Generation) com Knowledge Bases. "Como adicionar dados atuais?" → RAG. "Como controlar conteúdo?" → Guardrails.</p>
+          </div>
+        </div>
+
+        <!-- Amazon Bedrock -->
+        <div class="topic-block">
+          <h2>Amazon Bedrock — Serviço Principal de GenAI</h2>
+          <p>Serviço gerenciado que oferece acesso a Foundation Models de múltiplos provedores via API. <strong>É o serviço mais cobrado no exame para GenAI.</strong></p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Componente</th><th>Função</th><th>Detalhes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Model Access</strong></td><td>Acesso a FMs de múltiplos provedores</td><td>Anthropic (Claude), Meta (Llama), AI21, Cohere, Stability AI, Amazon (Titan, Nova)</td></tr>
+              <tr><td><strong>Knowledge Bases</strong></td><td>RAG gerenciado</td><td>Conecta FMs a dados corporativos (S3, web crawlers). Chunking automático, embeddings, vector store</td></tr>
+              <tr><td><strong>Agents</strong></td><td>Agentes autônomos com ações</td><td>LLM + ferramentas (APIs, Lambda). Planejam e executam tarefas multi-step automaticamente</td></tr>
+              <tr><td><strong>Guardrails</strong></td><td>Controle de conteúdo e segurança</td><td>Filtros de tópicos, PII, palavras proibidas, grounding check. Aplica a qualquer FM</td></tr>
+              <tr><td><strong>Fine-tuning</strong></td><td>Customização de modelos</td><td>Adaptar FM com dados próprios. Continued pre-training ou instruction fine-tuning</td></tr>
+              <tr><td><strong>Model Evaluation</strong></td><td>Avaliar e comparar modelos</td><td>Benchmarks automáticos e avaliação humana. Comparar FMs para seu caso de uso</td></tr>
+              <tr><td><strong>Provisioned Throughput</strong></td><td>Capacidade reservada</td><td>Throughput garantido para workloads de produção com alta demanda</td></tr>
+              <tr><td><strong>Bedrock Studio</strong></td><td>Interface visual para prototipar</td><td>Testar prompts, comparar modelos, criar aplicações sem código</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Conceito-chave RAG:</strong> Retrieval-Augmented Generation = buscar informações relevantes em uma base de conhecimento e incluí-las no prompt antes de gerar a resposta. Reduz alucinações e adiciona conhecimento atualizado/proprietário.</p>
+          </div>
+        </div>
+
+        <!-- Outros Serviços de GenAI -->
+        <div class="topic-block">
+          <h2>Outros Serviços AWS de IA Generativa</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>SageMaker JumpStart</code><span class="cmd-tag">Model Hub</span></div>
+              <p>Hub de modelos pré-treinados para deploy com um clique. Inclui Foundation Models e modelos de ML clássico.</p>
+              <pre><code>• Deploy de FMs em sua conta (infraestrutura própria)
+• Fine-tuning com seus dados
+• Mais controle sobre infraestrutura
+• Modelos: Llama, Falcon, Mistral, etc.
+• Diferença do Bedrock: você gerencia a infra</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon Q Developer</code><span class="cmd-tag">Código</span></div>
+              <p>Assistente de IA para desenvolvedores. Gera código, explica, debugga e transforma aplicações.</p>
+              <pre><code>• Autocompletar código (IDE)
+• Chat para perguntas técnicas
+• Transformação de código (Java 8→17)
+• Scan de segurança
+• Integração: VS Code, JetBrains, CLI</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon Q Business</code><span class="cmd-tag">Enterprise</span></div>
+              <p>Assistente de IA para funcionários. Responde perguntas usando dados internos da empresa.</p>
+              <pre><code>• Conecta a 40+ data sources
+• Respeita permissões existentes (ACL)
+• Busca em documentos corporativos
+• Summarização, Q&A, geração
+• Não requer conhecimento de ML</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>PartyRock</code><span class="cmd-tag">Playground</span></div>
+              <p>Playground gratuito para experimentar GenAI. Criar apps simples com prompts sem código e sem conta AWS.</p>
+              <pre><code>• Sem necessidade de conta AWS
+• Interface drag-and-drop
+• Criar apps com prompts
+• Educacional e prototipagem rápida
+• Powered by Bedrock</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Bedrock AgentCore</code><span class="cmd-tag">Infraestrutura</span></div>
+              <p>Infraestrutura gerenciada para deploy e operação de agentes de IA em produção.</p>
+              <pre><code>• Runtime gerenciado para agentes
+• Observabilidade e monitoramento
+• Gerenciamento de sessões e memória
+• Identity e access management
+• Escala automática</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon Nova</code><span class="cmd-tag">Amazon FM</span></div>
+              <p>Família de Foundation Models da própria Amazon, disponíveis no Bedrock.</p>
+              <pre><code>Modelos:
+• Nova Micro: texto, mais rápido e barato
+• Nova Lite: multimodal (texto+imagem+vídeo)
+• Nova Pro: multimodal, melhor equilíbrio
+• Nova Premier: mais capaz (complexo)
+• Nova Canvas: geração de imagens
+• Nova Reel: geração de vídeos</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diferenciação Crítica -->
+        <div class="topic-block">
+          <h2>Diferenciação Crítica de Serviços</h2>
+          <p>Tabela essencial para o exame — saber quando usar cada serviço:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Para Quem</th><th>Quando Usar</th><th>Infraestrutura</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon Bedrock</strong></td><td>Desenvolvedores de apps GenAI</td><td>Usar FMs via API, RAG, Agents, Guardrails</td><td>Serverless (AWS gerencia)</td></tr>
+              <tr><td><strong>SageMaker JumpStart</strong></td><td>Data Scientists / ML Engineers</td><td>Deploy de FMs com controle total da infra, fine-tuning avançado</td><td>Você gerencia (instâncias)</td></tr>
+              <tr><td><strong>Amazon Q Developer</strong></td><td>Desenvolvedores de software</td><td>Assistência de código, autocompletar, debug, transformação</td><td>Integrado na IDE</td></tr>
+              <tr><td><strong>Amazon Q Business</strong></td><td>Funcionários (não-técnicos)</td><td>Q&A sobre dados internos, busca empresarial com GenAI</td><td>Serverless, conectores prontos</td></tr>
+              <tr><td><strong>PartyRock</strong></td><td>Qualquer pessoa (educacional)</td><td>Experimentar GenAI, prototipar apps simples, aprender</td><td>Gratuito, sem conta AWS</td></tr>
+              <tr><td><strong>Amazon Lex</strong></td><td>Desenvolvedores de chatbots</td><td>Chatbots rule-based com NLU, IVR, fluxos conversacionais definidos</td><td>Serverless</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Regra de ouro para o exame:</strong></p>
+            <p>• "Usar Foundation Model via API" → <strong>Bedrock</strong></p>
+            <p>• "Controle total da infraestrutura de ML" → <strong>SageMaker JumpStart</strong></p>
+            <p>• "Assistente de código na IDE" → <strong>Q Developer</strong></p>
+            <p>• "Funcionários buscando em documentos internos" → <strong>Q Business</strong></p>
+            <p>• "Experimentar GenAI sem conta AWS" → <strong>PartyRock</strong></p>
+            <p>• "Chatbot com fluxo definido" → <strong>Lex</strong></p>
+          </div>
+        </div>
+
+        <!-- Casos de Uso -->
+        <div class="topic-block">
+          <h2>Casos de Uso de IA Generativa</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Caso de Uso</th><th>Descrição</th><th>Serviço AWS Recomendado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Geração de Conteúdo</strong></td><td>Criar textos, artigos, e-mails, posts para redes sociais</td><td>Bedrock (Claude, Titan, Nova)</td></tr>
+              <tr><td><strong>Sumarização</strong></td><td>Resumir documentos longos, reuniões, artigos, relatórios</td><td>Bedrock (Claude), Q Business</td></tr>
+              <tr><td><strong>Chatbots Inteligentes</strong></td><td>Atendimento ao cliente com compreensão contextual avançada</td><td>Bedrock Agents + Knowledge Bases</td></tr>
+              <tr><td><strong>Geração de Código</strong></td><td>Escrever, completar, explicar e debugar código</td><td>Q Developer, Bedrock (Claude)</td></tr>
+              <tr><td><strong>Busca Semântica</strong></td><td>Encontrar informações por significado, não apenas keywords</td><td>Bedrock Knowledge Bases, Kendra</td></tr>
+              <tr><td><strong>Geração de Imagens</strong></td><td>Criar imagens a partir de descrições textuais</td><td>Bedrock (Stable Diffusion, Titan Image, Nova Canvas)</td></tr>
+              <tr><td><strong>Tradução e Localização</strong></td><td>Traduzir conteúdo mantendo contexto e tom</td><td>Bedrock (Claude), Amazon Translate</td></tr>
+              <tr><td><strong>Extração de Informações</strong></td><td>Extrair dados estruturados de documentos não-estruturados</td><td>Bedrock + Textract</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-01.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-03.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

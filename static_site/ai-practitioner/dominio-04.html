@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — AI Practitioner Domínio 04: Diretrizes para IA Responsável</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../ai-practitioner.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-03.html" class="nav-link">← Anterior</a>
+        <a href="dominio-05.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🤖 AI Practitioner — Domínio 04</span>
+        <h1>Diretrizes para IA Responsável</h1>
+        <p>Princípios de IA responsável, tipos de viés, mitigação, SageMaker Clarify, Bedrock Guardrails, Human-in-the-Loop e riscos éticos e legais.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Principles -->
+        <div class="topic-block">
+          <h2>1. Princípios de IA Responsável</h2>
+          <p>A AWS define princípios fundamentais que guiam o desenvolvimento e uso ético de sistemas de IA. Esses princípios são a base para todas as decisões de governança.</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Princípio</th><th>Descrição</th><th>Na Prática</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Fairness (Justiça)</strong></td>
+                <td>Sistemas não devem discriminar grupos ou indivíduos</td>
+                <td>Testar modelo com dados diversos, monitorar disparidades</td>
+              </tr>
+              <tr>
+                <td><strong>Inclusivity (Inclusão)</strong></td>
+                <td>IA deve ser acessível e benéfica para todos</td>
+                <td>Considerar diferentes idiomas, culturas, capacidades</td>
+              </tr>
+              <tr>
+                <td><strong>Transparency (Transparência)</strong></td>
+                <td>Usuários devem saber que estão interagindo com IA</td>
+                <td>Disclosure claro, documentação de limitações</td>
+              </tr>
+              <tr>
+                <td><strong>Explainability (Explicabilidade)</strong></td>
+                <td>Decisões da IA devem ser compreensíveis</td>
+                <td>SHAP values, feature importance, Model Cards</td>
+              </tr>
+              <tr>
+                <td><strong>Safety (Segurança)</strong></td>
+                <td>Sistemas devem operar de forma segura e previsível</td>
+                <td>Guardrails, testes adversariais, fallbacks</td>
+              </tr>
+              <tr>
+                <td><strong>Privacy (Privacidade)</strong></td>
+                <td>Dados pessoais devem ser protegidos</td>
+                <td>PII redaction, data minimization, consent</td>
+              </tr>
+              <tr>
+                <td><strong>Veracity (Veracidade)</strong></td>
+                <td>Respostas devem ser verdadeiras e baseadas em fatos</td>
+                <td>RAG para grounding, citação de fontes, confidence scores</td>
+              </tr>
+              <tr>
+                <td><strong>Accountability (Responsabilização)</strong></td>
+                <td>Deve haver responsáveis pelas decisões da IA</td>
+                <td>Audit trails, logging, human oversight</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Types of Bias -->
+        <div class="topic-block">
+          <h2>2. Tipos de Viés (Bias)</h2>
+          <p>Viés em IA pode surgir em qualquer etapa do pipeline — desde a coleta de dados até a interpretação dos resultados.</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo de Viés</th><th>Origem</th><th>Exemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Data Bias</strong></td>
+                <td>Dados de treinamento não representam a realidade</td>
+                <td>Dataset com 90% de fotos de homens brancos para reconhecimento facial</td>
+              </tr>
+              <tr>
+                <td><strong>Selection Bias</strong></td>
+                <td>Amostra não é representativa da população</td>
+                <td>Treinar modelo de crédito apenas com dados de clientes aprovados</td>
+              </tr>
+              <tr>
+                <td><strong>Measurement Bias</strong></td>
+                <td>Forma de medir/coletar dados introduz distorção</td>
+                <td>Usar proxy inadequado (CEP como proxy para raça)</td>
+              </tr>
+              <tr>
+                <td><strong>Algorithm Bias</strong></td>
+                <td>O próprio algoritmo amplifica padrões discriminatórios</td>
+                <td>Modelo que aprende correlações espúrias nos dados</td>
+              </tr>
+              <tr>
+                <td><strong>Confirmation Bias</strong></td>
+                <td>Humanos interpretam resultados confirmando crenças prévias</td>
+                <td>Aceitar output do modelo sem questionar porque "faz sentido"</td>
+              </tr>
+              <tr>
+                <td><strong>Automation Bias</strong></td>
+                <td>Confiar excessivamente em sistemas automatizados</td>
+                <td>Aceitar todas as recomendações da IA sem revisão humana</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>🎯 Dica de Exame:</strong> Selection Bias e Data Bias são os mais cobrados. Lembre: o viés nos dados se propaga para o modelo. "Garbage in, garbage out" — mas com viés, é "bias in, bias amplified out".
+          </div>
+        </div>
+
+        <!-- Mitigation Strategies -->
+        <div class="topic-block">
+          <h2>3. Estratégias de Mitigação de Viés</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Mitigação</code><span class="cmd-tag">5 Estratégias</span></div>
+              <pre><code>Estratégias de Mitigação de Viés:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. DADOS DIVERSOS E REPRESENTATIVOS
+   • Coletar dados de múltiplas fontes
+   • Garantir representação de todos os grupos
+   • Augmentation para balancear classes minoritárias
+
+2. DETECÇÃO PRÉ-TREINAMENTO
+   • Analisar distribuição dos dados antes de treinar
+   • Class Imbalance (CI), Difference in Proportions (DPL)
+   • SageMaker Clarify pre-training bias metrics
+
+3. DETECÇÃO PÓS-TREINAMENTO
+   • Medir disparidade nas predições entre grupos
+   • Demographic Parity, Equal Opportunity
+   • SageMaker Clarify post-training bias metrics
+
+4. MONITORAMENTO CONTÍNUO
+   • Detectar drift de viés em produção
+   • Alertas quando métricas de fairness degradam
+   • SageMaker Model Monitor
+
+5. HUMAN-IN-THE-LOOP
+   • Revisão humana de decisões críticas
+   • Feedback loops para corrigir viés detectado
+   • Amazon A2I para workflows de revisão</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- AWS Services -->
+        <div class="topic-block">
+          <h2>4. Serviços AWS para IA Responsável</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>SageMaker Clarify</code><span class="cmd-tag">Bias + Explainability</span></div>
+              <p>Detecta viés e explica predições em modelos de ML clássico e Foundation Models.</p>
+              <pre><code>SageMaker Clarify:
+━━━━━━━━━━━━━━━━━━
+
+DETECÇÃO DE VIÉS:
+• Pre-training metrics: analisa dados ANTES do treino
+  - Class Imbalance (CI)
+  - Difference in Proportions of Labels (DPL)
+  - KL Divergence, Jensen-Shannon Divergence
+
+• Post-training metrics: analisa PREDIÇÕES do modelo
+  - Demographic Parity (DP)
+  - Equalized Odds
+  - Disparate Impact (DI)
+
+EXPLICABILIDADE (SHAP):
+• Feature importance global (quais features importam mais)
+• Feature importance local (por que ESTA predição)
+• Usa SHAP (SHapley Additive exPlanations)
+• Gera relatórios visuais de explicabilidade
+
+Para Foundation Models:
+• Prompt Stereotyping detection
+• Toxicity analysis
+• Explain FM responses</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Bedrock Guardrails</code><span class="cmd-tag">Content Safety</span></div>
+              <p>Filtra e controla inputs/outputs de Foundation Models no Bedrock.</p>
+              <pre><code>Amazon Bedrock Guardrails:
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────┐
+│         GUARDRAILS LAYERS           │
+├─────────────────────────────────────┤
+│                                     │
+│  1. CONTENT FILTERS                 │
+│     • Hate, Insults, Sexual,        │
+│       Violence, Misconduct          │
+│     • Configurable strength         │
+│       (NONE/LOW/MEDIUM/HIGH)        │
+│                                     │
+│  2. DENIED TOPICS                   │
+│     • Tópicos proibidos customizados│
+│     • Ex: "investimentos financeiros"│
+│                                     │
+│  3. WORD FILTERS                    │
+│     • Palavras/frases bloqueadas    │
+│     • Profanity filter              │
+│                                     │
+│  4. PII REDACTION                   │
+│     • Detecta e mascara PII        │
+│     • Nome, CPF, email, telefone    │
+│     • BLOCK ou ANONYMIZE            │
+│                                     │
+│  5. GROUNDING CHECK                 │
+│     • Verifica se resposta é        │
+│       baseada no contexto fornecido │
+│     • Detecta alucinações           │
+│                                     │
+└─────────────────────────────────────┘
+
+Aplicável a: Input (prompt) e Output (resposta)</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Model Cards</code><span class="cmd-tag">Documentação</span></div>
+              <p>Documentação padronizada sobre modelos de ML — limitações, uso pretendido, métricas de performance e considerações éticas.</p>
+              <pre><code>SageMaker Model Cards:
+━━━━━━━━━━━━━━━━━━━━━━
+• Documentam: propósito, limitações, métricas
+• Informam: dados de treino, viés conhecido
+• Facilitam: auditoria, compliance, transparência
+• Incluem: intended use, out-of-scope use
+• Exportáveis: PDF para stakeholders
+
+Conteúdo típico:
+- Model overview e intended use
+- Training data description
+- Evaluation results e metrics
+- Ethical considerations
+- Limitations e recommendations</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-left-color: #f59e0b;">
+            <strong>⭐ Diferenciação Crítica para o Exame:</strong><br><br>
+            <strong>SageMaker Clarify</strong> = Detecção de viés + Explicabilidade (SHAP) → ML clássico e FMs<br>
+            <strong>Bedrock Guardrails</strong> = Filtragem de conteúdo em tempo real → GenAI/FMs apenas<br>
+            <strong>Model Cards</strong> = Documentação e transparência → Qualquer modelo<br><br>
+            Se a pergunta fala em "detectar viés" ou "explicar predição" → Clarify<br>
+            Se fala em "filtrar conteúdo tóxico" ou "bloquear PII" → Guardrails<br>
+            Se fala em "documentar limitações" ou "transparência" → Model Cards
+          </div>
+        </div>
+
+        <!-- Human-in-the-Loop -->
+        <div class="topic-block">
+          <h2>5. Human-in-the-Loop</h2>
+          <p>Manter humanos no processo de decisão da IA é fundamental para segurança, qualidade e compliance — especialmente em decisões de alto impacto.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Conceito</code><span class="cmd-tag">HITL</span></div>
+              <pre><code>Human-in-the-Loop (HITL):
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Quando usar:
+• Decisões de alto impacto (crédito, saúde, jurídico)
+• Modelo tem baixa confiança na predição
+• Compliance exige revisão humana
+• Treinamento/melhoria contínua do modelo
+
+Padrões:
+┌──────────┐    ┌──────────┐    ┌──────────┐
+│  Modelo  │───▶│ Confiança│───▶│  Output  │
+│  Prediz  │    │  Alta?   │    │  Final   │
+└──────────┘    └────┬─────┘    └──────────┘
+                     │ Não
+                     ▼
+               ┌──────────┐
+               │  Humano  │
+               │  Revisa  │
+               └──────────┘</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon A2I</code><span class="cmd-tag">Augmented AI</span></div>
+              <p>Amazon Augmented AI — serviço gerenciado para workflows de revisão humana.</p>
+              <pre><code>Amazon A2I (Augmented AI):
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Componentes:
+• Worker Task Template: UI para revisores
+• Flow Definition: regras de quando enviar para revisão
+• Human Loop: instância de revisão ativa
+• Workforce: quem revisa (private, vendor, Mechanical Turk)
+
+Integrações nativas:
+• Amazon Textract (revisão de extração de docs)
+• Amazon Rekognition (moderação de imagens)
+• Custom ML models (qualquer modelo SageMaker)
+
+Triggers para revisão:
+• Confidence score abaixo do threshold
+• Amostragem aleatória para QA
+• Categorias específicas (ex: decisões financeiras)
+• Sempre (100% revisão humana)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal/Ethical Risks -->
+        <div class="topic-block">
+          <h2>6. Riscos Éticos e Legais</h2>
+          <p>O uso de IA generativa traz riscos legais e éticos significativos que devem ser considerados em qualquer implementação.</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Risco</th><th>Descrição</th><th>Mitigação</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Propriedade Intelectual (IP)</strong></td>
+                <td>Modelo pode gerar conteúdo protegido por copyright</td>
+                <td>Indemnity clauses, filtros de conteúdo, citação de fontes</td>
+              </tr>
+              <tr>
+                <td><strong>Viés e Discriminação</strong></td>
+                <td>Decisões automatizadas podem discriminar grupos protegidos</td>
+                <td>Bias testing, Clarify, auditorias regulares, diversidade nos dados</td>
+              </tr>
+              <tr>
+                <td><strong>Erosão de Confiança</strong></td>
+                <td>Respostas incorretas ou prejudiciais minam confiança do usuário</td>
+                <td>Guardrails, human oversight, transparência sobre limitações</td>
+              </tr>
+              <tr>
+                <td><strong>Alucinações</strong></td>
+                <td>Modelo gera informações falsas com alta confiança</td>
+                <td>RAG, grounding check, confidence scores, citação de fontes</td>
+              </tr>
+              <tr>
+                <td><strong>Privacidade</strong></td>
+                <td>Exposição de dados pessoais no treinamento ou inferência</td>
+                <td>PII redaction, data minimization, Guardrails, encryption</td>
+              </tr>
+              <tr>
+                <td><strong>Deepfakes</strong></td>
+                <td>Geração de conteúdo falso realista (imagens, vídeos, áudio)</td>
+                <td>Watermarking, content provenance, detection tools</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Environmental -->
+        <div class="topic-block">
+          <h2>7. Considerações Ambientais e Sustentabilidade</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Sustentabilidade</code><span class="cmd-tag">Meio Ambiente</span></div>
+              <pre><code>Impacto Ambiental da IA:
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Problemas:
+• Treinamento de LLMs consome energia massiva
+• Data centers geram emissões de carbono
+• Hardware especializado (GPUs) tem ciclo de vida curto
+
+Mitigações AWS:
+• Regiões com energia renovável
+• Graviton processors (mais eficientes)
+• Serverless (paga só pelo uso, sem idle)
+• Model distillation (modelos menores = menos energia)
+• Spot instances para treinamento
+• AWS Customer Carbon Footprint Tool
+
+Boas práticas:
+• Usar modelos menores quando possível
+• Batch inference vs real-time (mais eficiente)
+• Caching de respostas frequentes
+• Escolher região com menor carbon footprint
+• Provisioned Throughput vs On-demand (otimizar uso)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>🎯 Dica de Exame:</strong> Sustentabilidade é um pilar do Well-Architected Framework. Para IA: use modelos menores quando possível, prefira serverless, considere distillation, e escolha regiões com energia renovável.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-03.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-05.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
