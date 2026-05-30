@@ -7,6 +7,7 @@ const COURSE = process.argv[2] || 'docker';
 const COURSES = {
   docker: { modules: 7, title: 'Docker: Do Zero ao Avançado', emoji: '🐳', subtitle: 'Conceitos • Imagens • Volumes • Redes • Compose • Segurança • Produção' },
   terraform: { modules: 4, title: 'Terraform AWS: Do Zero ao Avançado', emoji: '🏗️', subtitle: 'VPC • EC2 • RDS • S3 • IAM • State • Produção' },
+  'ai-practitioner': { modules: 5, title: 'AWS AI Practitioner (AIF-C01)', emoji: '🤖', subtitle: 'Fundamentos IA/ML • IA Generativa • Modelos de Fundação • IA Responsável • Segurança', prefix: 'dominio' },
 };
 
 async function generatePDF(courseName) {
@@ -18,6 +19,8 @@ async function generatePDF(courseName) {
   const outputFile = path.join(outputDir, `${courseName}-do-zero-ao-avancado.pdf`);
   if (courseName === 'terraform') {
     var outputFileFinal = path.join(outputDir, 'terraform-aws-do-zero-ao-avancado.pdf');
+  } else if (courseName === 'ai-practitioner') {
+    var outputFileFinal = path.join(outputDir, 'aws-ai-practitioner-do-zero-ao-avancado.pdf');
   } else {
     var outputFileFinal = outputFile;
   }
@@ -25,9 +28,10 @@ async function generatePDF(courseName) {
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
   const modules = [];
+  const filePrefix = config.prefix || 'modulo';
   for (let i = 1; i <= config.modules; i++) {
     const num = i.toString().padStart(2, '0');
-    const filePath = path.join(modulesDir, `modulo-${num}.html`);
+    const filePath = path.join(modulesDir, `${filePrefix}-${num}.html`);
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf-8');
       const mainMatch = content.match(/<main>([\s\S]*?)<\/main>/);

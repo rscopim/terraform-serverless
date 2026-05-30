@@ -248,6 +248,17 @@ resource "aws_s3_object" "terraform_modules" {
   etag = filemd5("${path.root}/../../static_site/terraform/${each.value}")
 }
 
+resource "aws_s3_object" "ai_practitioner_modules" {
+  for_each = fileset("${path.root}/../../static_site/ai-practitioner", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "ai-practitioner/${each.value}"
+  source       = "${path.root}/../../static_site/ai-practitioner/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/ai-practitioner/${each.value}")
+}
+
 resource "aws_s3_object" "github_page" {
   bucket       = aws_s3_bucket.this.id
   key          = "github.html"
