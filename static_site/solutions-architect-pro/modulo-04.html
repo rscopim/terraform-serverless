@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 04: Melhoria Contínua</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="modulo-05.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 04</span>
+        <h1>Melhoria Contínua (25%)</h1>
+        <p>Otimização de custos, performance, excelência operacional e confiabilidade de soluções existentes na AWS.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Cost Optimization -->
+        <div class="topic-block">
+          <h2>Otimização de Custos</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Modelos de Compra EC2</code><span class="cmd-tag">Pricing</span></div>
+              <p>Escolher o modelo correto de compra pode reduzir custos em até 72%.</p>
+              <pre><code>On-Demand:
+• Paga por hora/segundo
+• Sem compromisso
+• Quando: workloads imprevisíveis, curta duração
+
+Reserved Instances (RI):
+• 1 ou 3 anos de compromisso
+• Até 72% de desconto
+• Standard RI: tipo fixo, pode vender no Marketplace
+• Convertible RI: pode trocar tipo (menor desconto)
+• Quando: workloads estáveis e previsíveis
+
+Savings Plans:
+• Compromisso de $/hora por 1 ou 3 anos
+• Compute SP: qualquer região, família, OS, tenancy
+• EC2 Instance SP: família específica em uma região
+• Mais flexível que RI
+• Quando: preferir flexibilidade sobre RI
+
+Spot Instances:
+• Até 90% de desconto
+• Pode ser interrompido (2 min aviso)
+• Quando: batch, CI/CD, tolerante a falha
+
+Dedicated Hosts:
+• Servidor físico dedicado
+• Quando: compliance, licenças por socket/core</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Right-Sizing & Lifecycle</code><span class="cmd-tag">Otimização</span></div>
+              <pre><code>AWS Compute Optimizer:
+• Analisa utilização de EC2, EBS, Lambda, ECS
+• Recomenda instance types ideais
+• Baseado em ML (14 dias de métricas)
+• Identifica over-provisioned e under-provisioned
+
+Right-Sizing:
+• Reduzir instance type se CPU/memória &lt;40%
+• Considerar Graviton (ARM) — até 40% melhor preço/performance
+• Usar T instances (burstable) para workloads variáveis
+
+S3 Lifecycle Policies:
+• Standard → Standard-IA (30+ dias)
+• Standard-IA → Glacier Instant (90+ dias)
+• Glacier → Deep Archive (180+ dias)
+• Expiration: deletar após N dias
+• S3 Intelligent-Tiering: automático
+
+Outras otimizações:
+• EBS: gp3 vs gp2 (gp3 é mais barato e configurável)
+• NAT Gateway: considerar VPC endpoints para S3/DynamoDB
+• Data transfer: usar CloudFront, VPC endpoints, mesma AZ
+• Idle resources: ELBs sem targets, EIPs não associados</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance -->
+        <div class="topic-block">
+          <h2>Otimização de Performance</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>CloudFront</code><span class="cmd-tag">CDN</span></div>
+              <p>CDN global que cacheia conteúdo em edge locations para reduzir latência.</p>
+              <pre><code>Otimizações:
+• Cache Policy: controle granular de cache keys
+• Origin Request Policy: headers enviados à origin
+• Cache behaviors: diferentes configs por path pattern
+• Lambda@Edge / CloudFront Functions:
+  → Manipular request/response na edge
+  → A/B testing, URL rewrite, auth
+
+Performance:
+• Compressão automática (gzip, Brotli)
+• HTTP/2 e HTTP/3 (QUIC)
+• Origin Shield: camada extra de cache
+• Regional Edge Caches: entre edge e origin
+
+Segurança:
+• OAC (Origin Access Control) para S3
+• WAF integration
+• Geo-restriction
+• Field-level encryption
+• Signed URLs / Signed Cookies</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Caching Strategies</code><span class="cmd-tag">Latência</span></div>
+              <pre><code>ElastiCache (Redis/Memcached):
+• Cache de queries de banco de dados
+• Session store
+• Leaderboards, rate limiting
+
+DAX (DynamoDB Accelerator):
+• Cache transparente para DynamoDB
+• Microsegundos de latência
+• API-compatible (drop-in replacement)
+
+API Gateway Caching:
+• Cache de respostas da API
+• TTL configurável (300s default)
+• Invalidação por header ou flush
+
+CloudFront Caching:
+• Conteúdo estático e dinâmico
+• TTL por behavior
+• Invalidation para forçar refresh
+
+Padrão de decisão:
+• DB reads pesados → ElastiCache/DAX
+• API responses → API Gateway cache
+• Assets/páginas → CloudFront
+• Session data → ElastiCache Redis</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Read Replicas & Connection Pooling</code><span class="cmd-tag">Database</span></div>
+              <pre><code>Read Replicas:
+• RDS: até 15 replicas (Aurora), 5 (outros engines)
+• Offload de leitura do primary
+• Cross-region replicas para DR e latência
+• Promoção para standalone em caso de falha
+
+Aurora Reader Endpoint:
+• Load balancing automático entre replicas
+• Connection string única para todas as replicas
+
+RDS Proxy:
+• Connection pooling gerenciado
+• Reduz conexões ao banco (Lambda → RDS)
+• Failover mais rápido (66% menos tempo)
+• IAM authentication
+• Quando: Lambda + RDS (evita connection exhaustion)
+
+Global Accelerator para DB:
+• Não aplicável diretamente
+• Use Aurora Global Database para multi-região
+• Route 53 latency-based para read replicas regionais</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operational Excellence -->
+        <div class="topic-block">
+          <h2>Excelência Operacional</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Infrastructure as Code</code><span class="cmd-tag">IaC</span></div>
+              <pre><code>AWS CloudFormation:
+• Templates declarativos (YAML/JSON)
+• Stacks: unidade de deploy
+• StackSets: deploy multi-conta/multi-região
+• Drift Detection: detecta mudanças manuais
+• Change Sets: preview de mudanças
+
+AWS CDK (Cloud Development Kit):
+• IaC em linguagens de programação
+• TypeScript, Python, Java, C#, Go
+• Compila para CloudFormation
+• Constructs: abstrações reutilizáveis
+• Quando: equipes de desenvolvimento preferem código
+
+Terraform:
+• Multi-cloud, HCL
+• State management
+• Quando: multi-cloud ou preferência da equipe
+
+Melhores práticas:
+• Versionamento em Git
+• CI/CD para infraestrutura
+• Ambientes separados (dev/staging/prod)
+• Módulos reutilizáveis
+• Drift detection periódico</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Systems Manager</code><span class="cmd-tag">Operações</span></div>
+              <pre><code>Componentes principais:
+• Session Manager: acesso SSH sem abrir porta 22
+• Patch Manager: patching automatizado
+• Parameter Store: configurações e secrets
+• Run Command: executar comandos em frota
+• Automation: runbooks para tarefas operacionais
+• State Manager: configuração desejada
+• Inventory: inventário de software/hardware
+
+Automation Runbooks:
+• Documentos que definem ações automatizadas
+• Aprovação manual opcional
+• Integra com EventBridge para triggers
+• Exemplos: restart instance, create AMI, remediate Config
+
+OpsCenter:
+• Visão centralizada de issues operacionais
+• OpsItems: tickets de operação
+• Integra com CloudWatch, Config, CloudFormation
+• Runbooks para resolução</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Config Rules & Auto-Remediation</code><span class="cmd-tag">Compliance</span></div>
+              <pre><code>AWS Config Rules:
+• Avaliam compliance de recursos continuamente
+• Managed Rules: 300+ regras pré-definidas
+• Custom Rules: Lambda functions
+• Organization Rules: aplicar em todas as contas
+
+Auto-Remediation:
+• Config Rule detecta non-compliance
+• Trigger automático de SSM Automation
+• Exemplos:
+  → SG aberto → fechar porta
+  → S3 sem encryption → habilitar
+  → EBS sem backup → criar snapshot
+  → Instance sem tag → adicionar tag
+
+Conformance Packs:
+• Conjunto de Config Rules + Remediations
+• Templates pré-definidos (PCI-DSS, HIPAA, etc.)
+• Deploy via Organizations (multi-conta)
+
+Fluxo:
+Config Rule (detecta) → SSM Automation (remedia)
+                      → EventBridge (notifica)
+                      → Security Hub (agrega)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reliability -->
+        <div class="topic-block">
+          <h2>Confiabilidade</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Multi-AZ & Multi-Region</code><span class="cmd-tag">HA</span></div>
+              <pre><code>Multi-AZ (Alta Disponibilidade):
+• RDS Multi-AZ: failover automático (standby síncrono)
+• Aurora: 6 cópias em 3 AZs, failover &lt;30s
+• ELB: distribui tráfego entre AZs
+• ASG: instâncias em múltiplas AZs
+• S3: replicação automática em 3+ AZs
+• EFS: multi-AZ por padrão
+
+Multi-Region (DR + Latência):
+• Aurora Global Database: &lt;1s replication lag
+• DynamoDB Global Tables: active-active multi-region
+• S3 Cross-Region Replication (CRR)
+• CloudFront: cache global
+• Route 53: latency-based / failover routing
+• API Gateway: regional endpoints por região
+
+Decisão:
+• HA dentro de uma região → Multi-AZ
+• DR ou latência global → Multi-Region
+• Ambos para máxima resiliência</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Route 53 Failover</code><span class="cmd-tag">DNS</span></div>
+              <pre><code>Routing Policies:
+• Simple: um registro, um destino
+• Weighted: distribuir % entre destinos
+• Latency: rota para região mais próxima
+• Failover: primary/secondary com health check
+• Geolocation: rota por localização do usuário
+• Geoproximity: rota por proximidade (com bias)
+• Multivalue: múltiplos IPs com health check
+
+Health Checks:
+• Endpoint: HTTP/HTTPS/TCP para IP ou domínio
+• Calculated: combina múltiplos health checks (AND/OR)
+• CloudWatch Alarm: baseado em métrica
+
+Failover Pattern:
+• Primary: região principal (health check ativo)
+• Secondary: região DR (ativado quando primary falha)
+• Failover automático em ~30-60 segundos
+• Pode combinar com Global Accelerator</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Chaos Engineering</code><span class="cmd-tag">Resiliência</span></div>
+              <pre><code>AWS Fault Injection Simulator (FIS):
+• Serviço gerenciado para chaos engineering
+• Injeta falhas controladas em recursos AWS
+• Experiment templates: definem ações e targets
+• Stop conditions: limites de segurança
+
+Tipos de experimentos:
+• EC2: terminate instances, stress CPU/memory
+• ECS: stop tasks, drain container instances
+• EKS: terminate pods, inject network latency
+• RDS: failover, reboot
+• Network: packet loss, latency injection
+
+Melhores práticas:
+• Comece em ambientes não-produtivos
+• Defina hipóteses antes do experimento
+• Monitore métricas durante o teste
+• Stop conditions para limitar blast radius
+• Game Days: exercícios regulares de DR
+
+Objetivo:
+• Validar que sistemas se recuperam de falhas
+• Encontrar pontos fracos antes que causem outages
+• Construir confiança na resiliência da arquitetura</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> "Otimizar custos" → Reserved/Savings Plans + right-sizing + lifecycle policies. "Melhorar performance" → caching (CloudFront, ElastiCache, DAX) + read replicas. "Reduzir esforço operacional" → serviços gerenciados + automação (SSM, Config auto-remediation). "Aumentar resiliência" → multi-AZ + health checks + chaos engineering.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

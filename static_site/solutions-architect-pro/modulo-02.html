@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 02: Complexidade Organizacional</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 02</span>
+        <h1>Complexidade Organizacional (26%)</h1>
+        <p>Design de soluções para conectividade de rede, estratégia multi-conta, DNS híbrido, federação de identidade e governança em escala empresarial.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Network Connectivity -->
+        <div class="topic-block">
+          <h2>Conectividade de Rede</h2>
+          <p>Serviços e padrões para conectar VPCs, data centers on-premises e escritórios remotos:</p>
+
+          <h3>Transit Gateway</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Transit Gateway</code><span class="cmd-tag">Hub Central</span></div>
+              <p>Hub de rede regional que conecta VPCs e redes on-premises através de um ponto central.</p>
+              <pre><code>Características:
+• Hub-and-spoke: conecta milhares de VPCs
+• Suporta peering inter-região (Transit Gateway Peering)
+• Route tables para segmentação de tráfego
+• Suporta multicast
+• Bandwidth: até 50 Gbps por attachment
+• Integra com Direct Connect Gateway e VPN
+
+Quando usar:
+• 3+ VPCs que precisam se comunicar
+• Topologia hub-and-spoke
+• Segmentação de rede entre ambientes
+• Conectividade transitiva entre VPCs</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Transit Gateway vs VPC Peering</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>VPC Peering:
+• Conexão 1:1 entre duas VPCs
+• Não transitivo (A↔B e B↔C ≠ A↔C)
+• Sem custo de hora (só transferência de dados)
+• Suporta inter-região
+• Melhor para: poucas VPCs (2-3)
+
+Transit Gateway:
+• Hub central para N VPCs
+• Transitivo por padrão
+• Custo por hora + transferência
+• Route tables para segmentação
+• Melhor para: muitas VPCs, topologia complexa
+
+Regra: &lt;5 VPCs sem transitividade → Peering
+        5+ VPCs ou transitividade → Transit Gateway</code></pre>
+            </div>
+          </div>
+
+          <h3>Direct Connect</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Direct Connect</code><span class="cmd-tag">Conexão Dedicada</span></div>
+              <p>Conexão de rede dedicada entre seu data center e a AWS. Não passa pela internet pública.</p>
+              <pre><code>Tipos de conexão:
+• Dedicated: 1 Gbps, 10 Gbps, 100 Gbps (porta física exclusiva)
+• Hosted: 50 Mbps a 10 Gbps (via parceiro AWS)
+
+Virtual Interfaces (VIFs):
+• Private VIF → acesso a VPCs (via VGW ou Direct Connect Gateway)
+• Public VIF → acesso a serviços públicos AWS (S3, DynamoDB)
+• Transit VIF → acesso via Transit Gateway
+
+Resiliência:
+• Single connection = single point of failure
+• High Resiliency: 2 conexões em 2 locais diferentes
+• Maximum Resiliency: 2 conexões em cada um de 2 locais (4 total)
+
+Lead time: semanas a meses para provisionar!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Direct Connect Gateway</code><span class="cmd-tag">Multi-Região</span></div>
+              <p>Permite acessar VPCs em múltiplas regiões através de uma única conexão Direct Connect.</p>
+              <pre><code>Sem DX Gateway:
+• 1 Direct Connect → 1 região apenas
+• Precisa de conexão por região
+
+Com DX Gateway:
+• 1 Direct Connect → múltiplas regiões
+• Conecta a VGWs ou Transit Gateways
+• Global (não é regional)
+
+Combinação com Transit Gateway:
+• DX → DX Gateway → Transit Gateway → VPCs
+• Acesso a centenas de VPCs via 1 conexão
+• Transit VIF necessário</code></pre>
+            </div>
+          </div>
+
+          <h3>VPN</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Site-to-Site VPN</code><span class="cmd-tag">IPsec</span></div>
+              <p>Conexão criptografada (IPsec) entre seu data center e a AWS via internet pública.</p>
+              <pre><code>Componentes:
+• Virtual Private Gateway (VGW) — lado AWS
+• Customer Gateway (CGW) — lado on-premises
+• 2 túneis IPsec para redundância
+
+Características:
+• Setup em minutos (vs semanas do DX)
+• Bandwidth: até ~1.25 Gbps por túnel
+• Criptografia IPsec
+• Pode usar como backup do Direct Connect
+
+VPN + Direct Connect (backup):
+• DX como primário (baixa latência)
+• VPN como failover (via internet)
+• BGP para failover automático</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Client VPN</code><span class="cmd-tag">Usuários Remotos</span></div>
+              <p>VPN gerenciada para conectar usuários individuais (laptops) à AWS ou rede corporativa.</p>
+              <pre><code>Características:
+• Baseado em OpenVPN
+• Escala elástica (milhares de usuários)
+• Autenticação: AD, SAML, certificados
+• Split-tunnel ou full-tunnel
+• Integra com Security Groups
+
+Quando usar:
+• Funcionários remotos acessando VPCs
+• Acesso seguro a recursos internos
+• Substituir VPN on-premises
+
+Diferença do Site-to-Site:
+• Site-to-Site = rede-a-rede (data center → AWS)
+• Client VPN = usuário-a-rede (laptop → AWS)</code></pre>
+            </div>
+          </div>
+
+          <h3>Outros Serviços de Rede</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS PrivateLink</code><span class="cmd-tag">Endpoint Services</span></div>
+              <p>Acesso privado a serviços AWS ou serviços de terceiros sem expor tráfego à internet.</p>
+              <pre><code>Tipos de VPC Endpoints:
+• Interface Endpoint (PrivateLink): ENI na sua VPC
+  → Maioria dos serviços AWS
+  → Serviços de terceiros no Marketplace
+  → Seus próprios serviços (via NLB)
+
+• Gateway Endpoint: entrada na route table
+  → Apenas S3 e DynamoDB
+  → Sem custo adicional
+
+Quando usar PrivateLink:
+• Expor serviço para outras contas sem peering
+• Acesso privado a SaaS
+• Compliance: tráfego não pode sair da rede AWS</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Global Accelerator</code><span class="cmd-tag">Performance</span></div>
+              <p>Melhora performance de aplicações globais usando a rede backbone da AWS (Anycast IPs).</p>
+              <pre><code>Como funciona:
+• 2 IPs Anycast estáticos globais
+• Tráfego entra na edge location mais próxima
+• Viaja pela rede privada AWS (não internet)
+• Roteamento inteligente para endpoints saudáveis
+
+vs CloudFront:
+• CloudFront: cache de conteúdo estático/dinâmico
+• Global Accelerator: TCP/UDP sem cache
+  → Gaming, IoT, VoIP
+  → Failover instantâneo entre regiões
+  → IPs estáticos (whitelist em firewalls)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS Cloud WAN</code><span class="cmd-tag">Rede Global</span></div>
+              <p>Serviço gerenciado para construir, gerenciar e monitorar uma rede global unificada.</p>
+              <pre><code>Características:
+• Rede global como serviço
+• Política centralizada (network policy)
+• Segmentação automática
+• Integra VPCs, DX, VPN, SD-WAN
+• Dashboard de monitoramento
+
+Quando usar:
+• Rede global complexa (muitas regiões)
+• Substituir Transit Gateway multi-região
+• Gerenciamento centralizado de rede
+• Segmentação por política</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-Account Strategy -->
+        <div class="topic-block">
+          <h2>Estratégia Multi-Conta</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Organizations</code><span class="cmd-tag">Governança</span></div>
+              <p>Gerenciamento centralizado de múltiplas contas AWS com billing consolidado e políticas.</p>
+              <pre><code>Estrutura:
+• Management Account (payer) — raiz
+• Organizational Units (OUs) — agrupamento lógico
+• Member Accounts — contas individuais
+
+Service Control Policies (SCPs):
+• Definem permissões MÁXIMAS para contas/OUs
+• NÃO concedem permissões (apenas restringem)
+• Não afetam a Management Account
+• Herança hierárquica (OU pai → OU filho)
+
+Exemplo de SCP:
+• Deny: criar recursos fora de regiões permitidas
+• Deny: desabilitar CloudTrail
+• Deny: sair da organização</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS Control Tower</code><span class="cmd-tag">Landing Zone</span></div>
+              <p>Configura e governa um ambiente multi-conta seguro seguindo melhores práticas (Landing Zone).</p>
+              <pre><code>Componentes:
+• Landing Zone: ambiente multi-conta pré-configurado
+• Guardrails: regras preventivas e detectivas
+  → Preventive: SCPs (bloqueia ações)
+  → Detective: Config Rules (detecta violações)
+• Account Factory: criação padronizada de contas
+• Dashboard: visão de compliance
+
+Contas criadas automaticamente:
+• Log Archive Account (CloudTrail centralizado)
+• Audit Account (acesso cross-account para auditoria)
+
+Quando usar:
+• Novo ambiente AWS multi-conta
+• Padronizar criação de contas
+• Governança automatizada</code></pre>
+            </div>
+          </div>
+
+          <h3>Padrão de Contas Recomendado</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Conta/OU</th><th>Propósito</th><th>Serviços Principais</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Management Account</strong></td><td>Billing, Organizations, SCPs</td><td>Organizations, Billing, IAM Identity Center</td></tr>
+              <tr><td><strong>Security OU</strong></td><td>Auditoria e logs centralizados</td><td>CloudTrail, Config, GuardDuty (delegated admin)</td></tr>
+              <tr><td><strong>Infrastructure OU</strong></td><td>Serviços compartilhados de rede</td><td>Transit Gateway, Direct Connect, DNS</td></tr>
+              <tr><td><strong>Sandbox OU</strong></td><td>Experimentação com limites de custo</td><td>Budgets, SCPs restritivas</td></tr>
+              <tr><td><strong>Workloads OU</strong></td><td>Aplicações (dev/staging/prod)</td><td>Separação por ambiente e aplicação</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Hybrid DNS -->
+        <div class="topic-block">
+          <h2>DNS Híbrido</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Route 53 Resolver</code><span class="cmd-tag">DNS Híbrido</span></div>
+              <p>Resolve consultas DNS entre a AWS e redes on-premises.</p>
+              <pre><code>Endpoints:
+• Inbound Endpoint:
+  → On-premises DNS → AWS (resolve domínios privados AWS)
+  → DNS on-prem encaminha queries para o endpoint
+  → ENIs na VPC que recebem queries
+
+• Outbound Endpoint:
+  → AWS → On-premises DNS (resolve domínios corporativos)
+  → Route 53 encaminha queries via regras
+  → Forwarding Rules definem quais domínios
+
+Resolver Rules:
+• Forward: encaminha domínio X para DNS Y
+• System: usa resolução padrão do Route 53
+• Compartilháveis via RAM (Resource Access Manager)
+
+Cenário típico:
+• corp.internal → Outbound → DNS on-premises
+• aws.internal → Inbound → Route 53 Private Hosted Zone</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Private Hosted Zones</code><span class="cmd-tag">DNS Privado</span></div>
+              <p>Zonas DNS que respondem apenas dentro de VPCs associadas.</p>
+              <pre><code>Características:
+• Resolução apenas dentro de VPCs associadas
+• Pode associar VPCs de outras contas (cross-account)
+• Split-view DNS: mesmo domínio, respostas diferentes
+  → Público: api.empresa.com → IP público
+  → Privado: api.empresa.com → IP privado
+
+Cross-account:
+• Conta A cria a Private Hosted Zone
+• Conta A autoriza associação da VPC da Conta B
+• Conta B aceita e associa sua VPC
+• Ambas resolvem os mesmos registros</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Identity Federation -->
+        <div class="topic-block">
+          <h2>Federação de Identidade</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IAM Identity Center</code><span class="cmd-tag">SSO</span></div>
+              <p>Gerenciamento centralizado de acesso SSO para múltiplas contas AWS e aplicações.</p>
+              <pre><code>Anteriormente: AWS SSO
+
+Características:
+• Login único para todas as contas da organização
+• Integra com IdPs externos (AD, Okta, Azure AD)
+• Permission Sets: definem acesso por conta
+• Atribuição: usuário/grupo → permission set → conta
+
+Identity Sources:
+• Identity Center directory (built-in)
+• Active Directory (AD Connector ou AWS Managed AD)
+• External IdP (SAML 2.0 — Okta, Azure AD, etc.)
+
+Quando usar:
+• Acesso humano a múltiplas contas AWS
+• SSO corporativo
+• Gerenciamento centralizado de permissões</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>SAML 2.0 / OIDC</code><span class="cmd-tag">Federação</span></div>
+              <p>Protocolos para federação de identidade com provedores externos.</p>
+              <pre><code>SAML 2.0:
+• Padrão enterprise (Active Directory, ADFS)
+• Assume Role via STS (AssumeRoleWithSAML)
+• Console AWS ou API/CLI
+• Fluxo: User → IdP → SAML Assertion → STS → Credentials
+
+OIDC (OpenID Connect):
+• Padrão web/mobile (Google, Facebook, Cognito)
+• AssumeRoleWithWebIdentity
+• Melhor usar Cognito como intermediário
+
+Amazon Cognito:
+• User Pools: autenticação (sign-up/sign-in)
+• Identity Pools: autorização (credenciais AWS temporárias)
+• Federação com SAML, OIDC, social IdPs
+• Quando usar: aplicações web/mobile com usuários externos</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Governance -->
+        <div class="topic-block">
+          <h2>Governança e Compliance</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Config</code><span class="cmd-tag">Compliance</span></div>
+              <p>Avalia, audita e monitora configurações de recursos AWS continuamente.</p>
+              <pre><code>Componentes:
+• Config Rules: regras de compliance
+  → Managed Rules (pré-definidas pela AWS)
+  → Custom Rules (Lambda)
+• Conformance Packs: conjunto de regras
+• Aggregator: visão multi-conta/multi-região
+• Remediation: correção automática (SSM Automation)
+
+Exemplos de regras:
+• EBS volumes devem ser criptografados
+• Security Groups não podem ter 0.0.0.0/0
+• S3 buckets devem ter versionamento
+• RDS deve ter backup habilitado
+
+Multi-conta:
+• Config Aggregator na conta de auditoria
+• Delegated Administrator
+• Organization Config Rules</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CloudTrail</code><span class="cmd-tag">Auditoria</span></div>
+              <p>Registra todas as chamadas de API feitas na conta AWS (quem fez o quê, quando).</p>
+              <pre><code>Tipos de eventos:
+• Management Events: operações de controle
+  (CreateBucket, AttachPolicy, RunInstances)
+• Data Events: operações em dados
+  (GetObject, PutObject, Invoke Lambda)
+• Insights Events: atividade incomum
+
+Organization Trail:
+• Trail na Management Account
+• Captura eventos de TODAS as contas
+• Centraliza logs em S3 da conta de segurança
+• Imutável com S3 Object Lock
+
+Integração:
+• S3 (armazenamento de longo prazo)
+• CloudWatch Logs (alertas em tempo real)
+• Athena (queries SQL nos logs)
+• EventBridge (automação baseada em eventos)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>GuardDuty</code><span class="cmd-tag">Detecção de Ameaças</span></div>
+              <p>Detecção inteligente de ameaças usando ML, análise de anomalias e threat intelligence.</p>
+              <pre><code>Fontes de dados:
+• CloudTrail Events (Management + Data)
+• VPC Flow Logs
+• DNS Logs
+• EKS Audit Logs
+• S3 Data Events
+
+Tipos de findings:
+• Reconnaissance (port scanning, API probing)
+• Instance Compromise (crypto mining, C&C)
+• Account Compromise (credenciais vazadas)
+• S3 Compromise (acesso anômalo)
+
+Multi-conta:
+• Delegated Administrator na conta de segurança
+• Habilitar para todas as contas da organização
+• Findings centralizados
+• Auto-enable para novas contas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Security Hub</code><span class="cmd-tag">Postura</span></div>
+              <p>Visão centralizada de segurança e compliance. Agrega findings de múltiplos serviços.</p>
+              <pre><code>Agrega findings de:
+• GuardDuty, Inspector, Macie
+• Firewall Manager, IAM Access Analyzer
+• Config, terceiros (Qualys, Palo Alto, etc.)
+
+Security Standards:
+• AWS Foundational Security Best Practices
+• CIS AWS Foundations Benchmark
+• PCI DSS
+• NIST 800-53
+
+Automação:
+• Custom Actions → EventBridge → Lambda
+• Automated response (quarantine, notify)
+• Cross-account aggregation
+• Integration com SIEM (Splunk, etc.)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> "Detectar ameaças" → GuardDuty | "Compliance de configuração" → Config | "Auditoria de API" → CloudTrail | "Visão centralizada de segurança" → Security Hub | "Governança multi-conta" → Organizations + SCPs + Control Tower</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

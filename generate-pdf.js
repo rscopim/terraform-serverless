@@ -14,6 +14,8 @@ const COURSES = {
   redes: { modules: 12, title: 'Redes de Computadores: Do Zero ao Avançado', emoji: '🌐', subtitle: 'Fundamentos • OSI • IP • Switching • Roteamento • Segurança • Automação • Design' },
   python: { modules: 10, title: 'Python: Do Zero ao Avançado', emoji: '🐍', subtitle: 'Fundamentos • OOP • APIs • boto3 • Bedrock • Automação AWS' },
   cloudformation: { modules: 4, title: 'AWS CloudFormation: Do Zero ao Avançado', emoji: '☁️', subtitle: 'Templates • VPC • EC2 • RDS • S3 • Nested Stacks' },
+  developer: { modules: 4, title: 'AWS Developer Associate (DVA-C02)', emoji: '💻', subtitle: 'Desenvolvimento • Segurança • Implantação • Troubleshooting', prefix: 'dominio' },
+  'solutions-architect-pro': { modules: 7, title: 'AWS SA Professional (SAP-C02)', emoji: '🏛️', subtitle: 'Complexidade • Novas Soluções • Melhoria • Migração • Cenários' },
 };
 
 async function generatePDF(courseName) {
@@ -29,6 +31,10 @@ async function generatePDF(courseName) {
     var outputFileFinal = path.join(outputDir, 'aws-ai-practitioner-do-zero-ao-avancado.pdf');
   } else if (courseName === 'github') {
     var outputFileFinal = path.join(outputDir, 'git-github-do-zero-ao-avancado.pdf');
+  } else if (courseName === 'developer') {
+    var outputFileFinal = path.join(outputDir, 'aws-developer-associate-do-zero-ao-avancado.pdf');
+  } else if (courseName === 'solutions-architect-pro') {
+    var outputFileFinal = path.join(outputDir, 'aws-sa-professional-do-zero-ao-avancado.pdf');
   } else {
     var outputFileFinal = outputFile;
   }

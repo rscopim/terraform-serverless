@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Developer Domínio 03: Implantação</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../developer.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="nav-link">← Anterior</a>
+        <a href="dominio-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">💻 Developer — Domínio 03</span>
+        <h1>Implantação (Deployment)</h1>
+        <p>CI/CD Pipeline, estratégias de deploy, SAM, CloudFormation, Elastic Beanstalk, ECS e ECR. Este domínio representa 24% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- CI/CD Pipeline -->
+        <div class="topic-block">
+          <h2>CI/CD Pipeline — AWS Developer Tools</h2>
+          <p>Suite de serviços para automação completa do ciclo de desenvolvimento.</p>
+
+          <h3>CodeCommit, CodeBuild, CodeDeploy, CodePipeline</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>CodeCommit</code><span class="cmd-tag">Source</span></div>
+              <pre><code>• Repositório Git gerenciado pela AWS
+• Privado, criptografado, altamente disponível
+• Sem limite de tamanho de repositório
+• Integração com IAM para acesso
+• Triggers: SNS, Lambda (push events)
+• Pull Requests com aprovações
+• Cross-account access via IAM role
+
+Autenticação:
+• HTTPS: Git credentials ou credential helper
+• SSH: SSH keys no IAM user
+• Não suporta: anonymous access</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CodeBuild</code><span class="cmd-tag">Build</span></div>
+              <pre><code>• Serviço de build serverless (pay-per-use)
+• Compila código, roda testes, gera artefatos
+• Ambientes: Docker containers gerenciados
+• Escala automaticamente
+
+buildspec.yml (na raiz do repo):
+version: 0.2
+env:
+  variables:
+    ENV: "prod"
+  secrets-manager:
+    DB_PASS: prod/db:password
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  pre_build:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+      - npm test
+  post_build:
+    commands:
+      - echo "Build complete"
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist
+cache:
+  paths:
+    - node_modules/**/*</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>CodeDeploy</code><span class="cmd-tag">Deploy</span></div>
+              <pre><code>• Deploy automatizado para EC2, ECS, Lambda, On-premises
+• Rollback automático em caso de falha
+• Deployment groups: conjunto de instâncias
+
+appspec.yml (EC2/On-premises):
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/html
+hooks:
+  BeforeInstall:
+    - location: scripts/install_deps.sh
+      timeout: 300
+  AfterInstall:
+    - location: scripts/configure.sh
+  ApplicationStart:
+    - location: scripts/start_server.sh
+  ValidateService:
+    - location: scripts/health_check.sh
+
+appspec.yml (Lambda):
+version: 0.0
+Resources:
+  - MyFunction:
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: my-function
+        Alias: live
+        CurrentVersion: 1
+        TargetVersion: 2
+
+Lifecycle Hooks (EC2):
+ApplicationStop → DownloadBundle →
+BeforeInstall → Install → AfterInstall →
+ApplicationStart → ValidateService</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CodePipeline</code><span class="cmd-tag">Orquestração</span></div>
+              <pre><code>• Orquestra o pipeline CI/CD completo
+• Visual workflow com stages e actions
+• Integra todos os Developer Tools
+
+Stages típicos:
+1. Source: CodeCommit, GitHub, S3, ECR
+2. Build: CodeBuild, Jenkins
+3. Test: CodeBuild, terceiros
+4. Deploy: CodeDeploy, ECS, S3, CloudFormation
+5. Approval: manual approval (SNS notification)
+
+Características:
+• Artifacts entre stages (S3)
+• Parallel actions dentro de um stage
+• Cross-region actions
+• Cross-account deployments
+• CloudWatch Events para triggers
+• Webhook para GitHub
+
+⚠️ Cada stage deve ter pelo menos 1 action
+⚠️ Manual approval para gates de produção</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> buildspec.yml = CodeBuild. appspec.yml = CodeDeploy. CodePipeline orquestra tudo. CodeBuild é serverless (sem gerenciar servidores). CodeDeploy hooks definem scripts em cada fase do deploy.</p>
+          </div>
+        </div>
+
+        <!-- Deployment Strategies -->
+        <div class="topic-block">
+          <h2>Estratégias de Deployment</h2>
+          <p>Diferentes abordagens para atualizar aplicações em produção com diferentes trade-offs de risco e velocidade.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estratégia</th><th>Downtime</th><th>Rollback</th><th>Custo</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>All-at-Once</strong></td><td>Sim</td><td>Re-deploy</td><td>Baixo</td><td>Atualiza todas as instâncias simultaneamente</td></tr>
+              <tr><td><strong>Rolling</strong></td><td>Parcial</td><td>Re-deploy</td><td>Baixo</td><td>Atualiza em batches (capacidade reduzida durante deploy)</td></tr>
+              <tr><td><strong>Rolling with Additional Batch</strong></td><td>Não</td><td>Re-deploy</td><td>Médio</td><td>Cria batch extra antes de atualizar (mantém capacidade)</td></tr>
+              <tr><td><strong>Immutable</strong></td><td>Não</td><td>Rápido (terminar novas)</td><td>Alto</td><td>Cria novas instâncias, troca quando saudáveis</td></tr>
+              <tr><td><strong>Blue/Green</strong></td><td>Não</td><td>Instantâneo (swap)</td><td>Alto (2x)</td><td>Ambiente novo completo, swap de DNS/LB</td></tr>
+              <tr><td><strong>Canary</strong></td><td>Não</td><td>Rápido</td><td>Médio</td><td>% pequeno do tráfego para nova versão, depois 100%</td></tr>
+              <tr><td><strong>Linear</strong></td><td>Não</td><td>Rápido</td><td>Médio</td><td>Incremento gradual do tráfego (10% a cada 10 min)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>CodeDeploy — EC2</code><span class="cmd-tag">Estratégias</span></div>
+              <pre><code>In-Place Deployment:
+• AllAtOnce: todas de uma vez
+• HalfAtATime: metade por vez
+• OneAtATime: uma por vez
+• Custom: definir % ou número
+
+Blue/Green Deployment:
+• Cria novo Auto Scaling Group
+• Registra no Load Balancer
+• Desregistra instâncias antigas
+• Rollback: re-route para blue</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CodeDeploy — Lambda</code><span class="cmd-tag">Traffic Shifting</span></div>
+              <pre><code>• Canary10Percent5Minutes:
+  10% por 5 min, depois 100%
+• Canary10Percent10Minutes:
+  10% por 10 min, depois 100%
+• Linear10PercentEvery1Minute:
+  +10% a cada 1 minuto
+• Linear10PercentEvery10Minutes:
+  +10% a cada 10 minutos
+• AllAtOnce:
+  100% imediatamente
+
+Pre/Post Traffic Hooks:
+• Lambda functions para validação
+• BeforeAllowTraffic: teste antes
+• AfterAllowTraffic: teste depois
+• Falha no hook = rollback automático</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Blue/Green = rollback instantâneo (mais seguro, mais caro). Canary = teste com % pequeno antes. Immutable = novas instâncias (rollback rápido). Rolling = capacidade reduzida durante deploy.</p>
+          </div>
+        </div>
+
+        <!-- SAM -->
+        <div class="topic-block">
+          <h2>AWS SAM (Serverless Application Model)</h2>
+          <p>Framework para definir e deployar aplicações serverless. Extensão do CloudFormation.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>SAM Template</code><span class="cmd-tag">template.yaml</span></div>
+              <pre><code>AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.11
+    MemorySize: 256
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref MyTable
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      CodeUri: src/
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /items
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyTable
+
+  MyTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Auth:
+        DefaultAuthorizer: MyCognitoAuth</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>SAM CLI</code><span class="cmd-tag">Comandos</span></div>
+              <pre><code>Desenvolvimento local:
+$ sam init          # scaffold novo projeto
+$ sam build         # compila e prepara artefatos
+$ sam local invoke  # invoca Lambda localmente
+$ sam local start-api  # API Gateway local
+$ sam local start-lambda  # endpoint Lambda local
+
+Deploy:
+$ sam deploy --guided  # deploy interativo
+$ sam deploy           # deploy com samconfig.toml
+
+Outros:
+$ sam validate    # valida template
+$ sam logs        # tail de logs do CloudWatch
+$ sam sync        # sync rápido (dev)
+
+samconfig.toml:
+[default.deploy.parameters]
+stack_name = "my-app"
+s3_bucket = "my-deploy-bucket"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+
+⚠️ Transform: AWS::Serverless-2016-10-31
+   é obrigatório no template SAM</code></pre>
+            </div>
+          </div>
+
+          <h3>SAM Globals e Policy Templates</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Globals</code><span class="cmd-tag">Herança</span></div>
+              <pre><code>Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 30
+    MemorySize: 256
+    Tracing: Active
+    Environment:
+      Variables:
+        STAGE: prod
+
+• Aplica a TODAS as funções do template
+• Função individual pode sobrescrever
+• Reduz repetição no template
+• Suporta: Function, Api, HttpApi, SimpleTable</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Policy Templates</code><span class="cmd-tag">Permissões</span></div>
+              <pre><code>Policies simplificadas do SAM:
+• DynamoDBCrudPolicy
+• S3ReadPolicy / S3CrudPolicy
+• SQSPollerPolicy
+• SNSPublishMessagePolicy
+• KMSDecryptPolicy
+• LambdaInvokePolicy
+• StepFunctionsExecutionPolicy
+• CloudWatchPutMetricPolicy
+
+Exemplo:
+Policies:
+  - DynamoDBCrudPolicy:
+      TableName: !Ref MyTable
+  - S3ReadPolicy:
+      BucketName: !Ref MyBucket
+
+⚠️ Muito mais simples que IAM policies manuais</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> SAM = extensão do CloudFormation para serverless. Transform é obrigatório. sam local para desenvolvimento local. Globals reduz repetição. Policy Templates simplificam IAM. sam build + sam deploy para CI/CD.</p>
+          </div>
+        </div>
+
+        <!-- CloudFormation -->
+        <div class="topic-block">
+          <h2>AWS CloudFormation</h2>
+          <p>Infrastructure as Code — define e provisiona recursos AWS de forma declarativa.</p>
+
+          <h3>Intrinsic Functions</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Funções Principais</code><span class="cmd-tag">Ref & GetAtt</span></div>
+              <pre><code>!Ref LogicalName
+• Retorna valor do recurso ou parâmetro
+• Recurso: geralmente ID físico
+• Parâmetro: valor do parâmetro
+
+!GetAtt Resource.Attribute
+• Retorna atributo específico do recurso
+• Ex: !GetAtt MyBucket.Arn
+• Ex: !GetAtt MyBucket.DomainName
+
+!Sub "Hello ${AWS::StackName}"
+• Substitui variáveis em strings
+• Suporta pseudo-parâmetros
+
+!Join [delimiter, [values]]
+• Concatena strings com delimitador
+
+!Select [index, [list]]
+• Seleciona item de uma lista
+
+!Split [delimiter, string]
+• Divide string em lista</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Condicionais & Mapping</code><span class="cmd-tag">Lógica</span></div>
+              <pre><code>Conditions:
+  IsProd: !Equals [!Ref Env, "prod"]
+
+Resources:
+  ProdBucket:
+    Type: AWS::S3::Bucket
+    Condition: IsProd
+
+!If [condition, true-value, false-value]
+!Equals [value1, value2]
+!Not [condition]
+!And [conditions...]
+!Or [conditions...]
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-12345
+    eu-west-1:
+      AMI: ami-67890
+
+!FindInMap [MapName, Key1, Key2]
+• Ex: !FindInMap [RegionMap, !Ref AWS::Region, AMI]
+
+Pseudo-parâmetros:
+• AWS::AccountId, AWS::Region
+• AWS::StackName, AWS::StackId
+• AWS::NoValue</code></pre>
+            </div>
+          </div>
+
+          <h3>Change Sets, Nested Stacks e Drift Detection</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Change Sets</code><span class="cmd-tag">Preview</span></div>
+              <pre><code>• Preview de mudanças antes de aplicar
+• Mostra: Add, Modify, Remove
+• Não garante sucesso (apenas preview)
+• Workflow:
+  1. Criar change set
+  2. Revisar mudanças
+  3. Executar ou deletar
+
+Replacement:
+• True: recurso será recriado
+• False: update in-place
+• Conditional: depende do atributo
+
+⚠️ Sempre usar change sets em produção</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Nested Stacks</code><span class="cmd-tag">Modularização</span></div>
+              <pre><code>• Stack dentro de stack
+• Reutilização de templates
+• Cada nested stack = recurso AWS::CloudFormation::Stack
+
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.../vpc.yaml
+      Parameters:
+        CIDR: "10.0.0.0/16"
+
+Cross-Stack References:
+• Export: Output com Export Name
+• Import: !ImportValue ExportName
+• Diferente de nested (compartilha entre stacks independentes)
+
+⚠️ Nested = composição (lifecycle junto)
+⚠️ Cross-stack = compartilhamento (lifecycle separado)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Drift Detection</code><span class="cmd-tag">Compliance</span></div>
+              <pre><code>• Detecta mudanças manuais nos recursos
+• Compara estado atual vs template
+• Status: IN_SYNC, DRIFTED, NOT_CHECKED
+
+Drift Status por recurso:
+• MODIFIED: propriedades alteradas
+• DELETED: recurso removido
+• NOT_CHECKED: não verificado
+
+Ações após detectar drift:
+• Atualizar template para refletir mudanças
+• Reverter mudanças manuais
+• Import resource para gerenciar
+
+⚠️ Nem todos os recursos suportam drift detection
+⚠️ Não detecta drift em nested stacks automaticamente</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> !Ref retorna ID, !GetAtt retorna atributos. Change Sets para preview. Nested Stacks para modularização. Cross-Stack para compartilhar outputs. Drift Detection para compliance.</p>
+          </div>
+        </div>
+
+        <!-- Elastic Beanstalk -->
+        <div class="topic-block">
+          <h2>AWS Elastic Beanstalk</h2>
+          <p>PaaS que gerencia infraestrutura automaticamente — deploy de aplicações web sem gerenciar servidores.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Plataformas & Ambientes</code><span class="cmd-tag">Configuração</span></div>
+              <pre><code>Plataformas suportadas:
+• Node.js, Python, Java, .NET, PHP, Ruby, Go
+• Docker (single/multi-container)
+• Custom platform (Packer)
+
+Tipos de ambiente:
+• Web Server Environment:
+  - ELB + Auto Scaling + EC2
+  - Para aplicações web (HTTP)
+• Worker Environment:
+  - SQS + Auto Scaling + EC2
+  - Para processamento em background
+  - Daemon processa mensagens da fila
+
+Componentes:
+• Application: container lógico
+• Environment: instância da aplicação
+• Application Version: código deployado
+• Configuration: settings do ambiente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Deployment Policies</code><span class="cmd-tag">Deploy</span></div>
+              <pre><code>• All at once: rápido, com downtime
+• Rolling: batches, capacidade reduzida
+• Rolling with additional batch: sem redução
+• Immutable: novas instâncias, rollback rápido
+• Traffic splitting: canary testing
+• Blue/Green: swap de environment URLs
+
+Rollback:
+• All at once: re-deploy versão anterior
+• Rolling: re-deploy
+• Immutable: terminar novas instâncias
+• Blue/Green: swap URLs de volta
+
+⚠️ Immutable e Blue/Green são os mais seguros
+⚠️ Traffic splitting = canary nativo do Beanstalk</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>.ebextensions</code><span class="cmd-tag">Customização</span></div>
+              <pre><code>Diretório .ebextensions/ na raiz do source bundle:
+
+.ebextensions/01-packages.config:
+packages:
+  yum:
+    git: []
+    nginx: []
+
+.ebextensions/02-files.config:
+files:
+  "/etc/nginx/conf.d/proxy.conf":
+    mode: "000644"
+    content: |
+      proxy_pass http://localhost:8080;
+
+.ebextensions/03-commands.config:
+container_commands:
+  01_migrate:
+    command: "python manage.py migrate"
+    leader_only: true
+
+Ordem de execução:
+• Arquivos .config em ordem alfabética
+• packages → sources → files → commands
+• container_commands: após app deploy
+• leader_only: apenas em 1 instância</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> .ebextensions para customizar ambiente. Worker environment para SQS processing. Immutable deployment para rollback rápido. leader_only para migrations. Docker suportado nativamente.</p>
+          </div>
+        </div>
+
+        <!-- ECS/ECR -->
+        <div class="topic-block">
+          <h2>Amazon ECS e ECR</h2>
+          <p>Orquestração de containers Docker na AWS com opções de compute gerenciado (Fargate) ou self-managed (EC2).</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Task Definitions</code><span class="cmd-tag">Blueprint</span></div>
+              <pre><code>• JSON que define como rodar containers
+• Imagem Docker, CPU, memória
+• Port mappings, volumes
+• Environment variables
+• Logging configuration
+• IAM roles
+
+{
+  "family": "my-app",
+  "taskRoleArn": "arn:aws:iam::...",
+  "executionRoleArn": "arn:aws:iam::...",
+  "containerDefinitions": [{
+    "name": "app",
+    "image": "123456.dkr.ecr.us-east-1.amazonaws.com/my-app:latest",
+    "cpu": 256,
+    "memory": 512,
+    "portMappings": [{"containerPort": 8080}],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/my-app",
+        "awslogs-region": "us-east-1"
+      }
+    }
+  }]
+}
+
+Roles:
+• Task Role: permissões do container (app)
+• Execution Role: permissões do ECS agent (pull image, logs)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Fargate vs EC2</code><span class="cmd-tag">Launch Type</span></div>
+              <pre><code>Fargate (Serverless):
+• Sem gerenciar instâncias EC2
+• Paga por vCPU + memória por segundo
+• Escala automaticamente
+• Isolamento por task (segurança)
+• Sem acesso ao host
+• Ideal para: microservices, batch jobs
+
+EC2 Launch Type:
+• Você gerencia as instâncias EC2
+• Mais controle (GPU, instance type)
+• Pode ser mais barato em escala
+• ECS Agent em cada instância
+• Capacity Providers para Auto Scaling
+• Ideal para: GPU, compliance, custo otimizado
+
+ECS Services:
+• Mantém N tasks rodando
+• Load balancer integration (ALB/NLB)
+• Auto Scaling (target tracking, step)
+• Rolling update ou Blue/Green (CodeDeploy)
+• Service discovery (Cloud Map)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon ECR</code><span class="cmd-tag">Registry</span></div>
+              <pre><code>Elastic Container Registry:
+• Registry privado de Docker images
+• Integração nativa com ECS, EKS, Lambda
+• Criptografia at rest (KMS)
+• Image scanning (vulnerabilidades)
+• Cross-region e cross-account replication
+
+Lifecycle Policies:
+• Limpar imagens antigas automaticamente
+• Por contagem ou por idade
+• Manter apenas N imagens mais recentes
+
+Comandos:
+# Login
+aws ecr get-login-password | \
+  docker login --username AWS --password-stdin \
+  123456.dkr.ecr.us-east-1.amazonaws.com
+
+# Push
+docker tag app:latest 123456.dkr.ecr.../app:latest
+docker push 123456.dkr.ecr.../app:latest
+
+# Immutable tags: previne overwrite de tags</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Task Role = permissões da app. Execution Role = permissões do ECS agent. Fargate = serverless containers. ECR lifecycle policies para limpeza. ECS Service para manter tasks rodando com LB.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-02.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-04.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

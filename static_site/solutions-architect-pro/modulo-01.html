@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 01: Visão Geral do Exame</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 01</span>
+        <h1>Visão Geral do Exame</h1>
+        <p>Detalhes do exame SAP-C02, distribuição de domínios, Well-Architected Framework, perfil do candidato e dicas estratégicas para aprovação.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Detalhes do Exame -->
+        <div class="topic-block">
+          <h2>Detalhes do Exame SAP-C02</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Item</th><th>Detalhe</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Código</strong></td><td>SAP-C02</td></tr>
+              <tr><td><strong>Questões</strong></td><td>75 (65 pontuadas + 10 não pontuadas)</td></tr>
+              <tr><td><strong>Duração</strong></td><td>180 minutos</td></tr>
+              <tr><td><strong>Nota de Aprovação</strong></td><td>750 / 1000</td></tr>
+              <tr><td><strong>Custo</strong></td><td>USD $300</td></tr>
+              <tr><td><strong>Formato</strong></td><td>Múltipla escolha e múltipla resposta</td></tr>
+              <tr><td><strong>Idiomas</strong></td><td>Inglês, Japonês, Coreano, Chinês Simplificado</td></tr>
+              <tr><td><strong>Validade</strong></td><td>3 anos</td></tr>
+              <tr><td><strong>Pré-requisito recomendado</strong></td><td>2+ anos de experiência prática com AWS</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Distribuição de Domínios -->
+        <div class="topic-block">
+          <h2>Distribuição de Domínios</h2>
+          <p>O exame é dividido em 4 domínios com pesos diferentes:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Domínio</th><th>Descrição</th><th>Peso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Domínio 1</strong></td><td>Design de Soluções para Complexidade Organizacional</td><td>26%</td></tr>
+              <tr><td><strong>Domínio 2</strong></td><td>Design para Novas Soluções</td><td>29%</td></tr>
+              <tr><td><strong>Domínio 3</strong></td><td>Melhoria Contínua de Soluções Existentes</td><td>25%</td></tr>
+              <tr><td><strong>Domínio 4</strong></td><td>Aceleração da Migração e Modernização de Workloads</td><td>20%</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Estratégia:</strong> Domínio 2 (Novas Soluções) é o mais pesado com 29%. Foque em arquiteturas serverless, event-driven e DR strategies. Domínios 1 e 3 juntos somam 51% — networking e otimização são fundamentais.</p>
+          </div>
+        </div>
+
+        <!-- Well-Architected Framework -->
+        <div class="topic-block">
+          <h2>Well-Architected Framework — 6 Pilares</h2>
+          <p>O framework é a base conceitual do exame. Todas as questões avaliam decisões arquiteturais sob a ótica destes pilares:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Excelência Operacional</code><span class="cmd-tag">Pilar 1</span></div>
+              <p>Executar e monitorar sistemas para entregar valor de negócio e melhorar continuamente processos e procedimentos.</p>
+              <pre><code>Práticas-chave:
+• IaC (CloudFormation, Terraform)
+• Observabilidade (CloudWatch, X-Ray)
+• Automação de operações
+• Runbooks e playbooks
+• Deploys frequentes e pequenos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Segurança</code><span class="cmd-tag">Pilar 2</span></div>
+              <p>Proteger informações, sistemas e ativos enquanto entrega valor de negócio através de avaliação de risco e estratégias de mitigação.</p>
+              <pre><code>Práticas-chave:
+• Princípio do menor privilégio
+• Rastreabilidade (CloudTrail)
+• Segurança em todas as camadas
+• Automação de segurança
+• Proteção de dados em trânsito e repouso
+• Preparação para incidentes</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Confiabilidade</code><span class="cmd-tag">Pilar 3</span></div>
+              <p>Garantir que um workload execute sua função pretendida corretamente e consistentemente quando esperado.</p>
+              <pre><code>Práticas-chave:
+• Recuperação automática de falhas
+• Teste de procedimentos de recuperação
+• Escala horizontal
+• Eliminar pontos únicos de falha
+• Gerenciamento de mudanças automatizado</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Eficiência de Performance</code><span class="cmd-tag">Pilar 4</span></div>
+              <p>Usar recursos computacionais de forma eficiente para atender requisitos do sistema e manter essa eficiência conforme a demanda muda.</p>
+              <pre><code>Práticas-chave:
+• Democratizar tecnologias avançadas
+• Globalizar em minutos
+• Usar arquiteturas serverless
+• Experimentar com mais frequência
+• Mechanical sympathy</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Otimização de Custos</code><span class="cmd-tag">Pilar 5</span></div>
+              <p>Evitar gastos desnecessários e executar sistemas para entregar valor de negócio ao menor preço.</p>
+              <pre><code>Práticas-chave:
+• Adotar modelo de consumo
+• Medir eficiência geral
+• Parar de gastar com data centers
+• Analisar e atribuir gastos
+• Usar serviços gerenciados</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Sustentabilidade</code><span class="cmd-tag">Pilar 6</span></div>
+              <p>Minimizar os impactos ambientais da execução de workloads na nuvem.</p>
+              <pre><code>Práticas-chave:
+• Entender seu impacto
+• Estabelecer metas de sustentabilidade
+• Maximizar utilização
+• Usar serviços gerenciados
+• Reduzir impacto downstream</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Perfil do Candidato -->
+        <div class="topic-block">
+          <h2>Perfil do Candidato</h2>
+          <p>O exame é destinado a profissionais com experiência avançada em AWS:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Requisito</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Experiência</strong></td><td>2+ anos de experiência prática projetando e implantando arquiteturas na AWS</td></tr>
+              <tr><td><strong>Habilidade</strong></td><td>Avaliar requisitos de aplicações e fazer recomendações arquiteturais para implementação e deploy</td></tr>
+              <tr><td><strong>Conhecimento</strong></td><td>Orientar a organização sobre melhores práticas de design multi-conta, multi-região e multi-tier</td></tr>
+              <tr><td><strong>Escopo</strong></td><td>Projetar soluções que atendam requisitos de segurança, confiabilidade, performance e custo</td></tr>
+              <tr><td><strong>Diferencial</strong></td><td>Capacidade de avaliar trade-offs entre diferentes abordagens arquiteturais</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tecnologias em Escopo -->
+        <div class="topic-block">
+          <h2>Tecnologias e Conceitos em Escopo</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Compute & Containers</code><span class="cmd-tag">Infraestrutura</span></div>
+              <pre><code>• EC2 (Auto Scaling, Spot, Reserved)
+• ECS / EKS / Fargate
+• Lambda (serverless)
+• Elastic Beanstalk
+• App Runner
+• Batch</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Networking</code><span class="cmd-tag">Conectividade</span></div>
+              <pre><code>• VPC, Subnets, Route Tables
+• Transit Gateway, VPC Peering
+• Direct Connect, Site-to-Site VPN
+• PrivateLink, Global Accelerator
+• Route 53, CloudFront
+• Cloud WAN</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Data & Analytics</code><span class="cmd-tag">Dados</span></div>
+              <pre><code>• Data Lakes (S3 + Glue + Athena)
+• Kinesis (Streams, Firehose, Analytics)
+• Redshift, EMR
+• DynamoDB, Aurora, ElastiCache
+• Neptune, Timestream, QLDB
+• QuickSight</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DevOps & IaC</code><span class="cmd-tag">Automação</span></div>
+              <pre><code>• CI/CD (CodePipeline, CodeBuild, CodeDeploy)
+• CloudFormation, CDK
+• Systems Manager
+• Config, CloudTrail
+• EventBridge, Step Functions</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Security & Governance</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>• IAM, Organizations, SCPs
+• Control Tower, Landing Zone
+• GuardDuty, Security Hub, Inspector
+• KMS, Secrets Manager, ACM
+• WAF, Shield, Firewall Manager
+• Macie, Detective</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Migration & DR</code><span class="cmd-tag">Migração</span></div>
+              <pre><code>• 6 Rs de Migração
+• Migration Hub, DMS, SCT
+• DataSync, Transfer Family
+• Snow Family
+• DR Strategies (Pilot Light, Warm Standby)
+• Elastic Disaster Recovery</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dicas para o Exame -->
+        <div class="topic-block">
+          <h2>Dicas Estratégicas para o Exame</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Gestão de Tempo</code><span class="cmd-tag">180 min</span></div>
+              <pre><code>• 75 questões em 180 minutos = ~2.4 min/questão
+• Questões são longas (cenários complexos)
+• Marque para revisão e siga em frente
+• Não gaste mais de 3 min em uma questão
+• Reserve 15 min para revisão final</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Estratégia de Resposta</code><span class="cmd-tag">Técnica</span></div>
+              <pre><code>• Leia os requisitos ANTES das opções
+• Identifique palavras-chave no enunciado
+• Elimine opções claramente erradas
+• "Menor esforço operacional" = serverless/gerenciado
+• "Custo-efetivo" = Reserved/Spot/lifecycle
+• "Alta disponibilidade" = multi-AZ/multi-região</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Padrões de Questão</code><span class="cmd-tag">Reconhecimento</span></div>
+              <pre><code>• Cenários multi-conta → Organizations + SCPs
+• Conectividade híbrida → Direct Connect + VPN
+• DR com baixo RTO → Warm Standby/Multi-Site
+• Migração de banco → DMS + SCT
+• Dados em tempo real → Kinesis
+• Desacoplamento → SQS/SNS/EventBridge</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Armadilhas Comuns</code><span class="cmd-tag">Atenção</span></div>
+              <pre><code>• Opção correta tecnicamente mas não atende requisito
+• Soluções over-engineered (complexas demais)
+• Confundir "pode funcionar" com "melhor opção"
+• Ignorar requisitos de compliance/região
+• Não considerar custos operacionais
+• Esquecer de ler TODAS as opções</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>🎯 Regra de ouro:</strong> A resposta correta no SAP-C02 é sempre a que melhor equilibra os requisitos do cenário (custo, performance, segurança, operação) com o menor esforço operacional possível. AWS sempre prefere serviços gerenciados sobre soluções self-managed.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../solutions-architect-pro.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

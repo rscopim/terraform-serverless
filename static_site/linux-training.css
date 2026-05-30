@@ -49,11 +49,14 @@
 .info-box code{font-family:'JetBrains Mono',monospace;background:rgba(99,102,241,0.08);padding:2px 6px;border-radius:4px;font-size:0.82rem}
 
 /* Tables */
-.options-table,.permissions-table,.interview-table{margin-top:14px;overflow-x:auto}
-.options-table table,.permissions-table table,.interview-table table{width:100%;border-collapse:collapse;font-size:0.84rem}
-.options-table th,.permissions-table th,.interview-table th{background:var(--gray-100);padding:10px 14px;text-align:left;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--gray-600)}
-.options-table td,.permissions-table td,.interview-table td{padding:9px 14px;border-bottom:1px solid var(--gray-200)}
+.options-table,.permissions-table,.interview-table,.styled-table{margin-top:14px;overflow-x:auto}
+.options-table table,.permissions-table table,.interview-table table,.styled-table{width:100%;border-collapse:collapse;font-size:0.84rem}
+.options-table th,.permissions-table th,.interview-table th,.styled-table th{background:var(--gray-100);padding:10px 14px;text-align:left;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--gray-600);border-bottom:2px solid var(--gray-200)}
+.options-table td,.permissions-table td,.interview-table td,.styled-table td{padding:9px 14px;border-bottom:1px solid var(--gray-200)}
 .options-table td:first-child,.permissions-table td:first-child,.interview-table td:first-child{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--primary-600);white-space:nowrap}
+.styled-table td:first-child{font-weight:600;color:var(--gray-800)}
+.styled-table strong{color:var(--primary-600)}
+.styled-table tr:hover{background:rgba(99,102,241,0.03)}
 .interview-table td:last-child code{font-size:0.78rem;background:rgba(99,102,241,0.06);padding:2px 5px;border-radius:4px}
 
 /* Checklist Grid */

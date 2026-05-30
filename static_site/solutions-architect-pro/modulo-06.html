@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — SA Professional Módulo 06: Palavras-Chave e Mapa de Serviços</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect-pro.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-05.html" class="nav-link">← Anterior</a>
+        <a href="modulo-07.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ SA Professional — Módulo 06</span>
+        <h1>Palavras-Chave e Mapa de Serviços</h1>
+        <p>Mapeamento rápido de palavras-chave para serviços AWS, árvores de decisão e comparações "quando usar X vs Y" para o exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Keywords → Services: Compute -->
+        <div class="topic-block">
+          <h2>Mapa de Palavras-Chave → Serviços</h2>
+          <p>Quando ver estas palavras-chave no enunciado, pense imediatamente no serviço correspondente:</p>
+
+          <h3>Compute</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Serverless", "sem gerenciar servidores", "event-driven"</td><td><strong>Lambda</strong></td></tr>
+              <tr><td>"Containers", "Docker", "microserviços"</td><td><strong>ECS / EKS + Fargate</strong></td></tr>
+              <tr><td>"Kubernetes", "portabilidade", "multi-cloud containers"</td><td><strong>EKS</strong></td></tr>
+              <tr><td>"Batch processing", "HPC", "jobs em lote"</td><td><strong>AWS Batch</strong></td></tr>
+              <tr><td>"Tolerante a interrupção", "90% desconto", "capacidade spare"</td><td><strong>Spot Instances</strong></td></tr>
+              <tr><td>"Workload estável", "compromisso 1-3 anos"</td><td><strong>Reserved Instances / Savings Plans</strong></td></tr>
+              <tr><td>"Licença por socket/core", "compliance de hardware"</td><td><strong>Dedicated Hosts</strong></td></tr>
+              <tr><td>"Deploy rápido de web apps", "sem gerenciar infra"</td><td><strong>Elastic Beanstalk</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Storage</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Object storage", "data lake", "backup", "ilimitado"</td><td><strong>S3</strong></td></tr>
+              <tr><td>"Arquivo", "compliance", "retenção longa", "vault"</td><td><strong>S3 Glacier</strong></td></tr>
+              <tr><td>"Shared file system", "NFS", "Linux", "containers"</td><td><strong>EFS</strong></td></tr>
+              <tr><td>"Windows file share", "SMB", "Active Directory"</td><td><strong>FSx for Windows</strong></td></tr>
+              <tr><td>"High performance", "HPC", "ML training", "Lustre"</td><td><strong>FSx for Lustre</strong></td></tr>
+              <tr><td>"Hybrid storage", "on-premises cache", "tape backup"</td><td><strong>Storage Gateway</strong></td></tr>
+              <tr><td>"Block storage", "EC2 volumes", "IOPS"</td><td><strong>EBS</strong></td></tr>
+              <tr><td>"Transferir dados", "migração de arquivos", "NFS/SMB → S3"</td><td><strong>DataSync</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Database</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Relacional", "MySQL/PostgreSQL compatível", "5x performance"</td><td><strong>Aurora</strong></td></tr>
+              <tr><td>"NoSQL", "key-value", "millisecond latency", "serverless DB"</td><td><strong>DynamoDB</strong></td></tr>
+              <tr><td>"Cache", "in-memory", "session store", "microsegundos"</td><td><strong>ElastiCache (Redis)</strong></td></tr>
+              <tr><td>"DynamoDB + microsegundos", "cache transparente"</td><td><strong>DAX</strong></td></tr>
+              <tr><td>"Graph", "relações", "social network", "fraud detection"</td><td><strong>Neptune</strong></td></tr>
+              <tr><td>"Time-series", "IoT metrics", "DevOps telemetry"</td><td><strong>Timestream</strong></td></tr>
+              <tr><td>"Ledger", "imutável", "auditável", "blockchain-like"</td><td><strong>QLDB</strong></td></tr>
+              <tr><td>"Data warehouse", "BI", "analytics pesado", "petabyte"</td><td><strong>Redshift</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Networking</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Conectar múltiplas VPCs", "hub central", "transitivo"</td><td><strong>Transit Gateway</strong></td></tr>
+              <tr><td>"Conexão dedicada", "baixa latência consistente", "1/10/100 Gbps"</td><td><strong>Direct Connect</strong></td></tr>
+              <tr><td>"Criptografado pela internet", "backup do DX", "rápido setup"</td><td><strong>Site-to-Site VPN</strong></td></tr>
+              <tr><td>"Acesso privado a serviços", "sem internet", "ENI na VPC"</td><td><strong>PrivateLink / Interface Endpoint</strong></td></tr>
+              <tr><td>"CDN", "cache na edge", "conteúdo estático/dinâmico"</td><td><strong>CloudFront</strong></td></tr>
+              <tr><td>"IPs estáticos globais", "TCP/UDP", "failover instantâneo"</td><td><strong>Global Accelerator</strong></td></tr>
+              <tr><td>"DNS", "routing policies", "health checks", "failover"</td><td><strong>Route 53</strong></td></tr>
+              <tr><td>"Rede global gerenciada", "política centralizada"</td><td><strong>Cloud WAN</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Security</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Multi-conta", "políticas de permissão máxima", "SCPs"</td><td><strong>Organizations</strong></td></tr>
+              <tr><td>"Landing zone", "guardrails", "account factory"</td><td><strong>Control Tower</strong></td></tr>
+              <tr><td>"SSO", "login único", "múltiplas contas"</td><td><strong>IAM Identity Center</strong></td></tr>
+              <tr><td>"Detecção de ameaças", "ML", "anomalias"</td><td><strong>GuardDuty</strong></td></tr>
+              <tr><td>"Compliance de configuração", "regras", "remediação"</td><td><strong>AWS Config</strong></td></tr>
+              <tr><td>"Auditoria de API", "quem fez o quê"</td><td><strong>CloudTrail</strong></td></tr>
+              <tr><td>"Visão centralizada de segurança", "findings agregados"</td><td><strong>Security Hub</strong></td></tr>
+              <tr><td>"Criptografia", "chaves gerenciadas", "rotation"</td><td><strong>KMS</strong></td></tr>
+              <tr><td>"WAF", "SQL injection", "XSS", "rate limiting"</td><td><strong>AWS WAF</strong></td></tr>
+              <tr><td>"DDoS", "proteção avançada", "SRT"</td><td><strong>AWS Shield Advanced</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Analytics & Integration</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Streaming", "real-time", "shards", "replay"</td><td><strong>Kinesis Data Streams</strong></td></tr>
+              <tr><td>"Entregar para S3/Redshift", "near real-time", "buffer"</td><td><strong>Kinesis Data Firehose</strong></td></tr>
+              <tr><td>"Query SQL em S3", "serverless analytics", "pay per scan"</td><td><strong>Athena</strong></td></tr>
+              <tr><td>"ETL", "data catalog", "crawlers", "schema discovery"</td><td><strong>AWS Glue</strong></td></tr>
+              <tr><td>"Fila de mensagens", "desacoplamento", "dead letter queue"</td><td><strong>SQS</strong></td></tr>
+              <tr><td>"Pub/sub", "fan-out", "múltiplos subscribers"</td><td><strong>SNS</strong></td></tr>
+              <tr><td>"Event bus", "SaaS events", "content filtering"</td><td><strong>EventBridge</strong></td></tr>
+              <tr><td>"Workflow", "state machine", "orquestração"</td><td><strong>Step Functions</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Migration</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Palavra-chave no Enunciado</th><th>Serviço AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>"Migrar servidores", "lift and shift", "replicação contínua"</td><td><strong>Application Migration Service (MGN)</strong></td></tr>
+              <tr><td>"Migrar banco de dados", "CDC", "replicação"</td><td><strong>DMS</strong></td></tr>
+              <tr><td>"Converter schema", "Oracle → PostgreSQL"</td><td><strong>SCT</strong></td></tr>
+              <tr><td>"Transferir petabytes", "offline", "dispositivo físico"</td><td><strong>Snow Family</strong></td></tr>
+              <tr><td>"Transferir arquivos", "NFS/SMB → S3/EFS"</td><td><strong>DataSync</strong></td></tr>
+              <tr><td>"SFTP gerenciado", "parceiros enviam arquivos"</td><td><strong>Transfer Family</strong></td></tr>
+              <tr><td>"Descobrir servidores", "dependências", "inventário"</td><td><strong>Application Discovery Service</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Decision Trees -->
+        <div class="topic-block">
+          <h2>Árvores de Decisão</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Escolha de Banco de Dados</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>Precisa de SQL/relacional?
+├── Sim → Precisa de alta performance/escala?
+│   ├── Sim → Aurora (MySQL/PostgreSQL)
+│   └── Não → RDS (MySQL, PostgreSQL, Oracle, SQL Server)
+└── Não → Que tipo de dados?
+    ├── Key-value, alta escala → DynamoDB
+    ├── Grafos/relações → Neptune
+    ├── Time-series → Timestream
+    ├── Ledger/imutável → QLDB
+    ├── Wide-column (Cassandra) → Keyspaces
+    ├── Document (MongoDB) → DocumentDB
+    └── Cache/session → ElastiCache Redis
+
+Precisa de data warehouse?
+└── Sim → Redshift (ou Athena para ad-hoc)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Escolha de Compute</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>Duração da execução?
+├── &lt;15 min, event-driven → Lambda
+├── Longa duração, stateless → Containers (ECS/EKS + Fargate)
+└── Longa duração, stateful → EC2
+
+Precisa gerenciar infraestrutura?
+├── Não → Fargate (containers) ou Lambda (functions)
+└── Sim → EC2 ou ECS/EKS com EC2 launch type
+
+Já usa Kubernetes?
+├── Sim → EKS
+└── Não → ECS (mais simples, AWS-native)
+
+Batch processing?
+├── Tolerante a interrupção → Spot Instances
+├── Jobs em lote → AWS Batch
+└── Big data → EMR</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Escolha de Conectividade</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>Conectar on-premises → AWS?
+├── Precisa de baixa latência consistente?
+│   ├── Sim → Direct Connect
+│   └── Não → Site-to-Site VPN
+├── Backup do Direct Connect?
+│   └── VPN como failover
+└── Usuários remotos (laptops)?
+    └── Client VPN
+
+Conectar VPCs entre si?
+├── 2-3 VPCs, sem transitividade → VPC Peering
+├── 5+ VPCs ou transitividade → Transit Gateway
+└── Rede global complexa → Cloud WAN
+
+Acessar serviços AWS sem internet?
+├── S3 ou DynamoDB → Gateway Endpoint (grátis)
+└── Outros serviços → Interface Endpoint (PrivateLink)
+
+Performance global?
+├── Conteúdo web (cache) → CloudFront
+└── TCP/UDP, IPs estáticos → Global Accelerator</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Escolha de Transferência de Dados</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>Volume de dados?
+├── &lt;10 TB → Internet/DataSync
+├── 10 TB - 10 PB → Snowball Edge
+└── &gt;10 PB → Snowmobile
+
+Transferência contínua ou única?
+├── Contínua → DataSync (scheduled) ou DX
+└── Única → Snow Family ou DataSync
+
+Tipo de dado?
+├── Arquivos (NFS/SMB) → DataSync
+├── Banco de dados → DMS
+├── Parceiros enviam via SFTP → Transfer Family
+└── Streaming real-time → Kinesis
+
+On-premises precisa acessar dados na AWS?
+└── Sim → Storage Gateway (cache local)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- When to use X vs Y -->
+        <div class="topic-block">
+          <h2>Quando Usar X vs Y</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Transit Gateway vs VPC Peering</code><span class="cmd-tag">Networking</span></div>
+              <pre><code>VPC Peering:
+✓ 2-3 VPCs com comunicação direta
+✓ Sem custo por hora (só data transfer)
+✓ Menor latência (conexão direta)
+✗ Não transitivo
+✗ Não escala bem (N×(N-1)/2 conexões)
+
+Transit Gateway:
+✓ 5+ VPCs
+✓ Conectividade transitiva
+✓ Segmentação com route tables
+✓ Integra com VPN e Direct Connect
+✗ Custo por hora + data processing
+✗ Latência ligeiramente maior (hop extra)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DynamoDB vs Aurora</code><span class="cmd-tag">Database</span></div>
+              <pre><code>DynamoDB:
+✓ Key-value / document access patterns
+✓ Escala massiva (milhões de requests/s)
+✓ Single-digit millisecond latency
+✓ Serverless (zero admin)
+✓ Global Tables (multi-region active-active)
+✗ Sem joins, sem SQL complexo
+✗ Queries limitadas (partition key + sort key)
+
+Aurora:
+✓ SQL complexo, joins, transações ACID
+✓ Compatível MySQL/PostgreSQL
+✓ Read replicas para offload
+✓ Global Database (cross-region)
+✓ Queries flexíveis (qualquer coluna)
+✗ Escala vertical (instance types)
+✗ Mais caro para alta throughput simples</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>SQS vs Kinesis</code><span class="cmd-tag">Messaging</span></div>
+              <pre><code>SQS:
+✓ Desacoplamento simples (producer/consumer)
+✓ Mensagem deletada após processamento
+✓ Escala automática ilimitada
+✓ Dead Letter Queue para falhas
+✓ Quando: task queue, buffering, 1 consumer group
+✗ Sem replay (mensagem some após consumo)
+✗ Sem ordering garantido (Standard)
+
+Kinesis Data Streams:
+✓ Múltiplos consumers leem mesmos dados
+✓ Replay (re-processar dados passados)
+✓ Ordering por shard (partition key)
+✓ Retenção até 365 dias
+✓ Quando: analytics real-time, múltiplos consumers
+✗ Gerenciar shards (capacity planning)
+✗ Mais complexo de operar</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CloudFront vs Global Accelerator</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>CloudFront:
+✓ Cache de conteúdo (estático e dinâmico)
+✓ HTTP/HTTPS
+✓ Lambda@Edge / CloudFront Functions
+✓ Quando: websites, APIs, streaming de vídeo
+✗ Não suporta TCP/UDP genérico
+✗ IPs mudam (não pode fazer whitelist)
+
+Global Accelerator:
+✓ TCP/UDP (qualquer protocolo)
+✓ 2 IPs Anycast estáticos (whitelist)
+✓ Failover instantâneo entre regiões
+✓ Quando: gaming, IoT, VoIP, non-HTTP
+✓ Health checks com failover automático
+✗ Sem cache
+✗ Mais caro que CloudFront para HTTP</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EventBridge vs SNS</code><span class="cmd-tag">Events</span></div>
+              <pre><code>SNS:
+✓ Fan-out simples e rápido
+✓ Alta throughput
+✓ Mobile push notifications
+✓ SMS, Email
+✓ Quando: notificações, fan-out para SQS queues
+✗ Filtering limitado (atributos simples)
+✗ Sem archive/replay
+
+EventBridge:
+✓ Content-based filtering avançado (JSON path)
+✓ Schema Registry (descoberta automática)
+✓ Archive & Replay de eventos
+✓ Integração com SaaS (Zendesk, Datadog)
+✓ Quando: event-driven architecture complexa
+✗ Menor throughput que SNS
+✗ Mais caro por evento</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DataSync vs Storage Gateway</code><span class="cmd-tag">Data</span></div>
+              <pre><code>DataSync:
+✓ MOVER dados (migração, sync periódico)
+✓ Alta velocidade (10x ferramentas open-source)
+✓ Verificação de integridade
+✓ Scheduling
+✓ Quando: migrar NFS/SMB para S3/EFS
+✗ Não fornece acesso contínuo on-premises
+
+Storage Gateway:
+✓ ACESSAR dados na AWS de on-premises
+✓ Cache local para baixa latência
+✓ Protocolos nativos (NFS, SMB, iSCSI)
+✓ Quando: acesso híbrido contínuo
+✗ Não é ferramenta de migração
+✗ Throughput limitado pelo cache local</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Dica final:</strong> No exame, identifique as palavras-chave no enunciado ANTES de ler as opções. Isso direciona seu raciocínio para o serviço correto e evita confusão com distratores. Pratique associar palavras-chave → serviço até virar automático.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-05.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-07.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
