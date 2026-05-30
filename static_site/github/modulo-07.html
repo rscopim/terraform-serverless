@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub Módulo 07: Automação e CI/CD</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-06.html" class="nav-link">← Anterior</a>
+        <a href="modulo-08.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐙 Git & GitHub — Módulo 07</span>
+        <h1>Automação: GitHub Actions, CI/CD e Hooks</h1>
+        <p>GitHub Actions, Hooks, Husky, lint-staged, pipelines. Automatize testes, builds e deploys diretamente no GitHub.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. GitHub Actions — Fundamentos</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Workflow YAML</code><span class="cmd-tag">CI/CD</span></div>
+              <p>Arquivo de workflow em <code>.github/workflows/</code>.</p>
+              <pre><code># .github/workflows/ci.yml
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Deploy Workflow</code><span class="cmd-tag">CD</span></div>
+              <p>Exemplo de deploy automático para AWS S3 + CloudFront.</p>
+              <pre><code># .github/workflows/deploy.yml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789:role/github-actions
+          aws-region: us-east-1
+
+      - name: Sync to S3
+        run: aws s3 sync ./dist s3://meu-bucket --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CF_DISTRIBUTION_ID }} \
+            --paths "/*"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Terraform CI com GitHub Actions</h2>
+          <div class="command-card wide">
+            <div class="command-header"><code>Terraform Pipeline</code><span class="cmd-tag">IaC</span></div>
+            <pre><code># .github/workflows/terraform.yml
+name: Terraform CI
+
+on:
+  pull_request:
+    paths: ['**/*.tf', '**/*.tfvars']
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>3. Git Hooks</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Hooks Locais</code><span class="cmd-tag">Automação</span></div>
+              <p>Scripts executados automaticamente em eventos Git.</p>
+              <pre><code># .git/hooks/pre-commit
+#!/bin/bash
+echo "Rodando lint antes do commit..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Lint falhou! Corrija antes de commitar."
+  exit 1
+fi
+
+# .git/hooks/commit-msg
+#!/bin/bash
+MSG=$(cat "$1")
+PATTERN="^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"
+if ! echo "$MSG" | grep -qE "$PATTERN"; then
+  echo "❌ Mensagem fora do padrão Conventional Commits"
+  exit 1
+fi</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Husky + lint-staged</code><span class="cmd-tag">Ferramenta</span></div>
+              <p>Gerencia hooks de forma compartilhável com o time.</p>
+              <pre><code># Instalar Husky
+npm install -D husky lint-staged
+npx husky init
+
+# .husky/pre-commit
+npx lint-staged
+
+# package.json
+{
+  "lint-staged": {
+    "*.{js,ts}": ["eslint --fix", "prettier --write"],
+    "*.{css,md}": ["prettier --write"]
+  }
+}
+
+# Agora todo commit roda lint automaticamente
+# E é compartilhado via package.json!</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-06.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-08.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

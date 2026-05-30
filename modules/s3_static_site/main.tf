@@ -259,6 +259,28 @@ resource "aws_s3_object" "ai_practitioner_modules" {
   etag = filemd5("${path.root}/../../static_site/ai-practitioner/${each.value}")
 }
 
+resource "aws_s3_object" "linux_modules" {
+  for_each = fileset("${path.root}/../../static_site/linux", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "linux/${each.value}"
+  source       = "${path.root}/../../static_site/linux/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/linux/${each.value}")
+}
+
+resource "aws_s3_object" "github_modules" {
+  for_each = fileset("${path.root}/../../static_site/github", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "github/${each.value}"
+  source       = "${path.root}/../../static_site/github/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/github/${each.value}")
+}
+
 resource "aws_s3_object" "github_page" {
   bucket       = aws_s3_bucket.this.id
   key          = "github.html"

@@ -8,6 +8,8 @@ const COURSES = {
   docker: { modules: 7, title: 'Docker: Do Zero ao Avançado', emoji: '🐳', subtitle: 'Conceitos • Imagens • Volumes • Redes • Compose • Segurança • Produção' },
   terraform: { modules: 4, title: 'Terraform AWS: Do Zero ao Avançado', emoji: '🏗️', subtitle: 'VPC • EC2 • RDS • S3 • IAM • State • Produção' },
   'ai-practitioner': { modules: 5, title: 'AWS AI Practitioner (AIF-C01)', emoji: '🤖', subtitle: 'Fundamentos IA/ML • IA Generativa • Modelos de Fundação • IA Responsável • Segurança', prefix: 'dominio' },
+  linux: { modules: 5, title: 'Linux: Do Zero ao Avançado', emoji: '🐧', subtitle: 'Terminal • Permissões • Shell Script • Redes • Automação' },
+  github: { modules: 9, title: 'Git & GitHub: Do Zero ao Avançado', emoji: '🐙', subtitle: 'Configuração • Branches • Colaboração • Rebase • Actions • Segurança', startAt: 0 },
 };
 
 async function generatePDF(courseName) {
@@ -21,6 +23,8 @@ async function generatePDF(courseName) {
     var outputFileFinal = path.join(outputDir, 'terraform-aws-do-zero-ao-avancado.pdf');
   } else if (courseName === 'ai-practitioner') {
     var outputFileFinal = path.join(outputDir, 'aws-ai-practitioner-do-zero-ao-avancado.pdf');
+  } else if (courseName === 'github') {
+    var outputFileFinal = path.join(outputDir, 'git-github-do-zero-ao-avancado.pdf');
   } else {
     var outputFileFinal = outputFile;
   }
@@ -29,7 +33,8 @@ async function generatePDF(courseName) {
 
   const modules = [];
   const filePrefix = config.prefix || 'modulo';
-  for (let i = 1; i <= config.modules; i++) {
+  const startAt = config.startAt || 1;
+  for (let i = startAt; i < startAt + config.modules; i++) {
     const num = i.toString().padStart(2, '0');
     const filePath = path.join(modulesDir, `${filePrefix}-${num}.html`);
     if (fs.existsSync(filePath)) {

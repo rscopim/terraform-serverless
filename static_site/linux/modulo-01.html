@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Linux Módulo 01: Navegação, Arquivos e Diretórios</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐧 Linux — Módulo 01</span>
+        <h1>Iniciante: Navegação, Arquivos e Diretórios</h1>
+        <p>O terminal é a interface de linha de comando do Linux. Dominar o terminal é essencial para administração de servidores, DevOps e cloud computing.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Primeiros Comandos -->
+        <div class="topic-block">
+          <h3>1. Primeiros Comandos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>pwd</code><span class="cmd-tag">Navegação</span></div>
+              <p>Mostra o caminho completo do diretório atual.</p>
+              <pre><code>$ pwd
+/home/usuario</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>whoami</code><span class="cmd-tag">Info</span></div>
+              <p>Mostra o nome do usuário logado.</p>
+              <pre><code>$ whoami
+joao</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>clear</code><span class="cmd-tag">Utilidade</span></div>
+              <p>Limpa a tela do terminal. Atalho: <kbd>Ctrl+L</kbd></p>
+              <pre><code>$ clear</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>history</code><span class="cmd-tag">Utilidade</span></div>
+              <p>Mostra todos os comandos digitados. Use <code>!numero</code> para repetir.</p>
+              <pre><code>$ history
+  1  ls -la
+  2  cd /var/log
+$ !1  # repete "ls -la"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navegação -->
+        <div class="topic-block">
+          <h3>2. Navegação entre Diretórios</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ls</code><span class="cmd-tag">Essencial</span></div>
+              <p>Lista conteúdo de diretórios.</p>
+              <pre><code>ls              # Lista arquivos e pastas
+ls -l           # Formato detalhado (permissões, dono, tamanho)
+ls -la          # Inclui arquivos ocultos (começam com .)
+ls -lh          # Tamanhos legíveis (KB, MB, GB)
+ls -ltr         # Ordenado por data (mais antigo primeiro)</code></pre>
+              <div class="options-table">
+                <table>
+                  <tr><td><code>-l</code></td><td>Formato longo</td></tr>
+                  <tr><td><code>-a</code></td><td>Arquivos ocultos</td></tr>
+                  <tr><td><code>-h</code></td><td>Tamanhos legíveis</td></tr>
+                  <tr><td><code>-t</code></td><td>Ordena por data</td></tr>
+                  <tr><td><code>-R</code></td><td>Recursivo</td></tr>
+                  <tr><td><code>-S</code></td><td>Ordena por tamanho</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>cd</code><span class="cmd-tag">Essencial</span></div>
+              <p>Muda de diretório.</p>
+              <pre><code>cd /home/usuario     # Caminho absoluto
+cd Documents         # Caminho relativo
+cd ..                # Volta um nível
+cd ~                 # Vai para o home
+cd -                 # Volta ao último diretório</code></pre>
+              <div class="info-box">
+                <strong>Conceitos:</strong> Caminho absoluto começa com <code>/</code>. Caminho relativo é a partir de onde você está. <code>~</code> = home, <code>.</code> = atual, <code>..</code> = pai.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Criação e Manipulação -->
+        <div class="topic-block">
+          <h3>3. Criação e Manipulação de Arquivos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>touch</code><span class="cmd-tag">Criar</span></div>
+              <p>Cria arquivo vazio ou atualiza timestamp.</p>
+              <pre><code>touch arquivo.txt
+touch file1.txt file2.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>mkdir</code><span class="cmd-tag">Criar</span></div>
+              <p>Cria diretórios. Use <code>-p</code> para criar estrutura completa.</p>
+              <pre><code>mkdir projetos
+mkdir -p pai/filho/neto</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>cp</code><span class="cmd-tag">Copiar</span></div>
+              <p>Copia arquivos e diretórios.</p>
+              <pre><code>cp arquivo.txt copia.txt
+cp -r pasta/ destino/
+cp -i arquivo.txt destino/  # confirmação</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>mv</code><span class="cmd-tag">Mover</span></div>
+              <p>Move ou renomeia arquivos.</p>
+              <pre><code>mv arquivo.txt /tmp/
+mv antigo.txt novo.txt  # renomeia</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>rm</code><span class="cmd-tag danger">Remover</span></div>
+              <p>Remove permanentemente. <strong>Não existe lixeira!</strong></p>
+              <pre><code>rm arquivo.txt
+rm -r pasta/       # recursivo
+rm -rf pasta/      # forçado (PERIGOSO!)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>find</code><span class="cmd-tag">Busca</span></div>
+              <p>Busca arquivos no sistema de arquivos.</p>
+              <pre><code>find /home -name "*.txt"
+find . -type f -size +100M
+find . -mtime -7  # últimos 7 dias</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualização -->
+        <div class="topic-block">
+          <h3>4. Visualização de Conteúdo</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>cat</code><span class="cmd-tag">Leitura</span></div>
+              <p>Exibe conteúdo completo do arquivo.</p>
+              <pre><code>cat arquivo.txt
+cat -n arquivo.txt  # com números</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>less</code><span class="cmd-tag">Leitura</span></div>
+              <p>Visualiza com paginação. Ideal para arquivos grandes.</p>
+              <pre><code>less arquivo_grande.txt
+# Espaço=avança, b=volta, /=busca, q=sai</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>head / tail</code><span class="cmd-tag">Leitura</span></div>
+              <p>Mostra início ou final do arquivo.</p>
+              <pre><code>head -20 arquivo.txt   # 20 primeiras
+tail -f /var/log/syslog  # tempo real!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tar</code><span class="cmd-tag">Compactação</span></div>
+              <p>Empacota e compacta arquivos.</p>
+              <pre><code>tar -czvf backup.tar.gz pasta/
+tar -xzvf backup.tar.gz</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../linux.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
