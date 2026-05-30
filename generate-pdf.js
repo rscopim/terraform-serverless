@@ -12,6 +12,8 @@ const COURSES = {
   github: { modules: 9, title: 'Git & GitHub: Do Zero ao Avançado', emoji: '🐙', subtitle: 'Configuração • Branches • Colaboração • Rebase • Actions • Segurança', startAt: 0 },
   kubernetes: { modules: 4, title: 'Kubernetes: Do Zero ao Avançado', emoji: '☸️', subtitle: 'Pods • Deployments • Services • Helm • HPA • GitOps • Produção' },
   redes: { modules: 12, title: 'Redes de Computadores: Do Zero ao Avançado', emoji: '🌐', subtitle: 'Fundamentos • OSI • IP • Switching • Roteamento • Segurança • Automação • Design' },
+  python: { modules: 10, title: 'Python: Do Zero ao Avançado', emoji: '🐍', subtitle: 'Fundamentos • OOP • APIs • boto3 • Bedrock • Automação AWS' },
+  cloudformation: { modules: 4, title: 'AWS CloudFormation: Do Zero ao Avançado', emoji: '☁️', subtitle: 'Templates • VPC • EC2 • RDS • S3 • Nested Stacks' },
 };
 
 async function generatePDF(courseName) {

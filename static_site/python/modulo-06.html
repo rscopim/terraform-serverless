@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python Módulo 06: Orientação a Objetos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-05.html" class="nav-link">← Anterior</a>
+        <a href="modulo-07.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐍 Python — Módulo 06</span>
+        <h1>Orientação a Objetos: Classes, Herança e Polimorfismo</h1>
+        <p>OOP permite modelar sistemas complexos com classes, encapsulamento, herança e polimorfismo.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Classes e Objetos</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>class</code><span class="cmd-tag">OOP</span></div>
+            <pre><code>class Servidor:
+    """Representa um servidor na infraestrutura."""
+
+    total_servidores = 0  # atributo de classe
+
+    def __init__(self, nome, ip, porta=8080):
+        self.nome = nome          # público
+        self.ip = ip
+        self._porta = porta       # protegido (convenção)
+        self.__status = "stopped" # privado (name mangling)
+        Servidor.total_servidores += 1
+
+    @property
+    def porta(self):
+        """Getter com @property."""
+        return self._porta
+
+    @porta.setter
+    def porta(self, valor):
+        """Setter com validação."""
+        if not 1 <= valor <= 65535:
+            raise ValueError("Porta inválida")
+        self._porta = valor
+
+    def iniciar(self):
+        self.__status = "running"
+        return f"{self.nome} iniciado em {self.ip}:{self._porta}"
+
+    def __str__(self):
+        return f"Servidor({self.nome}, {self.ip})"
+
+    def __repr__(self):
+        return f"Servidor('{self.nome}', '{self.ip}', {self._porta})"
+
+# Uso
+srv = Servidor("web-01", "10.0.1.50")
+srv.porta = 443
+print(srv.iniciar())</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Herança e Polimorfismo</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Herança</code><span class="cmd-tag">OOP</span></div>
+            <pre><code>from abc import ABC, abstractmethod
+
+class RecursoAWS(ABC):
+    """Classe abstrata base."""
+
+    def __init__(self, nome, regiao="us-east-1"):
+        self.nome = nome
+        self.regiao = regiao
+
+    @abstractmethod
+    def criar(self):
+        pass
+
+    @abstractmethod
+    def deletar(self):
+        pass
+
+class InstanciaEC2(RecursoAWS):
+    def __init__(self, nome, tipo="t3.micro", **kwargs):
+        super().__init__(nome, **kwargs)
+        self.tipo = tipo
+
+    def criar(self):
+        return f"EC2 '{self.nome}' ({self.tipo}) criada em {self.regiao}"
+
+    def deletar(self):
+        return f"EC2 '{self.nome}' terminada"
+
+class BucketS3(RecursoAWS):
+    def criar(self):
+        return f"Bucket '{self.nome}' criado em {self.regiao}"
+
+    def deletar(self):
+        return f"Bucket '{self.nome}' deletado"
+
+# Polimorfismo
+recursos = [
+    InstanciaEC2("web-server", tipo="t3.small"),
+    BucketS3("meu-bucket", regiao="sa-east-1"),
+]
+for recurso in recursos:
+    print(recurso.criar())  # cada um executa seu método</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-05.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-07.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

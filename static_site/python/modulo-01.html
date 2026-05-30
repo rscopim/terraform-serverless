@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python Módulo 01: Fundamentos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../python.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐍 Python — Módulo 01</span>
+        <h1>Fundamentos: Variáveis, Tipos e Operadores</h1>
+        <p>Python é uma linguagem de alto nível, interpretada e com tipagem dinâmica. Ideal para automação, dados, web e IA.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Variáveis e Tipos de Dados</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Variáveis</code><span class="cmd-tag">Básico</span></div>
+              <p>Em Python, variáveis são criadas na atribuição. Não é necessário declarar tipo.</p>
+              <pre><code># Tipos primitivos
+nome = "Ricardo"          # str
+idade = 30                # int
+altura = 1.75             # float
+ativo = True              # bool
+nulo = None               # NoneType
+
+# Verificar tipo
+print(type(nome))         # &lt;class 'str'&gt;
+print(isinstance(idade, int))  # True</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>f-strings</code><span class="cmd-tag">Formatação</span></div>
+              <p>F-strings são a forma moderna e eficiente de formatar strings em Python 3.6+.</p>
+              <pre><code># f-strings (Python 3.6+)
+nome = "Ricardo"
+idade = 30
+print(f"Olá, {nome}! Você tem {idade} anos.")
+
+# Expressões dentro de f-strings
+preco = 49.90
+print(f"Preço: R${preco:.2f}")
+print(f"{'Python':^20}")      # centralizado
+print(f"{1024:_}")            # 1_024 (separador)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Operadores</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Aritméticos</code><span class="cmd-tag">Operadores</span></div>
+              <pre><code>a, b = 10, 3
+print(a + b)    # 13
+print(a - b)    # 7
+print(a * b)    # 30
+print(a / b)    # 3.333...
+print(a // b)   # 3 (divisão inteira)
+print(a % b)    # 1 (módulo)
+print(a ** b)   # 1000 (potência)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Comparação e Lógicos</code><span class="cmd-tag">Operadores</span></div>
+              <pre><code># Comparação
+x = 5
+print(x == 5)    # True
+print(x != 3)    # True
+print(x > 3)     # True
+print(x >= 5)    # True
+
+# Lógicos
+print(x > 3 and x < 10)  # True
+print(x > 10 or x < 3)   # False
+print(not (x > 10))       # True</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Entrada e Conversão de Tipos</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>input / casting</code><span class="cmd-tag">I/O</span></div>
+            <pre><code># Entrada do usuário (sempre retorna str)
+nome = input("Seu nome: ")
+idade = int(input("Sua idade: "))
+peso = float(input("Seu peso: "))
+
+# Conversões (casting)
+numero_str = "42"
+numero_int = int(numero_str)      # 42
+numero_float = float(numero_str)  # 42.0
+texto = str(123)                  # "123"
+booleano = bool(1)                # True (0 = False)</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../python.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

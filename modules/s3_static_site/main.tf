@@ -326,3 +326,25 @@ resource "aws_s3_object" "redes_modules" {
 
   etag = filemd5("${path.root}/../../static_site/redes/${each.value}")
 }
+
+resource "aws_s3_object" "python_modules" {
+  for_each = fileset("${path.root}/../../static_site/python", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "python/${each.value}"
+  source       = "${path.root}/../../static_site/python/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/python/${each.value}")
+}
+
+resource "aws_s3_object" "cloudformation_modules" {
+  for_each = fileset("${path.root}/../../static_site/cloudformation", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "cloudformation/${each.value}"
+  source       = "${path.root}/../../static_site/cloudformation/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/cloudformation/${each.value}")
+}

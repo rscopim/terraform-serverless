@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — CloudFormation Módulo 04: Storage e Arquitetura Completa</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="../cloudformation.html" class="nav-link">Voltar ao Curso</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ CloudFormation — Módulo 04</span>
+        <h1>Storage e Arquitetura: S3, Nested Stacks e Cross-Stack References</h1>
+        <p>Complete a arquitetura com S3 Buckets, políticas de acesso, lifecycle rules, nested stacks e referências entre stacks.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. S3 Bucket com Policy e Lifecycle</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>S3 Bucket</code><span class="cmd-tag">Storage</span></div>
+            <p>S3 Buckets com versionamento, criptografia, lifecycle rules e bucket policy para controle de acesso.</p>
+            <pre><code>  AppBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-app-${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 30
+              - StorageClass: GLACIER
+                TransitionInDays: 90
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 60
+          - Id: CleanupIncomplete
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-app-bucket"
+
+  AppBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AppBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !GetAtt AppBucket.Arn
+              - !Sub "${AppBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+          - Sid: AllowEC2Access
+            Effect: Allow
+            Principal:
+              AWS: !GetAtt EC2Role.Arn
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:ListBucket"
+            Resource:
+              - !GetAtt AppBucket.Arn
+              - !Sub "${AppBucket.Arn}/*"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Nested Stacks</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Nested Stacks</code><span class="cmd-tag">Arquitetura</span></div>
+            <p>Nested Stacks permitem modularizar templates grandes em componentes reutilizáveis. O template pai orquestra os filhos.</p>
+            <pre><code># template-pai.yaml (root stack)
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Root Stack — orquestra nested stacks"
+
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/my-templates/network.yaml
+      Parameters:
+        VpcCidr: "10.0.0.0/16"
+        Environment: !Ref Environment
+      Tags:
+        - Key: Component
+          Value: Network
+
+  ComputeStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/my-templates/compute.yaml
+      Parameters:
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+        SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnet1Id
+        InstanceType: !Ref InstanceType
+      Tags:
+        - Key: Component
+          Value: Compute
+
+  DatabaseStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/my-templates/database.yaml
+      Parameters:
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+        PrivateSubnets: !GetAtt NetworkStack.Outputs.PrivateSubnetIds
+        DBPassword: !Ref DBPassword
+
+Outputs:
+  WebServerURL:
+    Value: !GetAtt ComputeStack.Outputs.WebServerURL
+  DatabaseEndpoint:
+    Value: !GetAtt DatabaseStack.Outputs.DatabaseEndpoint</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Cross-Stack References (Export/Import)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Export</code><span class="cmd-tag">Output</span></div>
+              <p>Outputs com Export tornam valores disponíveis para outros stacks na mesma região/conta.</p>
+              <pre><code># Stack A: network-stack
+Outputs:
+  VpcId:
+    Description: "VPC ID"
+    Value: !Ref VPC
+    Export:
+      Name: !Sub "${AWS::StackName}-VpcId"
+
+  PublicSubnet1Id:
+    Description: "Public Subnet 1"
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnet1"
+
+  PrivateSubnetIds:
+    Description: "Private Subnets"
+    Value: !Join
+      - ","
+      - - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+    Export:
+      Name: !Sub "${AWS::StackName}-PrivateSubnets"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ImportValue</code><span class="cmd-tag">Referência</span></div>
+              <p>Fn::ImportValue consome exports de outros stacks, criando dependências entre stacks.</p>
+              <pre><code># Stack B: compute-stack
+Resources:
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      SubnetId:
+        Fn::ImportValue: network-stack-PublicSubnet1
+
+  AppSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: network-stack-VpcId
+
+# Listar exports disponíveis via CLI
+# aws cloudformation list-exports \
+#   --query "Exports[].{Name:Name,Value:Value}"
+
+# Listar stacks que importam um export
+# aws cloudformation list-imports \
+#   --export-name network-stack-VpcId</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Best Practices</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Boas Práticas</code><span class="cmd-tag">Produção</span></div>
+            <p>Práticas essenciais para gerenciar stacks CloudFormation em produção com segurança.</p>
+            <pre><code># 1. SEMPRE use Change Sets antes de atualizar stacks em produção
+aws cloudformation create-change-set \
+  --stack-name prod-stack \
+  --change-set-name release-v2.1 \
+  --template-body file://template.yaml
+
+# 2. Drift Detection — detectar mudanças manuais
+aws cloudformation detect-stack-drift \
+  --stack-name minha-stack
+
+aws cloudformation describe-stack-drift-detection-status \
+  --stack-drift-detection-id &lt;detection-id&gt;
+
+aws cloudformation describe-stack-resource-drifts \
+  --stack-name minha-stack \
+  --stack-resource-drift-status-filters MODIFIED DELETED
+
+# 3. Stack Policy — proteger recursos críticos contra updates
+aws cloudformation set-stack-policy \
+  --stack-name prod-stack \
+  --stack-policy-body '{
+    "Statement": [{
+      "Effect": "Deny",
+      "Action": "Update:Replace",
+      "Principal": "*",
+      "Resource": "LogicalResourceId/Database"
+    }, {
+      "Effect": "Allow",
+      "Action": "Update:*",
+      "Principal": "*",
+      "Resource": "*"
+    }]
+  }'
+
+# 4. DeletionPolicy e UpdateReplacePolicy
+#    - Retain: mantém recurso ao deletar stack
+#    - Snapshot: cria snapshot antes de deletar (RDS, EBS)
+#    - Delete: remove recurso (padrão)
+
+# 5. Termination Protection
+aws cloudformation update-termination-protection \
+  --enable-termination-protection \
+  --stack-name prod-stack
+
+# 6. Tagging consistente em todos os recursos
+# 7. Usar SSM Parameter Store para valores dinâmicos (AMIs, etc.)
+# 8. Validar templates com cfn-lint antes do deploy
+# pip install cfn-lint
+# cfn-lint template.yaml</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- LABS -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">🧪 Labs Práticos</span>
+          <h2>4 Labs para Consolidar o Aprendizado</h2>
+          <p>Aplique cada módulo em labs progressivos que constroem uma arquitetura completa na AWS.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Lab 1: Template Básico — VPC Simples</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>lab01-vpc.yaml</code><span class="cmd-tag">Lab 01</span></div>
+            <pre><code>AWSTemplateFormatVersion: "2010-09-09"
+Description: "Lab 01 — VPC básica com subnet pública"
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: cloudtrilhas-lab01
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-vpc"
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.1.0/24"
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public"
+
+  IGW:
+    Type: AWS::EC2::InternetGateway
+
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IGW
+
+Outputs:
+  VpcId:
+    Value: !Ref VPC
+    Export:
+      Name: !Sub "${ProjectName}-VpcId"
+  SubnetId:
+    Value: !Ref PublicSubnet
+    Export:
+      Name: !Sub "${ProjectName}-SubnetId"
+
+# Deploy:
+# aws cloudformation create-stack --stack-name lab01 \
+#   --template-body file://lab01-vpc.yaml</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Lab 2: VPC + EC2 com Apache</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>lab02-ec2.yaml</code><span class="cmd-tag">Lab 02</span></div>
+            <pre><code>AWSTemplateFormatVersion: "2010-09-09"
+Description: "Lab 02 — EC2 com UserData e CreationPolicy"
+
+Parameters:
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+
+Resources:
+  WebSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "HTTP + SSH"
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: "0.0.0.0/0"
+
+  WebServer:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT5M
+    Properties:
+      ImageId: !Sub "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}"
+      InstanceType: t3.micro
+      KeyName: !Ref KeyPair
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref WebSG
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          echo "&lt;h1&gt;Lab 02 - ${AWS::StackName}&lt;/h1&gt;" > /var/www/html/index.html
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServer --region ${AWS::Region}
+
+Outputs:
+  URL:
+    Value: !Sub "http://${WebServer.PublicDnsName}"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Lab 3: VPC + EC2 + RDS MySQL</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>lab03-rds.yaml</code><span class="cmd-tag">Lab 03</span></div>
+            <pre><code>AWSTemplateFormatVersion: "2010-09-09"
+Description: "Lab 03 — Adicionando RDS com Conditions"
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, prod]
+  DBPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+
+Conditions:
+  IsProd: !Equals [!Ref Environment, prod]
+
+Mappings:
+  DBConfig:
+    dev:
+      Class: db.t3.micro
+      Storage: 20
+      MultiAZ: "false"
+    prod:
+      Class: db.r5.large
+      Storage: 100
+      MultiAZ: "true"
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Subnets privadas para RDS"
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  DBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "RDS MySQL"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref WebSG
+
+  MySQLDB:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      Engine: mysql
+      EngineVersion: "8.0"
+      DBInstanceClass: !FindInMap [DBConfig, !Ref Environment, Class]
+      AllocatedStorage: !FindInMap [DBConfig, !Ref Environment, Storage]
+      MultiAZ: !FindInMap [DBConfig, !Ref Environment, MultiAZ]
+      MasterUsername: admin
+      MasterUserPassword: !Ref DBPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref DBSG
+      StorageEncrypted: true
+      DeletionProtection: !If [IsProd, true, false]
+
+Outputs:
+  DBEndpoint:
+    Value: !GetAtt MySQLDB.Endpoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-DBEndpoint"
+
+# Deploy:
+# aws cloudformation create-stack --stack-name lab03 \
+#   --template-body file://lab03-rds.yaml \
+#   --parameters ParameterKey=DBPassword,ParameterValue=MinhaSenh@123</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Lab 4: Arquitetura Completa — VPC + EC2 + RDS + S3</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>lab04-full.yaml</code><span class="cmd-tag">Lab 04</span></div>
+            <pre><code>AWSTemplateFormatVersion: "2010-09-09"
+Description: "Lab 04 — Arquitetura completa com Nested Stacks"
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+  TemplateBucket:
+    Type: String
+    Description: "Bucket S3 com os templates filhos"
+
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/network.yaml"
+      Parameters:
+        Environment: !Ref Environment
+        VpcCidr: "10.0.0.0/16"
+
+  ComputeStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/compute.yaml"
+      Parameters:
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+        PublicSubnetId: !GetAtt NetworkStack.Outputs.PublicSubnet1Id
+        Environment: !Ref Environment
+
+  DatabaseStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/database.yaml"
+      Parameters:
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+        PrivateSubnets: !GetAtt NetworkStack.Outputs.PrivateSubnetIds
+        WebServerSGId: !GetAtt ComputeStack.Outputs.WebServerSGId
+        Environment: !Ref Environment
+
+  StorageStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/storage.yaml"
+      Parameters:
+        Environment: !Ref Environment
+        EC2RoleArn: !GetAtt ComputeStack.Outputs.EC2RoleArn
+
+Outputs:
+  WebURL:
+    Description: "URL da aplicação"
+    Value: !GetAtt ComputeStack.Outputs.WebServerURL
+  DBEndpoint:
+    Description: "Endpoint do banco"
+    Value: !GetAtt DatabaseStack.Outputs.DBEndpoint
+  S3Bucket:
+    Description: "Bucket da aplicação"
+    Value: !GetAtt StorageStack.Outputs.BucketName
+
+# Deploy:
+# 1. Upload templates para S3
+# aws s3 cp ./templates/ s3://my-cfn-templates/ --recursive
+#
+# 2. Deploy root stack
+# aws cloudformation create-stack --stack-name lab04-full \
+#   --template-body file://lab04-full.yaml \
+#   --parameters ParameterKey=TemplateBucket,ParameterValue=my-cfn-templates \
+#   --capabilities CAPABILITY_NAMED_IAM
+#
+# 3. Verificar
+# aws cloudformation describe-stacks --stack-name lab04-full</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../cloudformation.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

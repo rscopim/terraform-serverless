@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python Módulo 10: IA com Amazon Bedrock</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-09.html" class="nav-link">← Anterior</a>
+        <a href="../python.html" class="nav-link">Voltar ao Curso</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐍 Python — Módulo 10</span>
+        <h1>IA com Amazon Bedrock: Claude, Titan, Embeddings</h1>
+        <p>Integre modelos de IA generativa da AWS em suas aplicações Python usando Amazon Bedrock.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Invocando Modelos com Bedrock</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Bedrock - Claude</code><span class="cmd-tag">IA</span></div>
+            <pre><code>import boto3
+import json
+
+bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+
+# Invocar Claude (Anthropic)
+def invocar_claude(prompt, max_tokens=1024):
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": max_tokens,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    })
+
+    response = bedrock.invoke_model(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        contentType="application/json",
+        accept="application/json",
+        body=body
+    )
+
+    resultado = json.loads(response["body"].read())
+    return resultado["content"][0]["text"]
+
+# Uso
+resposta = invocar_claude("Explique o que é uma VPC na AWS em 3 frases.")
+print(resposta)
+
+# Com contexto de sistema
+def invocar_claude_sistema(prompt, sistema="Você é um especialista AWS."):
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 2048,
+        "system": sistema,
+        "messages": [{"role": "user", "content": prompt}]
+    })
+    response = bedrock.invoke_model(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        contentType="application/json",
+        accept="application/json",
+        body=body
+    )
+    return json.loads(response["body"].read())["content"][0]["text"]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Titan e Embeddings</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Titan Text</code><span class="cmd-tag">IA</span></div>
+              <pre><code># Invocar Amazon Titan
+def invocar_titan(prompt):
+    body = json.dumps({
+        "inputText": prompt,
+        "textGenerationConfig": {
+            "maxTokenCount": 512,
+            "temperature": 0.7,
+            "topP": 0.9
+        }
+    })
+
+    response = bedrock.invoke_model(
+        modelId="amazon.titan-text-express-v1",
+        contentType="application/json",
+        accept="application/json",
+        body=body
+    )
+
+    resultado = json.loads(response["body"].read())
+    return resultado["results"][0]["outputText"]
+
+resposta = invocar_titan("Liste 5 boas práticas de segurança no S3.")
+print(resposta)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Embeddings</code><span class="cmd-tag">IA</span></div>
+              <pre><code># Gerar embeddings para busca semântica
+def gerar_embedding(texto):
+    body = json.dumps({
+        "inputText": texto
+    })
+
+    response = bedrock.invoke_model(
+        modelId="amazon.titan-embed-text-v1",
+        contentType="application/json",
+        accept="application/json",
+        body=body
+    )
+
+    resultado = json.loads(response["body"].read())
+    return resultado["embedding"]  # vetor 1536D
+
+# Similaridade entre textos
+import numpy as np
+
+emb1 = gerar_embedding("Como criar um bucket S3?")
+emb2 = gerar_embedding("Criação de storage no AWS S3")
+emb3 = gerar_embedding("Receita de bolo de chocolate")
+
+def similaridade(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+print(f"S3 vs S3: {similaridade(emb1, emb2):.3f}")   # ~0.9
+print(f"S3 vs bolo: {similaridade(emb1, emb3):.3f}") # ~0.3</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Chatbot com Bedrock (Projeto)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>chatbot_aws.py</code><span class="cmd-tag">Projeto</span></div>
+            <pre><code>"""
+Projeto: Chatbot especialista em AWS usando Bedrock
+- Mantém histórico de conversa
+- Usa Claude como modelo base
+- Contexto de sistema como especialista AWS
+- Salva conversas em JSON
+"""
+import boto3
+import json
+from datetime import datetime
+
+class ChatbotAWS:
+    def __init__(self, modelo="anthropic.claude-3-sonnet-20240229-v1:0"):
+        self.bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+        self.modelo = modelo
+        self.historico = []
+        self.sistema = (
+            "Você é um especialista AWS certificado. "
+            "Responda de forma clara e prática, com exemplos de código quando relevante. "
+            "Sempre mencione boas práticas de segurança e custo."
+        )
+
+    def enviar(self, mensagem):
+        self.historico.append({"role": "user", "content": mensagem})
+
+        body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 2048,
+            "system": self.sistema,
+            "messages": self.historico
+        })
+
+        response = self.bedrock.invoke_model(
+            modelId=self.modelo,
+            contentType="application/json",
+            accept="application/json",
+            body=body
+        )
+
+        resultado = json.loads(response["body"].read())
+        resposta = resultado["content"][0]["text"]
+        self.historico.append({"role": "assistant", "content": resposta})
+        return resposta
+
+    def salvar_conversa(self):
+        arquivo = f"conversa_{datetime.now():%Y%m%d_%H%M%S}.json"
+        with open(arquivo, "w", encoding="utf-8") as f:
+            json.dump(self.historico, f, indent=2, ensure_ascii=False)
+        print(f"💾 Conversa salva em {arquivo}")
+
+if __name__ == "__main__":
+    bot = ChatbotAWS()
+    print("🤖 Chatbot AWS (digite 'sair' para encerrar)\n")
+    while True:
+        pergunta = input("Você: ")
+        if pergunta.lower() in ("sair", "exit", "quit"):
+            bot.salvar_conversa()
+            break
+        resposta = bot.enviar(pergunta)
+        print(f"\n🤖 {resposta}\n")</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-09.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../python.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
