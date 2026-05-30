@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Simulado AWS Cloud Practitioner (CLF-C02)</title>
+  <meta name="description" content="Simulado interativo com 20 perguntas no estilo do exame AWS Cloud Practitioner CLF-C02." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../cloud-practitioner.html" class="nav-link">← Cloud Practitioner</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../cloud-practitioner.html">Cloud Practitioner</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🎯 Simulado</span>
+        <h1>AWS Cloud Practitioner — Simulado</h1>
+        <p>20 perguntas no estilo do exame oficial CLF-C02. Nível foundational — conceitos de cloud, serviços e pricing.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 20</span>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 5%"></div></div>
+          </div>
+          <div class="quiz-score"><span id="scoreDisplay">Score: 0/0</span></div>
+        </div>
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Simulado Concluído!</h2>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/20</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar"><div class="result-fill" id="resultFill" style="width: 0%"></div></div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer simulado</button>
+            <a href="../cloud-practitioner.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Qual é a principal vantagem do modelo de precificação pay-as-you-go da AWS?",
+        options: ["A) Custos fixos mensais previsíveis", "B) Pagar apenas pelos recursos efetivamente consumidos", "C) Desconto automático de 50% em todos os serviços", "D) Gratuidade total no primeiro ano"],
+        correct: 1,
+        explanation: "O modelo pay-as-you-go permite pagar apenas pelo que é consumido, sem investimento inicial (CapEx). Isso transforma custos fixos em variáveis, alinhando gastos ao uso real."
+      },
+      {
+        question: "Qual pilar do AWS Well-Architected Framework foca em proteger dados, sistemas e ativos?",
+        options: ["A) Excelência Operacional", "B) Confiabilidade", "C) Segurança", "D) Eficiência de Performance"],
+        correct: 2,
+        explanation: "O pilar Segurança abrange proteção de dados, gerenciamento de identidades, detecção de eventos de segurança e proteção de infraestrutura e aplicações."
+      },
+      {
+        question: "Qual serviço AWS é um banco de dados relacional gerenciado?",
+        options: ["A) Amazon DynamoDB", "B) Amazon RDS", "C) Amazon S3", "D) Amazon ElastiCache"],
+        correct: 1,
+        explanation: "Amazon RDS (Relational Database Service) gerencia bancos relacionais como MySQL, PostgreSQL, Oracle e SQL Server. DynamoDB é NoSQL, S3 é storage e ElastiCache é cache."
+      },
+      {
+        question: "No modelo de responsabilidade compartilhada, qual é responsabilidade da AWS?",
+        options: ["A) Configuração de Security Groups", "B) Criptografia de dados do cliente", "C) Segurança física dos data centers", "D) Gerenciamento de IAM users"],
+        correct: 2,
+        explanation: "A AWS é responsável pela segurança DA nuvem: infraestrutura física, hardware, rede global e hypervisor. O cliente é responsável pela segurança NA nuvem: dados, IAM, firewall."
+      },
+      {
+        question: "Qual serviço permite executar código sem provisionar servidores?",
+        options: ["A) Amazon EC2", "B) AWS Lambda", "C) Amazon ECS", "D) AWS Elastic Beanstalk"],
+        correct: 1,
+        explanation: "AWS Lambda é serverless — executa código em resposta a eventos sem necessidade de gerenciar servidores. Cobra apenas pelo tempo de execução e número de invocações."
+      },
+      {
+        question: "Qual serviço AWS fornece uma rede de entrega de conteúdo (CDN) global?",
+        options: ["A) Amazon Route 53", "B) AWS Direct Connect", "C) Amazon CloudFront", "D) Elastic Load Balancing"],
+        correct: 2,
+        explanation: "Amazon CloudFront é a CDN da AWS com 450+ pontos de presença globais. Entrega conteúdo com baixa latência fazendo cache em edge locations próximas ao usuário."
+      },
+      {
+        question: "Qual conceito de cloud permite aumentar ou diminuir recursos automaticamente conforme a demanda?",
+        options: ["A) Alta disponibilidade", "B) Elasticidade", "C) Tolerância a falhas", "D) Agilidade"],
+        correct: 1,
+        explanation: "Elasticidade é a capacidade de escalar recursos automaticamente (para cima ou para baixo) conforme a demanda muda, pagando apenas pelo que é usado."
+      },
+      {
+        question: "Qual serviço AWS é usado para gerenciar identidades e permissões de acesso?",
+        options: ["A) Amazon Cognito", "B) AWS IAM", "C) AWS Shield", "D) Amazon Inspector"],
+        correct: 1,
+        explanation: "AWS IAM (Identity and Access Management) gerencia users, groups, roles e policies que controlam quem pode acessar quais recursos AWS e com quais permissões."
+      },
+      {
+        question: "Uma empresa precisa armazenar objetos com alta durabilidade (99.999999999%). Qual serviço usar?",
+        options: ["A) Amazon EBS", "B) Amazon S3", "C) Amazon EFS", "D) AWS Storage Gateway"],
+        correct: 1,
+        explanation: "Amazon S3 oferece 11 noves de durabilidade (99.999999999%). Projetado para armazenamento de objetos com redundância automática em múltiplas AZs."
+      },
+      {
+        question: "Qual plano de suporte AWS oferece acesso a um Technical Account Manager (TAM)?",
+        options: ["A) Basic", "B) Developer", "C) Business", "D) Enterprise"],
+        correct: 3,
+        explanation: "Apenas o plano Enterprise inclui um TAM dedicado, além de Concierge Support Team, revisões de arquitetura e tempo de resposta de 15 minutos para casos críticos."
+      },
+      {
+        question: "Qual serviço AWS monitora recursos e aplicações em tempo real com métricas e alarmes?",
+        options: ["A) AWS CloudTrail", "B) Amazon CloudWatch", "C) AWS Config", "D) AWS Trusted Advisor"],
+        correct: 1,
+        explanation: "Amazon CloudWatch coleta métricas, logs e eventos de recursos AWS. Permite criar alarmes, dashboards e reagir automaticamente a mudanças de estado."
+      },
+      {
+        question: "O que é uma Availability Zone (AZ) na AWS?",
+        options: ["A) Uma região geográfica com múltiplos data centers", "B) Um ou mais data centers isolados dentro de uma região", "C) Um ponto de presença do CloudFront", "D) Uma VPC privada"],
+        correct: 1,
+        explanation: "Uma AZ é um ou mais data centers com energia, rede e conectividade redundantes, isolados de outras AZs na mesma região. Regiões têm 2-6 AZs."
+      },
+      {
+        question: "Qual serviço AWS registra todas as chamadas de API feitas na conta para auditoria?",
+        options: ["A) Amazon CloudWatch", "B) AWS CloudTrail", "C) AWS Config", "D) Amazon GuardDuty"],
+        correct: 1,
+        explanation: "AWS CloudTrail registra todas as chamadas de API (quem, o quê, quando, de onde) para auditoria, compliance e investigação de segurança."
+      },
+      {
+        question: "Qual modelo de pricing oferece até 72% de desconto em troca de compromisso de 1 ou 3 anos?",
+        options: ["A) On-Demand", "B) Spot Instances", "C) Reserved Instances / Savings Plans", "D) Dedicated Hosts"],
+        correct: 2,
+        explanation: "Reserved Instances e Savings Plans oferecem descontos significativos (até 72%) em troca de compromisso de uso por 1 ou 3 anos. Ideal para workloads previsíveis."
+      },
+      {
+        question: "Qual serviço AWS protege aplicações web contra ataques DDoS automaticamente e sem custo adicional?",
+        options: ["A) AWS WAF", "B) AWS Shield Standard", "C) Amazon GuardDuty", "D) AWS Firewall Manager"],
+        correct: 1,
+        explanation: "AWS Shield Standard protege automaticamente todos os clientes AWS contra ataques DDoS nas camadas 3 e 4, sem custo adicional. Shield Advanced oferece proteção extra (pago)."
+      },
+      {
+        question: "Qual ferramenta AWS fornece recomendações de otimização em custo, performance, segurança e tolerância a falhas?",
+        options: ["A) AWS Config", "B) AWS Trusted Advisor", "C) AWS Systems Manager", "D) AWS Cost Explorer"],
+        correct: 1,
+        explanation: "AWS Trusted Advisor analisa sua conta e fornece recomendações em 5 categorias: custo, performance, segurança, tolerância a falhas e limites de serviço."
+      },
+      {
+        question: "Qual é o benefício de usar múltiplas Availability Zones para uma aplicação?",
+        options: ["A) Redução de custos", "B) Maior velocidade de processamento", "C) Alta disponibilidade e tolerância a falhas", "D) Melhor segurança de dados"],
+        correct: 2,
+        explanation: "Distribuir recursos em múltiplas AZs garante que a aplicação continue funcionando mesmo se uma AZ inteira falhar, proporcionando alta disponibilidade."
+      },
+      {
+        question: "Qual serviço AWS permite criar redes virtuais isoladas na nuvem?",
+        options: ["A) AWS Direct Connect", "B) Amazon VPC", "C) Amazon Route 53", "D) AWS Transit Gateway"],
+        correct: 1,
+        explanation: "Amazon VPC (Virtual Private Cloud) permite criar redes virtuais isoladas com controle total sobre IP ranges, subnets, route tables e gateways."
+      },
+      {
+        question: "Qual é a vantagem de usar infraestrutura global da AWS com múltiplas regiões?",
+        options: ["A) Custo zero de transferência de dados", "B) Menor latência para usuários globais e disaster recovery", "C) Todos os serviços são gratuitos em novas regiões", "D) Compliance automática com todas as regulamentações"],
+        correct: 1,
+        explanation: "Múltiplas regiões permitem posicionar recursos próximos aos usuários (menor latência) e implementar disaster recovery com failover entre regiões."
+      },
+      {
+        question: "Qual serviço AWS é usado para estimar custos de uma arquitetura antes de implementá-la?",
+        options: ["A) AWS Cost Explorer", "B) AWS Pricing Calculator", "C) AWS Budgets", "D) AWS Cost and Usage Report"],
+        correct: 1,
+        explanation: "AWS Pricing Calculator permite modelar arquiteturas e estimar custos mensais antes de criar qualquer recurso. Cost Explorer analisa custos já incorridos."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>
