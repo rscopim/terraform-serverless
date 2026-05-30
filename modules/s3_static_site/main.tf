@@ -370,3 +370,25 @@ resource "aws_s3_object" "sa_pro_modules" {
 
   etag = filemd5("${path.root}/../../static_site/solutions-architect-pro/${each.value}")
 }
+
+resource "aws_s3_object" "cloud_practitioner_modules" {
+  for_each = fileset("${path.root}/../../static_site/cloud-practitioner", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "cloud-practitioner/${each.value}"
+  source       = "${path.root}/../../static_site/cloud-practitioner/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/cloud-practitioner/${each.value}")
+}
+
+resource "aws_s3_object" "solutions_architect_modules" {
+  for_each = fileset("${path.root}/../../static_site/solutions-architect", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "solutions-architect/${each.value}"
+  source       = "${path.root}/../../static_site/solutions-architect/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/solutions-architect/${each.value}")
+}
