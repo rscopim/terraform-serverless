@@ -348,3 +348,25 @@ resource "aws_s3_object" "cloudformation_modules" {
 
   etag = filemd5("${path.root}/../../static_site/cloudformation/${each.value}")
 }
+
+resource "aws_s3_object" "developer_modules" {
+  for_each = fileset("${path.root}/../../static_site/developer", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "developer/${each.value}"
+  source       = "${path.root}/../../static_site/developer/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/developer/${each.value}")
+}
+
+resource "aws_s3_object" "sa_pro_modules" {
+  for_each = fileset("${path.root}/../../static_site/solutions-architect-pro", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "solutions-architect-pro/${each.value}"
+  source       = "${path.root}/../../static_site/solutions-architect-pro/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/solutions-architect-pro/${each.value}")
+}
