@@ -392,3 +392,19 @@ resource "aws_s3_object" "solutions_architect_modules" {
 
   etag = filemd5("${path.root}/../../static_site/solutions-architect/${each.value}")
 }
+
+resource "aws_s3_object" "robots_txt" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "robots.txt"
+  source       = "${path.root}/../../static_site/robots.txt"
+  content_type = "text/plain"
+  etag         = filemd5("${path.root}/../../static_site/robots.txt")
+}
+
+resource "aws_s3_object" "sitemap_xml" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sitemap.xml"
+  source       = "${path.root}/../../static_site/sitemap.xml"
+  content_type = "application/xml"
+  etag         = filemd5("${path.root}/../../static_site/sitemap.xml")
+}
