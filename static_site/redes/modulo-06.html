@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 06: Roteamento</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-05.html" class="nav-link">← Anterior</a>
+        <a href="modulo-07.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 06</span>
+        <h1>Roteamento</h1>
+        <p>Roteamento estático, dinâmico (OSPF, BGP), e conceitos de encaminhamento de pacotes.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Roteamento Estático</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Rotas Estáticas</code><span class="cmd-tag">Config</span></div>
+              <pre><code># Conceito: administrador define manualmente as rotas
+# Uso: redes pequenas, rotas específicas, backup
+
+# Cisco IOS
+Router(config)# ip route 10.0.0.0 255.255.255.0 192.168.1.1
+Router(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1    # default route
+
+# Linux
+ip route add 10.0.0.0/24 via 192.168.1.1
+ip route add default via 203.0.113.1
+
+# Verificação
+Router# show ip route
+Router# show ip route static
+
+Vantagens: simples, sem overhead, previsível
+Desvantagens: não escala, sem failover automático</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. OSPF (Open Shortest Path First)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>OSPF</code><span class="cmd-tag">IGP</span></div>
+              <pre><code># Protocolo Link-State, usa algoritmo Dijkstra (SPF)
+# Métrica: custo (baseado em bandwidth)
+# AD (Administrative Distance): 110
+
+# Conceitos:
+# - Áreas (Area 0 = backbone, obrigatória)
+# - LSA (Link-State Advertisements)
+# - DR/BDR (Designated Router em redes multi-acesso)
+# - Hello packets (10s em broadcast, 40s dead)
+
+# Configuração básica
+Router(config)# router ospf 1
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)# network 10.0.0.0 0.0.0.255 area 1
+Router(config-router)# passive-interface gi0/0
+
+# Verificação
+Router# show ip ospf neighbor
+Router# show ip ospf interface brief
+Router# show ip route ospf</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. BGP (Border Gateway Protocol)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>BGP</code><span class="cmd-tag">EGP</span></div>
+              <pre><code># Protocolo Path-Vector, usado entre Sistemas Autônomos (AS)
+# "O protocolo da Internet" — conecta ISPs e grandes redes
+# AD: eBGP = 20, iBGP = 200
+
+# Conceitos:
+# - AS (Autonomous System): rede sob administração única
+# - eBGP: entre ASes diferentes
+# - iBGP: dentro do mesmo AS
+# - Prefixos e AS-PATH
+# - Políticas de roteamento (route-maps, prefix-lists)
+
+# Configuração básica
+Router(config)# router bgp 65001
+Router(config-router)# neighbor 203.0.113.1 remote-as 65002
+Router(config-router)# network 192.168.0.0 mask 255.255.0.0
+Router(config-router)# address-family ipv4 unicast
+
+# Verificação
+Router# show ip bgp summary
+Router# show ip bgp
+Router# show ip bgp neighbors</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Comparação de Protocolos</code><span class="cmd-tag">Referência</span></div>
+              <div class="options-table">
+                <table>
+                  <thead><tr><th>Protocolo</th><th>Tipo</th><th>Algoritmo</th><th>Métrica</th><th>Uso</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>RIP</code></td><td>Distance-Vector</td><td>Bellman-Ford</td><td>Hop count (max 15)</td><td>Redes pequenas</td></tr>
+                    <tr><td><code>OSPF</code></td><td>Link-State</td><td>Dijkstra (SPF)</td><td>Custo (bandwidth)</td><td>Redes corporativas</td></tr>
+                    <tr><td><code>EIGRP</code></td><td>Hybrid</td><td>DUAL</td><td>Bandwidth + delay</td><td>Cisco (proprietário)</td></tr>
+                    <tr><td><code>BGP</code></td><td>Path-Vector</td><td>Best path</td><td>AS-PATH + atributos</td><td>Internet / ISPs</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-05.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-07.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

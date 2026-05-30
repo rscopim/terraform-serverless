@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 03: Endereçamento IP e Sub-redes</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-02.html" class="nav-link">← Anterior</a>
+        <a href="modulo-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 03</span>
+        <h1>Endereçamento IP e Sub-redes</h1>
+        <p>IPv4, IPv6, CIDR, cálculo de sub-redes e planejamento de endereçamento.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Endereçamento IPv4</h3>
+          <div class="info-box highlight">
+            <strong>IPv4:</strong> 32 bits divididos em 4 octetos. Formato: <code>192.168.1.100</code>. Total: ~4,3 bilhões de endereços.
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Classes de IP (legado)</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code>Classe A: 1.0.0.0   – 126.255.255.255   /8   (16M hosts)
+Classe B: 128.0.0.0 – 191.255.255.255   /16  (65K hosts)
+Classe C: 192.0.0.0 – 223.255.255.255   /24  (254 hosts)
+Classe D: 224.0.0.0 – 239.255.255.255   (Multicast)
+Classe E: 240.0.0.0 – 255.255.255.255   (Reservado)
+
+⚠️ Classful é legado — hoje usamos CIDR (Classless)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>IPs Privados (RFC 1918)</code><span class="cmd-tag">Importante</span></div>
+              <p>Não roteáveis na internet. Usados em redes internas.</p>
+              <pre><code>10.0.0.0/8       — 10.0.0.0 a 10.255.255.255
+172.16.0.0/12    — 172.16.0.0 a 172.31.255.255
+192.168.0.0/16   — 192.168.0.0 a 192.168.255.255
+
+Outros reservados:
+127.0.0.0/8      — Loopback
+169.254.0.0/16   — Link-local (APIPA)
+0.0.0.0          — Default route</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>IPs Públicos</code><span class="cmd-tag">Internet</span></div>
+              <p>Roteáveis na internet. Atribuídos por ISPs/RIRs.</p>
+              <pre><code>Características:
+- Únicos globalmente
+- Atribuídos por IANA → RIRs → ISPs
+- Necessários para servidores públicos
+- Escassos (IPv4 esgotado)
+
+RIRs regionais:
+  ARIN    — América do Norte
+  LACNIC  — América Latina
+  RIPE    — Europa
+  APNIC   — Ásia-Pacífico
+  AFRINIC — África</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Sub-redes (Subnetting) e CIDR</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>CIDR — Classless Inter-Domain Routing</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code>Notação CIDR: IP/prefixo → 192.168.1.0/24
+
+Máscara de sub-rede:
+/8  = 255.0.0.0       → 16.777.214 hosts
+/16 = 255.255.0.0     → 65.534 hosts
+/24 = 255.255.255.0   → 254 hosts
+/25 = 255.255.255.128 → 126 hosts
+/26 = 255.255.255.192 → 62 hosts
+/27 = 255.255.255.224 → 30 hosts
+/28 = 255.255.255.240 → 14 hosts
+/30 = 255.255.255.252 → 2 hosts (ponto-a-ponto)
+/32 = 255.255.255.255 → 1 host (host route)
+
+Fórmula: Hosts = 2^(32 - prefixo) - 2</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Exemplo de Subnetting</code><span class="cmd-tag">Prática</span></div>
+              <pre><code>Rede: 192.168.10.0/24 → dividir em 4 sub-redes
+
+Novo prefixo: /26 (emprestamos 2 bits → 2² = 4 sub-redes)
+
+Sub-rede 1: 192.168.10.0/26   (hosts: .1 a .62,   broadcast: .63)
+Sub-rede 2: 192.168.10.64/26  (hosts: .65 a .126, broadcast: .127)
+Sub-rede 3: 192.168.10.128/26 (hosts: .129 a .190, broadcast: .191)
+Sub-rede 4: 192.168.10.192/26 (hosts: .193 a .254, broadcast: .255)
+
+Cada sub-rede: 62 hosts utilizáveis</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. IPv6 — Visão Geral</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>IPv6</code><span class="cmd-tag">Futuro</span></div>
+            <pre><code>Formato: 128 bits em 8 grupos hexadecimais
+Exemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+Abreviado: 2001:db8:85a3::8a2e:370:7334
+
+Tipos de endereço:
+  ::1/128          — Loopback
+  fe80::/10        — Link-local (auto-configuração)
+  2000::/3         — Global Unicast (público)
+  fc00::/7         — Unique Local (privado)
+  ff00::/8         — Multicast
+
+Vantagens sobre IPv4:
+- Espaço praticamente ilimitado (3.4 × 10³⁸)
+- Sem necessidade de NAT
+- Auto-configuração (SLAAC)
+- IPSec nativo
+- Header simplificado</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

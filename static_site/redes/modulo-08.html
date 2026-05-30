@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 08: Serviços de Rede</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-07.html" class="nav-link">← Anterior</a>
+        <a href="modulo-09.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 08</span>
+        <h1>Serviços de Rede: DNS, DHCP, NAT e VPN</h1>
+        <p>Serviços fundamentais que sustentam a operação de redes modernas.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. DNS (Domain Name System)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Registros DNS</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code>Tipos de registro:
+  A      — Nome → IPv4           (example.com → 93.184.216.34)
+  AAAA   — Nome → IPv6           (example.com → 2606:2800:...)
+  CNAME  — Alias → outro nome    (www → example.com)
+  MX     — Mail Exchange          (prioridade + servidor de e-mail)
+  NS     — Nameserver             (ns1.example.com)
+  TXT    — Texto livre            (SPF, DKIM, verificação)
+  SOA    — Start of Authority     (info da zona)
+  PTR    — IP → Nome (reverso)    (34.216.184.93 → example.com)
+  SRV    — Serviço + porta        (_sip._tcp.example.com)
+
+Hierarquia: Root (.) → TLD (.com) → Domain (google) → Subdomain (www)
+
+Resolução:
+1. Cache local → 2. Resolver recursivo → 3. Root → 4. TLD → 5. Autoritativo</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. DHCP (Dynamic Host Configuration Protocol)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>DHCP — Processo DORA</code><span class="cmd-tag">Automático</span></div>
+              <pre><code>Processo de obtenção de IP (DORA):
+1. Discover — Cliente envia broadcast buscando servidor DHCP
+2. Offer    — Servidor oferece IP disponível
+3. Request  — Cliente aceita a oferta
+4. Acknowledge — Servidor confirma e entrega configuração
+
+Informações fornecidas:
+- Endereço IP
+- Máscara de sub-rede
+- Default Gateway
+- Servidores DNS
+- Lease time (tempo de concessão)
+
+# Configuração (Cisco IOS)
+Router(config)# ip dhcp pool LAN
+Router(dhcp-config)# network 192.168.1.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.1.1
+Router(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
+Router(dhcp-config)# lease 7
+Router(config)# ip dhcp excluded-address 192.168.1.1 192.168.1.10</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. NAT/PAT (Network Address Translation)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>NAT e PAT</code><span class="cmd-tag">Tradução</span></div>
+              <pre><code>Tipos de NAT:
+- Static NAT: 1 IP privado → 1 IP público (servidores)
+- Dynamic NAT: pool de IPs públicos compartilhados
+- PAT/NAT Overload: múltiplos IPs privados → 1 IP público (mais comum!)
+
+PAT usa portas para diferenciar conexões:
+  192.168.1.10:5001 → 203.0.113.1:40001
+  192.168.1.20:5002 → 203.0.113.1:40002
+  192.168.1.30:5003 → 203.0.113.1:40003
+
+# Configuração PAT (Cisco)
+Router(config)# access-list 1 permit 192.168.1.0 0.0.0.255
+Router(config)# ip nat inside source list 1 interface gi0/1 overload
+Router(config)# interface gi0/0
+Router(config-if)# ip nat inside
+Router(config)# interface gi0/1
+Router(config-if)# ip nat outside
+
+# Verificação
+Router# show ip nat translations
+Router# show ip nat statistics</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. VPN (Virtual Private Network)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IPSec VPN</code><span class="cmd-tag">Site-to-Site</span></div>
+              <pre><code>Fases IPSec:
+Fase 1 (IKE): estabelece canal seguro
+  - Autenticação (PSK ou certificado)
+  - Algoritmos (AES, SHA, DH group)
+  - Resultado: IKE SA
+
+Fase 2 (IPSec): túnel de dados
+  - Transform set (ESP/AH)
+  - Tráfego interessante (ACL)
+  - Resultado: IPSec SA
+
+Modos:
+- Tunnel: encapsula pacote inteiro (site-to-site)
+- Transport: apenas payload (host-to-host)
+
+Protocolos:
+- ESP: criptografia + autenticação
+- AH: apenas autenticação (sem criptografia)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>WireGuard</code><span class="cmd-tag">Moderno</span></div>
+              <p>VPN moderna, simples e de alta performance.</p>
+              <pre><code># Instalação
+sudo apt install wireguard
+
+# Gerar chaves
+wg genkey | tee privatekey | wg pubkey > publickey
+
+# /etc/wireguard/wg0.conf (Servidor)
+[Interface]
+PrivateKey = &lt;server_private_key&gt;
+Address = 10.0.0.1/24
+ListenPort = 51820
+
+[Peer]
+PublicKey = &lt;client_public_key&gt;
+AllowedIPs = 10.0.0.2/32
+
+# Ativar
+sudo wg-quick up wg0
+sudo systemctl enable wg-quick@wg0</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-07.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-09.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
