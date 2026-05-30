@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Simulado AWS SA Professional (SAP-C02)</title>
+  <meta name="description" content="Simulado interativo com 20 perguntas de nível Professional para o exame AWS Solutions Architect Professional SAP-C02." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../simulado.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../index.html" class="nav-link">Início</a>
+        <a href="../solutions-architect-pro.html" class="nav-link">← SA Professional</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../solutions-architect-pro.html">SA Professional</a>
+      <a href="../aws.html">AWS</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🎯 Simulado Professional</span>
+        <h1>AWS SA Professional — Simulado</h1>
+        <p>20 perguntas de nível Professional com cenários complexos de migração, multi-account, resiliência e arquiteturas avançadas.</p>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <span id="questionCounter">Pergunta 1 de 20</span>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 5%"></div></div>
+          </div>
+          <div class="quiz-score"><span id="scoreDisplay">Score: 0/0</span></div>
+        </div>
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Pergunta 1</div>
+          <h3 class="question-text" id="questionText"></h3>
+          <div class="options-list" id="optionsList"></div>
+          <div class="question-feedback" id="feedback" style="display:none">
+            <div class="feedback-icon" id="feedbackIcon"></div>
+            <p class="feedback-text" id="feedbackText"></p>
+            <div class="feedback-explanation" id="feedbackExplanation"></div>
+          </div>
+          <div class="question-actions">
+            <button class="quiz-btn" id="confirmBtn" disabled>Confirmar resposta</button>
+            <button class="quiz-btn next" id="nextBtn" style="display:none">Próxima pergunta →</button>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-result" id="quizResult" style="display:none">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">🎉</div>
+          <h2 id="resultTitle">Simulado Concluído!</h2>
+          <div class="result-score"><span class="score-number" id="finalScore">0/20</span><span class="score-percent" id="finalPercent">0%</span></div>
+          <div class="result-bar"><div class="result-fill" id="resultFill" style="width: 0%"></div></div>
+          <p class="result-message" id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="quiz-btn" onclick="restartQuiz()">Refazer simulado</button>
+            <a href="../solutions-architect-pro.html" class="quiz-btn secondary">Voltar ao curso</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script>
+    var QUIZ_DATA = [
+      {
+        question: "Uma empresa com 200 contas AWS precisa centralizar logs de CloudTrail, Config e VPC Flow Logs com retenção de 7 anos para compliance. A solução deve ser imutável e custo-eficiente. Qual arquitetura implementar?",
+        options: ["A) S3 bucket em cada conta com lifecycle para Glacier", "B) Conta de Log Archive centralizada com S3 Object Lock (Governance mode), lifecycle para Glacier Deep Archive e SCPs impedindo deleção", "C) CloudWatch Logs centralizado com retenção de 7 anos", "D) Amazon OpenSearch com cold storage"],
+        correct: 1,
+        explanation: "Log Archive centralizada com Object Lock garante imutabilidade (compliance). Lifecycle para Glacier Deep Archive otimiza custo de longo prazo. SCPs na Organization impedem que contas-membro deletem logs."
+      },
+      {
+        question: "Uma aplicação global precisa de failover automático entre us-east-1 e eu-west-1 com RPO < 1 segundo e RTO < 1 minuto para o banco de dados. Qual solução atende?",
+        options: ["A) RDS Multi-AZ com read replica cross-region", "B) Aurora Global Database com managed failover", "C) DynamoDB Global Tables", "D) B e C atendem dependendo do tipo de banco"],
+        correct: 3,
+        explanation: "Aurora Global Database oferece RPO < 1s com replicação assíncrona e failover gerenciado em < 1 min. DynamoDB Global Tables oferece replicação active-active com RPO de segundos. Ambos atendem."
+      },
+      {
+        question: "Uma empresa está migrando 500TB de dados on-premises para S3. A conexão internet é 1Gbps e o prazo é 2 semanas. A transferência via internet levaria 46 dias. Qual estratégia usar?",
+        options: ["A) AWS DataSync via internet", "B) AWS Snowball Edge (múltiplos dispositivos em paralelo)", "C) S3 Transfer Acceleration", "D) AWS Direct Connect com 10Gbps"],
+        correct: 1,
+        explanation: "500TB em 2 semanas é inviável via internet (1Gbps = 46 dias). Snowball Edge (80TB cada) permite enviar 7 dispositivos em paralelo. Direct Connect levaria semanas para provisionar."
+      },
+      {
+        question: "Uma organização AWS com 50 contas precisa garantir que nenhuma conta crie recursos fora de us-east-1 e eu-west-1. Qual mecanismo usar?",
+        options: ["A) IAM Policy em cada conta negando outras regiões", "B) SCP (Service Control Policy) na Organization Unit negando ações fora das regiões permitidas", "C) AWS Config rule em cada conta", "D) CloudWatch Events com Lambda remediadora"],
+        correct: 1,
+        explanation: "SCPs são o mecanismo correto para guardrails em Organizations. Aplicadas na OU, afetam todas as contas-membro. São preventivas (bloqueiam antes da ação), diferente de Config (detecta depois)."
+      },
+      {
+        question: "Uma aplicação de e-commerce precisa processar 50.000 pedidos/segundo durante Black Friday (10x o normal). A arquitetura atual usa ALB → EC2 → RDS. Qual redesign suporta esse pico?",
+        options: ["A) Aumentar instâncias EC2 e RDS para o maior tipo disponível", "B) ALB → ECS Fargate (auto-scaling) → SQS → Lambda → DynamoDB (on-demand) com ElastiCache para leituras", "C) Migrar tudo para Lambda com RDS Proxy", "D) Usar CloudFront para cachear todas as requisições"],
+        correct: 1,
+        explanation: "Arquitetura event-driven com SQS desacopla ingestão do processamento. DynamoDB on-demand escala para milhões de requests. ElastiCache reduz carga de leitura. Fargate escala containers automaticamente."
+      },
+      {
+        question: "Uma empresa precisa compartilhar um VPC com subnets específicas entre 10 contas AWS sem criar VPC Peering entre todas. Qual solução usar?",
+        options: ["A) VPC Peering mesh (45 connections)", "B) AWS RAM (Resource Access Manager) com VPC Sharing", "C) Transit Gateway com route tables", "D) PrivateLink entre todas as contas"],
+        correct: 1,
+        explanation: "AWS RAM com VPC Sharing permite compartilhar subnets de um VPC owner com participant accounts. Recursos de diferentes contas coexistem no mesmo VPC sem peering. Mais simples que Transit Gateway para este caso."
+      },
+      {
+        question: "Uma aplicação precisa de criptografia end-to-end onde a AWS nunca tenha acesso às chaves de criptografia. Qual abordagem implementar?",
+        options: ["A) SSE-KMS com CMK", "B) SSE-S3", "C) Client-side encryption com chaves gerenciadas pelo cliente (CSE-C)", "D) SSE-KMS com AWS managed key"],
+        correct: 2,
+        explanation: "Client-side encryption (CSE-C) criptografa dados antes de enviar à AWS. As chaves nunca saem do ambiente do cliente. SSE-KMS ainda permite que a AWS acesse dados durante processamento."
+      },
+      {
+        question: "Uma empresa precisa migrar 200 servidores on-premises para AWS com mínimo downtime. Os servidores têm dependências complexas entre si. Qual abordagem de migração usar?",
+        options: ["A) Lift-and-shift manual servidor por servidor", "B) AWS Application Migration Service (MGN) com wave planning baseado em dependências", "C) Reescrever todas as aplicações como serverless", "D) VMware Cloud on AWS"],
+        correct: 1,
+        explanation: "MGN (antigo CloudEndure) faz replicação contínua com cutover de minutos. Wave planning agrupa servidores por dependência para migrar juntos, evitando quebra de comunicação."
+      },
+      {
+        question: "Uma aplicação SaaS multi-tenant precisa isolar dados entre clientes no DynamoDB. Cada tenant tem volume diferente. Qual estratégia de particionamento é mais escalável?",
+        options: ["A) Uma tabela por tenant", "B) Tabela única com tenant_id como partition key prefix", "C) Tabela única com tenant_id como partition key e sort key para entidades", "D) Banco relacional com row-level security"],
+        correct: 2,
+        explanation: "Tabela única com tenant_id como PK e entity_type#entity_id como SK é o padrão single-table design. Escala uniformemente, permite IAM policies por tenant prefix e evita hot partitions."
+      },
+      {
+        question: "Uma empresa precisa de conectividade entre 30 VPCs em 5 regiões com roteamento centralizado e inspeção de tráfego. Qual arquitetura usar?",
+        options: ["A) VPC Peering mesh", "B) Transit Gateway em cada região com inter-region peering + Network Firewall na VPC de inspeção", "C) Site-to-Site VPN entre todos os VPCs", "D) AWS PrivateLink entre todos os VPCs"],
+        correct: 1,
+        explanation: "Transit Gateway centraliza roteamento por região. Inter-region peering conecta TGWs entre regiões. Network Firewall na VPC de inspeção analisa tráfego. Escalável e gerenciável."
+      },
+      {
+        question: "Uma aplicação precisa de exatamente uma execução de um workflow complexo com steps condicionais, retry, paralelismo e timeout de até 1 ano. Qual serviço usar?",
+        options: ["A) AWS Lambda com Step Functions (Standard)", "B) Amazon SQS com Lambda consumers", "C) AWS Batch", "D) Amazon MWAA (Managed Airflow)"],
+        correct: 0,
+        explanation: "Step Functions Standard suporta workflows de até 1 ano, exactly-once execution, paralelismo, retry com backoff, catch/error handling e integração nativa com 200+ serviços AWS."
+      },
+      {
+        question: "Uma empresa precisa implementar CI/CD para infraestrutura Terraform em 50 contas AWS com aprovação obrigatória antes do apply em produção. Qual arquitetura de pipeline?",
+        options: ["A) Jenkins em EC2 com credenciais de cada conta", "B) CodePipeline com CodeBuild assumindo cross-account roles via OIDC, manual approval gate antes do apply em prod", "C) GitHub Actions rodando terraform apply direto", "D) Terraform Cloud com remote execution"],
+        correct: 1,
+        explanation: "CodePipeline com cross-account roles (ou GitHub Actions + OIDC) é o padrão AWS. Manual approval gate garante revisão humana. Cross-account roles eliminam credenciais estáticas."
+      },
+      {
+        question: "Uma aplicação precisa processar eventos em tempo real de 100.000 dispositivos IoT com análise de anomalias e armazenamento para análise histórica. Qual arquitetura?",
+        options: ["A) API Gateway → Lambda → DynamoDB", "B) IoT Core → Kinesis Data Streams → Lambda (anomalias) + Kinesis Firehose → S3 (histórico) → Athena (análise)", "C) IoT Core → SQS → EC2", "D) IoT Core → SNS → Lambda"],
+        correct: 1,
+        explanation: "IoT Core ingere dados dos dispositivos. Kinesis Streams permite processamento em tempo real (Lambda para anomalias). Firehose entrega para S3 automaticamente. Athena permite queries SQL no histórico."
+      },
+      {
+        question: "Uma empresa precisa de disaster recovery com RTO de 4 horas e RPO de 1 hora para uma aplicação crítica. O orçamento é limitado. Qual estratégia DR usar?",
+        options: ["A) Multi-site Active-Active", "B) Warm Standby", "C) Pilot Light", "D) Backup and Restore"],
+        correct: 2,
+        explanation: "Pilot Light mantém componentes core (banco replicado) sempre ativos e escala compute sob demanda durante DR. Custo menor que Warm Standby, atende RTO 4h/RPO 1h. Active-Active é mais caro."
+      },
+      {
+        question: "Uma aplicação precisa servir conteúdo diferente baseado no país do usuário (geo-routing) e redirecionar para a região AWS mais próxima. Qual combinação usar?",
+        options: ["A) Route 53 Geolocation routing + CloudFront com múltiplas origins", "B) CloudFront com Lambda@Edge para geo-routing", "C) ALB com geo-based rules", "D) A e B são válidos para diferentes cenários"],
+        correct: 3,
+        explanation: "Route 53 Geolocation routing direciona DNS por país/continente para diferentes endpoints. Lambda@Edge permite lógica customizada por request (A/B testing, redirects). Ambos são válidos."
+      },
+      {
+        question: "Uma empresa precisa garantir que todas as contas AWS tenham GuardDuty, Config e SecurityHub habilitados automaticamente ao serem criadas. Qual mecanismo usar?",
+        options: ["A) CloudFormation StackSets com auto-deployment", "B) AWS Control Tower com guardrails obrigatórios", "C) Lambda trigger no Organizations CreateAccount event", "D) A e B são válidos"],
+        correct: 3,
+        explanation: "Control Tower aplica guardrails automaticamente em novas contas (inclui Config, CloudTrail). StackSets com auto-deployment pode habilitar GuardDuty/SecurityHub. Ambos são complementares."
+      },
+      {
+        question: "Uma aplicação precisa de cache distribuído com sub-millisecond latency, suporte a data structures (sorted sets, hashes) e replicação cross-AZ. Qual serviço usar?",
+        options: ["A) DynamoDB DAX", "B) ElastiCache Redis com cluster mode enabled", "C) ElastiCache Memcached", "D) Amazon MemoryDB for Redis"],
+        correct: 1,
+        explanation: "ElastiCache Redis com cluster mode oferece sharding, replicação cross-AZ, data structures avançadas e sub-ms latency. MemoryDB é para durabilidade (como banco primário). DAX é só para DynamoDB."
+      },
+      {
+        question: "Uma empresa precisa migrar uma aplicação monolítica para microserviços gradualmente (strangler fig pattern). O monolito roda em EC2. Qual abordagem de roteamento usar durante a migração?",
+        options: ["A) Substituir tudo de uma vez", "B) ALB com path-based routing: paths migrados → ECS/Lambda, paths restantes → EC2 monolito", "C) DNS round-robin", "D) API Gateway com VPC Link para o monolito"],
+        correct: 1,
+        explanation: "ALB path-based routing permite migrar endpoint por endpoint: /api/users → novo microserviço, /api/orders → ainda no monolito. Gradual, reversível e sem downtime."
+      },
+      {
+        question: "Uma empresa precisa de uma solução de data lake com governança centralizada, controle de acesso granular (column-level) e auditoria de quem acessou quais dados. Qual serviço usar?",
+        options: ["A) S3 com bucket policies", "B) AWS Lake Formation", "C) Amazon Redshift Spectrum", "D) AWS Glue Data Catalog apenas"],
+        correct: 1,
+        explanation: "Lake Formation oferece governança centralizada para data lakes: permissões column/row-level, data sharing cross-account, auditoria via CloudTrail e integração com Glue, Athena e Redshift."
+      },
+      {
+        question: "Uma aplicação precisa garantir que mensagens sejam processadas exatamente uma vez, mesmo com falhas e retries, em um sistema distribuído com múltiplos consumers. Qual padrão implementar?",
+        options: ["A) SQS Standard com visibility timeout alto", "B) SQS FIFO com deduplication + idempotent consumer pattern (DynamoDB conditional writes)", "C) SNS com retry policy", "D) Kinesis com checkpoint"],
+        correct: 1,
+        explanation: "Exactly-once requer: FIFO com deduplication (previne duplicatas na fila) + idempotent consumer (conditional write em DynamoDB com idempotency key previne reprocessamento). Defense in depth."
+      }
+    ];
+  </script>
+  <script src="../simulado.js"></script>
+</body>
+</html>
