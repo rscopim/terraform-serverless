@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Solutions Architect Domínio 02: Design de Arquiteturas Resilientes</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="dominio-01.html" class="nav-link">← Anterior</a>
+        <a href="dominio-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ Solutions Architect — Domínio 02</span>
+        <h1>Design de Arquiteturas Resilientes</h1>
+        <p>Alta disponibilidade, Auto Scaling, Load Balancing, Route 53, replicação, bancos de dados e estratégias de DR. Este domínio representa 26% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- High Availability -->
+        <div class="topic-block">
+          <h2>1. Alta Disponibilidade (High Availability)</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Multi-AZ</code><span class="cmd-tag">Regional</span></div>
+              <pre><code>Availability Zones (AZs):
+• Data centers isolados dentro de uma região
+• Conectados por rede de baixa latência
+• Falha de uma AZ não afeta outras
+
+Padrão Multi-AZ:
+• Distribuir recursos em 2+ AZs
+• ALB roteia entre AZs automaticamente
+• Auto Scaling lança em múltiplas AZs
+• RDS Multi-AZ: standby síncrono em outra AZ
+
+Serviços inerentemente Multi-AZ:
+• S3 (replicação automática em 3+ AZs)
+• DynamoDB (replicação em 3 AZs)
+• ELB (distribui entre AZs)
+• Lambda (executa em múltiplas AZs)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Multi-Region</code><span class="cmd-tag">Global</span></div>
+              <pre><code>Quando usar Multi-Region:
+• DR com RPO/RTO muito baixos
+• Latência global (usuários em vários continentes)
+• Compliance (dados em região específica)
+
+Serviços Multi-Region:
+• Route 53 (DNS global, failover)
+• CloudFront (CDN global)
+• S3 Cross-Region Replication
+• DynamoDB Global Tables
+• Aurora Global Database
+• AWS Global Accelerator
+
+Considerações:
+• Custo significativamente maior
+• Complexidade operacional
+• Data sovereignty e compliance
+• Consistência eventual entre regiões</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto Scaling -->
+        <div class="topic-block">
+          <h2>2. Auto Scaling</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Scaling Policies</code><span class="cmd-tag">Políticas</span></div>
+              <pre><code>Target Tracking (recomendado):
+• Define métrica alvo (ex: CPU = 50%)
+• ASG ajusta automaticamente para manter o target
+• Simples e eficiente para maioria dos casos
+
+Step Scaling:
+• Define steps baseados em alarmes CloudWatch
+• Ex: CPU > 70% → +2 instâncias
+      CPU > 90% → +4 instâncias
+• Mais controle granular
+
+Simple Scaling:
+• Uma ação por alarme
+• Cooldown period entre ações
+• Menos usado (prefer target tracking)
+
+Scheduled Scaling:
+• Escala em horários pré-definidos
+• Ex: +10 instâncias às 8h, -10 às 20h
+• Para padrões de carga previsíveis</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ASG Configuration</code><span class="cmd-tag">Config</span></div>
+              <pre><code>Launch Template:
+• AMI, instance type, key pair, SGs
+• User data (bootstrap scripts)
+• Suporta múltiplos instance types
+• Versioning (v1, v2, Latest)
+
+ASG Settings:
+• Min / Max / Desired capacity
+• Health check type: EC2 ou ELB
+• Health check grace period
+• Cooldown period (default 300s)
+• Termination policies
+
+Lifecycle Hooks:
+• Pending:Wait → executar ações antes de InService
+• Terminating:Wait → executar antes de terminar
+• Útil para: drain connections, backup logs
+
+Instance Refresh:
+• Rolling update de instâncias
+• Min healthy percentage
+• Útil para deploy de nova AMI</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Target Tracking é a política recomendada. Launch Template > Launch Configuration (deprecated). Health check ELB é mais preciso que EC2. Lifecycle hooks para ações pré/pós scaling.</p>
+          </div>
+        </div>
+
+        <!-- ELB -->
+        <div class="topic-block">
+          <h2>3. Elastic Load Balancing (ELB)</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>ALB (Application)</th><th>NLB (Network)</th><th>CLB (Classic)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Camada</strong></td><td>Layer 7 (HTTP/HTTPS)</td><td>Layer 4 (TCP/UDP/TLS)</td><td>Layer 4 e 7 (legacy)</td></tr>
+              <tr><td><strong>Performance</strong></td><td>Boa</td><td>Ultra-alta (milhões req/s)</td><td>Básica</td></tr>
+              <tr><td><strong>IP Estático</strong></td><td>Não (use Global Accelerator)</td><td>Sim (Elastic IP por AZ)</td><td>Não</td></tr>
+              <tr><td><strong>Roteamento</strong></td><td>Path, host, header, query string</td><td>Port-based</td><td>Básico</td></tr>
+              <tr><td><strong>WebSocket</strong></td><td>Sim</td><td>Sim</td><td>Não</td></tr>
+              <tr><td><strong>SSL Termination</strong></td><td>Sim</td><td>Sim (TLS)</td><td>Sim</td></tr>
+              <tr><td><strong>Sticky Sessions</strong></td><td>Sim (cookie)</td><td>Sim (source IP)</td><td>Sim</td></tr>
+              <tr><td><strong>Caso de uso</strong></td><td>Web apps, microserviços, containers</td><td>Gaming, IoT, ultra-low latency</td><td>Legacy (evitar)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Health Checks</code><span class="cmd-tag">Monitoramento</span></div>
+              <pre><code>Configurações:
+• Protocol: HTTP, HTTPS, TCP
+• Path: /health (endpoint dedicado)
+• Interval: 5-300s (default 30s)
+• Threshold: healthy/unhealthy count
+• Timeout: tempo máximo de resposta
+
+Comportamento:
+• Target unhealthy → para de receber tráfego
+• Target healthy novamente → volta a receber
+• Cross-zone load balancing distribui uniformemente
+
+💡 Sempre criar endpoint /health dedicado
+   que verifica dependências (DB, cache)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Sticky Sessions</code><span class="cmd-tag">Afinidade</span></div>
+              <pre><code>Application-based (ALB):
+• Cookie customizado ou gerado pelo ALB
+• Duração configurável
+• Útil para sessões stateful
+
+Problemas com sticky sessions:
+• Distribuição desigual de carga
+• Dificulta scaling
+• Se instância falha, sessão é perdida
+
+Alternativas (preferíveis):
+• Sessões em ElastiCache (Redis)
+• Sessões em DynamoDB
+• JWT tokens (stateless)
+• Cookies client-side criptografados
+
+💡 Exame: se perguntam sobre "manter sessão"
+   → ElastiCache/DynamoDB > sticky sessions</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route 53 -->
+        <div class="topic-block">
+          <h2>4. Route 53 — DNS e Routing Policies</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Routing Policy</th><th>Descrição</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Simple</strong></td><td>Um registro, um ou mais valores (retorna todos, cliente escolhe aleatório)</td><td>Aplicação single-server, sem health check</td></tr>
+              <tr><td><strong>Weighted</strong></td><td>Distribui tráfego por peso (ex: 70/30)</td><td>Blue/green deployment, A/B testing, migração gradual</td></tr>
+              <tr><td><strong>Latency-based</strong></td><td>Roteia para região com menor latência para o usuário</td><td>Aplicações multi-region, melhor experiência global</td></tr>
+              <tr><td><strong>Failover</strong></td><td>Primary/Secondary — failover automático via health check</td><td>DR ativo-passivo, alta disponibilidade</td></tr>
+              <tr><td><strong>Geolocation</strong></td><td>Roteia baseado na localização geográfica do usuário</td><td>Conteúdo localizado, compliance de dados, restrição regional</td></tr>
+              <tr><td><strong>Geoproximity</strong></td><td>Roteia baseado na proximidade geográfica com bias configurável</td><td>Shift de tráfego entre regiões (Traffic Flow)</td></tr>
+              <tr><td><strong>Multi-value</strong></td><td>Retorna múltiplos IPs saudáveis (até 8), com health check</td><td>Client-side load balancing simples</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Failover = DR. Weighted = deploy gradual. Latency = melhor performance global. Geolocation = compliance/localização. Health checks são obrigatórios para failover.</p>
+          </div>
+        </div>
+
+        <!-- S3 Replication -->
+        <div class="topic-block">
+          <h2>5. S3 — Replicação e Versionamento</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Replication</code><span class="cmd-tag">Cópia</span></div>
+              <pre><code>Cross-Region Replication (CRR):
+• Replica objetos para bucket em outra região
+• Casos: DR, compliance, latência
+• Requer versioning habilitado em ambos
+
+Same-Region Replication (SRR):
+• Replica dentro da mesma região
+• Casos: agregação de logs, compliance,
+  replicação entre contas na mesma região
+
+Regras:
+• Versioning OBRIGATÓRIO (source e destination)
+• Pode replicar para outra conta AWS
+• Objetos existentes NÃO são replicados (apenas novos)
+  → Use S3 Batch Replication para existentes
+• Delete markers podem ser replicados (opcional)
+• Não há replicação em cadeia (A→B→C não funciona)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Versioning</code><span class="cmd-tag">Histórico</span></div>
+              <pre><code>S3 Versioning:
+• Mantém todas as versões de um objeto
+• Protege contra deleção acidental
+• Uma vez habilitado, não pode ser desabilitado
+  (apenas suspenso)
+
+Delete Marker:
+• DELETE em objeto versionado cria delete marker
+• Objeto "desaparece" mas versões anteriores existem
+• Para restaurar: deletar o delete marker
+
+MFA Delete:
+• Requer MFA para deletar versões permanentemente
+• Proteção extra contra deleção maliciosa
+• Apenas root account pode habilitar
+
+Lifecycle + Versioning:
+• Mover versões antigas para classes mais baratas
+• Expirar versões antigas após X dias
+• Limpar incomplete multipart uploads</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- RDS e Aurora -->
+        <div class="topic-block">
+          <h2>6. RDS, Aurora e Bancos de Dados</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>RDS Multi-AZ</code><span class="cmd-tag">HA</span></div>
+              <pre><code>Multi-AZ Deployment:
+• Standby síncrono em outra AZ
+• Failover automático (1-2 minutos)
+• Mesmo endpoint DNS (sem mudança na app)
+• NÃO é para read scaling (standby não aceita reads)
+
+Read Replicas:
+• Replicação ASSÍNCRONA
+• Até 5 read replicas por DB
+• Podem estar em outra AZ ou região
+• Endpoint próprio (app precisa apontar)
+• Podem ser promovidas a standalone DB
+• Cross-region para DR
+
+Multi-AZ vs Read Replica:
+• Multi-AZ = HA (failover automático)
+• Read Replica = Performance (read scaling)
+• Podem ser combinados!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Amazon Aurora</code><span class="cmd-tag">Managed</span></div>
+              <pre><code>Aurora vs RDS:
+• 5x performance do MySQL, 3x do PostgreSQL
+• Storage auto-scaling (10GB → 128TB)
+• 6 cópias dos dados em 3 AZs
+• Self-healing storage
+
+Aurora Replicas:
+• Até 15 read replicas (vs 5 no RDS)
+• Failover automático para replica (< 30s)
+• Reader endpoint (load balance entre replicas)
+
+Aurora Serverless:
+• Auto-scaling de compute (ACUs)
+• Escala para zero quando ocioso
+• Pay-per-use
+• Bom para: workloads intermitentes, dev/test
+
+Aurora Global Database:
+• Replicação cross-region (< 1s lag)
+• Até 5 secondary regions
+• RPO < 1s, RTO < 1 minuto
+• Promoted region em caso de DR</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DR Strategies -->
+        <div class="topic-block">
+          <h2>7. Estratégias de Disaster Recovery</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estratégia</th><th>RTO</th><th>RPO</th><th>Custo</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Backup & Restore</strong></td><td>Horas</td><td>Horas</td><td>💰</td><td>Backups em S3/outra região. Restaura quando necessário. Mais barato, mais lento.</td></tr>
+              <tr><td><strong>Pilot Light</strong></td><td>10s min</td><td>Minutos</td><td>💰💰</td><td>Core mínimo rodando (DB replicado). Escala compute quando necessário.</td></tr>
+              <tr><td><strong>Warm Standby</strong></td><td>Minutos</td><td>Segundos</td><td>💰💰💰</td><td>Versão reduzida da produção rodando. Scale up quando ativado.</td></tr>
+              <tr><td><strong>Active-Active (Multi-site)</strong></td><td>~0</td><td>~0</td><td>💰💰💰💰</td><td>Full production em 2+ regiões. Tráfego distribuído. Mais caro, mais rápido.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>AWS Backup</code><span class="cmd-tag">Centralizado</span></div>
+              <pre><code>Serviço centralizado de backup:
+• Suporta: EC2, EBS, RDS, Aurora, DynamoDB, EFS, S3, FSx
+• Backup Plans: schedule, retention, lifecycle
+• Cross-region e cross-account backup
+• Vault Lock: WORM (Write Once Read Many) para compliance
+• Point-in-time recovery para serviços suportados
+
+Boas práticas:
+• Backup automático com retention policies
+• Cross-region para DR
+• Testar restore regularmente
+• Vault Lock para proteção contra ransomware
+• Tags para organização e compliance</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Backup/Restore = mais barato, maior RTO. Active-Active = mais caro, menor RTO. Pilot Light = DB replicado + compute sob demanda. RPO = quanto dado posso perder. RTO = quanto tempo posso ficar offline.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-01.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-03.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

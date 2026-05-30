@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Solutions Architect Domínio 04: Otimização de Custos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="dominio-03.html" class="nav-link">← Anterior</a>
+        <a href="../solutions-architect.html" class="nav-link">Voltar ao Curso</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ Solutions Architect — Domínio 04</span>
+        <h1>Otimização de Custos</h1>
+        <p>Modelos de precificação, storage classes, right-sizing, ferramentas de gerenciamento de custos, data transfer e estratégias serverless. Este domínio representa 20% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Pricing Models -->
+        <div class="topic-block">
+          <h2>1. Modelos de Precificação EC2</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Modelo</th><th>Desconto</th><th>Compromisso</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>On-Demand</strong></td><td>0% (preço cheio)</td><td>Nenhum</td><td>Workloads imprevisíveis, dev/test, picos curtos. Paga por segundo (Linux) ou hora (Windows).</td></tr>
+              <tr><td><strong>Reserved Instances (RI)</strong></td><td>Até 72%</td><td>1 ou 3 anos</td><td>Workloads estáveis e previsíveis. Standard RI (não muda) vs Convertible RI (pode trocar família).</td></tr>
+              <tr><td><strong>Savings Plans</strong></td><td>Até 72%</td><td>1 ou 3 anos ($/hora)</td><td>Compromisso de gasto (não de instância). Compute SP (EC2+Lambda+Fargate) ou EC2 Instance SP.</td></tr>
+              <tr><td><strong>Spot Instances</strong></td><td>Até 90%</td><td>Nenhum (pode ser interrompido)</td><td>Workloads tolerantes a interrupção: batch, CI/CD, big data, containers stateless.</td></tr>
+              <tr><td><strong>Dedicated Hosts</strong></td><td>Variável</td><td>On-Demand ou Reserved</td><td>Compliance, licenças por socket/core (BYOL), requisitos regulatórios.</td></tr>
+              <tr><td><strong>Dedicated Instances</strong></td><td>Variável</td><td>On-Demand</td><td>Hardware dedicado sem controle de placement. Menos controle que Dedicated Host.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Savings Plans</code><span class="cmd-tag">Flexível</span></div>
+              <pre><code>Compute Savings Plans:
+• Aplica a EC2, Lambda e Fargate
+• Qualquer região, família, OS, tenancy
+• Mais flexível que RI
+• Compromisso: $/hora por 1 ou 3 anos
+
+EC2 Instance Savings Plans:
+• Específico para família em uma região
+• Ex: M5 em us-east-1
+• Maior desconto que Compute SP
+• Flexível em AZ, size, OS
+
+Comparação com RI:
+• SP é mais simples de gerenciar
+• SP aplica automaticamente o desconto
+• RI Standard não pode mudar família
+• RI Convertible pode mudar (menor desconto)
+
+💡 Savings Plans é a recomendação atual da AWS
+   para a maioria dos cenários de desconto</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Spot Instances</code><span class="cmd-tag">Economia</span></div>
+              <pre><code>Como funciona:
+• Capacidade ociosa da AWS com desconto
+• Preço flutua baseado em oferta/demanda
+• AWS pode reclamar com 2 min de aviso
+• Spot Fleet: mix de Spot + On-Demand
+
+Estratégias Spot:
+• Spot Fleet com diversificação de tipos
+• Spot + Auto Scaling (mixed instances)
+• Spot Block (1-6 horas, deprecated)
+
+Boas práticas:
+• Diversificar instance types e AZs
+• Usar checkpointing para jobs longos
+• Combinar com On-Demand para baseline
+• Spot para scaling, On-Demand para base
+
+NÃO usar Spot para:
+• Databases
+• Aplicações stateful críticas
+• Workloads que não toleram interrupção</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- S3 Storage Classes -->
+        <div class="topic-block">
+          <h2>2. S3 Storage Classes e Lifecycle</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Classe</th><th>Disponibilidade</th><th>Min Storage</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>S3 Standard</strong></td><td>99.99%</td><td>—</td><td>Dados acessados frequentemente. Sem taxa de retrieval.</td></tr>
+              <tr><td><strong>S3 Intelligent-Tiering</strong></td><td>99.9%</td><td>—</td><td>Padrão de acesso desconhecido. Move automaticamente entre tiers. Taxa de monitoramento.</td></tr>
+              <tr><td><strong>S3 Standard-IA</strong></td><td>99.9%</td><td>30 dias</td><td>Acesso infrequente mas precisa de acesso rápido. Taxa de retrieval por GB.</td></tr>
+              <tr><td><strong>S3 One Zone-IA</strong></td><td>99.5%</td><td>30 dias</td><td>Dados recriáveis, infrequentes. Uma AZ apenas. 20% mais barato que Standard-IA.</td></tr>
+              <tr><td><strong>S3 Glacier Instant Retrieval</strong></td><td>99.9%</td><td>90 dias</td><td>Arquivo com acesso imediato (ms). Acesso ~1x por trimestre.</td></tr>
+              <tr><td><strong>S3 Glacier Flexible Retrieval</strong></td><td>99.99%</td><td>90 dias</td><td>Arquivo com retrieval em minutos a horas. Expedited (1-5min), Standard (3-5h), Bulk (5-12h).</td></tr>
+              <tr><td><strong>S3 Glacier Deep Archive</strong></td><td>99.99%</td><td>180 dias</td><td>Arquivo de longo prazo. Retrieval: Standard (12h), Bulk (48h). Mais barato.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Lifecycle Rules</code><span class="cmd-tag">Automação</span></div>
+              <pre><code>Transition Actions (mover entre classes):
+• Standard → Standard-IA (após 30 dias)
+• Standard-IA → Glacier Instant (após 60 dias)
+• Glacier Instant → Glacier Flexible (após 90 dias)
+• Glacier Flexible → Deep Archive (após 180 dias)
+
+Expiration Actions (deletar):
+• Expirar objetos após X dias
+• Expirar versões anteriores
+• Deletar incomplete multipart uploads
+• Deletar delete markers expirados
+
+Regras:
+• Mínimo 30 dias em Standard antes de transição para IA
+• Mínimo 30 dias em IA antes de transição para Glacier
+• Pode aplicar por prefixo ou tag
+• Versões atuais e anteriores separadamente
+
+💡 S3 Intelligent-Tiering é ideal quando não se conhece o padrão de acesso
+   (sem taxa de retrieval, apenas monitoramento)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right-sizing -->
+        <div class="topic-block">
+          <h2>3. Right-Sizing</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Compute Optimizer</code><span class="cmd-tag">Recomendações</span></div>
+              <pre><code>Analisa métricas e recomenda:
+• EC2: instance type ideal
+• EBS: volume type e size
+• Lambda: memory configuration
+• ECS on Fargate: CPU e memory
+
+Baseado em:
+• Utilização de CPU, memória, rede
+• Histórico de 14 dias (ou mais com Enhanced)
+• Machine Learning para prever necessidades
+
+Classificações:
+• Over-provisioned → reduzir (economia)
+• Under-provisioned → aumentar (performance)
+• Optimized → manter
+
+Enhanced Infrastructure Metrics:
+• Até 3 meses de histórico
+• Recomendações mais precisas
+• Custo adicional</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CloudWatch Metrics</code><span class="cmd-tag">Monitoramento</span></div>
+              <pre><code>Métricas para right-sizing:
+
+EC2:
+• CPUUtilization (< 10% = over-provisioned)
+• NetworkIn/Out
+• Disk Read/Write (instance store)
+• Nota: memória requer CloudWatch Agent
+
+EBS:
+• VolumeReadOps / VolumeWriteOps
+• VolumeQueueLength (> 1 = bottleneck)
+• BurstBalance (gp2/st1/sc1)
+
+RDS:
+• CPUUtilization
+• FreeableMemory
+• ReadIOPS / WriteIOPS
+• DatabaseConnections
+
+Trusted Advisor:
+• Low utilization EC2 instances
+• Idle Load Balancers
+• Underutilized EBS volumes
+• Unassociated Elastic IPs</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost Management -->
+        <div class="topic-block">
+          <h2>4. Ferramentas de Gerenciamento de Custos</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Ferramenta</th><th>Função</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>AWS Cost Explorer</strong></td><td>Visualização e análise de custos</td><td>Analisar gastos passados, prever futuros, identificar tendências. Recomendações de RI/SP.</td></tr>
+              <tr><td><strong>AWS Budgets</strong></td><td>Alertas e limites de gastos</td><td>Definir orçamentos (custo, uso, RI/SP coverage). Alertas por e-mail/SNS. Budget Actions automáticas.</td></tr>
+              <tr><td><strong>Cost Anomaly Detection</strong></td><td>Detecção de gastos anormais</td><td>ML detecta gastos inesperados automaticamente. Alertas proativos. Root cause analysis.</td></tr>
+              <tr><td><strong>Compute Optimizer</strong></td><td>Recomendações de right-sizing</td><td>Identificar recursos over/under-provisioned. EC2, EBS, Lambda, ECS.</td></tr>
+              <tr><td><strong>Cost and Usage Report (CUR)</strong></td><td>Relatório detalhado de custos</td><td>Dados granulares para análise avançada. Integra com Athena, QuickSight, Redshift.</td></tr>
+              <tr><td><strong>Billing Conductor</strong></td><td>Billing customizado</td><td>Criar billing groups, aplicar pricing rules, showback/chargeback para departamentos.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>AWS Budgets — Actions</code><span class="cmd-tag">Automação</span></div>
+              <pre><code>Budget Actions (automação de resposta):
+• Aplicar IAM policy restritiva quando budget excedido
+• Aplicar SCP para bloquear criação de recursos
+• Parar instâncias EC2 automaticamente
+
+Tipos de Budget:
+• Cost Budget — limite de gasto em $
+• Usage Budget — limite de uso (horas, GB)
+• RI Utilization Budget — alerta se RI subutilizado
+• RI Coverage Budget — alerta se cobertura RI baixa
+• Savings Plans Utilization/Coverage
+
+Alertas:
+• Actual (quando atingir X%)
+• Forecasted (quando previsão atingir X%)
+• Múltiplos thresholds (50%, 80%, 100%)
+• Notificação: e-mail, SNS, Chatbot</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Transfer -->
+        <div class="topic-block">
+          <h2>5. Custos de Data Transfer</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Regras de Transfer</code><span class="cmd-tag">Custo</span></div>
+              <pre><code>GRATUITO:
+• Inbound (internet → AWS) = grátis
+• Dentro da mesma AZ = grátis
+• S3 → CloudFront = grátis
+• Entre serviços na mesma região (alguns)
+
+PAGO:
+• Outbound (AWS → internet) = $$
+• Entre AZs na mesma região = $
+• Entre regiões = $$
+• NAT Gateway processing = $
+
+Otimizações:
+• VPC Endpoints (evita NAT Gateway)
+• CloudFront (reduz outbound)
+• S3 Transfer Acceleration (uploads)
+• Manter recursos na mesma AZ quando possível
+• Direct Connect (preço menor que internet)
+
+💡 Data transfer é frequentemente o custo
+   "escondido" que surpreende em produção</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Serverless Cost Optimization</code><span class="cmd-tag">Serverless</span></div>
+              <pre><code>Lambda:
+• Paga por: requests + duration (GB-seconds)
+• Otimizar memória (Power Tuning)
+• Provisioned Concurrency tem custo fixo
+• ARM (Graviton) = 20% mais barato
+
+API Gateway:
+• REST API: por request + data transfer
+• HTTP API: 70% mais barato que REST
+• WebSocket: por mensagem + connection time
+
+DynamoDB:
+• On-Demand: paga por request (RCU/WCU)
+• Provisioned: capacidade reservada (mais barato)
+• Reserved Capacity: desconto adicional
+• Auto Scaling para provisioned
+
+Fargate:
+• Paga por vCPU + memória por segundo
+• Spot Fargate: até 70% desconto
+• Compute Savings Plans aplicável</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tagging -->
+        <div class="topic-block">
+          <h2>6. Estratégias de Tagging</h2>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Cost Allocation Tags</code><span class="cmd-tag">Organização</span></div>
+              <pre><code>Tags para alocação de custos:
+
+AWS-generated tags (prefixo aws:):
+• aws:createdBy — quem criou o recurso
+• Ativadas no Billing Console
+
+User-defined tags:
+• Environment: prod, dev, staging
+• Project: projeto-x, projeto-y
+• Team: backend, frontend, data
+• CostCenter: CC-001, CC-002
+• Owner: email do responsável
+
+Boas práticas:
+• Definir tag policy na Organization
+• Enforcement via SCPs ou Config Rules
+• Tag Editor para aplicar em massa
+• Ativar tags no Cost Explorer para filtrar custos
+• Automação: Lambda + EventBridge para tag compliance
+
+Tag Policies (Organizations):
+• Define tags obrigatórias e valores permitidos
+• Reporta non-compliance
+• Não bloqueia criação (apenas reporta)
+• Combine com SCPs para enforcement</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Savings Plans > RI para flexibilidade. Spot para workloads tolerantes a interrupção. S3 Intelligent-Tiering para padrão desconhecido. VPC Endpoints reduzem custo de NAT. Tags são essenciais para cost allocation. Cost Anomaly Detection usa ML para alertas proativos.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-03.html" class="button secondary">← Domínio Anterior</a>
+        <a href="../solutions-architect.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

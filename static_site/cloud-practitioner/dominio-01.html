@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Cloud Practitioner Domínio 01: Conceitos de Cloud</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../cloud-practitioner.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ Cloud Practitioner — Domínio 01</span>
+        <h1>Conceitos de Cloud</h1>
+        <p>Benefícios da cloud computing, modelos de implantação e serviço, Well-Architected Framework, Cloud Adoption Framework e estratégias de migração.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- 6 Benefícios da Cloud -->
+        <div class="topic-block">
+          <h2>6 Benefícios da Cloud Computing</h2>
+          <p>Vantagens fundamentais da computação em nuvem segundo a AWS:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>#</th><th>Benefício</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Trocar CAPEX por OPEX</strong></td><td>Sem investimento inicial em data centers. Pague apenas pelo que usar (pay-as-you-go).</td></tr>
+              <tr><td>2</td><td><strong>Economias de escala</strong></td><td>AWS agrega uso de milhares de clientes, resultando em preços menores.</td></tr>
+              <tr><td>3</td><td><strong>Parar de adivinhar capacidade</strong></td><td>Escale para cima ou para baixo conforme a demanda real, sem over/under-provisioning.</td></tr>
+              <tr><td>4</td><td><strong>Aumentar velocidade e agilidade</strong></td><td>Recursos disponíveis em minutos (vs. semanas em on-premises).</td></tr>
+              <tr><td>5</td><td><strong>Parar de gastar com data centers</strong></td><td>Foque no negócio, não em manter infraestrutura física.</td></tr>
+              <tr><td>6</td><td><strong>Alcance global em minutos</strong></td><td>Deploy em múltiplas regiões ao redor do mundo com poucos cliques.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Dica para o exame:</strong> Esses 6 benefícios são cobrados diretamente. Memorize cada um e saiba associar cenários a eles.</p>
+          </div>
+        </div>
+
+        <!-- Modelos de Implantação -->
+        <div class="topic-block">
+          <h2>Modelos de Implantação (Deployment Models)</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Cloud Pública</code><span class="cmd-tag">Public</span></div>
+              <pre><code>• Recursos 100% na nuvem (AWS, Azure, GCP)
+• Sem infraestrutura on-premises
+• Máxima elasticidade e agilidade
+• Pay-as-you-go
+• Exemplo: startup que nasce na AWS</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>On-Premises (Private Cloud)</code><span class="cmd-tag">Privada</span></div>
+              <pre><code>• Infraestrutura no data center próprio
+• Virtualização e automação local
+• Controle total sobre hardware
+• Sem benefícios de elasticidade da cloud
+• Exemplo: empresa com requisitos regulatórios rígidos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Híbrida</code><span class="cmd-tag">Hybrid</span></div>
+              <pre><code>• Combina cloud pública + on-premises
+• Conectados via VPN ou Direct Connect
+• Dados sensíveis on-prem, workloads elásticos na cloud
+• AWS Outposts: hardware AWS no seu data center
+• Exemplo: banco com dados regulados + apps na cloud</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modelos de Serviço -->
+        <div class="topic-block">
+          <h2>Modelos de Serviço (IaaS / PaaS / SaaS)</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Modelo</th><th>Você Gerencia</th><th>AWS Gerencia</th><th>Exemplos AWS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>IaaS</strong> (Infrastructure as a Service)</td><td>OS, runtime, apps, dados</td><td>Hardware, rede, virtualização</td><td>EC2, VPC, EBS</td></tr>
+              <tr><td><strong>PaaS</strong> (Platform as a Service)</td><td>Apps e dados</td><td>OS, runtime, hardware, rede</td><td>Elastic Beanstalk, RDS, Lambda</td></tr>
+              <tr><td><strong>SaaS</strong> (Software as a Service)</td><td>Apenas configuração</td><td>Tudo (infra + app)</td><td>Amazon WorkMail, Amazon Chime</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> IaaS = máximo controle, mais responsabilidade | PaaS = foco no código | SaaS = apenas usa o software. EC2 = IaaS, Beanstalk = PaaS.</p>
+          </div>
+        </div>
+
+        <!-- Well-Architected Framework -->
+        <div class="topic-block">
+          <h2>Well-Architected Framework — 6 Pilares</h2>
+          <p>Framework da AWS para projetar arquiteturas seguras, resilientes, eficientes e econômicas:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Pilar</th><th>Foco</th><th>Palavras-chave</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>1. Excelência Operacional</strong></td><td>Executar e monitorar sistemas para entregar valor de negócio</td><td>IaC, automação, runbooks, observabilidade, melhoria contínua</td></tr>
+              <tr><td><strong>2. Segurança</strong></td><td>Proteger informações, sistemas e ativos</td><td>IAM, criptografia, rastreabilidade, menor privilégio, defesa em profundidade</td></tr>
+              <tr><td><strong>3. Confiabilidade</strong></td><td>Garantir que workloads funcionem corretamente e se recuperem de falhas</td><td>Recuperação de desastres, auto scaling, multi-AZ, backups</td></tr>
+              <tr><td><strong>4. Eficiência de Performance</strong></td><td>Usar recursos computacionais de forma eficiente</td><td>Tipo certo de recurso, monitoramento, experimentação, serverless</td></tr>
+              <tr><td><strong>5. Otimização de Custos</strong></td><td>Evitar gastos desnecessários</td><td>Pay-as-you-go, Reserved Instances, right-sizing, desligar recursos ociosos</td></tr>
+              <tr><td><strong>6. Sustentabilidade</strong></td><td>Minimizar impacto ambiental dos workloads</td><td>Eficiência energética, right-sizing, regiões sustentáveis, reduzir desperdício</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Princípios de Design -->
+        <div class="topic-block">
+          <h2>Princípios de Design na Cloud</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Princípios Gerais</code><span class="cmd-tag">Design</span></div>
+              <pre><code>• Pare de adivinhar capacidade
+• Teste sistemas em escala de produção
+• Automatize para facilitar experimentação
+• Permita arquiteturas evolutivas
+• Construa com dados (data-driven)
+• Melhore através de game days</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Conceitos Importantes</code><span class="cmd-tag">Cloud</span></div>
+              <pre><code>• Design for failure (tudo falha, planeje para isso)
+• Decouple components (componentes independentes)
+• Think parallel (escale horizontalmente)
+• Elasticity (escale automaticamente)
+• Disposable resources (recursos descartáveis)
+• Automation (IaC, auto scaling, self-healing)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cloud Adoption Framework -->
+        <div class="topic-block">
+          <h2>AWS Cloud Adoption Framework (CAF) — 6 Perspectivas</h2>
+          <p>Framework para planejar a migração para a cloud, organizado em 6 perspectivas:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Perspectiva</th><th>Foco</th><th>Stakeholders</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Business</strong></td><td>Alinhar TI com objetivos de negócio, ROI, business case</td><td>CEO, CFO, gerentes de negócio</td></tr>
+              <tr><td><strong>People</strong></td><td>Cultura, treinamento, gestão de mudanças organizacionais</td><td>RH, gerentes de pessoas</td></tr>
+              <tr><td><strong>Governance</strong></td><td>Orquestrar iniciativas de cloud, compliance, risco</td><td>CIO, gerentes de programa, arquitetos enterprise</td></tr>
+              <tr><td><strong>Platform</strong></td><td>Arquitetura, infraestrutura, provisionamento de recursos</td><td>CTO, arquitetos, engenheiros</td></tr>
+              <tr><td><strong>Security</strong></td><td>Controles de segurança, compliance, gestão de riscos</td><td>CISO, equipe de segurança</td></tr>
+              <tr><td><strong>Operations</strong></td><td>Operações do dia-a-dia, monitoramento, incident management</td><td>Gerentes de operações, SRE</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Dica:</strong> Business + People + Governance = foco em <strong>negócio</strong> | Platform + Security + Operations = foco em <strong>técnico</strong>.</p>
+          </div>
+        </div>
+
+        <!-- 7 Rs de Migração -->
+        <div class="topic-block">
+          <h2>7 Rs — Estratégias de Migração</h2>
+          <p>Estratégias para migrar workloads para a cloud:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estratégia</th><th>Descrição</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Rehost</strong> (Lift & Shift)</td><td>Mover para a cloud sem alterações</td><td>Migração rápida, sem refatoração</td></tr>
+              <tr><td><strong>Replatform</strong> (Lift & Reshape)</td><td>Pequenas otimizações sem mudar a arquitetura core</td><td>Migrar DB para RDS, app para Beanstalk</td></tr>
+              <tr><td><strong>Refactor / Re-architect</strong></td><td>Redesenhar usando serviços cloud-native</td><td>Máximo benefício da cloud, microserviços</td></tr>
+              <tr><td><strong>Repurchase</strong></td><td>Trocar por solução SaaS (ex: CRM → Salesforce)</td><td>Substituir software legado por SaaS</td></tr>
+              <tr><td><strong>Retire</strong></td><td>Desligar/descontinuar a aplicação</td><td>App não é mais necessária</td></tr>
+              <tr><td><strong>Retain</strong></td><td>Manter on-premises (não migrar agora)</td><td>Compliance, dependências, não está pronto</td></tr>
+              <tr><td><strong>Relocate</strong></td><td>Mover infraestrutura para cloud sem comprar novo hardware</td><td>VMware Cloud on AWS, mover hypervisor</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Rehost = mais rápido/simples | Refactor = mais benefícios da cloud | Retire = desligar | Retain = não migrar.</p>
+          </div>
+        </div>
+
+        <!-- AWS Snow Family -->
+        <div class="topic-block">
+          <h2>AWS Snow Family</h2>
+          <p>Dispositivos físicos para migração de dados em larga escala e edge computing:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Dispositivo</th><th>Capacidade</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Snowcone</strong></td><td>8 TB HDD / 14 TB SSD</td><td>Locais remotos, edge computing, espaços pequenos (2.1 kg)</td></tr>
+              <tr><td><strong>Snowball Edge Storage Optimized</strong></td><td>80 TB</td><td>Migração de dados em larga escala, storage local temporário</td></tr>
+              <tr><td><strong>Snowball Edge Compute Optimized</strong></td><td>42 TB + GPU</td><td>Edge computing, ML em locais remotos, processamento local</td></tr>
+              <tr><td><strong>Snowmobile</strong></td><td>100 PB (caminhão)</td><td>Migração de exabytes de dados (data centers inteiros)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>💡 Quando usar Snow Family:</strong> Quando a transferência pela rede levaria semanas/meses. Regra geral: se leva mais de 1 semana pela rede, considere Snow Family.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../cloud-practitioner.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

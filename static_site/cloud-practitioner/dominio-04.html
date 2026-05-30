@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Cloud Practitioner Domínio 04: Cobrança, Preços e Suporte</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="dominio-03.html" class="nav-link">← Anterior</a>
+        <a href="../cloud-practitioner.html" class="nav-link">Voltar ao Curso</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ Cloud Practitioner — Domínio 04</span>
+        <h1>Cobrança, Preços e Suporte</h1>
+        <p>Modelos de preço, Free Tier, ferramentas de gerenciamento de custos, planos de suporte e AWS Marketplace.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Pricing Models -->
+        <div class="topic-block">
+          <h2>Modelos de Preço EC2</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Modelo</th><th>Desconto</th><th>Compromisso</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>On-Demand</strong></td><td>0% (preço cheio)</td><td>Nenhum — pague por hora/segundo</td><td>Workloads imprevisíveis, testes, curta duração</td></tr>
+              <tr><td><strong>Reserved Instances (RI)</strong></td><td>Até 72%</td><td>1 ou 3 anos — tipo específico</td><td>Workloads estáveis e previsíveis (produção)</td></tr>
+              <tr><td><strong>Savings Plans</strong></td><td>Até 72%</td><td>1 ou 3 anos — $/hora de uso</td><td>Flexível entre famílias/regiões/OS</td></tr>
+              <tr><td><strong>Spot Instances</strong></td><td>Até 90%</td><td>Nenhum — pode ser interrompido</td><td>Workloads tolerantes a falha (batch, CI/CD, big data)</td></tr>
+              <tr><td><strong>Dedicated Hosts</strong></td><td>Variável</td><td>Servidor físico dedicado</td><td>Compliance, licenças por socket/core (BYOL)</td></tr>
+              <tr><td><strong>Dedicated Instances</strong></td><td>Variável</td><td>Hardware dedicado (sem compartilhar)</td><td>Isolamento de hardware sem gerenciar host</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> On-Demand = flexibilidade | Reserved/Savings Plans = economia para uso constante | Spot = mais barato mas pode ser interrompido | Dedicated = compliance/licenças.</p>
+          </div>
+        </div>
+
+        <!-- Free Tier -->
+        <div class="topic-block">
+          <h2>AWS Free Tier</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tipos de Free Tier</code><span class="cmd-tag">Gratuito</span></div>
+              <pre><code>1. Always Free (sempre gratuito):
+   • Lambda: 1M requests/mês
+   • DynamoDB: 25 GB storage
+   • CloudWatch: 10 custom metrics
+   • SNS: 1M publishes
+   • SQS: 1M requests
+
+2. 12 Months Free (novos clientes):
+   • EC2: 750h/mês t2.micro (Linux + Windows)
+   • S3: 5 GB storage
+   • RDS: 750h/mês db.t2.micro
+   • CloudFront: 50 GB data transfer
+
+3. Trials (período de teste):
+   • SageMaker: 2 meses
+   • Inspector: 15 dias
+   • GuardDuty: 30 dias</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Princípios de Preço AWS</code><span class="cmd-tag">Billing</span></div>
+              <pre><code>3 Drivers fundamentais de custo:
+1. Compute: tempo de uso (hora/segundo)
+2. Storage: GB armazenados por mês
+3. Data Transfer OUT: dados saindo da AWS
+   ⚠️ Data Transfer IN é GRATUITO
+
+Princípios:
+• Pay-as-you-go (pague pelo uso)
+• Pay less when you reserve (desconto por compromisso)
+• Pay less per unit by using more (volume discounts)
+• Pay less as AWS grows (AWS repassa economia de escala)
+
+Gratuito entre serviços na mesma região:
+• EC2 → S3 (mesma região) = grátis
+• EC2 → Internet = cobra data transfer out</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost Management Tools -->
+        <div class="topic-block">
+          <h2>Ferramentas de Gerenciamento de Custos</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Ferramenta</th><th>Função</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>AWS Budgets</strong></td><td>Definir orçamentos e alertas</td><td>Alertar quando custo/uso ultrapassar limite definido</td></tr>
+              <tr><td><strong>AWS Cost Explorer</strong></td><td>Visualizar e analisar custos</td><td>Entender gastos passados, prever custos futuros, identificar tendências</td></tr>
+              <tr><td><strong>AWS Cost and Usage Report (CUR)</strong></td><td>Relatório detalhado de custos</td><td>Dados granulares para análise avançada (exporta para S3)</td></tr>
+              <tr><td><strong>AWS Pricing Calculator</strong></td><td>Estimar custos antes de usar</td><td>Planejar arquitetura e estimar custo mensal</td></tr>
+              <tr><td><strong>TCO Calculator</strong> (descontinuado)</td><td>Comparar on-prem vs cloud</td><td>Business case para migração (Total Cost of Ownership)</td></tr>
+              <tr><td><strong>AWS Billing Dashboard</strong></td><td>Visão geral da fatura</td><td>Ver fatura atual, histórico, previsão do mês</td></tr>
+              <tr><td><strong>Cost Allocation Tags</strong></td><td>Categorizar custos por tags</td><td>Alocar custos por projeto, equipe, ambiente</td></tr>
+            </tbody>
+          </table>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Budgets</code><span class="cmd-tag">Alertas</span></div>
+              <pre><code>Tipos de budget:
+• Cost Budget: alerta por valor ($)
+• Usage Budget: alerta por uso (horas, GB)
+• Reservation Budget: cobertura de RIs
+• Savings Plans Budget: cobertura de SP
+
+Ações automáticas:
+• Enviar notificação (SNS, e-mail)
+• Aplicar IAM policy restritiva
+• Aplicar SCP para bloquear criação de recursos
+
+Exemplo: alertar quando custo > 80% do budget mensal</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cost Explorer</code><span class="cmd-tag">Análise</span></div>
+              <pre><code>Funcionalidades:
+• Visualizar custos por serviço, região, conta
+• Filtrar por tags, linked accounts
+• Forecast: previsão de custos futuros (12 meses)
+• Right-sizing recommendations (EC2)
+• Savings Plans recommendations
+• Reservation coverage e utilization reports
+
+Granularidade:
+• Mensal, diário ou por hora
+• Últimos 12 meses de dados
+• Previsão para próximos 12 meses</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Plans -->
+        <div class="topic-block">
+          <h2>Planos de Suporte AWS</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Plano</th><th>Custo</th><th>Tempo de Resposta</th><th>Recursos</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Basic</strong></td><td>Gratuito</td><td>—</td><td>Documentação, whitepapers, fóruns, Health Dashboard, 7 checks do Trusted Advisor</td></tr>
+              <tr><td><strong>Developer</strong></td><td>$29/mês ou 3% do uso</td><td>12h (general) / 24h (system impaired)</td><td>E-mail em horário comercial, 1 contato, orientação de arquitetura geral</td></tr>
+              <tr><td><strong>Business</strong></td><td>$100/mês ou 3-10% do uso</td><td>1h (production down) / 4h (impaired)</td><td>24/7 telefone/chat, todos os checks Trusted Advisor, API de suporte, contatos ilimitados</td></tr>
+              <tr><td><strong>Enterprise On-Ramp</strong></td><td>$5,500/mês</td><td>30 min (business-critical) / 1h (production)</td><td>Pool de TAMs, Concierge Support Team, revisão de arquitetura</td></tr>
+              <tr><td><strong>Enterprise</strong></td><td>$15,000/mês</td><td>15 min (business-critical) / 1h (production)</td><td>TAM dedicado, Concierge, Infrastructure Event Management, Well-Architected reviews</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> TAM (Technical Account Manager) = apenas Enterprise | Trusted Advisor completo = Business+ | Concierge = Enterprise | Telefone 24/7 = Business+.</p>
+          </div>
+        </div>
+
+        <!-- Trusted Advisor -->
+        <div class="topic-block">
+          <h2>AWS Trusted Advisor</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>5 Categorias</code><span class="cmd-tag">Best Practices</span></div>
+              <pre><code>1. Cost Optimization:
+   • Instâncias ociosas, EBS não utilizados
+   • Reserved Instance optimization
+
+2. Performance:
+   • Instâncias over-provisioned
+   • CloudFront optimization
+
+3. Security:
+   • Security Groups com acesso aberto (0.0.0.0/0)
+   • MFA no root, IAM access keys
+
+4. Fault Tolerance:
+   • Backups, Multi-AZ, redundância
+   • RDS backups, EBS snapshots
+
+5. Service Limits:
+   • Uso próximo dos limites de serviço
+   • VPCs, EIPs, instâncias por região</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Acesso por Plano</code><span class="cmd-tag">Disponibilidade</span></div>
+              <pre><code>Basic / Developer (7 checks gratuitos):
+• S3 bucket permissions
+• Security Groups (portas específicas)
+• IAM use
+• MFA on Root Account
+• EBS Public Snapshots
+• RDS Public Snapshots
+• Service Limits
+
+Business / Enterprise (TODOS os checks):
+• Todas as 5 categorias completas
+• Acesso via API
+• CloudWatch integration
+• Refresh programático
+• Recomendações de Reserved Instances
+• Recomendações de right-sizing</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- AWS Marketplace -->
+        <div class="topic-block">
+          <h2>AWS Marketplace</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>AWS Marketplace</code><span class="cmd-tag">Catálogo</span></div>
+              <pre><code>Catálogo digital de software de terceiros que roda na AWS:
+
+Categorias:
+• AMIs (imagens pré-configuradas)
+• CloudFormation templates
+• SaaS applications
+• Containers
+• Data products
+• Machine Learning models
+
+Benefícios:
+• Billing consolidado (aparece na fatura AWS)
+• Deploy com 1 clique
+• Free trials disponíveis
+• Contratos flexíveis (hourly, monthly, annual, BYOL)
+• Curadoria e reviews da AWS
+
+Exemplos: Splunk, Trend Micro, Databricks, CrowdStrike</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consolidated Billing -->
+        <div class="topic-block">
+          <h2>Consolidated Billing (AWS Organizations)</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Fatura Consolidada</code><span class="cmd-tag">Billing</span></div>
+              <pre><code>• Uma fatura para todas as contas da organização
+• Management Account paga tudo
+• Volume discounts agregados (todas as contas somam)
+• Reserved Instances compartilhadas entre contas
+• Savings Plans compartilhados
+• Gratuito (sem custo adicional)
+
+Benefício principal:
+Conta A usa 3 TB S3 + Conta B usa 7 TB S3
+= 10 TB total → desconto por volume aplicado a ambas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Otimização de Custos</code><span class="cmd-tag">Dicas</span></div>
+              <pre><code>Estratégias para reduzir custos:
+• Right-sizing: usar o tamanho correto de instância
+• Reserved Instances / Savings Plans para uso constante
+• Spot Instances para workloads tolerantes a falha
+• Desligar recursos não utilizados (dev/test à noite)
+• S3 Lifecycle policies (mover para Glacier)
+• Use serviços serverless (Lambda, Fargate)
+• Consolidar contas para volume discounts
+• Usar Cost Allocation Tags para visibilidade
+• Revisar Trusted Advisor regularmente
+• Configurar AWS Budgets com alertas</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-03.html" class="button secondary">← Domínio Anterior</a>
+        <a href="../cloud-practitioner.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Cloud Practitioner Domínio 02: Segurança e Conformidade</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="dominio-01.html" class="nav-link">← Anterior</a>
+        <a href="dominio-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ Cloud Practitioner — Domínio 02</span>
+        <h1>Segurança e Conformidade</h1>
+        <p>Modelo de responsabilidade compartilhada, IAM, MFA, AWS Organizations, compliance, criptografia e serviços de segurança da AWS.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Shared Responsibility Model -->
+        <div class="topic-block">
+          <h2>Modelo de Responsabilidade Compartilhada</h2>
+          <p>Define o que a AWS protege vs. o que o cliente protege:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Responsabilidade</th><th>AWS (Segurança DA Cloud)</th><th>Cliente (Segurança NA Cloud)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Infraestrutura física</strong></td><td>✅ Data centers, hardware, rede global</td><td>—</td></tr>
+              <tr><td><strong>Hypervisor</strong></td><td>✅ Virtualização, isolamento</td><td>—</td></tr>
+              <tr><td><strong>Sistema Operacional</strong></td><td>— (exceto serviços gerenciados)</td><td>✅ Patches, configuração (EC2)</td></tr>
+              <tr><td><strong>Rede</strong></td><td>✅ Infraestrutura de rede global</td><td>✅ Security Groups, NACLs, VPC config</td></tr>
+              <tr><td><strong>Dados</strong></td><td>—</td><td>✅ Criptografia, backups, classificação</td></tr>
+              <tr><td><strong>Identidade</strong></td><td>—</td><td>✅ IAM, MFA, senhas, permissões</td></tr>
+              <tr><td><strong>Aplicação</strong></td><td>—</td><td>✅ Código, configuração, vulnerabilidades</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Regra de ouro:</strong> Se você pode configurar no console AWS, é sua responsabilidade. Se não tem acesso, é responsabilidade da AWS.</p>
+          </div>
+        </div>
+
+        <!-- IAM -->
+        <div class="topic-block">
+          <h2>AWS IAM (Identity and Access Management)</h2>
+          <p>Serviço global para controlar acesso aos recursos AWS:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Users</code><span class="cmd-tag">Identidade</span></div>
+              <pre><code>• Representa uma pessoa ou aplicação
+• Credenciais: senha (console) + access keys (CLI/API)
+• Princípio: 1 user por pessoa física
+• Root user: acesso total — usar apenas para tarefas específicas
+• Ativar MFA no root user SEMPRE</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Groups</code><span class="cmd-tag">Organização</span></div>
+              <pre><code>• Coleção de users
+• Policies são atribuídas ao grupo
+• Users herdam permissões do grupo
+• Exemplos: Admins, Developers, Finance
+• Um user pode pertencer a múltiplos grupos
+• Groups NÃO podem conter outros groups</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Roles</code><span class="cmd-tag">Delegação</span></div>
+              <pre><code>• Identidade temporária com permissões
+• Não tem credenciais permanentes
+• Assumida por: serviços AWS, users, contas externas
+• Casos de uso:
+  - EC2 acessando S3
+  - Lambda acessando DynamoDB
+  - Cross-account access
+  - Federação (SSO)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Policies</code><span class="cmd-tag">Permissões</span></div>
+              <pre><code>• Documentos JSON que definem permissões
+• Tipos:
+  - AWS Managed (criadas pela AWS)
+  - Customer Managed (criadas por você)
+  - Inline (embutidas em user/group/role)
+• Estrutura: Effect + Action + Resource
+• Default: tudo negado (deny implícito)
+• Deny explícito > Allow</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>💡 Princípio do Menor Privilégio:</strong> Conceda apenas as permissões mínimas necessárias para realizar a tarefa. Comece com zero permissões e adicione conforme necessário.</p>
+          </div>
+        </div>
+
+        <!-- MFA -->
+        <div class="topic-block">
+          <h2>Multi-Factor Authentication (MFA)</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Tipos de MFA</code><span class="cmd-tag">Autenticação</span></div>
+              <pre><code>• Virtual MFA device (Google Authenticator, Authy)
+• Hardware TOTP token (key fob)
+• Hardware MFA key (YubiKey - FIDO U2F)
+• SMS (não recomendado para root)
+
+Fatores de autenticação:
+1. Algo que você SABE (senha)
+2. Algo que você TEM (token/celular)
+3. Algo que você É (biometria)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Boas Práticas</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>• SEMPRE ativar MFA no root user
+• Ativar MFA para todos os users com console access
+• Usar roles em vez de access keys quando possível
+• Rotacionar access keys regularmente
+• Nunca compartilhar credenciais
+• Usar IAM Access Analyzer para revisar permissões
+• Habilitar AWS CloudTrail para auditoria</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- AWS Organizations -->
+        <div class="topic-block">
+          <h2>AWS Organizations</h2>
+          <p>Gerenciamento centralizado de múltiplas contas AWS:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Conceitos</code><span class="cmd-tag">Multi-Account</span></div>
+              <pre><code>• Management Account (conta raiz/payer)
+• Member Accounts (contas membros)
+• Organizational Units (OUs) — agrupamento lógico
+• Consolidated Billing — fatura única
+• Volume discounts — desconto por uso agregado
+
+Estrutura:
+Root
+├── OU: Production
+│   ├── Account: Prod-App
+│   └── Account: Prod-DB
+├── OU: Development
+│   └── Account: Dev
+└── OU: Security
+    └── Account: Audit</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>SCPs (Service Control Policies)</code><span class="cmd-tag">Restrição</span></div>
+              <pre><code>• Políticas que RESTRINGEM permissões em OUs/contas
+• NÃO concedem permissões (apenas limitam)
+• Aplicadas na OU ou conta membro
+• NÃO afetam a Management Account
+• Hierárquicas: herdam da OU pai
+
+Exemplo de SCP:
+{
+  "Effect": "Deny",
+  "Action": "ec2:RunInstances",
+  "Resource": "*",
+  "Condition": {
+    "StringNotEquals": {
+      "ec2:Region": "us-east-1"
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compliance -->
+        <div class="topic-block">
+          <h2>Compliance e Conformidade</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS Artifact</code><span class="cmd-tag">Compliance</span></div>
+              <pre><code>• Portal self-service para relatórios de compliance
+• Acesso a documentos de auditoria da AWS
+• Agreements (acordos): BAA, NDA
+• Reports: SOC, PCI-DSS, ISO, HIPAA
+
+Programas de compliance:
+• SOC 1/2/3 (controles de segurança)
+• PCI-DSS (dados de cartão de crédito)
+• HIPAA (dados de saúde - EUA)
+• GDPR (dados pessoais - Europa)
+• LGPD (dados pessoais - Brasil)
+• ISO 27001 (segurança da informação)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS Config</code><span class="cmd-tag">Auditoria</span></div>
+              <pre><code>• Monitora e registra configurações de recursos
+• Avalia compliance com regras definidas
+• Histórico de mudanças de configuração
+• Regras: managed (AWS) ou custom
+
+Exemplos de regras:
+• S3 buckets devem ter encryption
+• Security Groups não devem ter 0.0.0.0/0
+• EBS volumes devem estar encrypted
+• EC2 instances devem ter tags obrigatórias
+
+NÃO previne mudanças — apenas detecta e alerta</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Encryption -->
+        <div class="topic-block">
+          <h2>Criptografia (KMS)</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS KMS</code><span class="cmd-tag">Key Management</span></div>
+              <pre><code>AWS Key Management Service:
+• Gerencia chaves de criptografia
+• Integrado com a maioria dos serviços AWS
+• Tipos de chaves:
+  - AWS Managed Keys (aws/s3, aws/ebs)
+  - Customer Managed Keys (CMK)
+  - AWS Owned Keys (usadas internamente)
+
+Encryption at Rest:
+• Dados armazenados criptografados (S3, EBS, RDS)
+
+Encryption in Transit:
+• Dados em movimento criptografados (TLS/SSL, HTTPS)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Outros Serviços</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>• CloudHSM: Hardware dedicado para chaves
+  - Você gerencia as chaves (não a AWS)
+  - FIPS 140-2 Level 3
+  - Single-tenant (hardware exclusivo)
+
+• AWS Certificate Manager (ACM):
+  - Provisiona certificados SSL/TLS
+  - Renovação automática
+  - Gratuito para serviços AWS integrados
+
+• AWS Secrets Manager:
+  - Armazena e rotaciona secrets
+  - DB passwords, API keys
+  - Rotação automática</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Services -->
+        <div class="topic-block">
+          <h2>Serviços de Segurança</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>O que Detecta/Protege</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon GuardDuty</strong></td><td>Detecção inteligente de ameaças</td><td>Atividades maliciosas, comportamento anômalo, IPs suspeitos (ML-based)</td></tr>
+              <tr><td><strong>Amazon Inspector</strong></td><td>Avaliação de vulnerabilidades</td><td>Vulnerabilidades em EC2, containers e Lambda (CVEs, network exposure)</td></tr>
+              <tr><td><strong>Amazon Macie</strong></td><td>Proteção de dados sensíveis</td><td>Dados pessoais (PII) em S3 — cartões, CPFs, e-mails (ML-based)</td></tr>
+              <tr><td><strong>AWS WAF</strong></td><td>Web Application Firewall</td><td>SQL injection, XSS, rate limiting, geo-blocking (Layer 7)</td></tr>
+              <tr><td><strong>AWS Shield</strong></td><td>Proteção contra DDoS</td><td>Standard (gratuito, Layer 3/4) | Advanced (pago, Layer 7, suporte 24/7)</td></tr>
+              <tr><td><strong>AWS Security Hub</strong></td><td>Visão centralizada de segurança</td><td>Agrega findings de GuardDuty, Inspector, Macie, Firewall Manager</td></tr>
+              <tr><td><strong>AWS CloudTrail</strong></td><td>Auditoria de API calls</td><td>Quem fez o quê, quando, de onde (log de todas as ações na conta)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> GuardDuty = ameaças inteligentes | Inspector = vulnerabilidades | Macie = dados sensíveis em S3 | WAF = proteção web (L7) | Shield = DDoS.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-01.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-03.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

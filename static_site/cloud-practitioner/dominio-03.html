@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Cloud Practitioner Domínio 03: Tecnologia e Serviços Cloud</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="dominio-02.html" class="nav-link">← Anterior</a>
+        <a href="dominio-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ Cloud Practitioner — Domínio 03</span>
+        <h1>Tecnologia e Serviços Cloud</h1>
+        <p>Compute, Storage, Database, Networking e Management — todos os serviços core da AWS que você precisa conhecer para o exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- Compute -->
+        <div class="topic-block">
+          <h2>Compute (Computação)</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Tipo</th><th>Descrição</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon EC2</strong></td><td>IaaS</td><td>Servidores virtuais com controle total do OS</td><td>Aplicações tradicionais, servidores web, bancos de dados</td></tr>
+              <tr><td><strong>AWS Lambda</strong></td><td>Serverless</td><td>Executa código sem gerenciar servidores (até 15 min)</td><td>Event-driven, APIs, processamento de dados</td></tr>
+              <tr><td><strong>Amazon ECS</strong></td><td>Containers</td><td>Orquestração de containers Docker</td><td>Microserviços em containers</td></tr>
+              <tr><td><strong>AWS Fargate</strong></td><td>Serverless Containers</td><td>Containers sem gerenciar servidores (EC2)</td><td>Containers sem preocupação com infraestrutura</td></tr>
+              <tr><td><strong>Amazon EKS</strong></td><td>Kubernetes</td><td>Kubernetes gerenciado pela AWS</td><td>Workloads Kubernetes em produção</td></tr>
+              <tr><td><strong>Amazon Lightsail</strong></td><td>Simplificado</td><td>VPS simples com preço fixo mensal</td><td>Sites simples, blogs, ambientes de dev</td></tr>
+              <tr><td><strong>AWS Batch</strong></td><td>Batch</td><td>Processamento em lote em escala</td><td>Renderização, simulações, análise de dados</td></tr>
+            </tbody>
+          </table>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>EC2 — Tipos de Instância</code><span class="cmd-tag">Famílias</span></div>
+              <pre><code>• General Purpose (t3, m5): balanceado
+• Compute Optimized (c5): CPU intensivo
+• Memory Optimized (r5): RAM intensivo
+• Storage Optimized (i3): I/O intensivo
+• Accelerated Computing (p3, g4): GPU/ML
+
+Nomenclatura: m5.xlarge
+m = família | 5 = geração | xlarge = tamanho</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EC2 — Auto Scaling</code><span class="cmd-tag">Elasticidade</span></div>
+              <pre><code>• Ajusta automaticamente o número de instâncias
+• Scale Out: adiciona instâncias (demanda alta)
+• Scale In: remove instâncias (demanda baixa)
+• Mantém disponibilidade e otimiza custos
+
+Componentes:
+• Launch Template (configuração da instância)
+• Auto Scaling Group (min/max/desired)
+• Scaling Policies (quando escalar)
+• ELB (distribui tráfego entre instâncias)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Storage -->
+        <div class="topic-block">
+          <h2>Storage (Armazenamento)</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Tipo</th><th>Descrição</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon S3</strong></td><td>Object Storage</td><td>Armazenamento de objetos ilimitado, 11 noves de durabilidade</td><td>Backups, data lake, hosting estático, arquivos</td></tr>
+              <tr><td><strong>Amazon EBS</strong></td><td>Block Storage</td><td>Discos virtuais para EC2 (persistente)</td><td>Boot volumes, bancos de dados, aplicações</td></tr>
+              <tr><td><strong>Amazon EFS</strong></td><td>File Storage</td><td>Sistema de arquivos compartilhado (NFS) — Linux</td><td>Compartilhamento entre múltiplas EC2</td></tr>
+              <tr><td><strong>Amazon FSx</strong></td><td>File Storage</td><td>File systems gerenciados (Windows/Lustre/NetApp)</td><td>Windows file shares, HPC</td></tr>
+              <tr><td><strong>S3 Glacier</strong></td><td>Archive</td><td>Armazenamento de longo prazo, custo muito baixo</td><td>Compliance, backups de longo prazo, arquivamento</td></tr>
+            </tbody>
+          </table>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>S3 — Classes de Armazenamento</code><span class="cmd-tag">Tiers</span></div>
+              <pre><code>• S3 Standard: acesso frequente, alta disponibilidade
+• S3 Standard-IA: acesso infrequente, custo menor
+• S3 One Zone-IA: infrequente, 1 AZ (mais barato)
+• S3 Intelligent-Tiering: move automaticamente
+• S3 Glacier Instant Retrieval: arquivo, acesso ms
+• S3 Glacier Flexible: arquivo, minutos a horas
+• S3 Glacier Deep Archive: mais barato, 12-48h
+
+Lifecycle Rules: mover objetos entre classes automaticamente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>EBS vs EFS vs S3</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code>EBS:
+• Attached a 1 EC2 (mesma AZ)
+• Block storage (como HD)
+• Snapshots para backup
+
+EFS:
+• Compartilhado entre múltiplas EC2
+• Multi-AZ automático
+• Apenas Linux (NFS)
+
+S3:
+• Object storage (via HTTP/API)
+• Ilimitado, serverless
+• Não é file system (não monta como disco)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database -->
+        <div class="topic-block">
+          <h2>Database (Banco de Dados)</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Tipo</th><th>Descrição</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon RDS</strong></td><td>Relacional</td><td>Banco relacional gerenciado (MySQL, PostgreSQL, Oracle, SQL Server, MariaDB)</td><td>Aplicações tradicionais, OLTP</td></tr>
+              <tr><td><strong>Amazon Aurora</strong></td><td>Relacional</td><td>Banco relacional cloud-native (5x MySQL, 3x PostgreSQL)</td><td>Alta performance e disponibilidade</td></tr>
+              <tr><td><strong>Amazon DynamoDB</strong></td><td>NoSQL</td><td>Key-value e document DB, serverless, single-digit ms latency</td><td>Gaming, IoT, mobile, alta escala</td></tr>
+              <tr><td><strong>Amazon ElastiCache</strong></td><td>In-Memory</td><td>Cache em memória (Redis ou Memcached)</td><td>Caching, sessões, leaderboards</td></tr>
+              <tr><td><strong>Amazon Redshift</strong></td><td>Data Warehouse</td><td>Análise de dados em escala (OLAP, columnar)</td><td>BI, analytics, data warehouse</td></tr>
+              <tr><td><strong>Amazon DocumentDB</strong></td><td>Document DB</td><td>Compatível com MongoDB</td><td>Content management, catálogos</td></tr>
+              <tr><td><strong>Amazon Neptune</strong></td><td>Graph DB</td><td>Banco de grafos gerenciado</td><td>Redes sociais, fraud detection, knowledge graphs</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> RDS = relacional gerenciado | DynamoDB = NoSQL serverless | ElastiCache = cache em memória | Redshift = data warehouse/analytics.</p>
+          </div>
+        </div>
+
+        <!-- Networking -->
+        <div class="topic-block">
+          <h2>Networking (Rede)</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Amazon VPC</code><span class="cmd-tag">Rede Virtual</span></div>
+              <pre><code>Virtual Private Cloud — sua rede isolada na AWS:
+• Subnets: públicas (internet) e privadas (interna)
+• Internet Gateway (IGW): acesso à internet
+• NAT Gateway: internet para subnets privadas (saída)
+• Route Tables: regras de roteamento
+• Security Groups: firewall stateful (instância)
+• NACLs: firewall stateless (subnet)
+
+Security Groups vs NACLs:
+• SG: stateful, allow only, nível de instância
+• NACL: stateless, allow + deny, nível de subnet</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Conectividade</code><span class="cmd-tag">Conexão</span></div>
+              <pre><code>• VPC Peering: conecta 2 VPCs (não transitivo)
+• Transit Gateway: hub central para múltiplas VPCs
+• VPN Site-to-Site: conexão criptografada via internet
+• AWS Direct Connect: conexão dedicada (fibra)
+  - Mais estável, menor latência
+  - Não passa pela internet pública
+  - Leva semanas para provisionar
+• VPC Endpoints: acesso privado a serviços AWS
+  - Gateway Endpoint: S3, DynamoDB
+  - Interface Endpoint: outros serviços</code></pre>
+            </div>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon Route 53</strong></td><td>DNS gerenciado + health checks</td><td>Registro de domínios, roteamento de tráfego, failover</td></tr>
+              <tr><td><strong>Amazon CloudFront</strong></td><td>CDN (Content Delivery Network)</td><td>Cache de conteúdo em edge locations, baixa latência global</td></tr>
+              <tr><td><strong>AWS Global Accelerator</strong></td><td>Aceleração de rede global</td><td>Aplicações globais com IPs estáticos, failover rápido</td></tr>
+              <tr><td><strong>Elastic Load Balancing</strong></td><td>Distribuição de tráfego</td><td>ALB (HTTP/HTTPS), NLB (TCP/UDP), GLB (appliances)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Management -->
+        <div class="topic-block">
+          <h2>Management e Governança</h2>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>O que Faz</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Amazon CloudWatch</strong></td><td>Monitoramento</td><td>Métricas, logs, alarmes, dashboards — monitora recursos e aplicações</td></tr>
+              <tr><td><strong>AWS CloudTrail</strong></td><td>Auditoria</td><td>Registra todas as chamadas de API na conta (quem, o quê, quando)</td></tr>
+              <tr><td><strong>AWS Systems Manager</strong></td><td>Gerenciamento operacional</td><td>Patch management, run commands, parameter store, inventário</td></tr>
+              <tr><td><strong>AWS CloudFormation</strong></td><td>Infrastructure as Code</td><td>Provisiona recursos via templates YAML/JSON (IaC)</td></tr>
+              <tr><td><strong>AWS Trusted Advisor</strong></td><td>Recomendações</td><td>Best practices em custo, performance, segurança, fault tolerance, service limits</td></tr>
+              <tr><td><strong>AWS Health Dashboard</strong></td><td>Status de serviços</td><td>Service Health (status global) + Account Health (eventos na sua conta)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> CloudWatch = métricas e monitoramento | CloudTrail = auditoria de API | CloudFormation = IaC | Trusted Advisor = recomendações de best practices.</p>
+          </div>
+        </div>
+
+        <!-- Global Infrastructure -->
+        <div class="topic-block">
+          <h2>Infraestrutura Global AWS</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Regiões e AZs</code><span class="cmd-tag">Global</span></div>
+              <pre><code>• Regions: áreas geográficas (us-east-1, sa-east-1)
+  - Cada região é independente
+  - Escolha baseada em: compliance, latência, serviços, preço
+
+• Availability Zones (AZs): data centers isolados
+  - Cada região tem 2-6 AZs
+  - Conectadas por rede de alta velocidade
+  - Isoladas contra falhas (energia, rede)
+  - Multi-AZ = alta disponibilidade
+
+• Edge Locations: pontos de presença para CDN
+  - CloudFront, Route 53, WAF, Shield
+  - Mais de 400 edge locations globalmente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Alta Disponibilidade</code><span class="cmd-tag">Resiliência</span></div>
+              <pre><code>Estratégias de resiliência:
+• Multi-AZ: protege contra falha de data center
+• Multi-Region: protege contra falha de região
+• Auto Scaling: mantém capacidade desejada
+• ELB: distribui tráfego entre instâncias saudáveis
+
+Conceitos:
+• RTO (Recovery Time Objective): tempo máximo de downtime
+• RPO (Recovery Point Objective): perda máxima de dados
+
+Disaster Recovery:
+• Backup & Restore (mais barato, mais lento)
+• Pilot Light (core mínimo rodando)
+• Warm Standby (versão reduzida ativa)
+• Multi-Site Active-Active (mais caro, mais rápido)</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-02.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-04.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
