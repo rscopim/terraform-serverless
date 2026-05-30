@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Redes Módulo 04: Comandos de Diagnóstico</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="modulo-05.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🌐 Redes — Módulo 04</span>
+        <h1>Comandos de Diagnóstico</h1>
+        <p>Ferramentas essenciais para troubleshooting e análise de conectividade em redes.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Conectividade e Resolução</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ping</code><span class="cmd-tag">ICMP</span></div>
+              <p>Testa conectividade usando pacotes ICMP Echo Request/Reply.</p>
+              <pre><code>ping 8.8.8.8              # teste básico
+ping -c 4 google.com      # 4 pacotes (Linux)
+ping -t google.com         # contínuo (Windows)
+ping -s 1472 -M do host   # testa MTU
+
+Interpretação:
+- Reply: conectividade OK
+- Request timed out: host/firewall bloqueando
+- Destination unreachable: rota inexistente
+- TTL expired: muitos saltos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>traceroute / tracert</code><span class="cmd-tag">Rota</span></div>
+              <p>Mostra o caminho (saltos) até o destino.</p>
+              <pre><code>traceroute google.com       # Linux (UDP)
+tracert google.com          # Windows (ICMP)
+traceroute -I google.com    # Linux com ICMP
+mtr google.com              # traceroute + ping
+
+Cada linha = um roteador no caminho
+* * * = roteador não responde (filtrado)
+Latência alta = possível gargalo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>nslookup / dig</code><span class="cmd-tag">DNS</span></div>
+              <p>Consulta registros DNS.</p>
+              <pre><code>nslookup google.com
+nslookup -type=MX gmail.com
+nslookup google.com 8.8.8.8  # DNS específico
+
+dig google.com +short
+dig google.com A              # registro A
+dig google.com MX             # registro MX
+dig google.com NS             # nameservers
+dig @8.8.8.8 google.com      # consulta DNS específico
+dig google.com +trace         # resolução completa</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>host / whois</code><span class="cmd-tag">DNS</span></div>
+              <p>Consultas rápidas de DNS e registro de domínio.</p>
+              <pre><code>host google.com
+host -t AAAA google.com    # IPv6
+host 8.8.8.8               # reverso
+
+whois google.com           # info do domínio
+whois 200.160.2.3          # info do IP</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Conexões e Portas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>netstat / ss</code><span class="cmd-tag">Essencial</span></div>
+              <p>Exibe conexões de rede, portas em escuta e estatísticas.</p>
+              <pre><code># ss (moderno, substitui netstat)
+ss -tuln                    # portas TCP/UDP em escuta
+ss -tunap                   # com PID e nome do processo
+ss -s                       # estatísticas resumidas
+ss state established        # conexões ativas
+ss -tuln | grep :443        # quem escuta na 443
+
+# netstat (legado, ainda útil)
+netstat -tuln               # portas em escuta
+netstat -an                 # todas as conexões
+netstat -rn                 # tabela de rotas
+netstat -i                  # estatísticas de interface</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>nmap</code><span class="cmd-tag">Scanner</span></div>
+              <p>Scanner de portas e descoberta de rede.</p>
+              <pre><code>nmap 192.168.1.1            # scan básico
+nmap -sV 192.168.1.1        # versão dos serviços
+nmap -O 192.168.1.1         # detecção de OS
+nmap -p 80,443 192.168.1.0/24  # portas específicas
+nmap -sn 192.168.1.0/24     # ping sweep (hosts ativos)
+nmap -A 192.168.1.1         # scan agressivo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tcpdump</code><span class="cmd-tag">Captura</span></div>
+              <p>Captura e analisa pacotes em tempo real.</p>
+              <pre><code>sudo tcpdump -i eth0              # todo tráfego
+sudo tcpdump -i eth0 port 80      # apenas porta 80
+sudo tcpdump -i eth0 host 10.0.0.1  # host específico
+sudo tcpdump -i eth0 -c 100       # 100 pacotes
+sudo tcpdump -i eth0 -w captura.pcap  # salva arquivo
+sudo tcpdump -r captura.pcap      # lê arquivo
+
+# Filtros combinados
+sudo tcpdump -i eth0 'tcp port 443 and host 10.0.0.5'</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Configuração de Interface</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ip (iproute2)</code><span class="cmd-tag">Linux</span></div>
+              <pre><code># Interfaces
+ip addr show                      # listar interfaces e IPs
+ip link show                      # status das interfaces
+ip link set eth0 up               # ativar interface
+ip link set eth0 down             # desativar interface
+
+# Endereços
+ip addr add 192.168.1.10/24 dev eth0    # adicionar IP
+ip addr del 192.168.1.10/24 dev eth0    # remover IP
+
+# Rotas
+ip route show                     # tabela de rotas
+ip route add 10.0.0.0/8 via 192.168.1.1  # adicionar rota
+ip route add default via 192.168.1.1      # default gateway
+ip route del 10.0.0.0/8 via 192.168.1.1  # remover rota
+
+# ARP / Vizinhos
+ip neigh show                     # tabela ARP</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

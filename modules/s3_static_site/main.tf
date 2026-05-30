@@ -281,6 +281,17 @@ resource "aws_s3_object" "github_modules" {
   etag = filemd5("${path.root}/../../static_site/github/${each.value}")
 }
 
+resource "aws_s3_object" "kubernetes_modules" {
+  for_each = fileset("${path.root}/../../static_site/kubernetes", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "kubernetes/${each.value}"
+  source       = "${path.root}/../../static_site/kubernetes/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/kubernetes/${each.value}")
+}
+
 resource "aws_s3_object" "github_page" {
   bucket       = aws_s3_bucket.this.id
   key          = "github.html"
@@ -303,4 +314,15 @@ resource "aws_s3_object" "cloudformation_page" {
   source       = "${path.root}/../../static_site/cloudformation.html"
   etag         = filemd5("${path.root}/../../static_site/cloudformation.html")
   content_type = "text/html"
+}
+
+resource "aws_s3_object" "redes_modules" {
+  for_each = fileset("${path.root}/../../static_site/redes", "*.html")
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "redes/${each.value}"
+  source       = "${path.root}/../../static_site/redes/${each.value}"
+  content_type = "text/html"
+
+  etag = filemd5("${path.root}/../../static_site/redes/${each.value}")
 }
