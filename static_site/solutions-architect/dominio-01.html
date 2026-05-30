@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Solutions Architect Domínio 01: Design de Arquiteturas Seguras</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../solutions-architect.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ Solutions Architect — Domínio 01</span>
+        <h1>Design de Arquiteturas Seguras</h1>
+        <p>IAM, VPC, criptografia, serviços de segurança, Organizations e governança. Este domínio representa 30% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- IAM -->
+        <div class="topic-block">
+          <h2>1. IAM — Identity and Access Management</h2>
+
+          <h3>Policies e Permissões</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Identity-based Policies</code><span class="cmd-tag">Usuário/Role</span></div>
+              <pre><code>Tipos de policies:
+• AWS Managed — criadas e mantidas pela AWS
+• Customer Managed — criadas pelo cliente (reusáveis)
+• Inline — embutidas diretamente no usuário/grupo/role
+
+Avaliação de permissões:
+1. Deny explícito → SEMPRE nega
+2. Allow explícito → permite (se não há deny)
+3. Deny implícito → padrão (sem policy = sem acesso)
+
+Princípio do menor privilégio:
+• Conceder apenas permissões necessárias
+• Usar conditions para restringir (IP, MFA, horário)
+• Revisar com IAM Access Analyzer</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Resource-based Policies</code><span class="cmd-tag">Recurso</span></div>
+              <pre><code>Aplicadas diretamente ao recurso:
+• S3 Bucket Policies
+• SQS Queue Policies
+• KMS Key Policies
+• Lambda Resource Policies
+
+Diferença-chave:
+• Identity-based: "O que este usuário pode fazer?"
+• Resource-based: "Quem pode acessar este recurso?"
+
+Cross-account:
+• Resource-based permite acesso cross-account
+  sem assumir role (Principal de outra conta)
+• Útil para compartilhar S3, KMS, SQS entre contas</code></pre>
+            </div>
+          </div>
+
+          <h3>IAM Roles e Cross-Account Access</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IAM Roles</code><span class="cmd-tag">Temporário</span></div>
+              <pre><code>Roles fornecem credenciais temporárias (STS):
+• Não têm credenciais permanentes
+• Assumidas por usuários, serviços ou contas externas
+
+Casos de uso:
+• EC2 Instance Profile (role para EC2)
+• Lambda Execution Role
+• Cross-account access
+• Federation (SAML, OIDC)
+
+Trust Policy:
+• Define QUEM pode assumir a role
+• Permissions Policy define O QUE a role pode fazer</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cross-Account Access</code><span class="cmd-tag">Multi-conta</span></div>
+              <pre><code>Padrão para acesso entre contas AWS:
+
+1. Conta B cria Role com Trust Policy
+   → Principal: arn:aws:iam::CONTA-A:root
+
+2. Conta A concede sts:AssumeRole para a role da Conta B
+
+3. Usuário na Conta A assume a role da Conta B
+   → Recebe credenciais temporárias
+
+Alternativas:
+• Resource-based policies (S3, KMS)
+• AWS Resource Access Manager (RAM)
+• Organizations + SCPs para governança</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> IAM Roles são SEMPRE preferíveis a access keys. Cross-account = Role + Trust Policy. MFA deve ser exigido para ações sensíveis. IAM Access Analyzer identifica recursos compartilhados externamente.</p>
+          </div>
+        </div>
+
+        <!-- VPC -->
+        <div class="topic-block">
+          <h2>2. VPC — Virtual Private Cloud</h2>
+
+          <h3>Subnets e Roteamento</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Subnets</code><span class="cmd-tag">Rede</span></div>
+              <pre><code>Subnet Pública:
+• Route table com rota para Internet Gateway (IGW)
+• Recursos com IP público acessam internet
+• Ex: ALB, NAT Gateway, Bastion Host
+
+Subnet Privada:
+• Sem rota direta para IGW
+• Acesso à internet via NAT Gateway (em subnet pública)
+• Ex: EC2 de aplicação, RDS, ElastiCache
+
+Boas práticas:
+• Mínimo 2 AZs para alta disponibilidade
+• Subnets separadas por tier (web, app, data)
+• CIDR planning para evitar conflitos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>VPC Endpoints</code><span class="cmd-tag">Privado</span></div>
+              <pre><code>Acesso a serviços AWS sem passar pela internet:
+
+Interface Endpoint (PrivateLink):
+• ENI na subnet com IP privado
+• Suporta: S3, DynamoDB, SQS, SNS, KMS, etc.
+• Security Groups aplicáveis
+• Custo por hora + dados transferidos
+
+Gateway Endpoint (gratuito):
+• Entrada na route table
+• Apenas S3 e DynamoDB
+• Sem custo adicional
+• Preferível para S3/DynamoDB
+
+💡 Gateway Endpoint para S3/DynamoDB
+   Interface Endpoint para demais serviços</code></pre>
+            </div>
+          </div>
+
+          <h3>NACLs vs Security Groups</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Security Groups</code><span class="cmd-tag">Stateful</span></div>
+              <pre><code>• Nível de instância (ENI)
+• STATEFUL — retorno automático permitido
+• Apenas regras ALLOW (sem deny explícito)
+• Avalia TODAS as regras antes de decidir
+• Pode referenciar outro SG como source
+
+Exemplo:
+• SG-Web: permite 80/443 de 0.0.0.0/0
+• SG-App: permite 8080 de SG-Web
+• SG-DB: permite 3306 de SG-App</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>NACLs</code><span class="cmd-tag">Stateless</span></div>
+              <pre><code>• Nível de subnet
+• STATELESS — precisa regra de entrada E saída
+• Regras ALLOW e DENY
+• Avalia regras em ORDEM numérica (primeira match)
+• Default NACL permite tudo
+
+Quando usar NACLs:
+• Bloquear IPs específicos (deny)
+• Camada extra de defesa
+• Compliance requirements
+
+⚠️ Ephemeral ports (1024-65535) devem ser
+   permitidos na saída para respostas</code></pre>
+            </div>
+          </div>
+
+          <h3>Conectividade</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>VPC Peering</code><span class="cmd-tag">1:1</span></div>
+              <pre><code>• Conexão direta entre 2 VPCs
+• Mesmo ou diferente account/region
+• NÃO transitivo (A↔B, B↔C ≠ A↔C)
+• CIDRs não podem se sobrepor
+• Precisa atualizar route tables em ambos lados
+
+Limitações:
+• Não escala para muitas VPCs
+• Cada par precisa de peering separado
+• Para muitas VPCs → Transit Gateway</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Transit Gateway</code><span class="cmd-tag">Hub</span></div>
+              <pre><code>• Hub central para conectar múltiplas VPCs
+• Suporta VPN e Direct Connect
+• TRANSITIVO — todas VPCs se comunicam via hub
+• Cross-region peering entre TGWs
+• Route tables para controle granular
+
+Casos de uso:
+• Muitas VPCs (>3) precisam se comunicar
+• Arquitetura hub-and-spoke
+• Shared services VPC
+• Conectividade híbrida centralizada</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> SG = stateful (só allow) | NACL = stateless (allow + deny). VPC Peering = não transitivo. Transit Gateway = transitivo, hub central. VPC Endpoints eliminam necessidade de NAT/IGW para serviços AWS.</p>
+          </div>
+        </div>
+
+        <!-- Criptografia -->
+        <div class="topic-block">
+          <h2>3. Criptografia e Proteção de Dados</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>AWS KMS</code><span class="cmd-tag">Chaves</span></div>
+              <pre><code>Key Management Service:
+
+Tipos de chaves:
+• AWS Managed Keys — criadas/gerenciadas pela AWS
+  (aws/s3, aws/ebs, aws/rds)
+• Customer Managed Keys (CMK) — controle total
+  (rotação, policies, auditoria)
+• AWS Owned Keys — usadas internamente pela AWS
+
+Envelope Encryption:
+1. KMS gera Data Key (plaintext + encrypted)
+2. Data Key criptografa os dados
+3. Plaintext key é descartada da memória
+4. Encrypted data key armazenada junto aos dados
+
+Rotação automática:
+• AWS Managed: a cada 1 ano (automático)
+• Customer Managed: configurável (anual)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Encryption at Rest</code><span class="cmd-tag">Armazenamento</span></div>
+              <pre><code>S3 Encryption:
+• SSE-S3: chave gerenciada pela AWS (padrão)
+• SSE-KMS: chave KMS (auditoria via CloudTrail)
+• SSE-C: chave fornecida pelo cliente
+• Client-side: criptografa antes de enviar
+
+EBS Encryption:
+• AES-256 via KMS
+• Snapshots de volumes encrypted são encrypted
+• Volumes criados de snapshots encrypted são encrypted
+• Não é possível remover encryption de volume existente
+
+RDS Encryption:
+• Ativada na criação (não pode ativar depois)
+• Read replicas herdam encryption
+• Snapshots de DB encrypted são encrypted
+• Para criptografar DB existente:
+  snapshot → copy com encryption → restore</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> SSE-KMS permite auditoria via CloudTrail. Envelope Encryption para dados grandes. Para criptografar RDS existente: snapshot → copy encrypted → restore. S3 default encryption = SSE-S3.</p>
+          </div>
+        </div>
+
+        <!-- Serviços de Segurança -->
+        <div class="topic-block">
+          <h2>4. Serviços de Segurança AWS</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Serviço</th><th>Função</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>AWS WAF</strong></td><td>Web Application Firewall</td><td>Proteger ALB/CloudFront/API Gateway contra SQL injection, XSS, rate limiting, geo-blocking</td></tr>
+              <tr><td><strong>AWS Shield</strong></td><td>Proteção DDoS</td><td>Standard (gratuito, L3/L4) | Advanced ($3k/mês, L7, DRT team, cost protection)</td></tr>
+              <tr><td><strong>Amazon GuardDuty</strong></td><td>Detecção de ameaças</td><td>Análise de VPC Flow Logs, DNS logs, CloudTrail — detecta comportamento malicioso</td></tr>
+              <tr><td><strong>Amazon Inspector</strong></td><td>Vulnerability scanning</td><td>Scan de EC2, containers ECR e Lambda para CVEs e network exposure</td></tr>
+              <tr><td><strong>Amazon Macie</strong></td><td>Proteção de dados sensíveis</td><td>Descobrir e proteger PII/dados sensíveis em S3 usando ML</td></tr>
+              <tr><td><strong>AWS Config</strong></td><td>Compliance e auditoria</td><td>Avaliar configurações de recursos contra regras de compliance (ex: EBS encrypted)</td></tr>
+              <tr><td><strong>CloudTrail</strong></td><td>Auditoria de API calls</td><td>Registrar TODAS as chamadas de API — quem fez o quê, quando, de onde</td></tr>
+              <tr><td><strong>Security Hub</strong></td><td>Central de segurança</td><td>Agregar findings de GuardDuty, Inspector, Macie, Config em um dashboard</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> WAF = camada 7 (HTTP). Shield Standard = gratuito (L3/L4). GuardDuty = detecção inteligente de ameaças. Inspector = vulnerabilidades. Macie = dados sensíveis em S3. Config = compliance de configuração.</p>
+          </div>
+        </div>
+
+        <!-- Organizations -->
+        <div class="topic-block">
+          <h2>5. AWS Organizations e Governança</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Organizations</code><span class="cmd-tag">Multi-conta</span></div>
+              <pre><code>Estrutura hierárquica:
+• Root → OUs (Organizational Units) → Accounts
+• Consolidated Billing (fatura única)
+• Volume discounts compartilhados
+
+SCPs (Service Control Policies):
+• Definem LIMITE MÁXIMO de permissões
+• NÃO concedem permissões (apenas restringem)
+• Aplicadas a OUs ou contas
+• Não afetam a Management Account
+• Herança hierárquica (OU pai → OU filho)
+
+Exemplo SCP — bloquear regiões:
+{
+  "Effect": "Deny",
+  "Action": "*",
+  "Resource": "*",
+  "Condition": {
+    "StringNotEquals": {
+      "aws:RequestedRegion": ["us-east-1","sa-east-1"]
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>AWS SSO / Identity Center</code><span class="cmd-tag">Acesso</span></div>
+              <pre><code>AWS IAM Identity Center (ex-SSO):
+• Single Sign-On para múltiplas contas AWS
+• Integra com Active Directory, Okta, Azure AD
+• Permission Sets definem acesso por conta
+• Um login → acesso a várias contas/apps
+
+Fluxo:
+1. Usuário autentica no Identity Center
+2. Seleciona conta e permission set
+3. Recebe credenciais temporárias (STS)
+
+Vantagens:
+• Gerenciamento centralizado de acesso
+• Auditoria unificada
+• Sem necessidade de IAM users por conta
+• Suporta SAML 2.0 e OIDC
+
+💡 Identity Center é a recomendação AWS
+   para gerenciar acesso multi-conta</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>CloudTrail + Config</code><span class="cmd-tag">Auditoria</span></div>
+              <pre><code>CloudTrail:
+• Registra TODAS as API calls (Management Events por padrão)
+• Data Events (S3 object-level, Lambda invocations) — custo adicional
+• Multi-region trail recomendado
+• Integração com CloudWatch Logs para alertas
+• Organization Trail para todas as contas
+
+AWS Config:
+• Avalia configurações contra regras
+• Config Rules: managed (AWS) ou custom (Lambda)
+• Remediation automática com SSM Automation
+• Aggregator para visão multi-conta/multi-região
+• Exemplos: s3-bucket-public-read-prohibited, encrypted-volumes, required-tags</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../solutions-architect.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="dominio-02.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

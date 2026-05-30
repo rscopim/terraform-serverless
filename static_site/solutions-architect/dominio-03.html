@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Solutions Architect Domínio 03: Design de Arquiteturas de Alta Performance</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="dominio-02.html" class="nav-link">← Anterior</a>
+        <a href="dominio-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🏛️ Solutions Architect — Domínio 03</span>
+        <h1>Design de Arquiteturas de Alta Performance</h1>
+        <p>EC2, EBS, S3, CloudFront, Global Accelerator, ElastiCache, DynamoDB, Lambda, containers e streaming. Este domínio representa 24% do exame.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <!-- EC2 -->
+        <div class="topic-block">
+          <h2>1. EC2 — Compute</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Instance Families</code><span class="cmd-tag">Tipos</span></div>
+              <pre><code>Famílias de instâncias (mnemônico):
+
+General Purpose (M, T):
+• M6i, M7g — workloads balanceados
+• T3, T4g — burstable (créditos CPU)
+
+Compute Optimized (C):
+• C6i, C7g — batch, ML inference, gaming, HPC
+
+Memory Optimized (R, X, z):
+• R6i — caches, in-memory DBs
+• X2idn — SAP HANA, grandes datasets
+• z1d — alta frequência de clock
+
+Storage Optimized (I, D, H):
+• I4i — alto IOPS (databases)
+• D3 — data warehousing, HDFS
+• H1 — throughput sequencial
+
+Accelerated Computing (P, G, Inf, Trn):
+• P5 — ML training (GPU NVIDIA)
+• G5 — graphics, video encoding
+• Inf2 — ML inference (Inferentia)
+• Trn1 — ML training (Trainium)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Placement Groups</code><span class="cmd-tag">Posicionamento</span></div>
+              <pre><code>Cluster:
+• Instâncias no MESMO rack/AZ
+• Menor latência possível (10 Gbps entre instâncias)
+• Risco: se rack falha, todas falham
+• Uso: HPC, big data jobs, low-latency apps
+
+Spread:
+• Instâncias em hardware DIFERENTE
+• Máximo 7 instâncias por AZ por grupo
+• Minimiza risco de falha correlacionada
+• Uso: aplicações críticas, HA
+
+Partition:
+• Grupos de instâncias em partições isoladas
+• Cada partição em rack diferente
+• Até 7 partições por AZ
+• Uso: HDFS, HBase, Cassandra, Kafka
+
+Enhanced Networking (ENA):
+• Até 100 Gbps
+• Menor latência, maior PPS
+• Sem custo adicional
+• Requer driver ENA na AMI</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- EBS -->
+        <div class="topic-block">
+          <h2>2. EBS — Elastic Block Store</h2>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>IOPS Máx</th><th>Throughput Máx</th><th>Caso de Uso</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>gp3</strong> (General Purpose SSD)</td><td>16.000</td><td>1.000 MB/s</td><td>Boot volumes, dev/test, apps gerais. IOPS e throughput independentes do tamanho.</td></tr>
+              <tr><td><strong>gp2</strong> (General Purpose SSD)</td><td>16.000</td><td>250 MB/s</td><td>Legacy. IOPS = 3 × GB (burst até 3.000). Prefer gp3.</td></tr>
+              <tr><td><strong>io2 Block Express</strong> (Provisioned IOPS)</td><td>256.000</td><td>4.000 MB/s</td><td>Databases críticos, SAP HANA, workloads I/O intensivos.</td></tr>
+              <tr><td><strong>io2</strong> (Provisioned IOPS)</td><td>64.000</td><td>1.000 MB/s</td><td>Databases que precisam de IOPS consistente e previsível.</td></tr>
+              <tr><td><strong>st1</strong> (Throughput Optimized HDD)</td><td>500</td><td>500 MB/s</td><td>Big data, data warehouses, log processing. Não pode ser boot volume.</td></tr>
+              <tr><td><strong>sc1</strong> (Cold HDD)</td><td>250</td><td>250 MB/s</td><td>Dados acessados raramente, menor custo. Não pode ser boot volume.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> gp3 é o padrão recomendado. io2 para databases com IOPS garantido. st1/sc1 = HDD (não pode ser boot). Multi-Attach (io1/io2) permite até 16 instâncias no mesmo volume. EBS é single-AZ — use snapshots para cross-AZ/region.</p>
+          </div>
+        </div>
+
+        <!-- S3 Performance -->
+        <div class="topic-block">
+          <h2>3. S3 — Performance</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Transfer Acceleration</code><span class="cmd-tag">Upload</span></div>
+              <pre><code>S3 Transfer Acceleration:
+• Usa edge locations da CloudFront para upload
+• Dados viajam pela rede backbone da AWS
+• 50-500% mais rápido para uploads distantes
+• Endpoint: bucketname.s3-accelerate.amazonaws.com
+• Custo adicional por GB transferido
+
+Quando usar:
+• Uploads de regiões distantes do bucket
+• Transferências intercontinentais
+• Clientes distribuídos globalmente
+
+Multipart Upload:
+• OBRIGATÓRIO para objetos > 5GB
+• Recomendado para > 100MB
+• Upload paralelo de partes
+• Retry de partes individuais (sem recomeçar tudo)
+• Abort incomplete uploads (lifecycle rule)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>S3 Performance Limits</code><span class="cmd-tag">Escala</span></div>
+              <pre><code>Limites por prefixo:
+• 3.500 PUT/COPY/POST/DELETE por segundo
+• 5.500 GET/HEAD por segundo
+• Por prefixo! Mais prefixos = mais throughput
+
+Otimização de prefixos:
+• Distribuir objetos em múltiplos prefixos
+• Ex: /images/2024/01/, /images/2024/02/
+• Cada prefixo tem seus próprios limites
+
+S3 Select / Glacier Select:
+• Filtrar dados com SQL no lado do servidor
+• Retorna apenas dados necessários
+• Reduz transferência de dados em até 400%
+• Reduz custo de transferência
+
+Byte-Range Fetches:
+• Download paralelo de partes do objeto
+• Acelera downloads grandes
+• Retry de ranges específicos</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- CloudFront -->
+        <div class="topic-block">
+          <h2>4. CloudFront — CDN</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Origins e Behaviors</code><span class="cmd-tag">Config</span></div>
+              <pre><code>Origins (fontes de conteúdo):
+• S3 Bucket (com OAC para acesso privado)
+• ALB / EC2 (custom origin)
+• API Gateway
+• MediaStore / MediaPackage
+
+Behaviors (regras de roteamento):
+• Path pattern: /images/*, /api/*, /static/*
+• Cada behavior → origin específico
+• Cache policy por behavior
+• Viewer protocol policy (HTTP→HTTPS redirect)
+
+OAC (Origin Access Control):
+• Substitui OAI (legacy)
+• S3 bucket pode ser privado
+• Apenas CloudFront acessa o bucket
+• Suporta SSE-KMS
+• Mais seguro que OAI</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cache Policies</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>Cache Key:
+• Define o que diferencia objetos no cache
+• Headers, query strings, cookies incluídos
+• Menos itens no cache key = melhor hit ratio
+
+TTL (Time to Live):
+• Min TTL, Max TTL, Default TTL
+• Cache-Control headers do origin
+• Invalidation para forçar refresh (custo)
+
+Cache Policies (managed):
+• CachingOptimized — máximo cache
+• CachingDisabled — sem cache (proxy)
+• Custom — controle granular
+
+Origin Request Policy:
+• O que enviar ao origin (separado do cache key)
+• Pode enviar headers sem afetar cache
+
+Lambda@Edge / CloudFront Functions:
+• Código na edge para manipular requests/responses
+• CloudFront Functions: leve, viewer events
+• Lambda@Edge: mais poder, origin events</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Accelerator -->
+        <div class="topic-block">
+          <h2>5. AWS Global Accelerator</h2>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Global Accelerator vs CloudFront</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code>Global Accelerator:
+• 2 IPs estáticos anycast globais
+• Tráfego entra na edge e viaja pela rede AWS (backbone)
+• Melhora performance para TCP/UDP (não apenas HTTP)
+• Health checks e failover automático entre regiões
+• Sem cache — todo tráfego vai ao origin
+• Casos: gaming, IoT, VoIP, APIs não-HTTP
+
+CloudFront:
+• CDN com cache na edge
+• Otimizado para conteúdo HTTP/HTTPS
+• Cache reduz carga no origin
+• Ideal para conteúdo estático e dinâmico cacheable
+
+Quando usar Global Accelerator:
+• Precisa de IP estático (whitelisting)
+• Protocolo não-HTTP (TCP/UDP)
+• Failover instantâneo entre regiões
+• Não precisa de cache, precisa de routing otimizado
+• Gaming multiplayer, financial trading</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- ElastiCache -->
+        <div class="topic-block">
+          <h2>6. ElastiCache</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Redis vs Memcached</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code>Redis:
+• Estruturas de dados ricas (strings, lists, sets, hashes)
+• Persistência (snapshots, AOF)
+• Replicação (Multi-AZ com failover automático)
+• Cluster mode (sharding)
+• Pub/Sub, Lua scripting
+• Backup e restore
+• Encryption at rest e in transit
+
+Memcached:
+• Simples key-value
+• Multi-threaded (melhor para multi-core)
+• Sem persistência
+• Sem replicação nativa
+• Sem backup
+• Auto-discovery de nodes
+
+Escolha:
+• Redis → persistência, HA, estruturas complexas
+• Memcached → cache simples, multi-threaded</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Caching Strategies</code><span class="cmd-tag">Padrões</span></div>
+              <pre><code>Lazy Loading (Cache-Aside):
+• App verifica cache primeiro
+• Cache miss → busca no DB → grava no cache
+• Dados podem ficar stale
+• Apenas dados requisitados são cacheados
+
+Write-Through:
+• App escreve no cache E no DB simultaneamente
+• Cache sempre atualizado
+• Maior latência de escrita
+• Dados nunca ficam stale
+
+TTL (Time to Live):
+• Expira dados após tempo definido
+• Combina com Lazy Loading
+• Balanceia freshness vs performance
+
+Session Store:
+• Armazenar sessões de usuário no Redis
+• Alternativa a sticky sessions
+• Compartilhado entre todas as instâncias
+• TTL para expirar sessões inativas</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DynamoDB -->
+        <div class="topic-block">
+          <h2>7. DynamoDB</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Partition Key Design</code><span class="cmd-tag">Modelagem</span></div>
+              <pre><code>Partition Key (PK):
+• Determina em qual partição o item é armazenado
+• DEVE ter alta cardinalidade (muitos valores únicos)
+• Distribuição uniforme = melhor performance
+
+Boas PKs: user_id, order_id, device_id
+Más PKs: status, date, country (hot partition)
+
+Sort Key (SK):
+• Ordena itens dentro da mesma partição
+• Permite range queries (begins_with, between)
+• Composite key: PK + SK = item único
+
+Padrões de design:
+• Single-table design (múltiplas entidades)
+• PK: USER#123, SK: ORDER#456
+• PK: USER#123, SK: PROFILE
+• Overloading de atributos</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>GSI e DAX</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>Global Secondary Index (GSI):
+• Nova partition key + optional sort key
+• Projeção de atributos (ALL, KEYS_ONLY, INCLUDE)
+• Capacidade provisionada separada
+• Eventually consistent reads apenas
+• Até 20 GSIs por tabela
+
+Local Secondary Index (LSI):
+• Mesma partition key, sort key diferente
+• Deve ser criado na criação da tabela
+• Strongly consistent reads possível
+• Até 5 LSIs por tabela
+
+DynamoDB Accelerator (DAX):
+• Cache in-memory para DynamoDB
+• Microsegundos de latência (vs ms)
+• Compatível com API DynamoDB (drop-in)
+• Write-through cache
+• Ideal para read-heavy workloads
+• Cluster Multi-AZ</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lambda e Containers -->
+        <div class="topic-block">
+          <h2>8. Lambda, ECS/EKS e Kinesis</h2>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Lambda Performance</code><span class="cmd-tag">Serverless</span></div>
+              <pre><code>Concurrency:
+• Default: 1.000 concurrent executions/region
+• Reserved concurrency: garante para função
+• Provisioned concurrency: elimina cold starts
+
+Memory (128MB - 10GB):
+• Mais memória = mais CPU proporcional
+• 1.769 MB = 1 vCPU completo
+• Otimizar: AWS Lambda Power Tuning
+
+Layers:
+• Bibliotecas compartilhadas entre funções
+• Até 5 layers por função
+• Reduz tamanho do deployment package
+• Versionadas independentemente
+
+Limites:
+• Timeout: máximo 15 minutos
+• Payload: 6MB (sync), 256KB (async)
+• /tmp storage: 512MB - 10GB
+• Deployment package: 50MB (zip), 250MB (unzipped)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ECS/EKS e Kinesis</code><span class="cmd-tag">Containers/Stream</span></div>
+              <pre><code>ECS (Elastic Container Service):
+• EC2 launch type: gerencia instâncias
+• Fargate launch type: serverless containers
+• Task definitions, services, clusters
+• ALB integration (dynamic port mapping)
+
+EKS (Elastic Kubernetes Service):
+• Kubernetes gerenciado
+• Nodes: EC2 ou Fargate
+• Para equipes com expertise em K8s
+• Portabilidade multi-cloud
+
+Kinesis Data Streams:
+• Streaming de dados em tempo real
+• Shards: unidade de capacidade
+  (1 MB/s in, 2 MB/s out por shard)
+• Retention: 24h (default) até 365 dias
+• Consumers: Lambda, KCL, Kinesis Analytics
+
+Kinesis Data Firehose:
+• Delivery stream (near real-time)
+• Destinos: S3, Redshift, OpenSearch, Splunk
+• Transformação com Lambda
+• Sem gerenciamento de shards (auto-scaling)</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <p><strong>🎯 Para o exame:</strong> Lambda = até 15 min, serverless. ECS Fargate = containers serverless. Kinesis Streams = real-time processing. Kinesis Firehose = delivery para S3/Redshift (near real-time, sem gerenciamento).</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="dominio-02.html" class="button secondary">← Domínio Anterior</a>
+        <a href="dominio-04.html" class="button primary">Próximo Domínio →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
