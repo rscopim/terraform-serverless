@@ -1,282 +1,142 @@
-# Fase 21 — CloudWatch Operational Dashboard + Alarmes
+# Fase 21 — CloudWatch Operational (Dashboard + Alarmes)
 
 ## 🎯 Objetivo
 
-Criar monitoramento operacional centralizado da aplicação CloudTrilhas utilizando Amazon CloudWatch, permitindo visualização em tempo real da saúde da aplicação e geração automática de alertas para eventos críticos.
-
-O objetivo desta fase é aumentar observabilidade, confiabilidade operacional e capacidade de resposta a incidentes.
+Criar monitoramento operacional centralizado com dashboard e alarmes automáticos para todos os serviços da aplicação CloudTrilhas, permitindo detecção proativa de problemas e resposta rápida a incidentes.
 
 ---
 
 ## 🏗️ O que foi criado
 
-* Dashboard operacional CloudWatch
-* Alarmes automáticos
-* Monitoramento Lambda
-* Monitoramento API Gateway
-* Monitoramento DynamoDB
-* Monitoramento SQS
-* Monitoramento SNS
-* Monitoramento CloudFront
-* Integração SNS para notificações
-* Painel centralizado operacional
+- Dashboard operacional com widgets para todos os serviços
+- 8 alarmes CloudWatch com integração SNS
+- Monitoramento de Lambda, API Gateway, DynamoDB, SQS, SNS e CloudFront
+- Notificações automáticas por email para eventos críticos
+- Módulo Terraform (`modules/cloudwatch_operational/`)
 
 ---
 
 ## 🧠 Conceitos importantes
 
-### CloudWatch Dashboard
+### Dashboard Operacional
 
-Painel visual centralizado para acompanhamento operacional dos recursos AWS.
-Permite acompanhar:
-* Métricas
-* Alarmes
-* Performance
-* Eventos operacionais
+Diferente do dashboard de downloads (Fase 11), este painel monitora a **saúde da infraestrutura**: erros, latência, throttling e falhas de entrega.
 
----
+### CloudWatch Alarms
 
-### CloudWatch Alarm
+Recurso que monitora uma métrica e executa ações quando um threshold é violado. Estados possíveis:
+- **OK**: Métrica dentro do normal
+- **ALARM**: Threshold violado → ação executada
+- **INSUFFICIENT_DATA**: Dados insuficientes para avaliação
 
-Recurso responsável por monitorar métricas e executar ações automáticas.
-Exemplo:
-```text
-Lambda Errors > 0
-```
+### Alarm Actions
 
-Ação:
-```text
-Notificar SNS
-```
+Quando um alarme dispara, ele pode executar ações:
+- Notificar SNS Topic (email)
+- Executar Auto Scaling
+- Executar Lambda
 
----
+Neste projeto, todos os alarmes notificam via SNS → Email.
 
-### Observabilidade
+### Métricas Padrão vs Custom
 
-Capacidade de entender o comportamento do sistema utilizando:
-* Logs
-* Métricas
-* Alarmes
-* Dashboards
+- **Padrão**: Geradas automaticamente pela AWS (Lambda Errors, API 5XX, etc.)
+- **Custom**: Criadas pela aplicação (PDFDownloads — Fase 10)
+
+Esta fase utiliza exclusivamente métricas padrão (custo zero adicional).
 
 ---
 
-### SNS Notifications
+## 📊 Alarmes implementados
 
-Integração utilizada para envio automático de alertas.
-Fluxo:
+| # | Serviço | Métrica | Condição | Severidade |
+|---|---------|---------|----------|------------|
+| 1 | Lambda (register_lead) | Errors | > 0 | Alta |
+| 2 | Lambda (download_metrics) | Errors | > 0 | Alta |
+| 3 | API Gateway | 5XXError | > 0 | Crítica |
+| 4 | DynamoDB | WriteThrottleEvents | > 0 | Alta |
+| 5 | SQS DLQ | ApproximateNumberOfMessagesVisible | > 0 | Alta |
+| 6 | SNS | NumberOfNotificationsFailed | > 0 | Média |
+| 7 | CloudFront | 5xxErrorRate | > 1% | Alta |
+| 8 | Lambda (register_lead) | Duration | > 5000ms | Média |
 
-```text
-CloudWatch
-↓
-Alarme
-↓
-SNS
-↓
-E-mail
-```
+---
+
+## 📊 Widgets do Dashboard
+
+| Widget | Serviço | Métricas |
+|--------|---------|----------|
+| Lambda Errors | Lambda | Errors por função |
+| Lambda Duration | Lambda | Duration (p50, p99) |
+| API Gateway | API GW | Requests, 4XX, 5XX |
+| DynamoDB | DynamoDB | Read/Write Throttle |
+| SQS | SQS | Messages Visible (fila + DLQ) |
+| CloudFront | CloudFront | Requests, Error Rate |
+| SNS | SNS | Notifications Failed |
 
 ---
 
 ## ⚙️ Como funciona
 
-Fluxo operacional:
-```text
-Aplicação CloudTrilhas
-↓
-CloudWatch Metrics
-↓
-CloudWatch Alarms
-↓
-SNS
-↓
-Notificação E-mail
-+
-Dashboard Operacional
+```
+Serviços AWS emitem métricas automaticamente
+        ↓
+CloudWatch coleta e armazena métricas
+        ↓
+Alarmes avaliam métricas a cada período (60s)
+        ↓
+Threshold violado → Estado muda para ALARM
+        ↓
+Ação executada → SNS → Email
+        ↓
+Dashboard exibe estado em tempo real
 ```
 
 ---
 
-## 📊 Recursos monitorados
+## 📁 Arquivos principais
 
-### CloudFront
-
-Métricas:
-* Requests
-* 4XX Error Rate
-* 5XX Error Rate
-
-Objetivo:
-Monitoramento CDN e erros de entrega.
-
----
-
-### API Gateway
-
-Métricas:
-* Count
-* 4XX
-* 5XX
-
-Objetivo:
-Monitoramento backend HTTP.
-
----
-
-### Lambda
-
-Métricas:
-* Errors
-* Duration
-* Invocations
-
-Objetivo:
-Monitoramento execução serverless.
-
----
-
-### DynamoDB
-
-Métricas:
-* ReadThrottleEvents
-* WriteThrottleEvents
-
-Objetivo:
-Monitoramento gargalos banco de dados.
-
----
-
-### SQS
-
-Métricas:
-
-* ApproximateNumberOfMessagesVisible
-Objetivo:
-Monitoramento filas.
-
----
-
-### DLQ
-
-Métricas:
-* ApproximateNumberOfMessagesVisible
-Objetivo:
-Identificar falhas processamento.
-
----
-
-### SNS
-
-Métricas:
-* NumberOfNotificationsFailed
-Objetivo:
-Validar entrega notificações.
-
----
-
-## 🚨 Alarmes implementados
-
-Lambda:
-```text
-Errors > 0
-```
-
-API Gateway:
-```text
-5XX > 0
-```
-
-DynamoDB:
-```text
-WriteThrottleEvents > 0
-```
-
-DLQ:
-```text
-Messages Visible > 0
-```
-
-SNS:
-```text
-Notifications Failed > 0
-```
-
-CloudFront:
-```text
-5XX Error Rate > 1%
-```
+| Arquivo | Função |
+|---------|--------|
+| `modules/cloudwatch_operational/main.tf` | Dashboard + Alarmes |
+| `modules/cloudwatch_operational/variables.tf` | Nomes dos recursos |
 
 ---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_dashboard
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm
-* https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html
-* https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_dashboard
+- https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html
 
 ---
 
-## 🧪 Como validar
+## 🧪 Como testar
 
-Abrir:
-```text
-CloudWatch
+```bash
+# Verificar alarmes criados
+aws cloudwatch describe-alarms \
+  --alarm-name-prefix "Terraform-Serverless-dev"
+
+# Forçar erro na Lambda (payload inválido)
+aws lambda invoke \
+  --function-name Terraform-Serverless-dev-register-lead \
+  --payload '{"body": "invalid"}' \
+  response.json
+
+# Verificar alarme disparado
+aws cloudwatch describe-alarms \
+  --state-value ALARM
 ```
 
-Selecionar:
-```text
-Dashboards
-```
-
-Validar:
-```text
-Terraform-Serverless-dev-operational-dashboard
-```
-
----
-
-Abrir:
-```text
-CloudWatch
-↓
-Alarms
-```
-
-Validar alarmes criados.
-
----
-
-Executar testes:
-* Erro Lambda
-* API inválida
-* CloudFront URL inexistente
-
-Resultado esperado:
-```text
-Alarme disparado
-```
-
-SNS:
-```text
-Notificação enviada
-```
+Dashboard: CloudWatch → Dashboards → `Terraform-Serverless-dev-operational-dashboard`
 
 ---
 
 ## 📈 Resultado esperado
 
-Ao final desta fase o CloudTrilhas deve possuir:
-* Observabilidade operacional
-* Dashboard centralizado
-* Alertas automáticos
-* Resposta rápida a incidentes
-* Monitoramento aplicação ponta a ponta
-
----
-
-## 📌 Observação operacional
-
-Implementação realizada utilizando métricas padrão AWS.
-Objetivo:
-Baixo custo operacional mantendo observabilidade elevada.
+- Visibilidade operacional completa em um único painel
+- Alertas automáticos para qualquer anomalia
+- Tempo de detecção de problemas: < 1 minuto
+- Notificação por email para resposta rápida
+- Custo mínimo (métricas padrão são gratuitas, alarmes ~$0.10/mês cada)

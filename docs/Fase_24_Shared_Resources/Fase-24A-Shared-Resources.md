@@ -1,43 +1,46 @@
-# Fase 24A — Shared Resources
+# Fase 24A — Shared Resources (Estrutura)
 
-## O que são Shared Resources?
+## 🎯 Objetivo
 
-Shared Resources são recursos compartilhados entre múltiplos ambientes.
-
-Exemplo:
-```text
-DEV
-PROD
-↓
-utilizam recurso compartilhado
-```
+Criar a estrutura do ambiente `shared/` com backend S3 independente para gerenciar recursos que pertencem à conta AWS como um todo.
 
 ---
 
-# Exemplos clássicos
+## 🏗️ O que foi criado
 
-```text
-OIDC Provider
-CloudTrail
-Budget
-KMS
-IAM centralizado
-```
+- Diretório `environments/shared/`
+- Backend S3 com key separada
+- Estrutura de variáveis e providers
+- Separação conceitual entre `resource` e `data`
 
 ---
 
-# Estrutura criada
+## 🧠 Conceitos importantes
 
-```text
-environments/
-├── shared/
-├── dev/
-└── prod/
+### Shared Resources
+
+Recursos compartilhados entre múltiplos ambientes que existem uma única vez na conta:
+
+| Recurso | Por quê é shared |
+|---------|-----------------|
+| OIDC Provider | 1 por conta AWS (global) |
+| Budget | Monitora conta inteira |
+| CloudTrail (org) | Auditoria centralizada |
+| KMS Keys | Compartilhadas entre serviços |
+
+### resource vs data
+
+```hcl
+# resource: Terraform CRIA e gerencia
+resource "aws_iam_openid_connect_provider" "github" { ... }
+
+# data: Terraform apenas CONSULTA (não gerencia)
+data "aws_iam_openid_connect_provider" "github" { ... }
 ```
 
----
+No shared, usamos `resource`. Nos ambientes DEV/PROD, usamos `data` para referenciar recursos shared.
 
-# Novo backend Terraform
+### Backend separado
 
 ```hcl
 terraform {
@@ -52,34 +55,23 @@ terraform {
 
 ---
 
-# Conceito importante
+## ⚙️ Operação
 
-## Resource
+```bash
+# Gerenciar recursos shared
+cd environments/shared
+terraform init
+terraform plan
+terraform apply
 
-```hcl
-resource "aws_xxx"
+# Recursos shared são referenciados por DEV/PROD via data sources ou outputs
 ```
-
-Terraform cria.
 
 ---
 
-## Data
+## 📈 Resultado esperado
 
-```hcl
-data "aws_xxx"
-```
-
-Terraform consulta recurso existente.
-
----
-
-# Benefícios da arquitetura
-
-```text
-✅ Menos conflito
-✅ Mais organização
-✅ Melhor governança
-✅ Mais próximo do mercado
-✅ Separação correta de responsabilidades
-```
+- Estrutura shared criada e funcional
+- State independente dos ambientes
+- Base para centralizar OIDC e Budget
+- Separação clara de responsabilidades

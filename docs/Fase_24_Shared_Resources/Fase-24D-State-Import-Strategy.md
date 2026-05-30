@@ -1,91 +1,123 @@
 # Fase 24D — State Import Strategy
 
-## Conceito
+## 🎯 Objetivo
 
-Durante a evolução da arquitetura foi necessário mover recursos entre Terraform States.
+Documentar a estratégia de migração de recursos entre Terraform States utilizada ao longo da Fase 24, servindo como referência para futuras refatorações de infraestrutura.
 
 ---
 
-# Problema
+## 🧠 O problema geral
 
-Recursos já existiam na AWS.
-Exemplo:
-```text
-OIDC
-Budget
+Quando a arquitetura evolui (separação de ambientes, centralização de recursos), é necessário mover recursos entre states sem destruí-los na AWS.
+
 ```
-
-Terraform tentou recriar:
-```text
-AlreadyExists
-DuplicateRecordException
+Cenário: Recurso existe na AWS + está no state DEV
+Objetivo: Mover para state SHARED
+Restrição: Zero downtime, zero recriação
 ```
 
 ---
 
-# Estratégia aplicada
+## ⚙️ Estratégia em 4 passos
 
-## 1. terraform import
-Assumir recurso existente:
-```powershell
-terraform import
+### Passo 1: Criar código no destino
+
+Escrever o recurso no novo ambiente (shared):
+```hcl
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
+  ...
+}
 ```
+
+### Passo 2: terraform import no destino
+
+Importar o recurso existente para o novo state:
+```bash
+cd environments/shared
+terraform import <address> <aws_id>
+```
+
+O Terraform agora "conhece" o recurso no novo state.
+
+### Passo 3: terraform state rm na origem
+
+Remover o recurso do state antigo:
+```bash
+cd environments/dev
+terraform state rm <address>
+```
+
+O Terraform "esquece" o recurso no state antigo — mas **não o destrói na AWS**.
+
+### Passo 4: Validar ambos
+
+```bash
+cd environments/shared && terraform plan  # No changes ✅
+cd environments/dev && terraform plan     # No changes ✅
+```
+
+Se ambos mostram "No changes", a migração foi bem-sucedida.
 
 ---
 
-## 2. terraform state rm
+## 📊 Recursos migrados nesta fase
 
-Remover recurso do state antigo:
-```powershell
-terraform state rm
-```
-
----
-
-# Conceito importante
-
-```text
-terraform state rm
-↓
-remove do state
-↓
-não remove AWS
-```
+| Recurso | Origem | Destino | Método |
+|---------|--------|---------|--------|
+| OIDC Provider | dev | shared | import + state rm |
+| IAM Role (GitHub) | dev | shared | import + state rm |
+| IAM Policies | dev | shared | import + state rm |
+| Budget | dev | shared | import + state rm |
 
 ---
 
-# Benefícios
+## ⚠️ Cuidados importantes
 
-```text
-✅ Sem downtime
-✅ Sem destruir produção
-✅ Migração controlada
-✅ Refatoração segura
-✅ Evolução arquitetural
-```
+### Nunca fazer import sem state rm na origem
+Se o recurso existir em dois states, ambos tentarão gerenciá-lo — causando conflitos.
 
----
+### Sempre validar com plan antes e depois
+O `terraform plan` deve mostrar "No changes" em ambos os ambientes após a migração.
 
-# Aprendizados da fase
+### state rm não destrói recursos
+É seguro executar `state rm` — ele apenas remove a referência do state file, sem tocar na AWS.
 
-```text
-Terraform State
-Import Strategy
-Shared Resources
-Resource Ownership
-State Separation
-Cloud Governance
-```
+### Ordem importa
+1. Primeiro: import no destino
+2. Depois: state rm na origem
+
+Se fizer na ordem inversa, o `terraform plan` na origem pode tentar recriar o recurso.
 
 ---
 
-# Resultado final
+## 📚 Documentação oficial
 
-CloudTrilhas passou a possuir:
-```text
-DEV
-PROD
-SHARED
+- https://developer.hashicorp.com/terraform/cli/commands/import
+- https://developer.hashicorp.com/terraform/cli/commands/state/rm
+- https://developer.hashicorp.com/terraform/cli/commands/state/mv
+- https://developer.hashicorp.com/terraform/language/state
+
+---
+
+## 📈 Aprendizados
+
+| Conceito | Aplicação |
+|----------|-----------|
+| Terraform State | Representa a "verdade" sobre a infraestrutura |
+| Import | Assume controle de recurso existente |
+| State rm | Libera recurso sem destruí-lo |
+| Resource Ownership | Cada recurso deve ter um único "dono" (state) |
+| Zero Downtime Migration | Possível com import + state rm |
+
+---
+
+## 🏁 Estado final do projeto
+
+```
+environments/shared/  → OIDC, Budget (recursos da conta)
+environments/dev/     → Infraestrutura DEV (isolada)
+environments/prod/    → Infraestrutura PROD (isolada)
 ```
 
-Com ownership correto dos recursos AWS.
+Cada recurso tem um único state responsável. Governança clara e madura.

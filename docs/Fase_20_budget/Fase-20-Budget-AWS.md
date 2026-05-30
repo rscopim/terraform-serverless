@@ -1,20 +1,18 @@
-# Fase 20 — Budget AWS + Controle Financeiro
+# Fase 20 — AWS Budgets (Governança Financeira)
 
 ## 🎯 Objetivo
 
-Criar monitoramento financeiro da aplicação CloudTrilhas utilizando AWS Budgets, permitindo acompanhamento de custos da infraestrutura e geração de alertas automáticos quando limites definidos forem atingidos.
-O objetivo desta fase é fortalecer governança financeira e aplicar práticas de FinOps dentro do ambiente AWS.
+Implementar controle financeiro da infraestrutura CloudTrilhas utilizando AWS Budgets, com alertas automáticos por email quando limites de gastos são atingidos, aplicando práticas de FinOps.
 
 ---
 
 ## 🏗️ O que foi criado
 
-* AWS Budget mensal
-* Filtro por tag de projeto
-* Cost Allocation Tag
-* Alertas automáticos por percentual de consumo
-* Integração com notificações por e-mail
-* Monitoramento isolado do CloudTrilhas
+- Budget mensal com limite de $10.00
+- Filtro por Cost Allocation Tag (`Project=Terraform-Serverless`)
+- Alertas automáticos em 4 thresholds (20%, 50%, 80%, 100%)
+- Notificação por email para o administrador
+- Módulo Terraform (`modules/budget/`)
 
 ---
 
@@ -22,208 +20,124 @@ O objetivo desta fase é fortalecer governança financeira e aplicar práticas d
 
 ### AWS Budgets
 
-Serviço da AWS utilizado para monitorar gastos, utilização e custos previstos da conta.
-Permite criação de alertas automáticos quando limites definidos são atingidos.
-
----
+Serviço de governança financeira que permite definir orçamentos e receber alertas quando gastos se aproximam ou excedem limites definidos. Suporta budgets de custo, uso e reservas.
 
 ### FinOps
 
-Prática utilizada para gestão financeira em ambientes cloud.
-Objetivo:
-* Controle de custos
-* Otimização financeira
-* Governança cloud
-* Visibilidade operacional
-
----
+Prática de gestão financeira em cloud que combina engenharia, finanças e negócios para otimizar custos. Princípios:
+- Visibilidade de gastos
+- Otimização contínua
+- Accountability por equipe/projeto
+- Decisões baseadas em dados
 
 ### Cost Allocation Tags
 
-Tags utilizadas para separar custos entre projetos, aplicações ou ambientes.
+Tags aplicadas aos recursos AWS que permitem segmentar custos por projeto, ambiente ou equipe no Cost Explorer e Budgets.
+
 Tag utilizada:
-```text
-Project=Terraform-Serverless```
-Dessa forma somente recursos relacionados ao CloudTrilhas são contabilizados.
----
-
-### Budget Threshold
-
-Percentual configurado para disparo de alertas financeiros.
-Configuração aplicada:
-```text
-20%
-50%
-80%
-100%
+```
+Project = Terraform-Serverless
 ```
 
----
+Isso garante que apenas recursos do CloudTrilhas sejam contabilizados no budget.
 
-### Cost Budget
+### Thresholds de Alerta
 
-Tipo de orçamento utilizado para acompanhar gastos financeiros.
-Periodicidade:
-```text
-MONTHLY
-```
+Percentuais configurados para disparo de notificações:
+
+| Threshold | Ação |
+|-----------|------|
+| 20% ($2.00) | Alerta informativo |
+| 50% ($5.00) | Atenção |
+| 80% ($8.00) | Alerta crítico |
+| 100% ($10.00) | Limite atingido |
+
+### Budget Type: COST
+
+Tipo de orçamento que monitora gastos financeiros reais (não uso ou reservas). Periodicidade mensal com reset automático.
 
 ---
 
 ## ⚙️ Como funciona
 
-Fluxo operacional:
-```text
-Recursos AWS
-(Lambda / S3 / CloudFront / DynamoDB / API Gateway)
-↓
-Tags aplicadas
-Project=Terraform-Serverless
-↓
-Cost Allocation Tags
-↓
-AWS Budget
-↓
-Verificação consumo financeiro
-↓
-Threshold atingido
-↓
-Notificação E-mail
 ```
+Recursos AWS executam (Lambda, S3, CloudFront, etc.)
+        ↓
+AWS registra custos por serviço
+        ↓
+Cost Allocation Tags filtram por projeto
+        ↓
+Budget compara gasto atual vs limite ($10)
+        ↓
+Threshold atingido (20%, 50%, 80%, 100%)
+        ↓
+Notificação automática por email
+```
+
+---
+
+## 📁 Arquivos principais
+
+| Arquivo | Função |
+|---------|--------|
+| `modules/budget/main.tf` | Budget + Thresholds + Notifications |
+| `modules/budget/variables.tf` | Limite, email, projeto |
 
 ---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/budgets_budget
-* https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html
-* https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html
-* https://aws.amazon.com/aws-cost-management/aws-budgets/
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/budgets_budget
+- https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html
+- https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html
 
 ---
 
-## 🧪 Como validar
+## 🧪 Como testar
 
-### Validar Cost Allocation Tag
+```bash
+# Verificar budget criado
+aws budgets describe-budgets --account-id <ACCOUNT_ID>
 
-Abrir:
-```text
-Billing and Cost Management
-→ Cost Allocation Tags
-→ User Defined
-```
-
-Validar:
-```text
-Project
-```
-
-Status esperado:
-```text
-Active
+# Verificar Cost Allocation Tag ativa
+# Console: Billing → Cost Allocation Tags → User Defined
+# Tag "Project" deve estar com status "Active"
 ```
 
 ---
 
-### Validar Budget
+## ⚠️ Passo manual necessário
 
-Abrir:
-```text
-Billing
-→ Budgets
-```
+A ativação da Cost Allocation Tag deve ser feita via Billing Console:
 
-Selecionar:
-```text
-Terraform-Serverless-dev-monthly-budget
-```
+1. Billing and Cost Management → Cost Allocation Tags
+2. User-defined cost allocation tags
+3. Selecionar tag `Project`
+4. Ativar
 
-Verificar:
-* Valor mensal
-* Thresholds
-* Filtro aplicado
+Esse passo é administrativo e não pode ser automatizado via Terraform.
 
 ---
 
-### Validar filtro
+## 💰 Custos monitorados
 
-Verificar:
-```text
-Project=Terraform-Serverless
-```
+| Serviço | Custo estimado/mês |
+|---------|-------------------|
+| Route 53 | ~$0.50 |
+| S3 + CloudFront | ~$0.05 |
+| Lambda + API GW | ~$0.00 (Free Tier) |
+| DynamoDB | ~$0.00 (Free Tier) |
+| CloudTrail | ~$0.00 |
+| **Total** | **< $1.00** |
 
-Resultado esperado:
-
-Somente recursos do CloudTrilhas sendo contabilizados.
-
----
-
-### Validar notificações
-
-Threshold configurado:
-```text
-20%
-50%
-80%
-100%
-```
-
-Ao atingir limite:
-
-```text
-Notificação automática por e-mail
-```
+Budget de $10 oferece margem confortável para crescimento.
 
 ---
 
 ## 📈 Resultado esperado
 
-Ao final desta fase o CloudTrilhas deve possuir:
-* Monitoramento financeiro
-* Governança de custos
-* Visibilidade operacional
-* Alertas financeiros automáticos
-* Separação de custos por projeto
-* Aplicação de práticas FinOps
-
----
-
-## 💰 Recursos monitorados
-
-Custos relacionados ao:
-* CloudFront
-* Lambda
-* DynamoDB
-* API Gateway
-* S3
-* SNS
-* EventBridge
-* CloudTrail
-* CloudWatch
-* Route53
-
-Filtrados por:
-
-```text
-Project=Terraform-Serverless
-```
-
----
-
-## 🚀 Evolução futura
-
-Próximas melhorias:
-* Dashboard financeiro CloudWatch
-* AWS Cost Explorer avançado
-* Relatórios financeiros mensais
-* Otimização contínua de custos
-* Monitoramento preditivo de gastos
-
----
-
-## 📌 Observação operacional
-
-A ativação da Cost Allocation Tag foi realizada via Billing Console.
-
-Motivo:
-Billing e gerenciamento financeiro pertencem à camada administrativa da conta AWS, não sendo parte direta da infraestrutura provisionada via Terraform.
+- Governança financeira implementada
+- Alertas automáticos antes de gastos inesperados
+- Custos isolados por projeto via tags
+- Visibilidade operacional sobre gastos
+- Prática FinOps aplicada desde o início do projeto

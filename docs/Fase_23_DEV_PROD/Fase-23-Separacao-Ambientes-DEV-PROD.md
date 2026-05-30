@@ -1,339 +1,159 @@
 # Fase 23 — Separação de Ambientes DEV / PROD
 
-## Objetivo
+## 🎯 Objetivo
 
-Evoluir o CloudTrilhas para um padrão mais próximo de ambientes corporativos, separando completamente os ambientes de desenvolvimento e produção.
-
-Antes desta fase:
-```text
-DEV + PROD compartilhavam a mesma infraestrutura
-```
-
-Após esta fase:
-```text
-DEV → Ambiente isolado para testes
-PROD → Ambiente estável para produção
-```
+Separar completamente os ambientes de desenvolvimento e produção do CloudTrilhas, garantindo isolamento total de infraestrutura, state, domínios e dados — padrão obrigatório em ambientes corporativos.
 
 ---
 
-# Cenário inicial
+## 🏗️ O que foi criado
 
-Estrutura anterior:
-```text
-terraform-serverless/
-environments/
-└── dev/
-modules/
-docs/
-```
-
-Problema:
-```text
-Alterações de desenvolvimento
-podiam impactar produção.
-```
-
-Exemplos de risco:
-- Mesmo bucket S3
-- Mesmo domínio
-- Mesmo state Terraform
-- Mesmo ambiente operacional
+- Diretório `environments/prod/` com configuração independente
+- Terraform State separado (keys diferentes no mesmo bucket S3)
+- Buckets S3 isolados por ambiente
+- Domínios DNS separados (dev vs prod)
+- Certificados ACM independentes
+- Distribuições CloudFront separadas
+- Variáveis parametrizadas via `terraform.tfvars`
 
 ---
 
-# Conceito adotado
+## 🧠 Conceitos importantes
 
-Separação de ambientes:
-```text
-DEV
-↓
-Testes
-Validação
-Mudanças rápidas
-↓
-PROD
-Produção
-Estabilidade
-Proteção operacional
-```
----
+### Isolamento de Ambientes
 
-# Nova estrutura
+Princípio fundamental: alterações em DEV nunca devem impactar PROD. Isso requer separação de:
+- State Terraform
+- Recursos AWS (buckets, tabelas, APIs)
+- Domínios e certificados
+- Pipelines de deploy
 
-Nova organização:
-```text
-terraform-serverless/
-environments/
-├── dev/
-│
-├── prod/
-modules/
-docs/
-.github/
-```
+### Terraform State por Ambiente
 
-Cada ambiente possui:
-
-```text
-backend.tf
-providers.tf
-variables.tf
-terraform.tfvars
-main.tf
-outputs.tf
-```
-
----
-
-# Separação do Terraform State
-
-Antes:
-```text
-1 único state
-```
-
-Depois:
-DEV:
-```hcl
-terraform {
-  backend "s3" {
-    bucket = "terraform-serverless-projeto-trilhas"
-    key = "environments/dev/terraform.tfstate"
-    region = "us-west-2"
-    encrypt = true
-  }
-}
-```
-
-PROD:
-```hcl
-terraform {
-  backend "s3" {
-    bucket = "terraform-serverless-projeto-trilhas"
-    key = "environments/prod/terraform.tfstate"
-    region = "us-west-2"
-    encrypt = true
-  }
-}
-```
-
-Resultado:
-```text
-State DEV separado do PROD
-```
-
----
-
-# Evolução das variáveis
-
-Antes:
-```hcl
-default = "dev"
-```
-
-Problema:
-```text
-Estrutura e valores misturados.
-```
-
-Depois:
-variables.tf:
+Cada ambiente possui seu próprio state file no S3:
 
 ```hcl
-variable "environment" {
-  description = "Ambiente"
-  type = string
-}
+# DEV
+key = "environments/dev/terraform.tfstate"
+
+# PROD
+key = "environments/prod/terraform.tfstate"
 ```
 
-terraform.tfvars:
-DEV:
+Isso garante que `terraform destroy` em DEV não afeta PROD.
+
+### Parametrização via tfvars
+
+A mesma estrutura de módulos é reutilizada, com valores diferentes por ambiente:
+
+**DEV (`terraform.tfvars`):**
 ```hcl
 environment = "dev"
 domain_name = "dev.cloudtrilhas.com.br"
+bucket_name = "materiais-e-trilhas-dev"
 ```
 
-PROD:
+**PROD (`terraform.tfvars`):**
 ```hcl
 environment = "prod"
 domain_name = "cloudtrilhas.com.br"
+bucket_name = "materiais-e-trilhas-de-estudos"
 ```
 
-Resultado:
-```text
-Estrutura separada dos valores.
+### Módulos Reutilizáveis
+
+Os 17 módulos Terraform são compartilhados entre ambientes. A diferença está apenas nos valores das variáveis — o código é idêntico.
+
+---
+
+## ⚙️ Arquitetura multi-ambiente
+
+```
+terraform-serverless/
+├── environments/
+│   ├── dev/           ← Testes e validações
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── terraform.tfvars
+│   │   └── backend.tf (key: dev/terraform.tfstate)
+│   │
+│   ├── prod/          ← Produção estável
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── terraform.tfvars
+│   │   └── backend.tf (key: prod/terraform.tfstate)
+│   │
+│   └── shared/        ← Recursos globais (Fase 24)
+│
+└── modules/           ← Código compartilhado
 ```
 
 ---
 
-# Bucket S3 isolado
+## 🌐 Separação de domínios
 
-Antes:
-```text
-materiais-e-trilhas-de-estudos
-```
-
-Problema:
-```text
-DEV poderia impactar PROD
-```
-
-Novo modelo:
-DEV:
-```text
-materiais-e-trilhas-dev
-```
-
-PROD:
-```text
-materiais-e-trilhas-de-estudos
-```
-
-Resultado:
-```text
-Buckets isolados
-```
+| Ambiente | URL | Bucket |
+|----------|-----|--------|
+| DEV | https://www.dev.cloudtrilhas.com.br | materiais-e-trilhas-dev |
+| PROD | https://www.cloudtrilhas.com.br | materiais-e-trilhas-de-estudos |
 
 ---
 
-# URLs isoladas
+## 🔐 Separação de segurança
 
-DEV:
-```text
-https://dev.cloudtrilhas.com.br
-```
-
-PROD:
-```text
-https://cloudtrilhas.com.br
-```
-
-PDF DEV:
-```text
-https://dev.cloudtrilhas.com.br/materiais/
-```
-
-PDF PROD:
-```text
-https://cloudtrilhas.com.br/materiais/
-```
-
-Resultado:
-```text
-Ambientes independentes
-```
----
-
-# ACM e DNS
-
-DEV utiliza:
-```text
-dev.cloudtrilhas.com.br
-```
-
-Fluxo:
-```text
-Terraform Apply
-↓
-ACM cria certificado
-↓
-Route53 cria DNS
-↓
-DNS propaga
-↓
-ACM valida
-↓
-ISSUED
-```
-
-Importante:
-
-```text
-CloudFront utiliza ACM em us-east-1
-```
+| Recurso | DEV | PROD |
+|---------|-----|------|
+| State | `dev/terraform.tfstate` | `prod/terraform.tfstate` |
+| CloudFront | Distribution separada | Distribution separada |
+| ACM | Certificado dev.* | Certificado raiz |
+| DynamoDB | Tabela *-dev-leads | Tabela *-prod-leads |
+| API Gateway | API separada | API separada |
 
 ---
 
-# Estado final
+## 📚 Documentação oficial
 
-PROD:
-```text
-CloudTrilhas produção
-State separado
-Bucket produção
-Domínio produção
-Protegido
-```
-
-DEV:
-```text
-CloudTrilhas laboratório
-Infraestrutura isolada
-Bucket separado
-Domínio separado
-```
+- https://developer.hashicorp.com/terraform/language/settings/backends/s3
+- https://developer.hashicorp.com/terraform/language/values/variables
+- https://developer.hashicorp.com/terraform/tutorials/modules/module-use
 
 ---
 
-# Benefícios obtidos
+## 🧪 Como operar
 
-- Separação real de ambientes
-- State isolado
-- Buckets isolados
-- DNS separado
-- Menor risco operacional
-- Melhor aderência mercado
-- Pipeline preparada para evolução futura
-- Estrutura próxima ambientes corporativos
+```bash
+# Trabalhar no DEV
+cd environments/dev
+terraform init
+terraform plan
+terraform apply
 
----
-
-# Lições aprendidas
-
-## State Terraform é ambiente
-
-State não representa apenas infraestrutura.
-Representa:
-```text
-Infraestrutura
-+
-Referência operacional
-```
-
----
-
-## DEV e PROD nunca devem compartilhar recursos críticos
-
-Itens críticos:
-- S3
-- Route53
-- CloudFront
-- State
-- ACM
-
----
-
-## Migração precisa ser controlada
-
-Nunca executar:
-```text
+# Trabalhar no PROD (separado)
+cd environments/prod
+terraform init
+terraform plan
 terraform apply
 ```
 
-sem validar:
-```text
-terraform plan
-```
+---
+
+## ⚠️ Lições aprendidas
+
+### State é identidade do ambiente
+Cada state representa um ambiente completo. Nunca compartilhar state entre DEV e PROD.
+
+### DEV e PROD nunca compartilham recursos críticos
+Buckets, tabelas, APIs e distribuições devem ser independentes.
+
+### Migração requer cuidado
+Ao separar ambientes, usar `terraform plan` antes de qualquer `apply` para validar que nenhum recurso será destruído acidentalmente.
 
 ---
 
-# Próximos passos
+## 📈 Resultado esperado
 
-Fase futura:
-```text
-Pipeline DEV → PROD separada
-```
-
-CloudTrilhas
-Projeto educacional focado em AWS, DevOps, Terraform e Arquitetura Cloud.
+- Ambientes completamente isolados
+- Alterações em DEV não impactam PROD
+- Mesmo código, valores diferentes
+- Deploy independente por ambiente
+- Estrutura pronta para escalar (staging, QA, etc.)

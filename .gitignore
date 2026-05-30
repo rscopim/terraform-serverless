@@ -16,3 +16,12 @@ package-lock.json
 
 # IDE
 .vscode/
+
+# Local templates (não subir)
+templates/
+
+# Documentos internos
+docs/MELHORIAS-E-EVOLUCAO.md
+
+# Backup
+static_site_backup/

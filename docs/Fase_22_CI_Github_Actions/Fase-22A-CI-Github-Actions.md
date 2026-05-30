@@ -1,200 +1,136 @@
-# Fase 22A — CI Seguro com GitHub Actions
+# Fase 22A — CI Seguro com GitHub Actions + OIDC
 
 ## 🎯 Objetivo
 
-Criar pipeline CI (Continuous Integration) utilizando GitHub Actions para validação automática da infraestrutura Terraform antes da implantação.
-Objetivo:
-Automatizar validações e aumentar segurança operacional.
+Criar a pipeline de Continuous Integration utilizando GitHub Actions com autenticação OIDC na AWS, executando validações automáticas do Terraform a cada push no repositório.
 
 ---
 
 ## 🏗️ O que foi criado
 
-* GitHub Actions Workflow
-* Integração GitHub + AWS
-* OIDC Provider
-* IAM Role temporária
-* Terraform Validate automático
-* Terraform Plan automático
-* Terraform Format Check automático
+- GitHub Actions Workflow (`.github/workflows/terraform-ci.yml`)
+- OIDC Provider na conta AWS
+- IAM Role para GitHub Actions com trust policy
+- Jobs: Format Check → Init → Validate → Plan
+- Integração segura sem access keys
 
 ---
 
 ## 🧠 Conceitos importantes
 
-### Continuous Integration (CI)
+### Workflow YAML
 
-Prática utilizada para validar automaticamente alterações enviadas ao repositório.
-Objetivo:
-* Reduzir erros
-* Garantir qualidade
-* Automatizar verificações
-
----
-
-### GitHub Actions
-
-Serviço utilizado para execução automática de pipelines CI/CD.
-Permite:
-* Build
-* Testes
-* Deploy
-* Validação Terraform
-
----
-
-### OIDC
-
-OpenID Connect.
-Permite autenticação segura entre GitHub e AWS.
-Fluxo:
-```text
-GitHub
-↓
-OIDC
-↓
-IAM Role temporária
-↓
-AWS
+Arquivo que define a automação. Estrutura:
+```yaml
+on: [push, pull_request]  # Trigger
+jobs:
+  terraform-plan:          # Job
+    runs-on: ubuntu-latest # Runner
+    steps:                 # Passos sequenciais
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v5
+      - uses: hashicorp/setup-terraform@v4
+      - run: terraform fmt -check
+      - run: terraform init
+      - run: terraform validate
+      - run: terraform plan
 ```
 
-Benefício:
-```text
-Sem Access Key
-Sem Secret Key
+### Runner
+
+Máquina virtual temporária (Ubuntu) que executa os comandos do workflow. É criada no início do job e descartada ao final — nenhum dado persiste entre execuções.
+
+### OIDC Flow
+
+```
+GitHub Actions inicia job
+        ↓
+GitHub gera JWT token com claims:
+  - repository: rscopim/terraform-serverless
+  - ref: refs/heads/main
+  - environment: production
+        ↓
+configure-aws-credentials envia token para AWS STS
+        ↓
+STS valida token contra OIDC Provider
+        ↓
+STS emite credenciais temporárias (15min)
+        ↓
+Terraform usa credenciais para acessar AWS
 ```
 
----
+### Trust Policy
 
-### Terraform Validate
-
-Executa validação sintática da infraestrutura.
-Exemplo:
-```text
-terraform validate
-```
-
----
-
-### Terraform Plan
-
-Executa comparação:
-```text
-Código Terraform
-VS
-Infraestrutura atual AWS
-```
-
-Resultado:
-```text
-O que será criado
-O que será alterado
-O que será removido
+Define quem pode assumir a IAM Role:
+```json
+{
+  "Condition": {
+    "StringLike": {
+      "token.actions.githubusercontent.com:sub": [
+        "repo:rscopim/terraform-serverless:ref:refs/heads/main",
+        "repo:rscopim/terraform-serverless:environment:production",
+        "repo:rscopim/terraform-serverless:pull_request"
+      ]
+    }
+  }
+}
 ```
 
 ---
 
-## ⚙️ Como funciona
+## ⚙️ Pipeline executada
 
-Fluxo operacional:
-```text
-VSCode
-↓
-Git Add
-↓
-Git Commit
-↓
-Git Push
-↓
-GitHub Actions
-↓
-Terraform Format
-↓
-Terraform Init
-↓
-Terraform Validate
-↓
-Terraform Plan
 ```
-
-Resultado:
-```text
-Validação automática
+Push/PR no GitHub
+        ↓
+Job: terraform-plan
+  ├── Checkout código
+  ├── Configure AWS (OIDC)
+  ├── Setup Terraform 1.10.5
+  ├── terraform fmt -recursive -check
+  ├── terraform init
+  ├── terraform validate
+  └── terraform plan -out=tfplan
+        ↓
+Resultado visível na PR/Actions
 ```
 
 ---
 
-## 🔒 Modelo implementado
+## 📁 Arquivos principais
 
-Pipeline segura.
-Não executa:
-```text
-terraform apply
-```
-
-Objetivo:
-Evitar alterações automáticas não aprovadas.
+| Arquivo | Função |
+|---------|--------|
+| `.github/workflows/terraform-ci.yml` | Workflow completo |
+| `modules/github_actions_oidc/main.tf` | OIDC + IAM Role |
 
 ---
 
 ## 📚 Documentação oficial
 
-* https://docs.github.com/actions
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-* https://github.com/aws-actions/configure-aws-credentials
-* https://github.com/hashicorp/setup-terraform
+- https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+- https://github.com/aws-actions/configure-aws-credentials
+- https://github.com/hashicorp/setup-terraform
 
 ---
 
 ## 🧪 Como validar
 
-Executar:
-```powershell
-git add .
-git commit -m "teste pipeline"
-git push origin main
-```
+```bash
+# Push para branch
+git push origin feature/test
 
-Abrir:
-```text
-GitHub
-↓
-Actions
-```
-
-Validar execução:
-```text
-Terraform Format Check
-Terraform Init
-Terraform Validate
-Terraform Plan
-```
-
-Resultado esperado:
-```text
-Success
+# Abrir GitHub → Actions
+# Verificar execução do workflow
+# Todos os steps devem estar ✅
 ```
 
 ---
 
 ## 📈 Resultado esperado
 
-Ao final desta fase o CloudTrilhas deve possuir:
-* CI automatizada
-* Validação automática Terraform
-* Integração segura GitHub + AWS
-* Pipeline moderna
-* Segurança operacional
-
----
-
-## 📌 Observação operacional
-
-Integração AWS realizada utilizando:
-```text
-OIDC + IAM Role temporária
-```
-
-Modelo moderno utilizado em ambientes corporativos.
-Objetivo:
-Eliminar uso de credenciais estáticas.
+- Cada push dispara validação automática
+- Erros de formatação detectados antes do merge
+- Plan visível para review antes de aplicar
+- Autenticação segura via OIDC
+- Zero secrets de longa duração no GitHub

@@ -1,27 +1,18 @@
-# Fase 18 — OAC + Geo Restriction
+# Fase 18 — OAC + Geo Restriction (Segurança Avançada)
 
 ## 🎯 Objetivo
 
-Elevar a segurança do portal CloudTrilhas utilizando boas práticas recomendadas pela AWS, impedindo acesso direto ao bucket S3 e restringindo o acesso ao portal para regiões específicas.
-
-Nesta fase foram implementados:
-
-* Origin Access Control (OAC)
-* Bucket S3 privado
-* Restrição geográfica via CloudFront (Geo Restriction)
+Elevar a segurança do portal CloudTrilhas implementando Origin Access Control (OAC) para impedir acesso direto ao S3 e Geo Restriction para limitar acesso geográfico, reduzindo a superfície de ataque da aplicação.
 
 ---
 
 ## 🏗️ O que foi criado
 
-* Bucket S3 privado
-* CloudFront utilizando Origin Access Control (OAC)
-* Remoção de acesso público direto ao S3
-* Política de acesso restrita ao CloudFront
-* Bloqueio total de acesso público no bucket
-* Restrição geográfica permitindo somente:
-  * América do Sul
-  * Portugal
+- Origin Access Control (OAC) no CloudFront
+- Bucket S3 configurado como privado (Block Public Access total)
+- Bucket Policy restrita exclusivamente ao CloudFront
+- Geo Restriction com whitelist de países permitidos
+- Remoção de qualquer acesso público ao S3
 
 ---
 
@@ -29,230 +20,127 @@ Nesta fase foram implementados:
 
 ### Origin Access Control (OAC)
 
-Mecanismo do CloudFront utilizado para acessar buckets S3 privados de forma segura.
+Mecanismo moderno do CloudFront para acessar buckets S3 privados. Substitui o antigo OAI (Origin Access Identity) e utiliza assinatura SigV4 para autenticação segura.
 
-O OAC substitui abordagens antigas de acesso público ou Origin Access Identity (OAI), utilizando assinatura SigV4 para autenticação.
-
----
-
-### Bucket Privado
-
-Bucket S3 configurado sem acesso público.
-
-Todo o acesso ao conteúdo passa obrigatoriamente pelo CloudFront.
-
----
+Benefícios sobre OAI:
+- Suporte a SSE-KMS
+- Melhor integração com IAM
+- Assinatura SigV4 (mais segura)
+- Recomendado pela AWS para novos projetos
 
 ### Block Public Access
 
-Configuração de segurança do S3 utilizada para impedir exposição pública acidental.
+Configuração de segurança do S3 que impede qualquer forma de acesso público:
+- ✅ Block Public ACLs
+- ✅ Ignore Public ACLs
+- ✅ Block Public Policies
+- ✅ Restrict Public Buckets
 
-Foram habilitadas:
+Com todas as opções habilitadas, é impossível tornar o bucket público acidentalmente.
 
-* Block Public ACLs
-* Ignore Public ACLs
-* Block Public Bucket Policies
-* Restrict Public Bucket Policies
+### Geo Restriction (Restrição Geográfica)
 
----
+Recurso do CloudFront que permite ou bloqueia acesso com base na localização geográfica do usuário (determinada pelo IP).
 
-### Geo Restriction
+Países permitidos neste projeto:
+- 🇧🇷 Brasil e toda América do Sul
+- 🇵🇹 Portugal
 
-Recurso nativo do CloudFront utilizado para restringir acesso por localização geográfica.
+### Bucket Policy com Condition
 
-Permissões aplicadas:
+A policy do bucket permite apenas requisições originadas do CloudFront, validando o ARN da distribuição:
 
-* Brasil
-* Argentina
-* Bolívia
-* Chile
-* Colômbia
-* Equador
-* Guiana
-* Paraguai
-* Peru
-* Suriname
-* Uruguai
-* Venezuela
-* Portugal
-
-Todo o restante permanece bloqueado.
-
----
-
-### SigV4
-
-Mecanismo de assinatura segura utilizado pelo CloudFront para autenticação junto ao bucket S3.
+```json
+{
+  "Condition": {
+    "StringEquals": {
+      "AWS:SourceArn": "<CLOUDFRONT_DISTRIBUTION_ARN>"
+    }
+  }
+}
+```
 
 ---
 
 ## ⚙️ Como funciona
 
-Fluxo atual do portal:
-
-1. O usuário acessa:
-
-```text
-https://cloudtrilhas.com.br
+```
+Usuário acessa cloudtrilhas.com.br
+        ↓
+CloudFront verifica localização geográfica
+        ↓
+┌───────┴───────┐
+↓               ↓
+Permitido       Bloqueado
+(América do     (403 Forbidden)
+ Sul + PT)
+        ↓
+CloudFront autentica no S3 via OAC (SigV4)
+        ↓
+S3 valida Bucket Policy (SourceArn)
+        ↓
+Conteúdo entregue ao usuário
 ```
 
-2. O CloudFront valida a origem geográfica
-
-3. Caso permitido:
-
-```text
-América do Sul
-Portugal
+Acesso direto ao S3 (sem CloudFront):
+```
+Usuário → S3 URL direta → 403 Access Denied
 ```
 
-4. O CloudFront utiliza OAC para autenticar no bucket S3
+---
 
-5. O bucket S3 entrega o conteúdo
+## 📁 Arquivos principais
 
-6. O portal é exibido ao usuário
-
-Fluxo final:
-
-```text
-Usuário
-   ↓
-CloudFront
-(Geo Restriction)
-   ↓
-Origin Access Control (OAC)
-   ↓
-Bucket S3 Privado
-```
+| Arquivo | Função |
+|---------|--------|
+| `modules/cloudfront/main.tf` | OAC + Geo Restriction |
+| `modules/s3_static_site/main.tf` | Block Public Access + Policy |
 
 ---
 
 ## 📚 Documentação oficial
 
-* https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_control
-
-* https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
-
-* https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html
-
-* https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
+- https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_control
+- https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
 
 ---
 
 ## 🧪 Como testar
 
-### Validar bucket privado
+```bash
+# Testar acesso direto ao S3 (deve falhar)
+curl https://materiais-e-trilhas-dev.s3.us-west-2.amazonaws.com/index.html
+# Resultado: 403 Forbidden / Access Denied
 
-Acessar URL direta do bucket:
+# Testar acesso via CloudFront (deve funcionar)
+curl -I https://www.dev.cloudtrilhas.com.br
+# Resultado: 200 OK
 
-```text
-https://bucket.s3.amazonaws.com/index.html
-```
-
-Resultado esperado:
-
-```text
-403 Forbidden
-```
-
-ou:
-
-```text
-Access Denied
+# Verificar Block Public Access
+aws s3api get-public-access-block --bucket materiais-e-trilhas-dev
+# Todas as opções devem ser true
 ```
 
 ---
 
-### Validar portal
+## 🔐 Segurança aplicada nesta fase
 
-Acessar:
-
-```text
-https://cloudtrilhas.com.br
-```
-
-Resultado esperado:
-
-Portal funcionando normalmente.
-
----
-
-### Validar Block Public Access
-
-Abrir:
-
-```text
-Amazon S3
-→ Bucket
-→ Permissions
-→ Block Public Access
-```
-
-Validar:
-
-* ✅ Block Public ACLs
-* ✅ Ignore Public ACLs
-* ✅ Block Public Policies
-* ✅ Restrict Public Buckets
-
----
-
-### Validar Geo Restriction
-
-Abrir:
-
-```text
-CloudFront
-→ Distribution
-→ Security
-→ Geographic Restrictions
-```
-
-Validar:
-
-```text
-Allow List
-```
-
-Países permitidos:
-
-* América do Sul
-* Portugal
+| Controle | Proteção |
+|----------|----------|
+| OAC | Impede acesso direto ao S3 |
+| Block Public Access | Impede exposição acidental |
+| Geo Restriction | Limita acesso por região |
+| HTTPS | Criptografia em trânsito |
+| SigV4 | Autenticação segura CloudFront → S3 |
 
 ---
 
 ## 📈 Resultado esperado
 
-Ao final da fase:
-
-* Bucket privado
-* CloudFront como único ponto de entrada
-* Bloqueio de acesso direto ao S3
-* Restrição geográfica ativa
-* Menor superfície de exposição
-* Melhor alinhamento com AWS Well-Architected Framework
-
----
-
-## 🔐 Segurança aplicada
-
-* Origin Access Control (OAC)
-* Bucket privado
-* Block Public Access
-* HTTPS obrigatório
-* TLS 1.2+
-* Geo Restriction
-* CloudFront como camada de proteção
-
----
-
-## 🚀 Evolução futura
-
-Próximas melhorias previstas:
-
-* AWS WAF
-* Rate Limiting
-* AWS Managed Rules
-* Proteção contra SQL Injection
-* Proteção contra XSS
-* CloudWatch Security Monitoring
-* Well-Architected Review
+- Bucket completamente privado (zero acesso público)
+- CloudFront como único ponto de entrada
+- Acesso restrito a América do Sul + Portugal
+- Menor superfície de exposição
+- Alinhamento com AWS Well-Architected Framework (pilar Segurança)

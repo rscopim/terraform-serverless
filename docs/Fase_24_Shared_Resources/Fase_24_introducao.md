@@ -1,98 +1,114 @@
-# Fase 24 — Shared Resources
+# Fase 24 — Shared Resources (Introdução)
 
-## Objetivo
+## 🎯 Objetivo
 
-Nesta fase o projeto CloudTrilhas evoluiu para um modelo mais próximo de arquiteturas corporativas, separando recursos compartilhados da conta AWS dos ambientes DEV e PROD.
-
----
-
-# Problema identificado
-
-Durante a separação dos ambientes DEV e PROD foram encontrados recursos globais da conta AWS sendo criados em múltiplos ambientes.
-
-Exemplos:
-```text
-GitHub OIDC
-
-Budget
-CloudTrail
-```
-
-Problemas causados:
-```text
-EntityAlreadyExists
-DuplicateRecordException
-Conflito entre ambientes
-State inconsistente
-```
+Centralizar recursos que pertencem à conta AWS (não a um ambiente específico) em um diretório `shared/` com state independente, resolvendo conflitos de duplicação e aplicando o conceito de resource ownership.
 
 ---
 
-# Nova arquitetura
+## 📖 Estrutura da Fase 24
 
-```text
+| Sub-fase | Tema | Recurso |
+|----------|------|---------|
+| **24A** | Conceito de Shared Resources | Estrutura e backend |
+| **24B** | GitHub OIDC Shared | OIDC Provider + IAM Role |
+| **24C** | Budget Shared | AWS Budget centralizado |
+| **24D** | State Import Strategy | Migração sem downtime |
+
+---
+
+## 🧠 O problema
+
+Durante a separação DEV/PROD (Fase 23), alguns recursos causaram conflitos:
+
+```
+DEV: terraform apply → Cria OIDC Provider ✅
+PROD: terraform apply → EntityAlreadyExists ❌
+```
+
+**Causa**: Recursos como OIDC Provider e Budget são globais na conta AWS — só pode existir um de cada, independente do ambiente.
+
+---
+
+## 🏗️ Nova arquitetura
+
+```
 terraform-serverless/
-environments/
-├── shared/
-│   Recursos globais AWS
-│
-├── dev/
-│   Ambiente desenvolvimento
-│
-└── prod/
-    Ambiente produção
+├── environments/
+│   ├── shared/        ← Recursos da CONTA (1 por conta)
+│   │   ├── main.tf
+│   │   ├── backend.tf (key: shared/terraform.tfstate)
+│   │   └── OIDC, Budget
+│   │
+│   ├── dev/           ← Recursos do AMBIENTE dev
+│   │   └── Lambda, S3, CloudFront, API GW, etc.
+│   │
+│   └── prod/          ← Recursos do AMBIENTE prod
+│       └── Lambda, S3, CloudFront, API GW, etc.
 ```
 
 ---
 
-# Recursos Shared
+## 🧠 Conceitos importantes
 
-Nesta fase foram movidos:
-```text
-GitHub Actions OIDC
-AWS Budget
+### Resource Ownership
+
+Nem todo recurso pertence a um ambiente. Classificação:
+
+| Tipo | Pertence a | Exemplos |
+|------|-----------|----------|
+| Ambiente | DEV ou PROD | S3, Lambda, API GW, DynamoDB |
+| Conta | Shared | OIDC Provider, Budget, CloudTrail |
+
+### terraform import
+
+Comando para assumir controle de um recurso AWS já existente sem recriá-lo:
+```bash
+terraform import <resource_address> <aws_id>
+```
+
+### terraform state rm
+
+Remove um recurso do state **sem destruí-lo na AWS**:
+```bash
+terraform state rm <resource_address>
+```
+
+Usado para "mover" recursos entre states (remove do antigo, importa no novo).
+
+---
+
+## ⚙️ Estratégia de migração
+
+```
+1. Identificar recurso global (OIDC, Budget)
+        ↓
+2. Criar código no shared/
+        ↓
+3. terraform import no shared state
+        ↓
+4. terraform state rm no dev/prod state
+        ↓
+5. Recurso agora gerenciado pelo shared
+        ↓
+6. Zero downtime, zero recriação
 ```
 
 ---
 
-# Objetivos alcançados
+## 📚 Documentação oficial
 
-```text
-✅ Recursos compartilhados centralizados
-✅ State separado
-✅ DEV independente
-✅ PROD independente
-✅ Sem destroy em produção
-✅ Terraform state consistente
-✅ Arquitetura mais próxima mercado
-```
+- https://developer.hashicorp.com/terraform/cli/commands/import
+- https://developer.hashicorp.com/terraform/cli/commands/state/rm
+- https://developer.hashicorp.com/terraform/language/state
 
 ---
 
-# Conceito principal
+## 📈 Resultado final
 
-Nem todo recurso pertence ao ambiente.
-Alguns pertencem:
-```text
-Conta AWS
-```
-
-Exemplo:
-```text
-OIDC GitHub
-↓
-1 por conta AWS
-```
-
----
-
-# Resultado final
-
-CloudTrilhas agora possui:
-```text
-DEV
-PROD
-SHARED
-```
-
-Separados corretamente.
+- 3 states independentes: shared, dev, prod
+- Recursos globais centralizados
+- Zero conflitos entre ambientes
+- Ownership claro de cada recurso
+- Governança de infraestrutura madura
+- Arquitetura próxima de padrões enterprise
