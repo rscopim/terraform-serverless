@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — CloudFormation Módulo 02: Computação — VPC + EC2</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ CloudFormation — Módulo 02</span>
+        <h1>Computação: VPC + EC2 com SecurityGroups e UserData</h1>
+        <p>Provisione uma VPC completa com subnets, internet gateway, security groups e instâncias EC2 com bootstrap via UserData.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. VPC e Networking</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>VPC + Subnets</code><span class="cmd-tag">Rede</span></div>
+            <p>Criação de VPC com subnets públicas e privadas, Internet Gateway e Route Tables.</p>
+            <pre><code>Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-vpc"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-igw"
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.1.0/24"
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-public-1"
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.10.0/24"
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-private-1"
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Security Groups</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>SecurityGroup</code><span class="cmd-tag">Segurança</span></div>
+            <p>Security Groups atuam como firewalls virtuais controlando tráfego de entrada e saída.</p>
+            <pre><code>  WebServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group para Web Server"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+          Description: "HTTP público"
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0"
+          Description: "HTTPS público"
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHCidr
+          Description: "SSH restrito"
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: "0.0.0.0/0"
+          Description: "Saída irrestrita"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-web-sg"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. EC2 Instance com UserData e CreationPolicy</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>EC2 + UserData</code><span class="cmd-tag">Computação</span></div>
+            <p>UserData executa scripts no boot da instância. CreationPolicy aguarda sinal de sucesso antes de marcar como CREATE_COMPLETE.</p>
+            <pre><code>  WebServer:
+    Type: AWS::EC2::Instance
+    DependsOn: AttachGateway
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M
+    Properties:
+      ImageId: !FindInMap [RegionAMI, !Ref "AWS::Region", HVM64]
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref PublicSubnet1
+      SecurityGroupIds:
+        - !Ref WebServerSG
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-web-server"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y httpd aws-cfn-bootstrap
+
+          # Configurar Apache
+          systemctl start httpd
+          systemctl enable httpd
+          echo "&lt;h1&gt;Stack: ${AWS::StackName}&lt;/h1&gt;" > /var/www/html/index.html
+          echo "&lt;p&gt;Região: ${AWS::Region}&lt;/p&gt;" >> /var/www/html/index.html
+
+          # Sinalizar sucesso ao CloudFormation
+          /opt/aws/bin/cfn-signal -e $? \
+            --stack ${AWS::StackName} \
+            --resource WebServer \
+            --region ${AWS::Region}
+
+Outputs:
+  WebServerPublicIP:
+    Description: "IP público do Web Server"
+    Value: !GetAtt WebServer.PublicIp
+  WebServerURL:
+    Description: "URL do Web Server"
+    Value: !Sub "http://${WebServer.PublicDnsName}"</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

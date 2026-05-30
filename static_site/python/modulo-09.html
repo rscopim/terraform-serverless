@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python Módulo 09: Automação AWS com boto3</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-08.html" class="nav-link">← Anterior</a>
+        <a href="modulo-10.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐍 Python — Módulo 09</span>
+        <h1>Automação AWS com boto3: EC2, S3, Lambda, IAM, CloudWatch</h1>
+        <p>Automatize a infraestrutura AWS usando Python e a SDK oficial boto3.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. EC2 — Gerenciamento de Instâncias</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>boto3 EC2</code><span class="cmd-tag">AWS</span></div>
+            <pre><code>import boto3
+
+ec2 = boto3.resource("ec2", region_name="us-east-1")
+client = boto3.client("ec2", region_name="us-east-1")
+
+# Listar instâncias
+for instance in ec2.instances.all():
+    nome = next((t["Value"] for t in (instance.tags or []) if t["Key"] == "Name"), "N/A")
+    print(f"{nome} | {instance.id} | {instance.state['Name']} | {instance.instance_type}")
+
+# Criar instância
+instances = ec2.create_instances(
+    ImageId="ami-0c02fb55956c7d316",
+    InstanceType="t3.micro",
+    MinCount=1,
+    MaxCount=1,
+    KeyName="minha-chave",
+    TagSpecifications=[{
+        "ResourceType": "instance",
+        "Tags": [{"Key": "Name", "Value": "python-demo"}]
+    }]
+)
+print(f"Instância criada: {instances[0].id}")
+
+# Start/Stop
+client.stop_instances(InstanceIds=["i-0123456789abcdef0"])
+client.start_instances(InstanceIds=["i-0123456789abcdef0"])</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. S3 — Armazenamento de Objetos</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>boto3 S3</code><span class="cmd-tag">AWS</span></div>
+            <pre><code>s3 = boto3.client("s3")
+
+# Listar buckets
+response = s3.list_buckets()
+for bucket in response["Buckets"]:
+    print(f"{bucket['Name']} (criado: {bucket['CreationDate']})")
+
+# Upload de arquivo
+s3.upload_file("relatorio.pdf", "meu-bucket", "docs/relatorio.pdf")
+
+# Upload com metadados
+s3.upload_file(
+    "dados.json", "meu-bucket", "data/dados.json",
+    ExtraArgs={"ContentType": "application/json", "ServerSideEncryption": "AES256"}
+)
+
+# Download
+s3.download_file("meu-bucket", "docs/relatorio.pdf", "/tmp/relatorio.pdf")
+
+# Listar objetos
+paginator = s3.get_paginator("list_objects_v2")
+for page in paginator.paginate(Bucket="meu-bucket", Prefix="logs/"):
+    for obj in page.get("Contents", []):
+        print(f"{obj['Key']} ({obj['Size']} bytes)")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Lambda — Funções Serverless</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>boto3 Lambda</code><span class="cmd-tag">AWS</span></div>
+            <pre><code>import json
+
+lambda_client = boto3.client("lambda", region_name="us-east-1")
+
+# Invocar função Lambda
+payload = {"nome": "Ricardo", "acao": "processar"}
+response = lambda_client.invoke(
+    FunctionName="minha-funcao",
+    InvocationType="RequestResponse",  # síncrono
+    Payload=json.dumps(payload)
+)
+resultado = json.loads(response["Payload"].read())
+print(f"Status: {response['StatusCode']}, Resultado: {resultado}")
+
+# Invocação assíncrona
+lambda_client.invoke(
+    FunctionName="processar-fila",
+    InvocationType="Event",  # assíncrono (fire-and-forget)
+    Payload=json.dumps({"batch_id": "abc123"})
+)
+
+# Listar funções
+paginator = lambda_client.get_paginator("list_functions")
+for page in paginator.paginate():
+    for func in page["Functions"]:
+        print(f"{func['FunctionName']} | Runtime: {func['Runtime']} | Memória: {func['MemorySize']}MB")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. IAM e CloudWatch</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IAM</code><span class="cmd-tag">AWS</span></div>
+              <pre><code>iam = boto3.client("iam")
+
+# Listar usuários
+users = iam.list_users()
+for user in users["Users"]:
+    print(f"{user['UserName']} | Criado: {user['CreateDate']}")
+
+# Verificar MFA
+for user in users["Users"]:
+    mfa = iam.list_mfa_devices(UserName=user["UserName"])
+    status = "✅" if mfa["MFADevices"] else "❌"
+    print(f"{user['UserName']}: MFA {status}")
+
+# Listar políticas do usuário
+policies = iam.list_attached_user_policies(
+    UserName="ricardo"
+)
+for p in policies["AttachedPolicies"]:
+    print(p["PolicyName"])</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CloudWatch</code><span class="cmd-tag">AWS</span></div>
+              <pre><code>cw = boto3.client("cloudwatch")
+logs = boto3.client("logs")
+
+# Métricas de CPU
+from datetime import datetime, timedelta
+response = cw.get_metric_statistics(
+    Namespace="AWS/EC2",
+    MetricName="CPUUtilization",
+    Dimensions=[{"Name": "InstanceId", "Value": "i-012345"}],
+    StartTime=datetime.utcnow() - timedelta(hours=1),
+    EndTime=datetime.utcnow(),
+    Period=300,
+    Statistics=["Average"]
+)
+for dp in response["Datapoints"]:
+    print(f"{dp['Timestamp']}: {dp['Average']:.1f}%")
+
+# Criar alarme
+cw.put_metric_alarm(
+    AlarmName="CPU-Alta",
+    MetricName="CPUUtilization",
+    Namespace="AWS/EC2",
+    Statistic="Average",
+    Period=300,
+    EvaluationPeriods=2,
+    Threshold=80.0,
+    ComparisonOperator="GreaterThanThreshold"
+)</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-08.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-10.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

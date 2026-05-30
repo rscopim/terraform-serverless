@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python Módulo 05: Arquivos e Exceções</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-04.html" class="nav-link">← Anterior</a>
+        <a href="modulo-06.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐍 Python — Módulo 05</span>
+        <h1>Arquivos e Exceções: CSV, JSON, try/except</h1>
+        <p>Leitura e escrita de arquivos, manipulação de dados estruturados e tratamento robusto de erros.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Manipulação de Arquivos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>open / with</code><span class="cmd-tag">Arquivos</span></div>
+              <pre><code># Leitura (sempre use 'with' para fechar automaticamente)
+with open("config.txt", "r", encoding="utf-8") as f:
+    conteudo = f.read()        # tudo de uma vez
+    # ou linha por linha:
+    # for linha in f:
+    #     print(linha.strip())
+
+# Escrita
+with open("saida.txt", "w") as f:
+    f.write("Linha 1\n")
+    f.write("Linha 2\n")
+
+# Append
+with open("log.txt", "a") as f:
+    f.write(f"[{datetime.now()}] Evento registrado\n")
+
+# pathlib (moderno)
+from pathlib import Path
+arquivo = Path("dados/config.json")
+arquivo.parent.mkdir(parents=True, exist_ok=True)
+arquivo.write_text('{"key": "value"}', encoding="utf-8")</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. CSV e JSON</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>csv</code><span class="cmd-tag">Dados</span></div>
+              <pre><code>import csv
+
+# Leitura CSV
+with open("servidores.csv") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(row["nome"], row["ip"])
+
+# Escrita CSV
+dados = [
+    {"nome": "web-01", "ip": "10.0.1.1"},
+    {"nome": "web-02", "ip": "10.0.1.2"},
+]
+with open("output.csv", "w", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=["nome", "ip"])
+    writer.writeheader()
+    writer.writerows(dados)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>json</code><span class="cmd-tag">Dados</span></div>
+              <pre><code>import json
+
+# Leitura JSON
+with open("config.json") as f:
+    config = json.load(f)
+
+# Escrita JSON
+dados = {"nome": "app", "versao": "2.0", "debug": False}
+with open("config.json", "w") as f:
+    json.dump(dados, f, indent=2, ensure_ascii=False)
+
+# String JSON
+json_str = json.dumps(dados, indent=2)
+obj = json.loads(json_str)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Tratamento de Exceções</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>try / except</code><span class="cmd-tag">Exceções</span></div>
+            <pre><code># Tratamento completo
+try:
+    with open("dados.json") as f:
+        dados = json.load(f)
+    resultado = dados["valor"] / dados["divisor"]
+except FileNotFoundError:
+    print("Arquivo não encontrado!")
+    dados = {}
+except KeyError as e:
+    print(f"Chave ausente: {e}")
+except ZeroDivisionError:
+    print("Divisão por zero!")
+except Exception as e:
+    print(f"Erro inesperado: {type(e).__name__}: {e}")
+else:
+    print(f"Sucesso! Resultado: {resultado}")
+finally:
+    print("Bloco finally sempre executa")
+
+# Levantar exceções
+def validar_idade(idade):
+    if idade < 0 or idade > 150:
+        raise ValueError(f"Idade inválida: {idade}")
+    return idade</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-06.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — CloudFormation Módulo 01: Fundamentos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../cloudformation.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ CloudFormation — Módulo 01</span>
+        <h1>Fundamentos: Template Structure e Intrinsic Functions</h1>
+        <p>CloudFormation é o serviço nativo da AWS para provisionar infraestrutura como código usando templates YAML/JSON declarativos.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Estrutura do Template</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Template Base</code><span class="cmd-tag">Estrutura</span></div>
+              <p>Todo template CloudFormation segue uma estrutura com seções opcionais e obrigatórias. Apenas <code>Resources</code> é obrigatório.</p>
+              <pre><code>AWSTemplateFormatVersion: "2010-09-09"
+Description: "Template de exemplo — infraestrutura básica"
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: "Ambiente de deploy"
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+
+Mappings:
+  RegionAMI:
+    us-east-1:
+      HVM64: ami-0c02fb55956c7d316
+    sa-east-1:
+      HVM64: ami-0b6c2d49148000cd5
+
+Conditions:
+  IsProd: !Equals [!Ref Environment, prod]
+
+Resources:
+  # Recursos AWS aqui
+
+Outputs:
+  StackEnvironment:
+    Description: "Ambiente do stack"
+    Value: !Ref Environment
+    Export:
+      Name: !Sub "${AWS::StackName}-Environment"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Parameters — Tipos e Validação</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Parameters</code><span class="cmd-tag">Entrada</span></div>
+            <p>Parameters permitem customizar stacks no momento do deploy sem alterar o template.</p>
+            <pre><code>Parameters:
+  VpcCidr:
+    Type: String
+    Default: "10.0.0.0/16"
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: "Deve ser um CIDR válido (ex: 10.0.0.0/16)"
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: "Par de chaves EC2 existente"
+
+  SubnetIds:
+    Type: List&lt;AWS::EC2::Subnet::Id&gt;
+    Description: "Lista de subnets para deploy"
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    MaxLength: 41
+    Description: "Senha do banco de dados (não exibida)"
+
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value&lt;AWS::EC2::Image::Id&gt;
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    Description: "AMI mais recente via SSM Parameter Store"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Intrinsic Functions</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Funções Intrínsecas</code><span class="cmd-tag">Referências</span></div>
+              <p>Funções intrínsecas permitem referenciar recursos, concatenar strings e aplicar lógica condicional.</p>
+              <pre><code># !Ref — referencia parâmetro ou recurso (retorna ID)
+SecurityGroup:
+  Type: AWS::EC2::SecurityGroup
+  Properties:
+    VpcId: !Ref MyVPC
+
+# !Sub — substituição de variáveis em strings
+Tags:
+  - Key: Name
+    Value: !Sub "${AWS::StackName}-web-server"
+
+# !GetAtt — obtém atributo de um recurso
+Outputs:
+  VpcId:
+    Value: !GetAtt MyVPC.VpcId
+  PublicIP:
+    Value: !GetAtt EC2Instance.PublicIp
+
+# !Join — concatena lista com delimitador
+UserData:
+  Fn::Base64:
+    !Join
+      - "\n"
+      - - "#!/bin/bash"
+        - "yum update -y"
+        - "yum install -y httpd"
+
+# !Select — seleciona item de uma lista por índice
+AvailabilityZone: !Select [0, !GetAZs ""]
+
+# !If — valor condicional baseado em Condition
+InstanceType: !If [IsProd, t3.large, t3.micro]
+
+# Fn::ImportValue — importa output de outro stack
+SubnetId:
+  Fn::ImportValue: !Sub "${NetworkStackName}-PublicSubnet1"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. AWS CLI — Comandos Essenciais</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>aws cloudformation</code><span class="cmd-tag">CLI</span></div>
+              <p>Comandos para gerenciar stacks via terminal.</p>
+              <pre><code># Validar template antes do deploy
+aws cloudformation validate-template \
+  --template-body file://template.yaml
+
+# Criar stack
+aws cloudformation create-stack \
+  --stack-name minha-stack \
+  --template-body file://template.yaml \
+  --parameters ParameterKey=Environment,ParameterValue=dev \
+               ParameterKey=InstanceType,ParameterValue=t3.micro \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --tags Key=Project,Value=CloudTrilhas
+
+# Atualizar stack
+aws cloudformation update-stack \
+  --stack-name minha-stack \
+  --template-body file://template.yaml \
+  --parameters ParameterKey=Environment,ParameterValue=prod
+
+# Criar Change Set (preview de mudanças)
+aws cloudformation create-change-set \
+  --stack-name minha-stack \
+  --change-set-name update-v2 \
+  --template-body file://template.yaml
+
+# Descrever Change Set
+aws cloudformation describe-change-set \
+  --stack-name minha-stack \
+  --change-set-name update-v2
+
+# Executar Change Set
+aws cloudformation execute-change-set \
+  --stack-name minha-stack \
+  --change-set-name update-v2
+
+# Descrever stack e outputs
+aws cloudformation describe-stacks \
+  --stack-name minha-stack \
+  --query "Stacks[0].Outputs"
+
+# Listar eventos (troubleshooting)
+aws cloudformation describe-stack-events \
+  --stack-name minha-stack \
+  --query "StackEvents[?ResourceStatus=='CREATE_FAILED']"
+
+# Deletar stack
+aws cloudformation delete-stack \
+  --stack-name minha-stack
+
+# Aguardar conclusão
+aws cloudformation wait stack-create-complete \
+  --stack-name minha-stack</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="../cloudformation.html" class="button secondary">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Python Módulo 04: Estruturas de Dados</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="modulo-05.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐍 Python — Módulo 04</span>
+        <h1>Estruturas de Dados: Listas, Dicts, Tuplas e Sets</h1>
+        <p>Domine as estruturas de dados nativas do Python para manipular coleções de forma eficiente.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Listas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>list</code><span class="cmd-tag">Mutável</span></div>
+              <pre><code># Criação e manipulação
+frutas = ["maçã", "banana", "uva", "manga"]
+
+# Acesso e slicing
+print(frutas[0])       # maçã
+print(frutas[-1])      # manga
+print(frutas[1:3])     # ['banana', 'uva']
+print(frutas[::2])     # ['maçã', 'uva']
+
+# Métodos principais
+frutas.append("kiwi")        # adiciona ao final
+frutas.insert(1, "laranja")  # insere na posição
+frutas.remove("banana")      # remove por valor
+frutas.pop()                 # remove último
+frutas.sort()                # ordena in-place
+frutas.reverse()             # inverte
+
+# Desempacotamento
+primeiro, *meio, ultimo = frutas</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Dicionários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>dict</code><span class="cmd-tag">Chave-Valor</span></div>
+            <pre><code># Criação
+servidor = {
+    "nome": "web-01",
+    "ip": "10.0.1.50",
+    "porta": 8080,
+    "ativo": True,
+    "tags": ["prod", "api"]
+}
+
+# Acesso seguro
+print(servidor.get("ip"))              # 10.0.1.50
+print(servidor.get("regiao", "us-east-1"))  # default
+
+# Métodos úteis
+servidor["cpu"] = 4                    # adiciona/atualiza
+del servidor["porta"]                  # remove
+print(servidor.keys())                 # chaves
+print(servidor.values())               # valores
+print(servidor.items())                # pares (k, v)
+
+# Iteração
+for chave, valor in servidor.items():
+    print(f"{chave}: {valor}")
+
+# Merge (Python 3.9+)
+config = {"debug": True} | servidor</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Tuplas e Sets</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>tuple</code><span class="cmd-tag">Imutável</span></div>
+              <pre><code># Tuplas são imutáveis
+coordenadas = (23.5505, -46.6333)
+rgb = (255, 128, 0)
+
+# Desempacotamento
+lat, lon = coordenadas
+
+# Named tuple
+from collections import namedtuple
+Servidor = namedtuple("Servidor", ["nome", "ip", "porta"])
+srv = Servidor("web-01", "10.0.1.50", 8080)
+print(srv.nome)  # web-01</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>set</code><span class="cmd-tag">Únicos</span></div>
+              <pre><code># Sets: elementos únicos, sem ordem
+ips_prod = {"10.0.1.1", "10.0.1.2", "10.0.1.3"}
+ips_dev = {"10.0.1.2", "10.0.1.4"}
+
+# Operações de conjuntos
+print(ips_prod | ips_dev)   # união
+print(ips_prod & ips_dev)   # interseção
+print(ips_prod - ips_dev)   # diferença
+
+# Remover duplicatas
+logs = ["erro", "info", "erro", "warn", "info"]
+unicos = list(set(logs))</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
