@@ -401,6 +401,22 @@ resource "aws_s3_object" "robots_txt" {
   etag         = filemd5("${path.root}/../../static_site/robots.txt")
 }
 
+resource "aws_s3_object" "simulado_css" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "simulado.css"
+  source       = "${path.root}/../../static_site/simulado.css"
+  content_type = "text/css"
+  etag         = filemd5("${path.root}/../../static_site/simulado.css")
+}
+
+resource "aws_s3_object" "simulado_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "simulado.js"
+  source       = "${path.root}/../../static_site/simulado.js"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.root}/../../static_site/simulado.js")
+}
+
 resource "aws_s3_object" "sitemap_xml" {
   bucket       = aws_s3_bucket.this.id
   key          = "sitemap.xml"
