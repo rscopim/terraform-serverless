@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub Módulo 03: Colaboração GitHub</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-02.html" class="nav-link">← Anterior</a>
+        <a href="modulo-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐙 Git & GitHub — Módulo 03</span>
+        <h1>Colaboração: Fork, Pull Request e Code Review</h1>
+        <p>Fork, Pull Request, Code Review, Issues, Templates. Aprenda o fluxo profissional de contribuição em projetos.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Fork e Contribuição</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Fork Workflow</code><span class="cmd-tag">Colaboração</span></div>
+              <p>Fluxo completo para contribuir em projetos open source.</p>
+              <pre><code># 1. Fork no GitHub (botão Fork)
+
+# 2. Clone do seu fork
+git clone git@github.com:SEU-USER/projeto.git
+cd projeto
+
+# 3. Adicione o repositório original como upstream
+git remote add upstream git@github.com:ORIGINAL/projeto.git
+
+# 4. Crie branch para sua contribuição
+git checkout -b fix/corrige-typo
+
+# 5. Faça suas mudanças e commit
+git add .
+git commit -m "fix: corrige typo na documentação"
+
+# 6. Push para seu fork
+git push origin fix/corrige-typo
+
+# 7. Abra Pull Request no GitHub (origin → upstream)
+
+# 8. Manter fork atualizado
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Pull Requests e Code Review</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Pull Request</code><span class="cmd-tag">GitHub</span></div>
+              <p>Boas práticas para criar PRs eficientes.</p>
+              <pre><code># Título claro e descritivo
+feat: implementa autenticação OAuth2
+
+# Descrição com template:
+## O que foi feito
+- Implementa login com Google
+- Adiciona middleware de auth
+
+## Como testar
+1. Rodar `npm run dev`
+2. Acessar /login
+3. Clicar em "Login com Google"
+
+## Screenshots
+(se aplicável)
+
+Closes #42</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Code Review</code><span class="cmd-tag">Boas Práticas</span></div>
+              <p>Checklist para revisar código de colegas.</p>
+              <pre><code># O que verificar no Code Review:
+
+✅ Código funciona conforme descrito?
+✅ Testes foram adicionados/atualizados?
+✅ Sem código duplicado?
+✅ Nomes de variáveis claros?
+✅ Sem secrets hardcoded?
+✅ Performance aceitável?
+✅ Documentação atualizada?
+
+# Tipos de comentário:
+# 🔴 Blocker — precisa corrigir
+# 🟡 Suggestion — melhoria opcional
+# 💬 Question — dúvida/discussão</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Issues</code><span class="cmd-tag">GitHub</span></div>
+              <p>Organize trabalho com Issues e Labels.</p>
+              <pre><code># Criar Issue com template:
+## Descrição do Bug
+Ao clicar em "Salvar", nada acontece.
+
+## Passos para Reproduzir
+1. Acessar /settings
+2. Alterar nome
+3. Clicar "Salvar"
+
+## Comportamento Esperado
+Dados salvos com sucesso.
+
+## Ambiente
+- Browser: Chrome 120
+- OS: Ubuntu 22.04
+
+# Labels úteis:
+# bug, enhancement, documentation
+# good first issue, help wanted</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>GitHub CLI</code><span class="cmd-tag">Produtividade</span></div>
+              <p>Gerencie PRs e Issues pelo terminal.</p>
+              <pre><code># Instalar: https://cli.github.com
+gh auth login
+
+# Pull Requests
+gh pr create --title "feat: login"
+gh pr list
+gh pr checkout 42
+gh pr merge 42 --squash
+
+# Issues
+gh issue create --title "Bug: login"
+gh issue list --label "bug"
+gh issue close 42
+
+# Repos
+gh repo create meu-projeto --public
+gh repo clone user/repo</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

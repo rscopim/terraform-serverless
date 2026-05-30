@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub Módulo 04: Resolução de Conflitos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-03.html" class="nav-link">← Anterior</a>
+        <a href="modulo-05.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐙 Git & GitHub — Módulo 04</span>
+        <h1>Resolução de Conflitos</h1>
+        <p>Identificar, resolver e prevenir conflitos de merge. Conflitos acontecem quando duas pessoas editam o mesmo trecho — saber resolvê-los é essencial.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Entendendo e Resolvendo Conflitos</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Conflito de Merge</code><span class="cmd-tag">Essencial</span></div>
+              <p>Anatomia de um conflito e como resolver.</p>
+              <pre><code># Quando o Git não consegue resolver automaticamente:
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+const titulo = "Versão da branch atual";
+=======
+const titulo = "Versão da branch incoming";
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/nova-funcionalidade
+
+# Resolução:
+# 1. Edite o arquivo — escolha uma versão ou combine
+const titulo = "Versão final combinada";
+
+# 2. Remova os marcadores (&lt;&lt;&lt;&lt;, ====, &gt;&gt;&gt;&gt;)
+
+# 3. Adicione e commite
+git add arquivo-resolvido.js
+git commit -m "fix: resolve conflito no título"
+
+# Ferramentas visuais:
+git mergetool              # abre ferramenta configurada
+# VS Code: aceitar current/incoming/both</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Prevenir Conflitos</code><span class="cmd-tag">Dica</span></div>
+              <p>Boas práticas para minimizar conflitos.</p>
+              <pre><code># 1. Pull frequente
+git pull --rebase origin main
+
+# 2. Branches curtas (1-3 dias)
+
+# 3. Comunicação com o time
+
+# 4. Arquivos pequenos e focados
+
+# 5. Rebase antes de abrir PR
+git checkout feature
+git rebase main
+# Resolve conflitos uma vez só</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Abortar e Recomeçar</code><span class="cmd-tag">Segurança</span></div>
+              <p>Quando a resolução fica complexa demais.</p>
+              <pre><code># Abortar merge em andamento
+git merge --abort
+
+# Abortar rebase em andamento
+git rebase --abort
+
+# Voltar ao estado anterior
+git reset --hard HEAD
+
+# Ver estado antes do conflito
+git stash
+git log --oneline --graph</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

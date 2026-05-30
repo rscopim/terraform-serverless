@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Linux Módulo 05: Automação, Monitoramento e Troubleshooting</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-04.html" class="nav-link">← Anterior</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐧 Linux — Módulo 05</span>
+        <h1>Profissional: Automação, Monitoramento e Troubleshooting</h1>
+        <p>Ferramentas de performance, análise de logs, Docker, segurança e automação de nível profissional.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Monitoramento de Performance</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>vmstat / iostat</code><span class="cmd-tag">Performance</span></div>
+              <pre><code>vmstat 2          # a cada 2s
+iostat -x 2       # I/O detalhado
+# %util > 80% = gargalo de disco</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>lsof</code><span class="cmd-tag">Diagnóstico</span></div>
+              <pre><code>lsof -i :80       # quem usa porta 80
+lsof -u joao      # arquivos do user
+lsof -p 1234      # arquivos do PID</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tcpdump</code><span class="cmd-tag">Rede</span></div>
+              <pre><code>sudo tcpdump -i eth0 port 80
+sudo tcpdump -i any -c 100
+sudo tcpdump -w captura.pcap</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>dmesg</code><span class="cmd-tag">Kernel</span></div>
+              <pre><code>dmesg -T | grep -i error
+dmesg -w  # tempo real</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Troubleshooting — Checklists</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>🌐 Servidor não responde</h4>
+              <ol>
+                <li><code>ip link show</code> — interface UP?</li>
+                <li><code>ping gateway</code> — conectividade local?</li>
+                <li><code>nslookup</code> — DNS funciona?</li>
+                <li><code>ip route show</code> — rotas OK?</li>
+                <li><code>ufw status</code> — firewall bloqueando?</li>
+                <li><code>ss -tuln</code> — serviço escutando?</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>🐌 Servidor lento</h4>
+              <ol>
+                <li><code>uptime</code> — load average</li>
+                <li><code>top</code> — CPU/memória</li>
+                <li><code>iostat -x 2</code> — disco</li>
+                <li><code>free -h</code> — swap em uso?</li>
+                <li><code>ps aux --sort=-%cpu | head</code></li>
+                <li><code>iotop</code> — I/O por processo</li>
+              </ol>
+            </div>
+            <div class="checklist-card">
+              <h4>💾 Disco cheio</h4>
+              <ol>
+                <li><code>df -h</code> — uso geral</li>
+                <li><code>du -sh /* | sort -rh | head</code></li>
+                <li><code>find / -size +100M</code></li>
+                <li><code>du -sh /var/log/*</code></li>
+                <li><code>sudo apt clean</code></li>
+                <li><code>df -i</code> — inodes</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Docker Essencial</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Docker</code><span class="cmd-tag">Containers</span></div>
+            <pre><code># Imagens e Containers
+docker pull nginx
+docker run -d --name web -p 8080:80 nginx
+docker ps                    # containers rodando
+docker ps -a                 # todos
+docker exec -it web bash     # shell dentro do container
+docker logs -f web           # logs em tempo real
+docker stop web && docker rm web
+
+# Docker Compose
+docker compose up -d         # inicia serviços
+docker compose down          # para tudo
+docker compose logs -f       # logs
+
+# Limpeza
+docker system prune -a       # remove tudo não usado</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Segurança do Servidor</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>SSH Hardening</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+Port 2222
+MaxAuthTries 3
+AllowUsers deploy admin</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Fail2ban</code><span class="cmd-tag">Proteção</span></div>
+              <pre><code>sudo apt install fail2ban
+sudo systemctl enable --now fail2ban
+sudo fail2ban-client status sshd
+# Bane IPs após 3 tentativas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Auditoria</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code>find / -perm -4000 -type f  # SUID
+find / -perm -777 -type f  # 777 (inseguro)
+last -10                   # últimos logins
+lastb -10                  # logins falhados</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tmux</code><span class="cmd-tag">Produtividade</span></div>
+              <pre><code>tmux new -s deploy    # nova sessão
+tmux ls               # lista sessões
+tmux attach -t deploy # reconecta
+# Ctrl+B, D = desconecta
+# Ctrl+B, % = divide vertical</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5. Comandos Mais Cobrados em Entrevistas</h3>
+          <div class="interview-table">
+            <table>
+              <thead><tr><th>Categoria</th><th>Comandos</th></tr></thead>
+              <tbody>
+                <tr><td>Navegação</td><td><code>cd, ls, pwd, find, locate</code></td></tr>
+                <tr><td>Arquivos</td><td><code>cp, mv, rm, mkdir, touch, tar</code></td></tr>
+                <tr><td>Texto</td><td><code>cat, grep, sed, awk, cut, sort, uniq</code></td></tr>
+                <tr><td>Permissões</td><td><code>chmod, chown, chgrp</code></td></tr>
+                <tr><td>Processos</td><td><code>ps, top, kill, systemctl, journalctl</code></td></tr>
+                <tr><td>Rede</td><td><code>ip, ss, ping, curl, nmap, tcpdump</code></td></tr>
+                <tr><td>SSH</td><td><code>ssh, scp, rsync, ssh-keygen</code></td></tr>
+                <tr><td>Docker</td><td><code>docker run, ps, exec, compose</code></td></tr>
+                <tr><td>Disco</td><td><code>df, du, mount, lsblk</code></td></tr>
+                <tr><td>Scripting</td><td><code>bash, if, for, while, funções</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../linux.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

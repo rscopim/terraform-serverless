@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Linux Módulo 03: Pipes, Filtros e Shell Script</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="modulo-02.html" class="nav-link">← Anterior</a>
+        <a href="modulo-04.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐧 Linux — Módulo 03</span>
+        <h1>Intermediário: Pipes, Filtros e Shell Script</h1>
+        <p>Redirecionamento, pipes e processamento de texto são os conceitos mais poderosos do Linux.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h3>1. Redirecionamento e Pipes</h3>
+          <div class="info-box">
+            <strong>3 canais:</strong> stdin (0) = entrada, stdout (1) = saída, stderr (2) = erros
+          </div>
+          <div class="command-card wide" style="margin-top:16px">
+            <div class="command-header"><code>Redirecionamento</code><span class="cmd-tag">Core</span></div>
+            <pre><code>echo "Hello" > arquivo.txt       # sobrescreve
+echo "World" >> arquivo.txt      # adiciona ao final
+find / -name "*.conf" 2>/dev/null  # descarta erros
+comando > saida.txt 2>&1          # stdout + stderr no arquivo
+ls -la | less                     # pipe: saída vira entrada
+ps aux | grep nginx | wc -l      # encadeia múltiplos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Filtros de Texto</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>grep</code><span class="cmd-tag">Essencial</span></div>
+              <p>Busca padrões em texto. O comando mais usado no dia a dia.</p>
+              <pre><code>grep "erro" /var/log/syslog        # busca texto
+grep -i "error" log.txt            # ignora case
+grep -r "TODO" /projeto/           # recursivo
+grep -n "function" script.js       # com número da linha
+grep -v "debug" log.txt            # inverte (NÃO contém)
+grep -c "error" log.txt            # conta ocorrências
+grep -E "error|warning" log.txt    # múltiplos padrões</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>sed</code><span class="cmd-tag">Edição</span></div>
+              <p>Editor de fluxo — substitui texto.</p>
+              <pre><code>sed 's/antigo/novo/g' arquivo.txt
+sed -i 's/localhost/192.168.1.100/g' config.conf
+sed '/^#/d' config.conf  # remove comentários
+sed -n '10,20p' arquivo.txt  # linhas 10-20</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>awk</code><span class="cmd-tag">Processamento</span></div>
+              <p>Processamento avançado por colunas.</p>
+              <pre><code>awk '{print $1}' arquivo.txt       # coluna 1
+awk -F: '{print $1}' /etc/passwd   # separador :
+ps aux | awk '{print $1, $2, $11}' # user, PID, cmd
+df -h | awk '{print $1, $5}'       # filesystem e %</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>sort / uniq / cut</code><span class="cmd-tag">Filtros</span></div>
+              <pre><code>sort -n numeros.txt         # ordena numérico
+sort arquivo.txt | uniq -c  # conta duplicatas
+cut -d: -f1 /etc/passwd     # recorta campo 1
+du -sh * | sort -rh | head  # top maiores</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Shell Script — Introdução</h3>
+          <div class="command-card wide" style="margin-bottom:16px">
+            <div class="command-header"><code>Variáveis e Estrutura</code><span class="cmd-tag">Script</span></div>
+            <pre><code>#!/bin/bash
+NOME="João"
+DATA=$(date +%Y-%m-%d)
+echo "Olá $NOME, hoje é $DATA"
+echo "Argumentos: $1 $2 (total: $#)"</code></pre>
+          </div>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>if / else</code><span class="cmd-tag">Condicional</span></div>
+              <pre><code>if [ -f "/etc/passwd" ]; then
+    echo "Arquivo existe!"
+elif [ -d "/tmp" ]; then
+    echo "Diretório existe"
+else
+    echo "Não encontrado"
+fi
+
+# Comparações numéricas:
+# -eq -ne -gt -lt -ge -le</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>for / while</code><span class="cmd-tag">Loops</span></div>
+              <pre><code>for f in /var/log/*.log; do
+    echo "Processando: $f"
+    wc -l "$f"
+done
+
+CONT=1
+while [ $CONT -le 5 ]; do
+    echo "Contagem: $CONT"
+    CONT=$((CONT + 1))
+done</code></pre>
+            </div>
+          </div>
+          <div class="command-card wide" style="margin-top:16px">
+            <div class="command-header"><code>Script Prático: Backup</code><span class="cmd-tag">Exemplo Real</span></div>
+            <pre><code>#!/bin/bash
+# backup.sh - Backup automatizado
+ORIGEM=${1:-"/home"}
+DESTINO=${2:-"/backup"}
+DATA=$(date +%Y%m%d_%H%M%S)
+
+log() { echo "[$(date '+%H:%M:%S')] $1"; }
+
+[ ! -d "$DESTINO" ] && mkdir -p "$DESTINO"
+
+log "Iniciando backup de $ORIGEM"
+tar -czvf "${DESTINO}/backup_${DATA}.tar.gz" "$ORIGEM"
+
+if [ $? -eq 0 ]; then
+    log "✅ Backup concluído!"
+else
+    log "❌ Falha no backup!"
+    exit 1
+fi
+
+# Remove backups > 7 dias
+find "$DESTINO" -name "backup_*.tar.gz" -mtime +7 -delete</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

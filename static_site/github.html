@@ -17,10 +17,8 @@
     <nav class="nav container" aria-label="Navegação principal">
       <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
-        <a href="#fundamentos" class="nav-link">Fundamentos</a>
-        <a href="#branches" class="nav-link">Branches</a>
-        <a href="#avancado" class="nav-link">Avançado</a>
-        <a href="#automacao" class="nav-link">Automação</a>
+        <a href="#modulos" class="nav-link">Módulos</a>
+        <a href="#materiais" class="nav-link">Materiais</a>
         <a href="index.html" class="nav-button">Início</a>
       </div>
     </nav>
@@ -33,8 +31,8 @@
         <h1>Git & GitHub: Do Zero ao Avançado</h1>
         <p>Trilha completa com 9 módulos — de configuração inicial à automação com GitHub Actions. Domine o controle de versão mais usado no mercado.</p>
         <div class="hero-actions" style="margin-top:28px">
-          <a href="#fundamentos" class="button primary">Começar pelo Módulo 00</a>
-          <a href="#avancado" class="button secondary">Ir para Avançado</a>
+          <a href="github/modulo-00.html" class="button primary">Começar pelo Módulo 00</a>
+          <a href="#materiais" class="button secondary">Baixar PDF Completo</a>
         </div>
       </div>
     </section>
@@ -42,1154 +40,106 @@
     <!-- PROGRESS BAR -->
     <section class="module-progress container">
       <div class="progress-track">
-        <a href="#fundamentos" class="progress-node active"><span>00–01</span><small>Fundamentos</small></a>
-        <a href="#branches" class="progress-node"><span>02–04</span><small>Branches</small></a>
-        <a href="#avancado" class="progress-node"><span>05–06</span><small>Avançado</small></a>
-        <a href="#automacao" class="progress-node"><span>07–08</span><small>Automação</small></a>
+        <a href="github/modulo-00.html" class="progress-node active"><span>00–01</span><small>Fundamentos</small></a>
+        <a href="github/modulo-02.html" class="progress-node"><span>02–04</span><small>Branches</small></a>
+        <a href="github/modulo-05.html" class="progress-node"><span>05–06</span><small>Avançado</small></a>
+        <a href="github/modulo-07.html" class="progress-node"><span>07–08</span><small>Automação</small></a>
       </div>
     </section>
 
-    <!-- ==================== SEÇÃO 1: FUNDAMENTOS (Módulos 00-01) ==================== -->
-    <section id="fundamentos" class="module-section">
+    <!-- ESTRUTURA DO CURSO -->
+    <section id="modulos" class="module-section">
       <div class="container">
         <div class="module-header">
-          <span class="module-badge">Módulo 00</span>
-          <h2>Configuração: Conta, SSH e Ambiente</h2>
-          <p>Antes de versionar código, configure seu ambiente corretamente. Uma boa configuração evita problemas futuros com autenticação e identidade.</p>
+          <span class="module-badge">📚 Estrutura do Curso</span>
+          <h2>9 Módulos Progressivos</h2>
+          <p>Siga os módulos na ordem. De configuração inicial até automação com GitHub Actions.</p>
         </div>
 
-        <div class="topic-block">
-          <h3>1. Configuração Inicial do Git</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>git config</code><span class="cmd-tag">Essencial</span></div>
-              <p>Define identidade e preferências globais do Git.</p>
-              <pre><code># Identidade (obrigatório)
-git config --global user.name "Seu Nome"
-git config --global user.email "seu@email.com"
+        <div class="command-grid">
+          <a href="github/modulo-00.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 00</code><span class="cmd-tag">Iniciante</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Configuração de Conta</h3>
+            <p>Criação de conta GitHub, SSH keys, 2FA, perfil profissional.</p>
+          </a>
 
-# Preferências úteis
-git config --global init.defaultBranch main
-git config --global core.editor "code --wait"
-git config --global pull.rebase true
+          <a href="github/modulo-01.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 01</code><span class="cmd-tag">Iniciante</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Fundamentos</h3>
+            <p>git init, add, commit, push, pull, clone, status, log, .gitignore.</p>
+          </a>
 
-# Verificar configurações
-git config --list
-git config --global --list</code></pre>
-            </div>
-          </div>
+          <a href="github/modulo-02.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 02</code><span class="cmd-tag">Intermediário</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Branches</h3>
+            <p>Criar, mergear, stash, convenções de nomes, estratégias de merge.</p>
+          </a>
+
+          <a href="github/modulo-03.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 03</code><span class="cmd-tag">Intermediário</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Colaboração GitHub</h3>
+            <p>Fork, Pull Request, Code Review, Issues, Templates.</p>
+          </a>
+
+          <a href="github/modulo-04.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 04</code><span class="cmd-tag">Intermediário</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Resolução de Conflitos</h3>
+            <p>Identificar, resolver e prevenir conflitos de merge.</p>
+          </a>
+
+          <a href="github/modulo-05.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 05</code><span class="cmd-tag">Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Histórico e Reescrita</h3>
+            <p>Rebase interativo, cherry-pick, reflog, reset, revert.</p>
+          </a>
+
+          <a href="github/modulo-06.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 06</code><span class="cmd-tag">Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Fluxos Profissionais</h3>
+            <p>Git Flow, GitHub Flow, Tags, Conventional Commits, SemVer.</p>
+          </a>
+
+          <a href="github/modulo-07.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 07</code><span class="cmd-tag">Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Automação e CI/CD</h3>
+            <p>GitHub Actions, Hooks, Husky, lint-staged, pipelines.</p>
+          </a>
+
+          <a href="github/modulo-08.html" class="command-card" style="text-decoration:none;cursor:pointer">
+            <div class="command-header"><code>Módulo 08</code><span class="cmd-tag">Avançado</span></div>
+            <h3 style="margin:0 0 8px;font-size:1.1rem">Projects, Pages e Segurança</h3>
+            <p>GitHub Projects, Pages, Environments, Branch Protection, CODEOWNERS, Dependabot.</p>
+          </a>
         </div>
 
-        <div class="topic-block">
-          <h3>2. Chave SSH e Autenticação</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>ssh-keygen</code><span class="cmd-tag">Autenticação</span></div>
-              <p>Gera par de chaves para autenticação sem senha no GitHub.</p>
-              <pre><code># Gerar chave SSH (Ed25519 recomendado)
-ssh-keygen -t ed25519 -C "seu@email.com"
-
-# Iniciar o ssh-agent
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-
-# Copiar chave pública para adicionar no GitHub
-cat ~/.ssh/id_ed25519.pub
-
-# Testar conexão
-ssh -T git@github.com
-# Hi usuario! You've successfully authenticated</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>2FA</code><span class="cmd-tag">Segurança</span></div>
-              <p>Ative autenticação de dois fatores no GitHub.</p>
-              <pre><code># GitHub → Settings → Password and authentication
-# → Two-factor authentication → Enable
-
-# Apps recomendados:
-# - Authy
-# - Google Authenticator
-# - 1Password
-
-# Salve os recovery codes em local seguro!</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Perfil GitHub</code><span class="cmd-tag">Dica</span></div>
-              <p>Configure seu perfil profissional no GitHub.</p>
-              <pre><code># Crie um repositório com seu username
-# Ex: github.com/seuuser/seuuser
-
-# Adicione um README.md com:
-# - Sobre você
-# - Tecnologias
-# - Projetos em destaque
-# - Links (LinkedIn, portfólio)
-
-# Use: github.com/anuraghazra/github-readme-stats</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-header" style="margin-top:64px">
-          <span class="module-badge">Módulo 01</span>
-          <h2>Fundamentos: Repositório, Commits e Remoto</h2>
-          <p>O fluxo básico do Git: inicializar, rastrear mudanças, criar snapshots e sincronizar com o GitHub.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>3. Criando e Clonando Repositórios</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git init</code><span class="cmd-tag">Criar</span></div>
-              <p>Inicializa um repositório Git local.</p>
-              <pre><code>mkdir meu-projeto
-cd meu-projeto
-git init
-# Initialized empty Git repository</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git clone</code><span class="cmd-tag">Criar</span></div>
-              <p>Clona um repositório remoto para sua máquina.</p>
-              <pre><code># Via SSH (recomendado)
-git clone git@github.com:user/repo.git
-
-# Via HTTPS
-git clone https://github.com/user/repo.git
-
-# Clone com nome customizado
-git clone git@github.com:user/repo.git meu-dir</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>4. Fluxo Básico: add → commit → push</h3>
-          <div class="info-box highlight">
-            <strong>Os 3 estados do Git:</strong>
-            <pre><code>Working Directory → Staging Area → Repository
-   (modificado)      (preparado)     (commitado)
-      git add →      git commit →    git push →  Remote</code></pre>
-          </div>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git status</code><span class="cmd-tag">Essencial</span></div>
-              <p>Mostra o estado atual dos arquivos.</p>
-              <pre><code>git status
-# On branch main
-# Changes not staged for commit:
-#   modified: index.html
-# Untracked files:
-#   style.css
-
-git status -s  # formato curto
-# M  index.html
-# ?? style.css</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git add</code><span class="cmd-tag">Staging</span></div>
-              <p>Adiciona arquivos à staging area.</p>
-              <pre><code>git add arquivo.txt       # arquivo específico
-git add .                 # tudo no diretório
-git add *.js              # por extensão
-git add -p                # interativo (por hunks)
-
-# Remover do staging (sem perder mudanças)
-git restore --staged arquivo.txt</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git commit</code><span class="cmd-tag">Essencial</span></div>
-              <p>Cria um snapshot das mudanças no staging.</p>
-              <pre><code>git commit -m "feat: adiciona navbar"
-git commit -am "fix: corrige typo"  # add + commit
-git commit --amend  # edita último commit
-
-# Boas práticas de mensagem:
-# tipo: descrição curta (max 72 chars)
-# feat: | fix: | docs: | refactor: | test:</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git log</code><span class="cmd-tag">Histórico</span></div>
-              <p>Visualiza o histórico de commits.</p>
-              <pre><code>git log                    # completo
-git log --oneline          # resumido
-git log --oneline --graph  # com branches
-git log -5                 # últimos 5
-git log --author="João"    # por autor
-git log --since="2024-01-01"</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>5. Sincronização com Remoto</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git remote</code><span class="cmd-tag">Remoto</span></div>
-              <p>Gerencia conexões com repositórios remotos.</p>
-              <pre><code>git remote add origin git@github.com:user/repo.git
-git remote -v              # lista remotos
-git remote rename origin upstream
-git remote remove upstream</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git push</code><span class="cmd-tag">Enviar</span></div>
-              <p>Envia commits locais para o remoto.</p>
-              <pre><code>git push origin main
-git push -u origin main    # define upstream
-git push                   # após -u, basta isso
-git push --force-with-lease # force seguro</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git pull</code><span class="cmd-tag">Receber</span></div>
-              <p>Baixa e integra mudanças do remoto.</p>
-              <pre><code>git pull                   # fetch + merge
-git pull --rebase          # fetch + rebase
-git pull origin main       # branch específica</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git fetch</code><span class="cmd-tag">Receber</span></div>
-              <p>Baixa mudanças sem integrar (mais seguro).</p>
-              <pre><code>git fetch origin
-git fetch --all            # todos os remotos
-git log origin/main..main  # ver diferenças
-# Depois: git merge origin/main</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>6. Arquivos Ignorados</h3>
-          <div class="command-card wide">
-            <div class="command-header"><code>.gitignore</code><span class="cmd-tag">Configuração</span></div>
-            <p>Define quais arquivos o Git deve ignorar.</p>
-            <pre><code># .gitignore — exemplo para Node.js + Terraform
-node_modules/
-dist/
-.env
-.env.local
-*.log
-
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.backup
-*.tfvars
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db</code></pre>
-          </div>
+        <div class="info-box" style="margin-top:32px">
+          <strong>Pré-requisitos:</strong> Computador com acesso à internet. Vontade de aprender!
         </div>
       </div>
     </section>
 
-    <!-- ==================== SEÇÃO 2: BRANCHES E COLABORAÇÃO (Módulos 02-04) ==================== -->
-    <section id="branches" class="module-section alt-bg">
+    <!-- SEÇÃO DE MATERIAIS PARA DOWNLOAD -->
+    <section id="materiais" class="module-section alt-bg">
       <div class="container">
         <div class="module-header">
-          <span class="module-badge">Módulo 02</span>
-          <h2>Branches: Ramificação e Merge</h2>
-          <p>Branches permitem trabalhar em funcionalidades isoladas sem afetar o código principal. É o coração do trabalho em equipe.</p>
+          <span class="module-badge">📥 Materiais</span>
+          <h2>Baixe o conteúdo completo em PDF</h2>
+          <p>Todo o conteúdo dos 9 módulos organizado em um PDF para estudar offline, imprimir ou consultar quando precisar.</p>
         </div>
 
-        <div class="topic-block">
-          <h3>1. Criando e Navegando entre Branches</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>git branch / checkout / switch</code><span class="cmd-tag">Essencial</span></div>
-              <p>Gerencia branches locais e remotas.</p>
-              <pre><code># Listar branches
-git branch              # locais
-git branch -a           # locais + remotas
-git branch -v           # com último commit
-
-# Criar branch
-git branch feature/login
-git checkout -b feature/login    # cria e muda
-git switch -c feature/login      # forma moderna
-
-# Mudar de branch
-git checkout main
-git switch main
-
-# Deletar branch
-git branch -d feature/login      # seguro (merged)
-git branch -D feature/login      # forçado
-git push origin --delete feature/login  # remota</code></pre>
-            </div>
-          </div>
-          <div class="info-box">
-            <strong>Convenções de nomes:</strong> <code>feature/</code> nova funcionalidade, <code>fix/</code> ou <code>bugfix/</code> correção, <code>hotfix/</code> correção urgente em produção, <code>release/</code> preparação de release, <code>chore/</code> tarefas de manutenção.
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>2. Merge e Estratégias</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git merge</code><span class="cmd-tag">Integração</span></div>
-              <p>Integra mudanças de uma branch em outra.</p>
-              <pre><code># Merge da feature na main
-git checkout main
-git merge feature/login
-
-# Merge com commit explícito
-git merge --no-ff feature/login
-
-# Abortar merge com conflito
-git merge --abort</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git stash</code><span class="cmd-tag">Utilidade</span></div>
-              <p>Salva mudanças temporariamente sem commit.</p>
-              <pre><code># Guardar mudanças
-git stash
-git stash push -m "WIP: navbar"
-
-# Listar e recuperar
-git stash list
-git stash pop           # aplica e remove
-git stash apply stash@{0}  # aplica sem remover
-
-# Limpar
-git stash drop stash@{0}
-git stash clear</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git diff</code><span class="cmd-tag">Comparação</span></div>
-              <p>Mostra diferenças entre estados.</p>
-              <pre><code>git diff                   # working vs staging
-git diff --staged          # staging vs commit
-git diff main..feature     # entre branches
-git diff HEAD~3            # últimos 3 commits
-git diff --stat            # resumo</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Estratégias de Merge</code><span class="cmd-tag">Conceito</span></div>
-              <p>Entenda quando usar cada tipo.</p>
-              <pre><code># Fast-forward (padrão quando possível)
-# Histórico linear, sem commit de merge
-git merge feature  # se main não avançou
-
-# No fast-forward (preserva histórico)
-git merge --no-ff feature
-# Cria commit de merge sempre
-
-# Squash (compacta commits)
-git merge --squash feature
-git commit -m "feat: login completo"</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-header" style="margin-top:64px">
-          <span class="module-badge">Módulo 03</span>
-          <h2>Colaboração: Fork, Pull Request e Code Review</h2>
-          <p>O GitHub é uma plataforma de colaboração. Aprenda o fluxo profissional de contribuição em projetos.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>3. Fork e Contribuição</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Fork Workflow</code><span class="cmd-tag">Colaboração</span></div>
-              <p>Fluxo completo para contribuir em projetos open source.</p>
-              <pre><code># 1. Fork no GitHub (botão Fork)
-
-# 2. Clone do seu fork
-git clone git@github.com:SEU-USER/projeto.git
-cd projeto
-
-# 3. Adicione o repositório original como upstream
-git remote add upstream git@github.com:ORIGINAL/projeto.git
-
-# 4. Crie branch para sua contribuição
-git checkout -b fix/corrige-typo
-
-# 5. Faça suas mudanças e commit
-git add .
-git commit -m "fix: corrige typo na documentação"
-
-# 6. Push para seu fork
-git push origin fix/corrige-typo
-
-# 7. Abra Pull Request no GitHub (origin → upstream)
-
-# 8. Manter fork atualizado
-git fetch upstream
-git checkout main
-git merge upstream/main
-git push origin main</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>4. Pull Requests e Code Review</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Pull Request</code><span class="cmd-tag">GitHub</span></div>
-              <p>Boas práticas para criar PRs eficientes.</p>
-              <pre><code># Título claro e descritivo
-feat: implementa autenticação OAuth2
-
-# Descrição com template:
-## O que foi feito
-- Implementa login com Google
-- Adiciona middleware de auth
-
-## Como testar
-1. Rodar `npm run dev`
-2. Acessar /login
-3. Clicar em "Login com Google"
-
-## Screenshots
-(se aplicável)
-
-Closes #42</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Code Review</code><span class="cmd-tag">Boas Práticas</span></div>
-              <p>Checklist para revisar código de colegas.</p>
-              <pre><code># O que verificar no Code Review:
-
-✅ Código funciona conforme descrito?
-✅ Testes foram adicionados/atualizados?
-✅ Sem código duplicado?
-✅ Nomes de variáveis claros?
-✅ Sem secrets hardcoded?
-✅ Performance aceitável?
-✅ Documentação atualizada?
-
-# Tipos de comentário:
-# 🔴 Blocker — precisa corrigir
-# 🟡 Suggestion — melhoria opcional
-# 💬 Question — dúvida/discussão</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Issues</code><span class="cmd-tag">GitHub</span></div>
-              <p>Organize trabalho com Issues e Labels.</p>
-              <pre><code># Criar Issue com template:
-## Descrição do Bug
-Ao clicar em "Salvar", nada acontece.
-
-## Passos para Reproduzir
-1. Acessar /settings
-2. Alterar nome
-3. Clicar "Salvar"
-
-## Comportamento Esperado
-Dados salvos com sucesso.
-
-## Ambiente
-- Browser: Chrome 120
-- OS: Ubuntu 22.04
-
-# Labels úteis:
-# bug, enhancement, documentation
-# good first issue, help wanted</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>GitHub CLI</code><span class="cmd-tag">Produtividade</span></div>
-              <p>Gerencie PRs e Issues pelo terminal.</p>
-              <pre><code># Instalar: https://cli.github.com
-gh auth login
-
-# Pull Requests
-gh pr create --title "feat: login"
-gh pr list
-gh pr checkout 42
-gh pr merge 42 --squash
-
-# Issues
-gh issue create --title "Bug: login"
-gh issue list --label "bug"
-gh issue close 42
-
-# Repos
-gh repo create meu-projeto --public
-gh repo clone user/repo</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-header" style="margin-top:64px">
-          <span class="module-badge">Módulo 04</span>
-          <h2>Resolução de Conflitos</h2>
-          <p>Conflitos acontecem quando duas pessoas editam o mesmo trecho. Saber resolvê-los é essencial para trabalho em equipe.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>5. Entendendo e Resolvendo Conflitos</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Conflito de Merge</code><span class="cmd-tag">Essencial</span></div>
-              <p>Anatomia de um conflito e como resolver.</p>
-              <pre><code># Quando o Git não consegue resolver automaticamente:
-<<<<<<< HEAD
-const titulo = "Versão da branch atual";
-=======
-const titulo = "Versão da branch incoming";
->>>>>>> feature/nova-funcionalidade
-
-# Resolução:
-# 1. Edite o arquivo — escolha uma versão ou combine
-const titulo = "Versão final combinada";
-
-# 2. Remova os marcadores (<<<<, ====, >>>>)
-
-# 3. Adicione e commite
-git add arquivo-resolvido.js
-git commit -m "fix: resolve conflito no título"
-
-# Ferramentas visuais:
-git mergetool              # abre ferramenta configurada
-# VS Code: aceitar current/incoming/both</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Prevenir Conflitos</code><span class="cmd-tag">Dica</span></div>
-              <p>Boas práticas para minimizar conflitos.</p>
-              <pre><code># 1. Pull frequente
-git pull --rebase origin main
-
-# 2. Branches curtas (1-3 dias)
-
-# 3. Comunicação com o time
-
-# 4. Arquivos pequenos e focados
-
-# 5. Rebase antes de abrir PR
-git checkout feature
-git rebase main
-# Resolve conflitos uma vez só</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Abortar e Recomeçar</code><span class="cmd-tag">Segurança</span></div>
-              <p>Quando a resolução fica complexa demais.</p>
-              <pre><code># Abortar merge em andamento
-git merge --abort
-
-# Abortar rebase em andamento
-git rebase --abort
-
-# Voltar ao estado anterior
-git reset --hard HEAD
-
-# Ver estado antes do conflito
-git stash
-git log --oneline --graph</code></pre>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== SEÇÃO 3: AVANÇADO (Módulos 05-06) ==================== -->
-    <section id="avancado" class="module-section">
-      <div class="container">
-        <div class="module-header">
-          <span class="module-badge">Módulo 05</span>
-          <h2>Histórico e Reescrita: Rebase, Cherry-pick e Reflog</h2>
-          <p>Ferramentas avançadas para manipular o histórico de commits. Use com cuidado em branches compartilhadas.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>1. Git Rebase</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>git rebase</code><span class="cmd-tag">Avançado</span></div>
-              <p>Reaplica commits sobre outra base. Cria histórico linear e limpo.</p>
-              <pre><code># Rebase simples — atualiza feature com main
-git checkout feature/login
-git rebase main
-# Seus commits são reaplicados sobre o topo da main
-
-# Rebase interativo — editar/squash/reorder commits
-git rebase -i HEAD~5
-# pick abc1234 feat: adiciona form
-# squash def5678 fix: ajusta validação
-# reword ghi9012 docs: atualiza README
-# drop jkl3456 WIP: teste temporário
-
-# Continuar após resolver conflito
-git rebase --continue
-
-# Abortar rebase
-git rebase --abort</code></pre>
-              <div class="info-box">
-                <strong>⚠️ Regra de Ouro:</strong> Nunca faça rebase em branches públicas/compartilhadas. Rebase reescreve o histórico — use apenas em branches locais ou pessoais.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>2. Cherry-pick e Reflog</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git cherry-pick</code><span class="cmd-tag">Avançado</span></div>
-              <p>Aplica um commit específico em outra branch.</p>
-              <pre><code># Aplicar commit específico
-git cherry-pick abc1234
-
-# Aplicar múltiplos commits
-git cherry-pick abc1234 def5678
-
-# Aplicar sem commitar (só staging)
-git cherry-pick --no-commit abc1234
-
-# Caso de uso: hotfix
-git checkout main
-git cherry-pick fix-commit-hash
-# Aplica a correção sem trazer toda a branch</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git reflog</code><span class="cmd-tag">Recuperação</span></div>
-              <p>Histórico de TODAS as ações — sua rede de segurança.</p>
-              <pre><code># Ver histórico completo de movimentos
-git reflog
-# abc1234 HEAD@{0}: commit: feat: login
-# def5678 HEAD@{1}: checkout: main → feature
-# ghi9012 HEAD@{2}: reset: moving to HEAD~1
-
-# Recuperar commit "perdido"
-git checkout HEAD@{2}
-git branch recuperada HEAD@{2}
-
-# Recuperar após reset --hard
-git reflog
-git reset --hard HEAD@{1}
-
-# Reflog expira em 90 dias (padrão)</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git reset</code><span class="cmd-tag danger">Reescrita</span></div>
-              <p>Move o HEAD para outro commit. <strong>Cuidado com --hard!</strong></p>
-              <pre><code># Soft — mantém mudanças no staging
-git reset --soft HEAD~1
-
-# Mixed (padrão) — mantém no working dir
-git reset HEAD~1
-
-# Hard — DESCARTA tudo (perigoso!)
-git reset --hard HEAD~1
-
-# Desfazer último commit (mantendo mudanças)
-git reset --soft HEAD~1
-# Agora pode re-commitar diferente</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git revert</code><span class="cmd-tag">Seguro</span></div>
-              <p>Cria novo commit que desfaz outro. Seguro para branches públicas.</p>
-              <pre><code># Reverter um commit (cria novo commit)
-git revert abc1234
-
-# Reverter sem commitar automaticamente
-git revert --no-commit abc1234
-
-# Reverter merge commit
-git revert -m 1 merge-commit-hash
-
-# Diferença de reset:
-# reset: apaga histórico (perigoso)
-# revert: adiciona ao histórico (seguro)</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-header" style="margin-top:64px">
-          <span class="module-badge">Módulo 06</span>
-          <h2>Fluxos Profissionais: Git Flow, Tags e Conventional Commits</h2>
-          <p>Estratégias de branching usadas por equipes profissionais. Escolha o fluxo certo para seu projeto.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>3. Git Flow vs GitHub Flow</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Git Flow</code><span class="cmd-tag">Fluxo</span></div>
-              <p>Modelo robusto para projetos com releases planejadas.</p>
-              <pre><code># Branches permanentes:
-# main     → código em produção
-# develop  → integração de features
-
-# Branches temporárias:
-# feature/* → novas funcionalidades
-# release/* → preparação de release
-# hotfix/*  → correções urgentes em produção
-
-# Fluxo:
-git checkout develop
-git checkout -b feature/pagamento
-# ... desenvolve ...
-git checkout develop
-git merge --no-ff feature/pagamento
-
-# Release:
-git checkout -b release/1.2.0 develop
-# ... ajustes finais, bump version ...
-git checkout main
-git merge --no-ff release/1.2.0
-git tag -a v1.2.0 -m "Release 1.2.0"
-git checkout develop
-git merge --no-ff release/1.2.0</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>GitHub Flow</code><span class="cmd-tag">Fluxo</span></div>
-              <p>Modelo simplificado — ideal para deploy contínuo.</p>
-              <pre><code># Apenas 1 branch permanente: main (sempre deployável)
-
-# Fluxo:
-# 1. Crie branch a partir de main
-git checkout -b feature/dark-mode
-
-# 2. Faça commits incrementais
-git commit -m "feat: adiciona toggle de tema"
-git commit -m "feat: implementa CSS dark mode"
-
-# 3. Abra Pull Request cedo (Draft PR)
-git push -u origin feature/dark-mode
-# → Abra PR no GitHub
-
-# 4. Code Review + CI passa
-
-# 5. Merge na main (squash ou merge commit)
-
-# 6. Deploy automático após merge
-
-# Quando usar cada um:
-# Git Flow → releases planejadas, múltiplas versões
-# GitHub Flow → deploy contínuo, SaaS, projetos ágeis</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>4. Tags e Versionamento</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git tag</code><span class="cmd-tag">Release</span></div>
-              <p>Marca pontos específicos no histórico (releases).</p>
-              <pre><code># Tag anotada (recomendada)
-git tag -a v1.0.0 -m "Primeira release"
-
-# Tag leve
-git tag v1.0.0-beta
-
-# Listar tags
-git tag -l "v1.*"
-
-# Push tags para remoto
-git push origin v1.0.0
-git push origin --tags    # todas
-
-# Deletar tag
-git tag -d v1.0.0
-git push origin --delete v1.0.0</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Conventional Commits</code><span class="cmd-tag">Padrão</span></div>
-              <p>Padrão de mensagens para changelog automático.</p>
-              <pre><code># Formato:
-# tipo(escopo): descrição
-
-feat: adiciona autenticação OAuth
-feat(api): implementa endpoint /users
-fix: corrige validação de email
-fix(auth): token não expira corretamente
-docs: atualiza README com exemplos
-style: formata código com prettier
-refactor: extrai lógica para service
-test: adiciona testes para UserService
-chore: atualiza dependências
-ci: adiciona step de lint no pipeline
-
-# Breaking change:
-feat!: remove suporte a Node 14
-# ou
-feat: migra para ESM
-BREAKING CHANGE: require() não funciona mais</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>5. Semantic Versioning (SemVer)</h3>
-          <div class="info-box highlight">
-            <strong>MAJOR.MINOR.PATCH — Exemplo: v2.1.3</strong>
-            <pre><code>MAJOR (2) → Breaking changes (incompatível com anterior)
-MINOR (1) → Nova funcionalidade (compatível)
-PATCH (3) → Correção de bug (compatível)
-
-Exemplos:
-v1.0.0 → v1.0.1  (fix: corrige bug)
-v1.0.1 → v1.1.0  (feat: nova feature)
-v1.1.0 → v2.0.0  (feat!: breaking change)</code></pre>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== SEÇÃO 4: AUTOMAÇÃO E GESTÃO (Módulos 07-08) ==================== -->
-    <section id="automacao" class="module-section alt-bg">
-      <div class="container">
-        <div class="module-header">
-          <span class="module-badge">Módulo 07</span>
-          <h2>Automação: GitHub Actions, CI/CD e Hooks</h2>
-          <p>Automatize testes, builds e deploys diretamente no GitHub. GitHub Actions é a plataforma de CI/CD integrada ao repositório.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>1. GitHub Actions — Fundamentos</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Workflow YAML</code><span class="cmd-tag">CI/CD</span></div>
-              <p>Arquivo de workflow em <code>.github/workflows/</code>.</p>
-              <pre><code># .github/workflows/ci.yml
-name: CI Pipeline
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build
-        run: npm run build</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>Deploy Workflow</code><span class="cmd-tag">CD</span></div>
-              <p>Exemplo de deploy automático para AWS S3 + CloudFront.</p>
-              <pre><code># .github/workflows/deploy.yml
-name: Deploy to Production
-
-on:
-  push:
-    branches: [main]
-
-permissions:
-  id-token: write
-  contents: read
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::123456789:role/github-actions
-          aws-region: us-east-1
-
-      - name: Sync to S3
-        run: aws s3 sync ./dist s3://meu-bucket --delete
-
-      - name: Invalidate CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CF_DISTRIBUTION_ID }} \
-            --paths "/*"</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>2. Terraform CI com GitHub Actions</h3>
-          <div class="command-card wide">
-            <div class="command-header"><code>Terraform Pipeline</code><span class="cmd-tag">IaC</span></div>
-            <pre><code># .github/workflows/terraform.yml
-name: Terraform CI
-
-on:
-  pull_request:
-    paths: ['**/*.tf', '**/*.tfvars']
-
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
-
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Init
-        run: terraform init -backend=false
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -no-color
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}</code></pre>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>3. Git Hooks</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Hooks Locais</code><span class="cmd-tag">Automação</span></div>
-              <p>Scripts executados automaticamente em eventos Git.</p>
-              <pre><code># .git/hooks/pre-commit
-#!/bin/bash
-echo "Rodando lint antes do commit..."
-npm run lint
-if [ $? -ne 0 ]; then
-  echo "❌ Lint falhou! Corrija antes de commitar."
-  exit 1
-fi
-
-# .git/hooks/commit-msg
-#!/bin/bash
-MSG=$(cat "$1")
-PATTERN="^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"
-if ! echo "$MSG" | grep -qE "$PATTERN"; then
-  echo "❌ Mensagem fora do padrão Conventional Commits"
-  exit 1
-fi</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Husky + lint-staged</code><span class="cmd-tag">Ferramenta</span></div>
-              <p>Gerencia hooks de forma compartilhável com o time.</p>
-              <pre><code># Instalar Husky
-npm install -D husky lint-staged
-npx husky init
-
-# .husky/pre-commit
-npx lint-staged
-
-# package.json
-{
-  "lint-staged": {
-    "*.{js,ts}": ["eslint --fix", "prettier --write"],
-    "*.{css,md}": ["prettier --write"]
-  }
-}
-
-# Agora todo commit roda lint automaticamente
-# E é compartilhado via package.json!</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-header" style="margin-top:64px">
-          <span class="module-badge">Módulo 08</span>
-          <h2>GitHub: Projects, Pages, Environments e Segurança</h2>
-          <p>Recursos avançados do GitHub para gestão de projetos, deploy de sites estáticos e segurança do repositório.</p>
-        </div>
-
-        <div class="topic-block">
-          <h3>4. Branch Protection Rules</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Branch Protection</code><span class="cmd-tag">Segurança</span></div>
-              <p>Proteja branches importantes contra push direto e merges sem review.</p>
-              <pre><code># Settings → Branches → Add rule
-# Branch name pattern: main
-
-# Regras recomendadas:
-✅ Require a pull request before merging
-  ✅ Require approvals (mínimo 1)
-  ✅ Dismiss stale pull request approvals
-✅ Require status checks to pass
-  ✅ Require branches to be up to date
-  → Selecione: CI Pipeline, Tests
-✅ Require conversation resolution
-✅ Require signed commits (opcional)
-✅ Do not allow bypassing the above settings
-
-# Resultado: ninguém faz push direto na main
-# Todo código passa por PR + CI + Review</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>CODEOWNERS</code><span class="cmd-tag">Governança</span></div>
-              <p>Define responsáveis automáticos por review.</p>
-              <pre><code># .github/CODEOWNERS
-
-# Donos globais (review em tudo)
-* @tech-lead @senior-dev
-
-# Por diretório
-/src/auth/     @security-team
-/infra/        @devops-team
-/docs/         @tech-writer
-
-# Por extensão
-*.tf           @devops-team
-*.yml          @devops-team
-*.test.ts      @qa-team
-
-# Resultado: PRs que tocam esses arquivos
-# automaticamente pedem review dos owners</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Environments</code><span class="cmd-tag">Deploy</span></div>
-              <p>Controle deploys com aprovações e secrets por ambiente.</p>
-              <pre><code># Settings → Environments
-
-# Ambiente: production
-# - Required reviewers: @tech-lead
-# - Wait timer: 5 minutes
-# - Deployment branches: main only
-# - Secrets: AWS_ROLE_ARN, CF_DIST_ID
-
-# Ambiente: staging
-# - No protection rules
-# - Deployment branches: develop, release/*
-# - Secrets: AWS_ROLE_ARN_STAGING
-
-# No workflow:
-jobs:
-  deploy:
-    environment: production  # ← ativa proteções
-    runs-on: ubuntu-latest</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>5. GitHub Projects e Pages</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>GitHub Projects</code><span class="cmd-tag">Gestão</span></div>
-              <p>Kanban integrado ao repositório.</p>
-              <pre><code># Criar Project (V2):
-# Repo → Projects → New Project
-
-# Colunas sugeridas:
-# 📋 Backlog
-# 🏗️ In Progress
-# 👀 In Review
-# ✅ Done
-
-# Automações:
-# - Issue criada → Backlog
-# - PR aberto → In Progress
-# - PR merged → Done
-
-# Campos customizados:
-# - Priority: P0, P1, P2
-# - Sprint: Sprint 1, Sprint 2
-# - Size: S, M, L, XL</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>GitHub Pages</code><span class="cmd-tag">Deploy</span></div>
-              <p>Hospede sites estáticos gratuitamente.</p>
-              <pre><code># Settings → Pages
-
-# Source: GitHub Actions (recomendado)
-# ou
-# Source: Deploy from branch (gh-pages)
-
-# Workflow para Pages:
-# .github/workflows/pages.yml
-name: Deploy to GitHub Pages
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-      - uses: actions/deploy-pages@v4</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Segurança</code><span class="cmd-tag">GitHub</span></div>
-              <p>Recursos de segurança do repositório.</p>
-              <pre><code># Settings → Security
-
-# Dependabot Alerts
-# → Detecta vulnerabilidades em dependências
-# → Cria PRs automáticos com fix
-
-# Secret Scanning
-# → Detecta tokens/keys commitados
-# → Alerta e pode bloquear push
-
-# Code Scanning (CodeQL)
-# → Análise estática de segurança
-# → Detecta SQL injection, XSS, etc.
-
-# Security Policy
-# → SECURITY.md na raiz
-# → Como reportar vulnerabilidades
-
-# Signed Commits (GPG)
-git config --global commit.gpgsign true
-git config --global user.signingkey KEY_ID</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Templates</code><span class="cmd-tag">Organização</span></div>
-              <p>Padronize Issues e PRs com templates.</p>
-              <pre><code># .github/ISSUE_TEMPLATE/bug_report.md
----
-name: Bug Report
-about: Reporte um bug
-labels: bug
----
-## Descrição
-## Passos para Reproduzir
-## Comportamento Esperado
-## Screenshots
-## Ambiente
-
-# .github/PULL_REQUEST_TEMPLATE.md
-## O que foi feito
-## Tipo de mudança
-- [ ] Bug fix
-- [ ] Nova feature
-- [ ] Breaking change
-## Checklist
-- [ ] Testes adicionados
-- [ ] Documentação atualizada
-- [ ] Lint passa sem erros</code></pre>
-            </div>
-          </div>
+        <div class="resource-grid">
+          <article class="resource-card">
+            <span class="resource-type">PDF</span>
+            <h3>Git & GitHub: Do Zero ao Avançado</h3>
+            <p>Guia completo com todos os 9 módulos — configuração, branches, colaboração, rebase, fluxos profissionais, GitHub Actions e segurança.</p>
+            <form class="inline-download-form" data-material="git-github-do-zero-ao-avancado.pdf">
+              <input type="text" name="name" placeholder="Seu nome" autocomplete="name" required />
+              <input type="email" name="email" placeholder="Seu e-mail" autocomplete="email" required />
+              <label class="checkbox"><input type="checkbox" name="consent" required /><span>Aceito compartilhar meus dados para receber este material.</span></label>
+              <button type="submit">Baixar PDF gratuito</button>
+              <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
         </div>
       </div>
     </section>
@@ -1198,11 +148,11 @@ labels: bug
     <section class="learning-section">
       <div class="container learning-box">
         <div>
-          <span class="eyebrow">🎉 Parabéns!</span>
-          <h2>Trilha Git & GitHub completa.</h2>
-          <p>O próximo passo é praticar diariamente. Contribua em projetos open source, crie repositórios pessoais e automatize seus workflows. A prática constante transforma conhecimento em habilidade.</p>
+          <span class="eyebrow">🚀 Pronto para começar?</span>
+          <h2>Comece pelo Módulo 00</h2>
+          <p>Siga os módulos na ordem, execute todos os comandos e domine o controle de versão mais usado no mercado.</p>
         </div>
-        <a href="index.html" class="button primary">Explorar outras trilhas</a>
+        <a href="github/modulo-00.html" class="button primary">Iniciar Módulo 00</a>
       </div>
     </section>
   </main>

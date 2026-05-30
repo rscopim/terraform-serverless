@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub Módulo 02: Branches</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-01.html" class="nav-link">← Anterior</a>
+        <a href="modulo-03.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐙 Git & GitHub — Módulo 02</span>
+        <h1>Branches: Ramificação e Merge</h1>
+        <p>Criar, mergear, stash, convenções de nomes, estratégias de merge. Branches permitem trabalhar em funcionalidades isoladas sem afetar o código principal.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Criando e Navegando entre Branches</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>git branch / checkout / switch</code><span class="cmd-tag">Essencial</span></div>
+              <p>Gerencia branches locais e remotas.</p>
+              <pre><code># Listar branches
+git branch              # locais
+git branch -a           # locais + remotas
+git branch -v           # com último commit
+
+# Criar branch
+git branch feature/login
+git checkout -b feature/login    # cria e muda
+git switch -c feature/login      # forma moderna
+
+# Mudar de branch
+git checkout main
+git switch main
+
+# Deletar branch
+git branch -d feature/login      # seguro (merged)
+git branch -D feature/login      # forçado
+git push origin --delete feature/login  # remota</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>Convenções de nomes:</strong> <code>feature/</code> nova funcionalidade, <code>fix/</code> ou <code>bugfix/</code> correção, <code>hotfix/</code> correção urgente em produção, <code>release/</code> preparação de release, <code>chore/</code> tarefas de manutenção.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Merge e Estratégias</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>git merge</code><span class="cmd-tag">Integração</span></div>
+              <p>Integra mudanças de uma branch em outra.</p>
+              <pre><code># Merge da feature na main
+git checkout main
+git merge feature/login
+
+# Merge com commit explícito
+git merge --no-ff feature/login
+
+# Abortar merge com conflito
+git merge --abort</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git stash</code><span class="cmd-tag">Utilidade</span></div>
+              <p>Salva mudanças temporariamente sem commit.</p>
+              <pre><code># Guardar mudanças
+git stash
+git stash push -m "WIP: navbar"
+
+# Listar e recuperar
+git stash list
+git stash pop           # aplica e remove
+git stash apply stash@{0}  # aplica sem remover
+
+# Limpar
+git stash drop stash@{0}
+git stash clear</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git diff</code><span class="cmd-tag">Comparação</span></div>
+              <p>Mostra diferenças entre estados.</p>
+              <pre><code>git diff                   # working vs staging
+git diff --staged          # staging vs commit
+git diff main..feature     # entre branches
+git diff HEAD~3            # últimos 3 commits
+git diff --stat            # resumo</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Estratégias de Merge</code><span class="cmd-tag">Conceito</span></div>
+              <p>Entenda quando usar cada tipo.</p>
+              <pre><code># Fast-forward (padrão quando possível)
+# Histórico linear, sem commit de merge
+git merge feature  # se main não avançou
+
+# No fast-forward (preserva histórico)
+git merge --no-ff feature
+# Cria commit de merge sempre
+
+# Squash (compacta commits)
+git merge --squash feature
+git commit -m "feat: login completo"</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

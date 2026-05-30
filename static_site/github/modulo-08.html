@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub Módulo 08: Projects, Pages e Segurança</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-07.html" class="nav-link">← Anterior</a>
+        <a href="../github.html" class="nav-link">Voltar ao Curso</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐙 Git & GitHub — Módulo 08</span>
+        <h1>GitHub: Projects, Pages, Environments e Segurança</h1>
+        <p>GitHub Projects, Pages, Environments, Branch Protection, CODEOWNERS, Dependabot. Recursos avançados para gestão de projetos e segurança.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Branch Protection Rules</h2>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Branch Protection</code><span class="cmd-tag">Segurança</span></div>
+              <p>Proteja branches importantes contra push direto e merges sem review.</p>
+              <pre><code># Settings → Branches → Add rule
+# Branch name pattern: main
+
+# Regras recomendadas:
+✅ Require a pull request before merging
+  ✅ Require approvals (mínimo 1)
+  ✅ Dismiss stale pull request approvals
+✅ Require status checks to pass
+  ✅ Require branches to be up to date
+  → Selecione: CI Pipeline, Tests
+✅ Require conversation resolution
+✅ Require signed commits (opcional)
+✅ Do not allow bypassing the above settings
+
+# Resultado: ninguém faz push direto na main
+# Todo código passa por PR + CI + Review</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CODEOWNERS</code><span class="cmd-tag">Governança</span></div>
+              <p>Define responsáveis automáticos por review.</p>
+              <pre><code># .github/CODEOWNERS
+
+# Donos globais (review em tudo)
+* @tech-lead @senior-dev
+
+# Por diretório
+/src/auth/     @security-team
+/infra/        @devops-team
+/docs/         @tech-writer
+
+# Por extensão
+*.tf           @devops-team
+*.yml          @devops-team
+*.test.ts      @qa-team
+
+# Resultado: PRs que tocam esses arquivos
+# automaticamente pedem review dos owners</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Environments</code><span class="cmd-tag">Deploy</span></div>
+              <p>Controle deploys com aprovações e secrets por ambiente.</p>
+              <pre><code># Settings → Environments
+
+# Ambiente: production
+# - Required reviewers: @tech-lead
+# - Wait timer: 5 minutes
+# - Deployment branches: main only
+# - Secrets: AWS_ROLE_ARN, CF_DIST_ID
+
+# Ambiente: staging
+# - No protection rules
+# - Deployment branches: develop, release/*
+# - Secrets: AWS_ROLE_ARN_STAGING
+
+# No workflow:
+jobs:
+  deploy:
+    environment: production  # ← ativa proteções
+    runs-on: ubuntu-latest</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. GitHub Projects e Pages</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>GitHub Projects</code><span class="cmd-tag">Gestão</span></div>
+              <p>Kanban integrado ao repositório.</p>
+              <pre><code># Criar Project (V2):
+# Repo → Projects → New Project
+
+# Colunas sugeridas:
+# 📋 Backlog
+# 🏗️ In Progress
+# 👀 In Review
+# ✅ Done
+
+# Automações:
+# - Issue criada → Backlog
+# - PR aberto → In Progress
+# - PR merged → Done
+
+# Campos customizados:
+# - Priority: P0, P1, P2
+# - Sprint: Sprint 1, Sprint 2
+# - Size: S, M, L, XL</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>GitHub Pages</code><span class="cmd-tag">Deploy</span></div>
+              <p>Hospede sites estáticos gratuitamente.</p>
+              <pre><code># Settings → Pages
+
+# Source: GitHub Actions (recomendado)
+# ou
+# Source: Deploy from branch (gh-pages)
+
+# Workflow para Pages:
+# .github/workflows/pages.yml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+      - uses: actions/deploy-pages@v4</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Segurança</code><span class="cmd-tag">GitHub</span></div>
+              <p>Recursos de segurança do repositório.</p>
+              <pre><code># Settings → Security
+
+# Dependabot Alerts
+# → Detecta vulnerabilidades em dependências
+# → Cria PRs automáticos com fix
+
+# Secret Scanning
+# → Detecta tokens/keys commitados
+# → Alerta e pode bloquear push
+
+# Code Scanning (CodeQL)
+# → Análise estática de segurança
+# → Detecta SQL injection, XSS, etc.
+
+# Security Policy
+# → SECURITY.md na raiz
+# → Como reportar vulnerabilidades
+
+# Signed Commits (GPG)
+git config --global commit.gpgsign true
+git config --global user.signingkey KEY_ID</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Templates</code><span class="cmd-tag">Organização</span></div>
+              <p>Padronize Issues e PRs com templates.</p>
+              <pre><code># .github/ISSUE_TEMPLATE/bug_report.md
+---
+name: Bug Report
+about: Reporte um bug
+labels: bug
+---
+## Descrição
+## Passos para Reproduzir
+## Comportamento Esperado
+## Screenshots
+## Ambiente
+
+# .github/PULL_REQUEST_TEMPLATE.md
+## O que foi feito
+## Tipo de mudança
+- [ ] Bug fix
+- [ ] Nova feature
+- [ ] Breaking change
+## Checklist
+- [ ] Testes adicionados
+- [ ] Documentação atualizada
+- [ ] Lint passa sem erros</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-07.html" class="button secondary">← Módulo Anterior</a>
+        <a href="../github.html" class="button primary">Voltar ao Curso</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>

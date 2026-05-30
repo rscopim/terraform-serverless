@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Git & GitHub Módulo 01: Fundamentos</title>
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="modulo-00.html" class="nav-link">← Anterior</a>
+        <a href="modulo-02.html" class="nav-link">Próximo →</a>
+        <a href="../index.html" class="nav-button">Início</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐙 Git & GitHub — Módulo 01</span>
+        <h1>Fundamentos</h1>
+        <p>git init, add, commit, push, pull, clone, status, log, .gitignore. O fluxo básico do Git: inicializar, rastrear mudanças, criar snapshots e sincronizar com o GitHub.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+
+        <div class="topic-block">
+          <h2>1. Criando e Clonando Repositórios</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>git init</code><span class="cmd-tag">Criar</span></div>
+              <p>Inicializa um repositório Git local.</p>
+              <pre><code>mkdir meu-projeto
+cd meu-projeto
+git init
+# Initialized empty Git repository</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git clone</code><span class="cmd-tag">Criar</span></div>
+              <p>Clona um repositório remoto para sua máquina.</p>
+              <pre><code># Via SSH (recomendado)
+git clone git@github.com:user/repo.git
+
+# Via HTTPS
+git clone https://github.com/user/repo.git
+
+# Clone com nome customizado
+git clone git@github.com:user/repo.git meu-dir</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>2. Fluxo Básico: add → commit → push</h2>
+          <div class="info-box highlight">
+            <strong>Os 3 estados do Git:</strong>
+            <pre><code>Working Directory → Staging Area → Repository
+   (modificado)      (preparado)     (commitado)
+      git add →      git commit →    git push →  Remote</code></pre>
+          </div>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>git status</code><span class="cmd-tag">Essencial</span></div>
+              <p>Mostra o estado atual dos arquivos.</p>
+              <pre><code>git status
+# On branch main
+# Changes not staged for commit:
+#   modified: index.html
+# Untracked files:
+#   style.css
+
+git status -s  # formato curto
+# M  index.html
+# ?? style.css</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git add</code><span class="cmd-tag">Staging</span></div>
+              <p>Adiciona arquivos à staging area.</p>
+              <pre><code>git add arquivo.txt       # arquivo específico
+git add .                 # tudo no diretório
+git add *.js              # por extensão
+git add -p                # interativo (por hunks)
+
+# Remover do staging (sem perder mudanças)
+git restore --staged arquivo.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git commit</code><span class="cmd-tag">Essencial</span></div>
+              <p>Cria um snapshot das mudanças no staging.</p>
+              <pre><code>git commit -m "feat: adiciona navbar"
+git commit -am "fix: corrige typo"  # add + commit
+git commit --amend  # edita último commit
+
+# Boas práticas de mensagem:
+# tipo: descrição curta (max 72 chars)
+# feat: | fix: | docs: | refactor: | test:</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git log</code><span class="cmd-tag">Histórico</span></div>
+              <p>Visualiza o histórico de commits.</p>
+              <pre><code>git log                    # completo
+git log --oneline          # resumido
+git log --oneline --graph  # com branches
+git log -5                 # últimos 5
+git log --author="João"    # por autor
+git log --since="2024-01-01"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>3. Sincronização com Remoto</h2>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>git remote</code><span class="cmd-tag">Remoto</span></div>
+              <p>Gerencia conexões com repositórios remotos.</p>
+              <pre><code>git remote add origin git@github.com:user/repo.git
+git remote -v              # lista remotos
+git remote rename origin upstream
+git remote remove upstream</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git push</code><span class="cmd-tag">Enviar</span></div>
+              <p>Envia commits locais para o remoto.</p>
+              <pre><code>git push origin main
+git push -u origin main    # define upstream
+git push                   # após -u, basta isso
+git push --force-with-lease # force seguro</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git pull</code><span class="cmd-tag">Receber</span></div>
+              <p>Baixa e integra mudanças do remoto.</p>
+              <pre><code>git pull                   # fetch + merge
+git pull --rebase          # fetch + rebase
+git pull origin main       # branch específica</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>git fetch</code><span class="cmd-tag">Receber</span></div>
+              <p>Baixa mudanças sem integrar (mais seguro).</p>
+              <pre><code>git fetch origin
+git fetch --all            # todos os remotos
+git log origin/main..main  # ver diferenças
+# Depois: git merge origin/main</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h2>4. Arquivos Ignorados</h2>
+          <div class="command-card wide">
+            <div class="command-header"><code>.gitignore</code><span class="cmd-tag">Configuração</span></div>
+            <p>Define quais arquivos o Git deve ignorar.</p>
+            <pre><code># .gitignore — exemplo para Node.js + Terraform
+node_modules/
+dist/
+.env
+.env.local
+*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="learning-section">
+      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
+        <a href="modulo-00.html" class="button secondary">← Módulo Anterior</a>
+        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
