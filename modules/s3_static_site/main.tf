@@ -417,6 +417,14 @@ resource "aws_s3_object" "simulado_js" {
   etag         = filemd5("${path.root}/../../static_site/simulado.js")
 }
 
+resource "aws_s3_object" "config_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "config.js"
+  content      = "window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };"
+  content_type = "application/javascript"
+  etag         = md5("window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };")
+}
+
 resource "aws_s3_object" "sitemap_xml" {
   bucket       = aws_s3_bucket.this.id
   key          = "sitemap.xml"
