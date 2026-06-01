@@ -34,12 +34,45 @@
       <div class="container training-hero-content">
         <span class="pill">🎯 Simulado</span>
         <h1>AWS Cloud Practitioner — Simulado</h1>
-        <p>20 perguntas no estilo do exame oficial CLF-C02. Nível foundational — conceitos de cloud, serviços e pricing.</p>
+        <p>Escolha a quantidade de questões e teste seus conhecimentos no exame CLF-C02.</p>
       </div>
     </section>
 
+    <!-- ===== SELETOR DE QUANTIDADE DE QUESTÕES — CLOUD PRACTITIONER ===== -->
+    <section class="section container" id="quizSetup">
+      <div style="max-width:520px;margin:0 auto;text-align:center">
+        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--gray-900)">Quantas questões você quer responder?</h2>
+        <p style="color:var(--gray-500);font-size:0.9rem;margin-bottom:28px">O exame oficial tem 65 questões. Escolha o modo que melhor se adapta ao seu tempo.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px">
+          <button class="quiz-size-btn" onclick="startQuizWithSize(10)">
+            <span style="font-size:1.6rem">⚡</span>
+            <strong>10 questões</strong>
+            <small>Revisão rápida</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(20)">
+            <span style="font-size:1.6rem">📝</span>
+            <strong>20 questões</strong>
+            <small>Treino padrão</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(40)">
+            <span style="font-size:1.6rem">🎯</span>
+            <strong>40 questões</strong>
+            <small>Simulado avançado</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(65)">
+            <span style="font-size:1.6rem">🏆</span>
+            <strong>65 questões</strong>
+            <small>Exame completo</small>
+          </button>
+        </div>
+        <p style="font-size:0.78rem;color:var(--gray-400)">Banco com <strong id="bankSizeInfo">—</strong> questões disponíveis. Questões sorteadas aleatoriamente a cada tentativa.</p>
+      </div>
+    </section>
+    <!-- ===== FIM SELETOR DE QUANTIDADE ===== -->
+
     <section class="section container">
-      <div class="quiz-container" id="quizContainer">
+      <!-- ===== QUIZ CONTAINER — oculto até o usuário escolher a quantidade ===== -->
+      <div class="quiz-container" id="quizContainer" style="display:none">
         <div class="quiz-header">
           <div class="quiz-progress">
             <span id="questionCounter">Pergunta 1 de 20</span>
@@ -73,6 +106,9 @@
           </div>
           <div class="result-bar"><div class="result-fill" id="resultFill" style="width: 0%"></div></div>
           <p class="result-message" id="resultMessage"></p>
+          <!-- ===== BADGE DE APROVAÇÃO — CLOUD PRACTITIONER ===== -->
+          <div id="approvalBadge" style="display:none;margin:12px 0 20px"></div>
+          <!-- ===== FIM BADGE DE APROVAÇÃO ===== -->
           <div class="result-actions">
             <button class="quiz-btn" onclick="restartQuiz()">Refazer simulado</button>
             <a href="../cloud-practitioner.html" class="quiz-btn secondary">Voltar ao curso</a>
@@ -93,6 +129,7 @@
   </footer>
 
   <script>
+    /* ===== BANCO DE QUESTÕES — CLOUD PRACTITIONER ===== */
     var QUIZ_BANK = [
       {
         question: "Qual é a principal vantagem do modelo de precificação pay-as-you-go da AWS?",
@@ -287,7 +324,70 @@
         explanation: "A nuvem transforma investimento de capital (servidores, data center) em despesa operacional (pay-as-you-go), além de oferecer elasticidade, velocidade de inovação e presença global."
       }
     ];
+    /* ===== FIM BANCO DE QUESTÕES ===== */
+
+    /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — CLOUD PRACTITIONER ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      var el = document.getElementById('bankSizeInfo');
+      if (el) el.textContent = QUIZ_BANK.length;
+    });
+
+    function startQuizWithSize(size) {
+      QUIZ_SIZE = Math.min(size, QUIZ_BANK.length);
+      document.getElementById('quizSetup').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+      initQuiz();
+    }
+
+    function restartQuiz() {
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('quizSetup').style.display = 'block';
+      document.getElementById('approvalBadge').style.display = 'none';
+    }
+
+    window.addEventListener('load', function() {
+      var origShowResult = showResult;
+      showResult = function() {
+        origShowResult();
+        var total = activeQuestions.length;
+        var percent = Math.round((score / total) * 100);
+        var badge = document.getElementById('approvalBadge');
+        var icon, label, color, msg;
+
+        if (percent >= 90) {
+          icon = '🏆'; label = 'Desempenho Excepcional';
+          color = '#065f46';
+          msg = 'Resultado extraordinário! Você demonstra domínio completo dos conceitos de Cloud. Está mais do que preparado — agende seu exame!';
+        } else if (percent >= 80) {
+          icon = '⭐'; label = 'Desempenho Excelente';
+          color = '#1d4ed8';
+          msg = 'Excelente! Seu conhecimento está muito sólido. Revise os pontos que errou e você chegará ao exame com grande confiança.';
+        } else if (percent >= 70) {
+          icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
+          color = '#047857';
+          msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
+        } else if (percent >= 60) {
+          icon = '📚'; label = 'Revisar e Continuar';
+          color = '#b45309';
+          msg = 'Você está próximo! Revise os domínios onde teve mais dificuldade, especialmente os de maior peso no exame, e tente novamente.';
+        } else {
+          icon = '🔄'; label = 'Rever Conceitos e Melhorar';
+          color = '#dc2626';
+          msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos de Cloud e pratique mais. Você consegue!';
+        }
+
+        badge.style.display = 'block';
+        badge.innerHTML =
+          '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
+          '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
+          '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
+          '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
+          '</div>';
+      };
+    });
+    /* ===== FIM SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO ===== */
   </script>
   <script src="../simulado.js"></script>
 </body>
+</html>
 </html>
