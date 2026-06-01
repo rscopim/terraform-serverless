@@ -23,8 +23,7 @@ templates/
 # Documentos internos
 docs/MELHORIAS-E-EVOLUCAO.md
 
-# Bancos de questões dos simulados (ficam locais)
-static_site/**/questoes.js
+
 
 # Backup
 static_site_backup/
