@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Simulado AWS Cloud Practitioner (CLF-C02)</title>
-  <meta name="description" content="Simulado interativo com 20 perguntas no estilo do exame AWS Cloud Practitioner CLF-C02." />
+  <meta name="description" content="Simulado interativo com questões no estilo do exame AWS Cloud Practitioner CLF-C02." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,11 +34,11 @@
       <div class="container training-hero-content">
         <span class="pill">🎯 Simulado</span>
         <h1>AWS Cloud Practitioner — Simulado</h1>
-        <p>Escolha a quantidade de questões e teste seus conhecimentos no exame CLF-C02.</p>
+        <p>Escolha a quantidade de questões e teste seus conhecimentos nos 5 domínios do exame CLF-C02.</p>
       </div>
     </section>
 
-    <!-- ===== SELETOR DE QUANTIDADE DE QUESTÕES — CLOUD PRACTITIONER ===== -->
+    <!-- ===== SELETOR DE QUANTIDADE DE QUESTÕES — Cloud Practitioner ===== -->
     <section class="section container" id="quizSetup">
       <div style="max-width:520px;margin:0 auto;text-align:center">
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--gray-900)">Quantas questões você quer responder?</h2>
@@ -76,10 +76,15 @@
         <div class="quiz-header">
           <div class="quiz-progress">
             <span id="questionCounter">Pergunta 1 de 20</span>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 5%"></div></div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 5%"></div>
+            </div>
           </div>
-          <div class="quiz-score"><span id="scoreDisplay">Score: 0/0</span></div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
         </div>
+
         <div class="question-card" id="questionCard">
           <div class="question-number" id="questionNumber">Pergunta 1</div>
           <h3 class="question-text" id="questionText"></h3>
@@ -104,9 +109,11 @@
             <span class="score-number" id="finalScore">0/20</span>
             <span class="score-percent" id="finalPercent">0%</span>
           </div>
-          <div class="result-bar"><div class="result-fill" id="resultFill" style="width: 0%"></div></div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
           <p class="result-message" id="resultMessage"></p>
-          <!-- ===== BADGE DE APROVAÇÃO — CLOUD PRACTITIONER ===== -->
+          <!-- ===== BADGE DE APROVAÇÃO — Cloud Practitioner ===== -->
           <div id="approvalBadge" style="display:none;margin:12px 0 20px"></div>
           <!-- ===== FIM BADGE DE APROVAÇÃO ===== -->
           <div class="result-actions">
@@ -121,217 +128,27 @@
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
       <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>
 
+  <!-- ===== SCRIPTS — ORDEM IMPORTANTE ===== -->
+  <!-- 1. Banco de questões (arquivo local, não sobe pro GitHub) -->
+  <script src="questoes.js"></script>
+  <!-- 2. Engine do simulado (lógica de quiz, shuffle, progresso) -->
+  <script src="../simulado.js"></script>
+  <!-- 3. Seletor de quantidade + badge de aprovação (carrega APÓS simulado.js) -->
   <script>
-    /* ===== BANCO DE QUESTÕES — CLOUD PRACTITIONER ===== */
-    var QUIZ_BANK = [
-      {
-        question: "Qual é a principal vantagem do modelo de precificação pay-as-you-go da AWS?",
-        options: ["A) Custos fixos mensais previsíveis", "B) Pagar apenas pelos recursos efetivamente consumidos", "C) Desconto automático de 50% em todos os serviços", "D) Gratuidade total no primeiro ano"],
-        correct: 1,
-        explanation: "O modelo pay-as-you-go permite pagar apenas pelo que é consumido, sem investimento inicial (CapEx). Isso transforma custos fixos em variáveis, alinhando gastos ao uso real."
-      },
-      {
-        question: "Qual pilar do AWS Well-Architected Framework foca em proteger dados, sistemas e ativos?",
-        options: ["A) Excelência Operacional", "B) Confiabilidade", "C) Segurança", "D) Eficiência de Performance"],
-        correct: 2,
-        explanation: "O pilar Segurança abrange proteção de dados, gerenciamento de identidades, detecção de eventos de segurança e proteção de infraestrutura e aplicações."
-      },
-      {
-        question: "Qual serviço AWS é um banco de dados relacional gerenciado?",
-        options: ["A) Amazon DynamoDB", "B) Amazon RDS", "C) Amazon S3", "D) Amazon ElastiCache"],
-        correct: 1,
-        explanation: "Amazon RDS (Relational Database Service) gerencia bancos relacionais como MySQL, PostgreSQL, Oracle e SQL Server. DynamoDB é NoSQL, S3 é storage e ElastiCache é cache."
-      },
-      {
-        question: "No modelo de responsabilidade compartilhada, qual é responsabilidade da AWS?",
-        options: ["A) Configuração de Security Groups", "B) Criptografia de dados do cliente", "C) Segurança física dos data centers", "D) Gerenciamento de IAM users"],
-        correct: 2,
-        explanation: "A AWS é responsável pela segurança DA nuvem: infraestrutura física, hardware, rede global e hypervisor. O cliente é responsável pela segurança NA nuvem: dados, IAM, firewall."
-      },
-      {
-        question: "Qual serviço permite executar código sem provisionar servidores?",
-        options: ["A) Amazon EC2", "B) AWS Lambda", "C) Amazon ECS", "D) AWS Elastic Beanstalk"],
-        correct: 1,
-        explanation: "AWS Lambda é serverless — executa código em resposta a eventos sem necessidade de gerenciar servidores. Cobra apenas pelo tempo de execução e número de invocações."
-      },
-      {
-        question: "Qual serviço AWS fornece uma rede de entrega de conteúdo (CDN) global?",
-        options: ["A) Amazon Route 53", "B) AWS Direct Connect", "C) Amazon CloudFront", "D) Elastic Load Balancing"],
-        correct: 2,
-        explanation: "Amazon CloudFront é a CDN da AWS com 450+ pontos de presença globais. Entrega conteúdo com baixa latência fazendo cache em edge locations próximas ao usuário."
-      },
-      {
-        question: "Qual conceito de cloud permite aumentar ou diminuir recursos automaticamente conforme a demanda?",
-        options: ["A) Alta disponibilidade", "B) Elasticidade", "C) Tolerância a falhas", "D) Agilidade"],
-        correct: 1,
-        explanation: "Elasticidade é a capacidade de escalar recursos automaticamente (para cima ou para baixo) conforme a demanda muda, pagando apenas pelo que é usado."
-      },
-      {
-        question: "Qual serviço AWS é usado para gerenciar identidades e permissões de acesso?",
-        options: ["A) Amazon Cognito", "B) AWS IAM", "C) AWS Shield", "D) Amazon Inspector"],
-        correct: 1,
-        explanation: "AWS IAM (Identity and Access Management) gerencia users, groups, roles e policies que controlam quem pode acessar quais recursos AWS e com quais permissões."
-      },
-      {
-        question: "Uma empresa precisa armazenar objetos com alta durabilidade (99.999999999%). Qual serviço usar?",
-        options: ["A) Amazon EBS", "B) Amazon S3", "C) Amazon EFS", "D) AWS Storage Gateway"],
-        correct: 1,
-        explanation: "Amazon S3 oferece 11 noves de durabilidade (99.999999999%). Projetado para armazenamento de objetos com redundância automática em múltiplas AZs."
-      },
-      {
-        question: "Qual plano de suporte AWS oferece acesso a um Technical Account Manager (TAM)?",
-        options: ["A) Basic", "B) Developer", "C) Business", "D) Enterprise"],
-        correct: 3,
-        explanation: "Apenas o plano Enterprise inclui um TAM dedicado, além de Concierge Support Team, revisões de arquitetura e tempo de resposta de 15 minutos para casos críticos."
-      },
-      {
-        question: "Qual serviço AWS monitora recursos e aplicações em tempo real com métricas e alarmes?",
-        options: ["A) AWS CloudTrail", "B) Amazon CloudWatch", "C) AWS Config", "D) AWS Trusted Advisor"],
-        correct: 1,
-        explanation: "Amazon CloudWatch coleta métricas, logs e eventos de recursos AWS. Permite criar alarmes, dashboards e reagir automaticamente a mudanças de estado."
-      },
-      {
-        question: "O que é uma Availability Zone (AZ) na AWS?",
-        options: ["A) Uma região geográfica com múltiplos data centers", "B) Um ou mais data centers isolados dentro de uma região", "C) Um ponto de presença do CloudFront", "D) Uma VPC privada"],
-        correct: 1,
-        explanation: "Uma AZ é um ou mais data centers com energia, rede e conectividade redundantes, isolados de outras AZs na mesma região. Regiões têm 2-6 AZs."
-      },
-      {
-        question: "Qual serviço AWS registra todas as chamadas de API feitas na conta para auditoria?",
-        options: ["A) Amazon CloudWatch", "B) AWS CloudTrail", "C) AWS Config", "D) Amazon GuardDuty"],
-        correct: 1,
-        explanation: "AWS CloudTrail registra todas as chamadas de API (quem, o quê, quando, de onde) para auditoria, compliance e investigação de segurança."
-      },
-      {
-        question: "Qual modelo de pricing oferece até 72% de desconto em troca de compromisso de 1 ou 3 anos?",
-        options: ["A) On-Demand", "B) Spot Instances", "C) Reserved Instances / Savings Plans", "D) Dedicated Hosts"],
-        correct: 2,
-        explanation: "Reserved Instances e Savings Plans oferecem descontos significativos (até 72%) em troca de compromisso de uso por 1 ou 3 anos. Ideal para workloads previsíveis."
-      },
-      {
-        question: "Qual serviço AWS protege aplicações web contra ataques DDoS automaticamente e sem custo adicional?",
-        options: ["A) AWS WAF", "B) AWS Shield Standard", "C) Amazon GuardDuty", "D) AWS Firewall Manager"],
-        correct: 1,
-        explanation: "AWS Shield Standard protege automaticamente todos os clientes AWS contra ataques DDoS nas camadas 3 e 4, sem custo adicional. Shield Advanced oferece proteção extra (pago)."
-      },
-      {
-        question: "Qual ferramenta AWS fornece recomendações de otimização em custo, performance, segurança e tolerância a falhas?",
-        options: ["A) AWS Config", "B) AWS Trusted Advisor", "C) AWS Systems Manager", "D) AWS Cost Explorer"],
-        correct: 1,
-        explanation: "AWS Trusted Advisor analisa sua conta e fornece recomendações em 5 categorias: custo, performance, segurança, tolerância a falhas e limites de serviço."
-      },
-      {
-        question: "Qual é o benefício de usar múltiplas Availability Zones para uma aplicação?",
-        options: ["A) Redução de custos", "B) Maior velocidade de processamento", "C) Alta disponibilidade e tolerância a falhas", "D) Melhor segurança de dados"],
-        correct: 2,
-        explanation: "Distribuir recursos em múltiplas AZs garante que a aplicação continue funcionando mesmo se uma AZ inteira falhar, proporcionando alta disponibilidade."
-      },
-      {
-        question: "Qual serviço AWS permite criar redes virtuais isoladas na nuvem?",
-        options: ["A) AWS Direct Connect", "B) Amazon VPC", "C) Amazon Route 53", "D) AWS Transit Gateway"],
-        correct: 1,
-        explanation: "Amazon VPC (Virtual Private Cloud) permite criar redes virtuais isoladas com controle total sobre IP ranges, subnets, route tables e gateways."
-      },
-      {
-        question: "Qual é a vantagem de usar infraestrutura global da AWS com múltiplas regiões?",
-        options: ["A) Custo zero de transferência de dados", "B) Menor latência para usuários globais e disaster recovery", "C) Todos os serviços são gratuitos em novas regiões", "D) Compliance automática com todas as regulamentações"],
-        correct: 1,
-        explanation: "Múltiplas regiões permitem posicionar recursos próximos aos usuários (menor latência) e implementar disaster recovery com failover entre regiões."
-      },
-      {
-        question: "Qual serviço AWS é usado para estimar custos de uma arquitetura antes de implementá-la?",
-        options: ["A) AWS Cost Explorer", "B) AWS Pricing Calculator", "C) AWS Budgets", "D) AWS Cost and Usage Report"],
-        correct: 1,
-        explanation: "AWS Pricing Calculator permite modelar arquiteturas e estimar custos mensais antes de criar qualquer recurso. Cost Explorer analisa custos já incorridos."
-      },
-      {
-        question: "Qual serviço AWS oferece armazenamento de objetos com classes de armazenamento para diferentes padrões de acesso?",
-        options: ["A) Amazon EBS", "B) Amazon S3", "C) Amazon EFS", "D) Amazon FSx"],
-        correct: 1,
-        explanation: "Amazon S3 oferece múltiplas classes: Standard, Intelligent-Tiering, Standard-IA, One Zone-IA, Glacier e Glacier Deep Archive — cada uma com custo e disponibilidade diferentes."
-      },
-      {
-        question: "O que é o AWS Free Tier?",
-        options: ["A) Um plano pago com desconto para startups", "B) Conjunto de ofertas gratuitas para novos clientes (12 meses, sempre gratuito ou trial)", "C) Um serviço específico da AWS", "D) Desconto automático após 1 ano de uso"],
-        correct: 1,
-        explanation: "AWS Free Tier oferece uso gratuito em três categorias: 12 meses grátis (EC2, S3, RDS), sempre gratuito (Lambda 1M requests/mês, DynamoDB 25GB) e trials de curto prazo."
-      },
-      {
-        question: "Qual serviço AWS permite criar e gerenciar usuários, grupos e permissões de acesso?",
-        options: ["A) AWS Organizations", "B) AWS IAM", "C) Amazon Cognito", "D) AWS SSO"],
-        correct: 1,
-        explanation: "AWS IAM gerencia identidades e acessos: users, groups, roles e policies. É o serviço central de controle de acesso para todos os recursos AWS."
-      },
-      {
-        question: "Qual é a vantagem de usar Auto Scaling?",
-        options: ["A) Reduz o custo de armazenamento S3", "B) Ajusta automaticamente a capacidade de compute para manter performance e minimizar custos", "C) Aumenta a segurança das instâncias EC2", "D) Melhora a latência do banco de dados"],
-        correct: 1,
-        explanation: "Auto Scaling adiciona instâncias quando a demanda aumenta e remove quando diminui, garantindo performance adequada e pagando apenas pelo necessário."
-      },
-      {
-        question: "Qual serviço AWS é usado para gerenciar múltiplas contas AWS de forma centralizada?",
-        options: ["A) AWS IAM", "B) AWS Control Tower", "C) AWS Organizations", "D) AWS Config"],
-        correct: 2,
-        explanation: "AWS Organizations permite gerenciar múltiplas contas com hierarquia de OUs, políticas centralizadas (SCPs), billing consolidado e automação de criação de contas."
-      },
-      {
-        question: "O que é o princípio de 'design for failure' na AWS?",
-        options: ["A) Aceitar que sistemas sempre falharão e não investir em redundância", "B) Projetar sistemas assumindo que componentes falharão, usando redundância e recuperação automática", "C) Usar apenas serviços gerenciados da AWS", "D) Fazer backup diário de todos os dados"],
-        correct: 1,
-        explanation: "Design for failure significa assumir que qualquer componente pode falhar e projetar para isso: múltiplas AZs, health checks, auto-recovery, circuit breakers e backups automáticos."
-      },
-      {
-        question: "Qual serviço AWS fornece recomendações de segurança e identifica recursos expostos publicamente?",
-        options: ["A) AWS CloudTrail", "B) Amazon GuardDuty", "C) AWS Trusted Advisor", "D) AWS Security Hub"],
-        correct: 2,
-        explanation: "Trusted Advisor verifica configurações e fornece recomendações em segurança (portas abertas, MFA, permissões excessivas), além de custo, performance e tolerância a falhas."
-      },
-      {
-        question: "Qual é a diferença entre escalabilidade vertical e horizontal?",
-        options: ["A) Vertical aumenta o número de servidores; horizontal aumenta o tamanho do servidor", "B) Vertical aumenta o tamanho do servidor (mais CPU/RAM); horizontal adiciona mais servidores", "C) São termos sinônimos na AWS", "D) Vertical é mais barato que horizontal"],
-        correct: 1,
-        explanation: "Scale up (vertical) = servidor maior. Scale out (horizontal) = mais servidores. A AWS favorece escala horizontal com Auto Scaling — mais resiliente e sem limite teórico."
-      },
-      {
-        question: "Qual serviço AWS detecta ameaças de segurança analisando logs de CloudTrail, VPC Flow e DNS?",
-        options: ["A) AWS Shield", "B) Amazon GuardDuty", "C) AWS WAF", "D) Amazon Inspector"],
-        correct: 1,
-        explanation: "Amazon GuardDuty usa ML para analisar logs e detectar comportamentos suspeitos: acesso de IPs maliciosos, mineração de criptomoedas, exfiltração de dados e comprometimento de credenciais."
-      },
-      {
-        question: "O que é o AWS Shared Responsibility Model?",
-        options: ["A) AWS e cliente dividem os custos igualmente", "B) AWS é responsável pela segurança DA nuvem; cliente é responsável pela segurança NA nuvem", "C) O cliente é responsável por toda a segurança", "D) AWS gerencia tudo, o cliente não tem responsabilidades"],
-        correct: 1,
-        explanation: "AWS cuida da infraestrutura física, hardware, rede e hypervisor. O cliente cuida de: dados, IAM, configuração de rede, patches do SO (em IaaS), aplicações e criptografia."
-      },
-      {
-        question: "Qual serviço AWS permite executar containers sem gerenciar servidores?",
-        options: ["A) Amazon EC2", "B) AWS Fargate", "C) Amazon EKS apenas", "D) AWS Batch"],
-        correct: 1,
-        explanation: "AWS Fargate é serverless para containers — você define CPU/memória e a AWS gerencia a infraestrutura. Funciona com ECS e EKS. Sem necessidade de provisionar ou gerenciar instâncias EC2."
-      },
-      {
-        question: "Qual é o benefício principal do modelo de nuvem em relação ao data center on-premises?",
-        options: ["A) A nuvem é sempre mais barata em qualquer cenário", "B) Troca de CapEx por OpEx, agilidade, elasticidade e alcance global", "C) A nuvem elimina completamente a necessidade de segurança", "D) Todos os serviços são gratuitos no primeiro ano"],
-        correct: 1,
-        explanation: "A nuvem transforma investimento de capital (servidores, data center) em despesa operacional (pay-as-you-go), além de oferecer elasticidade, velocidade de inovação e presença global."
-      }
-    ];
-    /* ===== FIM BANCO DE QUESTÕES ===== */
+    /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — Cloud Practitioner ===== */
 
-    /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — CLOUD PRACTITIONER ===== */
-    document.addEventListener('DOMContentLoaded', function() {
-      var el = document.getElementById('bankSizeInfo');
-      if (el) el.textContent = QUIZ_BANK.length;
-    });
+    // Exibe o tamanho do banco no setup
+    var el = document.getElementById('bankSizeInfo');
+    if (el && typeof QUIZ_BANK !== 'undefined') el.textContent = QUIZ_BANK.length;
 
+    // Inicia o quiz com a quantidade escolhida pelo aluno
     function startQuizWithSize(size) {
       QUIZ_SIZE = Math.min(size, QUIZ_BANK.length);
       document.getElementById('quizSetup').style.display = 'none';
@@ -339,55 +156,56 @@
       initQuiz();
     }
 
+    // Volta ao seletor ao reiniciar
     function restartQuiz() {
       document.getElementById('quizResult').style.display = 'none';
       document.getElementById('quizSetup').style.display = 'block';
       document.getElementById('approvalBadge').style.display = 'none';
     }
 
-    window.addEventListener('load', function() {
-      var origShowResult = showResult;
-      showResult = function() {
-        origShowResult();
-        var total = activeQuestions.length;
-        var percent = Math.round((score / total) * 100);
-        var badge = document.getElementById('approvalBadge');
-        var icon, label, color, msg;
+    // Sobrescreve showResult (simulado.js já foi carregado, então a sobrescrita funciona)
+    var _baseShowResult = showResult;
+    showResult = function() {
+      _baseShowResult();
+      var total = activeQuestions.length;
+      var percent = Math.round((score / total) * 100);
+      var badge = document.getElementById('approvalBadge');
+      var icon, label, color, msg;
 
-        if (percent >= 90) {
-          icon = '🏆'; label = 'Desempenho Excepcional';
-          color = '#065f46';
-          msg = 'Resultado extraordinário! Você demonstra domínio completo dos conceitos de Cloud. Está mais do que preparado — agende seu exame!';
-        } else if (percent >= 80) {
-          icon = '⭐'; label = 'Desempenho Excelente';
-          color = '#1d4ed8';
-          msg = 'Excelente! Seu conhecimento está muito sólido. Revise os pontos que errou e você chegará ao exame com grande confiança.';
-        } else if (percent >= 70) {
-          icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
-          color = '#047857';
-          msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
-        } else if (percent >= 60) {
-          icon = '📚'; label = 'Revisar e Continuar';
-          color = '#b45309';
-          msg = 'Você está próximo! Revise os domínios onde teve mais dificuldade, especialmente os de maior peso no exame, e tente novamente.';
-        } else {
-          icon = '🔄'; label = 'Rever Conceitos e Melhorar';
-          color = '#dc2626';
-          msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos de Cloud e pratique mais. Você consegue!';
-        }
+      if (percent >= 90) {
+        icon = '🏆'; label = 'Desempenho Excepcional';
+        color = '#065f46';
+        msg = 'Resultado extraordinário! Você domina o conteúdo com maestria. Está mais do que pronto para o exame — considere agendar agora.';
+      } else if (percent >= 80) {
+        icon = '⭐'; label = 'Desempenho Excelente';
+        color = '#1d4ed8';
+        msg = 'Excelente preparação! Seu conhecimento está sólido. Revise os pontos que errou e você estará em ótima forma para o exame.';
+      } else if (percent >= 70) {
+        icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
+        color = '#047857';
+        msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
+      } else if (percent >= 60) {
+        icon = '📚'; label = 'Revisar e Continuar';
+        color = '#b45309';
+        msg = 'Você está próximo da aprovação! Revise os domínios onde teve mais dificuldade e refaça o simulado. Você consegue!';
+      } else {
+        icon = '🔄'; label = 'Rever Conceitos e Melhorar';
+        color = '#dc2626';
+        msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos e pratique mais. A aprovação está ao seu alcance.';
+      }
 
-        badge.style.display = 'block';
-        badge.innerHTML =
-          '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
-          '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
-          '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
-          '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
-          '</div>';
-      };
-    });
+      badge.style.display = 'block';
+      badge.innerHTML =
+        '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
+        '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
+        '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
+        '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
+        '</div>';
+    };
     /* ===== FIM SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO ===== */
   </script>
-  <script src="../simulado.js"></script>
+  <!-- ===== FIM SCRIPTS ===== -->
 </body>
 </html>
-</html>
+
+

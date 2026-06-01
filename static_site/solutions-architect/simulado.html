@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Simulado AWS Solutions Architect Associate (SAA-C03)</title>
-  <meta name="description" content="Simulado interativo com 20 perguntas no estilo do exame AWS Solutions Architect Associate SAA-C03." />
+  <meta name="description" content="Simulado interativo com questões no estilo do exame AWS Solutions Architect Associate SAA-C03." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,7 +24,7 @@
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../solutions-architect.html">Solutions Architect</a>
+      <a href="../solutions-architect.html">Solutions Architect Associate</a>
       <a href="../aws.html">AWS</a>
     </div>
   </header>
@@ -32,21 +32,59 @@
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🎯 Simulado Associate</span>
+        <span class="pill">🎯 Simulado</span>
         <h1>AWS Solutions Architect Associate — Simulado</h1>
-        <p>20 perguntas de nível Associate com cenários de arquitetura, resiliência, performance e otimização de custos.</p>
+        <p>Escolha a quantidade de questões e teste seus conhecimentos nos 5 domínios do exame SAA-C03.</p>
       </div>
     </section>
 
+    <!-- ===== SELETOR DE QUANTIDADE DE QUESTÕES — Solutions Architect Associate ===== -->
+    <section class="section container" id="quizSetup">
+      <div style="max-width:520px;margin:0 auto;text-align:center">
+        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--gray-900)">Quantas questões você quer responder?</h2>
+        <p style="color:var(--gray-500);font-size:0.9rem;margin-bottom:28px">O exame oficial tem 65 questões. Escolha o modo que melhor se adapta ao seu tempo.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px">
+          <button class="quiz-size-btn" onclick="startQuizWithSize(10)">
+            <span style="font-size:1.6rem">⚡</span>
+            <strong>10 questões</strong>
+            <small>Revisão rápida</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(20)">
+            <span style="font-size:1.6rem">📝</span>
+            <strong>20 questões</strong>
+            <small>Treino padrão</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(40)">
+            <span style="font-size:1.6rem">🎯</span>
+            <strong>40 questões</strong>
+            <small>Simulado avançado</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(65)">
+            <span style="font-size:1.6rem">🏆</span>
+            <strong>65 questões</strong>
+            <small>Exame completo</small>
+          </button>
+        </div>
+        <p style="font-size:0.78rem;color:var(--gray-400)">Banco com <strong id="bankSizeInfo">—</strong> questões disponíveis. Questões sorteadas aleatoriamente a cada tentativa.</p>
+      </div>
+    </section>
+    <!-- ===== FIM SELETOR DE QUANTIDADE ===== -->
+
     <section class="section container">
-      <div class="quiz-container" id="quizContainer">
+      <!-- ===== QUIZ CONTAINER — oculto até o usuário escolher a quantidade ===== -->
+      <div class="quiz-container" id="quizContainer" style="display:none">
         <div class="quiz-header">
           <div class="quiz-progress">
             <span id="questionCounter">Pergunta 1 de 20</span>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 5%"></div></div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 5%"></div>
+            </div>
           </div>
-          <div class="quiz-score"><span id="scoreDisplay">Score: 0/0</span></div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
         </div>
+
         <div class="question-card" id="questionCard">
           <div class="question-number" id="questionNumber">Pergunta 1</div>
           <h3 class="question-text" id="questionText"></h3>
@@ -62,13 +100,22 @@
           </div>
         </div>
       </div>
+
       <div class="quiz-result" id="quizResult" style="display:none">
         <div class="result-card">
           <div class="result-icon" id="resultIcon">🎉</div>
           <h2 id="resultTitle">Simulado Concluído!</h2>
-          <div class="result-score"><span class="score-number" id="finalScore">0/20</span><span class="score-percent" id="finalPercent">0%</span></div>
-          <div class="result-bar"><div class="result-fill" id="resultFill" style="width: 0%"></div></div>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/20</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
           <p class="result-message" id="resultMessage"></p>
+          <!-- ===== BADGE DE APROVAÇÃO — Solutions Architect Associate ===== -->
+          <div id="approvalBadge" style="display:none;margin:12px 0 20px"></div>
+          <!-- ===== FIM BADGE DE APROVAÇÃO ===== -->
           <div class="result-actions">
             <button class="quiz-btn" onclick="restartQuiz()">Refazer simulado</button>
             <a href="../solutions-architect.html" class="quiz-btn secondary">Voltar ao curso</a>
@@ -81,203 +128,84 @@
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../solutions-architect.html">Solutions Architect Associate</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
       <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>
 
-  <script>
-    var QUIZ_BANK = [
-      {
-        question: "Uma empresa precisa de uma solução de armazenamento para arquivos acessados frequentemente nos primeiros 30 dias, raramente depois. Qual classe S3 oferece o melhor custo-benefício?",
-        options: ["A) S3 Standard", "B) S3 Intelligent-Tiering", "C) S3 Glacier Instant Retrieval", "D) S3 One Zone-IA"],
-        correct: 1,
-        explanation: "S3 Intelligent-Tiering move objetos automaticamente entre tiers (Frequent, Infrequent, Archive) baseado no padrão de acesso real, sem taxas de retrieval e sem necessidade de lifecycle rules manuais."
-      },
-      {
-        question: "Uma aplicação web precisa escalar automaticamente entre 2 e 20 instâncias EC2 baseado em CPU. O ALB distribui tráfego. Qual serviço configura essa escalabilidade?",
-        options: ["A) AWS Lambda", "B) EC2 Auto Scaling Group com target tracking policy", "C) Elastic Load Balancing", "D) AWS Fargate"],
-        correct: 1,
-        explanation: "Auto Scaling Group com target tracking policy (ex: CPUUtilization = 60%) adiciona/remove instâncias automaticamente. O ALB distribui tráfego, mas não escala instâncias."
-      },
-      {
-        question: "Uma aplicação precisa de um banco de dados com latência de microsegundos para leituras, altamente escalável e serverless. Qual serviço é mais adequado?",
-        options: ["A) Amazon RDS com Read Replicas", "B) Amazon DynamoDB com DAX", "C) Amazon Aurora Serverless", "D) Amazon ElastiCache Redis"],
-        correct: 1,
-        explanation: "DynamoDB oferece latência de milissegundos single-digit. Com DAX (DynamoDB Accelerator), a latência cai para microsegundos. É serverless e escala automaticamente."
-      },
-      {
-        question: "Uma empresa precisa conectar sua rede on-premises à AWS com conexão dedicada de alta largura de banda e baixa latência. Qual serviço usar?",
-        options: ["A) AWS Site-to-Site VPN", "B) AWS Direct Connect", "C) AWS Transit Gateway", "D) VPC Peering"],
-        correct: 1,
-        explanation: "AWS Direct Connect fornece conexão física dedicada entre on-premises e AWS, com largura de banda de 1Gbps a 100Gbps e latência consistente. VPN usa internet pública."
-      },
-      {
-        question: "Uma aplicação stateless roda em EC2 e tem picos de tráfego imprevisíveis. A empresa quer minimizar custos. Qual combinação de instâncias é ideal?",
-        options: ["A) 100% On-Demand", "B) Reserved Instances para baseline + On-Demand para picos", "C) Reserved Instances para baseline + Spot Instances para picos", "D) 100% Spot Instances"],
-        correct: 2,
-        explanation: "Reserved para carga base (desconto 72%) + Spot para picos (desconto 90%). Spot é ideal para workloads stateless e tolerantes a interrupção. 100% Spot é arriscado."
-      },
-      {
-        question: "Uma aplicação precisa processar 10.000 mensagens por segundo com ordenação garantida e sem duplicatas. Qual serviço usar?",
-        options: ["A) Amazon SQS Standard", "B) Amazon SQS FIFO", "C) Amazon Kinesis Data Streams", "D) Amazon SNS"],
-        correct: 2,
-        explanation: "Kinesis Data Streams suporta milhões de records/segundo com ordenação por shard. SQS FIFO garante ordem mas tem limite de 3.000 msg/s por grupo. Para 10K msg/s, Kinesis é adequado."
-      },
-      {
-        question: "Uma empresa precisa que sua aplicação web continue funcionando mesmo se uma região AWS inteira ficar indisponível. Qual arquitetura implementar?",
-        options: ["A) Multi-AZ deployment", "B) Multi-Region Active-Active com Route 53 failover", "C) Single region com Auto Scaling", "D) CloudFront com múltiplas origins na mesma região"],
-        correct: 1,
-        explanation: "Multi-Region Active-Active com Route 53 health checks e failover routing garante disponibilidade mesmo com falha regional completa. Multi-AZ protege apenas contra falha de AZ."
-      },
-      {
-        question: "Uma aplicação precisa armazenar arquivos compartilhados entre múltiplas instâncias EC2 Linux com acesso simultâneo. Qual serviço usar?",
-        options: ["A) Amazon EBS", "B) Amazon S3", "C) Amazon EFS", "D) Instance Store"],
-        correct: 2,
-        explanation: "Amazon EFS (Elastic File System) é um file system NFS compartilhado que pode ser montado simultaneamente em múltiplas instâncias EC2. EBS é attached a uma única instância."
-      },
-      {
-        question: "Uma empresa quer migrar um banco Oracle on-premises para Aurora PostgreSQL. Qual serviço facilita a migração com mínimo downtime?",
-        options: ["A) AWS DataSync", "B) AWS Database Migration Service (DMS)", "C) AWS Transfer Family", "D) AWS Backup"],
-        correct: 1,
-        explanation: "AWS DMS migra bancos de dados com mínimo downtime usando CDC (Change Data Capture). Suporta migrações heterogêneas (Oracle → PostgreSQL) com Schema Conversion Tool."
-      },
-      {
-        question: "Uma API precisa cachear respostas por 5 minutos para reduzir carga no backend. A API usa API Gateway + Lambda. Qual é a solução mais simples?",
-        options: ["A) Adicionar ElastiCache entre Lambda e DynamoDB", "B) Habilitar API Gateway caching no stage", "C) Usar CloudFront na frente do API Gateway", "D) Implementar cache na Lambda com variável global"],
-        correct: 1,
-        explanation: "API Gateway tem cache nativo por stage com TTL configurável. É a solução mais simples — não requer mudanças no código ou serviços adicionais."
-      },
-      {
-        question: "Uma aplicação precisa enviar emails transacionais (confirmação de cadastro, reset de senha) de forma confiável. Qual serviço AWS usar?",
-        options: ["A) Amazon SNS", "B) Amazon SES", "C) Amazon SQS", "D) Amazon Pinpoint"],
-        correct: 1,
-        explanation: "Amazon SES (Simple Email Service) é projetado para envio de emails transacionais e marketing com alta deliverability, bounce handling e reputation management."
-      },
-      {
-        question: "Uma empresa precisa criptografar dados em repouso no S3 usando chaves gerenciadas pelo cliente com controle total sobre rotação. Qual opção usar?",
-        options: ["A) SSE-S3", "B) SSE-KMS com CMK", "C) SSE-C", "D) Client-side encryption"],
-        correct: 1,
-        explanation: "SSE-KMS com Customer Managed Key (CMK) oferece controle total: políticas de acesso, rotação automática, auditoria via CloudTrail e separação de responsabilidades."
-      },
-      {
-        question: "Uma aplicação web tem picos de tráfego previsíveis toda segunda-feira às 9h. Qual tipo de scaling policy é mais eficiente?",
-        options: ["A) Target tracking (CPU 60%)", "B) Step scaling", "C) Scheduled scaling", "D) Simple scaling"],
-        correct: 2,
-        explanation: "Scheduled scaling permite pré-aquecer instâncias antes do pico conhecido. Para picos previsíveis em horários fixos, é mais eficiente que reactive scaling (target/step)."
-      },
-      {
-        question: "Uma empresa precisa de um serviço de containers sem gerenciar servidores ou clusters. Qual combinação usar?",
-        options: ["A) ECS com EC2 launch type", "B) ECS com Fargate launch type", "C) EKS com managed node groups", "D) EC2 com Docker instalado"],
-        correct: 1,
-        explanation: "ECS + Fargate é serverless para containers — não precisa provisionar, escalar ou gerenciar servidores. Paga apenas pelos recursos (vCPU + memória) do container."
-      },
-      {
-        question: "Uma aplicação precisa de um banco de dados relacional com failover automático, até 15 read replicas e 5x a performance do MySQL. Qual serviço usar?",
-        options: ["A) Amazon RDS MySQL Multi-AZ", "B) Amazon Aurora MySQL", "C) Amazon RDS PostgreSQL", "D) Amazon Redshift"],
-        correct: 1,
-        explanation: "Aurora oferece 5x performance do MySQL, até 15 read replicas com failover automático em <30s, storage auto-scaling até 128TB e replicação síncrona em 3 AZs."
-      },
-      {
-        question: "Uma empresa quer restringir que apenas instâncias EC2 com uma tag específica possam acessar um bucket S3. Qual mecanismo usar?",
-        options: ["A) Security Group", "B) NACL", "C) S3 Bucket Policy com condition baseada em tag da IAM role", "D) VPC Endpoint Policy"],
-        correct: 2,
-        explanation: "Bucket Policy com Condition usando aws:PrincipalTag ou aws:ResourceTag permite controle granular baseado em tags. Security Groups e NACLs não controlam acesso a S3."
-      },
-      {
-        question: "Uma aplicação precisa processar uploads de vídeo de forma assíncrona. O upload pode levar 30 minutos. Qual arquitetura é mais resiliente?",
-        options: ["A) API Gateway → Lambda (15 min timeout)", "B) S3 upload → S3 Event → SQS → EC2/ECS worker", "C) API Gateway → EC2 síncrono", "D) CloudFront → Lambda@Edge"],
-        correct: 1,
-        explanation: "Upload direto ao S3 + evento SQS + worker é resiliente: S3 garante durabilidade, SQS garante entrega, worker processa no próprio ritmo. Lambda tem limite de 15 min."
-      },
-      {
-        question: "Uma empresa precisa de um data warehouse para análise de petabytes de dados com queries SQL. Qual serviço usar?",
-        options: ["A) Amazon RDS", "B) Amazon DynamoDB", "C) Amazon Redshift", "D) Amazon Athena"],
-        correct: 2,
-        explanation: "Amazon Redshift é um data warehouse columnar otimizado para queries analíticas em petabytes. Athena é serverless para queries ad-hoc em S3, mas Redshift é melhor para workloads analíticos pesados."
-      },
-      {
-        question: "Uma aplicação precisa de DNS failover: se o endpoint primário falhar, redirecionar para um site estático no S3. Qual configuração do Route 53 usar?",
-        options: ["A) Simple routing", "B) Weighted routing 50/50", "C) Failover routing com health check", "D) Latency-based routing"],
-        correct: 2,
-        explanation: "Failover routing com health check monitora o endpoint primário. Se o health check falhar, Route 53 automaticamente direciona tráfego para o record secundário (S3 estático)."
-      },
-      {
-        question: "Uma empresa quer limitar gastos AWS a $1000/mês e receber alertas em 50%, 80% e 100%. Qual serviço configurar?",
-        options: ["A) AWS Cost Explorer", "B) AWS Budgets com alertas por threshold", "C) AWS Trusted Advisor", "D) CloudWatch Billing Alarm"],
-        correct: 1,
-        explanation: "AWS Budgets permite definir orçamentos com múltiplos thresholds de alerta (50%, 80%, 100%), notificações por email/SNS e até ações automáticas (ex: parar instâncias)."
-      },
-      {
-        question: "Uma aplicação precisa de um banco de dados relacional com alta disponibilidade automática e failover em menos de 30 segundos. Qual serviço usar?",
-        options: ["A) RDS Single-AZ", "B) RDS Multi-AZ com standby", "C) Aurora com Multi-AZ", "D) B e C atendem o requisito"],
-        correct: 3,
-        explanation: "RDS Multi-AZ mantém réplica síncrona em outra AZ com failover automático (~1-2 min). Aurora Multi-AZ tem failover ainda mais rápido (~30s) com réplicas de leitura promovíveis."
-      },
-      {
-        question: "Uma empresa precisa migrar 100TB de dados do S3 para outro bucket em outra região com mínimo impacto. Qual serviço usar?",
-        options: ["A) AWS DataSync", "B) S3 Replication (CRR) habilitado no bucket origem", "C) AWS Transfer Family", "D) Copiar manualmente via CLI"],
-        correct: 1,
-        explanation: "S3 Cross-Region Replication (CRR) replica objetos automaticamente para outro bucket em outra região. Para migração de dados existentes, use S3 Batch Operations ou DataSync."
-      },
-      {
-        question: "Qual é a diferença entre Security Group e Network ACL (NACL)?",
-        options: ["A) Security Group opera na subnet; NACL opera na instância", "B) Security Group é stateful (rastreia conexões); NACL é stateless (regras de entrada e saída independentes)", "C) NACL permite apenas regras de permissão; Security Group permite deny", "D) Não há diferença prática"],
-        correct: 1,
-        explanation: "Security Groups são stateful — resposta de tráfego permitido entra automaticamente. NACLs são stateless — precisam de regras explícitas para entrada E saída. SGs operam em instâncias, NACLs em subnets."
-      },
-      {
-        question: "Uma aplicação web precisa servir conteúdo estático globalmente com baixa latência. Qual arquitetura usar?",
-        options: ["A) EC2 em múltiplas regiões com Route 53", "B) S3 + CloudFront com edge locations globais", "C) ECS Fargate em múltiplas regiões", "D) Lambda@Edge apenas"],
-        correct: 1,
-        explanation: "S3 + CloudFront é a arquitetura padrão para conteúdo estático global. CloudFront tem 450+ edge locations que fazem cache do conteúdo próximo ao usuário, com latência mínima."
-      },
-      {
-        question: "Qual serviço AWS permite executar queries SQL em dados no S3 sem carregar em banco de dados?",
-        options: ["A) Amazon RDS", "B) Amazon Athena", "C) Amazon Redshift", "D) AWS Glue"],
-        correct: 1,
-        explanation: "Amazon Athena é serverless — executa queries SQL diretamente em arquivos no S3 (CSV, JSON, Parquet). Paga por dados escaneados. Ideal para análises ad-hoc sem infraestrutura."
-      },
-      {
-        question: "Uma empresa precisa de conexão privada entre VPC e serviços AWS (S3, DynamoDB) sem tráfego pela internet. Qual usar?",
-        options: ["A) NAT Gateway", "B) VPC Endpoints (Gateway ou Interface)", "C) Internet Gateway", "D) AWS Direct Connect"],
-        correct: 1,
-        explanation: "VPC Endpoints permitem acesso privado a serviços AWS sem internet. Gateway Endpoints (S3, DynamoDB) são gratuitos. Interface Endpoints (PrivateLink) usam ENI com IP privado."
-      },
-      {
-        question: "Qual estratégia de deploy no Elastic Beanstalk garante zero downtime e permite rollback instantâneo?",
-        options: ["A) All at once", "B) Rolling", "C) Immutable", "D) Blue/Green com swap de URL"],
-        correct: 3,
-        explanation: "Blue/Green cria um ambiente completamente novo (green), testa e faz swap de URL. Rollback é instantâneo — basta fazer swap de volta. Immutable também tem zero downtime mas rollback é mais lento."
-      },
-      {
-        question: "Uma aplicação precisa processar arquivos de log de 10GB com queries SQL ocasionais. Qual é a solução mais custo-eficiente?",
-        options: ["A) Carregar em RDS MySQL", "B) Armazenar em S3 (Parquet) + Athena para queries", "C) Usar DynamoDB", "D) Carregar em Redshift permanentemente"],
-        correct: 1,
-        explanation: "S3 + Athena é ideal para dados grandes com queries ocasionais. Parquet reduz dados escaneados (columnar). Custo: armazenamento S3 (~$0.023/GB) + queries Athena ($5/TB escaneado)."
-      },
-      {
-        question: "Qual é a função do AWS Transit Gateway?",
-        options: ["A) Conectar VPCs à internet", "B) Hub central para conectar múltiplos VPCs e redes on-premises com roteamento centralizado", "C) Substituir o Direct Connect", "D) Fazer NAT entre VPCs"],
-        correct: 1,
-        explanation: "Transit Gateway é um hub de roteamento que conecta VPCs, VPNs e Direct Connect em uma topologia hub-and-spoke. Elimina a necessidade de VPC Peering mesh entre muitos VPCs."
-      },
-      {
-        question: "Uma empresa precisa de armazenamento de arquivos compartilhado para instâncias Windows EC2. Qual serviço usar?",
-        options: ["A) Amazon EFS", "B) Amazon FSx for Windows File Server", "C) Amazon S3", "D) Amazon EBS Multi-Attach"],
-        correct: 1,
-        explanation: "FSx for Windows File Server é um file system SMB totalmente gerenciado, compatível com Active Directory e DFS. EFS usa NFS (Linux). EBS Multi-Attach tem limitações de uso."
-      },
-      {
-        question: "Qual é a diferença entre RTO e RPO em disaster recovery?",
-        options: ["A) RTO é quanto dado pode ser perdido; RPO é quanto tempo para recuperar", "B) RTO é o tempo máximo para recuperar o sistema; RPO é a quantidade máxima de dados que pode ser perdida", "C) São métricas de performance, não de DR", "D) RTO e RPO são sempre iguais"],
-        correct: 1,
-        explanation: "RTO (Recovery Time Objective) = tempo máximo aceitável de downtime. RPO (Recovery Point Objective) = quantidade máxima de dados que pode ser perdida (janela de tempo). Ambos guiam a estratégia de DR."
-      }
-    ];
-  </script>
+  <!-- ===== SCRIPTS — ORDEM IMPORTANTE ===== -->
+  <!-- 1. Banco de questões (arquivo local, não sobe pro GitHub) -->
+  <script src="questoes.js"></script>
+  <!-- 2. Engine do simulado (lógica de quiz, shuffle, progresso) -->
   <script src="../simulado.js"></script>
+  <!-- 3. Seletor de quantidade + badge de aprovação (carrega APÓS simulado.js) -->
+  <script>
+    /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — Solutions Architect Associate ===== */
+
+    // Exibe o tamanho do banco no setup
+    var el = document.getElementById('bankSizeInfo');
+    if (el && typeof QUIZ_BANK !== 'undefined') el.textContent = QUIZ_BANK.length;
+
+    // Inicia o quiz com a quantidade escolhida pelo aluno
+    function startQuizWithSize(size) {
+      QUIZ_SIZE = Math.min(size, QUIZ_BANK.length);
+      document.getElementById('quizSetup').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+      initQuiz();
+    }
+
+    // Volta ao seletor ao reiniciar
+    function restartQuiz() {
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('quizSetup').style.display = 'block';
+      document.getElementById('approvalBadge').style.display = 'none';
+    }
+
+    // Sobrescreve showResult (simulado.js já foi carregado, então a sobrescrita funciona)
+    var _baseShowResult = showResult;
+    showResult = function() {
+      _baseShowResult();
+      var total = activeQuestions.length;
+      var percent = Math.round((score / total) * 100);
+      var badge = document.getElementById('approvalBadge');
+      var icon, label, color, msg;
+
+      if (percent >= 90) {
+        icon = '🏆'; label = 'Desempenho Excepcional';
+        color = '#065f46';
+        msg = 'Resultado extraordinário! Você domina o conteúdo com maestria. Está mais do que pronto para o exame — considere agendar agora.';
+      } else if (percent >= 80) {
+        icon = '⭐'; label = 'Desempenho Excelente';
+        color = '#1d4ed8';
+        msg = 'Excelente preparação! Seu conhecimento está sólido. Revise os pontos que errou e você estará em ótima forma para o exame.';
+      } else if (percent >= 70) {
+        icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
+        color = '#047857';
+        msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
+      } else if (percent >= 60) {
+        icon = '📚'; label = 'Revisar e Continuar';
+        color = '#b45309';
+        msg = 'Você está próximo da aprovação! Revise os domínios onde teve mais dificuldade e refaça o simulado. Você consegue!';
+      } else {
+        icon = '🔄'; label = 'Rever Conceitos e Melhorar';
+        color = '#dc2626';
+        msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos e pratique mais. A aprovação está ao seu alcance.';
+      }
+
+      badge.style.display = 'block';
+      badge.innerHTML =
+        '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
+        '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
+        '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
+        '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
+        '</div>';
+    };
+    /* ===== FIM SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO ===== */
+  </script>
+  <!-- ===== FIM SCRIPTS ===== -->
 </body>
 </html>
+
+
