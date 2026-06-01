@@ -1,5 +1,4 @@
-const API_ENDPOINT =
-  "https://22uljugfhf.execute-api.us-west-2.amazonaws.com/leads";
+const API_ENDPOINT = window.CLOUDTRILHAS_CONFIG.apiEndpoint;
 
 function setMessage(element, message, type = "") {
   element.textContent = message;
