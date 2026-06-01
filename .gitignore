@@ -27,3 +27,6 @@ docs/MELHORIAS-E-EVOLUCAO.md
 
 # Backup
 static_site_backup/
+
+# Bancos de questões dos simulados (ficam locais, upload manual para S3)
+**/questoes.js
