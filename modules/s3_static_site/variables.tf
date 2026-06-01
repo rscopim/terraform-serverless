@@ -32,3 +32,8 @@ variable "cloudfront_distribution_arn" {
   description = "ARN da distribuição CloudFront"
   type        = string
 }
+
+variable "api_endpoint" {
+  description = "Endpoint da API de leads"
+  type        = string
+}
