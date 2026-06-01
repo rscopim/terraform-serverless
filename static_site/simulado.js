@@ -1,26 +1,51 @@
 /**
  * CloudTrilhas — Simulado Interativo
- * Lógica do quiz para certificações AWS
+ * Suporta banco de questões com seleção aleatória a cada reinício.
+ *
+ * Como usar:
+ *   - Defina QUIZ_BANK como array com TODAS as questões disponíveis
+ *   - Defina QUIZ_SIZE (opcional) com quantas questões sortear por rodada (padrão: 20)
+ *   - O simulado sorteia QUIZ_SIZE questões aleatórias a cada initQuiz()
  */
 
-let currentQuestion = 0;
-let score = 0;
-let selectedOption = null;
-let answered = false;
+var QUIZ_SIZE = (typeof QUIZ_SIZE !== 'undefined') ? QUIZ_SIZE : 20;
+
+var currentQuestion = 0;
+var score = 0;
+var selectedOption = null;
+var answered = false;
+var activeQuestions = []; // questões sorteadas para a rodada atual
+
+function shuffleArray(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function pickQuestions() {
+  // Suporta tanto QUIZ_BANK (banco grande) quanto QUIZ_DATA (lista fixa legada)
+  var bank = (typeof QUIZ_BANK !== 'undefined') ? QUIZ_BANK : QUIZ_DATA;
+  var size = Math.min(QUIZ_SIZE, bank.length);
+  return shuffleArray(bank).slice(0, size);
+}
 
 function initQuiz() {
   currentQuestion = 0;
   score = 0;
   selectedOption = null;
   answered = false;
+  activeQuestions = pickQuestions();
   document.getElementById('quizContainer').style.display = 'block';
   document.getElementById('quizResult').style.display = 'none';
   renderQuestion();
 }
 
 function renderQuestion() {
-  const q = QUIZ_DATA[currentQuestion];
-  const total = QUIZ_DATA.length;
+  var q = activeQuestions[currentQuestion];
+  var total = activeQuestions.length;
 
   document.getElementById('questionCounter').textContent = 'Pergunta ' + (currentQuestion + 1) + ' de ' + total;
   document.getElementById('progressFill').style.width = (((currentQuestion + 1) / total) * 100) + '%';
@@ -34,7 +59,7 @@ function renderQuestion() {
     var btn = document.createElement('button');
     btn.className = 'option-btn';
     btn.textContent = option;
-    btn.onclick = function() { selectOption(index, btn); };
+    btn.onclick = (function(i, b) { return function() { selectOption(i, b); }; })(index, btn);
     optionsList.appendChild(btn);
   });
 
@@ -58,7 +83,7 @@ function confirmAnswer() {
   if (selectedOption === null || answered) return;
   answered = true;
 
-  var q = QUIZ_DATA[currentQuestion];
+  var q = activeQuestions[currentQuestion];
   var isCorrect = selectedOption === q.correct;
   if (isCorrect) score++;
 
@@ -82,7 +107,7 @@ function confirmAnswer() {
 
   document.getElementById('confirmBtn').style.display = 'none';
 
-  if (currentQuestion < QUIZ_DATA.length - 1) {
+  if (currentQuestion < activeQuestions.length - 1) {
     document.getElementById('nextBtn').style.display = 'inline-flex';
   } else {
     setTimeout(showResult, 1200);
@@ -98,12 +123,17 @@ function showResult() {
   document.getElementById('quizContainer').style.display = 'none';
   document.getElementById('quizResult').style.display = 'block';
 
-  var total = QUIZ_DATA.length;
+  var total = activeQuestions.length;
   var percent = Math.round((score / total) * 100);
 
   document.getElementById('finalScore').textContent = score + '/' + total;
   document.getElementById('finalPercent').textContent = percent + '%';
   document.getElementById('resultFill').style.width = percent + '%';
+
+  var bank = (typeof QUIZ_BANK !== 'undefined') ? QUIZ_BANK : QUIZ_DATA;
+  var bankInfo = bank.length > total
+    ? ' (sorteadas de um banco de ' + bank.length + ' questões)'
+    : '';
 
   var resultIcon = document.getElementById('resultIcon');
   var resultTitle = document.getElementById('resultTitle');
@@ -112,15 +142,15 @@ function showResult() {
   if (percent >= 80) {
     resultIcon.textContent = '🎉';
     resultTitle.textContent = 'Excelente!';
-    resultMessage.textContent = 'Você está muito bem preparado para o exame. Continue revisando os pontos que errou.';
+    resultMessage.textContent = 'Você está muito bem preparado para o exame. Continue revisando os pontos que errou.' + bankInfo;
   } else if (percent >= 60) {
     resultIcon.textContent = '👍';
     resultTitle.textContent = 'Bom resultado!';
-    resultMessage.textContent = 'Você está no caminho certo. Revise os domínios onde teve mais dificuldade.';
+    resultMessage.textContent = 'Você está no caminho certo. Revise os domínios onde teve mais dificuldade.' + bankInfo;
   } else {
     resultIcon.textContent = '📚';
     resultTitle.textContent = 'Continue estudando!';
-    resultMessage.textContent = 'Revise o conteúdo dos módulos e refaça o simulado. A prática leva à aprovação.';
+    resultMessage.textContent = 'Revise o conteúdo dos módulos e refaça o simulado. A prática leva à aprovação.' + bankInfo;
   }
 }
 

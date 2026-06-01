@@ -93,7 +93,7 @@
   </footer>
 
   <script>
-    var QUIZ_DATA = [
+    var QUIZ_BANK = [
       {
         question: "Qual é a principal vantagem do modelo de precificação pay-as-you-go da AWS?",
         options: ["A) Custos fixos mensais previsíveis", "B) Pagar apenas pelos recursos efetivamente consumidos", "C) Desconto automático de 50% em todos os serviços", "D) Gratuidade total no primeiro ano"],
@@ -213,6 +213,78 @@
         options: ["A) AWS Cost Explorer", "B) AWS Pricing Calculator", "C) AWS Budgets", "D) AWS Cost and Usage Report"],
         correct: 1,
         explanation: "AWS Pricing Calculator permite modelar arquiteturas e estimar custos mensais antes de criar qualquer recurso. Cost Explorer analisa custos já incorridos."
+      },
+      {
+        question: "Qual serviço AWS oferece armazenamento de objetos com classes de armazenamento para diferentes padrões de acesso?",
+        options: ["A) Amazon EBS", "B) Amazon S3", "C) Amazon EFS", "D) Amazon FSx"],
+        correct: 1,
+        explanation: "Amazon S3 oferece múltiplas classes: Standard, Intelligent-Tiering, Standard-IA, One Zone-IA, Glacier e Glacier Deep Archive — cada uma com custo e disponibilidade diferentes."
+      },
+      {
+        question: "O que é o AWS Free Tier?",
+        options: ["A) Um plano pago com desconto para startups", "B) Conjunto de ofertas gratuitas para novos clientes (12 meses, sempre gratuito ou trial)", "C) Um serviço específico da AWS", "D) Desconto automático após 1 ano de uso"],
+        correct: 1,
+        explanation: "AWS Free Tier oferece uso gratuito em três categorias: 12 meses grátis (EC2, S3, RDS), sempre gratuito (Lambda 1M requests/mês, DynamoDB 25GB) e trials de curto prazo."
+      },
+      {
+        question: "Qual serviço AWS permite criar e gerenciar usuários, grupos e permissões de acesso?",
+        options: ["A) AWS Organizations", "B) AWS IAM", "C) Amazon Cognito", "D) AWS SSO"],
+        correct: 1,
+        explanation: "AWS IAM gerencia identidades e acessos: users, groups, roles e policies. É o serviço central de controle de acesso para todos os recursos AWS."
+      },
+      {
+        question: "Qual é a vantagem de usar Auto Scaling?",
+        options: ["A) Reduz o custo de armazenamento S3", "B) Ajusta automaticamente a capacidade de compute para manter performance e minimizar custos", "C) Aumenta a segurança das instâncias EC2", "D) Melhora a latência do banco de dados"],
+        correct: 1,
+        explanation: "Auto Scaling adiciona instâncias quando a demanda aumenta e remove quando diminui, garantindo performance adequada e pagando apenas pelo necessário."
+      },
+      {
+        question: "Qual serviço AWS é usado para gerenciar múltiplas contas AWS de forma centralizada?",
+        options: ["A) AWS IAM", "B) AWS Control Tower", "C) AWS Organizations", "D) AWS Config"],
+        correct: 2,
+        explanation: "AWS Organizations permite gerenciar múltiplas contas com hierarquia de OUs, políticas centralizadas (SCPs), billing consolidado e automação de criação de contas."
+      },
+      {
+        question: "O que é o princípio de 'design for failure' na AWS?",
+        options: ["A) Aceitar que sistemas sempre falharão e não investir em redundância", "B) Projetar sistemas assumindo que componentes falharão, usando redundância e recuperação automática", "C) Usar apenas serviços gerenciados da AWS", "D) Fazer backup diário de todos os dados"],
+        correct: 1,
+        explanation: "Design for failure significa assumir que qualquer componente pode falhar e projetar para isso: múltiplas AZs, health checks, auto-recovery, circuit breakers e backups automáticos."
+      },
+      {
+        question: "Qual serviço AWS fornece recomendações de segurança e identifica recursos expostos publicamente?",
+        options: ["A) AWS CloudTrail", "B) Amazon GuardDuty", "C) AWS Trusted Advisor", "D) AWS Security Hub"],
+        correct: 2,
+        explanation: "Trusted Advisor verifica configurações e fornece recomendações em segurança (portas abertas, MFA, permissões excessivas), além de custo, performance e tolerância a falhas."
+      },
+      {
+        question: "Qual é a diferença entre escalabilidade vertical e horizontal?",
+        options: ["A) Vertical aumenta o número de servidores; horizontal aumenta o tamanho do servidor", "B) Vertical aumenta o tamanho do servidor (mais CPU/RAM); horizontal adiciona mais servidores", "C) São termos sinônimos na AWS", "D) Vertical é mais barato que horizontal"],
+        correct: 1,
+        explanation: "Scale up (vertical) = servidor maior. Scale out (horizontal) = mais servidores. A AWS favorece escala horizontal com Auto Scaling — mais resiliente e sem limite teórico."
+      },
+      {
+        question: "Qual serviço AWS detecta ameaças de segurança analisando logs de CloudTrail, VPC Flow e DNS?",
+        options: ["A) AWS Shield", "B) Amazon GuardDuty", "C) AWS WAF", "D) Amazon Inspector"],
+        correct: 1,
+        explanation: "Amazon GuardDuty usa ML para analisar logs e detectar comportamentos suspeitos: acesso de IPs maliciosos, mineração de criptomoedas, exfiltração de dados e comprometimento de credenciais."
+      },
+      {
+        question: "O que é o AWS Shared Responsibility Model?",
+        options: ["A) AWS e cliente dividem os custos igualmente", "B) AWS é responsável pela segurança DA nuvem; cliente é responsável pela segurança NA nuvem", "C) O cliente é responsável por toda a segurança", "D) AWS gerencia tudo, o cliente não tem responsabilidades"],
+        correct: 1,
+        explanation: "AWS cuida da infraestrutura física, hardware, rede e hypervisor. O cliente cuida de: dados, IAM, configuração de rede, patches do SO (em IaaS), aplicações e criptografia."
+      },
+      {
+        question: "Qual serviço AWS permite executar containers sem gerenciar servidores?",
+        options: ["A) Amazon EC2", "B) AWS Fargate", "C) Amazon EKS apenas", "D) AWS Batch"],
+        correct: 1,
+        explanation: "AWS Fargate é serverless para containers — você define CPU/memória e a AWS gerencia a infraestrutura. Funciona com ECS e EKS. Sem necessidade de provisionar ou gerenciar instâncias EC2."
+      },
+      {
+        question: "Qual é o benefício principal do modelo de nuvem em relação ao data center on-premises?",
+        options: ["A) A nuvem é sempre mais barata em qualquer cenário", "B) Troca de CapEx por OpEx, agilidade, elasticidade e alcance global", "C) A nuvem elimina completamente a necessidade de segurança", "D) Todos os serviços são gratuitos no primeiro ano"],
+        correct: 1,
+        explanation: "A nuvem transforma investimento de capital (servidores, data center) em despesa operacional (pay-as-you-go), além de oferecer elasticidade, velocidade de inovação e presença global."
       }
     ];
   </script>

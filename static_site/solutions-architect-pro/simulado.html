@@ -89,7 +89,7 @@
   </footer>
 
   <script>
-    var QUIZ_DATA = [
+    var QUIZ_BANK = [
       {
         question: "Uma empresa com 200 contas AWS precisa centralizar logs de CloudTrail, Config e VPC Flow Logs com retenção de 7 anos para compliance. A solução deve ser imutável e custo-eficiente. Qual arquitetura implementar?",
         options: ["A) S3 bucket em cada conta com lifecycle para Glacier", "B) Conta de Log Archive centralizada com S3 Object Lock (Governance mode), lifecycle para Glacier Deep Archive e SCPs impedindo deleção", "C) CloudWatch Logs centralizado com retenção de 7 anos", "D) Amazon OpenSearch com cold storage"],
@@ -209,6 +209,72 @@
         options: ["A) SQS Standard com visibility timeout alto", "B) SQS FIFO com deduplication + idempotent consumer pattern (DynamoDB conditional writes)", "C) SNS com retry policy", "D) Kinesis com checkpoint"],
         correct: 1,
         explanation: "Exactly-once requer: FIFO com deduplication (previne duplicatas na fila) + idempotent consumer (conditional write em DynamoDB com idempotency key previne reprocessamento). Defense in depth."
+      },
+      {
+        question: "Uma empresa com 500 contas AWS precisa implementar patch management centralizado em todas as instâncias EC2. Qual solução usar?",
+        options: ["A) Script de cron em cada instância", "B) AWS Systems Manager Patch Manager com patch baselines e maintenance windows via Organizations", "C) AWS Config com auto-remediation", "D) CloudFormation StackSets com userdata"],
+        correct: 1,
+        explanation: "SSM Patch Manager com Organizations permite definir patch baselines, agendar maintenance windows e aplicar patches em todas as contas/regiões centralizadamente, com relatórios de compliance."
+      },
+      {
+        question: "Uma empresa precisa de uma estratégia de backup multi-region para RDS com RPO de 1 hora. Qual abordagem?",
+        options: ["A) Snapshots manuais diários", "B) RDS automated backups + cross-region snapshot copy automatizado via EventBridge + Lambda", "C) Read replica cross-region promovida manualmente", "D) Aurora Global Database apenas"],
+        correct: 1,
+        explanation: "Automated backups do RDS + cópia cross-region automatizada (via EventBridge schedule + Lambda ou AWS Backup) garante RPO de 1h. Aurora Global Database é melhor para RPO < 1s."
+      },
+      {
+        question: "Uma arquitetura multi-tenant SaaS precisa isolar completamente os dados de cada cliente. Qual estratégia de isolamento é mais forte?",
+        options: ["A) Row-level security no banco de dados compartilhado", "B) Schema separado por tenant no mesmo banco", "C) Conta AWS separada por tenant com infraestrutura dedicada", "D) VPC separada por tenant na mesma conta"],
+        correct: 2,
+        explanation: "Conta AWS separada oferece isolamento máximo: blast radius limitado, billing separado, IAM independente. Usado por SaaS enterprise. Row-level e schema são mais baratos mas com menor isolamento."
+      },
+      {
+        question: "Uma empresa precisa auditar todas as mudanças de configuração em recursos AWS e receber alertas quando configurações não-conformes são detectadas. Qual serviço?",
+        options: ["A) AWS CloudTrail", "B) AWS Config com Config Rules e remediation automática", "C) Amazon GuardDuty", "D) AWS Security Hub apenas"],
+        correct: 1,
+        explanation: "AWS Config rastreia mudanças de configuração ao longo do tempo. Config Rules avaliam conformidade continuamente. Auto-remediation via SSM Automation corrige automaticamente recursos não-conformes."
+      },
+      {
+        question: "Uma empresa precisa implementar uma solução de Single Sign-On para 200 contas AWS e aplicações SaaS. Qual serviço usar?",
+        options: ["A) IAM users em cada conta", "B) AWS IAM Identity Center (SSO) com integração ao Active Directory", "C) Amazon Cognito para todas as contas", "D) LDAP direto nas instâncias EC2"],
+        correct: 1,
+        explanation: "IAM Identity Center (antigo AWS SSO) centraliza acesso a múltiplas contas AWS e aplicações SaaS com um único login. Integra com AD/LDAP via AWS Managed Microsoft AD ou AD Connector."
+      },
+      {
+        question: "Uma aplicação crítica precisa de RTO de 15 minutos e RPO de 5 minutos. Qual estratégia de DR implementar?",
+        options: ["A) Backup and Restore", "B) Pilot Light com banco replicado e compute mínimo", "C) Warm Standby com capacidade reduzida sempre ativa", "D) Multi-site Active-Active"],
+        correct: 2,
+        explanation: "Warm Standby mantém uma versão reduzida do ambiente sempre ativa. RTO de 15 min é alcançável escalando o ambiente standby. Pilot Light seria mais lento (precisa iniciar compute). Active-Active é mais caro."
+      },
+      {
+        question: "Uma empresa precisa processar 1 milhão de imagens por dia com análise de ML. O processamento leva 30 segundos por imagem. Qual arquitetura?",
+        options: ["A) Lambda com timeout de 30s", "B) SQS + ECS Fargate com auto-scaling baseado em profundidade da fila", "C) EC2 On-Demand com cron job", "D) Step Functions com Lambda"],
+        correct: 1,
+        explanation: "SQS desacopla ingestão do processamento. ECS Fargate escala baseado em ApproximateNumberOfMessages no SQS. Sem limite de timeout (diferente de Lambda 15min). Custo otimizado com Spot."
+      },
+      {
+        question: "Qual é a diferença entre AWS Service Control Policies (SCPs) e IAM Policies?",
+        options: ["A) SCPs e IAM Policies são equivalentes", "B) SCPs definem o máximo de permissões possíveis para contas em uma OU; IAM Policies concedem permissões dentro desse limite", "C) IAM Policies têm precedência sobre SCPs", "D) SCPs funcionam apenas em contas root"],
+        correct: 1,
+        explanation: "SCPs são guardrails — definem o teto máximo de permissões. Mesmo que uma IAM Policy conceda acesso, se a SCP negar, o acesso é bloqueado. SCPs não concedem permissões, apenas restringem."
+      },
+      {
+        question: "Uma empresa precisa de uma solução de data mesh com governança centralizada e acesso self-service para times de dados. Qual arquitetura AWS?",
+        options: ["A) Um único data lake S3 com acesso irrestrito", "B) AWS Lake Formation + Glue Data Catalog + IAM Identity Center para governança e acesso granular", "C) Redshift por time de dados", "D) DynamoDB compartilhado entre times"],
+        correct: 1,
+        explanation: "Lake Formation centraliza governança (permissões column/row-level, data sharing), Glue Catalog é o metastore central, IAM Identity Center gerencia acesso self-service. Padrão para data mesh na AWS."
+      },
+      {
+        question: "Uma empresa precisa garantir que nenhum recurso AWS seja criado fora das regiões us-east-1 e sa-east-1 em todas as 100 contas. Qual é a solução mais eficiente?",
+        options: ["A) IAM Policy em cada usuário de cada conta", "B) SCP na root OU negando todas as regiões exceto us-east-1 e sa-east-1", "C) AWS Config rule em cada conta", "D) CloudFormation StackSets com validação"],
+        correct: 1,
+        explanation: "SCP na root OU aplica a todas as contas automaticamente, incluindo novas. É preventiva (bloqueia antes da ação). Config é detectiva (identifica depois). IAM por usuário não escala para 100 contas."
+      },
+      {
+        question: "Uma empresa precisa de uma solução de observabilidade unificada para logs, métricas e traces de 50 contas AWS. Qual arquitetura?",
+        options: ["A) CloudWatch em cada conta independentemente", "B) Conta de Observabilidade centralizada com CloudWatch cross-account observability + X-Ray + OpenSearch", "C) Instalar Prometheus em cada conta", "D) Usar apenas CloudTrail centralizado"],
+        correct: 1,
+        explanation: "CloudWatch cross-account observability permite visualizar métricas, logs e traces de múltiplas contas em um único painel. Combinado com X-Ray para tracing e OpenSearch para análise avançada de logs."
       }
     ];
   </script>

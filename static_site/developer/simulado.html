@@ -89,7 +89,7 @@
   </footer>
 
   <script>
-    var QUIZ_DATA = [
+    var QUIZ_BANK = [
       {
         question: "Uma aplicação Lambda está retornando erro 'Task timed out after 3.00 seconds'. O código faz uma chamada HTTP para uma API externa que demora 5 segundos. Qual a solução mais adequada?",
         options: ["A) Aumentar a memória da Lambda para 10GB", "B) Aumentar o timeout da Lambda para um valor maior que 5 segundos", "C) Usar provisioned concurrency", "D) Migrar para EC2"],
@@ -209,6 +209,72 @@
         options: ["A) Usar FIFO queue com deduplication", "B) Armazenar message ID processado em DynamoDB com conditional write", "C) Aumentar visibility timeout", "D) A e B são abordagens válidas"],
         correct: 3,
         explanation: "FIFO com deduplication previne duplicatas na fila. Conditional write em DynamoDB (idempotency key) previne reprocessamento. Ambas são válidas dependendo do cenário."
+      },
+      {
+        question: "Uma Lambda precisa ler um segredo do Secrets Manager a cada invocação. Como otimizar para reduzir latência e custo?",
+        options: ["A) Hardcodar o segredo no código", "B) Usar cache em variável global inicializada fora do handler", "C) Chamar Secrets Manager dentro do handler a cada invocação", "D) Armazenar o segredo em S3"],
+        correct: 1,
+        explanation: "Variáveis globais em Lambda persistem entre invocações quentes (warm). Inicializar o segredo fora do handler faz o cache funcionar automaticamente, reduzindo chamadas ao Secrets Manager."
+      },
+      {
+        question: "Qual é o comportamento do DynamoDB quando uma query filtra por atributo que não é partition key nem sort key sem GSI?",
+        options: ["A) Retorna erro automaticamente", "B) Faz Scan completo da tabela — use GSI para queries eficientes em outros atributos", "C) Usa índice automático", "D) Retorna apenas o primeiro item encontrado"],
+        correct: 1,
+        explanation: "Queries no DynamoDB exigem partition key. Filtrar por outros atributos sem GSI resulta em Scan (lê toda a tabela, caro). GSI permite queries eficientes em atributos alternativos."
+      },
+      {
+        question: "Qual serviço AWS permite criar pipelines de CI/CD nativos sem gerenciar servidores?",
+        options: ["A) CodePipeline + CodeBuild + CodeDeploy", "B) Jenkins no EC2", "C) GitHub Actions apenas", "D) AWS Batch"],
+        correct: 0,
+        explanation: "CodePipeline orquestra o pipeline, CodeBuild compila/testa (serverless), CodeDeploy faz deploy em EC2/Lambda/ECS. Juntos formam o stack nativo de CI/CD da AWS."
+      },
+      {
+        question: "Uma API Gateway retorna erro 502 Bad Gateway. O que provavelmente está acontecendo?",
+        options: ["A) O cliente enviou payload inválido", "B) A Lambda retornou resposta malformada ou lançou exceção não tratada", "C) O certificado SSL expirou", "D) O rate limit foi atingido"],
+        correct: 1,
+        explanation: "502 Bad Gateway no API Gateway indica que a Lambda retornou resposta inválida (sem statusCode, body malformado) ou lançou exceção. Verifique os logs da Lambda no CloudWatch."
+      },
+      {
+        question: "Como você passa configurações diferentes para uma Lambda em DEV vs PROD sem alterar o código?",
+        options: ["A) Usar if/else no código verificando o nome da função", "B) Variáveis de ambiente configuradas por ambiente no Terraform/CloudFormation", "C) Criar duas versões do código", "D) Usar parâmetros na URL de invocação"],
+        correct: 1,
+        explanation: "Variáveis de ambiente são a forma padrão de parametrizar Lambdas por ambiente. O código lê process.env.TABLE_NAME ou os.environ['TABLE_NAME'] sem saber em qual ambiente está."
+      },
+      {
+        question: "Qual é a função do AWS X-Ray SDK no código da aplicação?",
+        options: ["A) Criptografar dados em trânsito", "B) Instrumentar o código para criar segmentos de trace, capturando latência e erros", "C) Fazer deploy automático", "D) Gerenciar versões da Lambda"],
+        correct: 1,
+        explanation: "X-Ray SDK adiciona instrumentação ao código: cria segmentos para cada request e subsegmentos para chamadas a serviços externos (DynamoDB, S3, HTTP), capturando latência e erros."
+      },
+      {
+        question: "Uma Lambda com trigger SQS está falhando silenciosamente — mensagens somem sem processamento. Qual é a causa mais provável?",
+        options: ["A) A Lambda está com timeout muito alto", "B) A Lambda retorna sucesso (sem exceção) mesmo quando falha internamente", "C) O SQS está com visibility timeout muito baixo", "D) A Lambda não tem permissão de leitura no SQS"],
+        correct: 1,
+        explanation: "Se a Lambda não lança exceção, o SQS considera a mensagem processada e a deleta. Para falhas silenciosas, lance exceção explicitamente ou use partial batch response."
+      },
+      {
+        question: "Qual é a melhor prática para estruturar o código de uma Lambda para minimizar cold starts?",
+        options: ["A) Colocar toda a lógica dentro do handler", "B) Inicializar conexões e clientes fora do handler (escopo global do módulo)", "C) Usar sempre Provisioned Concurrency", "D) Reduzir o timeout para forçar reinicializações"],
+        correct: 1,
+        explanation: "Código fora do handler executa apenas no cold start. Conexões de banco e clientes SDK inicializados globalmente são reutilizados em invocações quentes, reduzindo latência."
+      },
+      {
+        question: "Qual header HTTP a Lambda deve retornar para que o API Gateway aceite a resposta corretamente?",
+        options: ["A) Content-Type apenas", "B) statusCode (número), headers (objeto) e body (string) no objeto de resposta", "C) Authorization header", "D) X-Lambda-Response header"],
+        correct: 1,
+        explanation: "A Lambda deve retornar um objeto com statusCode (int), headers (dict opcional) e body (string). Se o body for um objeto, deve ser serializado com json.dumps() ou JSON.stringify()."
+      },
+      {
+        question: "Qual é a diferença entre Layers e Container Images no Lambda?",
+        options: ["A) Layers são para código Python apenas; Container Images para Node.js", "B) Layers compartilham dependências entre funções (até 250MB); Container Images empacotam tudo junto (até 10GB)", "C) Container Images são mais rápidas que Layers", "D) Não há diferença prática"],
+        correct: 1,
+        explanation: "Layers permitem compartilhar bibliotecas entre múltiplas Lambdas sem duplicar. Container Images permitem pacotes maiores (10GB) e ambientes customizados, mas têm cold starts maiores."
+      },
+      {
+        question: "Como implementar autenticação em uma API Gateway sem código customizado?",
+        options: ["A) Verificar token manualmente na Lambda", "B) Usar Lambda Authorizer ou Cognito User Pool Authorizer no API Gateway", "C) Adicionar Basic Auth no header", "D) Usar IAM policies apenas"],
+        correct: 1,
+        explanation: "Lambda Authorizer executa lógica customizada de autenticação. Cognito Authorizer valida JWT tokens do Cognito automaticamente. Ambos evitam duplicar lógica de auth em cada Lambda."
       }
     ];
   </script>
