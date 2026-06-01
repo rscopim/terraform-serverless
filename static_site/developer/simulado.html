@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Simulado AWS Developer Associate (DVA-C02)</title>
-  <meta name="description" content="Simulado interativo com 20 perguntas no estilo do exame AWS Developer Associate DVA-C02." />
+  <meta name="description" content="Simulado interativo com questões no estilo do exame AWS Developer Associate DVA-C02." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,7 +24,7 @@
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../developer.html">Developer</a>
+      <a href="../developer.html">Developer Associate</a>
       <a href="../aws.html">AWS</a>
     </div>
   </header>
@@ -32,21 +32,59 @@
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🎯 Simulado Associate</span>
+        <span class="pill">🎯 Simulado</span>
         <h1>AWS Developer Associate — Simulado</h1>
-        <p>20 perguntas de nível Associate com cenários de desenvolvimento, deploy e troubleshooting na AWS.</p>
+        <p>Escolha a quantidade de questões e teste seus conhecimentos nos 5 domínios do exame DVA-C02.</p>
       </div>
     </section>
 
+    <!-- ===== SELETOR DE QUANTIDADE DE QUESTÕES — Developer Associate ===== -->
+    <section class="section container" id="quizSetup">
+      <div style="max-width:520px;margin:0 auto;text-align:center">
+        <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--gray-900)">Quantas questões você quer responder?</h2>
+        <p style="color:var(--gray-500);font-size:0.9rem;margin-bottom:28px">O exame oficial tem 65 questões. Escolha o modo que melhor se adapta ao seu tempo.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px">
+          <button class="quiz-size-btn" onclick="startQuizWithSize(10)">
+            <span style="font-size:1.6rem">⚡</span>
+            <strong>10 questões</strong>
+            <small>Revisão rápida</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(20)">
+            <span style="font-size:1.6rem">📝</span>
+            <strong>20 questões</strong>
+            <small>Treino padrão</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(40)">
+            <span style="font-size:1.6rem">🎯</span>
+            <strong>40 questões</strong>
+            <small>Simulado avançado</small>
+          </button>
+          <button class="quiz-size-btn" onclick="startQuizWithSize(65)">
+            <span style="font-size:1.6rem">🏆</span>
+            <strong>65 questões</strong>
+            <small>Exame completo</small>
+          </button>
+        </div>
+        <p style="font-size:0.78rem;color:var(--gray-400)">Banco com <strong id="bankSizeInfo">—</strong> questões disponíveis. Questões sorteadas aleatoriamente a cada tentativa.</p>
+      </div>
+    </section>
+    <!-- ===== FIM SELETOR DE QUANTIDADE ===== -->
+
     <section class="section container">
-      <div class="quiz-container" id="quizContainer">
+      <!-- ===== QUIZ CONTAINER — oculto até o usuário escolher a quantidade ===== -->
+      <div class="quiz-container" id="quizContainer" style="display:none">
         <div class="quiz-header">
           <div class="quiz-progress">
             <span id="questionCounter">Pergunta 1 de 20</span>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 5%"></div></div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 5%"></div>
+            </div>
           </div>
-          <div class="quiz-score"><span id="scoreDisplay">Score: 0/0</span></div>
+          <div class="quiz-score">
+            <span id="scoreDisplay">Score: 0/0</span>
+          </div>
         </div>
+
         <div class="question-card" id="questionCard">
           <div class="question-number" id="questionNumber">Pergunta 1</div>
           <h3 class="question-text" id="questionText"></h3>
@@ -62,13 +100,22 @@
           </div>
         </div>
       </div>
+
       <div class="quiz-result" id="quizResult" style="display:none">
         <div class="result-card">
           <div class="result-icon" id="resultIcon">🎉</div>
           <h2 id="resultTitle">Simulado Concluído!</h2>
-          <div class="result-score"><span class="score-number" id="finalScore">0/20</span><span class="score-percent" id="finalPercent">0%</span></div>
-          <div class="result-bar"><div class="result-fill" id="resultFill" style="width: 0%"></div></div>
+          <div class="result-score">
+            <span class="score-number" id="finalScore">0/20</span>
+            <span class="score-percent" id="finalPercent">0%</span>
+          </div>
+          <div class="result-bar">
+            <div class="result-fill" id="resultFill" style="width: 0%"></div>
+          </div>
           <p class="result-message" id="resultMessage"></p>
+          <!-- ===== BADGE DE APROVAÇÃO — Developer Associate ===== -->
+          <div id="approvalBadge" style="display:none;margin:12px 0 20px"></div>
+          <!-- ===== FIM BADGE DE APROVAÇÃO ===== -->
           <div class="result-actions">
             <button class="quiz-btn" onclick="restartQuiz()">Refazer simulado</button>
             <a href="../developer.html" class="quiz-btn secondary">Voltar ao curso</a>
@@ -81,203 +128,84 @@
   <footer class="footer">
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../developer.html">Developer Associate</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
       <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>
 
-  <script>
-    var QUIZ_BANK = [
-      {
-        question: "Uma aplicação Lambda está retornando erro 'Task timed out after 3.00 seconds'. O código faz uma chamada HTTP para uma API externa que demora 5 segundos. Qual a solução mais adequada?",
-        options: ["A) Aumentar a memória da Lambda para 10GB", "B) Aumentar o timeout da Lambda para um valor maior que 5 segundos", "C) Usar provisioned concurrency", "D) Migrar para EC2"],
-        correct: 1,
-        explanation: "O timeout padrão da Lambda é 3s. Se a operação leva 5s, basta aumentar o timeout (máximo 15 min). Aumentar memória melhora CPU mas não resolve timeout de I/O."
-      },
-      {
-        question: "Um desenvolvedor precisa armazenar credenciais de banco de dados que a aplicação Lambda consome. Qual serviço é mais adequado e seguro?",
-        options: ["A) Variáveis de ambiente da Lambda em texto plano", "B) AWS Systems Manager Parameter Store (SecureString)", "C) Hardcoded no código-fonte", "D) Arquivo .env no pacote de deploy"],
-        correct: 1,
-        explanation: "Parameter Store com SecureString criptografa valores com KMS. Variáveis de ambiente em texto plano são visíveis no console. Secrets Manager é outra opção com rotação automática."
-      },
-      {
-        question: "Uma API Gateway retorna erro 429 (Too Many Requests) para clientes. O que está acontecendo e como resolver?",
-        options: ["A) A Lambda está com erro — corrigir o código", "B) O throttling do API Gateway foi atingido — implementar retry com exponential backoff no cliente", "C) O certificado SSL expirou", "D) A VPC não tem internet gateway"],
-        correct: 1,
-        explanation: "HTTP 429 indica throttling — o cliente excedeu o rate limit. A solução é implementar retry com exponential backoff e jitter no lado do cliente, ou solicitar aumento de quota."
-      },
-      {
-        question: "Um desenvolvedor quer que uma Lambda processe mensagens SQS em lotes de 10, mas apenas se houver pelo menos 5 mensagens disponíveis. Qual configuração usar?",
-        options: ["A) BatchSize: 10, MaximumBatchingWindowInSeconds: 5", "B) BatchSize: 10 apenas", "C) ReservedConcurrency: 5", "D) VisibilityTimeout: 10"],
-        correct: 0,
-        explanation: "MaximumBatchingWindowInSeconds faz a Lambda esperar até X segundos para acumular mensagens antes de invocar (até atingir BatchSize). Isso otimiza processamento em lote."
-      },
-      {
-        question: "Uma aplicação usa DynamoDB e precisa ler um item com garantia de que o valor retornado é o mais recente. Qual tipo de leitura usar?",
-        options: ["A) Eventually Consistent Read", "B) Strongly Consistent Read", "C) Transactional Read", "D) Global Secondary Index Read"],
-        correct: 1,
-        explanation: "Strongly Consistent Read garante que o valor retornado reflete todas as escritas anteriores. Eventually Consistent pode retornar dados desatualizados (mais barato e rápido)."
-      },
-      {
-        question: "Um deploy CodeDeploy em Lambda falhou e precisa voltar à versão anterior imediatamente. Qual estratégia de deploy permite rollback instantâneo?",
-        options: ["A) AllAtOnce", "B) Canary10Percent5Minutes", "C) Linear10PercentEvery1Minute", "D) Todas permitem rollback automático com alarmes CloudWatch"],
-        correct: 3,
-        explanation: "Todas as estratégias do CodeDeploy para Lambda suportam rollback automático quando alarmes CloudWatch disparam. O tráfego volta 100% para a versão anterior instantaneamente."
-      },
-      {
-        question: "Uma Lambda precisa acessar uma tabela DynamoDB em outra conta AWS. Qual é a abordagem correta?",
-        options: ["A) Usar access keys da outra conta como variáveis de ambiente", "B) Configurar a Lambda para assumir uma IAM Role na conta destino (cross-account role)", "C) Tornar a tabela DynamoDB pública", "D) Usar VPC Peering"],
-        correct: 1,
-        explanation: "Cross-account access usa AssumeRole: a Lambda assume uma role na conta destino que tem permissão na tabela. Nunca usar access keys hardcoded ou tornar recursos públicos."
-      },
-      {
-        question: "Um desenvolvedor está debugando uma aplicação distribuída com Lambda, API Gateway e DynamoDB. Qual serviço permite rastrear requisições end-to-end?",
-        options: ["A) Amazon CloudWatch Logs", "B) AWS X-Ray", "C) AWS CloudTrail", "D) Amazon EventBridge"],
-        correct: 1,
-        explanation: "AWS X-Ray fornece tracing distribuído — rastreia uma requisição através de múltiplos serviços, mostrando latência, erros e gargalos em cada componente."
-      },
-      {
-        question: "Uma aplicação precisa enviar a mesma mensagem para múltiplos consumidores (Lambda, SQS, HTTP). Qual padrão de arquitetura usar?",
-        options: ["A) SQS com múltiplos consumers", "B) SNS com múltiplas subscriptions (fan-out)", "C) EventBridge com uma única rule", "D) Kinesis Data Streams"],
-        correct: 1,
-        explanation: "SNS fan-out publica uma mensagem para múltiplos subscribers simultaneamente (Lambda, SQS, HTTP, email). Cada subscriber recebe uma cópia independente da mensagem."
-      },
-      {
-        question: "Uma Lambda está com cold start de 8 segundos devido a inicialização de conexão com banco. Qual solução reduz o cold start?",
-        options: ["A) Reduzir o timeout da Lambda", "B) Usar Provisioned Concurrency", "C) Aumentar o batch size do SQS", "D) Usar DynamoDB ao invés de RDS"],
-        correct: 1,
-        explanation: "Provisioned Concurrency mantém instâncias da Lambda pré-aquecidas (initialized), eliminando cold starts. Ideal para funções com inicialização pesada ou requisitos de latência."
-      },
-      {
-        question: "Um desenvolvedor precisa garantir que duas operações DynamoDB (débito + crédito) aconteçam atomicamente. Qual recurso usar?",
-        options: ["A) Conditional Writes", "B) DynamoDB Transactions (TransactWriteItems)", "C) Batch Write com retry", "D) Strongly Consistent Reads"],
-        correct: 1,
-        explanation: "DynamoDB Transactions garantem ACID para múltiplas operações. TransactWriteItems executa até 100 ações atomicamente — todas succedem ou todas falham."
-      },
-      {
-        question: "Uma aplicação usa S3 para upload de arquivos. O frontend precisa fazer upload direto ao S3 sem passar pelo backend. Qual abordagem usar?",
-        options: ["A) Tornar o bucket público", "B) Gerar Pre-signed URL no backend e enviar ao frontend", "C) Usar IAM user credentials no JavaScript", "D) Configurar CORS apenas"],
-        correct: 1,
-        explanation: "Pre-signed URLs permitem upload direto ao S3 com permissão temporária (expira). O backend gera a URL com credenciais e o frontend faz PUT diretamente no S3."
-      },
-      {
-        question: "Uma Lambda está processando eventos SQS mas algumas mensagens falham repetidamente. Como evitar que mensagens problemáticas bloqueiem o processamento?",
-        options: ["A) Aumentar o timeout da Lambda", "B) Configurar Dead Letter Queue (DLQ) com maxReceiveCount", "C) Desabilitar o event source mapping", "D) Usar FIFO queue"],
-        correct: 1,
-        explanation: "DLQ com maxReceiveCount move mensagens que falharam N vezes para uma fila separada, permitindo análise posterior sem bloquear o processamento das demais."
-      },
-      {
-        question: "Um desenvolvedor precisa cachear respostas de uma API para reduzir latência e chamadas ao backend. Qual serviço usar?",
-        options: ["A) Amazon S3", "B) Amazon ElastiCache (Redis)", "C) Amazon DynamoDB DAX", "D) B e C são válidos dependendo do caso"],
-        correct: 3,
-        explanation: "ElastiCache (Redis/Memcached) é cache de propósito geral para APIs. DAX é cache específico para DynamoDB. Ambos reduzem latência para microsegundos."
-      },
-      {
-        question: "Uma aplicação Elastic Beanstalk precisa ser atualizada sem downtime. Qual deployment policy usar?",
-        options: ["A) All at once", "B) Rolling with additional batch", "C) Immutable", "D) B e C garantem zero downtime"],
-        correct: 3,
-        explanation: "Rolling with additional batch cria instâncias extras antes de remover as antigas. Immutable cria um novo ASG completo. Ambos garantem zero downtime durante deploy."
-      },
-      {
-        question: "Um desenvolvedor precisa que uma Lambda seja invocada quando um arquivo é uploaded para S3. Qual configuração é necessária?",
-        options: ["A) S3 Event Notification com trigger para Lambda", "B) CloudWatch Events polling S3", "C) Lambda polling S3 a cada minuto", "D) API Gateway webhook"],
-        correct: 0,
-        explanation: "S3 Event Notifications disparam Lambda automaticamente em eventos como PutObject, DeleteObject, etc. É event-driven, sem polling, com latência de segundos."
-      },
-      {
-        question: "Uma aplicação precisa armazenar sessões de usuário com TTL automático (expiração). Qual serviço é mais adequado?",
-        options: ["A) Amazon S3 com lifecycle rules", "B) DynamoDB com atributo TTL", "C) Amazon RDS com cron job", "D) ElastiCache sem persistência"],
-        correct: 1,
-        explanation: "DynamoDB TTL deleta itens automaticamente após o timestamp definido, sem custo de write. Ideal para sessões, tokens temporários e dados com expiração."
-      },
-      {
-        question: "Um pipeline CodePipeline falha no stage de deploy. O desenvolvedor quer ser notificado automaticamente. Qual integração usar?",
-        options: ["A) CloudWatch Logs", "B) CodePipeline notification rule com SNS", "C) AWS Config", "D) S3 event notification"],
-        correct: 1,
-        explanation: "CodePipeline Notification Rules enviam eventos (falha, sucesso, aprovação) para SNS, Slack (via Chatbot) ou Lambda. Permite resposta rápida a falhas de deploy."
-      },
-      {
-        question: "Uma Lambda com 128MB de memória está demorando 10 segundos para processar. Ao aumentar para 1024MB, o tempo cai para 1.5 segundos. Por quê?",
-        options: ["A) Mais memória permite mais conexões de rede", "B) Lambda aloca CPU proporcional à memória — mais memória = mais CPU", "C) O código foi otimizado automaticamente", "D) O cold start foi eliminado"],
-        correct: 1,
-        explanation: "Lambda aloca CPU linearmente proporcional à memória. Com 128MB tem ~0.08 vCPU; com 1024MB tem ~0.6 vCPU. Mais CPU = processamento mais rápido. O custo pode até diminuir."
-      },
-      {
-        question: "Um desenvolvedor precisa garantir idempotência em uma Lambda que processa eventos SQS (evitar processamento duplicado). Qual abordagem usar?",
-        options: ["A) Usar FIFO queue com deduplication", "B) Armazenar message ID processado em DynamoDB com conditional write", "C) Aumentar visibility timeout", "D) A e B são abordagens válidas"],
-        correct: 3,
-        explanation: "FIFO com deduplication previne duplicatas na fila. Conditional write em DynamoDB (idempotency key) previne reprocessamento. Ambas são válidas dependendo do cenário."
-      },
-      {
-        question: "Uma Lambda precisa ler um segredo do Secrets Manager a cada invocação. Como otimizar para reduzir latência e custo?",
-        options: ["A) Hardcodar o segredo no código", "B) Usar cache em variável global inicializada fora do handler", "C) Chamar Secrets Manager dentro do handler a cada invocação", "D) Armazenar o segredo em S3"],
-        correct: 1,
-        explanation: "Variáveis globais em Lambda persistem entre invocações quentes (warm). Inicializar o segredo fora do handler faz o cache funcionar automaticamente, reduzindo chamadas ao Secrets Manager."
-      },
-      {
-        question: "Qual é o comportamento do DynamoDB quando uma query filtra por atributo que não é partition key nem sort key sem GSI?",
-        options: ["A) Retorna erro automaticamente", "B) Faz Scan completo da tabela — use GSI para queries eficientes em outros atributos", "C) Usa índice automático", "D) Retorna apenas o primeiro item encontrado"],
-        correct: 1,
-        explanation: "Queries no DynamoDB exigem partition key. Filtrar por outros atributos sem GSI resulta em Scan (lê toda a tabela, caro). GSI permite queries eficientes em atributos alternativos."
-      },
-      {
-        question: "Qual serviço AWS permite criar pipelines de CI/CD nativos sem gerenciar servidores?",
-        options: ["A) CodePipeline + CodeBuild + CodeDeploy", "B) Jenkins no EC2", "C) GitHub Actions apenas", "D) AWS Batch"],
-        correct: 0,
-        explanation: "CodePipeline orquestra o pipeline, CodeBuild compila/testa (serverless), CodeDeploy faz deploy em EC2/Lambda/ECS. Juntos formam o stack nativo de CI/CD da AWS."
-      },
-      {
-        question: "Uma API Gateway retorna erro 502 Bad Gateway. O que provavelmente está acontecendo?",
-        options: ["A) O cliente enviou payload inválido", "B) A Lambda retornou resposta malformada ou lançou exceção não tratada", "C) O certificado SSL expirou", "D) O rate limit foi atingido"],
-        correct: 1,
-        explanation: "502 Bad Gateway no API Gateway indica que a Lambda retornou resposta inválida (sem statusCode, body malformado) ou lançou exceção. Verifique os logs da Lambda no CloudWatch."
-      },
-      {
-        question: "Como você passa configurações diferentes para uma Lambda em DEV vs PROD sem alterar o código?",
-        options: ["A) Usar if/else no código verificando o nome da função", "B) Variáveis de ambiente configuradas por ambiente no Terraform/CloudFormation", "C) Criar duas versões do código", "D) Usar parâmetros na URL de invocação"],
-        correct: 1,
-        explanation: "Variáveis de ambiente são a forma padrão de parametrizar Lambdas por ambiente. O código lê process.env.TABLE_NAME ou os.environ['TABLE_NAME'] sem saber em qual ambiente está."
-      },
-      {
-        question: "Qual é a função do AWS X-Ray SDK no código da aplicação?",
-        options: ["A) Criptografar dados em trânsito", "B) Instrumentar o código para criar segmentos de trace, capturando latência e erros", "C) Fazer deploy automático", "D) Gerenciar versões da Lambda"],
-        correct: 1,
-        explanation: "X-Ray SDK adiciona instrumentação ao código: cria segmentos para cada request e subsegmentos para chamadas a serviços externos (DynamoDB, S3, HTTP), capturando latência e erros."
-      },
-      {
-        question: "Uma Lambda com trigger SQS está falhando silenciosamente — mensagens somem sem processamento. Qual é a causa mais provável?",
-        options: ["A) A Lambda está com timeout muito alto", "B) A Lambda retorna sucesso (sem exceção) mesmo quando falha internamente", "C) O SQS está com visibility timeout muito baixo", "D) A Lambda não tem permissão de leitura no SQS"],
-        correct: 1,
-        explanation: "Se a Lambda não lança exceção, o SQS considera a mensagem processada e a deleta. Para falhas silenciosas, lance exceção explicitamente ou use partial batch response."
-      },
-      {
-        question: "Qual é a melhor prática para estruturar o código de uma Lambda para minimizar cold starts?",
-        options: ["A) Colocar toda a lógica dentro do handler", "B) Inicializar conexões e clientes fora do handler (escopo global do módulo)", "C) Usar sempre Provisioned Concurrency", "D) Reduzir o timeout para forçar reinicializações"],
-        correct: 1,
-        explanation: "Código fora do handler executa apenas no cold start. Conexões de banco e clientes SDK inicializados globalmente são reutilizados em invocações quentes, reduzindo latência."
-      },
-      {
-        question: "Qual header HTTP a Lambda deve retornar para que o API Gateway aceite a resposta corretamente?",
-        options: ["A) Content-Type apenas", "B) statusCode (número), headers (objeto) e body (string) no objeto de resposta", "C) Authorization header", "D) X-Lambda-Response header"],
-        correct: 1,
-        explanation: "A Lambda deve retornar um objeto com statusCode (int), headers (dict opcional) e body (string). Se o body for um objeto, deve ser serializado com json.dumps() ou JSON.stringify()."
-      },
-      {
-        question: "Qual é a diferença entre Layers e Container Images no Lambda?",
-        options: ["A) Layers são para código Python apenas; Container Images para Node.js", "B) Layers compartilham dependências entre funções (até 250MB); Container Images empacotam tudo junto (até 10GB)", "C) Container Images são mais rápidas que Layers", "D) Não há diferença prática"],
-        correct: 1,
-        explanation: "Layers permitem compartilhar bibliotecas entre múltiplas Lambdas sem duplicar. Container Images permitem pacotes maiores (10GB) e ambientes customizados, mas têm cold starts maiores."
-      },
-      {
-        question: "Como implementar autenticação em uma API Gateway sem código customizado?",
-        options: ["A) Verificar token manualmente na Lambda", "B) Usar Lambda Authorizer ou Cognito User Pool Authorizer no API Gateway", "C) Adicionar Basic Auth no header", "D) Usar IAM policies apenas"],
-        correct: 1,
-        explanation: "Lambda Authorizer executa lógica customizada de autenticação. Cognito Authorizer valida JWT tokens do Cognito automaticamente. Ambos evitam duplicar lógica de auth em cada Lambda."
-      }
-    ];
-  </script>
+  <!-- ===== SCRIPTS — ORDEM IMPORTANTE ===== -->
+  <!-- 1. Banco de questões (arquivo local, não sobe pro GitHub) -->
+  <script src="questoes.js"></script>
+  <!-- 2. Engine do simulado (lógica de quiz, shuffle, progresso) -->
   <script src="../simulado.js"></script>
+  <!-- 3. Seletor de quantidade + badge de aprovação (carrega APÓS simulado.js) -->
+  <script>
+    /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — Developer Associate ===== */
+
+    // Exibe o tamanho do banco no setup
+    var el = document.getElementById('bankSizeInfo');
+    if (el && typeof QUIZ_BANK !== 'undefined') el.textContent = QUIZ_BANK.length;
+
+    // Inicia o quiz com a quantidade escolhida pelo aluno
+    function startQuizWithSize(size) {
+      QUIZ_SIZE = Math.min(size, QUIZ_BANK.length);
+      document.getElementById('quizSetup').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+      initQuiz();
+    }
+
+    // Volta ao seletor ao reiniciar
+    function restartQuiz() {
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('quizSetup').style.display = 'block';
+      document.getElementById('approvalBadge').style.display = 'none';
+    }
+
+    // Sobrescreve showResult (simulado.js já foi carregado, então a sobrescrita funciona)
+    var _baseShowResult = showResult;
+    showResult = function() {
+      _baseShowResult();
+      var total = activeQuestions.length;
+      var percent = Math.round((score / total) * 100);
+      var badge = document.getElementById('approvalBadge');
+      var icon, label, color, msg;
+
+      if (percent >= 90) {
+        icon = '🏆'; label = 'Desempenho Excepcional';
+        color = '#065f46';
+        msg = 'Resultado extraordinário! Você domina o conteúdo com maestria. Está mais do que pronto para o exame — considere agendar agora.';
+      } else if (percent >= 80) {
+        icon = '⭐'; label = 'Desempenho Excelente';
+        color = '#1d4ed8';
+        msg = 'Excelente preparação! Seu conhecimento está sólido. Revise os pontos que errou e você estará em ótima forma para o exame.';
+      } else if (percent >= 70) {
+        icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
+        color = '#047857';
+        msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
+      } else if (percent >= 60) {
+        icon = '📚'; label = 'Revisar e Continuar';
+        color = '#b45309';
+        msg = 'Você está próximo da aprovação! Revise os domínios onde teve mais dificuldade e refaça o simulado. Você consegue!';
+      } else {
+        icon = '🔄'; label = 'Rever Conceitos e Melhorar';
+        color = '#dc2626';
+        msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos e pratique mais. A aprovação está ao seu alcance.';
+      }
+
+      badge.style.display = 'block';
+      badge.innerHTML =
+        '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
+        '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
+        '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
+        '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
+        '</div>';
+    };
+    /* ===== FIM SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO ===== */
+  </script>
+  <!-- ===== FIM SCRIPTS ===== -->
 </body>
 </html>
+
+

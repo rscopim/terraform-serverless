@@ -138,15 +138,15 @@
   <!-- ===== SCRIPTS — ORDEM IMPORTANTE ===== -->
   <!-- 1. Banco de questões (arquivo local, não sobe pro GitHub) -->
   <script src="questoes.js"></script>
-  <!-- 2. Lógica do simulado (seletor de quantidade + badge de aprovação) -->
+  <!-- 2. Engine do simulado (lógica de quiz, shuffle, progresso) -->
+  <script src="../simulado.js"></script>
+  <!-- 3. Seletor de quantidade + badge de aprovação (carrega APÓS simulado.js) -->
   <script>
     /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — AI PRACTITIONER ===== */
 
     // Exibe o tamanho do banco no setup
-    document.addEventListener('DOMContentLoaded', function() {
-      var el = document.getElementById('bankSizeInfo');
-      if (el && typeof QUIZ_BANK !== 'undefined') el.textContent = QUIZ_BANK.length;
-    });
+    var el = document.getElementById('bankSizeInfo');
+    if (el && typeof QUIZ_BANK !== 'undefined') el.textContent = QUIZ_BANK.length;
 
     // Inicia o quiz com a quantidade escolhida pelo aluno
     function startQuizWithSize(size) {
@@ -163,51 +163,47 @@
       document.getElementById('approvalBadge').style.display = 'none';
     }
 
-    // Badge de aprovação personalizado por faixa de percentual
-    window.addEventListener('load', function() {
-      var origShowResult = showResult;
-      showResult = function() {
-        origShowResult();
-        var total = activeQuestions.length;
-        var percent = Math.round((score / total) * 100);
-        var badge = document.getElementById('approvalBadge');
-        var icon, label, color, msg;
+    // Sobrescreve showResult (simulado.js já foi carregado, então a sobrescrita funciona)
+    var _baseShowResult = showResult;
+    showResult = function() {
+      _baseShowResult();
+      var total = activeQuestions.length;
+      var percent = Math.round((score / total) * 100);
+      var badge = document.getElementById('approvalBadge');
+      var icon, label, color, msg;
 
-        if (percent >= 90) {
-          icon = '🏆'; label = 'Desempenho Excepcional';
-          color = '#065f46';
-          msg = 'Resultado extraordinário! Você domina o conteúdo com maestria. Está mais do que pronto para o exame — considere agendar agora.';
-        } else if (percent >= 80) {
-          icon = '⭐'; label = 'Desempenho Excelente';
-          color = '#1d4ed8';
-          msg = 'Excelente preparação! Seu conhecimento está sólido. Revise os pontos que errou e você estará em ótima forma para o exame.';
-        } else if (percent >= 70) {
-          icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
-          color = '#047857';
-          msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
-        } else if (percent >= 60) {
-          icon = '📚'; label = 'Revisar e Continuar';
-          color = '#b45309';
-          msg = 'Você está próximo da aprovação! Revise os domínios onde teve mais dificuldade e refaça o simulado. Você consegue!';
-        } else {
-          icon = '🔄'; label = 'Rever Conceitos e Melhorar';
-          color = '#dc2626';
-          msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos e pratique mais. A aprovação está ao seu alcance.';
-        }
+      if (percent >= 90) {
+        icon = '🏆'; label = 'Desempenho Excepcional';
+        color = '#065f46';
+        msg = 'Resultado extraordinário! Você domina o conteúdo com maestria. Está mais do que pronto para o exame — considere agendar agora.';
+      } else if (percent >= 80) {
+        icon = '⭐'; label = 'Desempenho Excelente';
+        color = '#1d4ed8';
+        msg = 'Excelente preparação! Seu conhecimento está sólido. Revise os pontos que errou e você estará em ótima forma para o exame.';
+      } else if (percent >= 70) {
+        icon = '✅'; label = 'Aprovado — Ótimo Caminho!';
+        color = '#047857';
+        msg = 'Você atingiu a nota de aprovação! Continue praticando para aumentar sua margem de segurança antes do exame oficial.';
+      } else if (percent >= 60) {
+        icon = '📚'; label = 'Revisar e Continuar';
+        color = '#b45309';
+        msg = 'Você está próximo da aprovação! Revise os domínios onde teve mais dificuldade e refaça o simulado. Você consegue!';
+      } else {
+        icon = '🔄'; label = 'Rever Conceitos e Melhorar';
+        color = '#dc2626';
+        msg = 'Ainda há espaço para crescer! Volte aos módulos do curso, reforce os fundamentos e pratique mais. A aprovação está ao seu alcance.';
+      }
 
-        badge.style.display = 'block';
-        badge.innerHTML =
-          '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
-          '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
-          '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
-          '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
-          '</div>';
-      };
-    });
+      badge.style.display = 'block';
+      badge.innerHTML =
+        '<div style="background:' + color + '1a;border:2px solid ' + color + ';border-radius:12px;padding:16px 20px;text-align:center">' +
+        '<div style="font-size:2rem;margin-bottom:6px">' + icon + '</div>' +
+        '<div style="font-weight:800;font-size:1.05rem;color:' + color + ';margin-bottom:6px">' + label + '</div>' +
+        '<div style="font-size:0.86rem;color:#374151;line-height:1.6">' + msg + '</div>' +
+        '</div>';
+    };
     /* ===== FIM SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO ===== */
   </script>
-  <!-- 3. Engine do simulado (lógica de quiz, shuffle, progresso) -->
-  <script src="../simulado.js"></script>
   <!-- ===== FIM SCRIPTS ===== -->
 </body>
 </html>
