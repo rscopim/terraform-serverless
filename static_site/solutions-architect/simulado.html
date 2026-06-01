@@ -89,7 +89,7 @@
   </footer>
 
   <script>
-    var QUIZ_DATA = [
+    var QUIZ_BANK = [
       {
         question: "Uma empresa precisa de uma solução de armazenamento para arquivos acessados frequentemente nos primeiros 30 dias, raramente depois. Qual classe S3 oferece o melhor custo-benefício?",
         options: ["A) S3 Standard", "B) S3 Intelligent-Tiering", "C) S3 Glacier Instant Retrieval", "D) S3 One Zone-IA"],
@@ -209,6 +209,72 @@
         options: ["A) AWS Cost Explorer", "B) AWS Budgets com alertas por threshold", "C) AWS Trusted Advisor", "D) CloudWatch Billing Alarm"],
         correct: 1,
         explanation: "AWS Budgets permite definir orçamentos com múltiplos thresholds de alerta (50%, 80%, 100%), notificações por email/SNS e até ações automáticas (ex: parar instâncias)."
+      },
+      {
+        question: "Uma aplicação precisa de um banco de dados relacional com alta disponibilidade automática e failover em menos de 30 segundos. Qual serviço usar?",
+        options: ["A) RDS Single-AZ", "B) RDS Multi-AZ com standby", "C) Aurora com Multi-AZ", "D) B e C atendem o requisito"],
+        correct: 3,
+        explanation: "RDS Multi-AZ mantém réplica síncrona em outra AZ com failover automático (~1-2 min). Aurora Multi-AZ tem failover ainda mais rápido (~30s) com réplicas de leitura promovíveis."
+      },
+      {
+        question: "Uma empresa precisa migrar 100TB de dados do S3 para outro bucket em outra região com mínimo impacto. Qual serviço usar?",
+        options: ["A) AWS DataSync", "B) S3 Replication (CRR) habilitado no bucket origem", "C) AWS Transfer Family", "D) Copiar manualmente via CLI"],
+        correct: 1,
+        explanation: "S3 Cross-Region Replication (CRR) replica objetos automaticamente para outro bucket em outra região. Para migração de dados existentes, use S3 Batch Operations ou DataSync."
+      },
+      {
+        question: "Qual é a diferença entre Security Group e Network ACL (NACL)?",
+        options: ["A) Security Group opera na subnet; NACL opera na instância", "B) Security Group é stateful (rastreia conexões); NACL é stateless (regras de entrada e saída independentes)", "C) NACL permite apenas regras de permissão; Security Group permite deny", "D) Não há diferença prática"],
+        correct: 1,
+        explanation: "Security Groups são stateful — resposta de tráfego permitido entra automaticamente. NACLs são stateless — precisam de regras explícitas para entrada E saída. SGs operam em instâncias, NACLs em subnets."
+      },
+      {
+        question: "Uma aplicação web precisa servir conteúdo estático globalmente com baixa latência. Qual arquitetura usar?",
+        options: ["A) EC2 em múltiplas regiões com Route 53", "B) S3 + CloudFront com edge locations globais", "C) ECS Fargate em múltiplas regiões", "D) Lambda@Edge apenas"],
+        correct: 1,
+        explanation: "S3 + CloudFront é a arquitetura padrão para conteúdo estático global. CloudFront tem 450+ edge locations que fazem cache do conteúdo próximo ao usuário, com latência mínima."
+      },
+      {
+        question: "Qual serviço AWS permite executar queries SQL em dados no S3 sem carregar em banco de dados?",
+        options: ["A) Amazon RDS", "B) Amazon Athena", "C) Amazon Redshift", "D) AWS Glue"],
+        correct: 1,
+        explanation: "Amazon Athena é serverless — executa queries SQL diretamente em arquivos no S3 (CSV, JSON, Parquet). Paga por dados escaneados. Ideal para análises ad-hoc sem infraestrutura."
+      },
+      {
+        question: "Uma empresa precisa de conexão privada entre VPC e serviços AWS (S3, DynamoDB) sem tráfego pela internet. Qual usar?",
+        options: ["A) NAT Gateway", "B) VPC Endpoints (Gateway ou Interface)", "C) Internet Gateway", "D) AWS Direct Connect"],
+        correct: 1,
+        explanation: "VPC Endpoints permitem acesso privado a serviços AWS sem internet. Gateway Endpoints (S3, DynamoDB) são gratuitos. Interface Endpoints (PrivateLink) usam ENI com IP privado."
+      },
+      {
+        question: "Qual estratégia de deploy no Elastic Beanstalk garante zero downtime e permite rollback instantâneo?",
+        options: ["A) All at once", "B) Rolling", "C) Immutable", "D) Blue/Green com swap de URL"],
+        correct: 3,
+        explanation: "Blue/Green cria um ambiente completamente novo (green), testa e faz swap de URL. Rollback é instantâneo — basta fazer swap de volta. Immutable também tem zero downtime mas rollback é mais lento."
+      },
+      {
+        question: "Uma aplicação precisa processar arquivos de log de 10GB com queries SQL ocasionais. Qual é a solução mais custo-eficiente?",
+        options: ["A) Carregar em RDS MySQL", "B) Armazenar em S3 (Parquet) + Athena para queries", "C) Usar DynamoDB", "D) Carregar em Redshift permanentemente"],
+        correct: 1,
+        explanation: "S3 + Athena é ideal para dados grandes com queries ocasionais. Parquet reduz dados escaneados (columnar). Custo: armazenamento S3 (~$0.023/GB) + queries Athena ($5/TB escaneado)."
+      },
+      {
+        question: "Qual é a função do AWS Transit Gateway?",
+        options: ["A) Conectar VPCs à internet", "B) Hub central para conectar múltiplos VPCs e redes on-premises com roteamento centralizado", "C) Substituir o Direct Connect", "D) Fazer NAT entre VPCs"],
+        correct: 1,
+        explanation: "Transit Gateway é um hub de roteamento que conecta VPCs, VPNs e Direct Connect em uma topologia hub-and-spoke. Elimina a necessidade de VPC Peering mesh entre muitos VPCs."
+      },
+      {
+        question: "Uma empresa precisa de armazenamento de arquivos compartilhado para instâncias Windows EC2. Qual serviço usar?",
+        options: ["A) Amazon EFS", "B) Amazon FSx for Windows File Server", "C) Amazon S3", "D) Amazon EBS Multi-Attach"],
+        correct: 1,
+        explanation: "FSx for Windows File Server é um file system SMB totalmente gerenciado, compatível com Active Directory e DFS. EFS usa NFS (Linux). EBS Multi-Attach tem limitações de uso."
+      },
+      {
+        question: "Qual é a diferença entre RTO e RPO em disaster recovery?",
+        options: ["A) RTO é quanto dado pode ser perdido; RPO é quanto tempo para recuperar", "B) RTO é o tempo máximo para recuperar o sistema; RPO é a quantidade máxima de dados que pode ser perdida", "C) São métricas de performance, não de DR", "D) RTO e RPO são sempre iguais"],
+        correct: 1,
+        explanation: "RTO (Recovery Time Objective) = tempo máximo aceitável de downtime. RPO (Recovery Point Objective) = quantidade máxima de dados que pode ser perdida (janela de tempo). Ambos guiam a estratégia de DR."
       }
     ];
   </script>
