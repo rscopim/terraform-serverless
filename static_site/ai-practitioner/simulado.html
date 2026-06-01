@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Simulado AWS AI Practitioner (AIF-C01)</title>
-  <meta name="description" content="Simulado interativo com 20 perguntas no estilo do exame AWS AI Practitioner AIF-C01." />
+  <meta name="description" content="Simulado interativo com questões no estilo do exame AWS AI Practitioner AIF-C01." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -135,215 +135,17 @@
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>
 
+  <!-- ===== SCRIPTS — ORDEM IMPORTANTE ===== -->
+  <!-- 1. Banco de questões (arquivo local, não sobe pro GitHub) -->
+  <script src="questoes.js"></script>
+  <!-- 2. Lógica do simulado (seletor de quantidade + badge de aprovação) -->
   <script>
-    /* ===== BANCO DE QUESTÕES — AI PRACTITIONER ===== */
-    var QUIZ_BANK = [
-      {
-        question: "Qual tipo de aprendizado de máquina utiliza dados rotulados para treinar o modelo?",
-        options: ["A) Aprendizado não-supervisionado", "B) Aprendizado por reforço", "C) Aprendizado supervisionado", "D) Aprendizado semi-supervisionado"],
-        correct: 2,
-        explanation: "Aprendizado supervisionado utiliza dados rotulados (com respostas conhecidas) para treinar o modelo a fazer previsões. Exemplos: classificação e regressão."
-      },
-      {
-        question: "Uma empresa quer agrupar clientes por comportamento de compra sem categorias pré-definidas. Qual abordagem é mais adequada?",
-        options: ["A) Classificação supervisionada", "B) Regressão linear", "C) Clustering (aprendizado não-supervisionado)", "D) Aprendizado por reforço"],
-        correct: 2,
-        explanation: "Clustering é uma técnica de aprendizado não-supervisionado que agrupa dados similares sem necessidade de rótulos pré-definidos. K-Means é um algoritmo comum."
-      },
-      {
-        question: "Qual serviço AWS permite acessar modelos de fundação de múltiplos provedores (Anthropic, Meta, Amazon) via API unificada?",
-        options: ["A) Amazon SageMaker", "B) Amazon Bedrock", "C) Amazon Comprehend", "D) Amazon Lex"],
-        correct: 1,
-        explanation: "Amazon Bedrock é o serviço serverless que oferece acesso a Foundation Models de diversos provedores (Claude, Llama, Titan) via API unificada, sem gerenciar infraestrutura."
-      },
-      {
-        question: "O que é um 'token' no contexto de Large Language Models (LLMs)?",
-        options: ["A) Uma credencial de autenticação", "B) Uma unidade de texto processada pelo modelo (palavra ou parte de palavra)", "C) Um tipo de embedding vetorial", "D) Uma métrica de avaliação do modelo"],
-        correct: 1,
-        explanation: "Tokens são as unidades básicas de texto que o LLM processa. Podem ser palavras inteiras, partes de palavras ou caracteres. O custo e limites dos modelos são medidos em tokens."
-      },
-      {
-        question: "Qual técnica de Prompt Engineering fornece exemplos na entrada para guiar o modelo?",
-        options: ["A) Zero-shot prompting", "B) Chain-of-thought prompting", "C) Few-shot prompting", "D) Temperature tuning"],
-        correct: 2,
-        explanation: "Few-shot prompting inclui exemplos de entrada/saída no prompt para que o modelo entenda o padrão desejado. Zero-shot não usa exemplos, e chain-of-thought pede raciocínio passo a passo."
-      },
-      {
-        question: "O que é RAG (Retrieval-Augmented Generation)?",
-        options: ["A) Um método de fine-tuning de modelos", "B) Uma técnica que combina busca em base de conhecimento com geração de texto", "C) Um algoritmo de clustering", "D) Um tipo de rede neural recorrente"],
-        correct: 1,
-        explanation: "RAG combina recuperação de informações de uma base de conhecimento externa com a capacidade generativa do LLM, reduzindo alucinações e fornecendo respostas baseadas em dados atualizados."
-      },
-      {
-        question: "Qual parâmetro de inferência controla a aleatoriedade/criatividade das respostas de um LLM?",
-        options: ["A) Max tokens", "B) Top-k", "C) Temperature", "D) Stop sequences"],
-        correct: 2,
-        explanation: "Temperature controla a aleatoriedade: valores baixos (0.1) geram respostas mais determinísticas e focadas; valores altos (0.9) geram respostas mais criativas e variadas."
-      },
-      {
-        question: "Uma empresa quer usar IA generativa mas precisa que as respostas sejam baseadas apenas em documentos internos. Qual abordagem é recomendada?",
-        options: ["A) Aumentar a temperature do modelo", "B) Usar RAG com Knowledge Base no Bedrock", "C) Treinar um modelo do zero", "D) Usar zero-shot prompting"],
-        correct: 1,
-        explanation: "RAG com Knowledge Base no Amazon Bedrock permite que o modelo busque informações em documentos da empresa antes de gerar respostas, garantindo precisão e reduzindo alucinações."
-      },
-      {
-        question: "O que são 'alucinações' em modelos de IA generativa?",
-        options: ["A) Erros de processamento de GPU", "B) Respostas geradas que parecem corretas mas contêm informações falsas", "C) Problemas de latência na inferência", "D) Falhas de segurança no modelo"],
-        correct: 1,
-        explanation: "Alucinações ocorrem quando o modelo gera informações que parecem plausíveis mas são factualmente incorretas. RAG, guardrails e validação humana ajudam a mitigar esse problema."
-      },
-      {
-        question: "Qual serviço AWS é usado para detectar viés (bias) em dados de treinamento e modelos de ML?",
-        options: ["A) Amazon Macie", "B) Amazon Inspector", "C) Amazon SageMaker Clarify", "D) Amazon GuardDuty"],
-        correct: 2,
-        explanation: "SageMaker Clarify detecta viés em dados e modelos, fornecendo métricas de fairness e explicabilidade. Ajuda a garantir que modelos não discriminem grupos específicos."
-      },
-      {
-        question: "Qual recurso do Amazon Bedrock permite definir filtros de conteúdo e tópicos proibidos nas respostas do modelo?",
-        options: ["A) Bedrock Agents", "B) Bedrock Knowledge Bases", "C) Bedrock Guardrails", "D) Bedrock Fine-tuning"],
-        correct: 2,
-        explanation: "Bedrock Guardrails permite configurar filtros de conteúdo (violência, ódio, sexual), tópicos negados, filtros de PII e palavras bloqueadas para controlar as respostas do modelo."
-      },
-      {
-        question: "No modelo de responsabilidade compartilhada para IA na AWS, qual é responsabilidade do CLIENTE?",
-        options: ["A) Segurança física dos data centers", "B) Manutenção do hardware de GPUs", "C) Qualidade e governança dos dados de treinamento", "D) Patches do sistema operacional dos servidores Bedrock"],
-        correct: 2,
-        explanation: "No modelo compartilhado, o cliente é responsável pelos dados (qualidade, viés, governança, consentimento), configuração de acesso, e uso ético. A AWS cuida da infraestrutura."
-      },
-      {
-        question: "Qual é a diferença principal entre fine-tuning e RAG?",
-        options: ["A) Fine-tuning é mais barato que RAG", "B) RAG modifica os pesos do modelo, fine-tuning não", "C) Fine-tuning adapta o modelo com novos dados de treino; RAG busca informações em tempo real sem alterar o modelo", "D) Não há diferença, são sinônimos"],
-        correct: 2,
-        explanation: "Fine-tuning retreina o modelo com dados específicos (altera pesos). RAG mantém o modelo intacto e busca informações em uma base de conhecimento externa durante a inferência."
-      },
-      {
-        question: "Qual métrica avalia a proporção de previsões positivas corretas em relação ao total de previsões positivas?",
-        options: ["A) Recall", "B) Accuracy", "C) Precision", "D) F1-Score"],
-        correct: 2,
-        explanation: "Precision = TP / (TP + FP). Mede quantas das previsões positivas estavam realmente corretas. Importante quando falsos positivos têm alto custo (ex: diagnóstico médico)."
-      },
-      {
-        question: "Uma empresa quer criar um chatbot que execute ações (consultar banco, enviar email) além de responder perguntas. Qual recurso do Bedrock é adequado?",
-        options: ["A) Bedrock Knowledge Bases", "B) Bedrock Guardrails", "C) Bedrock Agents", "D) Bedrock Fine-tuning"],
-        correct: 2,
-        explanation: "Bedrock Agents permitem que o modelo execute ações via APIs externas (action groups), combinando raciocínio do LLM com execução de tarefas reais."
-      },
-      {
-        question: "Qual conceito descreve a quantidade máxima de texto que um LLM pode processar em uma única interação?",
-        options: ["A) Batch size", "B) Context window", "C) Embedding dimension", "D) Learning rate"],
-        correct: 1,
-        explanation: "Context window é o limite de tokens (entrada + saída) que o modelo pode processar por vez. Modelos maiores têm context windows maiores (ex: 200K tokens no Claude 3)."
-      },
-      {
-        question: "Qual serviço AWS analisa texto para extrair sentimento, entidades e idioma automaticamente?",
-        options: ["A) Amazon Transcribe", "B) Amazon Polly", "C) Amazon Comprehend", "D) Amazon Translate"],
-        correct: 2,
-        explanation: "Amazon Comprehend usa NLP para análise de sentimento, extração de entidades, detecção de idioma e modelagem de tópicos em texto."
-      },
-      {
-        question: "O que é 'Human-in-the-Loop' no contexto de IA responsável?",
-        options: ["A) Um algoritmo de aprendizado por reforço", "B) Revisão e validação humana em pontos críticos do processo de IA", "C) Um tipo de rede neural", "D) Uma técnica de data augmentation"],
-        correct: 1,
-        explanation: "Human-in-the-Loop envolve supervisão humana em decisões críticas da IA — revisão de outputs, validação de classificações e aprovação antes de ações automatizadas."
-      },
-      {
-        question: "Qual serviço AWS converte texto em fala natural?",
-        options: ["A) Amazon Transcribe", "B) Amazon Lex", "C) Amazon Polly", "D) Amazon Rekognition"],
-        correct: 2,
-        explanation: "Amazon Polly converte texto em fala (Text-to-Speech) com vozes naturais em múltiplos idiomas. Amazon Transcribe faz o inverso (Speech-to-Text)."
-      },
-      {
-        question: "Uma empresa precisa garantir que dados sensíveis (CPF, email) não apareçam nas respostas do modelo. Qual recurso utilizar?",
-        options: ["A) Amazon Macie", "B) Bedrock Guardrails com filtro de PII", "C) AWS WAF", "D) Amazon Inspector"],
-        correct: 1,
-        explanation: "Bedrock Guardrails oferece filtros de PII (Personally Identifiable Information) que detectam e mascaram dados sensíveis nas respostas do modelo automaticamente."
-      },
-      {
-        question: "Qual serviço AWS usa visão computacional para análise de imagens e vídeos?",
-        options: ["A) Amazon Comprehend", "B) Amazon Rekognition", "C) Amazon Textract", "D) Amazon Lookout for Vision"],
-        correct: 1,
-        explanation: "Amazon Rekognition detecta objetos, rostos, textos e cenas em imagens e vídeos. Textract extrai texto de documentos, Comprehend analisa texto, Lookout for Vision detecta anomalias visuais."
-      },
-      {
-        question: "O que é um embedding no contexto de IA/ML?",
-        options: ["A) Um tipo de camada de rede neural", "B) Representação numérica vetorial de dados (texto, imagem) que captura significado semântico", "C) Um método de compressão de dados", "D) Um algoritmo de clustering"],
-        correct: 1,
-        explanation: "Embeddings convertem dados (palavras, frases, imagens) em vetores numéricos onde itens semanticamente similares ficam próximos no espaço vetorial. Fundamentais para busca semântica e RAG."
-      },
-      {
-        question: "Qual é a diferença entre Precision e Recall em modelos de classificação?",
-        options: ["A) São a mesma métrica com nomes diferentes", "B) Precision mede acertos entre positivos previstos; Recall mede positivos reais encontrados", "C) Recall é sempre maior que Precision", "D) Precision é usada apenas para regressão"],
-        correct: 1,
-        explanation: "Precision = TP/(TP+FP): dos que o modelo disse positivo, quantos eram? Recall = TP/(TP+FN): dos positivos reais, quantos o modelo encontrou? F1-Score equilibra os dois."
-      },
-      {
-        question: "Qual serviço AWS permite criar chatbots com processamento de linguagem natural?",
-        options: ["A) Amazon Polly", "B) Amazon Transcribe", "C) Amazon Lex", "D) Amazon Connect"],
-        correct: 2,
-        explanation: "Amazon Lex usa NLU (Natural Language Understanding) para criar chatbots e assistentes virtuais. É o mesmo motor do Alexa. Polly é TTS, Transcribe é STT."
-      },
-      {
-        question: "O que é overfitting em modelos de ML?",
-        options: ["A) O modelo tem poucos parâmetros para aprender", "B) O modelo aprende demais os dados de treino e perde capacidade de generalizar para novos dados", "C) O modelo usa muita memória durante inferência", "D) O modelo tem alta latência"],
-        correct: 1,
-        explanation: "Overfitting ocorre quando o modelo memoriza os dados de treino (incluindo ruído) mas falha em dados novos. Soluções: mais dados, regularização, dropout, early stopping."
-      },
-      {
-        question: "Qual é a função do Amazon SageMaker no ciclo de vida de ML?",
-        options: ["A) Apenas hospedar modelos em produção", "B) Plataforma completa para preparar dados, treinar, avaliar e implantar modelos de ML", "C) Apenas criar datasets de treinamento", "D) Substituir o Amazon Bedrock"],
-        correct: 1,
-        explanation: "SageMaker é a plataforma end-to-end de ML da AWS: data labeling (Ground Truth), notebooks, treinamento distribuído, avaliação, registro de modelos e deploy em endpoints gerenciados."
-      },
-      {
-        question: "O que é Chain-of-Thought prompting?",
-        options: ["A) Encadear múltiplos modelos em sequência", "B) Técnica que pede ao modelo para mostrar o raciocínio passo a passo antes da resposta final", "C) Um tipo de fine-tuning", "D) Conectar prompts de diferentes usuários"],
-        correct: 1,
-        explanation: "Chain-of-Thought (CoT) instrui o modelo a 'pensar em voz alta' — mostrar os passos intermediários de raciocínio. Melhora significativamente a precisão em problemas matemáticos e lógicos."
-      },
-      {
-        question: "Qual é o risco de viés (bias) em modelos de IA e como a AWS ajuda a mitigá-lo?",
-        options: ["A) Viés é apenas um problema de performance; AWS não oferece ferramentas específicas", "B) Viés nos dados de treino pode gerar discriminação; SageMaker Clarify detecta e mede viés", "C) Viés só ocorre em modelos de linguagem, não em modelos de visão", "D) AWS elimina automaticamente todo viés nos modelos do Bedrock"],
-        correct: 1,
-        explanation: "Viés nos dados de treino pode fazer o modelo discriminar grupos. SageMaker Clarify mede métricas de fairness antes e depois do treino. Bedrock Guardrails ajuda a filtrar outputs tendenciosos."
-      },
-      {
-        question: "Qual serviço AWS extrai texto, tabelas e formulários de documentos escaneados?",
-        options: ["A) Amazon Comprehend", "B) Amazon Rekognition", "C) Amazon Textract", "D) Amazon Kendra"],
-        correct: 2,
-        explanation: "Amazon Textract usa ML para extrair texto estruturado de documentos (PDFs, imagens), incluindo tabelas e campos de formulários — além do simples OCR."
-      },
-      {
-        question: "O que é Amazon Kendra?",
-        options: ["A) Um serviço de tradução automática", "B) Um serviço de busca inteligente baseado em ML para documentos corporativos", "C) Um modelo de fundação da Amazon", "D) Um serviço de análise de sentimento"],
-        correct: 1,
-        explanation: "Amazon Kendra é um serviço de busca empresarial com ML que entende linguagem natural. Permite buscar em múltiplas fontes (S3, SharePoint, Salesforce) com respostas precisas."
-      },
-      {
-        question: "Qual é a diferença entre IA Generativa e IA Discriminativa?",
-        options: ["A) IA Generativa classifica dados; IA Discriminativa cria novos dados", "B) IA Generativa cria novos dados (texto, imagem); IA Discriminativa classifica/distingue entre categorias", "C) São termos sinônimos", "D) IA Discriminativa é mais recente que IA Generativa"],
-        correct: 1,
-        explanation: "IA Generativa (GPT, DALL-E, Stable Diffusion) cria novos conteúdos. IA Discriminativa (classificadores, detectores) aprende a distinguir entre categorias existentes."
-      },
-      {
-        question: "O que é o conceito de 'grounding' em IA Generativa?",
-        options: ["A) Processo de treinar o modelo do zero", "B) Técnica de conectar respostas do modelo a fontes de dados verificáveis para reduzir alucinações", "C) Método de compressão de modelos", "D) Processo de fine-tuning com RLHF"],
-        correct: 1,
-        explanation: "Grounding conecta as respostas do LLM a fontes de dados reais e verificáveis (via RAG, por exemplo), reduzindo alucinações e aumentando a confiabilidade das respostas."
-      },
-      {
-        question: "Qual serviço AWS oferece busca semântica usando embeddings vetoriais?",
-        options: ["A) Amazon OpenSearch Service com k-NN", "B) Amazon RDS", "C) Amazon DynamoDB", "D) Amazon Redshift"],
-        correct: 0,
-        explanation: "Amazon OpenSearch Service suporta busca k-NN (k-Nearest Neighbors) com vetores de embeddings, permitindo busca semântica por similaridade — componente essencial de sistemas RAG."
-      }
-    ];
-    /* ===== FIM BANCO DE QUESTÕES ===== */
-
     /* ===== SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO — AI PRACTITIONER ===== */
+
     // Exibe o tamanho do banco no setup
     document.addEventListener('DOMContentLoaded', function() {
       var el = document.getElementById('bankSizeInfo');
-      if (el) el.textContent = QUIZ_BANK.length;
+      if (el && typeof QUIZ_BANK !== 'undefined') el.textContent = QUIZ_BANK.length;
     });
 
     // Inicia o quiz com a quantidade escolhida pelo aluno
@@ -354,20 +156,14 @@
       initQuiz();
     }
 
-    // Sobrescreve restartQuiz para voltar ao seletor
+    // Volta ao seletor ao reiniciar
     function restartQuiz() {
       document.getElementById('quizResult').style.display = 'none';
       document.getElementById('quizSetup').style.display = 'block';
       document.getElementById('approvalBadge').style.display = 'none';
     }
 
-    // Sobrescreve showResult para exibir badge de aprovação personalizado
-    var _originalShowResult = window.showResult;
-    document.addEventListener('DOMContentLoaded', function() {
-      // Hook no resultado após o simulado.js carregar
-    });
-
-    // Função chamada pelo simulado.js — sobrescrita para adicionar badge
+    // Badge de aprovação personalizado por faixa de percentual
     window.addEventListener('load', function() {
       var origShowResult = showResult;
       showResult = function() {
@@ -410,6 +206,8 @@
     });
     /* ===== FIM SELETOR DE QUANTIDADE + RESULTADO PERSONALIZADO ===== */
   </script>
+  <!-- 3. Engine do simulado (lógica de quiz, shuffle, progresso) -->
   <script src="../simulado.js"></script>
+  <!-- ===== FIM SCRIPTS ===== -->
 </body>
 </html>
