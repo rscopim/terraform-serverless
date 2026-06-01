@@ -161,7 +161,8 @@ function restartQuiz() {
 document.getElementById('confirmBtn').addEventListener('click', confirmAnswer);
 document.getElementById('nextBtn').addEventListener('click', nextQuestion);
 
-// Só inicia automaticamente se não houver seletor de quantidade na página
-if (typeof startQuizWithSize === 'undefined') {
+// Só inicia automaticamente se o quizContainer estiver visível (sem seletor de quantidade)
+var qc = document.getElementById('quizContainer');
+if (qc && qc.style.display !== 'none') {
   initQuiz();
 }
