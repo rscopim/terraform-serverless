@@ -50,7 +50,7 @@ module "s3_static_site" {
   project_name = var.project_name
   environment  = var.environment
   bucket_name  = "materiais-e-trilhas-de-estudos"
-  api_endpoint = module.api_gateway.api_endpoint
+  api_endpoint = module.api_gateway.leads_endpoint
 
   index_file_path             = "${path.root}/../../static_site/index.html"
   style_file_path             = "${path.root}/../../static_site/style.css"
