@@ -15,7 +15,8 @@ resource "aws_cloudwatch_event_target" "sqs" {
 
 resource "aws_cloudwatch_event_rule" "pdf_download" {
   name        = "${var.project_name}-${var.environment}-pdf-download"
-  description = "Detecta download de PDFs no S3"
+  description = "Detecta downloads de arquivos no S3"
+  state       = "ENABLED"
 
   event_pattern = jsonencode({
     source      = ["aws.s3"]
@@ -26,10 +27,7 @@ resource "aws_cloudwatch_event_rule" "pdf_download" {
       eventName   = ["GetObject"]
 
       requestParameters = {
-        bucketName = [var.site_bucket_name]
-        key = [{
-          prefix = "materiais/"
-        }]
+      bucketName        = [var.site_bucket_name]
       }
     }
   })
