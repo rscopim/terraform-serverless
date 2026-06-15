@@ -40,6 +40,7 @@ function initQuiz() {
   activeQuestions = pickQuestions();
   document.getElementById('quizContainer').style.display = 'block';
   document.getElementById('quizResult').style.display = 'none';
+  trackSimuladoAccess();
   renderQuestion();
 }
 
@@ -161,8 +162,29 @@ function restartQuiz() {
 document.getElementById('confirmBtn').addEventListener('click', confirmAnswer);
 document.getElementById('nextBtn').addEventListener('click', nextQuestion);
 
+// ===== TRACKING DE ACESSO AOS SIMULADOS (custo zero — usa API existente) =====
+// Registra no DynamoDB quando o aluno inicia um simulado
+function trackSimuladoAccess() {
+  var page = window.location.pathname.split('/').slice(-2).join('/');
+  var apiUrl = (typeof API_ENDPOINT !== 'undefined') ? API_ENDPOINT : 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
+  try {
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'simulado-tracking',
+        email: 'tracking@cloudtrilhas.internal',
+        consent: true,
+        material: 'SIMULADO:' + page
+      })
+    }).catch(function() {});
+  } catch(e) {}
+}
+// ===== FIM TRACKING =====
+
 // Só inicia automaticamente se o quizContainer estiver visível (sem seletor de quantidade)
 var qc = document.getElementById('quizContainer');
 if (qc && qc.style.display !== 'none') {
+  trackSimuladoAccess();
   initQuiz();
 }
