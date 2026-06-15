@@ -15,7 +15,7 @@ permissions:
 
 env:
   AWS_REGION: us-west-2
-  TF_WORKING_DIR: environments/dev
+  TF_WORKING_DIR: environments/prod
 
 jobs:
   terraform-plan:
@@ -57,16 +57,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: environments/dev/tfplan
+          path: environments/prod/tfplan
 
       - name: Upload Lambda ZIP files
         uses: actions/upload-artifact@v4
         with:
           name: lambda-zips
           path: |
-            environments/dev/hello_lambda.zip
-            environments/dev/register_lead.zip
-            environments/dev/download_metrics.zip
+            environments/prod/hello_lambda.zip
+            environments/prod/register_lead.zip
+            environments/prod/download_metrics.zip
 
   terraform-apply:
     name: Terraform Apply
@@ -101,13 +101,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: environments/dev
+          path: environments/prod
 
       - name: Download Lambda ZIP files
         uses: actions/download-artifact@v4
         with:
           name: lambda-zips
-          path: environments/dev
+          path: environments/prod
           
 
       - name: Terraform Apply
