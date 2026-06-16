@@ -1,11 +1,7 @@
 /**
  * CloudTrilhas — Simulado Interativo
  * Suporta banco de questões com seleção aleatória a cada reinício.
- *
- * Como usar:
- *   - Defina QUIZ_BANK como array com TODAS as questões disponíveis
- *   - Defina QUIZ_SIZE (opcional) com quantas questões sortear por rodada (padrão: 20)
- *   - O simulado sorteia QUIZ_SIZE questões aleatórias a cada initQuiz()
+ * Requer identificação do aluno (nome + email) antes de iniciar.
  */
 
 var QUIZ_SIZE = (typeof QUIZ_SIZE !== 'undefined') ? QUIZ_SIZE : 20;
@@ -14,7 +10,12 @@ var currentQuestion = 0;
 var score = 0;
 var selectedOption = null;
 var answered = false;
-var activeQuestions = []; // questões sorteadas para a rodada atual
+var activeQuestions = [];
+
+// ===== DADOS DO ALUNO (preenchidos no formulário) =====
+var quizUserName = '';
+var quizUserEmail = '';
+// ===== FIM DADOS DO ALUNO =====
 
 function shuffleArray(arr) {
   var a = arr.slice();
@@ -26,7 +27,6 @@ function shuffleArray(arr) {
 }
 
 function pickQuestions() {
-  // Suporta tanto QUIZ_BANK (banco grande) quanto QUIZ_DATA (lista fixa legada)
   var bank = (typeof QUIZ_BANK !== 'undefined') ? QUIZ_BANK : QUIZ_DATA;
   var size = Math.min(QUIZ_SIZE, bank.length);
   return shuffleArray(bank).slice(0, size);
@@ -147,7 +147,7 @@ function showResult() {
   if (percent >= 80) {
     resultIcon.textContent = '🎉';
     resultTitle.textContent = 'Excelente!';
-    resultMessage.textContent = 'Você está muito bem preparado para o exame. Continue revisando os pontos que errou.' + bankInfo;
+    resultMessage.textContent = 'Você está muito bem preparado. Continue revisando os pontos que errou.' + bankInfo;
   } else if (percent >= 60) {
     resultIcon.textContent = '👍';
     resultTitle.textContent = 'Bom resultado!';
@@ -155,7 +155,7 @@ function showResult() {
   } else {
     resultIcon.textContent = '📚';
     resultTitle.textContent = 'Continue estudando!';
-    resultMessage.textContent = 'Revise o conteúdo dos módulos e refaça o simulado. A prática leva à aprovação.' + bankInfo;
+    resultMessage.textContent = 'Revise o conteúdo dos módulos e refaça o simulado.' + bankInfo;
   }
 }
 
@@ -166,7 +166,81 @@ function restartQuiz() {
 document.getElementById('confirmBtn').addEventListener('click', confirmAnswer);
 document.getElementById('nextBtn').addEventListener('click', nextQuestion);
 
-// ===== TRACKING DE ACESSO AOS SIMULADOS (custo zero — usa API existente) =====
+// ===== FORMULÁRIO DE IDENTIFICAÇÃO DO ALUNO =====
+function createUserForm() {
+  var container = document.querySelector('.section.container');
+  if (!container) return;
+
+  var formDiv = document.createElement('div');
+  formDiv.id = 'quizUserForm';
+  formDiv.style.cssText = 'max-width:420px;margin:0 auto;text-align:center;';
+  formDiv.innerHTML =
+    '<div style="background:#fff;border:1px solid var(--gray-200);border-radius:16px;padding:32px;box-shadow:0 8px 30px rgba(0,0,0,0.08)">' +
+    '<div style="font-size:2rem;margin-bottom:12px">👤</div>' +
+    '<h2 style="font-size:1.3rem;font-weight:800;margin-bottom:6px;color:var(--gray-900)">Identifique-se para iniciar</h2>' +
+    '<p style="color:var(--gray-500);font-size:0.86rem;margin-bottom:24px">Preencha seus dados para acessar o simulado e registrar seu desempenho.</p>' +
+    '<form id="quizIdentForm" style="display:grid;gap:12px;text-align:left">' +
+    '<div style="display:grid;gap:4px"><label style="font-weight:700;font-size:0.84rem;color:var(--gray-700)">Nome</label>' +
+    '<input type="text" id="quizNameInput" placeholder="Seu nome completo" required style="width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:0.9rem;background:var(--gray-50)">' +
+    '</div>' +
+    '<div style="display:grid;gap:4px"><label style="font-weight:700;font-size:0.84rem;color:var(--gray-700)">E-mail</label>' +
+    '<input type="email" id="quizEmailInput" placeholder="seu@email.com" required style="width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:0.9rem;background:var(--gray-50)">' +
+    '</div>' +
+    '<button type="submit" style="margin-top:8px;cursor:pointer;background:linear-gradient(135deg,#4f46e5,#06b6d4);color:#fff;padding:13px;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;box-shadow:0 4px 14px rgba(79,70,229,0.25)">Acessar Simulado →</button>' +
+    '</form>' +
+    '</div>';
+
+  // Insere antes do quizSetup (simulados AWS) ou quizContainer (testes)
+  var quizSetup = document.getElementById('quizSetup');
+  var quizContainer = document.getElementById('quizContainer');
+  var target = quizSetup || quizContainer;
+
+  if (target) {
+    target.parentNode.insertBefore(formDiv, target);
+    if (quizSetup) quizSetup.style.display = 'none';
+    if (quizContainer) quizContainer.style.display = 'none';
+  }
+
+  document.getElementById('quizIdentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    quizUserName = document.getElementById('quizNameInput').value.trim();
+    quizUserEmail = document.getElementById('quizEmailInput').value.trim();
+
+    if (!quizUserName || !quizUserEmail) return;
+
+    // Salva no localStorage para próximas vezes
+    localStorage.setItem('cloudtrilhas_user_name', quizUserName);
+    localStorage.setItem('cloudtrilhas_user_email', quizUserEmail);
+
+    // Esconde formulário
+    formDiv.style.display = 'none';
+
+    // Mostra seletor ou inicia quiz
+    if (quizSetup) {
+      quizSetup.style.display = 'block';
+    } else if (quizContainer) {
+      quizContainer.style.display = 'block';
+      trackSimuladoAccess();
+      initQuiz();
+    }
+  });
+}
+
+// Verifica se já tem dados salvos
+function checkSavedUser() {
+  var savedName = localStorage.getItem('cloudtrilhas_user_name');
+  var savedEmail = localStorage.getItem('cloudtrilhas_user_email');
+
+  if (savedName && savedEmail) {
+    quizUserName = savedName;
+    quizUserEmail = savedEmail;
+    return true;
+  }
+  return false;
+}
+// ===== FIM FORMULÁRIO DE IDENTIFICAÇÃO =====
+
+// ===== TRACKING DE ACESSO AOS SIMULADOS =====
 function trackSimuladoAccess() {
   var page = window.location.pathname.split('/').slice(-2).join('/');
   var apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
@@ -177,8 +251,8 @@ function trackSimuladoAccess() {
       body: JSON.stringify({
         type: 'simulado-access',
         page: page,
-        name: 'anonymous',
-        email: 'tracking@cloudtrilhas.internal',
+        name: quizUserName || 'anonymous',
+        email: quizUserEmail || 'tracking@cloudtrilhas.internal',
         consent: true,
         material: page
       })
@@ -186,8 +260,7 @@ function trackSimuladoAccess() {
   } catch(e) {}
 }
 
-// Registra resultado do simulado com score
-function trackSimuladoResult(score, total) {
+function trackSimuladoResult(scoreVal, totalVal) {
   var page = window.location.pathname.split('/').slice(-2).join('/');
   var apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
   try {
@@ -197,21 +270,29 @@ function trackSimuladoResult(score, total) {
       body: JSON.stringify({
         type: 'simulado-result',
         page: page,
-        name: 'anonymous',
-        email: 'tracking@cloudtrilhas.internal',
+        name: quizUserName || 'anonymous',
+        email: quizUserEmail || 'tracking@cloudtrilhas.internal',
         consent: true,
         material: page,
-        score: score,
-        total: total
+        score: scoreVal,
+        total: totalVal
       })
     }).catch(function() {});
   } catch(e) {}
 }
 // ===== FIM TRACKING =====
 
-// Só inicia automaticamente se o quizContainer estiver visível (sem seletor de quantidade)
-var qc = document.getElementById('quizContainer');
-if (qc && qc.style.display !== 'none') {
-  trackSimuladoAccess();
-  initQuiz();
+// ===== INICIALIZAÇÃO =====
+// Se já tem dados salvos, pula o formulário
+if (checkSavedUser()) {
+  // Já identificado — inicia normalmente
+  var qc = document.getElementById('quizContainer');
+  if (qc && qc.style.display !== 'none') {
+    trackSimuladoAccess();
+    initQuiz();
+  }
+} else {
+  // Precisa preencher formulário
+  createUserForm();
 }
+// ===== FIM INICIALIZAÇÃO =====
