@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Docker Módulo 05: Docker Compose</title>
+  <meta name="description" content="Guia completo sobre Docker Compose: defina aplicações multi-container em YAML, gerencie services, networks, volumes, healthchecks, profiles e deploy com um único comando." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,22 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-04.html" class="nav-link">← Anterior</a>
         <a href="modulo-06.html" class="nav-link">Próximo →</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <a href="../index.html" class="nav-button">Início</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,433 +38,2571 @@
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 05</span>
         <h1>Docker Compose</h1>
-        <p>Orquestre múltiplos containers de forma declarativa, reproduzível e versionável. Defina toda a infraestrutura da sua aplicação em um único arquivo YAML.</p>
+        <p>Domine a orquestração de aplicações multi-container com Docker Compose: defina toda a sua stack em um único arquivo YAML, gerencie serviços, redes e volumes de forma declarativa, configure healthchecks e dependências, e suba ambientes completos com um único comando.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node active"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: O QUE É DOCKER COMPOSE? -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
+          <h2>O que é Docker Compose?</h2>
+          <p>Docker Compose é a ferramenta que resolve o problema de gerenciar aplicações multi-container. Em vez de executar dezenas de comandos <code>docker run</code> com flags complexas, você define toda a stack em um único arquivo YAML e opera tudo com um comando.</p>
+        </div>
 
-        <!-- O que é Docker Compose -->
         <div class="topic-block">
-          <h3>O que é Docker Compose e Por que Usar</h3>
+          <h3>O Problema: Gerenciar Múltiplos Containers Manualmente</h3>
+          <p>Imagine que você precisa subir uma aplicação web com 4 serviços. Sem Compose, você faria assim:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>Orquestração Local</code>
-                <span class="cmd-tag">conceito</span>
-              </div>
-              <p>Docker Compose é uma ferramenta para definir e executar aplicações multi-container. Com um único arquivo YAML você descreve todos os serviços, redes e volumes da sua aplicação.</p>
-              <pre><code># Vantagens principais:
-# ✓ Declarativo — infraestrutura como código
-# ✓ Reproduzível — mesmo resultado em qualquer máquina
-# ✓ Versionável — arquivo YAML no Git
-# ✓ Um comando — sobe toda a stack
-# ✓ Isolamento — cada projeto em sua rede</code></pre>
+              <div class="command-header"><code>Sem Docker Compose — A dor de cabeça</code><span class="cmd-tag">Problema</span></div>
+              <pre><code># 1. Criar a rede
+docker network create minha-app
+
+# 2. Criar volumes
+docker volume create postgres-data
+docker volume create redis-data
+
+# 3. Subir PostgreSQL
+docker run -d \
+  --name postgres \
+  --network minha-app \
+  -v postgres-data:/var/lib/postgresql/data \
+  -e POSTGRES_USER=app \
+  -e POSTGRES_PASSWORD=senha123 \
+  -e POSTGRES_DB=minha_app \
+  --restart unless-stopped \
+  postgres:16-alpine
+
+# 4. Subir Redis
+docker run -d \
+  --name redis \
+  --network minha-app \
+  -v redis-data:/data \
+  --restart unless-stopped \
+  redis:7-alpine --appendonly yes
+
+# 5. Subir a aplicação (esperando DB e Redis estarem prontos...)
+docker run -d \
+  --name app \
+  --network minha-app \
+  -e DATABASE_URL=postgresql://app:senha123@postgres:5432/minha_app \
+  -e REDIS_URL=redis://redis:6379 \
+  --restart unless-stopped \
+  minha-app:latest
+
+# 6. Subir Nginx (reverse proxy)
+docker run -d \
+  --name nginx \
+  --network minha-app \
+  -p 80:80 -p 443:443 \
+  -v ./nginx.conf:/etc/nginx/nginx.conf:ro \
+  --restart unless-stopped \
+  nginx:alpine
+
+# PROBLEMAS:
+# ❌ 6+ comandos longos e propensos a erros de digitação
+# ❌ Sem controle de ordem/dependência de startup
+# ❌ Difícil de versionar (como guardar isso no Git?)
+# ❌ Difícil de replicar (outro dev precisa rodar tudo de novo)
+# ❌ Para destruir: docker stop + docker rm para CADA container
+# ❌ Variáveis de ambiente espalhadas em vários comandos
+# ❌ Se um container falhar, precisa lembrar o comando exato</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Estrutura do docker-compose.yml -->
         <div class="topic-block">
-          <h3>Estrutura do docker-compose.yml</h3>
+          <h3>A Solução: Docker Compose — Um Arquivo, Um Comando</h3>
+          <p>Com Docker Compose, a mesma stack é definida em um arquivo <code>docker-compose.yml</code> e operada com um único comando:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>docker-compose.yml</code>
-                <span class="cmd-tag">estrutura</span>
-              </div>
-              <p>Anatomia completa de um arquivo Compose com todas as diretivas principais.</p>
-              <pre><code>services:
-  nome-servico:
-    image: imagem:tag           # Imagem do Docker Hub ou registry
-    build:                      # OU build a partir de Dockerfile
-      context: ./dir
-      dockerfile: Dockerfile
-      args:
-        NODE_ENV: production
-    container_name: meu-app     # Nome fixo do container
+              <div class="command-header"><code>Com Docker Compose — A solução elegante</code><span class="cmd-tag">Solução</span></div>
+              <pre><code># docker-compose.yml — TODA a stack em um arquivo:
+services:
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: senha123
+      POSTGRES_DB: minha_app
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://app:senha123@postgres:5432/minha_app
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
     ports:
-      - "8080:80"               # host:container
+      - "80:80"
       - "443:443"
     volumes:
-      - ./src:/app/src          # Bind mount (dev)
-      - dados:/var/lib/data     # Named volume (persistência)
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-    env_file:
-      - .env                    # Variáveis de arquivo externo
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - db
-      - cache
-    networks:
-      - frontend
-      - backend
-    restart: unless-stopped     # Política de reinício
+      - app
+    restart: unless-stopped
 
+volumes:
+  postgres-data:
+  redis-data:
+
+# SUBIR TUDO:
+docker compose up -d
+
+# DERRUBAR TUDO:
+docker compose down
+
+# VANTAGENS:
+# ✅ Toda a stack em UM arquivo versionável (Git)
+# ✅ Um comando para subir, um para derrubar
+# ✅ Dependências declaradas (depends_on)
+# ✅ Rede criada automaticamente
+# ✅ Qualquer dev clona o repo e roda docker compose up
+# ✅ Reproduzível e determinístico
+# ✅ Fácil de modificar e manter</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Resumo:</strong> Docker Compose transforma uma sequência complexa de comandos em um arquivo declarativo e versionável. É a diferença entre "executar instruções" e "declarar o estado desejado".
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker-compose (v1) vs docker compose (v2)</h3>
+          <p>Existem duas versões do Compose que você vai encontrar no mercado. A v2 é a versão atual e recomendada:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Compose V1 (Legado)</code><span class="cmd-tag">Deprecado</span></div>
+              <pre><code># DOCKER COMPOSE V1 (docker-compose)
+# ═══════════════════════════════════
+#
+# CARACTERÍSTICAS:
+# • Binário separado: docker-compose
+# • Escrito em Python
+# • Instalação separada do Docker
+# • Usa hífen: docker-compose up
+# • End of Life: junho 2023
+#
+# IDENTIFICAR V1:
+docker-compose --version
+# docker-compose version 1.29.2
+
+# COMANDOS V1:
+docker-compose up -d
+docker-compose down
+docker-compose ps
+docker-compose logs
+
+# STATUS: ⚠️ DEPRECADO
+# Não recebe mais atualizações
+# Pode ter bugs não corrigidos
+# Migre para V2!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Compose V2 (Atual)</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># DOCKER COMPOSE V2 (docker compose)
+# ═══════════════════════════════════
+#
+# CARACTERÍSTICAS:
+# • Plugin do Docker CLI (Go)
+# • Instalado junto com Docker Desktop
+# • Usa espaço: docker compose up
+# • Mais rápido e confiável
+# • Suporte ativo e novas features
+#
+# IDENTIFICAR V2:
+docker compose version
+# Docker Compose version v2.27.0
+
+# COMANDOS V2:
+docker compose up -d
+docker compose down
+docker compose ps
+docker compose logs
+
+# VANTAGENS V2:
+# ✅ Mais rápido (Go vs Python)
+# ✅ Melhor integração com Docker CLI
+# ✅ Suporte a profiles
+# ✅ Suporte a watch (live reload)
+# ✅ Melhor error handling
+# ✅ Formato compose.yaml (sem version:)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Regra prática:</strong> Use sempre <code>docker compose</code> (com espaço, v2). Se encontrar documentação com <code>docker-compose</code> (com hífen), os comandos são equivalentes — apenas substitua o hífen por espaço.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Analogia: Compose é a "Planta Baixa" da sua Aplicação</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Analogia: Construção de um Prédio</code><span class="cmd-tag">Analogia</span></div>
+              <pre><code>CONSTRUÇÃO DE UM PRÉDIO              │  DOCKER COMPOSE
+═══════════════════════════════════  │  ═══════════════════════════════════
+                                     │
+Planta baixa (projeto arquitetônico) │  docker-compose.yml
+  → Define todos os cômodos          │    → Define todos os services
+  → Define encanamento               │    → Define networks
+  → Define elétrica                  │    → Define volumes
+  → Especificações de materiais      │    → Define images/builds
+                                     │
+Engenheiro executa a planta          │  docker compose up
+  → Constrói conforme especificado   │    → Cria conforme declarado
+  → Na ordem correta                 │    → Respeita depends_on
+  → Com os materiais certos          │    → Com as imagens certas
+                                     │
+Demolir o prédio                     │  docker compose down
+  → Remove toda a construção         │    → Remove containers + rede
+                                     │
+Reformar um cômodo                   │  docker compose up --build app
+  → Reconstrói parte específica      │    → Rebuild de um serviço
+                                     │
+Múltiplas obras com a mesma planta   │  Múltiplos ambientes com o mesmo yml
+  → Casa 1 (dev), Casa 2 (staging)  │    → dev, staging, produção
+
+FILOSOFIA: Infraestrutura como Código (IaC) para containers</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Quando Usar Docker Compose?</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Cenário</th><th>Usar Compose?</th><th>Motivo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Desenvolvimento local</td><td>✅ Sim (ideal)</td><td>Suba toda a stack com <code>docker compose up</code></td></tr>
+              <tr><td>Testes automatizados (CI/CD)</td><td>✅ Sim</td><td>Ambiente reproduzível para testes de integração</td></tr>
+              <tr><td>Produção simples (1 servidor)</td><td>✅ Sim</td><td>Deploy simples sem orquestrador complexo</td></tr>
+              <tr><td>Prototipagem rápida</td><td>✅ Sim</td><td>Testar combinações de serviços rapidamente</td></tr>
+              <tr><td>Documentação de arquitetura</td><td>✅ Sim</td><td>O YAML documenta toda a infraestrutura</td></tr>
+              <tr><td>Produção multi-host (cluster)</td><td>⚠️ Parcial</td><td>Use Kubernetes ou Docker Swarm para escala</td></tr>
+              <tr><td>Container único sem dependências</td><td>❌ Overkill</td><td>Um simples <code>docker run</code> é suficiente</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>💡 Regra geral:</strong> Se sua aplicação tem <strong>2+ containers</strong> que precisam se comunicar, use Docker Compose. Mesmo para desenvolvimento local, Compose economiza tempo e elimina erros.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: ESTRUTURA DO DOCKER-COMPOSE.YML -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Estrutura</span>
+          <h2>Estrutura do docker-compose.yml</h2>
+          <p>O arquivo Compose é organizado em seções de nível superior (top-level keys) que definem todos os componentes da sua aplicação. Entender essa estrutura é fundamental para criar configurações corretas e eficientes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Nomes de Arquivo Aceitos</h3>
+          <p>O Docker Compose procura arquivos nesta ordem de prioridade:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Nomes de arquivo válidos</code><span class="cmd-tag">Convenção</span></div>
+              <pre><code># ORDEM DE BUSCA (Compose V2):
+# ════════════════════════════════
+#
+# 1. compose.yaml     ← Recomendado (padrão novo)
+# 2. compose.yml
+# 3. docker-compose.yaml
+# 4. docker-compose.yml  ← Mais comum (legado)
+#
+# Se ambos existirem, compose.yaml tem prioridade.
+#
+# ESPECIFICAR ARQUIVO MANUALMENTE:
+docker compose -f custom-compose.yml up -d
+docker compose -f infra.yml -f app.yml up -d
+
+# MÚLTIPLOS ARQUIVOS (merge/override):
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.override.yml \
+  up -d
+
+# O segundo arquivo faz MERGE com o primeiro
+# (útil para dev vs prod)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Estrutura de diretório típica</code><span class="cmd-tag">Layout</span></div>
+              <pre><code>meu-projeto/
+├── docker-compose.yml          # Stack principal
+├── docker-compose.override.yml # Override para dev
+├── docker-compose.prod.yml     # Override para prod
+├── .env                        # Variáveis de ambiente
+├── .dockerignore               # Ignorar no build
+├── Dockerfile                  # Build da app
+├── src/                        # Código fonte
+│   └── ...
+├── nginx/
+│   └── nginx.conf              # Config do Nginx
+├── postgres/
+│   └── init.sql                # Script de init do DB
+└── scripts/
+    ├── backup.sh
+    └── deploy.sh
+
+# O Compose sempre é executado no diretório
+# onde está o docker-compose.yml (contexto)
+# O nome do diretório = nome do projeto (prefixo)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>A Chave "version" — Deprecada no Compose V2</h3>
+          <p>Se você já viu arquivos Compose, provavelmente encontrou a chave <code>version:</code> no topo. No Compose V2, ela é ignorada:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>version: — O que era e por que foi removida</code><span class="cmd-tag">Deprecado</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# A CHAVE "version:" NO COMPOSE
+# ════════════════════════════════════════════════════════════════
+
+# ANTIGAMENTE (Compose V1):
+# A chave "version" indicava qual formato de arquivo usar:
+version: "2.4"    # Formato 2.x (features de single-host)
+version: "3.8"    # Formato 3.x (features de Swarm/deploy)
+
+# PROBLEMA:
+# → Confusão sobre qual versão usar (2.x vs 3.x)
+# → Features disponíveis dependiam da version
+# → Incompatibilidades entre formatos
+# → Usuários não sabiam qual escolher
+
+# HOJE (Compose V2 / Compose Specification):
+# ✅ A chave "version" é OPCIONAL e IGNORADA
+# ✅ Todas as features estão sempre disponíveis
+# ✅ O formato é unificado (Compose Specification)
+
+# ARQUIVO MODERNO (sem version):
+services:
+  app:
+    image: node:20-alpine
+    ports:
+      - "3000:3000"
+
+# ARQUIVO LEGADO (version ainda funciona, mas é ignorada):
+version: "3.8"    # ← Ignorada pelo Compose V2
+services:
+  app:
+    image: node:20-alpine
+    ports:
+      - "3000:3000"
+
+# RECOMENDAÇÃO:
+# → Remova "version:" de novos arquivos
+# → Não precisa remover de arquivos existentes (funciona igual)
+# → Foque apenas em: services, networks, volumes</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Top-Level Keys — As 4 Seções Principais</h3>
+          <p>Um arquivo Compose completo pode ter estas seções de nível superior:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Estrutura completa do docker-compose.yml</code><span class="cmd-tag">Referência</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# ESTRUTURA COMPLETA DO DOCKER-COMPOSE.YML
+# ════════════════════════════════════════════════════════════════
+
+# ┌─────────────────────────────────────────────────────────────┐
+# │ name: (opcional)                                             │
+# │ Define o nome do projeto (substitui o nome do diretório)     │
+# └─────────────────────────────────────────────────────────────┘
+name: minha-aplicacao
+
+# ┌─────────────────────────────────────────────────────────────┐
+# │ services: (OBRIGATÓRIO)                                      │
+# │ Define os containers que compõem sua aplicação               │
+# │ Cada service = 1 container (ou múltiplas réplicas)           │
+# └─────────────────────────────────────────────────────────────┘
+services:
+  web:          # Nome do serviço (usado como hostname DNS)
+    image: nginx:alpine
+    ports:
+      - "80:80"
+
+  api:          # Outro serviço
+    build: ./api
+    ports:
+      - "3000:3000"
+
+  db:           # Banco de dados
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+# ┌─────────────────────────────────────────────────────────────┐
+# │ networks: (OPCIONAL)                                         │
+# │ Define redes customizadas                                    │
+# │ Se omitido, uma rede "default" é criada automaticamente      │
+# └─────────────────────────────────────────────────────────────┘
 networks:
   frontend:
     driver: bridge
   backend:
     driver: bridge
+    internal: true   # Sem acesso à internet
 
+# ┌─────────────────────────────────────────────────────────────┐
+# │ volumes: (OPCIONAL)                                          │
+# │ Define named volumes para persistência                       │
+# │ Volumes declarados aqui são gerenciados pelo Docker          │
+# └─────────────────────────────────────────────────────────────┘
 volumes:
-  dados:
+  db-data:
+    driver: local
+  cache-data:
+
+# ┌─────────────────────────────────────────────────────────────┐
+# │ configs: (OPCIONAL, mais usado com Swarm)                    │
+# │ Define configurações que podem ser montadas nos containers   │
+# └─────────────────────────────────────────────────────────────┘
+configs:
+  nginx-config:
+    file: ./nginx/nginx.conf
+
+# ┌─────────────────────────────────────────────────────────────┐
+# │ secrets: (OPCIONAL)                                          │
+# │ Define secrets que são montados de forma segura              │
+# └─────────────────────────────────────────────────────────────┘
+secrets:
+  db-password:
+    file: ./secrets/db-password.txt</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Arquivo Completo Comentado Linha por Linha</h3>
+          <p>Vamos ver um arquivo Compose real e completo com cada linha explicada:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker-compose.yml — Comentado completo</code><span class="cmd-tag">Exemplo Real</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# PROJETO: Aplicação Web com API, DB e Cache
+# ════════════════════════════════════════════════════════════════
+
+# Nome do projeto (opcional, senão usa o nome do diretório)
+name: minha-webapp
+
+# ────────────────────────────────────────────────────────────────
+# SERVICES: define cada container da aplicação
+# ────────────────────────────────────────────────────────────────
+services:
+
+  # ══════════════════════════════════════════════════════════════
+  # SERVIÇO: api (aplicação principal)
+  # ══════════════════════════════════════════════════════════════
+  api:
+    # Construir imagem a partir do Dockerfile local
+    build:
+      context: .              # Diretório de contexto para o build
+      dockerfile: Dockerfile  # Nome do Dockerfile (padrão)
+      args:                   # Build arguments
+        NODE_ENV: production
+
+    # Nome fixo do container (opcional, padrão: projeto-servico-1)
+    container_name: webapp-api
+
+    # Portas expostas: "HOST:CONTAINER"
+    ports:
+      - "3000:3000"           # API acessível na porta 3000 do host
+
+    # Variáveis de ambiente
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://app:${DB_PASSWORD}@db:5432/webapp
+      REDIS_URL: redis://cache:6379
+
+    # Volumes montados
+    volumes:
+      - ./uploads:/app/uploads          # Bind mount para uploads
+      - app-logs:/app/logs              # Named volume para logs
+
+    # Redes que este serviço pertence
+    networks:
+      - frontend       # Acessível pelo Nginx
+      - backend        # Acessa DB e Redis
+
+    # Dependências: esperar outros serviços
+    depends_on:
+      db:
+        condition: service_healthy  # Espera DB estar saudável
+      cache:
+        condition: service_started  # Espera Redis iniciar
+
+    # Política de restart
+    restart: unless-stopped
+
+    # Healthcheck para monitorar saúde
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ══════════════════════════════════════════════════════════════
+  # SERVIÇO: db (PostgreSQL)
+  # ══════════════════════════════════════════════════════════════
+  db:
+    image: postgres:16-alpine   # Imagem do Docker Hub
+
+    container_name: webapp-db
+
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD}   # Variável do .env
+      POSTGRES_DB: webapp
+
+    volumes:
+      - db-data:/var/lib/postgresql/data        # Dados persistentes
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+    networks:
+      - backend               # Apenas rede interna
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d webapp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ══════════════════════════════════════════════════════════════
+  # SERVIÇO: cache (Redis)
+  # ══════════════════════════════════════════════════════════════
+  cache:
+    image: redis:7-alpine
+
+    container_name: webapp-cache
+
+    command: redis-server --appendonly yes --maxmemory 256mb
+
+    volumes:
+      - cache-data:/data
+
+    networks:
+      - backend
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ══════════════════════════════════════════════════════════════
+  # SERVIÇO: nginx (reverse proxy)
+  # ══════════════════════════════════════════════════════════════
+  nginx:
+    image: nginx:alpine
+
+    container_name: webapp-nginx
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+
+    networks:
+      - frontend
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+# ────────────────────────────────────────────────────────────────
+# NETWORKS: define as redes da aplicação
+# ────────────────────────────────────────────────────────────────
+networks:
+  frontend:                  # Rede para tráfego externo
+    driver: bridge
+  backend:                   # Rede para serviços internos
+    driver: bridge
+    internal: true           # Sem acesso à internet (segurança!)
+
+# ────────────────────────────────────────────────────────────────
+# VOLUMES: define volumes nomeados para persistência
+# ────────────────────────────────────────────────────────────────
+volumes:
+  db-data:                   # Dados do PostgreSQL
+    driver: local
+  cache-data:                # Dados do Redis
+    driver: local
+  app-logs:                  # Logs da aplicação
+    driver: local</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Observação:</strong> O <code>${DB_PASSWORD}</code> é interpolado a partir de um arquivo <code>.env</code> no mesmo diretório. Compose lê automaticamente variáveis do <code>.env</code> — nunca coloque senhas diretamente no YAML!
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Nome do Projeto e Prefixos</h3>
+          <p>O Compose usa o conceito de "projeto" para agrupar e isolar recursos. O nome do projeto é usado como prefixo em todos os recursos criados:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Project Name — Como funciona</code><span class="cmd-tag">Projeto</span></div>
+              <pre><code># O NOME DO PROJETO determina o prefixo dos recursos:
+#
+# ORDEM DE PRIORIDADE para definir o nome:
+# 1. Flag: docker compose -p meu-projeto up
+# 2. Variável: COMPOSE_PROJECT_NAME=meu-projeto
+# 3. Chave no YAML: name: meu-projeto
+# 4. Nome do diretório (padrão)
+
+# Exemplo: diretório = "webapp", sem name: definido
+# Recursos criados:
+#   Container: webapp-api-1, webapp-db-1, webapp-cache-1
+#   Rede:      webapp_frontend, webapp_backend
+#   Volume:    webapp_db-data, webapp_cache-data
+
+# Exemplo: name: minha-app definido no YAML
+# Recursos criados:
+#   Container: minha-app-api-1, minha-app-db-1
+#   Rede:      minha-app_frontend, minha-app_backend
+#   Volume:    minha-app_db-data, minha-app_cache-data
+
+# IMPORTANTE: o prefixo garante ISOLAMENTO
+# Dois projetos diferentes no mesmo host NÃO conflitam:
+cd ~/projeto-a && docker compose up -d  # projeto-a_*
+cd ~/projeto-b && docker compose up -d  # projeto-b_*
+
+# Ver o projeto associado a um container:
+docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' webapp-api-1
+# webapp</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: SERVICES — TODAS AS OPÇÕES -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Services</span>
+          <h2>Services — Todas as Opções</h2>
+          <p>A seção <code>services</code> é o coração do Compose. Cada service define um container (ou grupo de réplicas) com todas as suas configurações. Aqui estão todas as opções disponíveis com exemplos práticos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>image vs build — De Onde Vem a Imagem?</h3>
+          <p>Todo service precisa de uma imagem. Você pode usar uma imagem pronta (<code>image</code>) ou construir uma a partir de um Dockerfile (<code>build</code>):</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>image — Usar imagem existente</code><span class="cmd-tag">Pull</span></div>
+              <pre><code># OPÇÃO 1: image (imagem pronta do registry)
+# ═══════════════════════════════════════════
+
+services:
+  # Imagem oficial, tag latest (não recomendado)
+  redis:
+    image: redis
+
+  # Imagem com tag específica (recomendado!)
+  postgres:
+    image: postgres:16-alpine
+
+  # Imagem de registry privado
+  api:
+    image: registry.empresa.com/api:v2.1.0
+
+  # Imagem do GitHub Container Registry
+  app:
+    image: ghcr.io/usuario/app:latest
+
+  # Imagem do AWS ECR
+  backend:
+    image: 123456789.dkr.ecr.us-east-1.amazonaws.com/api:prod
+
+# REGRA: sempre use tag específica em produção!
+# ❌ image: nginx          (latest implícito)
+# ❌ image: nginx:latest   (muda sem aviso)
+# ✅ image: nginx:1.25-alpine  (determinístico)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>build — Construir do Dockerfile</code><span class="cmd-tag">Build</span></div>
+              <pre><code># OPÇÃO 2: build (construir a imagem localmente)
+# ═══════════════════════════════════════════════
+
+services:
+  # Forma simples: path para o contexto de build
+  app:
+    build: .
+    # Equivalente a: docker build .
+
+  # Forma completa: todas as opções
+  api:
+    build:
+      context: ./backend         # Diretório de contexto
+      dockerfile: Dockerfile.prod # Dockerfile customizado
+      args:                       # Build arguments
+        NODE_ENV: production
+        API_VERSION: "2.1.0"
+      target: production          # Multi-stage target
+      cache_from:                 # Cache de build
+        - registry.io/api:cache
+      labels:                     # Labels na imagem
+        com.empresa.version: "2.1"
+      platforms:                  # Multi-platform
+        - linux/amd64
+        - linux/arm64
+
+  # COMBINAR image + build:
+  # Constrói E dá nome/tag à imagem
+  webapp:
+    build: .
+    image: minha-empresa/webapp:dev
+    # Resultado: imagem construída E taggeada</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>container_name, ports e expose</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>container_name e ports</code><span class="cmd-tag">Rede</span></div>
+              <pre><code># container_name: nome fixo do container
+# ═══════════════════════════════════════
+services:
+  db:
+    image: postgres:16
+    container_name: meu-postgres
+    # Sem container_name: projeto-db-1
+    # Com container_name: meu-postgres
+    #
+    # ⚠️ CUIDADO: com container_name fixo,
+    # você NÃO pode escalar (replicas > 1)
+    # pois nomes devem ser únicos!
+
+# ports: mapear portas host ↔ container
+# ═══════════════════════════════════════
+  web:
+    image: nginx
+    ports:
+      # Formato curto: "HOST:CONTAINER"
+      - "80:80"
+      - "443:443"
+
+      # Apenas container (porta aleatória no host)
+      - "3000"
+
+      # Bind em IP específico
+      - "127.0.0.1:8080:80"
+
+      # Range de portas
+      - "8000-8010:8000-8010"
+
+      # Formato longo (mais explícito):
+      - target: 80        # Porta no container
+        published: 8080   # Porta no host
+        protocol: tcp     # tcp ou udp
+        host_ip: 0.0.0.0  # IP de bind</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>expose vs ports</code><span class="cmd-tag">Diferença</span></div>
+              <pre><code># DIFERENÇA: expose vs ports
+# ═══════════════════════════════════════
+
+# expose: torna a porta acessível APENAS
+# para outros containers na mesma rede.
+# NÃO publica no host!
+services:
+  api:
+    build: .
+    expose:
+      - "3000"    # Outros containers acessam :3000
+                  # Host NÃO acessa!
+
+  # ports: publica no HOST (acessível externamente)
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"   # Host E containers acessam
+
+# QUANDO USAR CADA UM:
+#
+# expose: serviços internos que NÃO devem
+#         ser acessados de fora
+#   → Banco de dados
+#   → Cache (Redis)
+#   → APIs internas (microserviços)
+#
+# ports: serviços que DEVEM ser acessíveis
+#        do mundo externo
+#   → Nginx/Load Balancer (entrada)
+#   → API pública
+#   → Painel admin (dev apenas)
+
+# NOTA: na prática, containers na mesma
+# rede já se comunicam em qualquer porta.
+# "expose" é mais documentacional.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>environment e env_file</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>environment — Variáveis inline</code><span class="cmd-tag">Env</span></div>
+              <pre><code># environment: define variáveis no YAML
+# ═══════════════════════════════════════
+
+services:
+  api:
+    image: minha-api:latest
+
+    # Formato MAP (chave: valor) — recomendado:
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgresql://user:pass@db:5432/app
+      REDIS_URL: redis://cache:6379
+      LOG_LEVEL: info
+
+    # OU formato LISTA (- CHAVE=valor):
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://user:pass@db:5432/app
+
+    # INTERPOLAÇÃO de variáveis do host/.env:
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}       # Do .env
+      API_KEY: ${API_KEY:-default_key}  # Com fallback
+      DEBUG: ${DEBUG:-false}
+
+# ARQUIVO .env (mesmo diretório do compose):
+# DB_PASSWORD=minha-senha-segura
+# API_KEY=abc123
+# Compose lê .env AUTOMATICAMENTE!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>env_file — Variáveis de arquivo</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># env_file: carrega variáveis de arquivos externos
+# ═══════════════════════════════════════════════
+
+services:
+  api:
+    image: minha-api:latest
+
+    # Um arquivo:
+    env_file: .env.production
+
+    # Múltiplos arquivos (merge na ordem):
+    env_file:
+      - .env                # Base (comum)
+      - .env.production     # Específico (override)
+      - .env.secrets        # Secrets (não commitar!)
+
+    # Formato do arquivo .env.production:
+    # ────────────────────────────────────
+    # Comentários com #
+    # NODE_ENV=production
+    # PORT=3000
+    # DATABASE_URL=postgresql://...
+    # # Linhas em branco são ignoradas
+    #
+    # REDIS_URL=redis://cache:6379
+
+# BOAS PRÁTICAS:
+# ✅ Use .env.example no Git (sem valores reais)
+# ✅ Adicione .env* ao .gitignore
+# ✅ Use env_file para secrets (nunca inline)
+# ✅ Separe por ambiente: .env.dev, .env.prod
+
+# .gitignore:
+# .env
+# .env.*
+# !.env.example</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>volumes — Bind Mounts e Named Volumes</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>volumes em services — Todas as formas</code><span class="cmd-tag">Persistência</span></div>
+              <pre><code># volumes: montar dados no container
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  app:
+    image: node:20-alpine
+    volumes:
+      # ── FORMATO CURTO ──────────────────────────────────────
+
+      # Named volume (gerenciado pelo Docker):
+      - app-data:/app/data
+
+      # Bind mount (diretório do host):
+      - ./src:/app/src
+
+      # Bind mount read-only:
+      - ./config/app.conf:/etc/app/app.conf:ro
+
+      # Volume anônimo (sem nome, efêmero):
+      - /app/node_modules
+
+      # ── FORMATO LONGO (mais controle) ──────────────────────
+
+      # Named volume com opções:
+      - type: volume
+        source: app-data        # Nome do volume
+        target: /app/data       # Path no container
+
+      # Bind mount com opções:
+      - type: bind
+        source: ./src           # Path no host (relativo)
+        target: /app/src        # Path no container
+        read_only: false
+
+      # Bind mount read-only:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+
+      # tmpfs (RAM, dados temporários):
+      - type: tmpfs
+        target: /app/tmp
+        tmpfs:
+          size: 100000000       # 100MB máximo
+
+# ── DECLARAR NAMED VOLUMES NO TOP-LEVEL ──────────────────────
+volumes:
+  app-data:           # Deve ser declarado aqui se usado acima
     driver: local</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Exemplo Completo -->
         <div class="topic-block">
-          <h3>Exemplo Completo: Web + API + DB + Cache</h3>
+          <h3>networks — Conectar a Redes</h3>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>docker-compose.yml</code>
-                <span class="cmd-tag">exemplo</span>
-              </div>
-              <p>Stack completa com frontend React, API Node.js, PostgreSQL e Redis.</p>
-              <pre><code>services:
-  web:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - api
+              <div class="command-header"><code>networks em services</code><span class="cmd-tag">Conectividade</span></div>
+              <pre><code># networks: definir em quais redes o service participa
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # API: conectada a frontend E backend
+  api:
+    image: minha-api:latest
+    networks:
+      - frontend        # Nginx acessa a API
+      - backend         # API acessa DB e Redis
+
+  # DB: apenas backend (isolado do mundo externo)
+  db:
+    image: postgres:16
+    networks:
+      - backend
+
+  # Nginx: apenas frontend (ponto de entrada)
+  nginx:
+    image: nginx:alpine
     networks:
       - frontend
 
-  api:
-    build: ./backend
-    ports:
-      - "4000:4000"
-    environment:
-      - DATABASE_URL=postgres://user:pass@db:5432/app
-      - REDIS_URL=redis://cache:6379
-    depends_on:
-      db:
-        condition: service_healthy
-      cache:
-        condition: service_started
+  # Service com aliases e IP fixo:
+  legacy-app:
+    image: app-legada:v1
     networks:
-      - frontend
-      - backend
-    restart: unless-stopped
+      backend:
+        aliases:             # Nomes DNS adicionais
+          - app-v1
+          - api-legacy
+        ipv4_address: 172.20.0.100  # IP fixo (requer subnet)
+
+# RESULTADO:
+# ┌─────────────┐
+# │   FRONTEND  │  nginx ←→ api
+# └─────────────┘
+# ┌─────────────┐
+# │   BACKEND   │  api ←→ db, api ←→ redis
+# └─────────────┘
+# nginx ✗ db (redes diferentes = isolamento!)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>depends_on — Ordem de Inicialização</h3>
+          <p>O <code>depends_on</code> controla a ordem em que os serviços são iniciados. Com <code>condition</code>, você pode esperar que um serviço esteja realmente pronto (não apenas iniciado):</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>depends_on — Forma simples</code><span class="cmd-tag">Ordem</span></div>
+              <pre><code># depends_on SIMPLES:
+# Garante que db e cache INICIAM antes da api
+# MAS não espera estarem PRONTOS!
+
+services:
+  api:
+    build: .
+    depends_on:
+      - db       # Inicia db primeiro
+      - cache    # Inicia cache primeiro
+    # api inicia DEPOIS de db e cache
 
   db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: app
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend
+    image: postgres:16
 
   cache:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-    networks:
-      - backend
+    image: redis:7
 
-networks:
-  frontend:
-  backend:
-
-volumes:
-  pgdata:
-  redisdata:</code></pre>
+# PROBLEMA:
+# PostgreSQL pode demorar 5-10s para aceitar
+# conexões. A api pode iniciar e FALHAR porque
+# o db ainda não está pronto para queries.
+#
+# depends_on simples = ordem de START
+# NÃO garante que o serviço está FUNCIONAL!</code></pre>
             </div>
-          </div>
-        </div>
-
-        <!-- Comandos Essenciais -->
-        <div class="topic-block">
-          <h3>Comandos Essenciais</h3>
-          <div class="command-grid">
             <div class="command-card">
-              <div class="command-header">
-                <code>docker compose up</code>
-                <span class="cmd-tag">iniciar</span>
-              </div>
-              <p>Cria e inicia todos os containers definidos no compose.</p>
-              <pre><code># Modo detached (background)
-docker compose up -d
+              <div class="command-header"><code>depends_on + condition</code><span class="cmd-tag">Healthcheck</span></div>
+              <pre><code># depends_on com CONDITION (recomendado!):
+# Espera o serviço estar realmente PRONTO
 
-# Forçar rebuild das imagens
-docker compose up --build
-
-# Rebuild + detached
-docker compose up -d --build
-
-# Subir serviço específico
-docker compose up -d api</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose down</code>
-                <span class="cmd-tag danger">parar</span>
-              </div>
-              <p>Para e remove containers, redes criadas pelo compose.</p>
-              <pre><code># Parar e remover containers + redes
-docker compose down
-
-# Remover também os volumes
-docker compose down -v
-
-# Remover imagens locais criadas
-docker compose down --rmi local
-
-# Remover TODAS as imagens usadas
-docker compose down --rmi all</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose ps</code>
-                <span class="cmd-tag">status</span>
-              </div>
-              <p>Lista o status de todos os containers do projeto.</p>
-              <pre><code># Listar containers do projeto
-docker compose ps
-
-# Formato compacto
-docker compose ps --format "table {{.Name}}\t{{.Status}}"
-
-# Incluir containers parados
-docker compose ps -a</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose logs</code>
-                <span class="cmd-tag">debug</span>
-              </div>
-              <p>Visualiza logs dos containers do projeto.</p>
-              <pre><code># Logs de todos os serviços
-docker compose logs
-
-# Follow (tempo real)
-docker compose logs -f
-
-# Logs de serviço específico
-docker compose logs -f api
-
-# Últimas 50 linhas
-docker compose logs --tail 50 api</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose stop/start/restart</code>
-                <span class="cmd-tag">controle</span>
-              </div>
-              <p>Controla o ciclo de vida sem remover containers.</p>
-              <pre><code># Parar sem remover
-docker compose stop
-
-# Iniciar containers parados
-docker compose start
-
-# Reiniciar todos
-docker compose restart
-
-# Reiniciar serviço específico
-docker compose restart api</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose exec</code>
-                <span class="cmd-tag">executar</span>
-              </div>
-              <p>Executa comando em container já em execução.</p>
-              <pre><code># Shell interativo
-docker compose exec api sh
-
-# Comando direto
-docker compose exec db psql -U user -d app
-
-# Como root
-docker compose exec -u root api sh</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose run</code>
-                <span class="cmd-tag">executar</span>
-              </div>
-              <p>Cria container temporário para executar comando único.</p>
-              <pre><code># Executar e remover ao final
-docker compose run --rm api npm test
-
-# Executar migrations
-docker compose run --rm api npx prisma migrate deploy
-
-# Sem iniciar dependências
-docker compose run --rm --no-deps api npm run lint</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker compose scale / build / pull</code>
-                <span class="cmd-tag">gerenciar</span>
-              </div>
-              <p>Escalar réplicas, buildar imagens e baixar atualizações.</p>
-              <pre><code># Escalar serviço (múltiplas réplicas)
-docker compose up -d --scale api=3
-
-# Build sem iniciar
-docker compose build
-
-# Build sem cache
-docker compose build --no-cache
-
-# Baixar imagens atualizadas
-docker compose pull</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recursos Avançados -->
-        <div class="topic-block">
-          <h3>Recursos Avançados</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header">
-                <code>depends_on + healthcheck</code>
-                <span class="cmd-tag">dependência</span>
-              </div>
-              <p>Garanta que serviços só iniciem quando dependências estiverem saudáveis.</p>
-              <pre><code>services:
+services:
   api:
+    build: .
     depends_on:
       db:
         condition: service_healthy
+        # Espera db passar no healthcheck!
       cache:
-        condition: service_started
+        condition: service_healthy
+        # Espera cache passar no healthcheck!
+      migrations:
+        condition: service_completed_successfully
+        # Espera migrations terminar com exit 0!
 
   db:
-    image: postgres:16-alpine
+    image: postgres:16
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  cache:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  migrations:
+    build: .
+    command: npm run migrate
+    # Roda e termina (exit 0 = sucesso)
+
+# CONDITIONS DISPONÍVEIS:
+# service_started    → iniciou (padrão)
+# service_healthy    → healthcheck OK
+# service_completed_successfully → exit 0</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Melhor prática:</strong> Sempre use <code>depends_on</code> com <code>condition: service_healthy</code> em produção. Combine com <code>healthcheck</code> em cada serviço para garantir que as dependências estão realmente prontas antes de iniciar serviços dependentes.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>restart — Política de Reinicialização</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>restart — Todas as opções</code><span class="cmd-tag">Resiliência</span></div>
+              <pre><code># restart: define o que acontece quando um container para/falha
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # NO: nunca reinicia (padrão)
+  dev-tool:
+    image: dev-tool:latest
+    restart: "no"
+    # Container parou → fica parado
+    # Uso: ferramentas de desenvolvimento, jobs one-shot
+
+  # ALWAYS: sempre reinicia (mesmo se parado manualmente com docker stop)
+  critical-service:
+    image: monitoring:latest
+    restart: always
+    # Container parou → reinicia SEMPRE
+    # Mesmo após docker stop → reinicia no boot do Docker
+    # Uso: serviços que DEVEM estar sempre rodando
+
+  # UNLESS-STOPPED: reinicia exceto se parado manualmente
+  web-app:
+    image: webapp:latest
+    restart: unless-stopped
+    # Container crashou → reinicia
+    # docker stop → NÃO reinicia
+    # Docker restart/reboot → reinicia (se não foi stopped)
+    # Uso: aplicações de produção (mais comum!)
+
+  # ON-FAILURE: reinicia apenas se saiu com erro (exit code ≠ 0)
+  worker:
+    image: worker:latest
+    restart: on-failure
+    # exit 0 (sucesso) → NÃO reinicia
+    # exit 1+ (erro) → reinicia
+    # Uso: workers, processadores de fila
+
+# ┌────────────────────────────────────────────────────────────┐
+# │ RESUMO:                                                     │
+# │                                                             │
+# │ Política          │ Crash │ docker stop │ Docker restart    │
+# │ ──────────────────│───────│─────────────│─────────────────  │
+# │ no                │  Não  │    Não      │    Não            │
+# │ always            │  Sim  │    Sim      │    Sim            │
+# │ unless-stopped    │  Sim  │    Não      │    Sim*           │
+# │ on-failure        │  Sim  │    Não      │    Não            │
+# │                                                             │
+# │ * Se não foi stopped antes do Docker restart                │
+# └────────────────────────────────────────────────────────────┘
+
+# RECOMENDAÇÃO:
+# Dev: restart: "no" (quer ver crashes)
+# Prod: restart: unless-stopped (padrão seguro)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>command e entrypoint</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>command — Sobrescrever CMD</code><span class="cmd-tag">Execução</span></div>
+              <pre><code># command: sobrescreve o CMD do Dockerfile
+# ═══════════════════════════════════════════
+
+services:
+  # String (executada com shell):
+  app:
+    image: node:20-alpine
+    command: npm run start:prod
+
+  # Lista (exec form, sem shell):
+  api:
+    image: python:3.12
+    command: ["gunicorn", "app:app", "-b", "0.0.0.0:8000"]
+
+  # Múltiplas operações (com shell):
+  worker:
+    image: python:3.12
+    command: >
+      sh -c "pip install -r requirements.txt &&
+             python worker.py"
+
+  # Sobrescrever para dev (hot reload):
+  app-dev:
+    build: .
+    command: npm run dev
+    # Dockerfile tem CMD ["npm", "start"]
+    # Compose sobrescreve para dev mode
+
+  # Redis com argumentos customizados:
+  redis:
+    image: redis:7-alpine
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>entrypoint — Sobrescrever ENTRYPOINT</code><span class="cmd-tag">Execução</span></div>
+              <pre><code># entrypoint: sobrescreve o ENTRYPOINT do Dockerfile
+# ═══════════════════════════════════════════════════
+
+services:
+  # Sobrescrever entrypoint:
+  debug:
+    image: minha-app:latest
+    entrypoint: ["sh", "-c"]
+    command: ["echo 'Debug mode' && sleep infinity"]
+
+  # Desabilitar entrypoint (para debug):
+  app-debug:
+    image: minha-app:latest
+    entrypoint: []         # Remove ENTRYPOINT
+    command: /bin/sh       # Entra no shell
+
+  # Script customizado como entrypoint:
+  api:
+    build: .
+    entrypoint: ["/app/docker-entrypoint.sh"]
+    command: ["--workers", "4", "--port", "8000"]
+
+# DIFERENÇA:
+# entrypoint: O "executável" principal
+# command: Os "argumentos" passados ao entrypoint
+#
+# Resultado final:
+#   entrypoint + command = comando executado
+#   ["/app/docker-entrypoint.sh"] + ["--workers", "4"]
+#   → /app/docker-entrypoint.sh --workers 4
+
+# DICA: Use entrypoint para scripts de init
+# que fazem setup antes de rodar o command.
+# Ex: esperar DB, rodar migrations, ajustar permissões</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>healthcheck — Monitorar Saúde do Serviço</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>healthcheck — Configuração completa</code><span class="cmd-tag">Monitoramento</span></div>
+              <pre><code># healthcheck: verifica se o serviço está FUNCIONANDO
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # API com healthcheck HTTP:
+  api:
+    image: minha-api:latest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s       # Verificar a cada 30 segundos
+      timeout: 10s        # Timeout de cada verificação
+      retries: 3          # Quantas falhas até "unhealthy"
+      start_period: 40s   # Tempo de graça no startup
+      # start_period: container é considerado "starting"
+      # durante este período (falhas não contam)
+
+  # PostgreSQL com healthcheck:
+  db:
+    image: postgres:16
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s</code></pre>
+      start_period: 30s
+
+  # Redis com healthcheck:
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # MySQL/MariaDB com healthcheck:
+  mysql:
+    image: mysql:8
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # MongoDB com healthcheck:
+  mongo:
+    image: mongo:7
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx com healthcheck:
+  nginx:
+    image: nginx:alpine
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # RabbitMQ com healthcheck:
+  rabbitmq:
+    image: rabbitmq:3-management
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Desabilitar healthcheck da imagem:
+  simple-service:
+    image: alguma-imagem
+    healthcheck:
+      disable: true
+
+# ESTADOS DO HEALTHCHECK:
+# starting  → dentro do start_period (sem verificações)
+# healthy   → test retorna exit 0
+# unhealthy → test falhou retries vezes consecutivas
+
+# VERIFICAR STATUS:
+# docker compose ps (mostra health status)
+# docker inspect --format '{{.State.Health.Status}}' container</code></pre>
             </div>
+          </div>
+        </div>
 
+        <div class="topic-block">
+          <h3>deploy — Réplicas e Limites de Recursos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>deploy — Configuração de deploy</code><span class="cmd-tag">Recursos</span></div>
+              <pre><code># deploy: configurações de deployment (réplicas, recursos)
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  api:
+    image: minha-api:latest
+    deploy:
+      # Número de réplicas (instâncias do container):
+      replicas: 3
+      # Cria: api-1, api-2, api-3
+      # ⚠️ Não use container_name com replicas > 1!
+
+      # Limites de recursos (CPU e memória):
+      resources:
+        # LIMITS: máximo que o container pode usar
+        limits:
+          cpus: "1.0"          # Máximo 1 CPU core
+          memory: 512M         # Máximo 512MB RAM
+          # Container é KILLED se ultrapassar memory limit (OOM)
+
+        # RESERVATIONS: mínimo garantido
+        reservations:
+          cpus: "0.25"         # Garantido 0.25 CPU
+          memory: 128M         # Garantido 128MB RAM
+          # Compose não agenda se host não tem esse mínimo disponível
+
+      # Política de restart (alternativa ao restart: de top-level)
+      restart_policy:
+        condition: on-failure
+        delay: 5s              # Espera entre restarts
+        max_attempts: 3        # Máximo de tentativas
+        window: 120s           # Janela de avaliação
+
+      # Update config (para rolling updates)
+      update_config:
+        parallelism: 1         # Quantos containers atualizar por vez
+        delay: 10s             # Delay entre batches
+        order: start-first     # start-first ou stop-first
+
+  # Worker com recursos limitados:
+  worker:
+    image: worker:latest
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+  # Database: 1 réplica, muita memória:
+  db:
+    image: postgres:16
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+
+# VERIFICAR RECURSOS:
+# docker stats                        # Uso em tempo real
+# docker compose top                  # Processos de cada service
+# docker inspect api-1 | jq '.HostConfig.Memory'</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>labels e profiles</h3>
+          <div class="command-grid">
             <div class="command-card">
-              <div class="command-header">
-                <code>.env + Variáveis</code>
-                <span class="cmd-tag">config</span>
-              </div>
-              <p>Use arquivos .env para substituição de variáveis no compose.</p>
-              <pre><code># .env
-POSTGRES_VERSION=16-alpine
-APP_PORT=4000
-DB_PASSWORD=supersecret
+              <div class="command-header"><code>labels — Metadados no container</code><span class="cmd-tag">Organização</span></div>
+              <pre><code># labels: metadados no container
+# ═══════════════════════════════════
 
-# docker-compose.yml
+services:
+  api:
+    image: minha-api:latest
+    labels:
+      # Formato map:
+      com.empresa.project: "webapp"
+      com.empresa.team: "backend"
+      com.empresa.environment: "production"
+
+      # Labels para Traefik (reverse proxy):
+      traefik.enable: "true"
+      traefik.http.routers.api.rule: "Host(`api.empresa.com`)"
+      traefik.http.services.api.loadbalancer.server.port: "3000"
+
+      # Labels para Prometheus (monitoring):
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "3000"
+      prometheus.io/path: "/metrics"
+
+  # Labels para organização:
+  db:
+    image: postgres:16
+    labels:
+      - "com.empresa.backup=daily"
+      - "com.empresa.tier=data"
+      - "com.empresa.criticality=high"
+
+# FILTRAR por labels:
+# docker ps --filter label=com.empresa.team=backend
+# docker compose ps --filter label=com.empresa.tier=data</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>profiles — Serviços condicionais</code><span class="cmd-tag">Flexibilidade</span></div>
+              <pre><code># profiles: ativar services condicionalmente
+# ═══════════════════════════════════════════
+
+services:
+  # Serviços SEM profile: sempre sobem
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+
+  db:
+    image: postgres:16
+
+  # Serviços COM profile: só sobem se ativados
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    profiles:
+      - debug      # Só sobe com profile "debug"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    profiles:
+      - debug      # Só sobe com profile "debug"
+
+  prometheus:
+    image: prom/prometheus
+    profiles:
+      - monitoring  # Só sobe com profile "monitoring"
+
+  grafana:
+    image: grafana/grafana
+    profiles:
+      - monitoring
+
+# COMO ATIVAR PROFILES:
+# docker compose up -d
+#   → Sobe: api, db (sem profile)
+
+# docker compose --profile debug up -d
+#   → Sobe: api, db, adminer, mailhog
+
+# docker compose --profile debug --profile monitoring up -d
+#   → Sobe: TUDO
+
+# Via variável de ambiente:
+# COMPOSE_PROFILES=debug,monitoring docker compose up -d</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Dica:</strong> Use <code>profiles</code> para separar serviços de desenvolvimento (debug tools, mail catchers) de serviços de produção. Assim o mesmo arquivo serve para ambos ambientes sem duplicação.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: REDES NO COMPOSE -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Networks</span>
+          <h2>Redes no Compose</h2>
+          <p>O Docker Compose gerencia redes automaticamente, mas também permite configurações avançadas para cenários que exigem isolamento, IPs fixos, redes externas e aliases personalizados.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Rede Padrão — Criada Automaticamente</h3>
+          <p>Quando você roda <code>docker compose up</code>, o Compose cria automaticamente uma rede bridge chamada <code>&lt;projeto&gt;_default</code>:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Rede default — Comportamento automático</code><span class="cmd-tag">Padrão</span></div>
+              <pre><code># SEM definir "networks:" no compose, TODOS os services
+# são colocados na mesma rede default automaticamente.
+
+# Arquivo: ~/webapp/docker-compose.yml
+services:
+  api:
+    image: node:20-alpine
+    command: node server.js
+
+  db:
+    image: postgres:16
+
+  redis:
+    image: redis:7
+
+# Ao rodar docker compose up:
+# 1. Cria rede: webapp_default (bridge)
+# 2. Conecta TODOS os services a essa rede
+# 3. DNS automático: cada service é acessível pelo NOME
+
+# Dentro do container "api":
+#   ping db      → resolve para IP do postgres
+#   ping redis   → resolve para IP do redis
+
+# O NOME DO SERVICE = HOSTNAME DNS
+# api pode conectar em: postgresql://db:5432/app
+# api pode conectar em: redis://redis:6379
+
+# Verificar rede criada:
+docker network ls | grep webapp
+# abcdef123456   webapp_default   bridge   local
+
+# Inspecionar:
+docker network inspect webapp_default
+# → Mostra subnet, gateway, containers conectados
+
+# IMPORTANTE: a rede default é REMOVIDA com docker compose down
+docker compose down
+# Removing network webapp_default</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Para a maioria dos casos:</strong> A rede default é suficiente. Só defina redes customizadas quando precisar de <strong>isolamento entre grupos de serviços</strong> (ex: frontend não deve acessar banco direto).
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Redes Customizadas</h3>
+          <p>Defina redes customizadas para segmentar sua aplicação e controlar quem pode se comunicar com quem:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Redes customizadas — Isolamento</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># REDES CUSTOMIZADAS: isolar grupos de serviços
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # Nginx: apenas na rede frontend (ponto de entrada)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+
+  # API: em AMBAS as redes (ponte entre frontend e backend)
+  api:
+    build: .
+    networks:
+      - frontend     # Nginx acessa a API
+      - backend      # API acessa o banco
+
+  # Banco: apenas na rede backend (isolado!)
+  db:
+    image: postgres:16
+    networks:
+      - backend
+
+  # Redis: apenas na rede backend
+  redis:
+    image: redis:7
+    networks:
+      - backend
+
+# DEFINIÇÃO DAS REDES:
+networks:
+  frontend:
+    driver: bridge
+    # Rede para tráfego "público" (vindo do Nginx)
+
+  backend:
+    driver: bridge
+    # Rede para serviços internos (DB, cache)
+
+# RESULTADO:
+# ┌─────────────────────────────────────────────────────┐
+# │ FRONTEND NETWORK                                     │
+# │   nginx ←────→ api                                  │
+# └─────────────────────────────────────────────────────┘
+# ┌─────────────────────────────────────────────────────┐
+# │ BACKEND NETWORK                                      │
+# │   api ←────→ db                                     │
+# │   api ←────→ redis                                  │
+# └─────────────────────────────────────────────────────┘
+#
+# nginx → db:    ❌ BLOQUEADO (redes diferentes)
+# nginx → redis: ❌ BLOQUEADO (redes diferentes)
+# Usuário → db:  ❌ BLOQUEADO (sem ports publicados)
+#
+# SEGURANÇA: banco NUNCA é exposto diretamente!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Rede Internal — Sem Acesso à Internet</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>internal: true — Isolamento total</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># internal: true → containers NÃO acessam a internet
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  api:
+    build: .
+    networks:
+      - public       # Tem acesso à internet
+      - data         # Acessa DB (sem internet nesta rede)
+
+  db:
+    image: postgres:16
+    networks:
+      - data         # APENAS rede interna (sem internet!)
+    # PostgreSQL não precisa (e não deve) acessar a internet
+    # Qualquer tentativa de conexão externa é BLOQUEADA
+
+  redis:
+    image: redis:7
+    networks:
+      - data
+
+networks:
+  public:
+    driver: bridge
+    # Rede normal: containers podem acessar a internet
+
+  data:
+    driver: bridge
+    internal: true
+    # Rede INTERNA: sem gateway para internet
+    # → Containers NÃO podem fazer requests externos
+    # → Containers NÃO podem baixar nada
+    # → Apenas comunicação entre containers na mesma rede
+    # → Ideal para bancos de dados, caches, message queues
+
+# CENÁRIOS PARA internal: true:
+# ✅ Bancos de dados (PostgreSQL, MySQL, MongoDB)
+# ✅ Caches (Redis, Memcached)
+# ✅ Message queues (RabbitMQ, Kafka)
+# ✅ Serviços que processam dados sensíveis
+# ✅ Qualquer serviço que NÃO precisa acessar internet
+
+# TESTE:
+# docker compose exec db ping google.com
+# → ping: bad address 'google.com'  (DNS falha)
+# → connect: Network is unreachable</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Rede Externa (Pre-existing)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>external: true</code><span class="cmd-tag">Compartilhada</span></div>
+              <pre><code># external: true → usa rede já existente
+# (NÃO criada pelo Compose)
+# ═══════════════════════════════════════
+
+# CENÁRIO: múltiplos docker-compose.yml
+# compartilhando a mesma rede
+
+# Criar a rede ANTES:
+# docker network create rede-compartilhada
+
+# Projeto A: docker-compose.yml
+services:
+  api-a:
+    image: api-a:latest
+    networks:
+      - shared
+
+networks:
+  shared:
+    external: true
+    name: rede-compartilhada
+    # Compose NÃO cria essa rede
+    # Compose NÃO remove essa rede (down)
+    # A rede DEVE existir antes do up
+
+# Projeto B: docker-compose.yml
+services:
+  api-b:
+    image: api-b:latest
+    networks:
+      - shared
+
+networks:
+  shared:
+    external: true
+    name: rede-compartilhada
+
+# RESULTADO: api-a e api-b se comunicam
+# mesmo sendo de projetos Compose diferentes!
+
+# CASO DE USO:
+# → Reverse proxy global (Traefik/Nginx)
+# → Serviços compartilhados entre projetos
+# → Monitoramento centralizado</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aliases e ipv4_address</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># aliases: nomes DNS adicionais
+# ipv4_address: IP fixo na rede
+# ═══════════════════════════════════
+
+services:
+  # Service com aliases DNS:
+  api:
+    image: minha-api:latest
+    networks:
+      backend:
+        aliases:
+          - api-server
+          - app-backend
+          - rest-api
+    # Este container responde por:
+    # → "api" (nome do service, sempre)
+    # → "api-server"
+    # → "app-backend"
+    # → "rest-api"
+    # Útil para migração ou compatibilidade
+
+  # Service com IP fixo:
+  dns-server:
+    image: coredns/coredns
+    networks:
+      infra:
+        ipv4_address: 172.28.0.53
+    # Sempre terá o IP .53 (fácil lembrar para DNS)
+
+  legacy-app:
+    image: app-legada:v1
+    networks:
+      infra:
+        ipv4_address: 172.28.0.100
+    # App legada que precisa de IP fixo
+
+networks:
+  backend:
+    driver: bridge
+
+  infra:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
+    # IPAM: IP Address Management
+    # Define subnet para permitir ipv4_address fixo</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: VOLUMES NO COMPOSE -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Volumes</span>
+          <h2>Volumes no Compose</h2>
+          <p>Volumes no Compose permitem persistir dados entre restarts, compartilhar arquivos entre host e containers, e manter configurações de forma declarativa. Entenda todas as opções disponíveis.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Named Volumes — Declarados no Top-Level</h3>
+          <p>Named volumes são gerenciados pelo Docker e declarados na seção <code>volumes:</code> de nível superior. São a forma recomendada para persistir dados:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Named Volumes — Declaração e uso</code><span class="cmd-tag">Persistência</span></div>
+              <pre><code># NAMED VOLUMES: gerenciados pelo Docker
+# ═══════════════════════════════════════════════════════════════
+
 services:
   db:
-    image: postgres:${POSTGRES_VERSION}
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data    # Named volume
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data                    # Named volume
+
+  app:
+    build: .
+    volumes:
+      - app-uploads:/app/uploads            # Named volume
+      - app-logs:/app/logs                  # Named volume
+
+# DECLARAÇÃO TOP-LEVEL (obrigatória para named volumes):
+volumes:
+  # Forma simples (driver padrão: local):
+  db-data:
+  redis-data:
+  app-uploads:
+  app-logs:
+
+  # Forma com opções:
+  db-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/ssd/postgres-data     # Path específico no host
+      o: bind
+    labels:
+      com.empresa.backup: "daily"
+      com.empresa.retention: "30d"
+
+  # Com nome customizado (diferente da key):
+  cache:
+    name: "production-redis-data"
+    # Cria: production-redis-data (não projeto_cache)
+
+# CICLO DE VIDA:
+# docker compose up   → Cria volumes (se não existem)
+# docker compose down → NÃO remove volumes (dados preservados!)
+# docker compose down -v → REMOVE volumes (⚠️ PERDA DE DADOS!)
+
+# VERIFICAR:
+# docker volume ls | grep projeto
+# docker volume inspect projeto_db-data</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Regra de ouro:</strong> <code>docker compose down</code> preserva volumes. Use <code>docker compose down -v</code> <strong>apenas</strong> quando quiser destruir todos os dados (ex: reset de ambiente dev). Em produção, NUNCA use <code>-v</code> sem backup.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Bind Mounts — Diretórios do Host</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Bind Mounts — Sincronizar com o host</code><span class="cmd-tag">Desenvolvimento</span></div>
+              <pre><code># BIND MOUNTS: mapear diretório/arquivo do host para o container
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # Desenvolvimento com hot reload:
+  app-dev:
+    build: .
+    volumes:
+      # Código fonte (hot reload em dev):
+      - ./src:/app/src
+
+      # Configuração (read-only):
+      - ./config/app.yml:/app/config/app.yml:ro
+
+      # Evitar sobrescrever node_modules do container:
+      - ./src:/app/src
+      - /app/node_modules            # Volume anônimo (preserva)
+
+    # Formato longo para mais controle:
+    volumes:
+      - type: bind
+        source: ./src
+        target: /app/src
+        consistency: delegated    # Mac: melhor performance
+
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+
+# PATHS RELATIVOS:
+# ./   → relativo ao diretório do docker-compose.yml
+# ../  → um nível acima
+# ~    → NÃO funciona no Compose! Use path absoluto ou ./
+
+# BOAS PRÁTICAS PARA BIND MOUNTS:
+# ✅ Use para código em desenvolvimento (hot reload)
+# ✅ Use :ro para configs (read-only)
+# ✅ Não use em produção (prefira named volumes ou COPY no Dockerfile)
+# ✅ Cuidado com permissões (UID/GID do container vs host)
+
+# PROBLEMA COMUM EM LINUX:
+# Container cria arquivos como root → você não pode editar no host
+# SOLUÇÃO: definir user no service
+services:
+  app:
+    build: .
+    user: "1000:1000"    # Mesmo UID/GID do seu usuário
+    volumes:
+      - ./src:/app/src</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Volume Externo e tmpfs</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>external: true — Volume pré-existente</code><span class="cmd-tag">Externo</span></div>
+              <pre><code># external: true → volume criado FORA do Compose
+# ═══════════════════════════════════════════════
+
+# CENÁRIO: volume criado manualmente ou por outro projeto
+# docker volume create dados-compartilhados
+
+services:
+  app-a:
+    image: app-a:latest
+    volumes:
+      - dados-compartilhados:/data
+
+  app-b:
+    image: app-b:latest
+    volumes:
+      - dados-compartilhados:/data:ro
+
+volumes:
+  dados-compartilhados:
+    external: true
+    # Compose NÃO cria esse volume
+    # Compose NÃO remove esse volume
+    # Volume DEVE existir antes do up
+
+  # Com nome diferente da key:
+  backup-volume:
+    external: true
+    name: production-backup-v2
+    # Usa o volume "production-backup-v2"
+    # referenciado como "backup-volume" no compose
+
+# CASO DE USO:
+# → Volumes compartilhados entre projetos
+# → Volumes com dados pré-populados
+# → Volumes de backup que não devem ser removidos
+# → Migração entre versões do Compose</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tmpfs — Volume em memória RAM</code><span class="cmd-tag">Performance</span></div>
+              <pre><code># tmpfs: monta diretório em memória (RAM)
+# NÃO persiste entre restarts!
+# ═══════════════════════════════════════════
+
+services:
+  # Formato curto (seção tmpfs):
+  app:
+    image: minha-app:latest
+    tmpfs:
+      - /app/tmp
+      - /app/cache
+
+  # Formato longo (na seção volumes):
   api:
-    ports:
-      - "${APP_PORT}:4000"
-    environment:
-      - DB_PASS=${DB_PASSWORD}</code></pre>
+    image: api:latest
+    volumes:
+      - type: tmpfs
+        target: /app/tmp
+        tmpfs:
+          size: 104857600     # 100MB (em bytes)
+          mode: 1777          # Permissões
+
+  # Com limite de tamanho:
+  worker:
+    image: worker:latest
+    tmpfs:
+      - /tmp:size=50M
+
+# QUANDO USAR tmpfs:
+# ✅ Arquivos temporários que NÃO precisam persistir
+# ✅ Cache em memória (muito rápido!)
+# ✅ Secrets que não devem ir para disco
+# ✅ Dados de sessão efêmeros
+# ✅ Diretórios /tmp de alta performance
+
+# VANTAGENS:
+# → Mais rápido que filesystem (é RAM!)
+# → Dados destruídos quando container para
+# → Não gasta I/O de disco
+# → Ideal para dados sensíveis temporários</code></pre>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div class="command-card">
-              <div class="command-header">
-                <code>Profiles</code>
-                <span class="cmd-tag">avançado</span>
-              </div>
-              <p>Agrupe serviços em perfis para ativar sob demanda.</p>
-              <pre><code>services:
-  web:
-    build: ./frontend
-    # Sempre ativo (sem profile)
 
-  debug:
-    image: busybox
-    profiles: ["debug"]
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: COMANDOS DO DOCKER COMPOSE -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Comandos</span>
+          <h2>Comandos do docker compose</h2>
+          <p>Todos os comandos essenciais para operar sua stack Compose no dia a dia — desde subir e derrubar serviços até monitorar logs, executar comandos e validar configurações.</p>
+        </div>
 
-  monitoring:
-    image: grafana/grafana
-    profiles: ["monitoring"]
+        <div class="topic-block">
+          <h3>docker compose up — Subir a Stack</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker compose up — Todas as variações</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code># docker compose up: cria e inicia TODOS os serviços
+# ═══════════════════════════════════════════════════════════════
 
-# Uso:
-# docker compose up -d
-# docker compose --profile debug up -d
-# docker compose --profile monitoring up -d</code></pre>
-            </div>
+# Subir em foreground (logs no terminal):
+docker compose up
 
-            <div class="command-card">
-              <div class="command-header">
-                <code>Múltiplos Compose Files</code>
-                <span class="cmd-tag">avançado</span>
-              </div>
-              <p>Combine arquivos para diferentes ambientes (override pattern).</p>
-              <pre><code># docker-compose.yml (base)
-# docker-compose.override.yml (dev - auto-carregado)
-# docker-compose.prod.yml (produção)
-
-# Dev (carrega base + override automaticamente)
+# Subir em background (detached):
 docker compose up -d
 
-# Produção (especificar arquivos)
-docker compose -f docker-compose.yml \
-  -f docker-compose.prod.yml up -d
+# Subir apenas serviços específicos:
+docker compose up -d api db
+# Sobe api + db + dependências declaradas em depends_on
 
-# Override desabilita volumes de dev
-# e usa imagens do registry</code></pre>
+# Rebuild imagens antes de subir:
+docker compose up -d --build
+# Força docker build mesmo se imagem já existe
+
+# Forçar recreate dos containers:
+docker compose up -d --force-recreate
+# Remove e recria containers (mesmo sem mudanças)
+# Útil quando mudou env vars ou configurações
+
+# Não recriar containers que não mudaram:
+docker compose up -d --no-recreate
+# Só cria containers NOVOS (não toca nos existentes)
+
+# Remover containers órfãos (serviços removidos do YAML):
+docker compose up -d --remove-orphans
+# Se você removeu um service do YAML, o container antigo
+# ainda existe. --remove-orphans limpa esses "fantasmas"
+
+# Escalar um serviço:
+docker compose up -d --scale worker=5
+# Cria 5 instâncias do service "worker"
+
+# Timeout para esperar containers:
+docker compose up -d --timeout 60
+# Espera até 60s para containers ficarem healthy
+
+# COMBINAÇÃO COMUM PARA DEV:
+docker compose up -d --build --remove-orphans
+
+# COMBINAÇÃO COMUM PARA ATUALIZAR PRODUÇÃO:
+docker compose up -d --build --force-recreate --remove-orphans
+
+# O QUE docker compose up FAZ internamente:
+# 1. Lê docker-compose.yml (e overrides)
+# 2. Cria networks (se não existem)
+# 3. Cria volumes (se não existem)
+# 4. Puxa imagens (pull) se necessário
+# 5. Constrói imagens (build) se configurado
+# 6. Cria containers na ordem de depends_on
+# 7. Inicia containers
+# 8. Mostra logs (foreground) ou retorna (detached)</code></pre>
             </div>
+          </div>
+        </div>
 
-            <div class="command-card">
-              <div class="command-header">
-                <code>Restart Policies</code>
-                <span class="cmd-tag">resiliência</span>
-              </div>
-              <p>Defina como containers devem se comportar após falhas.</p>
-              <pre><code>services:
-  api:
-    restart: "no"            # Nunca reinicia (padrão)
+        <div class="topic-block">
+          <h3>docker compose down — Derrubar a Stack</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker compose down — Todas as variações</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code># docker compose down: para e REMOVE containers + rede
+# ═══════════════════════════════════════════════════════════════
 
-  web:
-    restart: always          # Sempre reinicia
+# Down básico (containers + rede default):
+docker compose down
+# ✅ Para todos os containers
+# ✅ Remove todos os containers
+# ✅ Remove redes criadas pelo Compose
+# ❌ NÃO remove volumes (dados preservados!)
+# ❌ NÃO remove imagens
 
-  worker:
-    restart: on-failure      # Só se exit code != 0
+# Down + remover volumes (⚠️ DADOS PERDIDOS!):
+docker compose down -v
+docker compose down --volumes
+# Remove TUDO acima + named volumes
+# ⚠️ CUIDADO: banco de dados, uploads, TUDO é apagado!
 
-  db:
-    restart: unless-stopped  # Sempre, exceto se
-                             # parado manualmente</code></pre>
+# Down + remover imagens:
+docker compose down --rmi all
+# Remove TUDO + todas as imagens usadas pelos serviços
+# (tanto pulled quanto built)
+
+docker compose down --rmi local
+# Remove apenas imagens que foram BUILT localmente
+# (não remove imagens pulled do registry)
+
+# Down + remover órfãos:
+docker compose down --remove-orphans
+# Remove containers de serviços que não estão mais no YAML
+
+# Down com timeout (espera containers pararem):
+docker compose down --timeout 30
+# Espera 30s antes de SIGKILL (padrão: 10s)
+
+# COMBINAÇÃO "NUCLEAR" (reset total do ambiente):
+docker compose down -v --rmi all --remove-orphans
+# Remove TUDO: containers, volumes, imagens, redes, órfãos
+# Ambiente volta ao estado "limpo"
+
+# TABELA RESUMO:
+# ┌────────────────────────────────────────────────┐
+# │ Flag              │ Remove                      │
+# │───────────────────│─────────────────────────────│
+# │ (nenhuma)         │ Containers + Redes          │
+# │ -v / --volumes    │ + Named volumes             │
+# │ --rmi all         │ + Todas imagens             │
+# │ --rmi local       │ + Imagens built localmente  │
+# │ --remove-orphans  │ + Containers órfãos         │
+# └────────────────────────────────────────────────┘</code></pre>
             </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ CUIDADO:</strong> <code>docker compose down -v</code> destrói TODOS os dados armazenados em named volumes (bancos de dados, uploads, etc.). Use apenas quando quiser um reset completo. Em produção, SEMPRE faça backup antes!
+          </div>
+        </div>
 
+        <div class="topic-block">
+          <h3>Monitoramento: ps, logs, exec, top</h3>
+          <div class="command-grid">
             <div class="command-card">
-              <div class="command-header">
-                <code>Resource Limits</code>
-                <span class="cmd-tag">recursos</span>
-              </div>
-              <p>Limite CPU e memória por serviço para evitar consumo excessivo.</p>
-              <pre><code>services:
+              <div class="command-header"><code>docker compose ps — Status dos serviços</code><span class="cmd-tag">Status</span></div>
+              <pre><code># ps: listar status de todos os serviços
+# ═══════════════════════════════════════
+
+# Listar todos os containers do projeto:
+docker compose ps
+# NAME          SERVICE   STATUS    PORTS
+# webapp-api-1  api       running   0.0.0.0:3000->3000/tcp
+# webapp-db-1   db        running   5432/tcp
+# webapp-redis  redis     running   6379/tcp
+
+# Incluir containers parados:
+docker compose ps -a
+docker compose ps --all
+
+# Formato com mais detalhes:
+docker compose ps --format json
+
+# Apenas IDs (útil para scripts):
+docker compose ps -q
+# a1b2c3d4e5
+# f6g7h8i9j0
+
+# Filtrar por status:
+docker compose ps --status running
+docker compose ps --status exited
+
+# Ver health status:
+docker compose ps
+# NAME      STATUS              PORTS
+# api-1     running (healthy)   ...
+# db-1      running (healthy)   ...
+# worker-1  running (unhealthy) ...</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker compose logs — Ver logs</code><span class="cmd-tag">Debug</span></div>
+              <pre><code># logs: ver output dos containers
+# ═══════════════════════════════════
+
+# Logs de TODOS os serviços:
+docker compose logs
+
+# Logs de serviço específico:
+docker compose logs api
+docker compose logs db
+
+# Follow (stream em tempo real):
+docker compose logs -f
+docker compose logs -f api
+
+# Últimas N linhas:
+docker compose logs --tail 100
+docker compose logs --tail 50 api
+
+# Com timestamps:
+docker compose logs -t api
+
+# Desde um horário:
+docker compose logs --since "2024-01-15T10:00:00"
+docker compose logs --since "1h"    # Última hora
+docker compose logs --since "30m"   # Últimos 30min
+
+# Sem prefixo de service name:
+docker compose logs --no-log-prefix api
+
+# Múltiplos serviços:
+docker compose logs api db redis
+
+# DICA: Combine para debugging:
+docker compose logs -f --tail 50 api db
+# Últimas 50 linhas de api e db, em stream</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker compose exec — Executar comandos</code><span class="cmd-tag">Interativo</span></div>
+              <pre><code># exec: executar comando DENTRO de um container rodando
+# ═══════════════════════════════════════════════════════
+
+# Shell interativo:
+docker compose exec api sh
+docker compose exec api bash
+docker compose exec db psql -U app -d webapp
+
+# Comando único:
+docker compose exec api npm run migrate
+docker compose exec api node scripts/seed.js
+docker compose exec db pg_dump -U app webapp > backup.sql
+
+# Como outro usuário:
+docker compose exec --user root api sh
+docker compose exec -u postgres db psql
+
+# Sem TTY (para scripts/CI):
+docker compose exec -T api npm test
+
+# Variáveis de ambiente extras:
+docker compose exec -e DEBUG=true api npm test
+
+# Diretório de trabalho:
+docker compose exec -w /app/src api ls
+
+# DIFERENÇA exec vs run:
+# exec → container JÁ rodando
+# run  → cria container NOVO (efêmero)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker compose top — Processos</code><span class="cmd-tag">Monitor</span></div>
+              <pre><code># top: listar processos de cada container
+# ═══════════════════════════════════════
+
+docker compose top
+# webapp-api-1
+# UID   PID    PPID   CMD
+# node  12345  12344  node server.js
+#
+# webapp-db-1
+# UID       PID    PPID   CMD
+# postgres  12400  12399  postgres
+# postgres  12405  12400  postgres: checkpointer
+# postgres  12406  12400  postgres: background writer
+
+# Top de serviço específico:
+docker compose top api
+docker compose top db
+
+# ÚTIL PARA:
+# → Verificar se processo está rodando
+# → Identificar processos zombie
+# → Ver consumo de PID
+# → Debug de containers "travados"
+
+# ALTERNATIVA com stats:
+docker compose stats
+# Mostra CPU, memória, I/O em tempo real
+# (não existe oficialmente, use docker stats)
+docker stats $(docker compose ps -q)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Build, Pull, Push e Config</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>build / pull / push</code><span class="cmd-tag">Imagens</span></div>
+              <pre><code># BUILD: construir imagens dos services
+# ═══════════════════════════════════════
+
+# Build de todos os services com "build:":
+docker compose build
+
+# Build de service específico:
+docker compose build api
+
+# Build sem cache:
+docker compose build --no-cache
+
+# Build com build args extras:
+docker compose build --build-arg VERSION=2.0 api
+
+# Build parallel (mais rápido):
+docker compose build --parallel
+
+# PULL: baixar imagens dos services
+# ═══════════════════════════════════════
+
+# Pull de todas as imagens:
+docker compose pull
+
+# Pull de service específico:
+docker compose pull db redis
+
+# Pull ignorando serviços com build:
+docker compose pull --ignore-buildable
+
+# PUSH: enviar imagens para registry
+# ═══════════════════════════════════════
+
+# Push de todas as imagens built:
+docker compose push
+
+# Push de service específico:
+docker compose push api
+
+# Requer que "image:" esteja definido
+# com registry path:
+# services:
+#   api:
+#     build: .
+#     image: registry.io/api:latest
+# docker compose build api
+# docker compose push api</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>config — Validar YAML</code><span class="cmd-tag">Validação</span></div>
+              <pre><code># CONFIG: validar e visualizar compose final
+# ═══════════════════════════════════════════
+
+# Validar o arquivo (mostra YAML processado):
+docker compose config
+# Interpola variáveis, resolve overrides
+# e mostra o resultado final
+
+# Apenas validar (sem output):
+docker compose config --quiet
+# Exit 0 = válido, Exit 1 = erro
+
+# Mostrar apenas services:
+docker compose config --services
+# api
+# db
+# redis
+# nginx
+
+# Mostrar apenas volumes:
+docker compose config --volumes
+
+# Mostrar apenas profiles:
+docker compose config --profiles
+
+# Formato JSON:
+docker compose config --format json
+
+# Resolver com .env específico:
+docker compose --env-file .env.prod config
+
+# CASO DE USO:
+# 1. Validar antes de deploy
+# 2. Ver resultado de interpolação
+# 3. Debug de overrides (ver merge final)
+# 4. CI/CD: validar na pipeline
+
+# EXEMPLO DE ERRO:
+docker compose config
+# validating: services.api.ports
+#   invalid port "abc"
+# Exit code: 1</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>restart, stop, start e run</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Controle de ciclo de vida</code><span class="cmd-tag">Operações</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CONTROLE DO CICLO DE VIDA DOS CONTAINERS
+# ═══════════════════════════════════════════════════════════════
+
+# STOP: parar containers (sem remover)
+docker compose stop            # Para todos
+docker compose stop api        # Para apenas api
+docker compose stop -t 30 api  # Timeout de 30s antes de SIGKILL
+
+# START: iniciar containers parados
+docker compose start           # Inicia todos os parados
+docker compose start api       # Inicia apenas api
+
+# RESTART: parar + iniciar
+docker compose restart         # Restart de todos
+docker compose restart api     # Restart apenas api
+docker compose restart -t 20 api  # Timeout de 20s
+
+# PAUSE / UNPAUSE: congelar processos (SIGSTOP/SIGCONT)
+docker compose pause api       # Congela (CPU = 0, mas mantém memória)
+docker compose unpause api     # Descongela
+
+# RUN: executar comando em container NOVO (one-shot)
+docker compose run api npm test
+docker compose run api npm run migrate
+docker compose run --rm api sh        # Remove container após sair
+docker compose run -d worker process  # Run em background
+docker compose run --no-deps api sh   # Sem subir dependências
+
+# KILL: forçar parada (SIGKILL imediato)
+docker compose kill            # Kill em todos
+docker compose kill -s SIGTERM api  # Enviar signal específico
+
+# DIFERENÇAS IMPORTANTES:
+# ┌─────────────────────────────────────────────────────────┐
+# │ stop/start  → Para/inicia containers existentes         │
+# │ restart     → stop + start (mesmo container)            │
+# │ down/up     → Remove + recria (container novo)          │
+# │ run         → Cria container NOVO temporário            │
+# │ exec        → Executa em container JÁ rodando          │
+# │ pause       → Congela processos (não para container)    │
+# └─────────────────────────────────────────────────────────┘</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: EXEMPLOS COMPLETOS DE PRODUÇÃO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Produção</span>
+          <h2>Exemplos Completos de Produção</h2>
+          <p>Três exemplos reais e completos de aplicações multi-container, cada um com docker-compose.yml comentado, healthchecks, redes isoladas, volumes e boas práticas aplicadas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo 1: App Python (Flask) + PostgreSQL + Redis</h3>
+          <p>Uma API REST em Flask com banco PostgreSQL para persistência e Redis para cache/sessões:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Flask + PostgreSQL + Redis — docker-compose.yml</code><span class="cmd-tag">Python Stack</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# STACK: Flask API + PostgreSQL + Redis
+# Ambiente: Produção (single-host)
+# ════════════════════════════════════════════════════════════════
+
+services:
+  # ──────────────────────────────────────────────────────────────
+  # API Flask (aplicação principal)
+  # ──────────────────────────────────────────────────────────────
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production           # Multi-stage: estágio de produção
+    container_name: flask-api
+    ports:
+      - "8000:8000"
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      LOG_LEVEL: info
+    env_file:
+      - .env.production
+    volumes:
+      - app-uploads:/app/uploads   # Uploads persistentes
+      - app-logs:/app/logs         # Logs persistentes
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     deploy:
       resources:
         limits:
@@ -477,58 +2612,1228 @@ docker compose -f docker-compose.yml \
           cpus: "0.25"
           memory: 128M
 
-  worker:
+  # ──────────────────────────────────────────────────────────────
+  # PostgreSQL (banco de dados principal)
+  # ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: flask-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./docker/postgres/backup:/backups
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         limits:
           cpus: "2.0"
-          memory: 1G</code></pre>
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  # ──────────────────────────────────────────────────────────────
+  # Redis (cache + sessões + fila de tarefas)
+  # ──────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: flask-redis
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 300M
+
+  # ──────────────────────────────────────────────────────────────
+  # Celery Worker (processamento assíncrono)
+  # ──────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: flask-worker
+    command: celery -A app.celery worker --loglevel=info --concurrency=4
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    env_file:
+      - .env.production
+    volumes:
+      - app-uploads:/app/uploads
+    networks:
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+# ──────────────────────────────────────────────────────────────
+# NETWORKS
+# ──────────────────────────────────────────────────────────────
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true     # DB e Redis sem acesso à internet
+
+# ──────────────────────────────────────────────────────────────
+# VOLUMES
+# ──────────────────────────────────────────────────────────────
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  app-uploads:
+    driver: local
+  app-logs:
+    driver: local</code></pre>
             </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Arquivo .env.production exemplo:</strong>
+            <code>DB_USER=flask_app</code> |
+            <code>DB_PASSWORD=super-secret-password-123</code> |
+            <code>DB_NAME=flask_production</code> |
+            <code>SECRET_KEY=your-256-bit-secret</code> |
+            <code>REDIS_PASSWORD=redis-secret-pass</code>
           </div>
         </div>
 
-        <!-- Tabela Resumo -->
         <div class="topic-block">
-          <h3>Resumo de Comandos</h3>
-          <div class="command-card wide">
-            <div class="options-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Comando</th>
-                    <th>Descrição</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>docker compose up -d</td><td>Criar e iniciar containers em background</td></tr>
-                  <tr><td>docker compose up --build</td><td>Rebuild + iniciar</td></tr>
-                  <tr><td>docker compose down</td><td>Parar e remover containers + redes</td></tr>
-                  <tr><td>docker compose down -v</td><td>Down + remover volumes</td></tr>
-                  <tr><td>docker compose down --rmi all</td><td>Down + remover imagens</td></tr>
-                  <tr><td>docker compose ps</td><td>Listar status dos containers</td></tr>
-                  <tr><td>docker compose logs -f</td><td>Logs em tempo real</td></tr>
-                  <tr><td>docker compose stop</td><td>Parar sem remover</td></tr>
-                  <tr><td>docker compose start</td><td>Iniciar containers parados</td></tr>
-                  <tr><td>docker compose restart</td><td>Reiniciar serviços</td></tr>
-                  <tr><td>docker compose exec &lt;svc&gt; sh</td><td>Shell em container ativo</td></tr>
-                  <tr><td>docker compose run --rm &lt;svc&gt; cmd</td><td>Comando único em container temporário</td></tr>
-                  <tr><td>docker compose up --scale api=3</td><td>Escalar réplicas</td></tr>
-                  <tr><td>docker compose build</td><td>Build das imagens</td></tr>
-                  <tr><td>docker compose pull</td><td>Baixar imagens atualizadas</td></tr>
-                  <tr><td>docker compose config</td><td>Validar e exibir compose final</td></tr>
-                </tbody>
-              </table>
+          <h3>Exemplo 2: App Node.js + MongoDB + Nginx (Reverse Proxy)</h3>
+          <p>Uma aplicação Express.js com MongoDB e Nginx como reverse proxy com SSL:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Node.js + MongoDB + Nginx — docker-compose.yml</code><span class="cmd-tag">Node Stack</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# STACK: Node.js (Express) + MongoDB + Nginx Reverse Proxy
+# Ambiente: Produção com HTTPS
+# ════════════════════════════════════════════════════════════════
+
+services:
+  # ──────────────────────────────────────────────────────────────
+  # Nginx (Reverse Proxy + SSL Termination)
+  # ──────────────────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: node-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - static-files:/usr/share/nginx/html/static:ro
+    networks:
+      - frontend
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ──────────────────────────────────────────────────────────────
+  # Certbot (renovação automática de certificados SSL)
+  # ──────────────────────────────────────────────────────────────
+  certbot:
+    image: certbot/certbot:latest
+    container_name: node-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    profiles:
+      - ssl          # Só sobe quando perfil SSL está ativo
+
+  # ──────────────────────────────────────────────────────────────
+  # App Node.js (Express API)
+  # ──────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: node-app
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DB}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: https://${DOMAIN}
+    env_file:
+      - .env
+    volumes:
+      - app-uploads:/app/uploads
+      - static-files:/app/public/static
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  # ──────────────────────────────────────────────────────────────
+  # MongoDB (banco de dados)
+  # ──────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: node-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+      - ./docker/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+
+  # ──────────────────────────────────────────────────────────────
+  # Mongo Express (admin UI — apenas dev/debug)
+  # ──────────────────────────────────────────────────────────────
+  mongo-express:
+    image: mongo-express:latest
+    container_name: node-mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+    depends_on:
+      mongo:
+        condition: service_healthy
+    profiles:
+      - debug        # Só sobe em modo debug
+
+# ──────────────────────────────────────────────────────────────
+# NETWORKS
+# ──────────────────────────────────────────────────────────────
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+# ──────────────────────────────────────────────────────────────
+# VOLUMES
+# ──────────────────────────────────────────────────────────────
+volumes:
+  mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
+  app-uploads:
+    driver: local
+  static-files:
+    driver: local</code></pre>
             </div>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>Exemplo 3: WordPress + MariaDB + Redis Object Cache</h3>
+          <p>WordPress com banco MariaDB e Redis para object cache, otimizado para performance:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>WordPress + MariaDB + Redis — docker-compose.yml</code><span class="cmd-tag">WordPress Stack</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# STACK: WordPress + MariaDB + Redis Object Cache
+# Ambiente: Produção otimizada
+# ════════════════════════════════════════════════════════════════
+
+services:
+  # ──────────────────────────────────────────────────────────────
+  # WordPress (CMS)
+  # ──────────────────────────────────────────────────────────────
+  wordpress:
+    image: wordpress:6.4-php8.3-apache
+    container_name: wp-app
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_REDIS_HOST', 'redis');
+        define('WP_REDIS_PORT', 6379);
+        define('WP_REDIS_PASSWORD', '${REDIS_PASSWORD}');
+        define('WP_REDIS_DATABASE', 0);
+        define('WP_CACHE', true);
+        define('WP_MEMORY_LIMIT', '256M');
+        define('WP_MAX_MEMORY_LIMIT', '512M');
+        define('DISALLOW_FILE_EDIT', true);
+        define('WP_AUTO_UPDATE_CORE', 'minor');
+    volumes:
+      - wp-content:/var/www/html/wp-content
+      - ./docker/wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/wp-admin/install.php || curl -f http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 512M
+
+  # ──────────────────────────────────────────────────────────────
+  # MariaDB (banco de dados — fork do MySQL, compatível)
+  # ──────────────────────────────────────────────────────────────
+  mariadb:
+    image: mariadb:11
+    container_name: wp-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./docker/mariadb/custom.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      - ./docker/mariadb/backups:/backups
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  # ──────────────────────────────────────────────────────────────
+  # Redis (Object Cache para WordPress)
+  # ──────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: wp-redis
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 150M
+
+  # ──────────────────────────────────────────────────────────────
+  # WP-CLI (administração via linha de comando)
+  # ──────────────────────────────────────────────────────────────
+  wpcli:
+    image: wordpress:cli-php8.3
+    container_name: wp-cli
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+    volumes:
+      - wp-content:/var/www/html/wp-content
+    networks:
+      - backend
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    profiles:
+      - tools        # Só sobe quando necessário
+    entrypoint: wp
+    command: "--info"
+
+  # ──────────────────────────────────────────────────────────────
+  # Backup automático (cron job)
+  # ──────────────────────────────────────────────────────────────
+  backup:
+    image: mariadb:11
+    container_name: wp-backup
+    environment:
+      MYSQL_HOST: mariadb
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - ./docker/mariadb/backups:/backups
+      - ./docker/scripts/backup.sh:/backup.sh:ro
+    networks:
+      - backend
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while true; do /backup.sh; sleep 86400; done"]
+    profiles:
+      - backup       # Ativar com --profile backup
+    restart: unless-stopped
+
+# ──────────────────────────────────────────────────────────────
+# NETWORKS
+# ──────────────────────────────────────────────────────────────
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+# ──────────────────────────────────────────────────────────────
+# VOLUMES
+# ──────────────────────────────────────────────────────────────
+volumes:
+  wp-content:
+    driver: local
+  mariadb-data:
+    driver: local
+  redis-data:
+    driver: local</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Dica de performance:</strong> O Redis Object Cache elimina queries repetidas ao banco de dados. Em um WordPress com tráfego, isso pode reduzir a carga no MariaDB em 70-90%. Instale o plugin "Redis Object Cache" no WP e ative a conexão.
+          </div>
+        </div>
       </div>
     </section>
 
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: BOAS PRÁTICAS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Boas Práticas</span>
+          <h2>Boas Práticas com Docker Compose</h2>
+          <p>Padrões e convenções que garantem segurança, manutenibilidade e robustez em seus arquivos Compose — do desenvolvimento à produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Segurança: Variáveis e Secrets</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Gerenciamento seguro de secrets</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# NUNCA coloque senhas diretamente no docker-compose.yml!
+# ════════════════════════════════════════════════════════════════
+
+# ❌ ERRADO: senhas expostas no YAML (vai para o Git!)
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: minha-senha-super-secreta    # ← NUNCA!
+
+# ✅ CORRETO: use env_file + .gitignore
+services:
+  db:
+    image: postgres:16
+    env_file:
+      - .env.secrets         # Arquivo com senhas (não commitado)
+    environment:
+      POSTGRES_USER: app     # Valores não-sensíveis podem ficar inline
+      POSTGRES_DB: webapp
+
+# ✅ CORRETO: interpolação do .env
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}   # Vem do .env
+
+# ESTRUTURA DE ARQUIVOS RECOMENDADA:
+# .env.example      → Template (commitado no Git)
+# .env              → Valores reais para dev (no .gitignore)
+# .env.production   → Valores de produção (no .gitignore)
+# .env.secrets      → Apenas secrets (no .gitignore)
+
+# .gitignore:
+# .env
+# .env.*
+# !.env.example
+
+# .env.example (commitado):
+# DB_PASSWORD=change-me
+# REDIS_PASSWORD=change-me
+# JWT_SECRET=change-me
+# API_KEY=change-me
+
+# DOCKER SECRETS (alternativa mais segura):
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    secrets:
+      - db-password
+
+secrets:
+  db-password:
+    file: ./secrets/db-password.txt    # Arquivo com apenas a senha</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Healthchecks e Dependências Corretas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Padrão robusto de healthcheck + depends_on</code><span class="cmd-tag">Resiliência</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# PADRÃO RECOMENDADO: healthcheck em CADA serviço
+# + depends_on com condition: service_healthy
+# ════════════════════════════════════════════════════════════════
+
+services:
+  # CAMADA 1: Infraestrutura (sem dependências)
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # CAMADA 2: Migrations (depende da infra)
+  migrations:
+    build: .
+    command: npm run db:migrate
+    depends_on:
+      db:
+        condition: service_healthy     # DB pronto para queries!
+    restart: "no"                       # Roda uma vez e para
+
+  # CAMADA 3: Aplicação (depende de tudo)
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully  # Migrations OK!
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # CAMADA 4: Reverse Proxy (depende da app)
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      api:
+        condition: service_healthy     # API pronta para requests!
+
+# BENEFÍCIOS:
+# ✅ Sem race conditions no startup
+# ✅ Sem "connection refused" durante inicialização
+# ✅ Migrations rodam ANTES da app iniciar
+# ✅ Nginx só recebe tráfego quando API está pronta
+# ✅ docker compose ps mostra status real (healthy/unhealthy)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Override Files — Dev vs Produção</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker-compose.yml (base)</code><span class="cmd-tag">Base</span></div>
+              <pre><code># docker-compose.yml — Configuração BASE
+# (Compartilhada entre ambientes)
+# ═══════════════════════════════════════
+
+services:
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://app:${DB_PASS}@db:5432/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: app
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  backend:
+
+volumes:
+  db-data:</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker-compose.override.yml (dev)</code><span class="cmd-tag">Dev</span></div>
+              <pre><code># docker-compose.override.yml — OVERRIDE para dev
+# (Lido automaticamente junto com docker-compose.yml!)
+# ═══════════════════════════════════════════════════
+
+services:
+  api:
+    # Dev: hot reload com volume mount
+    volumes:
+      - ./src:/app/src           # Hot reload!
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    ports:
+      - "3000:3000"              # Expor porta (dev)
+      - "9229:9229"              # Debug port
+    command: npm run dev          # Override para dev mode
+
+  db:
+    ports:
+      - "5432:5432"              # Acesso direto ao DB (dev)
+
+  # Serviços EXTRAS para dev:
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - backend
+
+# COMO FUNCIONA:
+# docker compose up (sem -f)
+# → Lê docker-compose.yml
+# → Lê docker-compose.override.yml (automático!)
+# → Faz MERGE dos dois arquivos
+# → Resultado: config de dev com hot reload</code></pre>
+            </div>
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker-compose.prod.yml (produção)</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># docker-compose.prod.yml — Override para PRODUÇÃO
+# (Deve ser especificado explicitamente com -f)
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  api:
+    # Prod: imagem built, sem volumes de código
+    image: registry.empresa.com/api:${VERSION:-latest}
+    build:
+      target: production
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: warn
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    # Sem ports expostos (Nginx faz proxy)
+
+  db:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    # Sem ports expostos (só acesso interno)
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+# COMO USAR EM PRODUÇÃO:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# (NÃO lê o .override automaticamente quando você especifica -f)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Checklist de Boas Práticas</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>📋 Segurança</h4>
+              <ul>
+                <li>Use <code>env_file</code> para variáveis sensíveis</li>
+                <li>Adicione <code>.env*</code> ao <code>.gitignore</code></li>
+                <li>Crie <code>.env.example</code> como template (commitado)</li>
+                <li>Use redes <code>internal: true</code> para DBs</li>
+                <li>Não exponha portas de bancos em produção</li>
+                <li>Use <code>read_only: true</code> para configs montadas</li>
+                <li>Defina <code>deploy.resources.limits</code> (evita OOM)</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>📋 Confiabilidade</h4>
+              <ul>
+                <li>Defina <code>healthcheck</code> em CADA serviço</li>
+                <li>Use <code>depends_on</code> com <code>condition: service_healthy</code></li>
+                <li>Sempre use <code>restart: unless-stopped</code> em prod</li>
+                <li>Nomeie volumes (não use anônimos em prod)</li>
+                <li>Use tags fixas nas imagens (não <code>:latest</code>)</li>
+                <li>Defina <code>start_period</code> adequado nos healthchecks</li>
+                <li>Teste com <code>docker compose config</code> antes de deploy</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>📋 Organização</h4>
+              <ul>
+                <li>Use override files para separar dev/prod</li>
+                <li>Use <code>profiles</code> para ferramentas opcionais</li>
+                <li>Comente seções importantes do YAML</li>
+                <li>Agrupe services por camada (infra → app → proxy)</li>
+                <li>Use <code>.dockerignore</code> para builds menores</li>
+                <li>Prefira <code>compose.yaml</code> (formato novo)</li>
+                <li>Documente com <code>README.md</code> como subir o projeto</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>📋 Performance</h4>
+              <ul>
+                <li>Use multi-stage builds no Dockerfile</li>
+                <li>Use imagens <code>-alpine</code> (menores)</li>
+                <li>Configure <code>maxmemory</code> no Redis</li>
+                <li>Use <code>tmpfs</code> para dados temporários</li>
+                <li>Defina limites de CPU/memória com <code>deploy</code></li>
+                <li>Use <code>--parallel</code> no build</li>
+                <li>Cache de build com <code>cache_from</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 9: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Coloque em prática tudo o que aprendeu neste módulo. Cada exercício constrói sobre o anterior, criando stacks cada vez mais completas e robustas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Stack Flask + PostgreSQL + Redis com 1 Comando</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 1 — Instruções</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 1: Subir Flask + PostgreSQL + Redis
+# ════════════════════════════════════════════════════════════════
+#
+# OBJETIVO: Criar um docker-compose.yml que suba 3 serviços
+# com um único "docker compose up -d"
+#
+# REQUISITOS:
+# 1. Service "api":
+#    - Build a partir de um Dockerfile (criar simples com Flask)
+#    - Porta 5000 exposta no host
+#    - Variáveis: DATABASE_URL, REDIS_URL
+#    - Depende de db e redis
+#    - Restart: unless-stopped
+#
+# 2. Service "db":
+#    - Imagem: postgres:16-alpine
+#    - Volume nomeado para dados
+#    - Variáveis: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+#    - Healthcheck com pg_isready
+#
+# 3. Service "redis":
+#    - Imagem: redis:7-alpine
+#    - Command: redis-server --appendonly yes
+#    - Volume nomeado para dados
+#    - Healthcheck com redis-cli ping
+#
+# 4. Rede customizada "app-network" para todos
+# 5. Volumes nomeados declarados no top-level
+# 6. Arquivo .env com as variáveis sensíveis
+#
+# PASSOS:
+# 1. Crie a estrutura de diretórios:
+mkdir -p exercicio-1 && cd exercicio-1
+
+# 2. Crie o Dockerfile para Flask:
+cat > Dockerfile << 'EOF'
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
+EOF
+
+# 3. Crie requirements.txt:
+cat > requirements.txt << 'EOF'
+flask==3.0.0
+psycopg2-binary==2.9.9
+redis==5.0.1
+gunicorn==21.2.0
+EOF
+
+# 4. Crie app.py:
+cat > app.py << 'EOF'
+from flask import Flask, jsonify
+import redis
+import psycopg2
+import os
+
+app = Flask(__name__)
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy"})
+
+@app.route('/')
+def home():
+    return jsonify({"message": "Flask + PostgreSQL + Redis"})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+EOF
+
+# 5. Crie o docker-compose.yml (FAÇA VOCÊ MESMO!)
+# 6. Crie o .env
+# 7. Execute: docker compose up -d
+# 8. Teste: curl http://localhost:5000/health
+# 9. Verifique: docker compose ps (todos healthy?)
+
+# VALIDAÇÃO:
+# ✅ docker compose ps → 3 containers running
+# ✅ curl localhost:5000/health → {"status": "healthy"}
+# ✅ docker compose logs db → "ready to accept connections"
+# ✅ docker compose exec redis redis-cli ping → PONG</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Adicionar Nginx como Reverse Proxy</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 2 — Instruções</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 2: Adicionar Nginx como Reverse Proxy
+# ════════════════════════════════════════════════════════════════
+#
+# OBJETIVO: Extender o exercício 1 adicionando Nginx
+# na frente da API Flask como reverse proxy.
+#
+# REQUISITOS:
+# 1. Novo service "nginx":
+#    - Imagem: nginx:alpine
+#    - Porta 80 no host (remover porta 5000 da api)
+#    - Volume bind mount para nginx.conf
+#    - Depende da API (condition: service_healthy)
+#    - Healthcheck
+#
+# 2. Criar nginx.conf com:
+#    - Proxy pass para http://api:5000
+#    - Headers de proxy (X-Real-IP, X-Forwarded-For)
+#    - Location /health para healthcheck do Nginx
+#
+# 3. Separar redes:
+#    - "frontend": nginx + api
+#    - "backend": api + db + redis
+#    - Nginx NÃO deve acessar db/redis diretamente
+#
+# 4. API não deve ter porta exposta no host (apenas via Nginx)
+#
+# ARQUIVO nginx.conf:
+cat > nginx/nginx.conf << 'EOF'
+events {
+    worker_connections 1024;
+}
+
+http {
+    upstream flask_app {
+        server api:5000;
+    }
+
+    server {
+        listen 80;
+        server_name _;
+
+        location / {
+            proxy_pass http://flask_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_connect_timeout 30s;
+            proxy_read_timeout 30s;
+        }
+
+        location /health {
+            access_log off;
+            return 200 "OK\n";
+            add_header Content-Type text/plain;
+        }
+    }
+}
+EOF
+
+# MODIFICAÇÕES NO docker-compose.yml:
+# - Remover ports da api (apenas expose: "5000")
+# - Adicionar service nginx com port 80
+# - Criar 2 redes: frontend e backend
+# - Api conectada a ambas
+# - Nginx apenas em frontend
+# - DB e Redis apenas em backend
+
+# VALIDAÇÃO:
+# ✅ curl localhost → resposta da API (via Nginx)
+# ✅ curl localhost:5000 → connection refused (porta não exposta)
+# ✅ docker compose exec nginx ping db → falha (redes separadas)
+# ✅ docker compose exec api ping db → funciona</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Profiles para Dev e Prod</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 3 — Instruções</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 3: Usar Profiles para Separar Dev e Prod
+# ════════════════════════════════════════════════════════════════
+#
+# OBJETIVO: Usar profiles para ter ferramentas de dev
+# que não sobem em produção, usando o MESMO arquivo.
+#
+# REQUISITOS:
+# 1. Services CORE (sem profile — sempre sobem):
+#    - api, db, redis, nginx
+#
+# 2. Services com profile "dev":
+#    - adminer (porta 8080) — admin de DB
+#    - mailhog (portas 1025/8025) — email catcher
+#    - redis-commander (porta 8081) — admin Redis
+#
+# 3. Services com profile "monitoring":
+#    - prometheus (porta 9090)
+#    - grafana (porta 3000)
+#
+# 4. Services com profile "debug":
+#    - pgadmin (porta 5050) — admin avançado PostgreSQL
+#
+# DOCKER-COMPOSE.YML (adicionar ao exercício 2):
+# services:
+#   adminer:
+#     image: adminer:latest
+#     ports:
+#       - "8080:8080"
+#     networks:
+#       - backend
+#     profiles:
+#       - dev
+#
+#   mailhog:
+#     image: mailhog/mailhog
+#     ports:
+#       - "1025:1025"
+#       - "8025:8025"
+#     networks:
+#       - backend
+#     profiles:
+#       - dev
+#
+#   redis-commander:
+#     image: rediscommander/redis-commander
+#     environment:
+#       REDIS_HOSTS: local:redis:6379
+#     ports:
+#       - "8081:8081"
+#     networks:
+#       - backend
+#     profiles:
+#       - dev
+
+# COMANDOS PARA TESTAR:
+
+# Produção (apenas core):
+docker compose up -d
+# Sobe: api, db, redis, nginx
+
+# Desenvolvimento (core + ferramentas dev):
+docker compose --profile dev up -d
+# Sobe: api, db, redis, nginx, adminer, mailhog, redis-commander
+
+# Com monitoramento:
+docker compose --profile dev --profile monitoring up -d
+# Sobe: TUDO acima + prometheus, grafana
+
+# Tudo:
+docker compose --profile dev --profile monitoring --profile debug up -d
+
+# Via variável (equivalente):
+COMPOSE_PROFILES=dev,monitoring docker compose up -d
+
+# VALIDAÇÃO:
+# ✅ docker compose up -d → apenas 4 containers (core)
+# ✅ docker compose --profile dev up -d → 7 containers
+# ✅ localhost:8080 acessível apenas com profile dev
+# ✅ docker compose --profile dev down → derruba tudo</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Healthcheck + depends_on com Condition</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 4 — Instruções</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 4: Implementar Healthcheck + Depends_on com Condition
+# ════════════════════════════════════════════════════════════════
+#
+# OBJETIVO: Garantir que os serviços só iniciam quando suas
+# dependências estão REALMENTE prontas (não apenas "rodando").
+#
+# CENÁRIO: API que precisa de migrations antes de iniciar
+#
+# REQUISITOS:
+# 1. Service "db": healthcheck com pg_isready
+#    - interval: 5s, timeout: 3s, retries: 10, start_period: 15s
+#
+# 2. Service "redis": healthcheck com redis-cli ping
+#    - interval: 5s, timeout: 3s, retries: 5
+#
+# 3. Service "migrations" (roda UMA vez e para):
+#    - Mesmo build que api
+#    - Command: python manage.py migrate
+#    - depends_on db: condition: service_healthy
+#    - restart: "no" (não reiniciar após completar)
+#
+# 4. Service "seed" (popular dados iniciais):
+#    - Mesmo build que api
+#    - Command: python manage.py seed
+#    - depends_on migrations: condition: service_completed_successfully
+#    - restart: "no"
+#
+# 5. Service "api":
+#    - depends_on:
+#        db: condition: service_healthy
+#        redis: condition: service_healthy
+#        migrations: condition: service_completed_successfully
+#    - Healthcheck: curl /health
+#
+# 6. Service "nginx":
+#    - depends_on api: condition: service_healthy
+#
+# ORDEM ESPERADA DE STARTUP:
+# 1. db + redis (paralelo, sem dependências)
+# 2. migrations (após db healthy)
+# 3. seed (após migrations completed)
+# 4. api (após db healthy + redis healthy + migrations completed)
+# 5. nginx (após api healthy)
+#
+# COMO OBSERVAR A ORDEM:
+docker compose up
+# (sem -d, para ver logs em tempo real)
+# Você verá:
+# ✓ db e redis iniciando
+# ✓ "waiting for db to become healthy..."
+# ✓ migrations rodando e completando
+# ✓ api iniciando
+# ✓ nginx iniciando por último
+
+# TESTE DE FALHA:
+# 1. Faça o migrations falhar (exit 1):
+#    command: "exit 1"
+# 2. Observe que api NÃO inicia
+# 3. docker compose ps → migrations: exited (1)
+# 4. api e nginx não aparecem como running
+
+# VALIDAÇÃO:
+# ✅ docker compose up mostra ordem correta de startup
+# ✅ API só inicia DEPOIS de migrations completar com sucesso
+# ✅ Nginx só inicia DEPOIS de API estar healthy
+# ✅ Se DB falha no healthcheck, nada mais sobe
+# ✅ docker compose ps mostra status (healthy) para todos</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🎯 Objetivo final:</strong> Ao completar os 4 exercícios, você terá uma stack completa com: reverse proxy, 2 redes isoladas, healthchecks em todos os serviços, dependências corretas, profiles para dev/prod, migrations automáticas e ferramentas de admin condicionais. Isso representa uma arquitetura Compose de nível profissional.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que vem no próximo módulo</h3>
+          <div class="info-box">
+            <strong>Módulo 06: Segurança no Docker</strong> — Você vai aprender como proteger containers em produção: rodar como non-root, usar read-only filesystems, limitar capabilities, aplicar seccomp e AppArmor profiles, escanear vulnerabilidades em imagens, implementar Content Trust e criar Dockerfiles seguros.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-06.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Próximo passo</span>
+          <h2>Pronto para dominar Segurança no Docker?</h2>
+          <p>No Módulo 06 você vai aprender como proteger containers em produção: rodar como non-root, limitar capabilities, usar read-only filesystems, escanear vulnerabilidades e implementar Docker Content Trust.</p>
+        </div>
+        <a href="modulo-06.html" class="button primary">Ir para Módulo 06 →</a>
       </div>
     </section>
   </main>

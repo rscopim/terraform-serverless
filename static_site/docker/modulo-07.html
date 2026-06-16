@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Docker Módulo 07: Docker em Produção e CI/CD</title>
+  <title>CloudTrilhas — Docker Módulo 07: Docker em Produção</title>
+  <meta name="description" content="Guia completo para operar Docker em produção: logging centralizado, monitoramento com Prometheus e Grafana, CI/CD pipelines, Docker Swarm, preparação para Kubernetes, performance e disaster recovery." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,22 +18,17 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-06.html" class="nav-link">← Anterior</a>
-        <a href="../docker.html" class="nav-link">Voltar ao Curso</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <a href="../index.html" class="nav-button">Início</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -40,190 +36,605 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 07</span>
-        <h1>Docker em Produção e CI/CD</h1>
-        <p>Leve seus containers para produção com registries privados, pipelines CI/CD automatizados, Docker Swarm e estratégias de troubleshooting.</p>
+        <h1>Docker em Produção</h1>
+        <p>Aprenda a operar Docker em ambientes de produção reais: configure logging centralizado, monitore containers com Prometheus e Grafana, construa pipelines CI/CD, entenda Docker Swarm, prepare-se para Kubernetes, otimize performance e implemente disaster recovery.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node active"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: CONTAINERS EM PRODUÇÃO — REALIDADE -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Realidade</span>
+          <h2>Containers em Produção — Realidade</h2>
+          <p>Docker em produção é muito diferente de desenvolvimento local. Aqui você precisa pensar em disponibilidade, observabilidade, escalabilidade e recuperação. A primeira decisão é: Docker sozinho ou com orquestrador?</p>
+        </div>
 
-        <!-- Private Registry -->
         <div class="topic-block">
-          <h3>Registry Privado</h3>
+          <h3>Docker Sozinho vs Orquestradores</h3>
+          <p>Não existe resposta única. A escolha depende da complexidade, escala e equipe disponível:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header">
-                <code>docker login / push / pull</code>
-                <span class="cmd-tag">registry</span>
-              </div>
-              <p>Autentique e publique imagens em registries privados (ECR, ACR, GCR, Docker Hub).</p>
-              <pre><code># Login no Docker Hub
-docker login
-
-# Login em registry privado (AWS ECR)
-aws ecr get-login-password --region us-east-1 | \
-  docker login --username AWS --password-stdin \
-  123456789.dkr.ecr.us-east-1.amazonaws.com
-
-# Tag para o registry
-docker tag app:v1 \
-  123456789.dkr.ecr.us-east-1.amazonaws.com/app:v1
-
-# Push para o registry
-docker push \
-  123456789.dkr.ecr.us-east-1.amazonaws.com/app:v1
-
-# Pull do registry
-docker pull \
-  123456789.dkr.ecr.us-east-1.amazonaws.com/app:v1</code></pre>
+              <div class="command-header"><code>Docker Compose em Produção</code><span class="cmd-tag">Simples</span></div>
+              <pre><code># DOCKER COMPOSE EM PRODUÇÃO
+# ════════════════════════════════════════
+#
+# QUANDO USAR:
+# ✅ 1 servidor (single-host)
+# ✅ Poucos services (< 10)
+# ✅ Tráfego previsível
+# ✅ Equipe pequena (1-5 devs)
+# ✅ Startups, projetos pessoais, MVPs
+# ✅ Aplicações internas
+#
+# VANTAGENS:
+# • Simples de operar
+# • Curva de aprendizado baixa
+# • restart: unless-stopped = auto-recovery
+# • docker compose pull + up = deploy
+# • Funciona em qualquer VPS de $5/mês
+#
+# LIMITAÇÕES:
+# ❌ Sem auto-scaling
+# ❌ Sem rolling updates nativos (downtime)
+# ❌ Single point of failure (1 host)
+# ❌ Sem service discovery avançado
+# ❌ Sem self-healing sofisticado
+#
+# CENÁRIO IDEAL:
+# • Blog/site com 1000-50000 visitas/dia
+# • API interna com poucos endpoints
+# • SaaS em estágio inicial
+# • Microserviços em fase de validação
+#
+# DEPLOY TÍPICO:
+ssh server "cd /app && \
+  docker compose pull && \
+  docker compose up -d"</code></pre>
             </div>
-
             <div class="command-card">
-              <div class="command-header">
-                <code>Estratégias de Tagging</code>
-                <span class="cmd-tag">versionamento</span>
-              </div>
-              <p>Use tags semânticas para rastreabilidade e rollback.</p>
-              <pre><code># Semantic Versioning (recomendado)
-docker tag app:latest registry/app:1.2.3
-docker tag app:latest registry/app:1.2
-docker tag app:latest registry/app:1
+              <div class="command-header"><code>Kubernetes / Swarm em Produção</code><span class="cmd-tag">Escala</span></div>
+              <pre><code># ORQUESTRADORES EM PRODUÇÃO
+# ════════════════════════════════════════
+#
+# QUANDO USAR ORQUESTRADOR:
+# ✅ Multi-host (cluster)
+# ✅ Alta disponibilidade (HA) necessária
+# ✅ Auto-scaling (horizontal)
+# ✅ Rolling updates sem downtime
+# ✅ Muitos services (10+)
+# ✅ Equipe com expertise DevOps
+#
+# OPÇÕES:
+#
+# 1. DOCKER SWARM (simples)
+# • Integrado ao Docker CLI
+# • Fácil migração de Compose
+# • Bom para equipes pequenas
+# • Menos features que K8s
+#
+# 2. KUBERNETES (enterprise)
+# • Padrão da indústria
+# • Ecossistema enorme
+# • Auto-scaling, self-healing
+# • Curva de aprendizado ALTA
+# • Precisa de equipe dedicada
+#
+# 3. MANAGED K8s (cloud)
+# • EKS (AWS), GKE (GCP), AKS (Azure)
+# • Control plane gerenciado
+# • Mais caro, menos ops
+#
+# DECISÃO:
+# < 5 services + 1 host → Compose
+# 5-20 services OU HA → Swarm
+# > 20 services + escala → Kubernetes
+# Enterprise + budget → Managed K8s</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Regra prática:</strong> Comece com Docker Compose em produção. Migre para Swarm quando precisar de HA ou rolling updates. Migre para Kubernetes quando Swarm não for suficiente. Não comece por K8s — a complexidade operacional é enorme para equipes pequenas.
+          </div>
+        </div>
 
-# Git SHA (rastreabilidade exata)
-GIT_SHA=$(git rev-parse --short HEAD)
-docker tag app:latest registry/app:${GIT_SHA}
+        <div class="topic-block">
+          <h3>Anatomia de um Deploy Docker em Produção</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Fluxo completo: Dev → Prod</code><span class="cmd-tag">Pipeline</span></div>
+              <pre><code># FLUXO DE DEPLOY DOCKER EM PRODUÇÃO
+# ════════════════════════════════════════════════════════════════
+#
+# ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+# │   Dev    │───▶│   CI     │───▶│ Registry │───▶│   Prod   │
+# │  (code)  │    │ (build)  │    │ (store)  │    │ (deploy) │
+# └──────────┘    └──────────┘    └──────────┘    └──────────┘
+#
+# ETAPAS DETALHADAS:
+#
+# 1. DESENVOLVIMENTO:
+#    • Dev escreve código + Dockerfile
+#    • Testa com docker compose up (local)
+#    • Faz commit e push para Git
+#
+# 2. CI (Continuous Integration):
+#    • Pipeline dispara no push/PR
+#    • Roda testes automatizados
+#    • Build da imagem Docker
+#    • Scan de vulnerabilidades (Trivy)
+#    • Gera SBOM e assinatura
+#    • Push para registry (tagged)
+#
+# 3. REGISTRY (Armazenamento):
+#    • Imagem tagueada: app:v1.2.3
+#    • Imagem tagueada: app:sha-abc123
+#    • SBOM e provenance armazenados
+#    • Scan contínuo de novas CVEs
+#
+# 4. DEPLOY (CD):
+#    • Pull da imagem nova do registry
+#    • Rolling update (zero-downtime)
+#    • Health check antes de rotear tráfego
+#    • Rollback automático se falhar
+#
+# 5. MONITORAMENTO (Operação):
+#    • Logs centralizados (ELK/Loki)
+#    • Métricas (Prometheus/Grafana)
+#    • Alertas (PagerDuty/Slack)
+#    • Health checks contínuos</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-# Data + Build number
-docker tag app:latest registry/app:2024.01.15-42
 
-# Combinação (melhor prática)
-docker tag app:latest registry/app:1.2.3
-docker tag app:latest registry/app:1.2.3-abc1234
-docker tag app:latest registry/app:latest
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: LOGGING -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Logging</span>
+          <h2>Logging</h2>
+          <p>Em produção, logs são seu principal mecanismo de debug. Docker captura stdout/stderr de cada container. O desafio é coletar, agregar e pesquisar logs de dezenas de containers de forma eficiente.</p>
+        </div>
 
-# ⚠️ NUNCA use apenas :latest em produção!</code></pre>
+        <div class="topic-block">
+          <h3>Logging Drivers do Docker</h3>
+          <p>Docker suporta múltiplos drivers de logging que determinam para onde os logs vão:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>json-file (padrão)</code><span class="cmd-tag">Default</span></div>
+              <pre><code># JSON-FILE — Driver padrão
+# ════════════════════════════════════════
+#
+# COMO FUNCIONA:
+# Docker grava stdout/stderr em arquivos JSON
+# em /var/lib/docker/containers/{id}/{id}-json.log
+#
+# CONFIGURAR NO COMPOSE:
+services:
+  api:
+    image: minha-api
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"    # Rotaciona em 10MB
+        max-file: "5"      # Mantém 5 arquivos
+        compress: "true"   # Comprime rotacionados
+        tag: "{{.Name}}"   # Tag no log
+
+# ⚠️ SEM LIMITES = DISCO CHEIO:
+# Sem max-size, logs crescem INFINITAMENTE
+# Container de alto tráfego = disco cheio em dias!
+
+# CONFIGURAR GLOBALMENTE:
+# /etc/docker/daemon.json
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+# Reiniciar: systemctl restart docker
+
+# ACESSAR LOGS:
+docker logs container --tail 100
+docker logs container --since 1h
+docker logs container -f  # Follow</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Drivers para centralização</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># DRIVERS PARA LOGGING CENTRALIZADO
+# ════════════════════════════════════════
+
+# 1. SYSLOG — Enviar para syslog server
+services:
+  api:
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://logserver:514"
+        tag: "api-{{.Name}}"
+
+# 2. FLUENTD — Coletor flexível
+services:
+  api:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "docker.api"
+        fluentd-async: "true"
+
+# 3. GELF — Para Graylog
+services:
+  api:
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://graylog:12201"
+        tag: "api"
+
+# 4. AWSLOGS — Para CloudWatch
+services:
+  api:
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-group: /docker/api
+        awslogs-stream: "{{.Name}}"
+
+# QUAL USAR:
+# • Dev/staging: json-file + max-size
+# • Prod simples: json-file + Promtail/Loki
+# • Prod enterprise: fluentd + ELK
+# • AWS: awslogs (integrado)
+# • Multi-cloud: fluentd/vector + S3</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Docker Compose para Produção -->
         <div class="topic-block">
-          <h3>Docker Compose para Produção</h3>
+          <h3>Logging Centralizado com Loki + Grafana</h3>
+          <p>A stack Grafana Loki é a alternativa leve ao ELK para logging centralizado:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>docker-compose.prod.yml</code>
-                <span class="cmd-tag">produção</span>
-              </div>
-              <p>Compose otimizado para produção com imagens do registry, healthchecks e limites de recursos.</p>
-              <pre><code>services:
-  api:
-    image: 123456789.dkr.ecr.us-east-1.amazonaws.com/app:1.2.3
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.25"
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "5"
-    environment:
-      - NODE_ENV=production
+              <div class="command-header"><code>Stack Loki completa com Docker Compose</code><span class="cmd-tag">Implementação</span></div>
+              <pre><code># STACK DE LOGGING: Promtail + Loki + Grafana
+# ════════════════════════════════════════════════════════════════
+#
+# ARQUITETURA:
+# Containers → stdout → Docker json-file → Promtail → Loki → Grafana
+#
+# docker-compose.logging.yml:
+services:
+  loki:
+    image: grafana/loki:2.9.0
     ports:
-      - "4000:4000"
-
-  db:
-    image: postgres:16-alpine
-    restart: always
+      - "3100:3100"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-    logging:
-      driver: json-file
-      options:
-        max-size: "20m"
-        max-file: "10"
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - monitoring
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+    depends_on:
+      - loki
+
+networks:
+  monitoring:
+    driver: bridge
 
 volumes:
-  pgdata:</code></pre>
+  loki-data:
+  grafana-data:
+
+# promtail-config.yml:
+# server:
+#   http_listen_port: 9080
+# positions:
+#   filename: /tmp/positions.yaml
+# clients:
+#   - url: http://loki:3100/loki/api/v1/push
+# scrape_configs:
+#   - job_name: docker
+#     static_configs:
+#       - targets: [localhost]
+#         labels:
+#           job: docker
+#           __path__: /var/lib/docker/containers/*/*-json.log
+#     pipeline_stages:
+#       - docker: {}
+
+# ALTERNATIVA MAIS LEVE: Docker plugin
+docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+# Então no compose:
+# services:
+#   api:
+#     logging:
+#       driver: loki
+#       options:
+#         loki-url: "http://localhost:3100/loki/api/v1/push"</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Loki vs ELK:</strong> Loki é significativamente mais leve e barato que ELK (Elasticsearch + Logstash + Kibana). Loki indexa apenas labels (metadata), não o conteúdo dos logs, consumindo 10x menos recursos. Para a maioria dos projetos, Loki é a escolha certa.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: MONITORAMENTO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Monitoring</span>
+          <h2>Monitoramento</h2>
+          <p>Sem monitoramento, você não sabe se seus containers estão saudáveis até que um usuário reclame. Métricas, healthchecks e alertas são essenciais para operação profissional.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>cAdvisor + Prometheus + Grafana</h3>
+          <p>A stack clássica de monitoramento para containers Docker:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>cAdvisor — Métricas de containers</code><span class="cmd-tag">Coleta</span></div>
+              <pre><code># cADVISOR — Container Advisor (Google)
+# ════════════════════════════════════════
+#
+# O QUE COLETA:
+# • CPU usage por container
+# • Memory usage e limits
+# • Network I/O
+# • Disk I/O
+# • Filesystem usage
+#
+# DOCKER COMPOSE:
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    devices:
+      - /dev/kmsg
+    networks:
+      - monitoring
+
+# ACESSAR: http://localhost:8080
+# Mostra métricas de TODOS os containers
+
+# ENDPOINT PROMETHEUS:
+# http://localhost:8080/metrics
+# → Prometheus scrape este endpoint
+
+# MÉTRICAS IMPORTANTES:
+# container_cpu_usage_seconds_total
+# container_memory_usage_bytes
+# container_network_receive_bytes_total
+# container_network_transmit_bytes_total
+# container_fs_usage_bytes</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Prometheus + Grafana</code><span class="cmd-tag">Visualização</span></div>
+              <pre><code># PROMETHEUS + GRAFANA
+# ════════════════════════════════════════
+services:
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+
+# prometheus.yml:
+# global:
+#   scrape_interval: 15s
+# scrape_configs:
+#   - job_name: 'cadvisor'
+#     static_configs:
+#       - targets: ['cadvisor:8080']
+#   - job_name: 'node'
+#     static_configs:
+#       - targets: ['node-exporter:9100']
+
+# GRAFANA DASHBOARDS PRONTOS:
+# • ID 893: Docker monitoring
+# • ID 14282: cAdvisor full
+# • ID 1860: Node Exporter full
+# Importar em: + → Import → ID</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Logging em Produção -->
         <div class="topic-block">
-          <h3>Logging em Produção</h3>
+          <h3>Healthchecks em Produção</h3>
+          <p>Healthchecks determinam se um container está pronto para receber tráfego:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>Logging Drivers</code>
-                <span class="cmd-tag">observabilidade</span>
-              </div>
-              <p>Configure drivers de log para centralizar e gerenciar logs em produção.</p>
-              <pre><code># json-file (padrão) — com rotação
-docker run -d \
-  --log-driver json-file \
-  --log-opt max-size=10m \
-  --log-opt max-file=5 \
-  app:v1
+              <div class="command-header"><code>Healthchecks — Padrões e configuração</code><span class="cmd-tag">Disponibilidade</span></div>
+              <pre><code># HEALTHCHECKS EM PRODUÇÃO
+# ════════════════════════════════════════════════════════════════
 
-# syslog — enviar para servidor syslog
-docker run -d \
-  --log-driver syslog \
-  --log-opt syslog-address=tcp://logserver:514 \
-  --log-opt tag="{{.Name}}" \
-  app:v1
+# TIPOS DE HEALTHCHECK:
+#
+# 1. LIVENESS — "O container está vivo?"
+#    Verifica se o processo está respondendo.
+#    Se falhar: restart do container.
+#
+# 2. READINESS — "O container está pronto para tráfego?"
+#    Verifica se pode receber requisições.
+#    Se falhar: remove do load balancer (não mata).
+#
+# 3. STARTUP — "O container já inicializou?"
+#    Dá tempo para apps lentas iniciarem.
+#    Se falhar: restart após N tentativas.
 
-# fluentd — agregação com Fluentd/Fluent Bit
-docker run -d \
-  --log-driver fluentd \
-  --log-opt fluentd-address=localhost:24224 \
-  --log-opt tag="docker.{{.Name}}" \
-  app:v1
+# PADRÕES POR TIPO DE SERVIÇO:
+# ─────────────────────────────────────────────────────────────
 
-# awslogs — direto para CloudWatch
-docker run -d \
-  --log-driver awslogs \
-  --log-opt awslogs-region=us-east-1 \
-  --log-opt awslogs-group=/ecs/app \
-  --log-opt awslogs-stream-prefix=prod \
-  app:v1</code></pre>
+# API REST / Web:
+healthcheck:
+  test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 30s
+
+# PostgreSQL:
+healthcheck:
+  test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+
+# Redis:
+healthcheck:
+  test: ["CMD", "redis-cli", "ping"]
+  interval: 10s
+  timeout: 3s
+  retries: 3
+
+# MongoDB:
+healthcheck:
+  test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  interval: 15s
+  timeout: 5s
+  retries: 3
+
+# RabbitMQ:
+healthcheck:
+  test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Nginx (proxy):
+healthcheck:
+  test: ["CMD", "nginx", "-t"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+
+# ENDPOINT /health — O QUE VERIFICAR:
+# {
+#   "status": "healthy",
+#   "checks": {
+#     "database": "connected",
+#     "redis": "connected",
+#     "disk_space": "ok",
+#     "memory": "ok"
+#   },
+#   "version": "1.5.2",
+#   "uptime": "2d 5h 30m"
+# }
+
+# DICAS:
+# • start_period: tempo para app inicializar (evita false positive)
+# • interval: NÃO muito baixo (consome recursos)
+# • retries: 3 é bom padrão (evita flap)
+# • timeout: menor que interval
+# • NUNCA ignore healthcheck em produção!</code></pre>
             </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- CI/CD com GitHub Actions -->
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: CI/CD COM DOCKER -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">CI/CD</span>
+          <h2>CI/CD com Docker</h2>
+          <p>Docker torna CI/CD mais confiável: builds reproduzíveis, ambientes de teste idênticos à produção, e deploys atômicos com rollback fácil. Veja como integrar Docker no seu pipeline.</p>
+        </div>
+
         <div class="topic-block">
-          <h3>CI/CD com GitHub Actions</h3>
+          <h3>Build no CI — Multi-platform e Cache</h3>
+          <p>Construir imagens no CI requer atenção a cache, multi-platform e segurança:</p>
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header">
-                <code>.github/workflows/docker.yml</code>
-                <span class="cmd-tag">CI/CD</span>
-              </div>
-              <p>Pipeline completo: build, scan, push para registry com cache otimizado.</p>
-              <pre><code>name: Docker Build & Push
+            <div class="command-card">
+              <div class="command-header"><code>GitHub Actions — Docker build</code><span class="cmd-tag">GitHub</span></div>
+              <pre><code># .github/workflows/docker.yml
+# ════════════════════════════════════════
+name: Docker Build & Push
 
 on:
   push:
     branches: [main]
-    tags: ["v*"]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
@@ -232,395 +643,1065 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Login to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Login to Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix=
-            type=ref,event=branch
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=sha,prefix=
 
-      - name: Build and Push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max</code></pre>
+    - name: Build and Push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Pipeline completo com scan</code><span class="cmd-tag">Seguro</span></div>
+              <pre><code># PIPELINE COMPLETO COM SEGURANÇA
+# ════════════════════════════════════════
+
+    # (continuação do job anterior)
+
+    - name: Scan vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
+
+    - name: Upload scan results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Fail on critical CVEs
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+        exit-code: '1'
+        severity: 'CRITICAL'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Deploy to production
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: deploy
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /app
+          docker compose pull
+          docker compose up -d --remove-orphans
+          docker image prune -f
+
+# RESULTADO DO PIPELINE:
+# 1. Build com cache (rápido)
+# 2. Push para registry
+# 3. Scan de CVEs (falha se CRITICAL)
+# 4. Deploy automático para prod
+# 5. Limpeza de imagens antigas</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- CI/CD com GitLab CI -->
         <div class="topic-block">
-          <h3>CI/CD com GitLab CI</h3>
+          <h3>Estratégias de Tagging</h3>
+          <p>Como taguear imagens de forma que facilite deploys e rollbacks:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>.gitlab-ci.yml</code>
-                <span class="cmd-tag">CI/CD</span>
-              </div>
-              <p>Pipeline GitLab com build, test e deploy para registry.</p>
-              <pre><code>stages:
-  - build
-  - test
-  - deploy
+              <div class="command-header"><code>Estratégias de tag para imagens</code><span class="cmd-tag">Estratégia</span></div>
+              <pre><code># ESTRATÉGIAS DE TAGGING
+# ════════════════════════════════════════════════════════════════
 
-variables:
-  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-  IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+# 1. SEMANTIC VERSIONING (recomendado para releases):
+minha-app:1.5.2          # Versão exata
+minha-app:1.5            # Latest patch da minor
+minha-app:1              # Latest minor da major
+minha-app:latest         # ⚠️ Apenas para dev
 
-build:
-  stage: build
-  image: docker:24
-  services:
-    - docker:24-dind
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build --cache-from $IMAGE_LATEST -t $IMAGE_TAG -t $IMAGE_LATEST .
-    - docker push $IMAGE_TAG
-    - docker push $IMAGE_LATEST
-  only:
-    - main
-    - tags
+# 2. GIT SHA (recomendado para CI/CD):
+minha-app:sha-abc1234    # Commit exato → rastreável
+minha-app:main-abc1234   # Branch + commit
 
-test:
-  stage: test
-  image: $IMAGE_TAG
-  script:
-    - npm run test
-  needs: [build]
+# 3. BUILD NUMBER:
+minha-app:build-456      # Número do build no CI
+minha-app:pipeline-789   # ID do pipeline
 
-scan:
-  stage: test
-  image: aquasec/trivy:latest
-  script:
-    - trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_TAG
-  needs: [build]
-  allow_failure: true
+# 4. DATE-BASED:
+minha-app:2024-01-15     # Data do build
+minha-app:20240115-1     # Data + sequência
 
-deploy:
-  stage: deploy
-  image: docker:24
-  services:
-    - docker:24-dind
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $IMAGE_TAG
-    - docker tag $IMAGE_TAG $CI_REGISTRY_IMAGE:production
-    - docker push $CI_REGISTRY_IMAGE:production
-  only:
-    - tags
-  when: manual</code></pre>
+# ESTRATÉGIA RECOMENDADA PARA PRODUÇÃO:
+# ──────────────────────────────────────
+# Taguear com MÚLTIPLAS tags no mesmo build:
+docker buildx build \
+  -t minha-app:1.5.2 \
+  -t minha-app:1.5 \
+  -t minha-app:sha-$(git rev-parse --short HEAD) \
+  -t minha-app:latest \
+  --push .
+
+# ROLLBACK:
+# Sabe a versão anterior? → docker compose com tag antiga
+# Não sabe? → Use o sha do commit anterior
+
+# docker-compose.prod.yml:
+services:
+  api:
+    image: ghcr.io/org/api:${APP_VERSION:-latest}
+# Deploy: APP_VERSION=1.5.2 docker compose up -d
+# Rollback: APP_VERSION=1.5.1 docker compose up -d</code></pre>
             </div>
           </div>
         </div>
-
-        <!-- Docker Swarm -->
-        <div class="topic-block">
-          <h3>Docker Swarm</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header">
-                <code>Inicialização e Nodes</code>
-                <span class="cmd-tag">cluster</span>
-              </div>
-              <p>Configure um cluster Swarm para orquestração nativa do Docker.</p>
-              <pre><code># Inicializar Swarm (no manager)
-docker swarm init --advertise-addr 192.168.1.10
-
-# Token para workers se juntarem
-docker swarm join-token worker
-
-# Listar nodes do cluster
-docker node ls
-
-# Promover worker a manager
-docker node promote worker-01
-
-# Remover node do cluster
-docker node rm worker-02</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Services</code>
-                <span class="cmd-tag">deploy</span>
-              </div>
-              <p>Crie e gerencie serviços distribuídos no cluster.</p>
-              <pre><code># Criar serviço com réplicas
-docker service create \
-  --name api \
-  --replicas 3 \
-  --publish 8080:4000 \
-  --env NODE_ENV=production \
-  registry/app:1.2.3
-
-# Listar serviços
-docker service ls
-
-# Ver tasks (containers) do serviço
-docker service ps api
-
-# Escalar réplicas
-docker service scale api=5
-
-# Logs do serviço
-docker service logs -f api</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Updates e Rollback</code>
-                <span class="cmd-tag">deploy</span>
-              </div>
-              <p>Rolling updates e rollback automático em caso de falha.</p>
-              <pre><code># Update da imagem (rolling update)
-docker service update \
-  --image registry/app:1.3.0 \
-  --update-parallelism 1 \
-  --update-delay 10s \
-  --update-failure-action rollback \
-  api
-
-# Rollback manual
-docker service rollback api
-
-# Remover serviço
-docker service rm api</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Stacks</code>
-                <span class="cmd-tag">deploy</span>
-              </div>
-              <p>Deploy de aplicações completas via compose file no Swarm.</p>
-              <pre><code># Deploy stack a partir de compose file
-docker stack deploy -c docker-compose.yml myapp
-
-# Listar stacks
-docker stack ls
-
-# Serviços da stack
-docker stack services myapp
-
-# Tasks da stack
-docker stack ps myapp
-
-# Remover stack
-docker stack rm myapp</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cleanup -->
-        <div class="topic-block">
-          <h3>Cleanup e Manutenção</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header">
-                <code>Comandos de Limpeza</code>
-                <span class="cmd-tag danger">manutenção</span>
-              </div>
-              <p>Mantenha o ambiente limpo removendo recursos não utilizados.</p>
-              <pre><code># Ver uso de disco
-docker system df
-
-# Limpar containers parados
-docker container prune
-
-# Limpar imagens sem tag (dangling)
-docker image prune
-
-# Limpar imagens não utilizadas por nenhum container
-docker image prune -a
-
-# Limpar volumes órfãos
-docker volume prune
-
-# Limpar redes não utilizadas
-docker network prune
-
-# Limpar build cache
-docker builder prune
-
-# NUCLEAR: limpar TUDO não utilizado + volumes
-docker system prune -a --volumes
-# ⚠️ Cuidado: remove dados persistentes!</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Troubleshooting -->
-        <div class="topic-block">
-          <h3>Troubleshooting</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header">
-                <code>Container Crashando</code>
-                <span class="cmd-tag">debug</span>
-              </div>
-              <p>Diagnostique containers que reiniciam ou falham ao iniciar.</p>
-              <pre><code># Ver logs do container que crashou
-docker logs --tail 100 meu-app
-docker logs --since 5m meu-app
-
-# Inspecionar exit code
-docker inspect meu-app --format='{{.State.ExitCode}}'
-# ExitCode 137 = OOM Killed (falta memória)
-# ExitCode 1   = Erro da aplicação
-# ExitCode 0   = Saiu normalmente
-
-# Ver estado detalhado
-docker inspect meu-app --format='{{json .State}}' | jq
-
-# Eventos do daemon
-docker events --filter container=meu-app
-
-# Ver se foi OOM killed
-docker inspect meu-app --format='{{.State.OOMKilled}}'</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Debug de Rede</code>
-                <span class="cmd-tag">debug</span>
-              </div>
-              <p>Diagnostique problemas de conectividade entre containers.</p>
-              <pre><code># Container de debug na mesma rede
-docker run --rm -it --network app_default \
-  nicolaka/netshoot sh
-
-# Testar DNS interno
-nslookup api
-nslookup db
-
-# Testar conectividade
-ping api
-curl -v http://api:4000/health
-
-# Inspecionar rede
-docker network inspect app_default
-
-# Ver portas mapeadas
-docker port meu-app</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Health Status</code>
-                <span class="cmd-tag">debug</span>
-              </div>
-              <p>Verifique o status de saúde dos containers.</p>
-              <pre><code># Ver health status
-docker inspect meu-app \
-  --format='{{.State.Health.Status}}'
-# healthy | unhealthy | starting
-
-# Histórico de health checks
-docker inspect meu-app \
-  --format='{{json .State.Health}}' | jq
-
-# Filtrar containers unhealthy
-docker ps --filter health=unhealthy
-
-# Ver logs do healthcheck
-docker inspect meu-app \
-  --format='{{range .State.Health.Log}}{{.Output}}{{end}}'</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Inspect com jq</code>
-                <span class="cmd-tag">debug</span>
-              </div>
-              <p>Use jq para extrair informações específicas do inspect.</p>
-              <pre><code># IP do container
-docker inspect meu-app | \
-  jq -r '.[0].NetworkSettings.IPAddress'
-
-# Variáveis de ambiente
-docker inspect meu-app | \
-  jq '.[0].Config.Env'
-
-# Mounts/Volumes
-docker inspect meu-app | \
-  jq '.[0].Mounts'
-
-# Port bindings
-docker inspect meu-app | \
-  jq '.[0].NetworkSettings.Ports'
-
-# Restart count
-docker inspect meu-app | \
-  jq '.[0].RestartCount'</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tabela Resumo -->
-        <div class="topic-block">
-          <h3>Resumo: Checklist de Produção</h3>
-          <div class="command-card wide">
-            <div class="options-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Área</th>
-                    <th>Prática</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>Imagem</td><td>Multi-stage build, Alpine, tag específica (nunca :latest)</td></tr>
-                  <tr><td>Segurança</td><td>Non-root user, --read-only, --cap-drop ALL, scan de vulnerabilidades</td></tr>
-                  <tr><td>Recursos</td><td>Limites de CPU e memória definidos (deploy.resources.limits)</td></tr>
-                  <tr><td>Healthcheck</td><td>Endpoint /health, interval 30s, retries 3</td></tr>
-                  <tr><td>Logging</td><td>Driver json-file com max-size e max-file configurados</td></tr>
-                  <tr><td>Restart</td><td>restart: unless-stopped para serviços críticos</td></tr>
-                  <tr><td>Registry</td><td>Imagens versionadas no registry privado (ECR/GCR/ACR)</td></tr>
-                  <tr><td>CI/CD</td><td>Build automatizado, scan, push e deploy via pipeline</td></tr>
-                  <tr><td>Backup</td><td>Volumes com backup regular, named volumes para dados</td></tr>
-                  <tr><td>Cleanup</td><td>Prune agendado, monitorar docker system df</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: DOCKER SWARM -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Swarm</span>
+          <h2>Docker Swarm (Overview)</h2>
+          <p>Docker Swarm é o orquestrador nativo do Docker. É significativamente mais simples que Kubernetes e ideal para equipes que precisam de HA e rolling updates sem a complexidade do K8s.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Conceitos Fundamentais do Swarm</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Swarm — Arquitetura e conceitos</code><span class="cmd-tag">Conceitos</span></div>
+              <pre><code># DOCKER SWARM — CONCEITOS
+# ════════════════════════════════════════
+#
+# ARQUITETURA:
+# ┌────────────────────────────────────┐
+# │         SWARM CLUSTER              │
+# │                                    │
+# │  ┌─────────┐  ┌─────────┐         │
+# │  │ Manager │  │ Manager │ (Raft)   │
+# │  │  (líder)│  │(follower)│         │
+# │  └────┬────┘  └────┬────┘         │
+# │       │             │              │
+# │  ┌────┴────┐  ┌────┴────┐         │
+# │  │ Worker  │  │ Worker  │         │
+# │  │ node 1  │  │ node 2  │         │
+# │  └─────────┘  └─────────┘         │
+# └────────────────────────────────────┘
+#
+# CONCEITOS:
+# • Node: máquina no cluster (manager/worker)
+# • Service: definição do que rodar (imagem, replicas)
+# • Task: instância de um container rodando
+# • Stack: grupo de services (como compose)
+# • Overlay network: rede entre hosts
+#
+# INICIALIZAR SWARM:
+docker swarm init --advertise-addr 192.168.1.10
+# → Gera token para workers entrarem
+
+# ADICIONAR WORKER:
+docker swarm join --token SWMTKN-1-xxx 192.168.1.10:2377
+
+# VER NODES:
+docker node ls
+# ID   HOSTNAME   STATUS  AVAILABILITY  MANAGER
+# *    manager1   Ready   Active        Leader
+#      worker1    Ready   Active
+#      worker2    Ready   Active</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Services, Replicas e Updates</code><span class="cmd-tag">Operação</span></div>
+              <pre><code># SERVICES NO SWARM
+# ════════════════════════════════════════
+
+# CRIAR SERVICE COM RÉPLICAS:
+docker service create \
+  --name api \
+  --replicas 3 \
+  --publish 80:3000 \
+  --update-delay 10s \
+  --update-parallelism 1 \
+  --rollback-parallelism 1 \
+  --rollback-monitor 30s \
+  minha-api:1.0
+
+# VER SERVICES:
+docker service ls
+# ID    NAME  REPLICAS  IMAGE
+# abc   api   3/3       minha-api:1.0
+
+# VER TASKS (containers):
+docker service ps api
+# Mostra em qual node cada réplica roda
+
+# ROLLING UPDATE (zero downtime):
+docker service update \
+  --image minha-api:1.1 \
+  api
+# Atualiza 1 container por vez
+# Espera 10s entre cada um
+# Se falhar, faz rollback automático!
+
+# ROLLBACK MANUAL:
+docker service rollback api
+
+# SCALE:
+docker service scale api=5
+# Agora são 5 réplicas distribuídas
+
+# SECRETS NO SWARM:
+echo "senha123" | docker secret create db_pass -
+docker service update \
+  --secret-add db_pass \
+  api
+
+# DEPLOY VIA STACK (compose file):
+docker stack deploy -c docker-compose.yml myapp
+docker stack services myapp
+docker stack rm myapp</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Quando usar Swarm:</strong> Se você precisa de 2-5 servidores com HA, rolling updates e service discovery, Swarm é perfeito. A migração de Docker Compose para Swarm é trivial (mesmo arquivo YAML + seção <code>deploy:</code>). Se precisa de auto-scaling, políticas avançadas ou tem 50+ services, migre para Kubernetes.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: PREPARAÇÃO PARA KUBERNETES -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Kubernetes</span>
+          <h2>Preparação para Kubernetes</h2>
+          <p>Kubernetes é o próximo passo depois do Docker. Entender como Docker se conecta ao K8s ajuda na transição e nas decisões arquiteturais que você toma agora.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Como Docker se Conecta ao Kubernetes</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Docker → containerd → K8s</code><span class="cmd-tag">Arquitetura</span></div>
+              <pre><code># EVOLUÇÃO: DOCKER → KUBERNETES
+# ════════════════════════════════════════
+#
+# ANTIGAMENTE (K8s < 1.24):
+# K8s usava Docker como container runtime
+# kubectl → kubelet → dockershim → Docker → containerd
+#
+# HOJE (K8s >= 1.24):
+# K8s usa containerd DIRETAMENTE
+# kubectl → kubelet → CRI → containerd
+#
+# O QUE MUDOU:
+# • dockershim foi REMOVIDO do K8s
+# • Docker NÃO é mais necessário nos nodes
+# • containerd roda containers diretamente
+# • Suas IMAGENS Docker continuam funcionando!
+#
+# CRI — Container Runtime Interface:
+# É a API padrão que K8s usa para:
+# • Criar/deletar containers
+# • Pull de imagens
+# • Gerenciar lifecycle
+#
+# RUNTIMES COMPATÍVEIS COM CRI:
+# • containerd (padrão, usado pelo Docker)
+# • CRI-O (Red Hat/OpenShift)
+# • gVisor (sandbox, mais seguro)
+# • Kata Containers (micro-VMs)
+#
+# CONCLUSÃO:
+# Tudo que você aprende com Docker
+# (Dockerfile, images, compose patterns)
+# se aplica diretamente em K8s!
+# A diferença é COMO você faz o deploy
+# (kubectl vs docker compose)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Compose → Kubernetes (mapeamento)</code><span class="cmd-tag">Migração</span></div>
+              <pre><code># MAPEAMENTO: COMPOSE → KUBERNETES
+# ════════════════════════════════════════
+#
+# DOCKER COMPOSE        →  KUBERNETES
+# ─────────────────────────────────────
+# docker-compose.yml    →  Deployment + Service YAML
+# service               →  Pod + Deployment
+# ports                 →  Service (ClusterIP/LoadBalancer)
+# volumes               →  PersistentVolumeClaim (PVC)
+# networks              →  NetworkPolicy
+# environment           →  ConfigMap / Secret
+# secrets               →  K8s Secret
+# healthcheck           →  livenessProbe / readinessProbe
+# deploy.replicas       →  spec.replicas
+# deploy.resources      →  resources.limits
+# restart: always       →  restartPolicy: Always
+# depends_on            →  InitContainers
+#
+# FERRAMENTA DE CONVERSÃO:
+# Kompose converte compose → K8s manifests:
+kompose convert -f docker-compose.yml
+# Gera: deployment.yaml, service.yaml, pvc.yaml
+#
+# ⚠️ NÃO É PERFEITO:
+# • Gera manifests básicos
+# • Precisa ajustar para produção
+# • Use como ponto de partida
+#
+# BOAS PRÁTICAS DOCKER QUE FACILITAM K8s:
+# ✅ Imagens pequenas e otimizadas
+# ✅ Healthchecks definidos
+# ✅ Logs em stdout/stderr
+# ✅ Config via env vars
+# ✅ Stateless (estado em volumes/DB)
+# ✅ Graceful shutdown (SIGTERM)</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 O mais importante:</strong> Se você seguiu boas práticas Docker (imagens mínimas, non-root, healthchecks, logs em stdout, config via env), a migração para Kubernetes é principalmente sobre aprender os manifests YAML — seus containers já estão prontos.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: PERFORMANCE EM PRODUÇÃO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Performance</span>
+          <h2>Performance em Produção</h2>
+          <p>Containers em produção precisam de resource limits, storage drivers otimizados e logging controlado. Sem limites, um container com memory leak pode derrubar todo o host.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Resource Limits — CPU e Memória</h3>
+          <p>SEMPRE defina limites de recursos em produção. Um container sem limites pode consumir TUDO do host:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Memory Limits</code><span class="cmd-tag">RAM</span></div>
+              <pre><code># MEMORY LIMITS
+# ════════════════════════════════════════
+
+# Docker run:
+docker run -d \
+  --memory=512m \
+  --memory-swap=512m \
+  --memory-reservation=256m \
+  minha-app
+
+# Docker Compose:
+services:
+  api:
+    image: minha-api
+    deploy:
+      resources:
+        limits:
+          memory: 512M    # Máximo absoluto
+        reservations:
+          memory: 256M    # Garantido
+
+# O QUE ACONTECE SEM LIMITE:
+# Container com memory leak → consome toda RAM
+# → Linux OOM Killer mata processos
+# → Pode matar outros containers ou o Docker!
+
+# O QUE ACONTECE COM LIMITE:
+# Container excede 512M → OOM Kill APENAS dele
+# → Docker reinicia (restart: unless-stopped)
+# → Outros containers não são afetados
+
+# MONITORAR USO:
+docker stats --no-stream
+# CONTAINER  CPU%  MEM USAGE/LIMIT  NET I/O
+# api        5%    287MB/512MB       10MB/5MB
+
+# DICAS:
+# • memory-swap = memory → Sem swap (melhor perf)
+# • reservation → Mínimo garantido pelo scheduler
+# • Monitore por 1 semana antes de definir limites
+# • Alertar quando > 80% do limite</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CPU Limits</code><span class="cmd-tag">CPU</span></div>
+              <pre><code># CPU LIMITS
+# ════════════════════════════════════════
+
+# Docker run:
+docker run -d \
+  --cpus=1.5 \
+  --cpu-shares=1024 \
+  minha-app
+
+# Docker Compose:
+services:
+  api:
+    image: minha-api
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"     # Máximo 1.5 cores
+        reservations:
+          cpus: "0.5"     # Garantido 0.5 core
+
+# ENTENDENDO OS PARÂMETROS:
+#
+# --cpus=1.5
+# → Pode usar no máximo 1.5 CPU cores
+# → Em host com 4 cores: usa até 37.5%
+#
+# --cpu-shares=1024 (relativo)
+# → Peso relativo quando há competição
+# → Default: 1024
+# → 512 = metade da prioridade
+# → 2048 = dobro da prioridade
+# → SÓ importa quando CPU está 100%
+#
+# --cpuset-cpus="0,1"
+# → Pina container nos cores 0 e 1
+# → Útil para workloads NUMA-aware
+
+# COMBINAÇÃO RECOMENDADA PARA PRODUÇÃO:
+services:
+  api:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+
+# DICA: Defina SEMPRE memory limit.
+# CPU limit é menos crítico (não mata o host),
+# mas evita que um container monopolize CPU.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Storage Drivers e Logging Rotation</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Storage Drivers e otimização de disco</code><span class="cmd-tag">Storage</span></div>
+              <pre><code># STORAGE DRIVERS DO DOCKER
+# ════════════════════════════════════════════════════════════════
+
+# VER DRIVER ATUAL:
+docker info | grep "Storage Driver"
+# Storage Driver: overlay2  ← Padrão e recomendado
+
+# OVERLAY2 — O PADRÃO RECOMENDADO:
+# • Melhor performance geral
+# • Suportado em todos os kernels modernos
+# • Copy-on-write eficiente
+# • Funciona com ext4 e xfs
+
+# CONFIGURAÇÃO OTIMIZADA (/etc/docker/daemon.json):
+{
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3",
+    "compress": "true"
+  },
+  "default-ulimits": {
+    "nofile": {
+      "Name": "nofile",
+      "Hard": 65536,
+      "Soft": 65536
+    }
+  },
+  "max-concurrent-downloads": 10,
+  "max-concurrent-uploads": 5
+}
+
+# LOGGING ROTATION — PREVENIR DISCO CHEIO:
+# ──────────────────────────────────────────
+# SEM rotation: um container pode gerar 100GB+ de logs!
+# COM rotation: máximo 30MB por container (10m × 3 files)
+
+# LIMPAR ESPAÇO EM DISCO:
+docker system prune -a --volumes  # ⚠️ Remove TUDO não-usado
+docker image prune -a             # Remove imagens sem container
+docker volume prune               # Remove volumes não-usados
+docker builder prune              # Remove build cache
+
+# VER USO DE DISCO:
+docker system df
+# TYPE          TOTAL  ACTIVE  SIZE     RECLAIMABLE
+# Images        15     5       5.2GB    3.1GB (59%)
+# Containers    5      5       120MB    0B
+# Volumes       8      5       2.1GB    800MB
+# Build Cache   25     0       1.5GB    1.5GB</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: DISASTER RECOVERY -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">DR</span>
+          <h2>Disaster Recovery</h2>
+          <p>O que acontece quando seu servidor morre? Quando o disco corrompe? Quando alguém deleta o volume do banco? Um plano de disaster recovery garante que você pode recuperar rapidamente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Backup Strategy para Containers</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Backup de Volumes</code><span class="cmd-tag">Dados</span></div>
+              <pre><code># BACKUP DE VOLUMES DOCKER
+# ════════════════════════════════════════
+
+# MÉTODO 1: Container temporário com tar
+docker run --rm \
+  -v meu-volume:/source:ro \
+  -v $(pwd)/backups:/backup \
+  alpine tar czf /backup/vol-$(date +%Y%m%d).tar.gz \
+  -C /source .
+
+# MÉTODO 2: Backup de PostgreSQL (dump)
+docker exec postgres \
+  pg_dump -U app -d mydb \
+  | gzip > backup-$(date +%Y%m%d).sql.gz
+
+# MÉTODO 3: Backup com docker compose
+# backup.sh:
+#!/bin/bash
+BACKUP_DIR="/backups/$(date +%Y%m%d)"
+mkdir -p $BACKUP_DIR
+
+# Parar app (consistência)
+docker compose stop api
+
+# Backup do volume de dados
+docker run --rm \
+  -v myapp_db-data:/source:ro \
+  -v $BACKUP_DIR:/backup \
+  alpine tar czf /backup/db-data.tar.gz \
+  -C /source .
+
+# Backup do compose file e configs
+cp docker-compose.yml $BACKUP_DIR/
+cp -r configs/ $BACKUP_DIR/
+cp .env $BACKUP_DIR/
+
+# Restart
+docker compose start api
+
+echo "Backup concluído: $BACKUP_DIR"
+
+# CRON para backup diário:
+# 0 3 * * * /app/backup.sh >> /var/log/backup.log 2>&1</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Registry e Infra as Code</code><span class="cmd-tag">Imutável</span></div>
+              <pre><code># IMAGE REGISTRY — Seu "backup" de imagens
+# ════════════════════════════════════════
+
+# NUNCA dependa de rebuild para recuperar!
+# Se o registry está OK, você pode redeploy
+# em minutos em qualquer host.
+
+# BOAS PRÁTICAS DE REGISTRY:
+# ✅ Registry privado com redundância
+# ✅ Retention policy (manter últimas 30 tags)
+# ✅ Geo-replication (DR em outra região)
+# ✅ Tag imutáveis (não sobrescrever tags)
+
+# INFRA AS CODE — Recuperação do ambiente:
+# ════════════════════════════════════════
+# Tudo que define seu ambiente deve estar em Git:
+meu-projeto/
+├── docker-compose.yml      # Stack definition
+├── docker-compose.prod.yml # Production overrides
+├── Dockerfile              # Build da app
+├── .env.example            # Template de env vars
+├── nginx/                  # Configs do proxy
+├── prometheus/             # Configs de monitoring
+├── scripts/
+│   ├── backup.sh           # Script de backup
+│   ├── restore.sh          # Script de restore
+│   └── deploy.sh           # Script de deploy
+└── docs/
+    └── runbook.md          # Procedimentos de DR
+
+# RESTORE COMPLETO:
+# 1. Provisionar novo servidor
+# 2. Instalar Docker
+# 3. git clone do repo
+# 4. Restaurar volumes do backup
+# 5. docker compose up -d
+# 6. Verificar healthchecks
+# Tempo estimado: 15-30 minutos
+
+# TESTE DE DR:
+# Execute restore em servidor separado
+# pelo menos 1x por trimestre!
+# Backup que não foi testado = não existe.</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Regra do 3-2-1:</strong> 3 cópias dos dados, em 2 tipos de mídia diferentes, com 1 cópia offsite (outra região/cloud). Para Docker: volume local + backup em S3 + registry geo-replicado.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 9: CHECKLIST DE PRODUÇÃO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Checklist</span>
+          <h2>Checklist de Produção</h2>
+          <p>Antes de colocar sua stack Docker em produção, valide cada item desta lista. São 15 verificações que cobrem segurança, performance, observabilidade e resiliência.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Top 15 Items Antes de Ir para Produção</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>1. Resource Limits</h4>
+              <p>TODOS os containers têm <code>memory</code> e <code>cpus</code> limits definidos. Sem exceção. Um container sem limite pode derrubar o host inteiro.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>2. Healthchecks</h4>
+              <p>Cada service tem healthcheck configurado com interval, timeout, retries e start_period adequados ao tempo de startup.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>3. Logging Rotation</h4>
+              <p>Log driver configurado com <code>max-size</code> e <code>max-file</code>. Sem rotation = disco cheio em dias de alto tráfego.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>4. Restart Policy</h4>
+              <p>Todos os services usam <code>restart: unless-stopped</code> ou <code>restart: always</code>. Containers devem se recuperar automaticamente.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>5. Non-Root</h4>
+              <p>Nenhum container roda como root. USER definido no Dockerfile ou via <code>user:</code> no compose. Validado com <code>whoami</code>.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>6. Imagens Pinadas</h4>
+              <p>Todas as imagens usam tag exata ou digest SHA256. Zero uso de <code>:latest</code> em produção. Builds são reproduzíveis.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>7. Secrets Protegidos</h4>
+              <p>Nenhuma senha ou token em variáveis de ambiente visíveis. Use Docker Secrets, Vault, ou secrets manager da cloud.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>8. Scan de CVEs</h4>
+              <p>Pipeline falha em CVEs CRITICAL. Scan executado em cada build. Imagens base atualizadas regularmente (mensal).</p>
+            </div>
+            <div class="checklist-card">
+              <h4>9. Backup Automatizado</h4>
+              <p>Volumes de dados (DB, uploads) com backup diário automatizado. Restore testado pelo menos trimestralmente.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>10. Monitoramento</h4>
+              <p>Métricas de CPU, RAM, disco e rede coletadas. Dashboards configurados. Alertas para thresholds críticos.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>11. Logging Centralizado</h4>
+              <p>Logs de todos os containers agregados em sistema central (Loki, ELK, CloudWatch). Pesquisáveis e com retenção definida.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>12. Network Isolation</h4>
+              <p>Services internos (DB, cache) em redes <code>internal: true</code>. Apenas reverse proxy com porta exposta ao público.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>13. CI/CD Pipeline</h4>
+              <p>Deploy automatizado via pipeline. Sem SSH manual para produção. Rollback documentado e testado.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>14. TLS/HTTPS</h4>
+              <p>Todo tráfego externo via HTTPS. Certificados automáticos (Let's Encrypt via Traefik/Certbot). HSTS habilitado.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>15. Documentação (Runbook)</h4>
+              <p>Runbook com: como fazer deploy, rollback, restore de backup, troubleshooting comum, contatos de emergência.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Validação Rápida — Script de Verificação</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Script de validação pré-produção</code><span class="cmd-tag">Automação</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# SCRIPT: Verificação pré-produção
+# Salvar como: scripts/pre-prod-check.sh
+# ════════════════════════════════════════════════════════════════
+#!/bin/bash
+set -e
+
+echo "🔍 Verificação Pré-Produção Docker"
+echo "════════════════════════════════════"
+PASS=0; FAIL=0
+
+check() {
+  if eval "$2" > /dev/null 2>&1; then
+    echo "  ✅ $1"; ((PASS++))
+  else
+    echo "  ❌ $1"; ((FAIL++))
+  fi
+}
+
+echo ""
+echo "📦 Containers:"
+check "Todos rodando" "[ $(docker compose ps --status running -q | wc -l) -eq $(docker compose ps -q | wc -l) ]"
+check "Todos healthy" "! docker compose ps | grep -q 'unhealthy'"
+check "Nenhum como root" "! docker compose exec -T api whoami | grep -q root"
+
+echo ""
+echo "🔒 Segurança:"
+check "Sem :latest" "! grep -q ':latest' docker-compose.yml"
+check "Sem senhas em ENV" "! grep -qi 'password=' docker-compose.yml"
+check "Rede interna existe" "grep -q 'internal: true' docker-compose.yml"
+
+echo ""
+echo "📊 Recursos:"
+check "Memory limits definidos" "grep -q 'memory:' docker-compose.yml"
+check "Log rotation configurado" "grep -q 'max-size' docker-compose.yml"
+check "Healthcheck definido" "grep -q 'healthcheck:' docker-compose.yml"
+
+echo ""
+echo "💾 Backup:"
+check "Script de backup existe" "[ -f scripts/backup.sh ]"
+check "Último backup < 24h" "find /backups -name '*.tar.gz' -mtime -1 | grep -q ."
+
+echo ""
+echo "════════════════════════════════════"
+echo "Resultado: ✅ $PASS passed, ❌ $FAIL failed"
+[ $FAIL -eq 0 ] && echo "🎉 Pronto para produção!" || echo "⚠️ Corrija os itens acima antes do deploy."
+exit $FAIL</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 10: EXERCÍCIOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Pratique operações reais de produção Docker. Estes exercícios simulam cenários que você enfrentará ao operar containers em ambientes reais.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Logging Centralizado com Loki</h3>
+          <p>Objetivo: Configurar coleta e visualização centralizada de logs de múltiplos containers.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 1 — Logging Centralizado</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 1: LOGGING CENTRALIZADO COM LOKI + GRAFANA
+# ════════════════════════════════════════════════════════════════
+
+# CENÁRIO: Você tem 3 services (api, worker, nginx) e precisa
+# centralizar os logs para pesquisa e alertas.
+
+# REQUISITOS:
+# 1. Stack de aplicação: api + worker + nginx
+#    - api: Express.js que loga em JSON para stdout
+#    - worker: processo background com logs
+#    - nginx: reverse proxy (access logs)
+#
+# 2. Stack de logging: Loki + Promtail + Grafana
+#    - Promtail coleta logs de /var/lib/docker/containers/
+#    - Loki armazena e indexa
+#    - Grafana visualiza com dashboards
+#
+# 3. Todos os services com logging rotation:
+#    - max-size: 10m
+#    - max-file: 3
+#
+# 4. Labels nos containers para filtrar no Grafana:
+#    - app=minha-app
+#    - environment=production
+#    - service=api|worker|nginx
+
+# PASSOS:
+# 1. Criar docker-compose.yml com app stack
+# 2. Criar docker-compose.logging.yml com Loki stack
+# 3. Criar promtail-config.yml
+# 4. Subir tudo: docker compose -f docker-compose.yml -f docker-compose.logging.yml up -d
+# 5. Acessar Grafana (localhost:3000)
+# 6. Adicionar Loki como data source (http://loki:3100)
+# 7. Criar dashboard com logs de cada service
+
+# DICA: Usar Docker plugin do Loki é mais fácil que Promtail:
+docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+
+# Então no compose:
+services:
+  api:
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-external-labels: "app=minha-app,service=api"
+
+# VALIDAÇÃO:
+# ✅ Grafana mostra logs dos 3 services
+# ✅ Filtro por service funciona ({service="api"})
+# ✅ Filtro por tempo funciona (last 1h, 6h, 24h)
+# ✅ Busca por texto funciona (|= "error")
+# ✅ Log rotation está ativo (max-size configurado)
+# ✅ Logs antigos (> 7 dias) são removidos automaticamente</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Pipeline CI/CD Completo</h3>
+          <p>Objetivo: Criar um pipeline que builda, testa, escaneia e deploya automaticamente.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 2 — CI/CD Pipeline</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 2: PIPELINE CI/CD COM DOCKER
+# ════════════════════════════════════════════════════════════════
+
+# CENÁRIO: Configurar pipeline completo no GitHub Actions
+# que builda, testa, escaneia e deploya automaticamente.
+
+# REQUISITOS DO PIPELINE:
+# 1. Trigger: push na branch main + tags v*
+# 2. Job "test":
+#    - Rodar testes com docker compose (compose de teste)
+#    - docker compose -f docker-compose.test.yml up --exit-code-from tests
+#
+# 3. Job "build" (depende de test):
+#    - Build com Docker Buildx (multi-platform amd64+arm64)
+#    - Cache com GitHub Actions cache
+#    - Tag com semver + sha
+#    - Push para GitHub Container Registry (ghcr.io)
+#
+# 4. Job "scan" (depende de build):
+#    - Trivy scan da imagem buildada
+#    - Falhar em CRITICAL
+#    - Upload SARIF para GitHub Security
+#
+# 5. Job "deploy" (depende de scan, apenas main):
+#    - SSH para servidor de produção
+#    - docker compose pull
+#    - docker compose up -d
+#    - Verificar healthcheck
+#    - Notificar Slack (sucesso/falha)
+
+# ARQUIVOS A CRIAR:
+# .github/workflows/docker-ci.yml  ← Pipeline
+# docker-compose.test.yml          ← Stack de teste
+# docker-compose.prod.yml          ← Stack de produção
+# Dockerfile                       ← Multi-stage build
+
+# docker-compose.test.yml:
+services:
+  tests:
+    build:
+      context: .
+      target: test    # Stage de teste no Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://test:test@db:5432/testdb
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+# VALIDAÇÃO:
+# ✅ Push na main dispara pipeline automaticamente
+# ✅ Testes rodam em containers isolados
+# ✅ Build usa cache (2a execução mais rápida)
+# ✅ Scan de CVEs bloqueia deploy se CRITICAL
+# ✅ Deploy automático após scan passar
+# ✅ Rollback funciona (mudar tag no compose + redeploy)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Deploy com Rolling Update</h3>
+          <p>Objetivo: Implementar deploy sem downtime usando Docker Swarm ou script customizado.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 3 — Rolling Update</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 3: DEPLOY COM ROLLING UPDATE (ZERO DOWNTIME)
+# ════════════════════════════════════════════════════════════════
+
+# CENÁRIO: Deploy de nova versão sem que usuários percebam.
+# Escolha uma das abordagens:
+
+# ── OPÇÃO A: Docker Swarm Rolling Update ─────────────────────
+
+# 1. Inicializar Swarm:
+docker swarm init
+
+# 2. Deploy da stack:
+docker stack deploy -c docker-compose.yml myapp
+
+# 3. docker-compose.yml com deploy config:
+services:
+  api:
+    image: minha-api:1.0
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1        # 1 container por vez
+        delay: 10s            # Espera 10s entre cada
+        failure_action: rollback
+        monitor: 30s          # Monitora 30s após update
+        max_failure_ratio: 0.3
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+# 4. Rolling update:
+docker service update --image minha-api:1.1 myapp_api
+# Observe: 1 réplica atualizada por vez, com 10s entre cada
+
+# ── OPÇÃO B: Script de Rolling Update (sem Swarm) ────────────
+
+# Para Docker Compose single-host:
+# blue-green-deploy.sh:
+#!/bin/bash
+NEW_IMAGE=$1
+SERVICE="api"
+COMPOSE_FILE="docker-compose.yml"
+
+echo "🚀 Deploying $NEW_IMAGE..."
+
+# 1. Pull nova imagem
+docker compose pull $SERVICE
+
+# 2. Scale up (2 instâncias: old + new)
+docker compose up -d --no-deps --scale $SERVICE=2 $SERVICE
+
+# 3. Esperar novo container ficar healthy
+echo "Aguardando healthcheck..."
+sleep 30
+
+# 4. Verificar se novo está healthy
+if docker compose ps $SERVICE | grep -q "healthy"; then
+  echo "✅ Novo container healthy"
+  # 5. Scale down para 1 (remove o antigo)
+  docker compose up -d --no-deps --scale $SERVICE=1 $SERVICE
+  echo "🎉 Deploy concluído!"
+else
+  echo "❌ Novo container unhealthy - rollback!"
+  docker compose up -d --no-deps --scale $SERVICE=1 $SERVICE
+  exit 1
+fi
+
+# VALIDAÇÃO:
+# ✅ Durante o deploy, o service continua respondendo
+# ✅ curl em loop mostra 0 erros durante update
+# ✅ Se novo container falha healthcheck, rollback automático
+# ✅ Após deploy, apenas containers da versão nova estão rodando
+# ✅ docker service ps (Swarm) mostra histórico de updates</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🎯 Objetivo final:</strong> Ao completar os 3 exercícios, você terá experiência prática com os três pilares da operação Docker em produção: observabilidade (logging centralizado), automação (CI/CD pipeline) e disponibilidade (rolling updates sem downtime). Isso é o que empresas esperam de um profissional DevOps.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Parabéns! Você Completou o Curso de Docker</h3>
+          <div class="info-box">
+            <strong>🎉 Curso completo!</strong> — Você percorreu toda a jornada Docker: desde conceitos básicos (Módulo 01), passando por imagens (02), volumes (03), redes (04), Docker Compose (05), segurança (06) e agora produção (07). Você tem o conhecimento necessário para construir, proteger e operar containers em ambientes profissionais. O próximo passo natural é <strong>Kubernetes</strong> — onde você orquestra containers em escala.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-06.html" class="button secondary">← Módulo Anterior</a>
-        <a href="../docker.html" class="button primary">Voltar ao Curso →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Curso Completo</span>
+          <h2>Parabéns por completar o curso Docker!</h2>
+          <p>Você dominou Docker do zero à produção. Continue sua jornada explorando Kubernetes, Terraform e outras trilhas disponíveis na plataforma.</p>
+        </div>
+        <a href="../docker.html" class="button primary">← Voltar ao Curso</a>
       </div>
     </section>
   </main>
