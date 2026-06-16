@@ -25,7 +25,10 @@
 .topic-block h3{font-size:1.3rem;font-weight:700;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--gray-200)}
 
 /* Command Grid */
-.command-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+/* Command Grid */
+.command-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:1024px){.command-grid{grid-template-columns:repeat(2,1fr)}}
+.command-card.wide{grid-column:1/-1}
 .command-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:22px;transition:all 0.3s;overflow:hidden}
 .command-card:hover{border-color:rgba(99,102,241,0.25);box-shadow:0 8px 30px rgba(99,102,241,0.08)}
 .command-card.wide{grid-column:1/-1}
