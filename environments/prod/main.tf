@@ -58,13 +58,8 @@ module "s3_static_site" {
   cloudfront_distribution_arn = module.cloudfront.cloudfront_distribution_arn
 }
 
-module "cloudtrail" {
-  source = "../../modules/cloudtrail"
-
-  project_name      = var.project_name
-  environment       = var.environment
-  target_bucket_arn = module.s3_static_site.bucket_arn
-}
+# module "cloudtrail" removido — gerava custo alto de S3 ($5+/mês)
+# Monitoramento de acessos agora via CloudFront metrics (custo zero)
 
 module "download_metrics" {
   source = "../../modules/download_metrics"
