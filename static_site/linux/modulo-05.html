@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Linux Módulo 05: Automação, Monitoramento e Troubleshooting</title>
+  <title>CloudTrilhas — Linux Módulo 05: Profissional — Automação e Administração</title>
+  <meta name="description" content="Guia completo sobre monitoramento, gerenciamento de discos, LVM, shell scripting avançado, segurança, automação e performance tuning no Linux." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,22 +18,17 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-04.html" class="nav-link">← Anterior</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -40,170 +36,1835 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐧 Linux — Módulo 05</span>
-        <h1>Profissional: Automação, Monitoramento e Troubleshooting</h1>
-        <p>Ferramentas de performance, análise de logs, Docker, segurança e automação de nível profissional.</p>
+        <h1>Profissional: Automação e Administração</h1>
+        <p>Domine monitoramento de sistemas, gerenciamento de discos, scripting avançado, segurança, automação e tuning de performance para administração Linux de nível profissional.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Iniciante</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Básico</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Intermediário</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Avançado</small></a>
+        <a href="modulo-05.html" class="progress-node active"><span>05</span><small>Profissional</small></a>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 1: MONITORAMENTO DO SISTEMA -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Monitoramento</span>
+          <h2>Monitoramento do Sistema</h2>
+          <p>Monitorar recursos (CPU, memória, disco, I/O) é fundamental para identificar gargalos, prever problemas e manter servidores saudáveis. Estas ferramentas são o "painel de controle" do sysadmin.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Monitoramento de Performance</h3>
+          <h3>Memória e CPU</h3>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>vmstat / iostat</code><span class="cmd-tag">Performance</span></div>
-              <pre><code>vmstat 2          # a cada 2s
-iostat -x 2       # I/O detalhado
-# %util > 80% = gargalo de disco</code></pre>
+              <div class="command-header"><code>free — Uso de memória</code><span class="cmd-tag">RAM</span></div>
+              <pre><code># Memória em formato legível:
+free -h
+#               total   used   free   shared  buff/cache  available
+# Mem:          16Gi   4.2Gi  8.1Gi  256Mi   3.7Gi       11Gi
+# Swap:         4.0Gi  0B     4.0Gi
+
+# Explicação dos campos:
+# total     = RAM física total
+# used      = em uso por processos
+# free      = completamente livre
+# shared    = memória compartilhada (tmpfs)
+# buff/cache = buffers do kernel + cache de disco
+# available = disponível para novos processos
+#             (free + cache que pode ser liberado)
+
+# ⚠️ "available" é o número que importa, NÃO "free"!
+# Linux usa RAM livre como cache — isso é NORMAL.
+
+# Atualizar a cada 2 segundos:
+watch -n 2 free -h
+
+# Em megabytes:
+free -m
+
+# Total (sem detalhamento):
+free -h --total
+
+# Apenas uma linha resumida:
+free -h | awk '/Mem:/{printf "RAM: %s/%s (available: %s)\n", $3, $2, $7}'</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>lsof</code><span class="cmd-tag">Diagnóstico</span></div>
-              <pre><code>lsof -i :80       # quem usa porta 80
-lsof -u joao      # arquivos do user
-lsof -p 1234      # arquivos do PID</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>tcpdump</code><span class="cmd-tag">Rede</span></div>
-              <pre><code>sudo tcpdump -i eth0 port 80
-sudo tcpdump -i any -c 100
-sudo tcpdump -w captura.pcap</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>dmesg</code><span class="cmd-tag">Kernel</span></div>
-              <pre><code>dmesg -T | grep -i error
-dmesg -w  # tempo real</code></pre>
+              <div class="command-header"><code>vmstat — Estatísticas de VM</code><span class="cmd-tag">vmstat</span></div>
+              <pre><code># Snapshot atual:
+vmstat
+# procs --------memory--------- --swap-- ---io--- -system-- ------cpu-----
+#  r  b  swpd   free   buff  cache  si  so  bi  bo  in  cs us sy id wa st
+#  1  0  0    8345612 234512 3876544  0   0   5  12 150 300  3  1 95  1  0
+
+# Campos importantes:
+# r  = processos esperando CPU (run queue)
+# b  = processos bloqueados (waiting I/O)
+# si/so = swap in/out (deve ser 0 em produção!)
+# bi/bo = block I/O in/out (disco)
+# us = % CPU user space
+# sy = % CPU kernel
+# id = % CPU idle
+# wa = % CPU waiting I/O (gargalo de disco!)
+
+# Monitorar a cada 1 segundo, 10 amostras:
+vmstat 1 10
+
+# Com timestamps:
+vmstat -t 1
+
+# Estatísticas de disco:
+vmstat -d
+
+# Resumo desde o boot:
+vmstat -s
+
+# Alerta: se wa > 20%, há gargalo de I/O
+# Alerta: se r > num_cpus, há gargalo de CPU
+# Alerta: se si/so > 0 constantemente, precisa mais RAM</code></pre>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Troubleshooting — Checklists</h3>
-          <div class="checklist-grid">
-            <div class="checklist-card">
-              <h4>🌐 Servidor não responde</h4>
-              <ol>
-                <li><code>ip link show</code> — interface UP?</li>
-                <li><code>ping gateway</code> — conectividade local?</li>
-                <li><code>nslookup</code> — DNS funciona?</li>
-                <li><code>ip route show</code> — rotas OK?</li>
-                <li><code>ufw status</code> — firewall bloqueando?</li>
-                <li><code>ss -tuln</code> — serviço escutando?</li>
-              </ol>
-            </div>
-            <div class="checklist-card">
-              <h4>🐌 Servidor lento</h4>
-              <ol>
-                <li><code>uptime</code> — load average</li>
-                <li><code>top</code> — CPU/memória</li>
-                <li><code>iostat -x 2</code> — disco</li>
-                <li><code>free -h</code> — swap em uso?</li>
-                <li><code>ps aux --sort=-%cpu | head</code></li>
-                <li><code>iotop</code> — I/O por processo</li>
-              </ol>
-            </div>
-            <div class="checklist-card">
-              <h4>💾 Disco cheio</h4>
-              <ol>
-                <li><code>df -h</code> — uso geral</li>
-                <li><code>du -sh /* | sort -rh | head</code></li>
-                <li><code>find / -size +100M</code></li>
-                <li><code>du -sh /var/log/*</code></li>
-                <li><code>sudo apt clean</code></li>
-                <li><code>df -i</code> — inodes</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>3. Docker Essencial</h3>
-          <div class="command-card wide">
-            <div class="command-header"><code>Docker</code><span class="cmd-tag">Containers</span></div>
-            <pre><code># Imagens e Containers
-docker pull nginx
-docker run -d --name web -p 8080:80 nginx
-docker ps                    # containers rodando
-docker ps -a                 # todos
-docker exec -it web bash     # shell dentro do container
-docker logs -f web           # logs em tempo real
-docker stop web && docker rm web
-
-# Docker Compose
-docker compose up -d         # inicia serviços
-docker compose down          # para tudo
-docker compose logs -f       # logs
-
-# Limpeza
-docker system prune -a       # remove tudo não usado</code></pre>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>4. Segurança do Servidor</h3>
+          <h3>Disco e I/O</h3>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>SSH Hardening</code><span class="cmd-tag">Segurança</span></div>
-              <pre><code># /etc/ssh/sshd_config
-PermitRootLogin no
-PasswordAuthentication no
-Port 2222
-MaxAuthTries 3
-AllowUsers deploy admin</code></pre>
+              <div class="command-header"><code>df — Espaço em disco</code><span class="cmd-tag">Disco</span></div>
+              <pre><code># Uso de disco por filesystem:
+df -h
+# Filesystem      Size  Used  Avail  Use%  Mounted on
+# /dev/sda1       50G   32G   16G    68%   /
+# /dev/sdb1       200G  150G  40G    79%   /data
+# tmpfs           8.0G  256M  7.8G   4%    /dev/shm
+
+# Filtrar tipo de filesystem:
+df -hT                    # mostra tipo (ext4, xfs...)
+df -h --type=ext4         # apenas ext4
+df -h --exclude-type=tmpfs
+
+# Inodes (pode acabar antes do espaço!):
+df -i
+# Se inodes = 100%, não pode criar mais arquivos
+# mesmo com espaço em disco disponível
+
+# Apenas um filesystem:
+df -h /home
+df -h /var
+
+# Em formato de bloco (scripting):
+df --output=source,fstype,size,used,avail,pcent,target
+
+# Monitorar com watch:
+watch -n 5 'df -h | grep -v tmpfs'
+
+# Alerta: partição acima de 80%:
+df -h | awk '+$5 > 80 {print "ALERTA:", $0}'</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Fail2ban</code><span class="cmd-tag">Proteção</span></div>
-              <pre><code>sudo apt install fail2ban
-sudo systemctl enable --now fail2ban
+              <div class="command-header"><code>du — Uso por diretório</code><span class="cmd-tag">Diretórios</span></div>
+              <pre><code># Tamanho de um diretório:
+du -sh /var/log
+# 2.3G    /var/log
+
+# Top 10 maiores diretórios:
+du -h --max-depth=1 /var | sort -rh | head -10
+
+# Maiores arquivos no sistema:
+find / -type f -size +100M -exec ls -lh {} \; 2>/dev/null | \
+  sort -k5 -rh | head -20
+
+# Tamanho de cada subdiretório:
+du -sh /var/*/
+# 1.5G   /var/log/
+# 800M   /var/cache/
+# 200M   /var/lib/
+
+# Excluir padrões:
+du -sh --exclude="*.log" /opt/app/
+
+# Tamanho total de arquivos por extensão:
+find /var/log -name "*.log" -exec du -ch {} + | tail -1
+
+# ncdu — ferramenta interativa (recomendado!):
+sudo apt install ncdu
+ncdu /var              # navegar visualmente
+ncdu -x /             # apenas filesystem local
+
+# Comparar uso ao longo do tempo:
+du -sb /var/log > /tmp/disk-$(date +%H).txt</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>iostat, sar e dmesg</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>iostat — I/O do disco</code><span class="cmd-tag">I/O</span></div>
+              <pre><code># Instalar:
+sudo apt install sysstat
+
+# Estatísticas de I/O:
+iostat
+iostat -x              # formato estendido (mais detalhes)
+iostat -xh 1           # atualizar a cada 1s, human-readable
+
+# Campos importantes do iostat -x:
+# %util   = utilização do disco (>80% = gargalo)
+# await   = tempo médio de espera por I/O (ms)
+# r/s     = reads per second
+# w/s     = writes per second
+# rkB/s   = kilobytes lidos por segundo
+# wkB/s   = kilobytes escritos por segundo
+
+# Apenas um disco:
+iostat -x /dev/sda 1
+
+# sar — System Activity Reporter (histórico):
+sar -u 1 5             # CPU, 1s intervalo, 5 amostras
+sar -r 1 5             # memória
+sar -d 1 5             # disco
+sar -n DEV 1 5         # rede
+
+# Histórico (dados coletados pelo sysstat):
+sar -u -f /var/log/sysstat/sa15   # CPU do dia 15
+
+# Habilitar coleta histórica:
+sudo systemctl enable --now sysstat</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>dmesg e /proc</code><span class="cmd-tag">Kernel</span></div>
+              <pre><code># dmesg — Mensagens do kernel:
+dmesg                    # todas as mensagens
+dmesg -T                 # com timestamps legíveis
+dmesg --level=err        # apenas erros
+dmesg --level=warn,err   # warnings e erros
+dmesg -w                 # follow (tempo real)
+dmesg | tail -30         # últimas 30 linhas
+
+# Cenários comuns no dmesg:
+dmesg | grep -i "error\|fail\|warn"
+dmesg | grep -i "oom"      # Out of Memory killer
+dmesg | grep -i "usb"      # dispositivos USB
+dmesg | grep -i "disk\|sda" # problemas de disco
+
+# /proc — Filesystem virtual do kernel:
+cat /proc/cpuinfo        # informações da CPU
+cat /proc/meminfo        # detalhes da memória
+cat /proc/version        # versão do kernel
+cat /proc/uptime         # tempo de atividade
+cat /proc/loadavg        # load average
+
+# /proc/[PID] — Info por processo:
+ls /proc/1234/           # info do PID 1234
+cat /proc/1234/status    # status do processo
+cat /proc/1234/cmdline   # comando que iniciou
+ls -la /proc/1234/fd/    # file descriptors abertos
+
+# /sys — Configurações do kernel (runtime):
+cat /sys/block/sda/queue/scheduler
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+# lscpu — Resumo da CPU:
+lscpu
+# Architecture: x86_64, CPUs: 8, Model: Intel i7...</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>📊 Checklist de monitoramento rápido:</strong>
+            <pre><code># Script de health check rápido:
+echo "=== LOAD ===" && uptime
+echo "=== CPU ===" && mpstat 1 1 2>/dev/null || vmstat 1 2 | tail -1
+echo "=== MEM ===" && free -h | grep Mem
+echo "=== DISK ===" && df -h | grep -v tmpfs | awk '+$5 > 70'
+echo "=== TOP PROCS ===" && ps aux --sort=-%mem | head -6</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: LOG MANAGEMENT -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Logs</span>
+          <h2>Gerenciamento de Logs</h2>
+          <p>Logs são a principal ferramenta de diagnóstico em servidores. Saber onde ficam, como rotacioná-los e como centralizar é essencial para qualquer administrador.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Syslog e journald</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Estrutura de logs no Linux</code><span class="cmd-tag">syslog</span></div>
+              <pre><code># Diretório principal de logs:
+ls /var/log/
+# auth.log      → autenticação (login, sudo, SSH)
+# syslog        → mensagens gerais do sistema
+# kern.log      → mensagens do kernel
+# dpkg.log      → instalações de pacotes
+# apt/          → logs do apt
+# nginx/        → logs do Nginx
+# mysql/        → logs do MySQL
+# journal/      → dados binários do journald
+
+# Ler logs em tempo real:
+tail -f /var/log/syslog
+tail -f /var/log/auth.log
+
+# Múltiplos logs simultâneos:
+tail -f /var/log/syslog /var/log/auth.log
+
+# Buscar por padrão:
+grep "Failed password" /var/log/auth.log
+grep "error" /var/log/syslog | tail -20
+
+# rsyslog — daemon de logs (config):
+cat /etc/rsyslog.conf
+# Regras: facility.priority  destino
+# auth.*           /var/log/auth.log
+# kern.*           /var/log/kern.log
+# *.emerg          :omusrmsg:*
+
+# Facilities: auth, kern, mail, cron, daemon, user, local0-7
+# Priorities: emerg, alert, crit, err, warning, notice, info, debug
+
+# Enviar mensagem para syslog (de scripts):
+logger "Backup concluído com sucesso"
+logger -p local0.info -t meu-app "Mensagem customizada"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>journald — Logs estruturados</code><span class="cmd-tag">journald</span></div>
+              <pre><code># journald é o sistema de logs do systemd
+# Vantagens: estruturado, indexado, comprimido, metadata
+
+# Configuração: /etc/systemd/journald.conf
+[Journal]
+Storage=persistent         # auto, volatile, persistent, none
+Compress=yes
+SystemMaxUse=2G            # máximo em disco
+SystemMaxFileSize=100M     # máximo por arquivo
+MaxRetentionSec=30day      # retenção máxima
+ForwardToSyslog=yes        # encaminhar para rsyslog
+
+# Aplicar mudanças:
+sudo systemctl restart systemd-journald
+
+# journald vs rsyslog:
+# journald: logs binários, estruturados, do systemd
+# rsyslog:  logs texto, flexível, rede
+# Ambos podem coexistir (ForwardToSyslog=yes)
+
+# Uso de disco do journal:
+journalctl --disk-usage
+# Archived and active journals take up 1.2G
+
+# Limpar logs antigos:
+sudo journalctl --vacuum-time=7d
+sudo journalctl --vacuum-size=500M
+sudo journalctl --vacuum-files=5
+
+# Verificar integridade:
+journalctl --verify</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>logrotate — Rotação de logs</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>logrotate — Configuração e exemplos</code><span class="cmd-tag">Rotação</span></div>
+              <pre><code># logrotate previne que logs cresçam infinitamente
+# Rotaciona, comprime e remove logs antigos automaticamente
+
+# Configuração global:
+cat /etc/logrotate.conf
+
+# Configurações por aplicação:
+ls /etc/logrotate.d/
+# nginx, apt, dpkg, syslog, mysql, ...
+
+# Exemplo: /etc/logrotate.d/minha-app
+/var/log/minha-app/*.log {
+    daily                   # rotacionar diariamente (weekly, monthly)
+    rotate 14               # manter 14 arquivos rotacionados
+    compress                # comprimir com gzip
+    delaycompress           # comprimir apenas a partir do 2º arquivo
+    missingok               # não dar erro se log não existir
+    notifempty              # não rotacionar se arquivo vazio
+    create 0640 appuser appgroup  # permissões do novo arquivo
+    sharedscripts           # executar scripts uma vez (não por arquivo)
+    
+    postrotate
+        # Comando executado APÓS rotação:
+        systemctl reload minha-app > /dev/null 2>&1 || true
+    endscript
+    
+    prerotate
+        # Comando executado ANTES da rotação:
+        echo "Iniciando rotação em $(date)" >> /var/log/logrotate-audit.log
+    endscript
+}
+
+# Exemplo para Nginx:
+/var/log/nginx/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        [ -f /var/run/nginx.pid ] && kill -USR1 $(cat /var/run/nginx.pid)
+    endscript
+}
+
+# Testar configuração (dry-run):
+sudo logrotate -d /etc/logrotate.d/minha-app
+
+# Forçar rotação manual:
+sudo logrotate -f /etc/logrotate.d/minha-app
+
+# logrotate é executado via cron:
+cat /etc/cron.daily/logrotate</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Centralização de logs (introdução):</strong> Em ambientes com múltiplos servidores, centralize logs usando: <strong>rsyslog</strong> (envio via rede), <strong>Elasticsearch + Kibana</strong> (ELK stack), <strong>Grafana Loki</strong>, ou <strong>CloudWatch Logs</strong> (AWS). Isso permite correlacionar eventos e debugar problemas distribuídos.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: GERENCIAMENTO DE DISCO -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Disco</span>
+          <h2>Gerenciamento de Disco</h2>
+          <p>Particionar discos, criar filesystems e gerenciar volumes é uma habilidade crítica para sysadmins. LVM adiciona flexibilidade permitindo redimensionar partições sem downtime.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Particionamento e formatação</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>fdisk/parted — Particionar disco</code><span class="cmd-tag">Partição</span></div>
+              <pre><code># Listar discos e partições:
+sudo fdisk -l
+sudo lsblk
+# NAME   MAJ:MIN RM   SIZE TYPE MOUNTPOINT
+# sda      8:0    0    50G  disk
+# ├─sda1   8:1    0    49G  part /
+# └─sda2   8:2    0     1G  part [SWAP]
+# sdb      8:0    0   100G  disk
+
+# Informações do disco:
+sudo fdisk -l /dev/sdb
+sudo parted /dev/sdb print
+
+# Particionar com fdisk (interativo):
+sudo fdisk /dev/sdb
+# Comandos: n=nova, d=deletar, p=print, w=write, q=quit
+
+# Particionar com parted (GPT, discos > 2TB):
+sudo parted /dev/sdb
+# (parted) mklabel gpt
+# (parted) mkpart primary ext4 0% 50%
+# (parted) mkpart primary ext4 50% 100%
+# (parted) print
+# (parted) quit
+
+# Parted não-interativo:
+sudo parted -s /dev/sdb mklabel gpt
+sudo parted -s /dev/sdb mkpart primary ext4 0% 100%
+
+# Verificar partições após criar:
+sudo partprobe /dev/sdb    # informar kernel
+lsblk /dev/sdb</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>mkfs e mount — Formatar e montar</code><span class="cmd-tag">Filesystem</span></div>
+              <pre><code># Formatar partição (CUIDADO: apaga dados!):
+sudo mkfs.ext4 /dev/sdb1           # ext4 (padrão Linux)
+sudo mkfs.xfs /dev/sdb1            # XFS (alta performance)
+sudo mkfs.btrfs /dev/sdb1          # Btrfs (snapshots)
+
+# Com label:
+sudo mkfs.ext4 -L "dados" /dev/sdb1
+
+# Montar filesystem:
+sudo mkdir -p /mnt/dados
+sudo mount /dev/sdb1 /mnt/dados
+
+# Verificar montagem:
+mount | grep sdb1
+df -h /mnt/dados
+
+# Desmontar:
+sudo umount /mnt/dados
+# Se "busy":
+sudo umount -l /mnt/dados    # lazy unmount
+# Ou encontrar quem está usando:
+sudo lsof +D /mnt/dados
+sudo fuser -mv /mnt/dados
+
+# Montar com opções:
+sudo mount -o noexec,nosuid /dev/sdb1 /mnt/dados
+sudo mount -o ro /dev/sdb1 /mnt/readonly
+
+# Montar por UUID (mais confiável):
+sudo blkid /dev/sdb1
+# /dev/sdb1: UUID="abc123..." TYPE="ext4"
+sudo mount UUID="abc123..." /mnt/dados
+
+# Verificar filesystem:
+sudo fsck /dev/sdb1        # ⚠️ apenas com partition desmontada!
+sudo e2fsck -f /dev/sdb1   # ext4 específico</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>fstab — Montagem automática no boot</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>/etc/fstab — Persistir montagens</code><span class="cmd-tag">fstab</span></div>
+              <pre><code># /etc/fstab define o que montar automaticamente no boot
+# ⚠️ ERRO no fstab pode impedir o sistema de iniciar!
+# SEMPRE use UUID em vez de /dev/sdX (pode mudar!)
+
+# Formato:
+# &lt;device&gt;        &lt;mountpoint&gt;  &lt;type&gt;  &lt;options&gt;        &lt;dump&gt; &lt;pass&gt;
+UUID=abc123...   /mnt/dados    ext4    defaults         0      2
+UUID=def456...   /mnt/backup   xfs     defaults,noexec  0      2
+UUID=ghi789...   none          swap    sw               0      0
+
+# Campos:
+# device    = UUID (ou /dev/sdX, mas UUID é mais seguro)
+# mountpoint = onde montar
+# type      = ext4, xfs, swap, nfs, etc.
+# options   = defaults, noexec, nosuid, ro, noatime, etc.
+# dump      = 0 (não fazer backup com dump)
+# pass      = 0=não checar, 1=root, 2=outros (ordem de fsck)
+
+# Opções comuns:
+# defaults   = rw, suid, dev, exec, auto, nouser, async
+# noexec     = não permitir executar binários
+# nosuid     = ignorar bit SUID
+# noatime    = não atualizar access time (performance!)
+# ro         = read-only
+# nofail     = não falhar boot se device não existir
+
+# Workflow seguro para adicionar ao fstab:
+# 1. Obter UUID:
+sudo blkid /dev/sdb1
+
+# 2. Fazer backup do fstab:
+sudo cp /etc/fstab /etc/fstab.bak
+
+# 3. Adicionar linha:
+echo 'UUID=abc123... /mnt/dados ext4 defaults,noatime 0 2' | sudo tee -a /etc/fstab
+
+# 4. Testar ANTES de reiniciar:
+sudo mount -a           # monta tudo do fstab
+# Se não der erro, está seguro!
+
+# 5. Verificar:
+df -h /mnt/dados</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>LVM — Logical Volume Manager</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>LVM — Conceitos e criação</code><span class="cmd-tag">LVM Create</span></div>
+              <pre><code># LVM permite:
+# - Redimensionar partições sem downtime
+# - Combinar múltiplos discos em um volume
+# - Snapshots para backup consistente
+
+# Hierarquia LVM:
+# Physical Volumes (PV) → /dev/sdb, /dev/sdc
+#   Volume Group (VG) → vg-dados
+#     Logical Volumes (LV) → lv-app, lv-logs
+
+# Instalar:
+sudo apt install lvm2
+
+# 1. Criar Physical Volumes:
+sudo pvcreate /dev/sdb /dev/sdc
+sudo pvs         # listar PVs
+sudo pvdisplay   # detalhes
+
+# 2. Criar Volume Group:
+sudo vgcreate vg-dados /dev/sdb /dev/sdc
+sudo vgs         # listar VGs
+sudo vgdisplay   # detalhes
+
+# 3. Criar Logical Volumes:
+sudo lvcreate -L 50G -n lv-app vg-dados
+sudo lvcreate -L 30G -n lv-logs vg-dados
+sudo lvcreate -l 100%FREE -n lv-backup vg-dados  # todo espaço restante
+sudo lvs         # listar LVs
+
+# 4. Formatar e montar:
+sudo mkfs.ext4 /dev/vg-dados/lv-app
+sudo mkdir -p /opt/app
+sudo mount /dev/vg-dados/lv-app /opt/app
+
+# 5. Adicionar ao fstab:
+echo '/dev/vg-dados/lv-app /opt/app ext4 defaults 0 2' | sudo tee -a /etc/fstab</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>LVM — Expandir e gerenciar</code><span class="cmd-tag">LVM Manage</span></div>
+              <pre><code># === EXPANDIR VOLUME (principal vantagem do LVM!) ===
+
+# Expandir LV em 20GB:
+sudo lvextend -L +20G /dev/vg-dados/lv-app
+
+# Expandir para usar todo espaço livre do VG:
+sudo lvextend -l +100%FREE /dev/vg-dados/lv-app
+
+# Expandir o filesystem (ONLINE, sem downtime!):
+sudo resize2fs /dev/vg-dados/lv-app    # ext4
+sudo xfs_growfs /opt/app               # XFS
+
+# Tudo em um comando:
+sudo lvextend -L +20G --resizefs /dev/vg-dados/lv-app
+
+# === ADICIONAR DISCO AO VG ===
+sudo pvcreate /dev/sdd
+sudo vgextend vg-dados /dev/sdd
+# Agora tem mais espaço para expandir LVs!
+
+# === SNAPSHOTS ===
+# Criar snapshot (backup consistente):
+sudo lvcreate -L 10G -s -n snap-app /dev/vg-dados/lv-app
+
+# Montar snapshot (read-only para backup):
+sudo mount -o ro /dev/vg-dados/snap-app /mnt/snapshot
+
+# Restaurar snapshot:
+sudo lvconvert --merge /dev/vg-dados/snap-app
+
+# Remover snapshot:
+sudo lvremove /dev/vg-dados/snap-app
+
+# === MONITORAR ===
+sudo pvs      # physical volumes
+sudo vgs      # volume groups  
+sudo lvs      # logical volumes
+sudo vgdisplay vg-dados   # espaço livre no VG</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Por que usar LVM em servidores?</strong>
+            <ul style="margin-top:8px;padding-left:20px">
+              <li>Expandir <code>/var/log</code> quando enche — sem downtime</li>
+              <li>Adicionar discos extras e expandir volumes existentes</li>
+              <li>Snapshots antes de atualizações arriscadas</li>
+              <li>Migrar dados entre discos sem interrupção</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: SHELL SCRIPTING AVANÇADO -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Scripting</span>
+          <h2>Shell Scripting Avançado</h2>
+          <p>Domine recursos avançados do Bash: arrays, traps, debugging, getopts e heredocs para criar scripts robustos e profissionais de automação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Arrays e Arrays Associativos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Arrays indexados</code><span class="cmd-tag">Arrays</span></div>
+              <pre><code>#!/bin/bash
+# Array simples (indexado por número):
+servers=("web1" "web2" "web3" "db1")
+
+# Acessar elementos:
+echo "${servers[0]}"       # web1 (primeiro)
+echo "${servers[2]}"       # web3 (terceiro)
+echo "${servers[-1]}"      # db1 (último)
+
+# Todos os elementos:
+echo "${servers[@]}"       # web1 web2 web3 db1
+echo "${servers[*]}"       # web1 web2 web3 db1
+
+# Número de elementos:
+echo "${#servers[@]}"      # 4
+
+# Adicionar elemento:
+servers+=("db2")
+
+# Remover elemento:
+unset servers[1]           # remove web2
+
+# Slice (subarray):
+echo "${servers[@]:1:2}"   # web2 web3 (do index 1, 2 elementos)
+
+# Iterar:
+for server in "${servers[@]}"; do
+    echo "Checking $server..."
+    ssh "$server" "uptime" 2>/dev/null || echo "  FALHOU!"
+done
+
+# Array a partir de comando:
+log_files=($(find /var/log -name "*.log" -mtime -1))
+echo "Encontrados ${#log_files[@]} logs recentes"
+
+# Array de linhas de um arquivo:
+mapfile -t lines < /etc/hosts
+echo "Hosts file tem ${#lines[@]} linhas"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Arrays associativos (hash/dict)</code><span class="cmd-tag">Associativo</span></div>
+              <pre><code>#!/bin/bash
+# Declarar array associativo (Bash 4+):
+declare -A config
+
+# Atribuir valores:
+config[host]="192.168.1.100"
+config[port]="5432"
+config[user]="postgres"
+config[database]="production"
+
+# Acessar:
+echo "Conectando em ${config[host]}:${config[port]}"
+
+# Todas as chaves:
+echo "${!config[@]}"    # host port user database
+
+# Todos os valores:
+echo "${config[@]}"
+
+# Iterar por chave/valor:
+for key in "${!config[@]}"; do
+    echo "$key = ${config[$key]}"
+done
+
+# Verificar se chave existe:
+if [[ -v config[host] ]]; then
+    echo "Host configurado: ${config[host]}"
+fi
+
+# Caso prático — status de servidores:
+declare -A server_status
+servers=("web1" "web2" "db1")
+for srv in "${servers[@]}"; do
+    if ping -c 1 -W 1 "$srv" &>/dev/null; then
+        server_status[$srv]="UP"
+    else
+        server_status[$srv]="DOWN"
+    fi
+done
+
+# Relatório:
+for srv in "${!server_status[@]}"; do
+    printf "%-10s %s\n" "$srv" "${server_status[$srv]}"
+done</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>trap, debugging e getopts</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>trap — Capturar sinais</code><span class="cmd-tag">Sinais</span></div>
+              <pre><code>#!/bin/bash
+# trap executa comando quando o script recebe um sinal
+
+# Limpar arquivos temporários ao sair:
+TMPFILE=$(mktemp)
+trap "rm -f $TMPFILE; echo 'Limpeza concluída'" EXIT
+
+# Capturar Ctrl+C:
+trap "echo 'Interrompido!'; exit 1" INT
+
+# Capturar múltiplos sinais:
+trap "cleanup" EXIT INT TERM
+
+# Função de cleanup:
+cleanup() {
+    echo "Limpando recursos..."
+    rm -f /tmp/meu-app-*.tmp
+    [ -n "$PID" ] && kill "$PID" 2>/dev/null
+}
+
+# Ignorar sinal:
+trap "" HUP    # Ignora SIGHUP (nohup caseiro)
+
+# Restaurar comportamento padrão:
+trap - INT     # restaura Ctrl+C padrão
+
+# Sinais comuns:
+# EXIT (0)  = sempre ao sair do script
+# INT (2)   = Ctrl+C
+# TERM (15) = kill (padrão)
+# HUP (1)   = terminal fechado
+# ERR       = quando um comando falha (set -e)
+
+# Trap com ERR (log de erros):
+trap 'echo "ERRO na linha $LINENO: $BASH_COMMAND" >&2' ERR
+
+# Lock file (evitar execução simultânea):
+LOCKFILE="/tmp/meu-script.lock"
+trap "rm -f $LOCKFILE" EXIT
+if [ -f "$LOCKFILE" ]; then
+    echo "Script já em execução!"
+    exit 1
+fi
+echo $$ > "$LOCKFILE"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Debugging e getopts</code><span class="cmd-tag">Debug</span></div>
+              <pre><code>#!/bin/bash
+# === DEBUGGING ===
+
+# set -x: mostra cada comando antes de executar
+set -x    # ativar
+set +x    # desativar
+
+# Debug apenas de uma seção:
+set -x
+comando_suspeito
+resultado=$(calculo_complexo)
+set +x
+
+# Debug ao executar:
+bash -x meu-script.sh
+
+# set -e: parar no primeiro erro
+set -e
+
+# set -u: erro em variável não definida
+set -u    # ${var_inexistente} → erro
+
+# Combinação recomendada para produção:
+set -euo pipefail
+# -e = exit on error
+# -u = error on undefined variable
+# -o pipefail = pipe retorna erro se qualquer etapa falhar
+
+# === GETOPTS — Parsing de argumentos ===
+#!/bin/bash
+usage() {
+    echo "Uso: $0 [-v] [-f arquivo] [-n numero] [-h]"
+    exit 1
+}
+
+verbose=false
+file=""
+count=1
+
+while getopts "vf:n:h" opt; do
+    case $opt in
+        v) verbose=true ;;
+        f) file="$OPTARG" ;;
+        n) count="$OPTARG" ;;
+        h) usage ;;
+        ?) usage ;;
+    esac
+done
+shift $((OPTIND - 1))   # remover flags processadas
+
+# $@ agora contém argumentos não-flag
+echo "Verbose: $verbose"
+echo "File: $file"
+echo "Count: $count"
+echo "Remaining args: $@"
+
+# Uso:
+# ./script.sh -v -f dados.txt -n 5 extra_arg</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Heredoc e técnicas avançadas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Heredoc, funções e padrões</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code>#!/bin/bash
+# === HEREDOC — Texto multi-linha em scripts ===
+
+# Heredoc básico (com expansão de variáveis):
+HOST="meuservidor"
+cat << EOF
+Conectando ao servidor: $HOST
+Data: $(date)
+Usuário: $USER
+EOF
+
+# Heredoc sem expansão (aspas no delimitador):
+cat << 'EOF'
+Isso é literal: $HOME não será expandido
+Nem $(comandos)
+EOF
+
+# Heredoc para criar arquivo:
+cat > /tmp/config.yml << EOF
+server:
+  host: ${HOST}
+  port: 8080
+  workers: $(nproc)
+EOF
+
+# Heredoc com indentação (<<- remove tabs iniciais):
+function gerar_html() {
+	cat <<- EOF
+		<html>
+		  <body>
+		    <h1>Status: $1</h1>
+		  </body>
+		</html>
+	EOF
+}
+
+# === FUNÇÕES AVANÇADAS ===
+
+# Função com retorno de string:
+get_ip() {
+    local interface="${1:-eth0}"
+    ip -4 addr show "$interface" 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}'
+}
+my_ip=$(get_ip ens33)
+
+# Função com validação:
+require_root() {
+    if [[ $EUID -ne 0 ]]; then
+        echo "Este script requer root. Use sudo." >&2
+        exit 1
+    fi
+}
+
+# Retry pattern:
+retry() {
+    local max_attempts="${1:-3}"
+    local delay="${2:-5}"
+    shift 2
+    local cmd="$@"
+    
+    for ((i=1; i<=max_attempts; i++)); do
+        echo "Tentativa $i/$max_attempts: $cmd"
+        if eval "$cmd"; then
+            return 0
+        fi
+        [ $i -lt $max_attempts ] && sleep "$delay"
+    done
+    echo "FALHOU após $max_attempts tentativas" >&2
+    return 1
+}
+
+# Uso:
+retry 3 5 curl -sf http://api.example.com/health</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: AUTOMAÇÃO -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Automação</span>
+          <h2>Ferramentas de Automação</h2>
+          <p>Da automação com scripts e cron até ferramentas de configuration management como Ansible — entenda como profissionais gerenciam centenas de servidores de forma consistente e repetível.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Ansible — Conceitos fundamentais</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Ansible — O que é e como funciona</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code># Ansible = Automação de configuração e deploy
+# Características:
+# - Agentless (não instala nada nos servidores)
+# - Usa SSH para conectar
+# - Idempotente (rodar N vezes = mesmo resultado)
+# - Declarativo (descreve estado desejado)
+# - YAML para configurações
+
+# Instalar:
+sudo apt install ansible
+# ou
+pip install ansible
+
+# Inventário (lista de servidores):
+# /etc/ansible/hosts ou inventory.ini
+[webservers]
+web1 ansible_host=192.168.1.10
+web2 ansible_host=192.168.1.11
+
+[databases]
+db1 ansible_host=192.168.1.20 ansible_user=admin
+
+[all:vars]
+ansible_user=deploy
+ansible_ssh_private_key_file=~/.ssh/deploy-key
+
+# Comandos ad-hoc:
+ansible all -m ping                  # testar conexão
+ansible webservers -m shell -a "uptime"
+ansible databases -m service -a "name=postgresql state=restarted"
+ansible all -m apt -a "name=nginx state=present" --become</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Ansible — Playbook básico</code><span class="cmd-tag">Playbook</span></div>
+              <pre><code># Playbook = arquivo YAML com tarefas
+# deploy-web.yml:
+---
+- name: Configurar servidor web
+  hosts: webservers
+  become: yes          # executar como root
+  
+  vars:
+    app_port: 8080
+    app_user: webapp
+
+  tasks:
+    - name: Instalar pacotes
+      apt:
+        name:
+          - nginx
+          - python3
+          - python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Criar usuário da aplicação
+      user:
+        name: "{{ app_user }}"
+        shell: /bin/bash
+        create_home: yes
+
+    - name: Copiar configuração do Nginx
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/sites-available/app
+      notify: Restart Nginx
+
+    - name: Iniciar e habilitar Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+# Executar:
+ansible-playbook -i inventory.ini deploy-web.yml
+ansible-playbook deploy-web.yml --check  # dry-run</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Padrões de automação com scripts</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Cron + Scripts — Padrões comuns</code><span class="cmd-tag">Padrões</span></div>
+              <pre><code>#!/bin/bash
+# === PADRÃO: Script com lock file ===
+set -euo pipefail
+LOCKFILE="/var/run/$(basename $0).lock"
+exec 200>"$LOCKFILE"
+flock -n 200 || { echo "Já em execução"; exit 1; }
+
+# === PADRÃO: Log estruturado ===
+LOG="/var/log/automacao.log"
+log() {
+    local level="$1"; shift
+    echo "[$(date '+%F %T')] [$level] $*" >> "$LOG"
+}
+log INFO "Script iniciado"
+log ERROR "Algo falhou"
+
+# === PADRÃO: Notificação em falha ===
+notify_error() {
+    local msg="$1"
+    # Slack webhook:
+    curl -s -X POST "$SLACK_WEBHOOK" \
+        -H 'Content-type: application/json' \
+        -d "{\"text\":\"🚨 ERRO: $msg\"}" >/dev/null
+}
+trap 'notify_error "Script falhou na linha $LINENO"' ERR
+
+# === PADRÃO: Health check periódico ===
+check_service() {
+    local service="$1"
+    if ! systemctl is-active --quiet "$service"; then
+        log WARN "$service down, reiniciando..."
+        systemctl restart "$service"
+        notify_error "$service foi reiniciado automaticamente"
+    fi
+}
+
+# Agendar: */5 * * * * /opt/scripts/healthcheck.sh</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>CI/CD — Conceitos básicos</code><span class="cmd-tag">CI/CD</span></div>
+              <pre><code># CI/CD = Continuous Integration / Continuous Delivery
+
+# Pipeline típico:
+# 1. Developer faz push no Git
+# 2. CI server detecta mudança
+# 3. Roda testes automatizados
+# 4. Faz build da aplicação
+# 5. Deploy automático (CD)
+
+# Ferramentas populares:
+# - GitHub Actions (mais popular para open source)
+# - GitLab CI/CD
+# - Jenkins (self-hosted)
+# - AWS CodePipeline
+
+# Exemplo GitHub Actions (.github/workflows/deploy.yml):
+# name: Deploy
+# on:
+#   push:
+#     branches: [main]
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - run: npm install
+#       - run: npm test
+#       - run: npm run build
+#       - name: Deploy to server
+#         run: |
+#           rsync -avz ./dist/ user@server:/var/www/app/
+
+# O Linux é a BASE de todo CI/CD:
+# - Containers rodam em Linux
+# - Build servers são Linux
+# - Scripts de deploy são shell scripts
+# - Docker images usam Linux
+
+# Conceitos chave:
+# Idempotência: rodar N vezes = mesmo resultado
+# Infraestrutura como código: configs no Git
+# Imutabilidade: não modifica, substitui</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6: SEGURANÇA -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Segurança</span>
+          <h2>Security Hardening</h2>
+          <p>Hardening é o processo de reduzir a superfície de ataque de um servidor. Cada camada de proteção dificulta a vida de atacantes — da configuração SSH até auditoria de sistema.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>fail2ban — Proteção contra brute-force</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>fail2ban — Instalar e configurar</code><span class="cmd-tag">fail2ban</span></div>
+              <pre><code># Instalar:
+sudo apt install fail2ban
+
+# Nunca edite jail.conf diretamente!
+# Criar override local:
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+# Ou melhor, criar arquivo de override:
+sudo cat > /etc/fail2ban/jail.local << 'EOF'
+[DEFAULT]
+bantime = 3600          # ban por 1 hora (segundos)
+findtime = 600          # janela de observação (10 min)
+maxretry = 5            # máximo de tentativas
+banaction = ufw         # usar UFW para banir
+
+# Email de notificação:
+destemail = admin@empresa.com
+sender = fail2ban@servidor.com
+action = %(action_mwl)s  # ban + email com log
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3            # ban após 3 tentativas SSH
+
+[nginx-http-auth]
+enabled = true
+port = http,https
+filter = nginx-http-auth
+logpath = /var/log/nginx/error.log
+maxretry = 5
+
+[nginx-limit-req]
+enabled = true
+port = http,https
+filter = nginx-limit-req
+logpath = /var/log/nginx/error.log
+maxretry = 10
+EOF
+
+# Iniciar e habilitar:
+sudo systemctl enable --now fail2ban</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>fail2ban — Gerenciamento</code><span class="cmd-tag">Gerenciar</span></div>
+              <pre><code># Status geral:
+sudo fail2ban-client status
+# |- Number of jail: 3
+# `- Jail list: sshd, nginx-http-auth, nginx-limit-req
+
+# Status de uma jail:
 sudo fail2ban-client status sshd
-# Bane IPs após 3 tentativas</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Auditoria</code><span class="cmd-tag">Segurança</span></div>
-              <pre><code>find / -perm -4000 -type f  # SUID
-find / -perm -777 -type f  # 777 (inseguro)
-last -10                   # últimos logins
-lastb -10                  # logins falhados</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>tmux</code><span class="cmd-tag">Produtividade</span></div>
-              <pre><code>tmux new -s deploy    # nova sessão
-tmux ls               # lista sessões
-tmux attach -t deploy # reconecta
-# Ctrl+B, D = desconecta
-# Ctrl+B, % = divide vertical</code></pre>
+# |- Filter
+# |  |- Currently failed: 2
+# |  |- Total failed: 47
+# |  `- File list: /var/log/auth.log
+# `- Actions
+#    |- Currently banned: 3
+#    |- Total banned: 15
+#    `- Banned IP list: 203.0.113.1 198.51.100.2
+
+# Desbanir IP manualmente:
+sudo fail2ban-client set sshd unbanip 203.0.113.1
+
+# Banir IP manualmente:
+sudo fail2ban-client set sshd banip 198.51.100.50
+
+# Recarregar configuração:
+sudo fail2ban-client reload
+
+# Ver log do fail2ban:
+sudo tail -f /var/log/fail2ban.log
+
+# Testar regex de um filtro:
+sudo fail2ban-regex /var/log/auth.log /etc/fail2ban/filter.d/sshd.conf</code></pre>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>5. Comandos Mais Cobrados em Entrevistas</h3>
-          <div class="interview-table">
-            <table>
-              <thead><tr><th>Categoria</th><th>Comandos</th></tr></thead>
+          <h3>SSH Hardening</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>/etc/ssh/sshd_config — Configuração segura</code><span class="cmd-tag">SSH Security</span></div>
+              <pre><code># Editar: sudo nano /etc/ssh/sshd_config
+# Recomendações de segurança:
+
+# Desabilitar login como root:
+PermitRootLogin no
+
+# Apenas autenticação por chave (desabilitar senha):
+PasswordAuthentication no
+PubkeyAuthentication yes
+ChallengeResponseAuthentication no
+
+# Limitar usuários que podem conectar:
+AllowUsers deploy admin
+# ou por grupo:
+AllowGroups ssh-users
+
+# Mudar porta padrão (security through obscurity):
+Port 2222
+# ⚠️ Lembre de atualizar o firewall: ufw allow 2222/tcp
+
+# Timeout e tentativas:
+LoginGraceTime 30              # 30s para completar login
+MaxAuthTries 3                 # máximo 3 tentativas
+MaxSessions 5                  # máximo 5 sessões simultâneas
+MaxStartups 3:50:10            # rate limiting de conexões
+
+# Desabilitar recursos desnecessários:
+X11Forwarding no
+PermitEmptyPasswords no
+AllowAgentForwarding no        # se não precisa de tunneling
+AllowTcpForwarding no          # se não precisa de tunneling
+
+# Algoritmos seguros (remover antigos):
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org
+
+# Banner de aviso legal:
+Banner /etc/ssh/banner.txt
+
+# Aplicar mudanças:
+sudo sshd -t                    # testar config (não reinicia!)
+sudo systemctl restart sshd
+
+# ⚠️ SEMPRE teste em outra sessão SSH antes de fechar a atual!
+# Se errar, pode ficar trancado fora do servidor.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Atualizações automáticas e auditoria</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Unattended Upgrades</code><span class="cmd-tag">Auto-update</span></div>
+              <pre><code># Instalar atualizações automáticas de segurança:
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure unattended-upgrades
+
+# Configuração: /etc/apt/apt.conf.d/50unattended-upgrades
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}-security";
+    "${distro_id}ESMApps:${distro_codename}-apps-security";
+};
+
+# Auto-remover pacotes órfãos:
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+# Email de notificação:
+Unattended-Upgrade::Mail "admin@empresa.com";
+
+# Reiniciar automaticamente se necessário:
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "03:00";
+
+# Verificar agendamento:
+/etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+
+# Testar (dry-run):
+sudo unattended-upgrade --dry-run --debug
+
+# Ver logs:
+cat /var/log/unattended-upgrades/unattended-upgrades.log</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Auditoria básica</code><span class="cmd-tag">Audit</span></div>
+              <pre><code># auditd — Sistema de auditoria do kernel:
+sudo apt install auditd
+sudo systemctl enable --now auditd
+
+# Regras de auditoria:
+# Monitorar alterações em /etc/passwd:
+sudo auditctl -w /etc/passwd -p wa -k passwd_changes
+# -w = watch, -p wa = write+attribute, -k = key
+
+# Monitorar alterações em /etc/ssh/:
+sudo auditctl -w /etc/ssh/ -p wa -k ssh_config
+
+# Monitorar execução de comandos privilegiados:
+sudo auditctl -a always,exit -F arch=b64 -S execve -F euid=0 -k root_commands
+
+# Buscar eventos:
+sudo ausearch -k passwd_changes
+sudo ausearch -k ssh_config --start today
+
+# Relatório:
+sudo aureport --auth        # autenticações
+sudo aureport --login       # logins
+sudo aureport --failed      # falhas
+
+# Regras permanentes: /etc/audit/rules.d/
+# Arquivo: /etc/audit/rules.d/custom.rules
+
+# Outras verificações de segurança:
+# Arquivos com SUID (podem ser explorados):
+find / -perm -4000 -type f 2>/dev/null
+
+# Portas abertas:
+ss -tlnp
+
+# Usuários com UID 0 (root):
+awk -F: '$3==0 {print $1}' /etc/passwd
+
+# Senhas fracas (verificar expiração):
+sudo chage -l usuario</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7: PERFORMANCE TUNING -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Performance</span>
+          <h2>Performance Tuning</h2>
+          <p>Tuning de performance envolve ajustar parâmetros do kernel, limites de processos e configurações de I/O para extrair o máximo do hardware. Cada carga de trabalho tem seu perfil ideal.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>sysctl — Parâmetros do kernel</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>sysctl — Tuning de rede e memória</code><span class="cmd-tag">sysctl</span></div>
+              <pre><code># Ver todos os parâmetros:
+sysctl -a
+
+# Ver valor específico:
+sysctl net.ipv4.ip_forward
+sysctl vm.swappiness
+
+# Alterar em runtime (temporário):
+sudo sysctl -w vm.swappiness=10
+sudo sysctl -w net.core.somaxconn=65535
+
+# Persistir alterações: /etc/sysctl.d/99-tuning.conf
+cat > /etc/sysctl.d/99-tuning.conf << 'EOF'
+# === MEMÓRIA ===
+vm.swappiness = 10                    # reduzir uso de swap (0-100)
+vm.dirty_ratio = 20                   # % RAM suja antes de flush
+vm.dirty_background_ratio = 5         # % RAM suja para flush em background
+vm.overcommit_memory = 0              # heuristic overcommit
+
+# === REDE ===
+net.core.somaxconn = 65535            # backlog de conexões
+net.core.netdev_max_backlog = 5000    # queue de pacotes recebidos
+net.ipv4.tcp_max_syn_backlog = 65535  # SYN queue
+net.ipv4.tcp_tw_reuse = 1            # reusar TIME_WAIT sockets
+net.ipv4.ip_local_port_range = 1024 65535  # range de portas efêmeras
+net.ipv4.tcp_fin_timeout = 30         # timeout de FIN_WAIT
+
+# === SEGURANÇA DE REDE ===
+net.ipv4.tcp_syncookies = 1           # proteção SYN flood
+net.ipv4.conf.all.rp_filter = 1      # anti-spoofing
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# === FILE DESCRIPTORS ===
+fs.file-max = 2097152                 # max FDs do sistema
+fs.inotify.max_user_watches = 524288  # para IDEs/watchers
+EOF
+
+# Aplicar:
+sudo sysctl --system</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ulimits — Limites por processo</code><span class="cmd-tag">ulimit</span></div>
+              <pre><code># Ver limites do usuário atual:
+ulimit -a
+# core file size          (blocks) 0
+# data seg size           (kbytes) unlimited
+# file size               (blocks) unlimited
+# max locked memory       (kbytes) 65536
+# max memory size         (kbytes) unlimited
+# open files                       1024    ← geralmente muito baixo!
+# pipe size            (512 bytes) 8
+# stack size              (kbytes) 8192
+# max user processes               15445
+
+# Alterar temporariamente (sessão atual):
+ulimit -n 65535          # open files
+ulimit -u 30000          # max processes
+
+# Persistir: /etc/security/limits.conf
+# ou /etc/security/limits.d/custom.conf
+
+# Formato: user/group  type  item  value
+*         soft  nofile  65535
+*         hard  nofile  65535
+*         soft  nproc   30000
+*         hard  nproc   30000
+deploy    soft  nofile  131072
+deploy    hard  nofile  131072
+
+# Para serviços systemd, adicionar no unit file:
+# [Service]
+# LimitNOFILE=65535
+# LimitNPROC=30000
+
+# Verificar limites de um processo rodando:
+cat /proc/$(pgrep nginx | head -1)/limits
+
+# ⚠️ Sinais de que precisa aumentar limites:
+# - "Too many open files" no log
+# - Conexões recusadas em alta carga
+# - "Cannot fork" errors</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>I/O Scheduler e Swap</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>I/O Scheduler</code><span class="cmd-tag">Scheduler</span></div>
+              <pre><code># Ver scheduler atual:
+cat /sys/block/sda/queue/scheduler
+# [mq-deadline] kyber bfq none
+
+# Schedulers disponíveis:
+# none      → SSD/NVMe (sem reordenação, hardware faz)
+# mq-deadline → servidores (latência previsível)
+# bfq       → desktops (fairness entre processos)
+# kyber     → SSD de alta performance
+
+# Alterar temporariamente:
+echo "none" | sudo tee /sys/block/sda/queue/scheduler
+
+# Persistir com udev rule:
+# /etc/udev/rules.d/60-scheduler.rules
+ACTION=="add|change", KERNEL=="sd*", ATTR{queue/scheduler}="mq-deadline"
+ACTION=="add|change", KERNEL=="nvme*", ATTR{queue/scheduler}="none"
+
+# Verificar se disco é rotacional (HDD) ou SSD:
+cat /sys/block/sda/queue/rotational
+# 1 = HDD (rotacional)
+# 0 = SSD
+
+# Recomendações:
+# SSD/NVMe → none ou mq-deadline
+# HDD      → mq-deadline (servidores) ou bfq (desktop)
+# VM/Cloud → mq-deadline
+
+# Outros tunings de I/O:
+# Read-ahead (prefetch de disco):
+cat /sys/block/sda/queue/read_ahead_kb
+echo 256 | sudo tee /sys/block/sda/queue/read_ahead_kb
+
+# Queue depth:
+cat /sys/block/sda/queue/nr_requests
+echo 512 | sudo tee /sys/block/sda/queue/nr_requests</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Swap Management</code><span class="cmd-tag">Swap</span></div>
+              <pre><code># Ver uso de swap:
+swapon --show
+free -h | grep Swap
+
+# Verificar swappiness (0-100):
+cat /proc/sys/vm/swappiness
+# 60 = padrão (agressivo para desktop)
+# 10 = melhor para servidores com bastante RAM
+# 1  = usar swap apenas em emergência
+
+# Alterar swappiness:
+sudo sysctl vm.swappiness=10
+
+# === CRIAR SWAP FILE (se não tem partição swap) ===
+
+# 1. Criar arquivo de 4GB:
+sudo fallocate -l 4G /swapfile
+# ou: sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+
+# 2. Permissões:
+sudo chmod 600 /swapfile
+
+# 3. Formatar como swap:
+sudo mkswap /swapfile
+
+# 4. Ativar:
+sudo swapon /swapfile
+
+# 5. Persistir no fstab:
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# === DESATIVAR SWAP (ex: para Kubernetes) ===
+sudo swapoff -a
+# Comentar linha swap no /etc/fstab
+
+# === QUANDO SWAP ESTÁ ALTA ===
+# Verificar quais processos usam swap:
+for pid in /proc/[0-9]*; do
+    [ -f "$pid/status" ] && \
+    awk '/VmSwap/{if($2>0)print FILENAME,$0}' "$pid/status"
+done | sort -k3 -rn | head -10
+
+# Limpar swap (mover de volta para RAM):
+sudo swapoff -a && sudo swapon -a
+# ⚠️ Requer RAM livre suficiente!</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>📋 Checklist de performance por cenário:</strong>
+            <table class="styled-table" style="margin-top:12px">
+              <thead><tr><th>Cenário</th><th>Ajustes prioritários</th></tr></thead>
               <tbody>
-                <tr><td>Navegação</td><td><code>cd, ls, pwd, find, locate</code></td></tr>
-                <tr><td>Arquivos</td><td><code>cp, mv, rm, mkdir, touch, tar</code></td></tr>
-                <tr><td>Texto</td><td><code>cat, grep, sed, awk, cut, sort, uniq</code></td></tr>
-                <tr><td>Permissões</td><td><code>chmod, chown, chgrp</code></td></tr>
-                <tr><td>Processos</td><td><code>ps, top, kill, systemctl, journalctl</code></td></tr>
-                <tr><td>Rede</td><td><code>ip, ss, ping, curl, nmap, tcpdump</code></td></tr>
-                <tr><td>SSH</td><td><code>ssh, scp, rsync, ssh-keygen</code></td></tr>
-                <tr><td>Docker</td><td><code>docker run, ps, exec, compose</code></td></tr>
-                <tr><td>Disco</td><td><code>df, du, mount, lsblk</code></td></tr>
-                <tr><td>Scripting</td><td><code>bash, if, for, while, funções</code></td></tr>
+                <tr><td>Servidor Web (Nginx)</td><td>somaxconn=65535, nofile=65535, swappiness=10, scheduler=none</td></tr>
+                <tr><td>Banco de Dados</td><td>swappiness=1, dirty_ratio=40, hugepages, nofile=131072</td></tr>
+                <tr><td>Container Host (K8s)</td><td>swap off, ip_forward=1, inotify_watches alto, nf_conntrack_max</td></tr>
+                <tr><td>Build Server (CI/CD)</td><td>nofile alto, nproc alto, max_map_count (Elasticsearch)</td></tr>
               </tbody>
             </table>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- SEÇÃO 8: CHECKLIST E EXERCÍCIOS -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Checklist</span>
+          <h2>Checklist de Produção + Exercícios</h2>
+          <p>Antes de colocar um servidor em produção, siga este checklist de segurança e performance. Depois, pratique com os exercícios abaixo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Production Readiness Checklist</h3>
+          <div class="checklist-card">
+            <h4>🔒 Segurança</h4>
+            <ul style="list-style:none;padding:0;margin:12px 0">
+              <li>☐ SSH: autenticação por chave, sem root login, porta alterada</li>
+              <li>☐ Firewall ativo (ufw/iptables), apenas portas necessárias abertas</li>
+              <li>☐ fail2ban configurado para SSH e aplicações web</li>
+              <li>☐ Atualizações automáticas de segurança (unattended-upgrades)</li>
+              <li>☐ Usuário dedicado para aplicação (não root)</li>
+              <li>☐ Permissões mínimas em arquivos sensíveis</li>
+              <li>☐ Auditd para monitorar alterações críticas</li>
+              <li>☐ Sem senhas hardcoded em scripts ou configs</li>
+            </ul>
+
+            <h4>📊 Monitoramento</h4>
+            <ul style="list-style:none;padding:0;margin:12px 0">
+              <li>☐ Monitoramento de CPU, RAM, disco e rede configurado</li>
+              <li>☐ Alertas para disco > 80%, RAM > 90%, CPU > 95%</li>
+              <li>☐ Logs centralizados ou rotacionados (logrotate)</li>
+              <li>☐ Health checks automáticos para serviços críticos</li>
+              <li>☐ Uptime monitoring externo</li>
+            </ul>
+
+            <h4>💾 Backup e Recovery</h4>
+            <ul style="list-style:none;padding:0;margin:12px 0">
+              <li>☐ Backup automatizado (cron + script)</li>
+              <li>☐ Backup testado — consegue restaurar?</li>
+              <li>☐ Retenção definida (7 dias, 30 dias?)</li>
+              <li>☐ Backup offsite (outro servidor ou cloud)</li>
+              <li>☐ Documentação de recovery procedimento</li>
+            </ul>
+
+            <h4>⚡ Performance</h4>
+            <ul style="list-style:none;padding:0;margin:12px 0">
+              <li>☐ sysctl tuning aplicado para carga esperada</li>
+              <li>☐ ulimits configurados (nofile, nproc)</li>
+              <li>☐ Swap configurada (ou desabilitada se K8s)</li>
+              <li>☐ I/O scheduler correto para tipo de disco</li>
+              <li>☐ Serviços desnecessários desabilitados</li>
+            </ul>
+
+            <h4>🔧 Operacional</h4>
+            <ul style="list-style:none;padding:0;margin:12px 0">
+              <li>☐ Timezone correto configurado</li>
+              <li>☐ NTP sincronizado (systemd-timesyncd ou chrony)</li>
+              <li>☐ /etc/fstab correto e testado (mount -a)</li>
+              <li>☐ Hostname descritivo configurado</li>
+              <li>☐ Serviços no systemd com restart automático</li>
+              <li>☐ Documentação de setup e runbooks</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Script de monitoramento completo</h3>
+          <p>Crie um script Bash que coleta CPU, memória, disco e conexões de rede. Se qualquer métrica ultrapassar o threshold (CPU > 90%, RAM available < 10%, Disco > 85%), envie um alerta para um arquivo de log. Use arrays associativos para os thresholds e trap para cleanup.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code>#!/bin/bash
+set -euo pipefail
+
+# Trap para cleanup
+TMPFILE=$(mktemp)
+trap "rm -f $TMPFILE" EXIT
+
+# Configuração com array associativo
+declare -A thresholds
+thresholds[cpu]=90
+thresholds[ram]=90
+thresholds[disk]=85
+
+LOG="/var/log/monitor-alertas.log"
+HOSTNAME=$(hostname)
+
+log_alert() {
+    echo "[$(date '+%F %T')] [$HOSTNAME] ALERTA: $1" | tee -a "$LOG"
+}
+
+# Coletar métricas
+cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print int($2 + $4)}')
+ram_total=$(free -m | awk '/Mem:/{print $2}')
+ram_available=$(free -m | awk '/Mem:/{print $7}')
+ram_percent=$(( (ram_total - ram_available) * 100 / ram_total ))
+disk_usage=$(df -h / | awk 'NR==2{print int($5)}')
+connections=$(ss -tn state established | wc -l)
+
+# Verificar thresholds
+if [ "$cpu_usage" -gt "${thresholds[cpu]}" ]; then
+    log_alert "CPU em ${cpu_usage}% (threshold: ${thresholds[cpu]}%)"
+fi
+
+if [ "$ram_percent" -gt "${thresholds[ram]}" ]; then
+    log_alert "RAM em ${ram_percent}% (available: ${ram_available}MB)"
+fi
+
+if [ "$disk_usage" -gt "${thresholds[disk]}" ]; then
+    log_alert "Disco em ${disk_usage}% (threshold: ${thresholds[disk]}%)"
+fi
+
+# Relatório
+printf "CPU: %d%% | RAM: %d%% (%dMB free) | Disco: %d%% | Conexões: %d\n" \
+    "$cpu_usage" "$ram_percent" "$ram_available" "$disk_usage" "$connections"</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Setup LVM + fstab completo</h3>
+          <p>Dado um novo disco <code>/dev/sdb</code> de 100GB, configure LVM com: Volume Group "vg-app", dois Logical Volumes (lv-data 60GB ext4 em <code>/opt/data</code>, lv-logs 40GB xfs em <code>/var/app-logs</code>). Adicione ao fstab com opção noatime. Demonstre como expandir lv-data em 20GB posteriormente.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code># 1. Criar Physical Volume:
+sudo pvcreate /dev/sdb
+
+# 2. Criar Volume Group:
+sudo vgcreate vg-app /dev/sdb
+
+# 3. Criar Logical Volumes:
+sudo lvcreate -L 60G -n lv-data vg-app
+sudo lvcreate -L 40G -n lv-logs vg-app
+
+# 4. Formatar:
+sudo mkfs.ext4 /dev/vg-app/lv-data
+sudo mkfs.xfs /dev/vg-app/lv-logs
+
+# 5. Criar pontos de montagem:
+sudo mkdir -p /opt/data /var/app-logs
+
+# 6. Montar:
+sudo mount /dev/vg-app/lv-data /opt/data
+sudo mount /dev/vg-app/lv-logs /var/app-logs
+
+# 7. Adicionar ao fstab:
+sudo cp /etc/fstab /etc/fstab.bak
+echo '/dev/vg-app/lv-data /opt/data ext4 defaults,noatime 0 2' | sudo tee -a /etc/fstab
+echo '/dev/vg-app/lv-logs /var/app-logs xfs defaults,noatime 0 2' | sudo tee -a /etc/fstab
+
+# 8. Testar fstab:
+sudo umount /opt/data /var/app-logs
+sudo mount -a
+df -h | grep vg-app
+
+# === EXPANSÃO POSTERIOR ===
+# Cenário: adicionar novo disco /dev/sdc de 50GB
+
+# Adicionar disco ao VG:
+sudo pvcreate /dev/sdc
+sudo vgextend vg-app /dev/sdc
+
+# Expandir lv-data em 20GB + resize filesystem:
+sudo lvextend -L +20G --resizefs /dev/vg-app/lv-data
+
+# Verificar:
+df -h /opt/data   # agora mostra 80GB</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Hardening completo de servidor</h3>
+          <p>Configure um servidor Ubuntu recém-instalado com: SSH hardening (chave apenas, sem root, porta 2222), UFW (apenas SSH e HTTPS), fail2ban, atualizações automáticas, e sysctl tuning para web server. Documente cada passo.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code>#!/bin/bash
+# hardening.sh — Script de hardening para Ubuntu Server
+set -euo pipefail
+
+echo "=== 1. ATUALIZAR SISTEMA ==="
+apt update && apt upgrade -y
+
+echo "=== 2. SSH HARDENING ==="
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+cat > /etc/ssh/sshd_config.d/hardening.conf << 'EOF'
+Port 2222
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+MaxAuthTries 3
+MaxSessions 5
+X11Forwarding no
+AllowAgentForwarding no
+ClientAliveInterval 300
+ClientAliveCountMax 2
+EOF
+sshd -t && systemctl restart sshd
+
+echo "=== 3. FIREWALL ==="
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 2222/tcp comment 'SSH'
+ufw allow 443/tcp comment 'HTTPS'
+ufw limit 2222/tcp
+ufw --force enable
+
+echo "=== 4. FAIL2BAN ==="
+apt install -y fail2ban
+cat > /etc/fail2ban/jail.local << 'EOF'
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 3
+banaction = ufw
+[sshd]
+enabled = true
+port = 2222
+EOF
+systemctl enable --now fail2ban
+
+echo "=== 5. AUTO-UPDATES ==="
+apt install -y unattended-upgrades
+dpkg-reconfigure -plow unattended-upgrades
+
+echo "=== 6. SYSCTL TUNING ==="
+cat > /etc/sysctl.d/99-hardening.conf << 'EOF'
+vm.swappiness = 10
+net.core.somaxconn = 65535
+net.ipv4.tcp_max_syn_backlog = 65535
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.all.rp_filter = 1
+fs.file-max = 2097152
+EOF
+sysctl --system
+
+echo "=== 7. LIMITES ==="
+cat > /etc/security/limits.d/99-tuning.conf << 'EOF'
+* soft nofile 65535
+* hard nofile 65535
+EOF
+
+echo "=== HARDENING COMPLETO ==="
+echo "Porta SSH: 2222 | Firewall: ativo | fail2ban: ativo"</code></pre>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-04.html" class="button secondary">← Módulo Anterior</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🎉 Parabéns!</span>
+          <h2>Você completou o curso de Linux!</h2>
+          <p>Dos comandos básicos até administração profissional de servidores — agora você tem a base sólida para trabalhar com Linux em qualquer ambiente de produção. Continue praticando e explorando!</p>
+        </div>
         <a href="../linux.html" class="button primary">Voltar ao Curso</a>
       </div>
     </section>

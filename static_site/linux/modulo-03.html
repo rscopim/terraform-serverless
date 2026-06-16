@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Linux Módulo 03: Pipes, Filtros e Shell Script</title>
+  <title>CloudTrilhas — Linux Módulo 03: Intermediário — Pipes, Filtros e Shell Script</title>
+  <meta name="description" content="Guia completo sobre pipes, filtros de texto (grep, sed, awk), compactação, variáveis de ambiente e fundamentos de shell script no Linux." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,23 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="nav-link">← Anterior</a>
         <a href="modulo-04.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,142 +38,899 @@
       <div class="container training-hero-content">
         <span class="pill">🐧 Linux — Módulo 03</span>
         <h1>Intermediário: Pipes, Filtros e Shell Script</h1>
-        <p>Redirecionamento, pipes e processamento de texto são os conceitos mais poderosos do Linux.</p>
+        <p>Domine o poder dos pipes para conectar comandos, aprenda filtros de texto avançados (grep, sed, awk), compactação de arquivos e fundamentos de shell scripting para automação profissional.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Iniciante</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Básico</small></a>
+        <a href="modulo-03.html" class="progress-node active"><span>03</span><small>Intermediário</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Avançado</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Profissional</small></a>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 1: PIPES -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h3>1. Redirecionamento e Pipes</h3>
-          <div class="info-box">
-            <strong>3 canais:</strong> stdin (0) = entrada, stdout (1) = saída, stderr (2) = erros
-          </div>
-          <div class="command-card wide" style="margin-top:16px">
-            <div class="command-header"><code>Redirecionamento</code><span class="cmd-tag">Core</span></div>
-            <pre><code>echo "Hello" > arquivo.txt       # sobrescreve
-echo "World" >> arquivo.txt      # adiciona ao final
-find / -name "*.conf" 2>/dev/null  # descarta erros
-comando > saida.txt 2>&1          # stdout + stderr no arquivo
-ls -la | less                     # pipe: saída vira entrada
-ps aux | grep nginx | wc -l      # encadeia múltiplos</code></pre>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Pipes</span>
+          <h2>Pipes (|) — Conectar Comandos</h2>
+          <p>O pipe é o operador mais poderoso do shell. Conecta a saída (stdout) de um comando diretamente à entrada (stdin) do próximo, criando pipelines de processamento de dados.</p>
         </div>
 
         <div class="topic-block">
-          <h3>2. Filtros de Texto</h3>
+          <h3>Conceito fundamental</h3>
+          <p>Um pipe (<code>|</code>) pega o stdout de um comando e envia como stdin para o próximo. É como uma esteira em uma fábrica — cada etapa processa e passa adiante:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>grep</code><span class="cmd-tag">Essencial</span></div>
-              <p>Busca padrões em texto. O comando mais usado no dia a dia.</p>
-              <pre><code>grep "erro" /var/log/syslog        # busca texto
-grep -i "error" log.txt            # ignora case
-grep -r "TODO" /projeto/           # recursivo
-grep -n "function" script.js       # com número da linha
-grep -v "debug" log.txt            # inverte (NÃO contém)
-grep -c "error" log.txt            # conta ocorrências
-grep -E "error|warning" log.txt    # múltiplos padrões</code></pre>
+              <div class="command-header"><code>Anatomia de um pipeline</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code># Sem pipe: cada comando opera isoladamente
+ls /var/log          # lista tudo no terminal
+grep "error"         # espera input do teclado (inútil sozinho)
+
+# Com pipe: comandos trabalham em cadeia
+ls /var/log | grep "error"
+# ls produz lista → pipe envia para grep → grep filtra
+
+# Pipeline de múltiplos estágios:
+cat /var/log/syslog | grep "ERROR" | sort | uniq -c | sort -rn | head -10
+# 1. cat lê o arquivo
+# 2. grep filtra linhas com "ERROR"
+# 3. sort ordena alfabeticamente
+# 4. uniq -c conta duplicatas consecutivas
+# 5. sort -rn ordena por número (maior primeiro)
+# 6. head -10 mostra apenas top 10
+# Resultado: top 10 erros mais frequentes!</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>Diagrama visual de um pipeline:</strong>
+            <pre><code>┌─────┐     ┌──────┐     ┌──────┐     ┌──────┐     ┌──────┐
+│ cat │────▶│ grep │────▶│ sort │────▶│ uniq │────▶│ head │
+│     │ stdout  │  │ stdout  │  │ stdout  │  │ stdout  │  │──▶ Terminal
+└─────┘  │  └──────┘  │  └──────┘  │  └──────┘  │  └──────┘
+         pipe         pipe         pipe         pipe</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplos práticos progressivos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Pipelines simples</code><span class="cmd-tag">Básico</span></div>
+              <pre><code># Contar arquivos em um diretório
+ls /etc | wc -l
+
+# Processos do nginx
+ps aux | grep nginx
+
+# Últimas 5 conexões SSH
+last | head -5
+
+# Uso de disco ordenado por tamanho
+du -sh /* 2>/dev/null | sort -rh | head -10
+
+# IPs únicos no log de acesso
+cat access.log | awk '{print $1}' | sort -u
+
+# Portas em uso
+ss -tlnp | grep LISTEN</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>sed</code><span class="cmd-tag">Edição</span></div>
-              <p>Editor de fluxo — substitui texto.</p>
-              <pre><code>sed 's/antigo/novo/g' arquivo.txt
-sed -i 's/localhost/192.168.1.100/g' config.conf
-sed '/^#/d' config.conf  # remove comentários
-sed -n '10,20p' arquivo.txt  # linhas 10-20</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>awk</code><span class="cmd-tag">Processamento</span></div>
-              <p>Processamento avançado por colunas.</p>
-              <pre><code>awk '{print $1}' arquivo.txt       # coluna 1
-awk -F: '{print $1}' /etc/passwd   # separador :
-ps aux | awk '{print $1, $2, $11}' # user, PID, cmd
-df -h | awk '{print $1, $5}'       # filesystem e %</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>sort / uniq / cut</code><span class="cmd-tag">Filtros</span></div>
-              <pre><code>sort -n numeros.txt         # ordena numérico
-sort arquivo.txt | uniq -c  # conta duplicatas
-cut -d: -f1 /etc/passwd     # recorta campo 1
-du -sh * | sort -rh | head  # top maiores</code></pre>
+              <div class="command-header"><code>Pipelines avançados</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># Top 10 IPs que mais acessaram o site
+cat access.log | awk '{print $1}' | \
+  sort | uniq -c | sort -rn | head -10
+
+# Encontrar processos zumbis
+ps aux | awk '$8 == "Z" {print}'
+
+# Tamanho total de arquivos .log
+find /var/log -name "*.log" -exec du -b {} + | \
+  awk '{sum+=$1} END {printf "%.2f MB\n", sum/1024/1024}'
+
+# Usuários com shell válido
+grep -v "nologin\|false" /etc/passwd | \
+  cut -d: -f1,7 | column -t -s:
+
+# Monitorar logs em tempo real filtrando
+tail -f /var/log/syslog | grep --line-buffered "ERROR\|WARN"</code></pre>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Shell Script — Introdução</h3>
-          <div class="command-card wide" style="margin-bottom:16px">
-            <div class="command-header"><code>Variáveis e Estrutura</code><span class="cmd-tag">Script</span></div>
-            <pre><code>#!/bin/bash
-NOME="João"
-DATA=$(date +%Y-%m-%d)
-echo "Olá $NOME, hoje é $DATA"
-echo "Argumentos: $1 $2 (total: $#)"</code></pre>
+          <h3>tee — Dividir saída (arquivo + terminal)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>tee — Escreve em arquivo E continua no pipe</code><span class="cmd-tag">Duplicar</span></div>
+              <pre><code># tee salva stdout em arquivo E passa adiante
+ls -la /etc | tee listagem.txt | wc -l
+# Resultado: listagem.txt tem o conteúdo completo
+#            terminal mostra apenas o número de linhas
+
+# Append com tee -a
+echo "Nova entrada" | tee -a /var/log/custom.log
+
+# Salvar etapa intermediária de um pipeline
+cat access.log | grep "404" | tee erros-404.txt | wc -l
+# erros-404.txt = todas as linhas 404
+# Terminal = contagem total
+
+# Usar com sudo (para escrever em arquivo protegido)
+echo "nova linha" | sudo tee -a /etc/hosts > /dev/null
+# Sem tee: sudo echo "x" > /etc/hosts FALHA (redirecionamento não é sudo)</code></pre>
+            </div>
           </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>xargs — Converter stdin em argumentos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>xargs — Transformar input em argumentos de comando</code><span class="cmd-tag">Argumentos</span></div>
+              <pre><code># Problema: alguns comandos não leem stdin
+# find produz lista, mas rm não lê stdin via pipe
+
+# ERRADO (rm não lê stdin):
+find . -name "*.tmp" | rm    # NÃO FUNCIONA!
+
+# CORRETO com xargs:
+find . -name "*.tmp" | xargs rm
+# xargs pega cada linha do stdin e passa como argumento para rm
+
+# Com confirmação (-p):
+find . -name "*.bak" | xargs -p rm
+
+# Um por vez (-n 1):
+find . -name "*.log" | xargs -n 1 gzip
+
+# Com placeholder (-I {}):
+find . -name "*.txt" | xargs -I {} cp {} /backup/
+
+# Lidar com espaços em nomes (-0 com find -print0):
+find . -name "*.pdf" -print0 | xargs -0 mv -t /docs/
+
+# Paralelizar (-P N processos):
+find . -name "*.jpg" | xargs -P 4 -I {} convert {} -resize 50% small-{}
+
+# Cenários práticos:
+# Deletar containers Docker parados
+docker ps -aq --filter status=exited | xargs docker rm
+
+# Kill processos por padrão
+pgrep -f "zombie" | xargs kill -9
+
+# Chmod em arquivos específicos
+find /var/www -name "*.php" | xargs chmod 644</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: GREP AVANÇADO -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">grep</span>
+          <h2>grep Avançado — Expressões Regulares</h2>
+          <p>grep com regex transforma buscas simples em filtros poderosos. Domine expressões regulares para encontrar padrões complexos em logs, código e configurações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Expressões Regulares Essenciais</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Metacaracteres de regex</code><span class="cmd-tag">Regex</span></div>
+              <pre><code># METACARACTERES FUNDAMENTAIS:
+.     → Qualquer caractere (1 char)
+*     → Zero ou mais do anterior
++     → Um ou mais do anterior (grep -E)
+?     → Zero ou um do anterior (grep -E)
+^     → Início da linha
+$     → Fim da linha
+[]    → Conjunto de caracteres [abc] ou range [a-z]
+[^]   → Negação do conjunto [^0-9] = não-dígito
+|     → OU (alternância, grep -E)
+()    → Agrupamento (grep -E)
+{n}   → Exatamente n repetições (grep -E)
+{n,m} → Entre n e m repetições (grep -E)
+\b    → Limite de palavra (word boundary)
+\d    → Dígito [0-9] (grep -P apenas)
+
+# EXEMPLOS PRÁTICOS:
+grep "^root" /etc/passwd           # linhas que COMEÇAM com root
+grep "bash$" /etc/passwd           # linhas que TERMINAM com bash
+grep "^$" arquivo.txt              # linhas vazias
+grep -v "^$" arquivo.txt           # linhas NÃO vazias
+grep "[0-9]" arquivo.txt           # linhas com dígitos
+grep "^[A-Z]" arquivo.txt          # começa com maiúscula
+grep "error\|warning" log.txt      # error OU warning (básico)
+grep -E "error|warning" log.txt    # error OU warning (estendido)
+grep -E "^[0-9]{1,3}\.[0-9]{1,3}" log.txt  # linhas com IP no início</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>grep -E (Extended) — Regex completo</h3>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>if / else</code><span class="cmd-tag">Condicional</span></div>
-              <pre><code>if [ -f "/etc/passwd" ]; then
-    echo "Arquivo existe!"
-elif [ -d "/tmp" ]; then
-    echo "Diretório existe"
-else
-    echo "Não encontrado"
-fi
+              <div class="command-header"><code>Padrões com grep -E</code><span class="cmd-tag">Estendido</span></div>
+              <pre><code># IPs no log:
+grep -E "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" access.log
 
-# Comparações numéricas:
-# -eq -ne -gt -lt -ge -le</code></pre>
+# Emails:
+grep -E "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" dados.txt
+
+# URLs HTTP/HTTPS:
+grep -E "https?://[^ ]+" arquivo.txt
+
+# Linhas com exatamente 3 campos:
+grep -E "^[^ ]+ [^ ]+ [^ ]+$" dados.txt
+
+# Status HTTP 4xx ou 5xx:
+grep -E " (4|5)[0-9]{2} " access.log
+
+# Data no formato DD/MM/YYYY:
+grep -E "[0-9]{2}/[0-9]{2}/[0-9]{4}" log.txt
+
+# Palavras repetidas:
+grep -E "\b(\w+)\s+\1\b" texto.txt</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>for / while</code><span class="cmd-tag">Loops</span></div>
-              <pre><code>for f in /var/log/*.log; do
-    echo "Processando: $f"
-    wc -l "$f"
+              <div class="command-header"><code>Flags úteis do grep</code><span class="cmd-tag">Opções</span></div>
+              <pre><code># Busca recursiva em diretório:
+grep -rn "TODO" src/        # -r recursivo, -n número da linha
+
+# Apenas nomes de arquivo:
+grep -rl "password" /etc/   # -l lista apenas filenames
+
+# Somente o match (não a linha inteira):
+grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" log.txt
+
+# Contexto (linhas ao redor):
+grep -B2 -A3 "CRITICAL" app.log  # 2 antes, 3 depois
+
+# Contar ocorrências:
+grep -c "ERROR" /var/log/syslog
+
+# Word boundary (palavra inteira):
+grep -w "in" texto.txt    # "in" mas não "inside"
+
+# Excluir diretórios na busca:
+grep -r "func" --exclude-dir={node_modules,.git,vendor} .
+
+# Incluir apenas certos tipos:
+grep -r "import" --include="*.py" .</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: SED -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">sed</span>
+          <h2>sed — Stream Editor</h2>
+          <p>sed processa texto linha por linha, aplicando transformações. É a ferramenta ideal para substituições em massa, deleção de linhas e edição automatizada de arquivos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Substituição, deleção e edição in-place</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Substituição: s/antigo/novo/</code><span class="cmd-tag">Substituir</span></div>
+              <pre><code># Substituir primeira ocorrência por linha:
+sed 's/antigo/novo/' arquivo.txt
+
+# Substituir TODAS as ocorrências (g = global):
+sed 's/http/https/g' urls.txt
+
+# Case-insensitive (I):
+sed 's/error/ERROR/gI' log.txt
+
+# Usar delimitador diferente (útil com paths):
+sed 's|/var/www|/opt/app|g' config.txt
+sed 's#old/path#new/path#g' script.sh
+
+# Substituir apenas na linha 5:
+sed '5s/antigo/novo/' arquivo.txt
+
+# Substituir nas linhas 10-20:
+sed '10,20s/debug/info/g' config.yml
+
+# Substituir em linhas que contêm padrão:
+sed '/ERROR/s/level=1/level=3/g' app.conf
+
+# Referência ao match (&amp;):
+sed 's/[0-9]*/(&amp;)/' dados.txt  # envolve números em ()
+
+# Grupos de captura (\1, \2):
+sed 's/\(.*\)@\(.*\)/User: \1, Domain: \2/' emails.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Deleção e impressão</code><span class="cmd-tag">Filtrar</span></div>
+              <pre><code># Deletar linhas que contêm padrão:
+sed '/DEBUG/d' app.log         # remove linhas com DEBUG
+sed '/^$/d' arquivo.txt        # remove linhas vazias
+sed '/^#/d' config.txt         # remove comentários
+
+# Deletar linhas por número:
+sed '1d' arquivo.txt           # deleta primeira linha
+sed '1,5d' arquivo.txt         # deleta linhas 1-5
+sed '$d' arquivo.txt           # deleta última linha
+
+# Imprimir apenas linhas específicas:
+sed -n '10,20p' arquivo.txt    # linhas 10-20
+sed -n '/ERROR/p' log.txt      # apenas linhas com ERROR
+
+# Inserir texto:
+sed '1i\# Header adicionado' arquivo.txt  # antes da linha 1
+sed '$a\# Footer adicionado' arquivo.txt  # após última linha
+
+# Edição IN-PLACE (-i):
+sed -i 's/antigo/novo/g' arquivo.txt       # modifica o arquivo!
+sed -i.bak 's/antigo/novo/g' arquivo.txt   # cria backup .bak
+
+# Múltiplas operações (-e):
+sed -e 's/foo/bar/g' -e '/DEBUG/d' -e '1i\# Processado' log.txt</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Cenários reais com sed:</strong>
+            <pre><code># Mudar porta em config:
+sed -i 's/port: 3000/port: 8080/' config.yml
+
+# Comentar uma linha:
+sed -i '/server_name/s/^/#/' nginx.conf
+
+# Descomentar:
+sed -i '/server_name/s/^#//' nginx.conf
+
+# Trocar domínio em múltiplos arquivos:
+find . -name "*.html" -exec sed -i 's/old-domain.com/new-domain.com/g' {} \;</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: AWK -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">awk</span>
+          <h2>awk — Processamento de Texto Estruturado</h2>
+          <p>awk é uma linguagem de programação para processar texto coluna por coluna. Ideal para extrair campos, calcular totais, gerar relatórios e transformar dados estruturados.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Fundamentos do awk</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Campos ($1, $2, $NF)</code><span class="cmd-tag">Campos</span></div>
+              <pre><code># awk divide cada linha em campos por espaço/tab
+# $0 = linha inteira
+# $1 = primeiro campo, $2 = segundo, etc.
+# $NF = último campo (Number of Fields)
+# NR = número da linha atual
+
+# Imprimir primeiro campo:
+awk '{print $1}' arquivo.txt
+
+# Imprimir campos 1 e 3:
+awk '{print $1, $3}' /etc/passwd
+
+# Usar outro separador (-F):
+awk -F: '{print $1, $7}' /etc/passwd
+# joao /bin/bash
+# maria /bin/zsh
+
+# Último campo:
+awk '{print $NF}' arquivo.txt
+
+# Número da linha + conteúdo:
+awk '{print NR, $0}' arquivo.txt
+
+# Formatar saída:
+awk -F: '{printf "%-15s %s\n", $1, $7}' /etc/passwd</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Condições e cálculos</code><span class="cmd-tag">Lógica</span></div>
+              <pre><code># Filtrar por condição:
+awk '$3 > 1000' /etc/passwd     # UID > 1000
+awk -F: '$7 ~ /bash/' /etc/passwd  # shell contém bash
+awk 'length > 80' codigo.py    # linhas > 80 chars
+
+# Somar uma coluna:
+awk '{sum += $5} END {print sum}' dados.txt
+
+# Média:
+awk '{sum+=$1; n++} END {print sum/n}' numeros.txt
+
+# Contar linhas por padrão:
+awk '/ERROR/{count++} END {print count}' log.txt
+
+# BEGIN e END (cabeçalho/rodapé):
+awk 'BEGIN {print "=== Relatório ==="} 
+     {print $1, $2} 
+     END {print "Total:", NR, "linhas"}' dados.txt
+
+# Extrair IPs e contar acessos:
+awk '{print $1}' access.log | sort | uniq -c | sort -rn
+
+# Processar CSV:
+awk -F, '{print $2, $4}' planilha.csv
+
+# Somar valores de uma coluna específica:
+awk -F, '{total+=$3} END {printf "Total: R$ %.2f\n", total}' vendas.csv</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: OUTROS FILTROS -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Filtros</span>
+          <h2>Outros Filtros Essenciais</h2>
+          <p>Além de grep/sed/awk, Linux oferece filtros especializados que combinados em pipelines resolvem problemas complexos de forma elegante.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>cut, sort, uniq, tr, diff</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>cut — Extrair colunas/campos</code><span class="cmd-tag">Colunas</span></div>
+              <pre><code># Por delimitador e campo:
+cut -d: -f1 /etc/passwd       # username
+cut -d: -f1,7 /etc/passwd     # user + shell
+cut -d, -f2-4 dados.csv       # campos 2 a 4
+
+# Por posição de caractere:
+cut -c1-10 arquivo.txt        # primeiros 10 chars
+cut -c5- arquivo.txt          # do 5º char em diante
+
+# Complemento (tudo EXCETO):
+cut -d: --complement -f2 /etc/passwd</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>sort — Ordenar linhas</code><span class="cmd-tag">Ordenar</span></div>
+              <pre><code># Alfabético (padrão):
+sort nomes.txt
+
+# Numérico (-n):
+sort -n numeros.txt
+
+# Reverso (-r):
+sort -rn numeros.txt     # maior primeiro
+
+# Por campo específico (-k):
+sort -t: -k3 -n /etc/passwd   # por UID
+
+# Human-readable (-h):
+du -sh /* | sort -rh     # ordena 10G, 5M, 3K
+
+# Remover duplicatas (-u):
+sort -u lista.txt
+
+# Ignorar case (-f):
+sort -f nomes.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>uniq — Duplicatas</code><span class="cmd-tag">Deduplicar</span></div>
+              <pre><code># ⚠️ uniq só detecta duplicatas CONSECUTIVAS!
+# SEMPRE use sort antes de uniq.
+
+# Remover duplicatas:
+sort arquivo.txt | uniq
+
+# Contar ocorrências (-c):
+sort ips.txt | uniq -c | sort -rn
+
+# Apenas duplicadas (-d):
+sort lista.txt | uniq -d
+
+# Apenas únicas (-u):
+sort lista.txt | uniq -u
+
+# Ignorar case (-i):
+sort -f nomes.txt | uniq -i</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tr — Traduzir/deletar</code><span class="cmd-tag">Transformar</span></div>
+              <pre><code># Converter minúscula → maiúscula:
+echo "hello" | tr 'a-z' 'A-Z'   # HELLO
+
+# Substituir espaços por newlines:
+echo "a b c" | tr ' ' '\n'
+
+# Deletar caracteres (-d):
+echo "abc123" | tr -d '0-9'      # abc
+
+# Squeeze repetidos (-s):
+echo "hello     world" | tr -s ' '  # hello world
+
+# Remover \r de arquivos Windows:
+tr -d '\r' < windows.txt > unix.txt
+
+# Gerar senha aleatória:
+tr -dc 'A-Za-z0-9!@#' < /dev/urandom | head -c 16</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6: COMPACTAÇÃO -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Compactação</span>
+          <h2>Compactação e Arquivamento</h2>
+          <p>tar + gzip é a combinação mais usada em servidores Linux para backup, transferência e distribuição de arquivos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>tar — O canivete suíço de arquivamento</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Criar arquivos tar</code><span class="cmd-tag">Criar</span></div>
+              <pre><code># tar + gzip (.tar.gz ou .tgz):
+tar czf backup.tar.gz /var/www/
+# c=create, z=gzip, f=file
+
+# tar + bzip2 (.tar.bz2) — menor, mais lento:
+tar cjf backup.tar.bz2 /var/www/
+
+# tar + xz (.tar.xz) — menor ainda:
+tar cJf backup.tar.xz /var/www/
+
+# Sem compressão (.tar):
+tar cf backup.tar /var/www/
+
+# Verbose (mostra arquivos):
+tar czvf backup.tar.gz /var/www/
+
+# Excluir padrões:
+tar czf backup.tar.gz --exclude="*.log" \
+  --exclude="node_modules" /opt/app/</code></pre>
+            </div>
+            <div class="command-card">
+              <div name="command-header"><code>Extrair e listar</code><span class="cmd-tag">Extrair</span></div>
+              <pre><code># Extrair .tar.gz:
+tar xzf backup.tar.gz
+# x=extract, z=gunzip, f=file
+
+# Extrair em diretório específico:
+tar xzf backup.tar.gz -C /opt/restore/
+
+# Extrair .tar.bz2:
+tar xjf backup.tar.bz2
+
+# Extrair .tar.xz:
+tar xJf backup.tar.xz
+
+# Listar conteúdo (sem extrair):
+tar tzf backup.tar.gz        # gzip
+tar tjf backup.tar.bz2       # bzip2
+
+# Extrair arquivo específico:
+tar xzf backup.tar.gz var/www/index.html
+
+# Mnemônico para tar:
+# c = Create (criar)
+# x = eXtract (extrair)
+# t = lisT (listar)
+# z = gZip
+# j = bzip2 (j de "j'compressed")
+# J = xz (J maiúsculo)
+# f = File (sempre por último!)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Comparação de compressão:</strong>
+            <pre><code># Arquivo original: 100MB
+# .tar     → 100MB (sem compressão, só agrupa)
+# .tar.gz  → ~30MB (rápido, boa compressão)
+# .tar.bz2 → ~25MB (mais lento, melhor compressão)
+# .tar.xz  → ~20MB (lento, máxima compressão)
+# .zip     → ~30MB (compatível com Windows)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7: SHELL SCRIPT -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Shell Script</span>
+          <h2>Shell Script — Fundamentos de Automação</h2>
+          <p>Shell scripting transforma sequências de comandos em programas reutilizáveis. É a base de toda automação em Linux — deploys, backups, monitoramento e CI/CD.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Estrutura básica de um script</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Anatomia de um shell script</code><span class="cmd-tag">Estrutura</span></div>
+              <pre><code>#!/bin/bash
+# ↑ Shebang: define qual interpretador usar
+
+# Variáveis
+BACKUP_DIR="/opt/backups"
+DATE=$(date +%Y%m%d-%H%M%S)
+APP_NAME="minha-app"
+
+# Variáveis especiais:
+# $0 = nome do script
+# $1, $2... = argumentos passados
+# $# = número de argumentos
+# $@ = todos os argumentos como lista
+# $? = exit code do último comando
+# $$ = PID do script atual
+
+# Condicional
+if [ -d "$BACKUP_DIR" ]; then
+    echo "Diretório existe"
+else
+    mkdir -p "$BACKUP_DIR"
+    echo "Diretório criado"
+fi
+
+# Loop
+for file in /var/log/*.log; do
+    echo "Processando: $file"
+    gzip "$file"
 done
 
-CONT=1
-while [ $CONT -le 5 ]; do
-    echo "Contagem: $CONT"
-    CONT=$((CONT + 1))
+# Função
+fazer_backup() {
+    local origem=$1
+    local destino=$2
+    tar czf "$destino/backup-$DATE.tar.gz" "$origem"
+    return $?
+}
+
+# Chamada da função
+fazer_backup "/var/www" "$BACKUP_DIR"
+
+# Verificar resultado
+if [ $? -eq 0 ]; then
+    echo "Backup concluído com sucesso!"
+    exit 0
+else
+    echo "ERRO: Backup falhou!" >&2
+    exit 1
+fi</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Condicionais e loops</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>if / elif / else</code><span class="cmd-tag">Condição</span></div>
+              <pre><code># Testes de arquivo:
+[ -f arquivo ]   # arquivo existe?
+[ -d dir ]       # diretório existe?
+[ -r arquivo ]   # legível?
+[ -w arquivo ]   # escrevível?
+[ -x arquivo ]   # executável?
+[ -s arquivo ]   # tamanho > 0?
+
+# Testes de string:
+[ -z "$var" ]    # string vazia?
+[ -n "$var" ]    # string não vazia?
+[ "$a" = "$b" ]  # strings iguais?
+[ "$a" != "$b" ] # strings diferentes?
+
+# Testes numéricos:
+[ $a -eq $b ]    # igual
+[ $a -ne $b ]    # diferente
+[ $a -gt $b ]    # maior que
+[ $a -lt $b ]    # menor que
+[ $a -ge $b ]    # maior ou igual
+[ $a -le $b ]    # menor ou igual
+
+# Exemplo completo:
+if [ $# -lt 1 ]; then
+    echo "Uso: $0 <ambiente>"
+    exit 1
+elif [ "$1" = "prod" ]; then
+    echo "Deploy em PRODUÇÃO"
+elif [ "$1" = "dev" ]; then
+    echo "Deploy em DEV"
+else
+    echo "Ambiente inválido: $1"
+    exit 1
+fi</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>for / while / until</code><span class="cmd-tag">Loops</span></div>
+              <pre><code># For com lista:
+for server in web1 web2 web3; do
+    echo "Reiniciando $server..."
+    ssh $server "sudo systemctl restart nginx"
+done
+
+# For com range:
+for i in {1..10}; do
+    echo "Iteração $i"
+done
+
+# For com saída de comando:
+for user in $(cut -d: -f1 /etc/passwd); do
+    echo "User: $user"
+done
+
+# While (enquanto condição verdadeira):
+count=0
+while [ $count -lt 5 ]; do
+    echo "Tentativa $count"
+    count=$((count + 1))
+done
+
+# While lendo arquivo linha por linha:
+while IFS= read -r line; do
+    echo "Linha: $line"
+done < arquivo.txt
+
+# Loop infinito com condição de saída:
+while true; do
+    if curl -s http://localhost:8080/health > /dev/null; then
+        echo "App está no ar!"
+        break
+    fi
+    echo "Aguardando app iniciar..."
+    sleep 2
 done</code></pre>
             </div>
           </div>
-          <div class="command-card wide" style="margin-top:16px">
-            <div class="command-header"><code>Script Prático: Backup</code><span class="cmd-tag">Exemplo Real</span></div>
-            <pre><code>#!/bin/bash
-# backup.sh - Backup automatizado
-ORIGEM=${1:-"/home"}
-DESTINO=${2:-"/backup"}
-DATA=$(date +%Y%m%d_%H%M%S)
-
-log() { echo "[$(date '+%H:%M:%S')] $1"; }
-
-[ ! -d "$DESTINO" ] && mkdir -p "$DESTINO"
-
-log "Iniciando backup de $ORIGEM"
-tar -czvf "${DESTINO}/backup_${DATA}.tar.gz" "$ORIGEM"
-
-if [ $? -eq 0 ]; then
-    log "✅ Backup concluído!"
-else
-    log "❌ Falha no backup!"
-    exit 1
-fi
-
-# Remove backups > 7 dias
-find "$DESTINO" -name "backup_*.tar.gz" -mtime +7 -delete</code></pre>
-          </div>
         </div>
 
+        <div class="topic-block">
+          <h3>Exemplo completo: Script de backup profissional</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>backup.sh — Script de produção</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code>#!/bin/bash
+set -euo pipefail  # Parar no primeiro erro, variáveis indefinidas = erro
+
+# === CONFIGURAÇÃO ===
+BACKUP_DIR="/opt/backups"
+RETENTION_DAYS=7
+APP_DIR="/var/www/app"
+DB_NAME="production"
+DB_USER="backup_user"
+LOG="/var/log/backup.log"
+DATE=$(date +%Y%m%d-%H%M%S)
+
+# === FUNÇÕES ===
+log() { echo "[$(date '+%F %T')] $1" | tee -a "$LOG"; }
+
+check_space() {
+    local available=$(df -BG "$BACKUP_DIR" | awk 'NR==2{print $4}' | tr -d 'G')
+    if [ "$available" -lt 5 ]; then
+        log "ERRO: Menos de 5GB disponível em $BACKUP_DIR"
+        exit 1
+    fi
+}
+
+backup_files() {
+    log "Iniciando backup de arquivos..."
+    tar czf "$BACKUP_DIR/files-$DATE.tar.gz" \
+        --exclude="*.log" --exclude="node_modules" "$APP_DIR"
+    log "Backup de arquivos concluído: files-$DATE.tar.gz"
+}
+
+backup_database() {
+    log "Iniciando backup do banco..."
+    pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$BACKUP_DIR/db-$DATE.sql.gz"
+    log "Backup do banco concluído: db-$DATE.sql.gz"
+}
+
+cleanup_old() {
+    log "Removendo backups com mais de $RETENTION_DAYS dias..."
+    find "$BACKUP_DIR" -name "*.tar.gz" -mtime +$RETENTION_DAYS -delete
+    find "$BACKUP_DIR" -name "*.sql.gz" -mtime +$RETENTION_DAYS -delete
+    log "Limpeza concluída"
+}
+
+# === EXECUÇÃO ===
+log "=== Backup iniciado ==="
+mkdir -p "$BACKUP_DIR"
+check_space
+backup_files
+backup_database
+cleanup_old
+log "=== Backup finalizado com sucesso ==="
+exit 0</code></pre>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- SEÇÃO 8: EXERCÍCIOS -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Pratique pipelines, filtros de texto e shell scripting com cenários reais.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Pipeline para análise de logs</h3>
+          <p>Encontre os 5 IPs que mais geraram erros 404 no access.log do Nginx.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code>cat /var/log/nginx/access.log | grep " 404 " | awk '{print $1}' | sort | uniq -c | sort -rn | head -5</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Substituição em massa com sed/find</h3>
+          <p>Substitua "http://old-domain.com" por "https://new-domain.com" em todos os arquivos .html de um diretório.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code>find /var/www -name "*.html" -exec sed -i 's|http://old-domain.com|https://new-domain.com|g' {} \;</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Processar CSV com awk</h3>
+          <p>Dado um CSV com colunas (nome,email,vendas), calcule o total de vendas e o vendedor com maior valor.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code># Total de vendas:
+awk -F, 'NR>1 {total+=$3} END {printf "Total: R$ %.2f\n", total}' vendas.csv
+
+# Maior vendedor:
+awk -F, 'NR>1 && $3>max {max=$3; nome=$1} END {print "Melhor:", nome, "R$", max}' vendas.csv</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Script de monitoramento</h3>
+          <p>Crie um script que verifica se um serviço está rodando e reinicia se necessário, com log.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code>#!/bin/bash
+SERVICE="nginx"
+LOG="/var/log/monitor.log"
+
+if ! systemctl is-active --quiet "$SERVICE"; then
+    echo "[$(date)] $SERVICE está parado. Reiniciando..." >> "$LOG"
+    systemctl restart "$SERVICE"
+    if systemctl is-active --quiet "$SERVICE"; then
+        echo "[$(date)] $SERVICE reiniciado com sucesso" >> "$LOG"
+    else
+        echo "[$(date)] FALHA ao reiniciar $SERVICE!" >> "$LOG"
+        exit 1
+    fi
+fi</code></pre>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐧 Próximo passo</span>
+          <h2>Pronto para redes e serviços?</h2>
+          <p>No Módulo 04 você aprenderá sobre configuração de rede, serviços systemd, gerenciamento de pacotes e firewall.</p>
+        </div>
+        <a href="modulo-04.html" class="button primary">Ir para Módulo 04 →</a>
       </div>
     </section>
   </main>

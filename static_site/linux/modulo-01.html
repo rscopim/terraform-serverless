@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Linux Módulo 01: Navegação, Arquivos e Diretórios</title>
+  <title>CloudTrilhas — Linux Módulo 01: Iniciante — Navegação, Arquivos e Diretórios</title>
+  <meta name="description" content="Guia completo para iniciantes em Linux: navegação no terminal, manipulação de arquivos e diretórios, busca, wildcards e documentação. Do zero ao domínio do filesystem." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,7 +20,7 @@
         <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
@@ -41,168 +42,2394 @@
       <div class="container training-hero-content">
         <span class="pill">🐧 Linux — Módulo 01</span>
         <h1>Iniciante: Navegação, Arquivos e Diretórios</h1>
-        <p>O terminal é a interface de linha de comando do Linux. Dominar o terminal é essencial para administração de servidores, DevOps e cloud computing.</p>
+        <p>Domine o terminal Linux desde o zero. Aprenda a navegar pelo filesystem, manipular arquivos e diretórios, buscar conteúdo e utilizar a documentação integrada. Este é o fundamento para toda carreira em DevOps, Cloud e administração de servidores.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node active"><span>01</span><small>Iniciante</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Básico</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Intermediário</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Avançado</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Profissional</small></a>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: O QUE É LINUX? -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
+          <h2>O que é Linux?</h2>
+          <p>Linux é o sistema operacional que sustenta 95% da internet, roda em 100% dos supercomputadores do mundo, e é a base de toda infraestrutura cloud moderna. Entender Linux é pré-requisito para qualquer profissional de tecnologia.</p>
+        </div>
 
-        <!-- Primeiros Comandos -->
         <div class="topic-block">
-          <h3>1. Primeiros Comandos</h3>
+          <h3>História breve — De Unix a Linux</h3>
+          <p>Para entender Linux, precisamos voltar no tempo:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>pwd</code><span class="cmd-tag">Navegação</span></div>
-              <p>Mostra o caminho completo do diretório atual.</p>
-              <pre><code>$ pwd
-/home/usuario</code></pre>
+              <div class="command-header"><code>1969 — Unix</code><span class="cmd-tag">Origem</span></div>
+              <p>Ken Thompson e Dennis Ritchie criaram o Unix nos Bell Labs (AT&T). Sistema multiusuário e multitarefa, revolucionário para a época. Escrito em C (que Ritchie também criou), tornando-o portável entre diferentes hardwares.</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>whoami</code><span class="cmd-tag">Info</span></div>
-              <p>Mostra o nome do usuário logado.</p>
-              <pre><code>$ whoami
-joao</code></pre>
+              <div class="command-header"><code>1983 — Projeto GNU</code><span class="cmd-tag">Software Livre</span></div>
+              <p>Richard Stallman lançou o projeto GNU para criar um SO livre compatível com Unix. Desenvolveu ferramentas essenciais (gcc, bash, coreutils), mas faltava o kernel.</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>clear</code><span class="cmd-tag">Utilidade</span></div>
-              <p>Limpa a tela do terminal. Atalho: <kbd>Ctrl+L</kbd></p>
-              <pre><code>$ clear</code></pre>
+              <div class="command-header"><code>1991 — Linux Kernel</code><span class="cmd-tag">Revolução</span></div>
+              <p>Linus Torvalds, estudante finlandês de 21 anos, criou um kernel compatível com Unix como projeto pessoal. Combinado com as ferramentas GNU, nasceu o "GNU/Linux" — um SO completo e livre.</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>history</code><span class="cmd-tag">Utilidade</span></div>
-              <p>Mostra todos os comandos digitados. Use <code>!numero</code> para repetir.</p>
-              <pre><code>$ history
-  1  ls -la
-  2  cd /var/log
-$ !1  # repete "ls -la"</code></pre>
+              <div class="command-header"><code>Hoje — Dominação</code><span class="cmd-tag">Presente</span></div>
+              <p>Linux roda em smartphones (Android), servidores (AWS, Azure, GCP), supercomputadores (100% do TOP500), IoT, carros autônomos, e praticamente toda a infraestrutura da internet.</p>
             </div>
           </div>
         </div>
 
-        <!-- Navegação -->
         <div class="topic-block">
-          <h3>2. Navegação entre Diretórios</h3>
+          <h3>Kernel vs Distribuição — Entenda a diferença</h3>
+          <p>Linux tecnicamente é apenas o <strong>kernel</strong> — o núcleo que gerencia hardware, memória, processos e I/O. Uma <strong>distribuição</strong> combina o kernel com ferramentas, gerenciador de pacotes e configurações para criar um SO utilizável.</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Distribuição</th><th>Base</th><th>Gerenciador de Pacotes</th><th>Uso Principal</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Ubuntu</strong></td><td>Debian</td><td>apt / dpkg</td><td>Desktop, servidores, cloud (mais popular)</td></tr>
+              <tr><td><strong>Debian</strong></td><td>Independente</td><td>apt / dpkg</td><td>Servidores (estabilidade extrema)</td></tr>
+              <tr><td><strong>CentOS / Rocky / Alma</strong></td><td>RHEL</td><td>dnf / yum / rpm</td><td>Enterprise, servidores corporativos</td></tr>
+              <tr><td><strong>Alpine</strong></td><td>Independente</td><td>apk</td><td>Containers Docker (imagens mínimas ~5MB)</td></tr>
+              <tr><td><strong>Arch Linux</strong></td><td>Independente</td><td>pacman</td><td>Desktop avançado (rolling release)</td></tr>
+              <tr><td><strong>Amazon Linux</strong></td><td>RHEL/Fedora</td><td>dnf / yum</td><td>AWS (otimizado para EC2)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box highlight">
+            <strong>💡 Para DevOps e Cloud:</strong> Foque em Ubuntu (mais usado em cloud), Alpine (containers) e Amazon Linux (AWS). Os comandos que você aprender aqui funcionam em todas — a diferença principal está no gerenciador de pacotes.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Por que Linux domina servidores?</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Estabilidade</code><span class="cmd-tag">Produção</span></div>
+              <p>Servidores Linux rodam por <strong>anos</strong> sem reiniciar. Atualizações de kernel (livepatch) podem ser aplicadas sem downtime. Não existe "reinicie para aplicar atualização" obrigatório.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Performance</code><span class="cmd-tag">Eficiência</span></div>
+              <p>Sem interface gráfica consumindo recursos. Um servidor Ubuntu Server usa ~200MB de RAM idle. Windows Server usa ~2GB+. Mais recursos disponíveis para sua aplicação.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Segurança</code><span class="cmd-tag">Proteção</span></div>
+              <p>Modelo de permissões robusto (usuário/grupo/outros). SELinux/AppArmor para controle de acesso mandatório. Código aberto = milhares de olhos revisando vulnerabilidades.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Custo Zero</code><span class="cmd-tag">Economia</span></div>
+              <p>Licença gratuita. Sem custo por servidor, por core, ou por usuário. Compare com licenças Windows Server que custam milhares de dólares por instância.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Automação</code><span class="cmd-tag">DevOps</span></div>
+              <p>Tudo é controlável via terminal e scripts. Infraestrutura como código (Terraform, Ansible) funciona nativamente. CI/CD pipelines rodam em Linux.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Ecossistema</code><span class="cmd-tag">Compatibilidade</span></div>
+              <p>Docker, Kubernetes, Nginx, PostgreSQL, Redis, Elasticsearch — praticamente toda ferramenta moderna de infraestrutura foi projetada para Linux primeiro.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Terminal vs GUI — Por que dominar o terminal é essencial</h3>
+          <p>GUIs são intuitivas, mas o terminal é onde a produtividade real acontece:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>GUI (Interface Gráfica)</th><th>Terminal (CLI)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Velocidade</strong></td><td>Cliques múltiplos, menus aninhados</td><td>Um comando = ação imediata</td></tr>
+              <tr><td><strong>Automação</strong></td><td>Impossível ou limitada (macros)</td><td>Scripts reutilizáveis, cron jobs, pipelines</td></tr>
+              <tr><td><strong>Acesso remoto</strong></td><td>RDP/VNC (lento, pesado, inseguro)</td><td>SSH (leve, rápido, seguro, funciona em qualquer rede)</td></tr>
+              <tr><td><strong>Reprodutibilidade</strong></td><td>"Clique aqui, depois ali" — impossível replicar exatamente</td><td>Comandos documentados, versionáveis, compartilháveis</td></tr>
+              <tr><td><strong>Recursos</strong></td><td>Consome RAM e CPU com renderização</td><td>Quase zero de overhead</td></tr>
+              <tr><td><strong>Servidores</strong></td><td>Servidores não têm GUI instalada</td><td>Única opção em 95% dos servidores de produção</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>💡 Realidade do mercado:</strong> Em entrevistas para DevOps, SRE e Cloud Engineer, <strong>100% das perguntas técnicas</strong> envolvem terminal. Ninguém vai te pedir para clicar em um botão — vão pedir para escrever o comando que resolve o problema.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Shell — bash, zsh, sh: O que são e diferenças</h3>
+          <p>O <strong>shell</strong> é o programa que interpreta seus comandos. É a interface entre você e o kernel. Existem vários shells disponíveis:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Shell</th><th>Nome Completo</th><th>Características</th><th>Onde é usado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>sh</strong></td><td>Bourne Shell</td><td>Mínimo, POSIX-compliant. Base para scripts portáveis.</td><td>Scripts de sistema, Docker (#!/bin/sh)</td></tr>
+              <tr><td><strong>bash</strong></td><td>Bourne Again Shell</td><td>Padrão na maioria das distros. Arrays, aritmética, auto-complete.</td><td>Ubuntu, Debian, CentOS, Amazon Linux</td></tr>
+              <tr><td><strong>zsh</strong></td><td>Z Shell</td><td>Superset do bash. Correção de typos, temas, plugins (Oh My Zsh).</td><td>macOS (padrão desde Catalina), devs</td></tr>
+              <tr><td><strong>dash</strong></td><td>Debian Almquist Shell</td><td>Ultra-rápido, mínimo. Usado como /bin/sh no Debian/Ubuntu.</td><td>Scripts de inicialização do sistema</td></tr>
+              <tr><td><strong>fish</strong></td><td>Friendly Interactive Shell</td><td>Auto-sugestões, syntax highlighting, configuração fácil.</td><td>Uso pessoal, desenvolvimento</td></tr>
+            </tbody>
+          </table>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>ls</code><span class="cmd-tag">Essencial</span></div>
-              <p>Lista conteúdo de diretórios.</p>
-              <pre><code>ls              # Lista arquivos e pastas
-ls -l           # Formato detalhado (permissões, dono, tamanho)
-ls -la          # Inclui arquivos ocultos (começam com .)
-ls -lh          # Tamanhos legíveis (KB, MB, GB)
-ls -ltr         # Ordenado por data (mais antigo primeiro)</code></pre>
-              <div class="options-table">
-                <table>
-                  <tr><td><code>-l</code></td><td>Formato longo</td></tr>
-                  <tr><td><code>-a</code></td><td>Arquivos ocultos</td></tr>
-                  <tr><td><code>-h</code></td><td>Tamanhos legíveis</td></tr>
-                  <tr><td><code>-t</code></td><td>Ordena por data</td></tr>
-                  <tr><td><code>-R</code></td><td>Recursivo</td></tr>
-                  <tr><td><code>-S</code></td><td>Ordena por tamanho</td></tr>
-                </table>
-              </div>
+              <div class="command-header"><code>Verificar e mudar seu shell</code><span class="cmd-tag">Prático</span></div>
+              <pre><code># Qual shell estou usando?
+echo $SHELL
+# /bin/bash
+
+# Listar shells disponíveis no sistema
+cat /etc/shells
+# /bin/sh
+# /bin/bash
+# /usr/bin/zsh
+# /bin/dash
+
+# Mudar shell padrão (requer logout/login)
+chsh -s /usr/bin/zsh
+
+# Executar um shell diferente temporariamente
+zsh      # entra no zsh
+exit     # volta ao shell anterior</code></pre>
             </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Recomendação:</strong> Aprenda bash primeiro — é o padrão universal em servidores, containers e scripts de automação. Quando dominar bash, migre para zsh no uso diário para aproveitar recursos extras.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Anatomia de um comando Linux</h3>
+          <p>Todo comando Linux segue a mesma estrutura fundamental:</p>
+          <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>cd</code><span class="cmd-tag">Essencial</span></div>
-              <p>Muda de diretório.</p>
-              <pre><code>cd /home/usuario     # Caminho absoluto
-cd Documents         # Caminho relativo
-cd ..                # Volta um nível
-cd ~                 # Vai para o home
-cd -                 # Volta ao último diretório</code></pre>
-              <div class="info-box">
-                <strong>Conceitos:</strong> Caminho absoluto começa com <code>/</code>. Caminho relativo é a partir de onde você está. <code>~</code> = home, <code>.</code> = atual, <code>..</code> = pai.
-              </div>
+              <div class="command-header"><code>Estrutura: comando [opções] [argumentos]</code><span class="cmd-tag">Sintaxe</span></div>
+              <pre><code># Estrutura genérica:
+comando  -opções  argumento1  argumento2
+
+# Exemplo real detalhado:
+ls       -la      /var/log
+
+# Decomposição:
+# ls      → COMANDO (o programa a executar)
+# -la     → OPÇÕES (modificam o comportamento: -l=longo, -a=ocultos)
+# /var/log → ARGUMENTO (alvo do comando — sobre o que agir)
+
+# Mais exemplos:
+cp       -rv      arquivo.txt    /backup/
+# cp      → comando (copiar)
+# -rv     → opções (-r=recursivo, -v=verbose)
+# arquivo.txt → argumento 1 (origem)
+# /backup/    → argumento 2 (destino)
+
+grep     -rni     "erro"        /var/log/
+# grep    → comando (buscar texto)
+# -rni    → opções (-r=recursivo, -n=linhas, -i=ignore case)
+# "erro"  → argumento 1 (padrão a buscar)
+# /var/log/ → argumento 2 (onde buscar)</code></pre>
             </div>
           </div>
-        </div>
+          <div class="info-box highlight">
+            <strong>Regras das opções:</strong>
+            <pre><code># Opções curtas (uma letra, com -)
+ls -l -a -h     # opções separadas
+ls -lah         # combinadas (mesmo efeito)
 
-        <!-- Criação e Manipulação -->
-        <div class="topic-block">
-          <h3>3. Criação e Manipulação de Arquivos</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>touch</code><span class="cmd-tag">Criar</span></div>
-              <p>Cria arquivo vazio ou atualiza timestamp.</p>
-              <pre><code>touch arquivo.txt
-touch file1.txt file2.txt</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>mkdir</code><span class="cmd-tag">Criar</span></div>
-              <p>Cria diretórios. Use <code>-p</code> para criar estrutura completa.</p>
-              <pre><code>mkdir projetos
-mkdir -p pai/filho/neto</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>cp</code><span class="cmd-tag">Copiar</span></div>
-              <p>Copia arquivos e diretórios.</p>
-              <pre><code>cp arquivo.txt copia.txt
-cp -r pasta/ destino/
-cp -i arquivo.txt destino/  # confirmação</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>mv</code><span class="cmd-tag">Mover</span></div>
-              <p>Move ou renomeia arquivos.</p>
-              <pre><code>mv arquivo.txt /tmp/
-mv antigo.txt novo.txt  # renomeia</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>rm</code><span class="cmd-tag danger">Remover</span></div>
-              <p>Remove permanentemente. <strong>Não existe lixeira!</strong></p>
-              <pre><code>rm arquivo.txt
-rm -r pasta/       # recursivo
-rm -rf pasta/      # forçado (PERIGOSO!)</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>find</code><span class="cmd-tag">Busca</span></div>
-              <p>Busca arquivos no sistema de arquivos.</p>
-              <pre><code>find /home -name "*.txt"
-find . -type f -size +100M
-find . -mtime -7  # últimos 7 dias</code></pre>
-            </div>
+# Opções longas (palavra, com --)
+ls --all --human-readable
+
+# Opções com valor
+tail -n 20 arquivo.txt        # -n recebe valor 20
+grep --max-count=5 "texto"    # --opção=valor
+
+# Convenções:
+# -h ou --help    → ajuda do comando
+# -v ou --verbose → saída detalhada
+# -V ou --version → versão do programa
+# -r ou -R        → recursivo
+# -f              → forçar (sem confirmação)</code></pre>
           </div>
         </div>
-
-        <!-- Visualização -->
-        <div class="topic-block">
-          <h3>4. Visualização de Conteúdo</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>cat</code><span class="cmd-tag">Leitura</span></div>
-              <p>Exibe conteúdo completo do arquivo.</p>
-              <pre><code>cat arquivo.txt
-cat -n arquivo.txt  # com números</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>less</code><span class="cmd-tag">Leitura</span></div>
-              <p>Visualiza com paginação. Ideal para arquivos grandes.</p>
-              <pre><code>less arquivo_grande.txt
-# Espaço=avança, b=volta, /=busca, q=sai</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>head / tail</code><span class="cmd-tag">Leitura</span></div>
-              <p>Mostra início ou final do arquivo.</p>
-              <pre><code>head -20 arquivo.txt   # 20 primeiras
-tail -f /var/log/syslog  # tempo real!</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>tar</code><span class="cmd-tag">Compactação</span></div>
-              <p>Empacota e compacta arquivos.</p>
-              <pre><code>tar -czvf backup.tar.gz pasta/
-tar -xzvf backup.tar.gz</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: FILESYSTEM HIERARCHY STANDARD -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Filesystem</span>
+          <h2>Filesystem Hierarchy Standard (FHS)</h2>
+          <p>Linux organiza seus arquivos em uma árvore de diretórios padronizada. Diferente do Windows (C:\, D:\), tudo parte de uma única raiz: <code>/</code>. Entender essa estrutura é essencial para administrar qualquer servidor.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Árvore de Diretórios — Visão Geral</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Estrutura FHS</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>/                          ← Raiz (root) — tudo começa aqui
+├── bin/                   ← Binários essenciais (ls, cp, mv, cat)
+├── sbin/                  ← Binários do sistema (fdisk, iptables, mount)
+├── boot/                  ← Kernel e bootloader (vmlinuz, grub)
+├── dev/                   ← Dispositivos (disco, USB, terminal como arquivos)
+├── etc/                   ← Configurações do sistema (nginx.conf, fstab, hosts)
+├── home/                  ← Diretórios pessoais dos usuários
+│   ├── joao/             ← Home do usuário joao (~)
+│   └── maria/            ← Home do usuário maria
+├── lib/                   ← Bibliotecas compartilhadas (.so — como .dll no Windows)
+├── media/                 ← Montagem automática (USB, CD)
+├── mnt/                   ← Montagem manual temporária
+├── opt/                   ← Software de terceiros (não vem com a distro)
+├── proc/                  ← Sistema de arquivos virtual (info do kernel/processos)
+├── root/                  ← Home do superusuário (root)
+├── run/                   ← Dados de runtime (PIDs, sockets)
+├── srv/                   ← Dados de serviços (web, FTP)
+├── sys/                   ← Interface com o kernel (hardware, drivers)
+├── tmp/                   ← Arquivos temporários (limpo no reboot)
+├── usr/                   ← Programas e dados do usuário (read-only)
+│   ├── bin/              ← Binários não-essenciais (gcc, python, git)
+│   ├── lib/              ← Bibliotecas de /usr/bin
+│   ├── local/            ← Software instalado manualmente
+│   └── share/            ← Dados compartilhados (man pages, docs)
+└── var/                   ← Dados variáveis (logs, cache, email, banco)
+    ├── log/              ← Logs do sistema e aplicações
+    ├── cache/            ← Cache de pacotes e aplicações
+    ├── tmp/              ← Temporários persistentes entre reboots
+    └── www/              ← Arquivos web (em algumas distros)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Detalhamento de cada diretório</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Diretório</th><th>Conteúdo</th><th>Quando você acessa</th><th>Exemplo prático</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>/</strong></td><td>Raiz do filesystem</td><td>Ponto de partida de tudo</td><td><code>cd /</code></td></tr>
+              <tr><td><strong>/home</strong></td><td>Dados pessoais de usuários</td><td>Seus arquivos, projetos, downloads</td><td><code>/home/joao/projetos/</code></td></tr>
+              <tr><td><strong>/etc</strong></td><td>Configurações do sistema</td><td>Configurar serviços, rede, DNS</td><td><code>/etc/nginx/nginx.conf</code></td></tr>
+              <tr><td><strong>/var/log</strong></td><td>Logs de sistema e apps</td><td>Debug, auditoria, monitoramento</td><td><code>/var/log/syslog</code></td></tr>
+              <tr><td><strong>/tmp</strong></td><td>Temporários (limpo no reboot)</td><td>Dados que não precisam persistir</td><td><code>/tmp/download-temp.zip</code></td></tr>
+              <tr><td><strong>/usr/bin</strong></td><td>Programas instalados</td><td>Executar ferramentas do sistema</td><td><code>/usr/bin/python3</code></td></tr>
+              <tr><td><strong>/usr/local</strong></td><td>Software instalado manualmente</td><td>Compilações, binários custom</td><td><code>/usr/local/bin/terraform</code></td></tr>
+              <tr><td><strong>/opt</strong></td><td>Software de terceiros</td><td>Apps que não seguem FHS padrão</td><td><code>/opt/google/chrome/</code></td></tr>
+              <tr><td><strong>/dev</strong></td><td>Dispositivos como arquivos</td><td>Discos, terminais, random</td><td><code>/dev/sda1</code> (disco)</td></tr>
+              <tr><td><strong>/proc</strong></td><td>Info do kernel (virtual)</td><td>Ver CPU, memória, processos</td><td><code>/proc/cpuinfo</code></td></tr>
+              <tr><td><strong>/bin</strong></td><td>Binários essenciais</td><td>Comandos básicos (ls, cat, cp)</td><td><code>/bin/bash</code></td></tr>
+              <tr><td><strong>/sbin</strong></td><td>Binários de administração</td><td>Comandos que requerem root</td><td><code>/sbin/iptables</code></td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>💡 Curiosidade:</strong> Em distros modernas (Ubuntu 20.04+), <code>/bin</code> é um symlink para <code>/usr/bin</code> e <code>/sbin</code> é symlink para <code>/usr/sbin</code>. A separação existe por compatibilidade histórica, mas na prática tudo vive em <code>/usr</code>.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Caminhos Absolutos vs Relativos</h3>
+          <p>Existem duas formas de referenciar qualquer arquivo ou diretório no Linux:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Caminho Absoluto</code><span class="cmd-tag">Completo</span></div>
+              <p>Começa sempre com <code>/</code> (raiz). É o endereço completo, funciona de qualquer lugar.</p>
+              <pre><code># Sempre começa com /
+/home/joao/projetos/app/main.py
+/etc/nginx/nginx.conf
+/var/log/syslog
+
+# Funciona independente de onde você está:
+cat /etc/hostname    # sempre funciona
+cd /var/log          # sempre vai para /var/log</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Caminho Relativo</code><span class="cmd-tag">Contextual</span></div>
+              <p>Relativo ao diretório atual (onde você está). Não começa com <code>/</code>.</p>
+              <pre><code># Depende de onde você está (pwd)
+# Se estou em /home/joao:
+cd projetos/app      # vai para /home/joao/projetos/app
+cat .bashrc          # lê /home/joao/.bashrc
+ls ../maria          # lista /home/maria (.. = pai)
+
+# Se estou em /var:
+cd log               # vai para /var/log
+cat log/syslog       # lê /var/log/syslog</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>Atalhos de navegação essenciais:</strong>
+            <pre><code>~     → Home do usuário atual (/home/joao)
+.     → Diretório atual (onde estou agora)
+..    → Diretório pai (um nível acima)
+-     → Último diretório visitado (cd - alterna entre dois)
+/     → Raiz do filesystem (início de tudo)
+
+# Combinações:
+~/projetos     → /home/joao/projetos
+./script.sh    → script.sh no diretório atual
+../../etc      → dois níveis acima, depois entra em etc
+~maria         → /home/maria (home de outro usuário)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>pwd e cd — Onde estou? Para onde vou?</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>pwd</code><span class="cmd-tag">Localização</span></div>
+              <p><strong>Print Working Directory</strong> — mostra o caminho absoluto do diretório atual.</p>
+              <pre><code>$ pwd
+/home/joao/projetos
+
+# pwd -P mostra caminho real (resolve symlinks)
+$ cd /usr/bin
+$ pwd
+/usr/bin
+$ pwd -P
+/usr/bin     # se não for symlink, é igual</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>cd</code><span class="cmd-tag">Navegação</span></div>
+              <p><strong>Change Directory</strong> — muda o diretório de trabalho.</p>
+              <pre><code># Exemplos completos:
+cd /               # vai para raiz
+cd ~               # vai para home (mesmo que cd sozinho)
+cd                 # também vai para home (sem argumentos)
+cd -               # alterna entre dois diretórios
+cd ..              # sobe um nível
+cd ../..           # sobe dois níveis
+cd ~/projetos      # home + subdiretório</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: NAVEGAÇÃO NO TERMINAL -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Navegação</span>
+          <h2>Navegação no Terminal</h2>
+          <p>Navegar pelo filesystem com agilidade é a habilidade mais fundamental. Domine estes comandos e você nunca mais se sentirá perdido no terminal.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>cd — Mudança de diretório em profundidade</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>cd — Todos os cenários de uso</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code># Navegação absoluta (começa com /)
+cd /                     # raiz
+cd /home/joao            # caminho completo
+cd /var/log/nginx        # direto para logs do nginx
+cd /etc/systemd/system   # serviços do systemd
+
+# Navegação relativa (a partir de onde estou)
+cd projetos              # entra em ./projetos
+cd projetos/backend/src  # entra em múltiplos níveis
+cd ..                    # sobe um nível
+cd ../..                 # sobe dois níveis
+cd ../../outro-projeto   # sobe dois e entra em outro
+
+# Atalhos especiais
+cd                       # vai para $HOME (sem argumentos)
+cd ~                     # vai para $HOME (explícito)
+cd ~root                 # vai para home do root (/root)
+cd ~maria                # vai para home da maria (/home/maria)
+cd -                     # volta ao último diretório
+cd -                     # alterna entre dois (press de novo)
+
+# Cenário prático de cd -
+$ pwd
+/home/joao/projetos
+$ cd /var/log
+$ pwd
+/var/log
+$ cd -
+/home/joao/projetos      # voltou!
+$ cd -
+/var/log                 # alternou de novo!</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Dica profissional:</strong> Use <code>pushd</code> e <code>popd</code> para navegar com pilha de diretórios:
+            <pre><code>pushd /var/log    # empilha e vai para /var/log
+pushd /etc        # empilha e vai para /etc
+popd              # volta para /var/log
+popd              # volta para diretório original
+dirs -v           # mostra a pilha de diretórios</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>ls — Listagem completa de diretórios</h3>
+          <p><code>ls</code> (list) é provavelmente o comando que você mais usará. Conheça todas as opções úteis:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ls — Opções essenciais</code><span class="cmd-tag">Listagem</span></div>
+              <pre><code># Básico
+ls                  # lista arquivos e diretórios (sem ocultos)
+ls /var/log         # lista conteúdo de outro diretório
+ls *.txt            # lista apenas .txt (wildcard)
+
+# Formato longo (-l)
+ls -l
+# -rw-r--r-- 1 joao devs 4096 Jan 15 10:30 arquivo.txt
+# │────────│ │ │──│ │──│ │──│ │─────────│  │─────────│
+# │permiss │ │ dono grupo tam   data       nome
+# │        │ links
+
+# Incluir ocultos (-a)
+ls -a               # mostra . .. .bashrc .ssh etc
+ls -A               # mostra ocultos sem . e ..
+
+# Tamanhos legíveis (-h)
+ls -lh
+# -rw-r--r-- 1 joao devs 4.0K Jan 15 10:30 config.yml
+# -rw-r--r-- 1 joao devs 2.3M Jan 15 10:30 backup.tar.gz
+# -rw-r--r-- 1 joao devs 1.1G Jan 15 10:30 database.dump
+
+# Ordenação
+ls -lt              # ordena por data (mais recente primeiro)
+ls -ltr             # ordena por data (mais antigo primeiro)
+ls -lS              # ordena por tamanho (maior primeiro)
+ls -lSr             # ordena por tamanho (menor primeiro)
+
+# Recursivo
+ls -R               # lista subdiretórios recursivamente
+ls -lR /etc/nginx   # tudo dentro de /etc/nginx
+
+# Outras úteis
+ls --color=auto     # cores para tipos (dir=azul, exec=verde)
+ls -i               # mostra inode number
+ls -d */            # lista apenas diretórios
+ls -1               # um item por linha (número 1, não L)</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>Combinações mais usadas no dia a dia:</strong>
+            <pre><code>ls -la          # detalhado + ocultos (mais usado!)
+ls -lah         # detalhado + ocultos + tamanho legível
+ls -ltr         # ordenado por data (mais antigo primeiro — útil para logs)
+ls -lSh         # ordenado por tamanho (achar arquivos grandes)
+ls -la /etc/    # ver configurações (muitos são ocultos)
+
+# Alias recomendado (adicione ao ~/.bashrc):
+alias ll='ls -lah --color=auto'
+alias la='ls -A --color=auto'
+alias l='ls -CF --color=auto'</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>tree — Visualização em árvore</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>tree</code><span class="cmd-tag">Visualização</span></div>
+              <p>Mostra a estrutura de diretórios como árvore hierárquica. Muito melhor que ls -R para entender a organização.</p>
+              <pre><code># Instalar (não vem por padrão)
+sudo apt install tree    # Ubuntu/Debian
+sudo yum install tree    # CentOS/RHEL
+
+# Uso básico
+$ tree
+.
+├── src/
+│   ├── main.py
+│   ├── utils.py
+│   └── config/
+│       └── settings.yaml
+├── tests/
+│   └── test_main.py
+├── README.md
+└── requirements.txt
+
+3 directories, 5 files
+
+# Limitar profundidade
+tree -L 2              # máximo 2 níveis
+tree -L 1              # apenas primeiro nível
+
+# Apenas diretórios
+tree -d                # não mostra arquivos
+tree -d -L 2           # diretórios até 2 níveis
+
+# Com tamanhos
+tree -h                # tamanhos legíveis
+tree --du              # tamanho acumulado por diretório
+
+# Filtrar
+tree -P "*.py"         # apenas arquivos .py
+tree -I "node_modules|.git"  # ignorar padrões
+tree -I "__pycache__"  # ignorar cache do Python
+
+# Colorido
+tree -C                # cores no terminal</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Tab Completion — Economia de tempo</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Tab (Autocompletar)</code><span class="cmd-tag">Produtividade</span></div>
+              <p>A tecla <kbd>Tab</kbd> é seu melhor amigo no terminal. Completa nomes de arquivos, diretórios, comandos e até argumentos.</p>
+              <pre><code># Completar nome de arquivo/diretório
+$ cd /etc/sys[TAB]
+$ cd /etc/systemd/     # completou automaticamente!
+
+# Se houver múltiplas opções: TAB TAB mostra todas
+$ cd /etc/s[TAB][TAB]
+security/  selinux/  skel/  ssh/  ssl/  systemd/
+
+# Completar comandos
+$ sys[TAB][TAB]
+systemctl  systemd-analyze  systemd-escape  ...
+
+# Completar argumentos de comandos (com bash-completion)
+$ git ch[TAB][TAB]
+checkout  cherry  cherry-pick
+
+$ docker [TAB][TAB]
+build  compose  container  exec  image  ...
+
+# Instalar bash-completion para mais funcionalidades:
+sudo apt install bash-completion
+source /etc/bash_completion</code></pre>
+              <div class="info-box">
+                <strong>💡 Regra de ouro:</strong> Se você está digitando mais de 5 caracteres sem apertar Tab, está fazendo errado. Tab completion previne erros de digitação e economiza horas ao longo de uma carreira.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Histórico de Comandos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>history e atalhos</code><span class="cmd-tag">Produtividade</span></div>
+              <pre><code># Ver histórico completo
+history
+
+# Ver últimos N comandos
+history 20
+
+# Executar comando do histórico por número
+!42               # executa comando número 42
+!-3               # executa o terceiro último comando
+
+# Executar último comando
+!!                # repete o último comando inteiro
+sudo !!           # repete último comando com sudo (muito útil!)
+
+# Buscar no histórico por início
+!cd               # último comando que começou com "cd"
+!grep             # último comando que começou com "grep"
+
+# Busca reversa interativa (CTRL+R)
+# Pressione Ctrl+R e comece a digitar:
+(reverse-i-search)`docker': docker run -d -p 80:80 nginx
+# Enter para executar, Ctrl+R para próximo resultado
+# Ctrl+G ou Esc para cancelar
+
+# Limpar histórico
+history -c        # limpa o histórico da sessão atual
+
+# Arquivo do histórico
+cat ~/.bash_history    # histórico persistente em disco
+
+# Configurações úteis (adicione ao ~/.bashrc):
+export HISTSIZE=10000        # comandos na memória
+export HISTFILESIZE=20000    # comandos no arquivo
+export HISTCONTROL=ignoredups:erasedups  # sem duplicatas
+export HISTIGNORE="ls:cd:pwd:exit:clear"  # ignorar comandos simples</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>Atalhos de teclado essenciais no bash:</strong>
+            <pre><code>Ctrl+R     → Busca reversa no histórico
+Ctrl+A     → Mover cursor para início da linha
+Ctrl+E     → Mover cursor para fim da linha
+Ctrl+W     → Apagar palavra anterior
+Ctrl+U     → Apagar do cursor até início
+Ctrl+K     → Apagar do cursor até fim
+Ctrl+L     → Limpar tela (mesmo que clear)
+Ctrl+C     → Cancelar comando atual
+Ctrl+D     → Sair do shell (logout)
+Alt+.      → Inserir último argumento do comando anterior
+↑ / ↓      → Navegar pelo histórico</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: MANIPULAÇÃO DE ARQUIVOS E DIRETÓRIOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Manipulação</span>
+          <h2>Manipulação de Arquivos e Diretórios</h2>
+          <p>Criar, copiar, mover, renomear e remover — as operações fundamentais que todo administrador de sistemas executa dezenas de vezes por dia.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>touch — Criar arquivos e atualizar timestamps</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>touch</code><span class="cmd-tag">Criar</span></div>
+              <p>Cria arquivos vazios ou atualiza o timestamp de arquivos existentes (access time e modification time).</p>
+              <pre><code># Criar arquivo vazio
+touch arquivo.txt
+
+# Criar múltiplos arquivos de uma vez
+touch file1.txt file2.txt file3.txt
+
+# Criar arquivos com nomes complexos (use aspas)
+touch "meu arquivo com espaços.txt"
+touch arquivo-com-{1,2,3}.log    # brace expansion
+
+# Atualizar timestamp (arquivo já existe)
+touch arquivo-existente.txt      # atualiza mtime e atime
+
+# Definir data específica
+touch -t 202401150930 arquivo.txt   # 15/Jan/2024 09:30
+touch -d "2024-01-15 09:30" arquivo.txt  # formato ISO
+
+# Copiar timestamp de outro arquivo
+touch -r referencia.txt alvo.txt    # alvo recebe timestamps de referencia
+
+# Verificar que funcionou
+stat arquivo.txt    # mostra todos os timestamps</code></pre>
+              <div class="info-box">
+                <strong>💡 Por que atualizar timestamps?</strong> Ferramentas de build (make, cmake) usam timestamps para decidir o que recompilar. Sistemas de backup usam mtime para detectar mudanças. Logs usam timestamps para ordenação.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>mkdir — Criar diretórios</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>mkdir</code><span class="cmd-tag">Criar</span></div>
+              <p><strong>Make Directory</strong> — cria diretórios. A flag <code>-p</code> é essencial para criar estruturas aninhadas.</p>
+              <pre><code># Criar um diretório
+mkdir projetos
+
+# Criar múltiplos diretórios
+mkdir dir1 dir2 dir3
+
+# Criar estrutura aninhada (SEM -p = ERRO)
+mkdir pai/filho/neto
+# mkdir: cannot create directory 'pai/filho/neto': No such file or directory
+
+# Criar estrutura aninhada (COM -p = sucesso)
+mkdir -p pai/filho/neto    # cria pai/, pai/filho/, pai/filho/neto/
+
+# Criar estrutura complexa de projeto
+mkdir -p projeto/{src,tests,docs,config}
+mkdir -p projeto/src/{controllers,models,services,utils}
+# Resultado:
+# projeto/
+# ├── config/
+# ├── docs/
+# ├── src/
+# │   ├── controllers/
+# │   ├── models/
+# │   ├── services/
+# │   └── utils/
+# └── tests/
+
+# Criar com permissões específicas
+mkdir -m 755 publico       # rwxr-xr-x
+mkdir -m 700 privado       # rwx------
+
+# Verbose (mostra o que está criando)
+mkdir -pv app/{frontend,backend}/{src,dist,config}
+# mkdir: created directory 'app'
+# mkdir: created directory 'app/frontend'
+# mkdir: created directory 'app/frontend/src'
+# ...</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>cp — Copiar arquivos e diretórios</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>cp</code><span class="cmd-tag">Copiar</span></div>
+              <p><strong>Copy</strong> — copia arquivos e diretórios. Para diretórios, sempre use <code>-r</code> (recursivo).</p>
+              <pre><code># Copiar arquivo
+cp original.txt copia.txt
+
+# Copiar para outro diretório (mantém o nome)
+cp arquivo.txt /backup/
+cp arquivo.txt /backup/novo-nome.txt    # copiar e renomear
+
+# Copiar múltiplos arquivos para um diretório
+cp file1.txt file2.txt file3.txt /destino/
+cp *.log /backup/logs/                  # wildcard
+
+# Copiar diretório inteiro (-r = recursivo)
+cp -r projeto/ projeto-backup/
+cp -r /etc/nginx /backup/nginx-config
+
+# Opções importantes:
+cp -i arquivo.txt /destino/    # -i = interativo (pergunta antes de sobrescrever)
+cp -v arquivo.txt /destino/    # -v = verbose (mostra o que está copiando)
+cp -u *.txt /backup/           # -u = update (copia só se origem é mais novo)
+cp -p arquivo.txt /backup/     # -p = preservar (permissões, timestamps, dono)
+cp -a projeto/ /backup/        # -a = archive (-r + -p + links, o mais completo)
+
+# Cenários práticos:
+# Backup antes de editar configuração:
+cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+
+# Copiar estrutura sem conteúdo dos arquivos:
+rsync -a --include='*/' --exclude='*' src/ dest/</code></pre>
+              <div class="info-box">
+                <strong>⚠️ Cuidado:</strong> <code>cp</code> por padrão sobrescreve arquivos sem perguntar! Use <code>cp -i</code> ou configure <code>alias cp='cp -i'</code> no seu ~/.bashrc para segurança.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>mv — Mover e renomear</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>mv</code><span class="cmd-tag">Mover/Renomear</span></div>
+              <p><strong>Move</strong> — move arquivos/diretórios entre locais ou renomeia. Diferente do <code>cp</code>, o original deixa de existir.</p>
+              <pre><code># Renomear arquivo
+mv antigo.txt novo.txt
+mv relatorio.doc relatorio-final.doc
+
+# Renomear diretório
+mv projeto-v1 projeto-v2
+
+# Mover para outro diretório
+mv arquivo.txt /home/joao/documentos/
+mv *.log /var/log/archive/
+
+# Mover e renomear ao mesmo tempo
+mv /tmp/download.tar.gz ~/backups/backup-2024-01-15.tar.gz
+
+# Mover múltiplos arquivos
+mv file1.txt file2.txt file3.txt /destino/
+mv *.jpg ~/imagens/
+
+# Opções importantes:
+mv -i arquivo.txt /destino/    # -i = perguntar antes de sobrescrever
+mv -v *.txt /backup/           # -v = verbose
+mv -n arquivo.txt /destino/    # -n = não sobrescrever se destino existe
+mv -u arquivo.txt /destino/    # -u = mover só se origem é mais novo
+
+# Cenário: organizar downloads
+mv ~/Downloads/*.pdf ~/Documentos/PDFs/
+mv ~/Downloads/*.jpg ~/Imagens/
+mv ~/Downloads/*.mp4 ~/Videos/</code></pre>
+              <div class="info-box">
+                <strong>💡 mv vs cp+rm:</strong> <code>mv</code> dentro do mesmo filesystem é instantâneo (apenas renomeia o inode). Entre filesystems diferentes, <code>mv</code> internamente faz cp+rm. Para mover dados grandes entre discos, <code>rsync</code> é mais seguro (permite retomar transferências interrompidas).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>rm — Remover (COM CUIDADO!)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>rm</code><span class="cmd-tag danger">Remover</span></div>
+              <p><strong>Remove</strong> — apaga arquivos e diretórios permanentemente. <strong>Não existe lixeira no terminal Linux!</strong> Uma vez removido, é quase impossível recuperar.</p>
+              <pre><code># Remover arquivo
+rm arquivo.txt
+
+# Remover múltiplos arquivos
+rm file1.txt file2.txt file3.txt
+rm *.log                    # todos os .log
+rm *.tmp *.bak              # temporários e backups
+
+# Remover diretório vazio
+rmdir pasta-vazia/          # só funciona se está vazio
+
+# Remover diretório com conteúdo (-r = recursivo)
+rm -r pasta-com-conteudo/
+
+# Forçar sem confirmações (-f = force)
+rm -f arquivo-protegido.txt    # não pede confirmação
+
+# O COMANDO MAIS PERIGOSO DO LINUX:
+rm -rf diretorio/              # recursivo + forçado
+
+# ⚠️ NUNCA EXECUTE ESTES COMANDOS:
+# rm -rf /                     # APAGA TODO O SISTEMA
+# rm -rf /*                    # APAGA TODO O SISTEMA
+# rm -rf ~                     # APAGA TODOS SEUS ARQUIVOS
+# rm -rf .                     # APAGA TUDO NO DIRETÓRIO ATUAL
+
+# Modo seguro (-i = interativo)
+rm -ri pasta/               # pergunta para CADA arquivo
+# rm: remove regular file 'pasta/a.txt'? y
+# rm: remove regular file 'pasta/b.txt'? n
+
+# Verbose
+rm -rv pasta/               # mostra o que está removendo
+
+# Proteger contra erros com -- (fim de opções)
+rm -- -arquivo-com-traço.txt    # sem -- interpretaria como flag</code></pre>
+              <div class="info-box highlight">
+                <strong>🛡️ Práticas de segurança com rm:</strong>
+                <pre><code># 1. SEMPRE verifique antes de rm -rf:
+ls pasta-a-remover/         # veja o que tem dentro primeiro!
+pwd                         # confirme onde está!
+
+# 2. Use alias de proteção no ~/.bashrc:
+alias rm='rm -i'            # sempre pedir confirmação
+
+# 3. Use trash-cli ao invés de rm para uso diário:
+sudo apt install trash-cli
+trash-put arquivo.txt       # move para lixeira
+trash-list                  # ver lixeira
+trash-restore               # restaurar
+
+# 4. Em scripts, valide variáveis ANTES de usar com rm:
+# ERRADO: rm -rf $DIR/   (se $DIR está vazio, vira rm -rf /)
+# CERTO:
+if [ -n "$DIR" ] && [ -d "$DIR" ]; then
+    rm -rf "$DIR"
+fi</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>ln — Links simbólicos e hard links</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Symlink (Link Simbólico)</code><span class="cmd-tag">Atalho</span></div>
+              <p>Como um "atalho" do Windows. Aponta para o caminho do arquivo original. Se o original for removido, o link fica quebrado.</p>
+              <pre><code># Criar symlink
+ln -s /caminho/original link-nome
+
+# Exemplos práticos:
+ln -s /opt/app-v2.3 /opt/app-current
+# /opt/app-current → aponta para v2.3
+# Para atualizar: mude o link, não a app
+
+ln -s ~/.config/nvim/init.vim ~/vimrc
+# Atalho conveniente
+
+# Verificar
+ls -la link-nome
+# lrwxrwxrwx 1 joao joao 18 Jan 15 link → /caminho/original
+
+# Remover symlink (não afeta original)
+rm link-nome
+unlink link-nome</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Hard Link</code><span class="cmd-tag">Referência</span></div>
+              <p>Cria outra "entrada" apontando para o mesmo inode (dados no disco). O arquivo só é deletado quando TODOS os hard links são removidos.</p>
+              <pre><code># Criar hard link
+ln original.txt hardlink.txt
+
+# Verificar (mesmo inode number!)
+ls -li
+# 1234567 -rw-r--r-- 2 joao joao 100 original.txt
+# 1234567 -rw-r--r-- 2 joao joao 100 hardlink.txt
+# ↑ mesmo inode      ↑ 2 links
+
+# Se remover o "original", o hardlink continua
+rm original.txt
+cat hardlink.txt    # dados ainda existem!
+
+# Limitações de hard links:
+# - Não funciona entre filesystems diferentes
+# - Não funciona com diretórios
+# - Mais confuso de gerenciar</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Quando usar cada um:</strong>
+            <pre><code>Symlink (ln -s) → 95% dos casos. Use para:
+  - Atalhos para diretórios
+  - Versionamento de apps (/opt/app-current → /opt/app-v2.3)
+  - Compartilhar configs entre ambientes
+  - Qualquer "referência" que pode mudar
+
+Hard Link (ln) → Casos específicos:
+  - Backups eficientes (rsync --link-dest)
+  - Manter dados enquanto pelo menos uma referência existir
+  - Não funciona com diretórios ou entre discos</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: VISUALIZAÇÃO DE CONTEÚDO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Visualização</span>
+          <h2>Visualização de Conteúdo</h2>
+          <p>Ler arquivos de diferentes formas é uma necessidade constante. Desde ver um arquivo inteiro até monitorar logs em tempo real, cada ferramenta tem seu caso de uso ideal.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>cat — Exibir e concatenar arquivos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>cat</code><span class="cmd-tag">Leitura</span></div>
+              <p><strong>Concatenate</strong> — exibe o conteúdo completo de um ou mais arquivos. Ideal para arquivos pequenos.</p>
+              <pre><code># Exibir conteúdo de um arquivo
+cat arquivo.txt
+
+# Exibir com números de linha
+cat -n arquivo.txt
+#      1  primeira linha
+#      2  segunda linha
+#      3  terceira linha
+
+# Numerar apenas linhas não-vazias
+cat -b arquivo.txt
+
+# Mostrar caracteres invisíveis
+cat -A arquivo.txt    # $ no fim de linha, ^I para tab
+cat -v arquivo.txt    # caracteres não-imprimíveis visíveis
+cat -T arquivo.txt    # tabs como ^I
+
+# Suprimir linhas vazias múltiplas
+cat -s arquivo.txt    # múltiplas vazias → uma só
+
+# Concatenar múltiplos arquivos
+cat parte1.txt parte2.txt parte3.txt
+cat header.html body.html footer.html > pagina.html
+
+# Criar arquivo com conteúdo (Ctrl+D para finalizar)
+cat > novo-arquivo.txt
+Primeira linha
+Segunda linha
+[Ctrl+D]
+
+# Adicionar conteúdo ao final de arquivo existente
+cat >> arquivo.txt
+Linha adicionada
+[Ctrl+D]
+
+# Uso com pipe (será aprofundado no módulo 02)
+cat /var/log/syslog | grep "error"
+cat arquivo.txt | wc -l</code></pre>
+              <div class="info-box">
+                <strong>⚠️ Quando NÃO usar cat:</strong> Para arquivos grandes (>1000 linhas), use <code>less</code>. Para ver apenas o início, use <code>head</code>. Para ver o final, use <code>tail</code>. <code>cat</code> despeja TUDO no terminal de uma vez, o que pode ser caótico com arquivos grandes.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>less / more — Paginação</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>less</code><span class="cmd-tag">Paginação</span></div>
+              <p><strong>Less is more</strong> — visualizador interativo com navegação. Não carrega o arquivo inteiro na memória (eficiente com arquivos gigantes).</p>
+              <pre><code># Abrir arquivo no less
+less /var/log/syslog
+less arquivo-grande.txt
+
+# Navegação dentro do less:
+# Espaço ou PgDn  → Avançar uma página
+# b ou PgUp       → Voltar uma página
+# Enter ou ↓      → Avançar uma linha
+# k ou ↑          → Voltar uma linha
+# G               → Ir para o final do arquivo
+# g               → Ir para o início do arquivo
+# 100G            → Ir para linha 100
+
+# Busca dentro do less:
+# /texto          → Buscar "texto" para frente
+# ?texto          → Buscar "texto" para trás
+# n               → Próxima ocorrência
+# N               → Ocorrência anterior
+
+# Outros atalhos:
+# q               → Sair
+# h               → Ajuda completa
+# -N              → Ativar/desativar números de linha
+# F               → Modo follow (como tail -f, Ctrl+C para sair)
+# v               → Abrir no editor ($EDITOR)
+
+# Opções de linha de comando:
+less -N arquivo.txt       # com números de linha
+less -S arquivo.txt       # não quebrar linhas longas (scroll horizontal)
+less +G arquivo.txt       # abrir no final (útil para logs)
+less +/erro arquivo.txt   # abrir e buscar "erro"
+
+# less com pipe
+cat /var/log/syslog | less
+dmesg | less
+ps aux | less</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>more</code><span class="cmd-tag">Legado</span></div>
+              <p>Versão antiga e mais simples. Só navega para frente. Use <code>less</code> que faz tudo que more faz e mais.</p>
+              <pre><code># Uso básico (Espaço=avança, q=sai)
+more arquivo.txt
+
+# A única vantagem: funciona mesmo
+# em sistemas ultra-minimalistas onde
+# less não está instalado (raro hoje)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>head / tail — Início e fim de arquivos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>head</code><span class="cmd-tag">Início</span></div>
+              <p>Mostra as primeiras linhas de um arquivo. Por padrão, 10 linhas.</p>
+              <pre><code># Primeiras 10 linhas (padrão)
+head arquivo.txt
+
+# Primeiras N linhas
+head -n 5 arquivo.txt     # 5 primeiras
+head -5 arquivo.txt       # mesmo efeito (atalho)
+head -n 1 arquivo.txt     # primeira linha apenas
+
+# Primeiros N bytes
+head -c 100 arquivo.txt   # primeiros 100 bytes
+head -c 1K arquivo.txt    # primeiro 1 kilobyte
+
+# Tudo EXCETO as últimas N linhas
+head -n -5 arquivo.txt    # tudo exceto últimas 5
+
+# Múltiplos arquivos
+head -n 3 *.txt
+# ==> file1.txt <==
+# linha 1
+# linha 2
+# linha 3
+# ==> file2.txt <==
+# ...</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tail</code><span class="cmd-tag">Fim</span></div>
+              <p>Mostra as últimas linhas. Essencial para monitorar logs em tempo real com <code>-f</code>.</p>
+              <pre><code># Últimas 10 linhas (padrão)
+tail arquivo.txt
+
+# Últimas N linhas
+tail -n 20 /var/log/syslog
+tail -20 /var/log/syslog
+
+# A partir da linha N
+tail -n +100 arquivo.txt  # da linha 100 até o fim
+
+# FOLLOW MODE (-f) — monitorar em tempo real
+tail -f /var/log/syslog
+# Fica "esperando" novas linhas aparecerem
+# Ctrl+C para parar
+
+# Follow com múltiplos arquivos
+tail -f /var/log/*.log
+
+# Follow que detecta rotação de log
+tail -F /var/log/nginx/access.log
+# -F = --follow=name --retry
+# Se o arquivo for rotacionado (logrotate),
+# tail -F reabre o novo arquivo automaticamente
+
+# Combinação poderosa: tail + grep
+tail -f /var/log/syslog | grep "error"
+# Mostra apenas linhas com "error" em tempo real
+
+# Últimos N bytes
+tail -c 500 arquivo.txt</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>💡 Cenário real — debug de aplicação:</strong>
+            <pre><code># Monitorar log da aplicação enquanto testa:
+# Terminal 1:
+tail -f /var/log/app/application.log | grep --color "ERROR\|WARN"
+
+# Terminal 2:
+curl http://localhost:3000/api/endpoint
+
+# Resultado: no Terminal 1 você vê em tempo real
+# as linhas de ERROR e WARN que a request gerou</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>wc — Contar linhas, palavras e caracteres</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>wc</code><span class="cmd-tag">Contagem</span></div>
+              <p><strong>Word Count</strong> — conta linhas, palavras e bytes/caracteres em arquivos.</p>
+              <pre><code># Contagem completa (linhas, palavras, bytes)
+wc arquivo.txt
+#   150  1200  8500  arquivo.txt
+# linhas palavras bytes
+
+# Apenas linhas
+wc -l arquivo.txt          # 150 arquivo.txt
+wc -l < arquivo.txt        # 150 (sem nome de arquivo)
+
+# Apenas palavras
+wc -w arquivo.txt          # 1200 arquivo.txt
+
+# Apenas bytes
+wc -c arquivo.txt          # 8500 arquivo.txt
+
+# Apenas caracteres (diferente de bytes em UTF-8)
+wc -m arquivo.txt
+
+# Maior linha (em bytes)
+wc -L arquivo.txt          # comprimento da maior linha
+
+# Contar múltiplos arquivos (com total)
+wc -l *.py
+#   50 main.py
+#   30 utils.py
+#   20 config.py
+#  100 total
+
+# Uso prático com pipes:
+ls /etc | wc -l            # quantos arquivos/dirs em /etc?
+ps aux | wc -l             # quantos processos rodando?
+grep -r "TODO" src/ | wc -l  # quantos TODOs no código?
+docker ps | wc -l          # quantos containers rodando?</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>file e stat — Identificar tipo e metadados</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>file</code><span class="cmd-tag">Tipo</span></div>
+              <p>Identifica o tipo real de um arquivo (não confia na extensão, analisa o conteúdo/magic bytes).</p>
+              <pre><code># Identificar tipo
+file documento.pdf
+# documento.pdf: PDF document, version 1.7
+
+file foto.jpg
+# foto.jpg: JPEG image data, 1920x1080
+
+file script.sh
+# script.sh: Bourne-Again shell script, ASCII text
+
+file binario
+# binario: ELF 64-bit LSB executable, x86-64
+
+file arquivo-sem-extensao
+# arquivo-sem-extensao: PNG image data, 800x600
+
+# Verificar múltiplos
+file *
+# Útil quando recebe arquivos sem extensão
+# ou suspeita que extensão está errada
+
+# Tipo MIME (para web/programação)
+file --mime-type imagem.png
+# imagem.png: image/png
+
+file --mime-encoding texto.txt
+# texto.txt: us-ascii</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>stat</code><span class="cmd-tag">Metadados</span></div>
+              <p>Mostra metadados detalhados: tamanho, permissões, timestamps, inode, links.</p>
+              <pre><code># Informações completas
+stat arquivo.txt
+#   File: arquivo.txt
+#   Size: 4096      Blocks: 8    IO Block: 4096  regular file
+# Device: 801h/2049d  Inode: 1234567  Links: 1
+# Access: (0644/-rw-r--r--)
+#   Uid: (1000/joao) Gid: (1000/devs)
+# Access: 2024-01-15 10:30:00.000
+# Modify: 2024-01-14 15:20:00.000
+# Change: 2024-01-14 15:20:00.000
+#  Birth: 2024-01-10 09:00:00.000
+
+# Timestamps explicados:
+# Access (atime) → última vez que foi lido
+# Modify (mtime) → última vez que conteúdo mudou
+# Change (ctime) → última vez que metadados mudaram
+# Birth           → quando foi criado
+
+# Formato customizado
+stat --format="%s bytes" arquivo.txt  # só tamanho
+stat --format="%U:%G" arquivo.txt     # dono:grupo
+stat -c "%a %n" *.txt  # permissões octal + nome</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: BUSCA DE ARQUIVOS E CONTEÚDO -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Busca</span>
+          <h2>Busca de Arquivos e Conteúdo</h2>
+          <p>Encontrar arquivos e texto em um servidor com milhares de arquivos é uma habilidade crítica. Linux oferece ferramentas poderosas para busca por nome, tipo, tamanho, data e conteúdo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>find — Busca avançada no filesystem</h3>
+          <p><code>find</code> é o comando mais versátil para localizar arquivos. Busca recursivamente a partir de um diretório, com filtros por nome, tipo, tamanho, data, permissão e muito mais.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>find — Busca por nome e tipo</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code># Sintaxe: find [onde] [critérios] [ação]
+
+# Buscar por nome (case-sensitive)
+find /home -name "arquivo.txt"
+find . -name "*.py"             # todos os .py no diretório atual e sub
+find /var/log -name "*.log"     # todos os logs
+
+# Buscar por nome (case-insensitive)
+find . -iname "readme*"         # README, Readme, readme...
+
+# Buscar por tipo
+find . -type f                  # f = arquivo regular (file)
+find . -type d                  # d = diretório
+find . -type l                  # l = link simbólico
+find /dev -type b               # b = block device (discos)
+find /dev -type c               # c = character device (terminais)
+
+# Combinar nome + tipo
+find . -type f -name "*.conf"   # apenas arquivos .conf (não dirs)
+find /etc -type d -name "nginx" # diretório chamado nginx</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>find — Busca por tamanho</code><span class="cmd-tag">Filtros</span></div>
+              <pre><code># Buscar por tamanho
+find . -size +100M              # maiores que 100MB
+find . -size -1k                # menores que 1KB
+find . -size 4096c              # exatamente 4096 bytes
+find /var -size +1G             # arquivos gigantes
+
+# Unidades: c=bytes, k=KB, M=MB, G=GB
+
+# Cenário: encontrar arquivos que estão consumindo disco
+find / -type f -size +500M 2>/dev/null | head -20
+
+# Encontrar diretórios pesados
+du -sh */ | sort -rh | head -10</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>find — Busca por data/hora</code><span class="cmd-tag">Temporal</span></div>
+              <pre><code># Modificados nos últimos N dias
+find . -mtime -7                # modificados nos últimos 7 dias
+find . -mtime +30               # modificados há mais de 30 dias
+find . -mtime 1                 # modificados exatamente ontem
+
+# Modificados nos últimos N minutos
+find . -mmin -60                # última hora
+find . -mmin -5                 # últimos 5 minutos
+
+# Acessados (access time)
+find . -atime -1                # acessados nas últimas 24h
+
+# Alteração de metadados (change time)
+find . -ctime -1                # metadados alterados (chmod, chown)
+
+# Mais novos que um arquivo de referência
+find . -newer referencia.txt    # modificados depois de referencia.txt
+
+# Cenário: encontrar logs antigos para limpeza
+find /var/log -name "*.log" -mtime +90 -type f
+# Logs com mais de 90 dias</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>find — Busca por permissão e dono</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Buscar por permissão
+find . -perm 777                # exatamente 777 (perigoso!)
+find . -perm -644               # pelo menos 644
+find / -perm -4000 -type f      # arquivos com SUID (auditoria)
+find / -perm -2000 -type f      # arquivos com SGID
+
+# Buscar por dono/grupo
+find / -user joao               # todos os arquivos do joao
+find / -group developers        # todos do grupo developers
+find / -nouser                  # arquivos sem dono (orfãos)
+find / -nogroup                 # arquivos sem grupo</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>find — Ações (exec, delete)</code><span class="cmd-tag">Poderoso</span></div>
+              <pre><code># Executar comando em cada resultado
+find . -name "*.tmp" -exec rm {} \;       # remover cada .tmp
+find . -name "*.sh" -exec chmod +x {} \;  # tornar executável
+find . -name "*.log" -exec gzip {} \;     # comprimir cada log
+
+# {} = placeholder para o arquivo encontrado
+# \; = fim do comando exec
+
+# Usar + ao invés de \; (mais eficiente, agrupa argumentos)
+find . -name "*.txt" -exec grep -l "erro" {} +
+
+# Pedir confirmação antes de executar
+find . -name "*.bak" -ok rm {} \;
+# rm ... ./file1.bak ? y
+# rm ... ./file2.bak ? n
+
+# Deletar diretamente (mais eficiente que -exec rm)
+find /tmp -type f -mtime +7 -delete      # limpar /tmp
+
+# Cenários práticos do dia a dia:
+# 1. Encontrar e listar arquivos grandes
+find / -type f -size +100M -exec ls -lh {} \; 2>/dev/null
+
+# 2. Limpar cache antigo
+find /var/cache -type f -atime +30 -delete
+
+# 3. Encontrar configurações editadas recentemente
+find /etc -type f -mmin -60
+
+# 4. Buscar arquivos com permissão world-writable (segurança)
+find / -type f -perm -o+w 2>/dev/null
+
+# 5. Contar arquivos por extensão
+find . -type f | sed 's/.*\.//' | sort | uniq -c | sort -rn</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>locate — Busca rápida via banco de dados</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>locate</code><span class="cmd-tag">Rápido</span></div>
+              <p>Busca instantânea usando um banco de dados pré-construído. Muito mais rápido que <code>find</code>, mas pode não estar atualizado.</p>
+              <pre><code># Instalar (se não tiver)
+sudo apt install plocate    # Ubuntu 22.04+
+sudo apt install mlocate    # Ubuntu mais antigo
+
+# Atualizar banco de dados (necessário após criar novos arquivos)
+sudo updatedb
+
+# Buscar
+locate nginx.conf
+# /etc/nginx/nginx.conf
+# /usr/share/doc/nginx/examples/nginx.conf
+
+# Case-insensitive
+locate -i readme
+# /home/joao/projeto/README.md
+# /usr/share/doc/bash/README
+
+# Contar resultados
+locate -c "*.py"        # quantos .py existem no sistema?
+
+# Limitar resultados
+locate -l 5 "*.conf"    # apenas 5 primeiros
+
+# locate vs find:
+# locate → instantâneo, mas usa banco de dados (pode estar desatualizado)
+# find   → sempre atualizado, mas varre o disco (pode ser lento)
+
+# Quando usar cada:
+# locate → busca rápida por nome de arquivo
+# find   → busca com critérios complexos (tamanho, data, permissão)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>which / whereis — Localizar executáveis</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>which</code><span class="cmd-tag">Executável</span></div>
+              <p>Mostra o caminho completo de um comando/programa. Busca nos diretórios do $PATH.</p>
+              <pre><code># Onde está o executável?
+which python3
+# /usr/bin/python3
+
+which docker
+# /usr/bin/docker
+
+which terraform
+# /usr/local/bin/terraform
+
+# Múltiplos comandos
+which python3 node npm
+
+# Verificar se comando existe
+which comandoXYZ
+# (sem saída = não encontrado)
+# Use $? para verificar:
+which python3 && echo "existe" || echo "não existe"
+
+# Mostrar todos (se houver múltiplos no PATH)
+which -a python
+# /usr/bin/python
+# /usr/local/bin/python</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>whereis</code><span class="cmd-tag">Completo</span></div>
+              <p>Além do executável, mostra localização do código-fonte e man pages.</p>
+              <pre><code># Informações completas
+whereis nginx
+# nginx: /usr/sbin/nginx
+#        /usr/lib/nginx
+#        /etc/nginx
+#        /usr/share/nginx
+#        /usr/share/man/man8/nginx.8.gz
+
+whereis python3
+# python3: /usr/bin/python3
+#          /usr/lib/python3
+#          /usr/share/man/man1/python3.1.gz
+
+# Apenas binários
+whereis -b nginx
+# nginx: /usr/sbin/nginx
+
+# Apenas man pages
+whereis -m nginx
+
+# Apenas fontes
+whereis -s nginx</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>grep — Buscar texto dentro de arquivos (introdução)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>grep — Basics</code><span class="cmd-tag">Busca de texto</span></div>
+              <p><strong>Global Regular Expression Print</strong> — busca padrões de texto dentro de arquivos. Aqui cobrimos o básico; no módulo 03 aprofundaremos com regex.</p>
+              <pre><code># Buscar texto em um arquivo
+grep "erro" /var/log/syslog
+grep "connection refused" app.log
+
+# Case-insensitive (-i)
+grep -i "error" /var/log/syslog     # Error, ERROR, error...
+
+# Recursivo em diretórios (-r)
+grep -r "TODO" ~/projetos/          # busca em todos os arquivos
+grep -r "password" /etc/            # auditoria de segurança
+
+# Mostrar número da linha (-n)
+grep -n "function" main.js
+# 15:function calcular() {
+# 42:function validar() {
+
+# Mostrar contexto (linhas ao redor)
+grep -B 2 "error" log.txt     # 2 linhas Before
+grep -A 3 "error" log.txt     # 3 linhas After
+grep -C 2 "error" log.txt     # 2 linhas Context (before + after)
+
+# Inverter (mostrar linhas que NÃO contêm)
+grep -v "debug" app.log       # tudo exceto linhas com "debug"
+
+# Contar ocorrências
+grep -c "error" /var/log/syslog    # número de linhas com "error"
+
+# Listar apenas nomes de arquivos que contêm
+grep -rl "TODO" src/           # -l = só nomes de arquivo
+grep -rL "test" src/           # -L = arquivos que NÃO contêm
+
+# Combinar com outros comandos (pipe)
+ps aux | grep nginx            # processos do nginx
+cat /etc/passwd | grep joao    # info do usuário
+dmesg | grep -i "usb"         # mensagens USB do kernel
+
+# Cenário prático: buscar erro em logs
+grep -rn "Exception\|Error\|FATAL" /var/log/app/ --include="*.log"</code></pre>
+              <div class="info-box">
+                <strong>💡 Prévia:</strong> No módulo 03 (Intermediário), aprofundaremos grep com expressões regulares (regex), <code>egrep</code>, e combinações avançadas com <code>sed</code> e <code>awk</code>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: WILDCARDS E EXPANSÃO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Wildcards</span>
+          <h2>Wildcards e Expansão</h2>
+          <p>Wildcards (curingas) permitem trabalhar com múltiplos arquivos de uma vez usando padrões. O shell expande esses padrões antes de executar o comando — isso se chama "globbing".</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>* — Qualquer quantidade de caracteres</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>* (asterisco)</code><span class="cmd-tag">Coringa</span></div>
+              <p>Substitui zero ou mais caracteres. O wildcard mais usado.</p>
+              <pre><code># Todos os arquivos .txt
+ls *.txt
+# arquivo.txt  notas.txt  readme.txt
+
+# Todos os arquivos que começam com "log"
+ls log*
+# log.txt  log-2024-01.txt  log-backup.tar.gz
+
+# Todos os arquivos que terminam com "-backup"
+ls *-backup*
+# db-backup.sql  site-backup.tar.gz
+
+# Todos os arquivos (exceto ocultos)
+ls *
+
+# Combinar com comandos
+cp *.py /backup/python/     # copiar todos os .py
+rm *.tmp                    # remover temporários
+mv *.jpg ~/imagens/         # mover imagens
+find . -name "*.log"        # buscar logs
+
+# * NÃO corresponde a arquivos ocultos (começam com .)
+ls *         # NÃO mostra .bashrc, .ssh/
+ls .*        # mostra APENAS ocultos
+ls -a        # mostra TODOS (melhor opção)
+
+# * em caminhos
+ls /var/log/*.log           # logs no /var/log
+ls /home/*/projetos/        # projetos de todos os usuários
+cat /etc/nginx/sites-enabled/*   # todas as configs do nginx</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>? — Exatamente um caractere</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>? (interrogação)</code><span class="cmd-tag">Um caractere</span></div>
+              <p>Substitui exatamente UM caractere (qualquer um).</p>
+              <pre><code># Arquivos com exatamente 1 caractere no nome + extensão
+ls ?.txt
+# a.txt  b.txt  1.txt
+
+# Arquivos com padrão específico
+ls file?.txt
+# file1.txt  file2.txt  fileA.txt
+# (NÃO pega file10.txt — ? é UM caractere só)
+
+# Combinar múltiplos ?
+ls ???.txt
+# abc.txt  xyz.txt  123.txt (nomes de 3 caracteres)
+
+# Extensões de 3 letras
+ls *.???
+# foto.jpg  dados.csv  site.htm  app.exe
+
+# Cenário: logs numerados
+ls access.log.?
+# access.log.1  access.log.2  ... access.log.9
+# (não pega access.log.10 — seria ??)
+
+ls access.log.??
+# access.log.10  access.log.11  ... access.log.99</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>[] — Range de caracteres</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>[] (colchetes)</code><span class="cmd-tag">Range</span></div>
+              <p>Substitui UM caractere dentro do conjunto especificado.</p>
+              <pre><code># Um caractere do conjunto
+ls file[123].txt
+# file1.txt  file2.txt  file3.txt
+
+# Range de caracteres
+ls file[1-5].txt          # file1 a file5
+ls [a-z]*.txt             # começa com letra minúscula
+ls [A-Z]*.txt             # começa com letra maiúscula
+ls [0-9]*.log             # começa com número
+
+# Negar (NOT) com ^ ou !
+ls [!0-9]*                # NÃO começa com número
+ls file[^ab].txt          # file + qualquer char exceto a ou b
+
+# Classes de caracteres POSIX
+ls [[:upper:]]*           # começa com maiúscula
+ls [[:lower:]]*           # começa com minúscula
+ls [[:digit:]]*           # começa com dígito
+ls [[:alpha:]]*           # começa com letra
+ls [[:alnum:]]*           # começa com alfanumérico
+
+# Exemplos práticos
+ls /dev/sd[a-z]           # discos SATA/SCSI
+ls /dev/sd[a-z][1-9]     # partições
+cp log-2024-0[1-6]* /backup/  # logs do primeiro semestre
+rm screenshot-[0-9][0-9][0-9].png  # screenshots numerados</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>{} — Brace Expansion</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>{} (chaves)</code><span class="cmd-tag">Expansão</span></div>
+              <p>Gera múltiplas strings a partir de um padrão. Diferente de wildcards, brace expansion NÃO depende de arquivos existirem — gera os nomes antes de verificar.</p>
+              <pre><code># Lista de valores
+echo {a,b,c}
+# a b c
+
+touch arquivo-{1,2,3}.txt
+# Cria: arquivo-1.txt  arquivo-2.txt  arquivo-3.txt
+
+# Sequência numérica
+echo {1..10}
+# 1 2 3 4 5 6 7 8 9 10
+
+echo {01..12}
+# 01 02 03 04 05 06 07 08 09 10 11 12 (com zero-padding!)
+
+mkdir dir-{01..05}
+# Cria: dir-01  dir-02  dir-03  dir-04  dir-05
+
+# Sequência alfabética
+echo {a..z}
+# a b c d e f g h i j k l m n o p q r s t u v w x y z
+
+# Sequência com incremento
+echo {0..100..10}
+# 0 10 20 30 40 50 60 70 80 90 100
+
+# Combinações (produto cartesiano)
+echo {A,B}{1,2,3}
+# A1 A2 A3 B1 B2 B3
+
+touch test-{unit,integration,e2e}-{01..03}.py
+# test-unit-01.py  test-unit-02.py  test-unit-03.py
+# test-integration-01.py  test-integration-02.py  ...
+# test-e2e-01.py  test-e2e-02.py  test-e2e-03.py
+
+# Criar estrutura de projeto completa
+mkdir -p projeto/{src/{controllers,models,services},tests,docs,config}
+
+# Backup com brace expansion
+cp config.yml{,.bak}
+# Equivale a: cp config.yml config.yml.bak
+
+# Renomear extensão
+mv arquivo.{txt,md}
+# Equivale a: mv arquivo.txt arquivo.md
+
+# Cenário: criar estrutura mensal de logs
+mkdir -p logs/2024/{01..12}
+# logs/2024/01/  logs/2024/02/  ...  logs/2024/12/</code></pre>
+              <div class="info-box">
+                <strong>💡 Wildcards vs Brace Expansion:</strong>
+                <pre><code># Wildcards (* ? []) → fazem "glob" — expandem para arquivos que EXISTEM
+ls *.txt              # só mostra .txt que existem no diretório
+
+# Brace expansion {} → gera strings ANTES de verificar existência
+touch {a,b,c}.txt     # cria os arquivos (não precisam existir antes)
+echo {1..5}           # imprime "1 2 3 4 5" (não importa se existem)</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplos práticos combinados</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Cenários reais do dia a dia</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># 1. Organizar downloads por tipo
+mv ~/Downloads/*.{jpg,jpeg,png,gif,webp} ~/Imagens/
+mv ~/Downloads/*.{pdf,doc,docx,txt} ~/Documentos/
+mv ~/Downloads/*.{mp4,mkv,avi} ~/Videos/
+
+# 2. Backup seletivo de configurações
+cp /etc/{nginx,apache2,mysql}/*.conf /backup/configs/
+
+# 3. Limpar arquivos temporários de múltiplas extensões
+rm -f *.{tmp,bak,swp,~}
+find . -name "*.pyc" -o -name "__pycache__" -type d | xargs rm -rf
+
+# 4. Criar múltiplos ambientes
+mkdir -p environments/{dev,staging,prod}/{configs,secrets,data}
+
+# 5. Listar apenas código-fonte (excluir binários e vendored)
+ls src/**/*.{js,ts,py,go,rs}
+
+# 6. Copiar apenas tipos específicos recursivamente
+find . -name "*.py" -exec cp {} /backup/python/ \;
+
+# 7. Verificar permissões de scripts
+ls -la scripts/[a-z]*.sh
+
+# 8. Encontrar arquivos de configuração editados recentemente
+find /etc -name "*.conf" -mtime -1 -type f</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: AJUDA E DOCUMENTAÇÃO -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Documentação</span>
+          <h2>Ajuda e Documentação</h2>
+          <p>Um bom profissional Linux não memoriza todos os comandos — sabe onde encontrar a informação. O Linux possui um sistema de documentação completo integrado ao terminal.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>man — Manual Pages</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>man</code><span class="cmd-tag">Manual</span></div>
+              <p><strong>Manual</strong> — documentação oficial e detalhada de praticamente todo comando, arquivo de configuração e chamada de sistema.</p>
+              <pre><code># Abrir manual de um comando
+man ls
+man grep
+man find
+man bash
+
+# Navegação dentro do man (usa less internamente):
+# Espaço     → próxima página
+# b          → página anterior
+# /texto     → buscar
+# n          → próxima ocorrência
+# q          → sair
+
+# Seções do man (cada uma cobre um tipo de conteúdo):
+# 1 = Comandos do usuário (ls, cp, grep)
+# 2 = System calls (open, read, write — programação C)
+# 3 = Bibliotecas C (printf, malloc)
+# 4 = Arquivos especiais (/dev/*)
+# 5 = Formatos de arquivo (crontab, passwd, fstab)
+# 6 = Jogos
+# 7 = Miscelânea (regex, charsets, protocols)
+# 8 = Comandos de administração (mount, iptables, systemctl)
+
+# Especificar seção (quando nome existe em múltiplas seções)
+man 5 passwd         # formato do arquivo /etc/passwd
+man 1 passwd         # comando passwd (mudar senha)
+man 5 crontab        # formato do crontab
+man 8 mount          # comando mount como admin
+
+# Buscar dentro das man pages
+man -k "copy files"  # buscar nas descrições (como apropos)
+man -f ls            # descrição curta (como whatis)
+
+# Estrutura de uma man page:
+# NAME        → nome e descrição curta
+# SYNOPSIS    → sintaxe de uso
+# DESCRIPTION → explicação detalhada
+# OPTIONS     → todas as flags e opções
+# EXAMPLES    → exemplos práticos
+# SEE ALSO    → comandos relacionados
+# BUGS        → problemas conhecidos
+# AUTHOR      → quem escreveu</code></pre>
+              <div class="info-box">
+                <strong>💡 Dica:</strong> Na seção SYNOPSIS, a notação entre colchetes <code>[ ]</code> indica opções opcionais. <code>...</code> indica que pode repetir. <code>|</code> indica alternativas. Ex: <code>ls [-alh] [file...]</code> = ls pode receber opções -a/-l/-h (opcionais) e zero ou mais arquivos.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>--help — Ajuda rápida</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>--help / -h</code><span class="cmd-tag">Rápido</span></div>
+              <p>A maioria dos comandos aceita <code>--help</code> para um resumo rápido das opções. Mais conciso que <code>man</code>.</p>
+              <pre><code># Ajuda rápida
+ls --help
+grep --help
+docker --help
+terraform --help
+
+# Algumas variações:
+comando --help     # padrão GNU
+comando -h         # versão curta (nem todos suportam)
+comando help       # subcomando (git help, docker help)
+comando -?         # alguns programas usam
+
+# Dica: combinar com less para paginar
+ls --help | less
+find --help 2>&1 | less    # 2>&1 porque alguns imprimem em stderr
+
+# Quando usar --help vs man:
+# --help → resumo rápido, lembrar uma flag específica
+# man    → documentação completa, exemplos, detalhes</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>info — Documentação GNU</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>info</code><span class="cmd-tag">GNU Docs</span></div>
+              <p>Sistema de documentação do projeto GNU. Geralmente mais detalhado que man pages para comandos GNU (coreutils, bash, etc.).</p>
+              <pre><code># Abrir documentação info
+info coreutils       # documentação de todos os comandos básicos
+info bash            # manual completo do bash (imenso!)
+info grep            # grep com todos os detalhes
+
+# Navegação no info:
+# Tab       → próximo link
+# Enter     → seguir link
+# l         → voltar (back)
+# n         → próximo nó
+# p         → nó anterior
+# u         → subir um nível
+# q         → sair
+# /texto    → buscar
+# h         → ajuda do info
+
+# Na prática, man é mais usado que info.
+# info é útil para documentação muito longa (bash, make)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>apropos — Buscar comandos por descrição</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>apropos</code><span class="cmd-tag">Descobrir</span></div>
+              <p>Busca em todas as man pages por palavras-chave na descrição. Ideal quando você sabe O QUE quer fazer mas não sabe QUAL comando usar.</p>
+              <pre><code># Buscar comandos relacionados a "compress"
+apropos compress
+# bzip2 (1) - a block-sorting file compressor
+# gzip (1)  - compress or expand files
+# tar (1)   - an archiving utility
+# xz (1)    - Compress or decompress .xz files
+# zip (1)   - package and compress files
+
+# Buscar comandos para "directory"
+apropos directory
+# ls (1)     - list directory contents
+# mkdir (1)  - make directories
+# rmdir (1)  - remove empty directories
+# pwd (1)    - print name of current/working directory
+
+# Buscar por "network"
+apropos network
+# ifconfig (8) - configure a network interface
+# ip (8)       - show / manipulate routing, devices, policy
+# netstat (8)  - Print network connections, routing tables...
+# ss (8)       - another utility to investigate sockets
+
+# Equivalente: man -k
+man -k "copy file"
+man -k "disk usage"
+man -k "process"
+
+# Atualizar banco de dados do apropos
+sudo mandb</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>tldr — Páginas simplificadas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>tldr</code><span class="cmd-tag">Prático</span></div>
+              <p><strong>Too Long; Didn't Read</strong> — versão ultra-simplificada das man pages com exemplos práticos diretos. Mantido pela comunidade.</p>
+              <pre><code># Instalar
+sudo apt install tldr       # Ubuntu/Debian
+npm install -g tldr         # via Node.js
+pip install tldr            # via Python
+
+# Atualizar banco de dados
+tldr --update
+
+# Usar (muito mais amigável que man!)
+$ tldr tar
+
+  tar
+  Archiving utility.
+  Often combined with a compression method, such as gzip or bzip2.
+
+  - Create an archive from files:
+    tar cf target.tar file1 file2 file3
+
+  - Create a gzipped archive:
+    tar czf target.tar.gz file1 file2 file3
+
+  - Extract a (compressed) archive into the current directory:
+    tar xf source.tar[.gz|.bz2|.xz]
+
+  - Extract an archive into a target directory:
+    tar xf source.tar -C directory
+
+  - List the contents of a tar file:
+    tar tvf source.tar
+
+$ tldr find
+$ tldr grep
+$ tldr chmod
+
+# Quando usar:
+# tldr   → lembrar rapidamente a sintaxe e exemplos comuns
+# --help → ver todas as opções disponíveis
+# man    → entender detalhes, edge cases, formatos completos</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>Resumo — Hierarquia de consulta:</strong>
+            <pre><code>1. tldr comando        → Exemplos rápidos e práticos
+2. comando --help      → Lista de opções resumida
+3. man comando         → Documentação oficial completa
+4. info comando        → Documentação GNU detalhada
+5. apropos "descrição" → Descobrir qual comando usar
+6. Google/StackOverflow → Cenários específicos e troubleshooting</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 9: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>A melhor forma de aprender Linux é praticando. Execute estes exercícios em uma máquina virtual, container Docker, ou WSL. Tente resolver antes de ver a solução!</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Navegação e Exploração do Filesystem</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Navegação</span></div>
+              <p>Pratique navegação pelo filesystem e listagem de conteúdo:</p>
+              <pre><code># Tarefas:
+# 1. Descubra em qual diretório você está agora
+# 2. Vá para a raiz do sistema (/)
+# 3. Liste todos os diretórios na raiz com detalhes
+# 4. Navegue até /etc e liste os 10 arquivos modificados mais recentemente
+# 5. Volte para seu home sem digitar o caminho completo
+# 6. Liste todos os arquivos ocultos no seu home
+# 7. Vá para /var/log e descubra quantos arquivos .log existem
+# 8. Use cd - para alternar entre /var/log e seu home
+# 9. Descubra o caminho real de /bin (é symlink em distros modernas?)
+# 10. Liste o conteúdo de /proc/cpuinfo (informações da CPU)</code></pre>
+              <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+<pre style="margin-top:8px"><code># 1. Descobrir diretório atual
+pwd
+
+# 2. Ir para a raiz
+cd /
+
+# 3. Listar diretórios na raiz com detalhes
+ls -la /
+# ou apenas diretórios:
+ls -ld /*/
+
+# 4. Navegar até /etc e listar 10 mais recentes
+cd /etc
+ls -lt | head -10
+
+# 5. Voltar para home
+cd ~
+# ou simplesmente:
+cd
+
+# 6. Listar arquivos ocultos no home
+ls -la ~
+# ou apenas ocultos:
+ls -d ~/.*
+
+# 7. Contar arquivos .log em /var/log
+cd /var/log
+find . -name "*.log" -type f | wc -l
+# ou:
+ls -la *.log 2>/dev/null | wc -l
+
+# 8. Alternar com cd -
+cd /var/log
+cd ~
+cd -       # volta para /var/log
+cd -       # volta para home
+
+# 9. Verificar se /bin é symlink
+ls -la /bin
+# Se mostrar: /bin -> usr/bin, é symlink!
+# Ou: readlink -f /bin
+
+# 10. Informações da CPU
+cat /proc/cpuinfo
+# Ou de forma mais legível:
+lscpu</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Criar Estrutura de Projeto Completa</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Criação</span></div>
+              <p>Crie a seguinte estrutura de projeto usando o mínimo de comandos possível:</p>
+              <pre><code># Estrutura desejada:
+# ~/exercicio-linux/
+# ├── app/
+# │   ├── src/
+# │   │   ├── controllers/
+# │   │   ├── models/
+# │   │   ├── services/
+# │   │   └── utils/
+# │   ├── tests/
+# │   │   ├── unit/
+# │   │   └── integration/
+# │   ├── config/
+# │   │   ├── dev.yaml
+# │   │   ├── staging.yaml
+# │   │   └── prod.yaml
+# │   └── docs/
+# │       ├── README.md
+# │       └── CHANGELOG.md
+# ├── infra/
+# │   ├── terraform/
+# │   ├── docker/
+# │   └── scripts/
+# ├── .gitignore
+# ├── .env.example
+# └── Makefile
+
+# Regras:
+# 1. Use mkdir -p com brace expansion para criar diretórios
+# 2. Use touch com brace expansion para criar arquivos
+# 3. Tente fazer tudo em no máximo 5 comandos
+# 4. Verifique com tree no final</code></pre>
+              <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+<pre style="margin-top:8px"><code># Criar toda a estrutura de diretórios (1 comando!)
+mkdir -p ~/exercicio-linux/{app/{src/{controllers,models,services,utils},tests/{unit,integration},config,docs},infra/{terraform,docker,scripts}}
+
+# Criar arquivos de config (1 comando!)
+touch ~/exercicio-linux/app/config/{dev,staging,prod}.yaml
+
+# Criar arquivos de docs (1 comando!)
+touch ~/exercicio-linux/app/docs/{README.md,CHANGELOG.md}
+
+# Criar arquivos na raiz do projeto (1 comando!)
+touch ~/exercicio-linux/{.gitignore,.env.example,Makefile}
+
+# Verificar resultado
+cd ~/exercicio-linux
+tree
+# ou se tree não estiver instalado:
+find . -type f | sort
+find . -type d | sort
+
+# BONUS — tudo em 2 comandos:
+mkdir -p ~/exercicio-linux/{app/{src/{controllers,models,services,utils},tests/{unit,integration},config,docs},infra/{terraform,docker,scripts}}
+touch ~/exercicio-linux/{.gitignore,.env.example,Makefile} ~/exercicio-linux/app/config/{dev,staging,prod}.yaml ~/exercicio-linux/app/docs/{README.md,CHANGELOG.md}</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Buscar Arquivos por Diferentes Critérios</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Busca</span></div>
+              <p>Execute buscas no filesystem usando find, locate e grep:</p>
+              <pre><code># Tarefas:
+# 1. Encontre TODOS os arquivos .conf dentro de /etc
+# 2. Encontre arquivos maiores que 10MB em /var
+# 3. Encontre arquivos modificados na última hora em /etc
+# 4. Encontre todos os links simbólicos em /usr/bin
+# 5. Encontre arquivos com permissão 777 no seu home (e corrija!)
+# 6. Encontre o executável do python3 usando which e whereis
+# 7. Busque a palavra "error" em todos os .log dentro de /var/log
+# 8. Descubra quantos arquivos existem em /usr/bin
+# 9. Encontre diretórios vazios em /tmp
+# 10. Use apropos para descobrir um comando que lista processos
+
+# Dica: redirecione erros de permissão com 2>/dev/null</code></pre>
+              <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+<pre style="margin-top:8px"><code># 1. Todos os .conf em /etc
+find /etc -name "*.conf" -type f 2>/dev/null
+# Contar:
+find /etc -name "*.conf" -type f 2>/dev/null | wc -l
+
+# 2. Arquivos maiores que 10MB em /var
+find /var -type f -size +10M 2>/dev/null
+# Com tamanho legível:
+find /var -type f -size +10M -exec ls -lh {} \; 2>/dev/null
+
+# 3. Modificados na última hora em /etc
+find /etc -type f -mmin -60 2>/dev/null
+
+# 4. Links simbólicos em /usr/bin
+find /usr/bin -type l
+# Contar:
+find /usr/bin -type l | wc -l
+# Ver para onde apontam:
+find /usr/bin -type l -exec ls -la {} \;
+
+# 5. Arquivos com permissão 777 no home
+find ~ -perm 777 -type f
+# Corrigir (mudar para 644):
+find ~ -perm 777 -type f -exec chmod 644 {} \;
+
+# 6. Localizar python3
+which python3
+# /usr/bin/python3
+whereis python3
+# python3: /usr/bin/python3 /usr/lib/python3 /usr/share/man/man1/python3.1.gz
+
+# 7. Buscar "error" em .log de /var/log
+grep -ri "error" /var/log/*.log 2>/dev/null
+# Recursivo em subdiretórios:
+grep -rn "error" /var/log/ --include="*.log" 2>/dev/null
+
+# 8. Quantos arquivos em /usr/bin
+find /usr/bin -type f | wc -l
+# ou:
+ls -1 /usr/bin | wc -l
+
+# 9. Diretórios vazios em /tmp
+find /tmp -type d -empty 2>/dev/null
+
+# 10. Comando para listar processos
+apropos "list process"
+apropos process | grep -i list
+# Resultado: ps (1) - report a snapshot of the current processes</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Manipular Arquivos (Copiar, Mover, Renomear, Remover)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Manipulação</span></div>
+              <p>Pratique operações de arquivo em um ambiente seguro:</p>
+              <pre><code># Setup inicial (execute primeiro):
+mkdir -p ~/lab-arquivos/{originais,backup,organizado/{docs,logs,configs}}
+cd ~/lab-arquivos/originais
+touch relatorio-{jan,fev,mar,abr,mai,jun}.pdf
+touch app-{1..5}.log
+touch config-{dev,prod,staging}.yaml
+touch notas.txt rascunho.txt importante.md
+echo "Conteúdo do arquivo" > dados.txt
+
+# Tarefas:
+# 1. Copie todos os .pdf para backup/ preservando timestamps
+# 2. Mova todos os .log para organizado/logs/
+# 3. Mova todos os .yaml para organizado/configs/
+# 4. Renomeie importante.md para README.md
+# 5. Crie um link simbólico de dados.txt chamado atalho-dados.txt
+# 6. Copie toda a pasta originais/ para backup/ recursivamente
+# 7. Remova todos os .txt de originais/ (modo interativo)
+# 8. Verifique que o symlink ainda funciona após mover o original
+# 9. Conte quantos arquivos ficaram em cada diretório
+# 10. Limpe tudo (remova ~/lab-arquivos completamente)</code></pre>
+              <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+<pre style="margin-top:8px"><code># 1. Copiar PDFs preservando timestamps
+cp -p ~/lab-arquivos/originais/*.pdf ~/lab-arquivos/backup/
+
+# 2. Mover logs
+mv ~/lab-arquivos/originais/*.log ~/lab-arquivos/organizado/logs/
+
+# 3. Mover configs
+mv ~/lab-arquivos/originais/*.yaml ~/lab-arquivos/organizado/configs/
+
+# 4. Renomear
+mv ~/lab-arquivos/originais/importante.md ~/lab-arquivos/originais/README.md
+
+# 5. Criar symlink
+ln -s ~/lab-arquivos/originais/dados.txt ~/lab-arquivos/originais/atalho-dados.txt
+# Verificar:
+ls -la ~/lab-arquivos/originais/atalho-dados.txt
+cat ~/lab-arquivos/originais/atalho-dados.txt
+
+# 6. Copiar pasta inteira
+cp -a ~/lab-arquivos/originais/ ~/lab-arquivos/backup/originais-copia/
+
+# 7. Remover .txt interativamente
+rm -i ~/lab-arquivos/originais/*.txt
+# Responda y ou n para cada arquivo
+
+# 8. Testar symlink (vai mostrar erro se original foi removido)
+cat ~/lab-arquivos/originais/atalho-dados.txt
+# Se dados.txt foi removido no passo 7: "No such file or directory"
+# Symlink ficou "quebrado" (dangling symlink)
+ls -la ~/lab-arquivos/originais/atalho-dados.txt  # mostra em vermelho
+
+# 9. Contar arquivos em cada diretório
+echo "Originais:"; find ~/lab-arquivos/originais -type f | wc -l
+echo "Backup:"; find ~/lab-arquivos/backup -type f | wc -l
+echo "Logs:"; find ~/lab-arquivos/organizado/logs -type f | wc -l
+echo "Configs:"; find ~/lab-arquivos/organizado/configs -type f | wc -l
+
+# 10. Limpar tudo
+rm -rf ~/lab-arquivos
+# Verificar que foi removido:
+ls ~/lab-arquivos 2>&1   # "No such file or directory"</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- CHECKLIST E RESUMO -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Resumo</span>
+          <h2>Checklist do Módulo 01</h2>
+          <p>Antes de avançar para o Módulo 02, confirme que você domina todos estes conceitos e comandos:</p>
+        </div>
+
+        <div class="checklist-grid">
+          <div class="checklist-card">
+            <h4>🐧 Fundamentos Linux</h4>
+            <ul>
+              <li>Entendo a diferença entre kernel e distribuição</li>
+              <li>Sei por que Linux domina servidores</li>
+              <li>Entendo terminal vs GUI</li>
+              <li>Conheço os diferentes shells (bash, zsh, sh)</li>
+              <li>Sei a anatomia de um comando (comando + opções + argumentos)</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>📁 Filesystem</h4>
+            <ul>
+              <li>Conheço os diretórios principais do FHS (/, /home, /etc, /var, /tmp, /usr)</li>
+              <li>Sei a diferença entre caminho absoluto e relativo</li>
+              <li>Domino os atalhos ~, ., .., -</li>
+              <li>Sei navegar com cd, verificar com pwd</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>🧭 Navegação</h4>
+            <ul>
+              <li>Uso cd com confiança (absoluto, relativo, -, ~)</li>
+              <li>Domino ls com as flags -la, -lh, -lt, -lS, -R</li>
+              <li>Sei usar tree para visualizar estruturas</li>
+              <li>Uso Tab completion para economizar tempo</li>
+              <li>Conheço o histórico (history, !!, Ctrl+R)</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>📝 Manipulação</h4>
+            <ul>
+              <li>touch para criar/atualizar timestamps</li>
+              <li>mkdir -p para estruturas aninhadas</li>
+              <li>cp -r/-a para copiar com segurança</li>
+              <li>mv para mover e renomear</li>
+              <li>rm -r com cautela (sem lixeira!)</li>
+              <li>ln -s para symlinks</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>👁️ Visualização</h4>
+            <ul>
+              <li>cat para arquivos pequenos</li>
+              <li>less para paginação interativa</li>
+              <li>head/tail para início/fim (tail -f para logs)</li>
+              <li>wc para contar linhas/palavras</li>
+              <li>file e stat para metadados</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>🔍 Busca</h4>
+            <ul>
+              <li>find por nome, tipo, tamanho, data</li>
+              <li>find -exec para ações em massa</li>
+              <li>locate para busca rápida</li>
+              <li>which/whereis para executáveis</li>
+              <li>grep para busca de texto (básico)</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>✨ Wildcards</h4>
+            <ul>
+              <li>* para qualquer quantidade de caracteres</li>
+              <li>? para exatamente um caractere</li>
+              <li>[] para ranges e conjuntos</li>
+              <li>{} para brace expansion</li>
+              <li>Combinar wildcards com comandos</li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h4>📚 Documentação</h4>
+            <ul>
+              <li>man para documentação oficial</li>
+              <li>--help para resumo rápido</li>
+              <li>apropos para descobrir comandos</li>
+              <li>tldr para exemplos práticos</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-box highlight" style="margin-top:2rem">
+          <strong>📊 Estatísticas deste módulo:</strong>
+          <pre><code>Comandos aprendidos: ~30 (cd, ls, pwd, tree, touch, mkdir, cp, mv, rm, ln, cat, less, more, head, tail, wc, file, stat, find, locate, which, whereis, grep, man, info, apropos, history, pushd, popd, echo)
+Conceitos dominados: Filesystem, navegação, manipulação, busca, wildcards, documentação
+Tempo estimado de prática: 2-3 horas
+Próximo módulo: Permissões, usuários, processos, redirecionamento e pipes</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA: PRÓXIMO MÓDULO -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="../linux.html" class="button secondary">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      <div class="container" style="text-align:center;padding:60px 0">
+        <h2 style="margin-bottom:8px">Pronto para o próximo nível?</h2>
+        <p style="color:var(--text-secondary);margin-bottom:24px">No Módulo 02 você aprenderá sobre permissões, usuários, grupos, processos, redirecionamento e pipes — os pilares da administração Linux.</p>
+        <a href="modulo-02.html" class="button primary" style="font-size:1.1rem;padding:14px 32px">Avançar para Módulo 02: Básico →</a>
       </div>
     </section>
   </main>
