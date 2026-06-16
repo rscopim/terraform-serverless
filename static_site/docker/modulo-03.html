@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Docker Módulo 03: Volumes e Persistência de Dados</title>
+  <meta name="description" content="Guia completo sobre volumes Docker e persistência de dados: named volumes, bind mounts, tmpfs, backup de dados, persistência para bancos de dados e boas práticas de mercado." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,23 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="nav-link">← Anterior</a>
         <a href="modulo-04.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,315 +38,2526 @@
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 03</span>
         <h1>Volumes e Persistência de Dados</h1>
-        <p>Containers são efêmeros por natureza. Aprenda a persistir dados com volumes, bind mounts e tmpfs — e domine backup, restauração e transferência de dados.</p>
+        <p>Entenda por que containers perdem dados, domine os três tipos de armazenamento (volumes, bind mounts, tmpfs), configure persistência para bancos de dados, implemente estratégias de backup e aplique as boas práticas do mercado.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node active"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: O PROBLEMA DA PERSISTÊNCIA -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
+          <h2>O Problema da Persistência</h2>
+          <p>Containers são efêmeros por natureza. Quando você remove um container, todos os dados armazenados dentro dele desaparecem para sempre. Entender esse comportamento é o primeiro passo para gerenciar dados corretamente.</p>
+        </div>
 
-        <!-- O Problema -->
         <div class="topic-block">
-          <h2>O Problema: Containers são Efêmeros</h2>
-          <p>Quando um container é removido, todos os dados escritos dentro dele são perdidos. Isso é por design — containers devem ser descartáveis e recriáveis. Mas aplicações reais precisam persistir dados: bancos de dados, uploads de usuários, logs, configurações.</p>
-          <div class="info-box">
-            <strong>Regra de ouro:</strong> Nunca armazene dados importantes apenas dentro do filesystem do container. Use volumes ou bind mounts para qualquer dado que precisa sobreviver à remoção do container.
+          <h3>Containers são Efêmeros — O que isso significa?</h3>
+          <p>A filosofia do Docker é que containers devem ser <strong>descartáveis</strong>. Você pode parar, destruir e recriar um container a qualquer momento sem preocupação. Mas isso cria um problema crítico: <strong>onde ficam os dados?</strong></p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Demonstração: dados perdidos ao remover container</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># 1. Criar um container e gravar um arquivo dentro dele
+docker run -d --name meu-app ubuntu:22.04 sleep 3600
+
+# 2. Entrar no container e criar dados
+docker exec meu-app bash -c "echo 'Dados importantes!' > /dados.txt"
+docker exec meu-app cat /dados.txt
+# Saída: Dados importantes!
+
+# 3. Parar e remover o container
+docker stop meu-app
+docker rm meu-app
+
+# 4. Recriar o container com o mesmo nome
+docker run -d --name meu-app ubuntu:22.04 sleep 3600
+
+# 5. Tentar ler o arquivo...
+docker exec meu-app cat /dados.txt
+# Saída: cat: /dados.txt: No such file or directory
+# ❌ DADOS PERDIDOS PARA SEMPRE!
+
+# 6. Limpar
+docker stop meu-app && docker rm meu-app</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Isso não é um bug — é uma feature!</strong> Containers efêmeros permitem:
+            <ul>
+              <li><strong>Deploys limpos:</strong> Cada deploy começa do zero, sem "lixo" acumulado</li>
+              <li><strong>Escalabilidade:</strong> Criar e destruir instâncias rapidamente</li>
+              <li><strong>Reprodutibilidade:</strong> Mesmo container, mesmo comportamento, sempre</li>
+              <li><strong>Isolamento:</strong> Problemas em um container não contaminam outros</li>
+            </ul>
+            O desafio é: como manter dados persistentes em um mundo efêmero?
           </div>
         </div>
 
-        <!-- Tipos de Storage -->
         <div class="topic-block">
-          <h2>Tipos de Armazenamento</h2>
+          <h3>A Camada de Escrita do Container</h3>
+          <p>Quando Docker cria um container a partir de uma imagem, ele adiciona uma <strong>camada de escrita (writable layer)</strong> no topo das camadas read-only da imagem. Todo dado criado ou modificado pelo container vai para essa camada.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Anatomia do filesystem de um container</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────────┐
+│         CAMADA DE ESCRITA (Writable Layer) — EFÊMERA           │
+│                                                                 │
+│  • Todos os arquivos criados pelo container vão aqui            │
+│  • Modificações em arquivos da imagem usam Copy-on-Write (CoW)  │
+│  • REMOVIDA quando o container é removido (docker rm)           │
+│  • Tamanho cresce conforme o container gera dados               │
+│  • Específica deste container — não compartilhada               │
+├─────────────────────────────────────────────────────────────────┤
+│         CAMADAS DA IMAGEM (Read-Only Layers) — PERMANENTES      │
+│                                                                 │
+│  Layer 4: COPY app.py /app/           [código]                  │
+│  Layer 3: RUN pip install flask       [dependências]            │
+│  Layer 2: RUN apt-get install python  [runtime]                 │
+│  Layer 1: FROM ubuntu:22.04           [SO base]                 │
+│                                                                 │
+│  • Compartilhadas entre TODOS os containers desta imagem        │
+│  • Imutáveis — nunca são modificadas                            │
+│  • Permanecem no disco até a imagem ser removida                │
+└─────────────────────────────────────────────────────────────────┘
+
+Quando container modifica um arquivo da imagem:
+  1. Docker COPIA o arquivo para a camada de escrita (CoW)
+  2. Modificação acontece na cópia
+  3. Original na camada da imagem permanece intacto</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Copy-on-Write (CoW) — Como funciona</h3>
+          <p>O mecanismo Copy-on-Write é o que permite que múltiplos containers compartilhem as mesmas camadas de imagem com eficiência:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Leitura — sem cópia</code><span class="cmd-tag">Eficiente</span></div>
+              <pre><code># Quando um container LÊ um arquivo:
+# → Docker busca nas camadas de cima para baixo
+# → Encontra na camada da imagem
+# → Serve o arquivo diretamente (sem cópia)
+# → Múltiplos containers leem o mesmo arquivo
+
+# Exemplo: 10 containers nginx
+# Todos leem /etc/nginx/nginx.conf
+# da MESMA camada da imagem = economia de disco</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Escrita — cópia necessária</code><span class="cmd-tag">CoW</span></div>
+              <pre><code># Quando um container MODIFICA um arquivo:
+# → Docker COPIA o arquivo para a writable layer
+# → Modificação acontece na cópia
+# → Próximas leituras veem a versão modificada
+# → Outros containers não são afetados
+
+# Exemplo:
+docker exec container1 bash -c \
+  "echo 'custom' > /etc/nginx/nginx.conf"
+# Container1: vê versão modificada (da writable layer)
+# Container2: vê versão original (da imagem)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Impacto no desempenho:</strong> A primeira escrita em um arquivo grande tem overhead (precisa copiar). Por isso, para dados que mudam frequentemente (bancos de dados, logs, uploads), usamos <strong>volumes</strong> — que bypassa completamente o mecanismo CoW.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Analogia: O Quadro Branco da Sala de Reunião</h3>
+          <p>Pense no container como uma sala de reunião com um quadro branco:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Container sem volume = Quadro branco apagado ao sair</code><span class="cmd-tag">Analogia</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────┐
+│  SALA DE REUNIÃO (Container)                                 │
+│                                                              │
+│  📋 Quadro branco com anotações da reunião                   │
+│  📝 Notas escritas durante a sessão                          │
+│  📊 Diagramas desenhados                                     │
+│                                                              │
+│  Quando a reunião TERMINA e a sala é liberada:               │
+│  → O quadro é APAGADO                                        │
+│  → As notas são DESCARTADAS                                  │
+│  → Próxima reunião começa do ZERO                            │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  SALA DE REUNIÃO COM ARQUIVO (Container com Volume)          │
+│                                                              │
+│  📋 Quadro branco (dados temporários no container)           │
+│  📁 ARQUIVO EXTERNO (volume) — documentos salvos aqui        │
+│                                                              │
+│  Quando a reunião TERMINA e a sala é liberada:               │
+│  → O quadro é apagado (camada de escrita removida)           │
+│  → O ARQUIVO permanece (volume persiste)                     │
+│  → Próxima reunião pode CONSULTAR o arquivo                  │
+└─────────────────────────────────────────────────────────────┘
+
+Volume = Arquivo/armário FORA da sala que sobrevive às reuniões</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Verificando o tamanho da camada de escrita</h3>
+          <p>Você pode inspecionar quanto espaço cada container está consumindo na sua camada de escrita:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker system df / docker ps --size</code><span class="cmd-tag">Monitoramento</span></div>
+              <pre><code># Ver espaço usado por containers, imagens e volumes:
+docker system df
+
+TYPE            TOTAL   ACTIVE   SIZE      RECLAIMABLE
+Images          15      5        4.2GB     2.8GB (66%)
+Containers      8       3        250MB     200MB (80%)
+Local Volumes   12      4        1.5GB     800MB (53%)
+
+# Ver tamanho individual de cada container:
+docker ps --size
+
+CONTAINER ID  IMAGE     SIZE
+a1b2c3d4e5f6  postgres  150MB (virtual 400MB)
+b2c3d4e5f6a7  nginx     2KB (virtual 187MB)
+
+# SIZE = espaço na writable layer (dados do container)
+# virtual = SIZE + tamanho das camadas da imagem
+
+# Detalhes com docker system df -v:
+docker system df -v
+
+# 💡 Se a writable layer cresce muito, considere usar volumes!</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: TIPOS DE ARMAZENAMENTO NO DOCKER -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Armazenamento</span>
+          <h2>Tipos de Armazenamento no Docker</h2>
+          <p>Docker oferece três mecanismos para persistir dados fora da camada de escrita do container. Cada um tem características, vantagens e casos de uso distintos. Entender quando usar cada um é essencial.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Visão Geral dos Três Tipos</h3>
+          <p>Docker oferece três formas de armazenar dados fora do ciclo de vida do container:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Volumes (Named Volumes)</code><span class="cmd-tag">Recomendado</span></div>
+              <p><strong>Gerenciados pelo Docker.</strong> Armazenados em um diretório especial do Docker no host (<code>/var/lib/docker/volumes/</code>). O Docker controla o ciclo de vida, permissões e localização.</p>
+              <pre><code># Criar e usar:
+docker volume create meus-dados
+docker run -v meus-dados:/app/data nginx
+
+# Características:
+✅ Gerenciado pelo Docker
+✅ Portável entre hosts
+✅ Funciona em Linux, Mac, Windows
+✅ Suporta volume drivers (NFS, cloud)
+✅ Backup fácil
+✅ Pode ser compartilhado entre containers</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Bind Mounts</code><span class="cmd-tag">Desenvolvimento</span></div>
+              <p><strong>Mapeamento direto do host.</strong> Um diretório ou arquivo do host é montado diretamente dentro do container. Qualquer caminho do filesystem do host pode ser usado.</p>
+              <pre><code># Criar e usar:
+docker run -v /home/user/projeto:/app nginx
+docker run -v $(pwd):/app node:20
+
+# Características:
+✅ Acesso direto aos arquivos do host
+✅ Ideal para desenvolvimento (hot-reload)
+✅ Performance nativa no Linux
+⚠️ Dependente da estrutura do host
+⚠️ Problemas de permissão (uid/gid)
+⚠️ Risco de segurança se mal configurado</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>tmpfs Mounts</code><span class="cmd-tag">Memória RAM</span></div>
+              <p><strong>Armazenamento em memória.</strong> Dados existem apenas na RAM do host. Nunca são escritos em disco e desaparecem quando o container para.</p>
+              <pre><code># Criar e usar:
+docker run --tmpfs /app/cache nginx
+docker run --mount type=tmpfs,dst=/secrets nginx
+
+# Características:
+✅ Velocidade máxima (RAM)
+✅ Dados sensíveis nunca vão ao disco
+✅ Ideal para cache temporário
+⚠️ Limitado pela RAM disponível
+⚠️ Dados perdidos ao parar container
+⚠️ Não pode ser compartilhado entre containers</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Diagrama: Onde cada tipo vive no sistema</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Arquitetura de armazenamento Docker</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                           HOST (Máquina Física/VM)                        │
+│                                                                          │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────┐  │
+│  │   /var/lib/docker/    │  │  /home/user/projeto/ │  │   RAM do Host │  │
+│  │   volumes/            │  │  (qualquer caminho)  │  │               │  │
+│  │                       │  │                      │  │  ┌─────────┐  │  │
+│  │  ┌─────────────────┐ │  │  ├── src/            │  │  │  tmpfs  │  │  │
+│  │  │ meu-volume/     │ │  │  ├── package.json    │  │  │  mount  │  │  │
+│  │  │  └── _data/     │ │  │  └── docker-compose  │  │  │         │  │  │
+│  │  │      └── ...    │ │  │                      │  │  └────┬────┘  │  │
+│  │  └────────┬────────┘ │  └──────────┬───────────┘  │       │      │  │
+│  └───────────┼──────────┘             │               └───────┼──────┘  │
+│              │                         │                       │         │
+│  ┌───────────┼─────────────────────────┼───────────────────────┼──────┐  │
+│  │           │        CONTAINER        │                       │      │  │
+│  │           ▼                         ▼                       ▼      │  │
+│  │    /app/data/              /app/ (código)              /tmp/cache   │  │
+│  │    (volume)                (bind mount)               (tmpfs)      │  │
+│  │                                                                    │  │
+│  │    Writable Layer (camada de escrita — tudo mais)                   │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+LEGENDA:
+  Volume     → Docker gerencia | Dados em /var/lib/docker/volumes/
+  Bind Mount → Você gerencia   | Qualquer path do host
+  tmpfs      → Só na memória   | Nunca toca o disco</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Tabela Comparativa — Quando usar cada um</h3>
           <table class="styled-table">
             <thead>
-              <tr><th>Tipo</th><th>Localização</th><th>Gerenciado por</th><th>Uso Ideal</th></tr>
+              <tr>
+                <th>Característica</th>
+                <th>Volume</th>
+                <th>Bind Mount</th>
+                <th>tmpfs</th>
+              </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Volume</strong></td>
-                <td><code>/var/lib/docker/volumes/</code></td>
-                <td>Docker</td>
-                <td>Dados de produção, bancos de dados, dados compartilhados entre containers</td>
+                <td><strong>Gerenciado por</strong></td>
+                <td>Docker Engine</td>
+                <td>Usuário/Host</td>
+                <td>Kernel (RAM)</td>
               </tr>
               <tr>
-                <td><strong>Bind Mount</strong></td>
-                <td>Qualquer caminho no host</td>
-                <td>Usuário</td>
-                <td>Desenvolvimento (código-fonte), configurações do host</td>
+                <td><strong>Localização</strong></td>
+                <td>/var/lib/docker/volumes/</td>
+                <td>Qualquer path do host</td>
+                <td>Memória RAM</td>
               </tr>
               <tr>
-                <td><strong>tmpfs</strong></td>
-                <td>Memória RAM do host</td>
-                <td>Kernel</td>
-                <td>Dados temporários sensíveis, cache em memória</td>
+                <td><strong>Persiste após rm</strong></td>
+                <td>✅ Sim</td>
+                <td>✅ Sim (está no host)</td>
+                <td>❌ Não</td>
+              </tr>
+              <tr>
+                <td><strong>Compartilhável</strong></td>
+                <td>✅ Entre containers</td>
+                <td>✅ Entre containers</td>
+                <td>❌ Não</td>
+              </tr>
+              <tr>
+                <td><strong>Performance</strong></td>
+                <td>Excelente (Linux nativo)</td>
+                <td>Nativa Linux / Lenta Mac/Win</td>
+                <td>Máxima (RAM)</td>
+              </tr>
+              <tr>
+                <td><strong>Portabilidade</strong></td>
+                <td>✅ Funciona em qualquer OS</td>
+                <td>⚠️ Paths diferentes por OS</td>
+                <td>✅ Funciona em qualquer OS</td>
+              </tr>
+              <tr>
+                <td><strong>Backup</strong></td>
+                <td>docker volume + tar</td>
+                <td>Backup normal do filesystem</td>
+                <td>N/A (volátil)</td>
+              </tr>
+              <tr>
+                <td><strong>Caso de uso ideal</strong></td>
+                <td>Produção, bancos de dados</td>
+                <td>Desenvolvimento, config files</td>
+                <td>Secrets, cache temporário</td>
+              </tr>
+              <tr>
+                <td><strong>Segurança</strong></td>
+                <td>Isolado do host</td>
+                <td>⚠️ Acesso ao filesystem do host</td>
+                <td>✅ Dados nunca no disco</td>
+              </tr>
+              <tr>
+                <td><strong>Volume drivers</strong></td>
+                <td>✅ NFS, AWS EBS, etc.</td>
+                <td>❌ Não suporta</td>
+                <td>❌ Não suporta</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Comandos de Volume -->
         <div class="topic-block">
-          <h2>Comandos para Gerenciar Volumes</h2>
+          <h3>Regra de Decisão Rápida</h3>
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker volume create</code><span class="cmd-tag">Criar</span></div>
-              <p>Cria um volume nomeado gerenciado pelo Docker.</p>
-              <pre><code># Criar volume
-docker volume create meu-volume
+            <div class="command-card wide">
+              <div class="command-header"><code>Fluxograma: qual tipo usar?</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code>Precisa persistir dados?
+├── NÃO → Use a camada de escrita (padrão)
+│         Ex: arquivos temporários de processamento
+│
+└── SIM → Os dados são sensíveis e temporários?
+          ├── SIM → Use tmpfs
+          │         Ex: tokens JWT, session data, cache in-memory
+          │
+          └── NÃO → É para desenvolvimento (precisa editar no host)?
+                    ├── SIM → Use Bind Mount
+                    │         Ex: código-fonte com hot-reload, configs de dev
+                    │
+                    └── NÃO → Use Volume (Named Volume)
+                              Ex: banco de dados, uploads, logs persistentes
 
-# Criar com driver específico
-docker volume create --driver local \
-  --opt type=nfs \
-  --opt o=addr=192.168.1.100,rw \
-  --opt device=:/path/to/dir \
-  nfs-volume</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker volume ls</code><span class="cmd-tag">Listar</span></div>
-              <p>Lista todos os volumes existentes no host.</p>
-              <pre><code># Listar volumes
-docker volume ls
-
-# Filtrar por driver
-docker volume ls --filter driver=local
-
-# Filtrar volumes não utilizados (dangling)
-docker volume ls --filter dangling=true</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker volume inspect</code><span class="cmd-tag">Inspecionar</span></div>
-              <p>Mostra detalhes do volume: driver, mountpoint, labels, etc.</p>
-              <pre><code>docker volume inspect meu-volume
-
-# Saída:
-# [{ "CreatedAt": "...",
-#    "Driver": "local",
-#    "Mountpoint": "/var/lib/docker/volumes/meu-volume/_data",
-#    "Name": "meu-volume" }]</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker volume rm</code><span class="cmd-tag">Remover</span></div>
-              <p>Remove um ou mais volumes. Falha se o volume estiver em uso.</p>
-              <pre><code># Remover volume específico
-docker volume rm meu-volume
-
-# Remover múltiplos
-docker volume rm vol1 vol2 vol3</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker volume prune</code><span class="cmd-tag">Limpar</span></div>
-              <p>Remove TODOS os volumes não utilizados por nenhum container. Use com cuidado!</p>
-              <pre><code># Remover volumes órfãos
-docker volume prune
-
-# Sem confirmação
-docker volume prune -f</code></pre>
+RESUMO PRÁTICO:
+  🏭 Produção      → Volumes (sempre)
+  💻 Desenvolvimento → Bind Mounts (código) + Volumes (dados de banco)
+  🔐 Secrets/Cache  → tmpfs</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Usando Volumes -->
         <div class="topic-block">
-          <h2>Usando Volumes com Containers</h2>
+          <h3>Sintaxe: -v vs --mount</h3>
+          <p>Docker oferece duas formas de montar armazenamento. A sintaxe <code>--mount</code> é mais explícita e recomendada para cenários complexos:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>-v (volume)</code><span class="cmd-tag">Sintaxe curta</span></div>
-              <p>Monta um volume nomeado no container. Cria o volume automaticamente se não existir.</p>
-              <pre><code># Montar volume nomeado
-docker run -d -v meu-volume:/app/data nginx
+              <div class="command-header"><code>-v (--volume) — Sintaxe curta</code><span class="cmd-tag">Clássica</span></div>
+              <pre><code># Volume nomeado:
+docker run -v meu-vol:/app/data nginx
 
-# Volume anônimo (Docker gera nome aleatório)
-docker run -d -v /app/data nginx
+# Bind mount:
+docker run -v /host/path:/container/path nginx
+docker run -v $(pwd):/app nginx
 
-# Volume somente-leitura
-docker run -d -v meu-volume:/app/data:ro nginx</code></pre>
+# Read-only:
+docker run -v meu-vol:/app/data:ro nginx
+
+# Formato:
+# -v [nome_ou_path_host]:[path_container]:[opções]
+
+# ⚠️ Comportamento ambíguo:
+# Se o path começa com / ou ./ → bind mount
+# Se é apenas um nome → volume nomeado
+docker run -v dados:/app/data   # ← Volume "dados"
+docker run -v ./dados:/app/data # ← Bind mount ./dados</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>--mount (volume)</code><span class="cmd-tag">Sintaxe explícita</span></div>
-              <p>Sintaxe mais verbosa e clara. Recomendada para scripts e documentação.</p>
-              <pre><code># Montar volume nomeado
-docker run -d \
-  --mount type=volume,source=meu-volume,target=/app/data \
+              <div class="command-header"><code>--mount — Sintaxe explícita</code><span class="cmd-tag">Recomendada</span></div>
+              <pre><code># Volume nomeado:
+docker run --mount \
+  type=volume,source=meu-vol,target=/app/data \
   nginx
 
-# Volume somente-leitura
-docker run -d \
-  --mount type=volume,source=meu-volume,target=/app/data,readonly \
-  nginx</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Demonstração de Persistência -->
-        <div class="topic-block">
-          <h2>Demonstração de Persistência — MySQL</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>MySQL com Volume</code><span class="cmd-tag">Exemplo prático</span></div>
-              <p>Dados do MySQL persistem mesmo após remover e recriar o container.</p>
-              <pre><code># Criar volume para dados do MySQL
-docker volume create mysql-data
-
-# Iniciar MySQL com volume
-docker run -d \
-  --name meu-mysql \
-  -e MYSQL_ROOT_PASSWORD=senha123 \
-  -e MYSQL_DATABASE=app_db \
-  -v mysql-data:/var/lib/mysql \
-  -p 3306:3306 \
-  mysql:8.0
-
-# Criar dados no banco
-docker exec -it meu-mysql mysql -uroot -psenha123 -e \
-  "CREATE TABLE app_db.users (id INT, name VARCHAR(50)); \
-   INSERT INTO app_db.users VALUES (1, 'João');"
-
-# Remover o container
-docker rm -f meu-mysql
-
-# Recriar — dados ainda estão lá!
-docker run -d \
-  --name meu-mysql \
-  -e MYSQL_ROOT_PASSWORD=senha123 \
-  -v mysql-data:/var/lib/mysql \
-  -p 3306:3306 \
-  mysql:8.0
-
-# Verificar dados
-docker exec -it meu-mysql mysql -uroot -psenha123 -e \
-  "SELECT * FROM app_db.users;"
-# → 1 | João ✓</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bind Mounts -->
-        <div class="topic-block">
-          <h2>Bind Mounts</h2>
-          <p>Bind mounts mapeiam um diretório do host diretamente no container. Ideal para desenvolvimento — alterações no código são refletidas instantaneamente.</p>
-
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Linux / macOS</code><span class="cmd-tag">Bind Mount</span></div>
-              <pre><code># Montar diretório atual
-docker run -d -v $(pwd):/app -p 3000:3000 node:20-alpine
-
-# Caminho absoluto
-docker run -d -v /home/user/projeto:/app nginx
-
-# Somente-leitura
-docker run -d -v $(pwd)/config:/etc/nginx/conf.d:ro nginx</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Windows PowerShell</code><span class="cmd-tag">Bind Mount</span></div>
-              <pre><code># Montar diretório atual (PowerShell)
-docker run -d -v ${PWD}:/app -p 3000:3000 node:20-alpine
-
-# Caminho absoluto
-docker run -d -v C:\Users\dev\projeto:/app nginx</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Windows CMD</code><span class="cmd-tag">Bind Mount</span></div>
-              <pre><code># Montar diretório atual (CMD)
-docker run -d -v %cd%:/app -p 3000:3000 node:20-alpine</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>--mount (bind)</code><span class="cmd-tag">Sintaxe explícita</span></div>
-              <p>Sintaxe --mount para bind mounts. Falha se o diretório source não existir (mais seguro).</p>
-              <pre><code>docker run -d \
-  --mount type=bind,source=$(pwd)/src,target=/app/src \
-  --mount type=bind,source=$(pwd)/config,target=/app/config,readonly \
-  -p 3000:3000 \
-  node:20-alpine</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- tmpfs -->
-        <div class="topic-block">
-          <h2>tmpfs — Armazenamento em Memória</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>--tmpfs</code><span class="cmd-tag">Memória</span></div>
-              <p>Monta um filesystem temporário em RAM. Dados são perdidos ao parar o container. Ideal para dados sensíveis temporários.</p>
-              <pre><code># tmpfs simples
-docker run -d --tmpfs /app/temp nginx
-
-# Com --mount (mais opções)
-docker run -d \
-  --mount type=tmpfs,target=/app/temp,tmpfs-size=100m,tmpfs-mode=1770 \
+# Bind mount:
+docker run --mount \
+  type=bind,source=/host/path,target=/container/path \
   nginx
 
-# Uso: cache de sessão, tokens temporários, dados sensíveis</code></pre>
+# tmpfs:
+docker run --mount \
+  type=tmpfs,target=/app/cache,tmpfs-size=100m \
+  nginx
+
+# Read-only:
+docker run --mount \
+  type=volume,source=meu-vol,target=/app/data,readonly \
+  nginx
+
+# ✅ Vantagens do --mount:
+# → Explícito sobre o tipo (volume, bind, tmpfs)
+# → Erro claro se path não existe (bind mount)
+# → Mais opções (tmpfs-size, volume-driver, etc.)
+# → Recomendado pela documentação oficial</code></pre>
             </div>
           </div>
-        </div>
-
-        <!-- Backup e Restore -->
-        <div class="topic-block">
-          <h2>Backup e Restauração de Volumes</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Backup</code><span class="cmd-tag">tar</span></div>
-              <p>Cria um arquivo tar com o conteúdo do volume usando um container auxiliar.</p>
-              <pre><code># Backup de volume para arquivo tar
-docker run --rm \
-  -v meu-volume:/data \
-  -v $(pwd):/backup \
-  alpine tar czf /backup/meu-volume-backup.tar.gz -C /data .
-
-# Explicação:
-# - Monta o volume em /data (leitura)
-# - Monta diretório atual em /backup (escrita)
-# - Cria tar.gz com conteúdo de /data</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Restore</code><span class="cmd-tag">tar</span></div>
-              <p>Restaura dados de um arquivo tar para um volume.</p>
-              <pre><code># Criar volume de destino
-docker volume create meu-volume-restaurado
-
-# Restaurar backup
-docker run --rm \
-  -v meu-volume-restaurado:/data \
-  -v $(pwd):/backup \
-  alpine tar xzf /backup/meu-volume-backup.tar.gz -C /data
-
-# Verificar
-docker run --rm -v meu-volume-restaurado:/data alpine ls -la /data</code></pre>
-            </div>
+          <div class="info-box">
+            <strong>💡 Diferença importante:</strong> Com <code>-v</code>, se o path do host não existe em um bind mount, Docker <strong>cria o diretório automaticamente</strong> (pode causar bugs silenciosos). Com <code>--mount type=bind</code>, Docker retorna um <strong>erro</strong> se o path não existe — comportamento mais seguro.
           </div>
         </div>
-
-        <!-- docker cp -->
-        <div class="topic-block">
-          <h2>docker cp — Copiar Arquivos</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker cp</code><span class="cmd-tag">Copiar</span></div>
-              <p>Copia arquivos entre o host e um container (em execução ou parado). Útil para debugging e extração de dados.</p>
-              <pre><code># Host → Container
-docker cp ./config.json meu-container:/app/config.json
-docker cp ./src/ meu-container:/app/src/
-
-# Container → Host
-docker cp meu-container:/app/logs/error.log ./error.log
-docker cp meu-container:/var/log/ ./logs-extraidos/
-
-# Funciona com container parado também
-docker cp container-parado:/data/dump.sql ./backup.sql</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: VOLUMES (NAMED VOLUMES) — PROFUNDO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Volumes</span>
+          <h2>Volumes (Named Volumes) — Guia Completo</h2>
+          <p>Volumes são o mecanismo preferido para persistir dados gerados e usados por containers Docker. São completamente gerenciados pelo Docker e funcionam consistentemente em qualquer plataforma.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Gerenciamento de Volumes — Comandos Essenciais</h3>
+          <p>Docker fornece um conjunto completo de comandos para criar, listar, inspecionar e remover volumes:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker volume create</code><span class="cmd-tag">Criar</span></div>
+              <pre><code># Criar volume com nome específico:
+docker volume create meu-volume
+
+# Criar com labels (organização):
+docker volume create \
+  --label projeto=ecommerce \
+  --label ambiente=producao \
+  dados-postgres
+
+# Criar com driver específico:
+docker volume create \
+  --driver local \
+  --opt type=nfs \
+  --opt o=addr=192.168.1.100,rw \
+  --opt device=:/shared/data \
+  volume-nfs
+
+# Volume com opções de montagem:
+docker volume create \
+  --driver local \
+  --opt type=none \
+  --opt device=/mnt/ssd/data \
+  --opt o=bind \
+  volume-ssd</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker volume ls</code><span class="cmd-tag">Listar</span></div>
+              <pre><code># Listar todos os volumes:
+docker volume ls
+
+DRIVER    VOLUME NAME
+local     dados-postgres
+local     redis-data
+local     uploads-app
+local     3a4b5c6d7e8f9g...  ← Anônimo (sem nome)
+
+# Filtrar por label:
+docker volume ls --filter label=projeto=ecommerce
+
+# Filtrar por driver:
+docker volume ls --filter driver=local
+
+# Filtrar volumes "dangling" (não usados):
+docker volume ls --filter dangling=true
+
+# Formato customizado:
+docker volume ls --format "{{.Name}}: {{.Driver}}"
+
+# Mostrar apenas nomes (útil para scripts):
+docker volume ls -q</code></pre>
+            </div>
+          </div>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker volume inspect</code><span class="cmd-tag">Detalhes</span></div>
+              <pre><code># Inspecionar volume:
+docker volume inspect dados-postgres
+
+[{
+  "CreatedAt": "2024-01-15T10:30:00Z",
+  "Driver": "local",
+  "Labels": {
+    "projeto": "ecommerce",
+    "ambiente": "producao"
+  },
+  "Mountpoint": "/var/lib/docker/volumes/dados-postgres/_data",
+  "Name": "dados-postgres",
+  "Options": {},
+  "Scope": "local"
+}]
+
+# Ver apenas o mountpoint:
+docker volume inspect --format '{{.Mountpoint}}' dados-postgres
+# /var/lib/docker/volumes/dados-postgres/_data
+
+# 💡 O Mountpoint é onde os dados ficam no HOST
+# Em Linux, você pode acessar diretamente (como root):
+sudo ls /var/lib/docker/volumes/dados-postgres/_data/</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker volume rm / prune</code><span class="cmd-tag">Remover</span></div>
+              <pre><code># Remover volume específico:
+docker volume rm meu-volume
+# ⚠️ Falha se volume está em uso por um container
+
+# Forçar remoção (mesmo se container parado usa):
+docker volume rm -f meu-volume
+
+# Remover múltiplos:
+docker volume rm vol1 vol2 vol3
+
+# 🧹 Prune — remover volumes NÃO USADOS:
+docker volume prune
+# Remove todos os volumes não referenciados por containers
+
+# Prune com filtro:
+docker volume prune --filter label=ambiente=dev
+# Remove apenas volumes de dev não usados
+
+# ⚠️ CUIDADO: prune remove dados permanentemente!
+# Sempre verifique antes:
+docker volume ls --filter dangling=true</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Montando Volumes em Containers</h3>
+          <p>A principal utilidade de volumes é montá-los dentro de containers para que os dados persistam além do ciclo de vida do container:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Montagem com -v e --mount</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># FORMA 1: -v (volume flag — sintaxe curta)
+docker run -d \
+  --name postgres-db \
+  -v pgdata:/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=secret123 \
+  postgres:16
+
+# FORMA 2: --mount (sintaxe explícita — recomendada)
+docker run -d \
+  --name postgres-db \
+  --mount type=volume,source=pgdata,target=/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=secret123 \
+  postgres:16
+
+# Volume read-only (container não pode escrever):
+docker run -d \
+  --name web \
+  -v config-vol:/etc/nginx/conf.d:ro \
+  nginx:1.25
+
+# Ou com --mount:
+docker run -d \
+  --name web \
+  --mount type=volume,source=config-vol,target=/etc/nginx/conf.d,readonly \
+  nginx:1.25
+
+# Volume criado automaticamente se não existir:
+docker run -v novo-volume:/data nginx
+# Docker cria "novo-volume" automaticamente na primeira vez</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Demonstração: Volumes sobrevivem ao container</h3>
+          <p>A prova definitiva de que volumes persistem dados mesmo após a remoção do container:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Dados persistem entre containers</code><span class="cmd-tag">Demonstração</span></div>
+              <pre><code># 1. Criar um volume
+docker volume create demo-persistencia
+
+# 2. Criar container e gravar dados no volume
+docker run --rm \
+  -v demo-persistencia:/dados \
+  ubuntu:22.04 \
+  bash -c "echo 'Criado em: $(date)' > /dados/registro.txt && \
+           echo 'Informação importante' >> /dados/registro.txt && \
+           echo '--- Dados gravados! ---'"
+
+# Saída: --- Dados gravados! ---
+# Container foi removido automaticamente (--rm)
+
+# 3. Verificar que o volume ainda existe:
+docker volume ls | grep demo-persistencia
+# local     demo-persistencia  ✓
+
+# 4. Criar NOVO container e ler os dados do MESMO volume:
+docker run --rm \
+  -v demo-persistencia:/dados \
+  alpine:3.19 \
+  cat /dados/registro.txt
+
+# Saída:
+# Criado em: Mon Jan 15 10:30:00 UTC 2024
+# Informação importante
+
+# ✅ DADOS PERSISTIRAM! Mesmo usando imagem diferente (alpine vs ubuntu)!
+
+# 5. Limpar:
+docker volume rm demo-persistencia</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚡ Pontos-chave demonstrados:</strong>
+            <ul>
+              <li>O container foi removido (<code>--rm</code>), mas os dados permaneceram no volume</li>
+              <li>Um container completamente diferente (alpine) conseguiu ler os dados</li>
+              <li>O volume é independente do container — vive no host, gerenciado pelo Docker</li>
+              <li>Volumes não dependem da imagem — qualquer container pode montar qualquer volume</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Compartilhando Volumes entre Containers</h3>
+          <p>Volumes podem ser montados simultaneamente em múltiplos containers, permitindo compartilhamento de dados:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Múltiplos containers, mesmo volume</code><span class="cmd-tag">Compartilhamento</span></div>
+              <pre><code># Cenário: app que gera logs + container que processa logs
+
+# 1. Criar volume compartilhado:
+docker volume create logs-compartilhados
+
+# 2. Container 1: Aplicação que gera logs
+docker run -d \
+  --name app-producer \
+  -v logs-compartilhados:/var/log/app \
+  alpine:3.19 \
+  sh -c "while true; do echo \"[$(date)] Evento processado\" >> /var/log/app/events.log; sleep 2; done"
+
+# 3. Container 2: Processador de logs (lê do mesmo volume)
+docker run -d \
+  --name log-processor \
+  -v logs-compartilhados:/logs:ro \
+  alpine:3.19 \
+  sh -c "tail -f /logs/events.log"
+
+# 4. Verificar que o processador recebe os logs:
+docker logs log-processor
+# [Mon Jan 15 10:30:00 UTC 2024] Evento processado
+# [Mon Jan 15 10:30:02 UTC 2024] Evento processado
+# ...
+
+# 5. Container 3: Backup periódico (também lê o volume)
+docker run --rm \
+  -v logs-compartilhados:/source:ro \
+  -v $(pwd):/backup \
+  alpine:3.19 \
+  tar czf /backup/logs-backup.tar.gz -C /source .
+
+# ✅ Três containers acessando o mesmo volume!
+
+# Limpar:
+docker stop app-producer log-processor
+docker rm app-producer log-processor
+docker volume rm logs-compartilhados</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Cuidado com concorrência:</strong> Quando múltiplos containers escrevem no mesmo volume, podem ocorrer conflitos. Use <code>:ro</code> (read-only) para leitores, e garanta que apenas um container escreve, ou use mecanismos de lock no nível da aplicação.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Volume Drivers — Além do Armazenamento Local</h3>
+          <p>Por padrão, volumes usam o driver <code>local</code> (filesystem do host). Mas volume drivers permitem armazenar dados em NFS, cloud storage, clusters distribuídos e mais:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Driver local com NFS</code><span class="cmd-tag">Rede</span></div>
+              <pre><code># Volume NFS — compartilhado entre múltiplos hosts:
+docker volume create \
+  --driver local \
+  --opt type=nfs \
+  --opt o=addr=192.168.1.100,rw,nfsvers=4 \
+  --opt device=:/export/shared \
+  volume-nfs
+
+# Usar como qualquer outro volume:
+docker run -d \
+  -v volume-nfs:/app/shared \
+  nginx
+
+# Cenário: cluster Docker Swarm
+# Todos os nós acessam o mesmo NFS
+# → Dados disponíveis em qualquer nó</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Plugins de terceiros</code><span class="cmd-tag">Cloud</span></div>
+              <pre><code># REX-Ray — multi-cloud (AWS EBS, Azure, GCE):
+docker plugin install rexray/ebs
+docker volume create \
+  --driver rexray/ebs \
+  --opt size=50 \
+  volume-ebs
+
+# Portworx — storage distribuído:
+docker volume create \
+  --driver pxd \
+  --opt size=100 \
+  --opt repl=3 \
+  volume-portworx
+
+# NetApp Trident:
+docker volume create \
+  --driver netapp \
+  --opt size=200 \
+  volume-netapp
+
+# 💡 Em Kubernetes, esses conceitos evoluem para:
+# PersistentVolume (PV) e PersistentVolumeClaim (PVC)
+# StorageClass define o driver automaticamente</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Backup e Restore de Volumes</h3>
+          <p>Volumes não têm backup automático. Você precisa implementar estratégias de backup usando containers auxiliares:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Backup de volume</code><span class="cmd-tag">Importante</span></div>
+              <pre><code># Estratégia: container temporário monta o volume
+# e cria um arquivo tar
+
+# Backup completo:
+docker run --rm \
+  -v pgdata:/source:ro \
+  -v $(pwd)/backups:/backup \
+  alpine:3.19 \
+  tar czf /backup/pgdata-$(date +%Y%m%d-%H%M%S).tar.gz \
+    -C /source .
+
+# Resultado: ./backups/pgdata-20240115-103000.tar.gz
+
+# Backup com compressão xz (menor):
+docker run --rm \
+  -v pgdata:/source:ro \
+  -v $(pwd)/backups:/backup \
+  alpine:3.19 \
+  sh -c "tar cf - -C /source . | xz > /backup/pgdata.tar.xz"
+
+# Listar conteúdo do backup:
+tar -tzf backups/pgdata-20240115-103000.tar.gz | head</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Restore de volume</code><span class="cmd-tag">Recuperação</span></div>
+              <pre><code># 1. Criar volume de destino (ou usar existente):
+docker volume create pgdata-restored
+
+# 2. Restaurar do backup:
+docker run --rm \
+  -v pgdata-restored:/target \
+  -v $(pwd)/backups:/backup:ro \
+  alpine:3.19 \
+  sh -c "cd /target && tar xzf /backup/pgdata-20240115-103000.tar.gz"
+
+# 3. Usar o volume restaurado:
+docker run -d \
+  --name postgres-recovered \
+  -v pgdata-restored:/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=secret123 \
+  postgres:16
+
+# 4. Verificar que dados estão lá:
+docker exec postgres-recovered \
+  psql -U postgres -c "SELECT count(*) FROM users;"
+
+# ✅ Dados recuperados com sucesso!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Volumes Anônimos vs Nomeados</h3>
+          <p>Quando você não especifica um nome, Docker cria um volume com hash aleatório — chamado "anônimo":</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Anônimo vs Nomeado</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code># Volume ANÔNIMO (sem nome — hash aleatório):
+docker run -v /var/lib/postgresql/data postgres:16
+# Docker cria: /var/lib/docker/volumes/3a4b5c6d7e8f.../_data/
+# Difícil de identificar, fácil de perder
+
+# Volume NOMEADO (com nome explícito):
+docker run -v pgdata:/var/lib/postgresql/data postgres:16
+# Docker cria: /var/lib/docker/volumes/pgdata/_data/
+# Fácil de identificar, gerenciar e fazer backup
+
+# VOLUME definido no Dockerfile (cria anônimo por padrão):
+# No Dockerfile:
+#   VOLUME /var/lib/postgresql/data
+# Ao rodar sem -v, Docker cria volume anônimo automaticamente
+
+# ⚠️ Problema dos volumes anônimos:
+docker volume ls
+DRIVER    VOLUME NAME
+local     pgdata                          ← Fácil de saber o que é
+local     3a4b5c6d7e8f9g0h1i2j3k4l5m6n   ← O que é isso??
+local     7a8b9c0d1e2f3g4h5i6j7k8l9m0n   ← E isso??
+
+# 💡 REGRA: Sempre use volumes NOMEADOS em produção!
+# Volumes anônimos são aceitáveis apenas para testes rápidos.</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: BIND MOUNTS — PROFUNDO -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Bind Mounts</span>
+          <h2>Bind Mounts — Mapeamento Direto do Host</h2>
+          <p>Bind mounts permitem montar qualquer arquivo ou diretório do host diretamente dentro do container. São a ferramenta principal para ambientes de desenvolvimento, mas exigem cuidado em produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Como Bind Mounts Funcionam</h3>
+          <p>Um bind mount cria um "espelho" — o container vê exatamente o mesmo conteúdo que está no path do host, em tempo real:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Bind mount básico</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># Sintaxe com -v (path absoluto do host):
+docker run -d \
+  --name web-dev \
+  -v /home/user/meu-site:/usr/share/nginx/html \
+  -p 8080:80 \
+  nginx:1.25
+
+# Sintaxe com $(pwd) — diretório atual:
+docker run -d \
+  --name web-dev \
+  -v $(pwd)/src:/usr/share/nginx/html \
+  -p 8080:80 \
+  nginx:1.25
+
+# Sintaxe com --mount (mais explícita):
+docker run -d \
+  --name web-dev \
+  --mount type=bind,source=$(pwd)/src,target=/usr/share/nginx/html \
+  -p 8080:80 \
+  nginx:1.25
+
+# ⚠️ DIFERENÇA IMPORTANTE com -v:
+# Se $(pwd)/src NÃO EXISTE:
+#   -v      → Docker CRIA o diretório (vazio) silenciosamente
+#   --mount → Docker retorna ERRO (mais seguro!)
+
+# Montar arquivo individual (não só diretório):
+docker run -d \
+  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  nginx:1.25</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Caso de Uso Principal: Desenvolvimento com Hot-Reload</h3>
+          <p>O cenário mais comum para bind mounts é desenvolvimento local — você edita código no host e o container reflete instantaneamente:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Node.js com nodemon</code><span class="cmd-tag">Hot-Reload</span></div>
+              <pre><code># Estrutura do projeto:
+# ./meu-app/
+# ├── package.json
+# ├── src/
+# │   └── index.js
+# └── Dockerfile
+
+# Rodar em modo desenvolvimento:
+docker run -d \
+  --name node-dev \
+  -v $(pwd):/app \
+  -v /app/node_modules \
+  -p 3000:3000 \
+  -w /app \
+  node:20 \
+  npx nodemon src/index.js
+
+# Explicação:
+# -v $(pwd):/app       → Código do host no container
+# -v /app/node_modules → Volume anônimo para node_modules
+#                        (evita conflito host vs container)
+# -w /app              → Working directory
+
+# Agora edite src/index.js no seu editor...
+# → nodemon detecta a mudança
+# → Reinicia automaticamente
+# → Resultado visível em http://localhost:3000</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Python com Flask (auto-reload)</code><span class="cmd-tag">Hot-Reload</span></div>
+              <pre><code># Estrutura:
+# ./flask-app/
+# ├── requirements.txt
+# ├── app.py
+# └── templates/
+
+# Modo desenvolvimento com Flask:
+docker run -d \
+  --name flask-dev \
+  -v $(pwd):/app \
+  -p 5000:5000 \
+  -w /app \
+  -e FLASK_ENV=development \
+  -e FLASK_DEBUG=1 \
+  python:3.12-slim \
+  sh -c "pip install -r requirements.txt && \
+         flask run --host=0.0.0.0"
+
+# React/Next.js com hot-reload:
+docker run -d \
+  --name react-dev \
+  -v $(pwd):/app \
+  -v /app/node_modules \
+  -p 3000:3000 \
+  -w /app \
+  node:20 \
+  npm run dev
+
+# ✅ Edite arquivos no VS Code
+# ✅ Container detecta mudanças
+# ✅ Browser atualiza automaticamente</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Permissões e Problemas de UID/GID</h3>
+          <p>Um dos maiores problemas com bind mounts é a diferença de permissões entre host e container. O processo dentro do container pode rodar como um usuário diferente do seu usuário no host:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>O problema de permissões</code><span class="cmd-tag">Troubleshooting</span></div>
+              <pre><code># Cenário problemático:
+# Seu usuário no host: uid=1000, gid=1000
+# Processo no container: uid=0 (root) ou uid=999 (postgres)
+
+# Container cria arquivo como root:
+docker run --rm -v $(pwd)/data:/data alpine:3.19 touch /data/arquivo.txt
+ls -la data/arquivo.txt
+# -rw-r--r-- 1 root root 0 Jan 15 10:30 data/arquivo.txt
+# ❌ Você (uid=1000) pode ter problemas para editar!
+
+# SOLUÇÃO 1: Rodar container com seu UID:
+docker run --rm \
+  -v $(pwd)/data:/data \
+  --user $(id -u):$(id -g) \
+  alpine:3.19 \
+  touch /data/arquivo.txt
+
+ls -la data/arquivo.txt
+# -rw-r--r-- 1 user user 0 Jan 15 10:30 data/arquivo.txt ✅
+
+# SOLUÇÃO 2: No Dockerfile, criar usuário com mesmo UID:
+# Dockerfile:
+# FROM node:20
+# RUN groupadd -g 1000 appgroup && \
+#     useradd -u 1000 -g appgroup -m appuser
+# USER appuser
+
+# SOLUÇÃO 3: fixuid (ferramenta para ajuste automático):
+# Ajusta UID/GID no entrypoint do container
+
+# SOLUÇÃO 4: Permissões adequadas no host:
+chmod 777 data/   # ⚠️ Não ideal para produção
+chmod g+w data/ && chgrp docker data/  # Melhor</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Em Docker Desktop (Mac/Windows):</strong> O problema de UID/GID é menos frequente porque Docker Desktop faz tradução automática de permissões entre o host e a VM Linux. Em Linux nativo, é o cenário mais comum de frustração com bind mounts.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Read-Only Bind Mounts</h3>
+          <p>Quando o container só precisa LER dados do host (configs, certificados, etc.), monte como read-only para segurança:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Montagem read-only</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Com -v (adicionar :ro no final):
+docker run -d \
+  -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+  -v $(pwd)/certs:/etc/ssl/certs:ro \
+  nginx:1.25
+
+# Com --mount (readonly flag):
+docker run -d \
+  --mount type=bind,source=$(pwd)/config,target=/app/config,readonly \
+  minha-app:latest
+
+# Container tenta escrever:
+docker exec container1 touch /etc/nginx/nginx.conf
+# touch: /etc/nginx/nginx.conf: Read-only file system
+# ✅ Proteção funcionando!
+
+# Cenários para read-only:
+# → Arquivos de configuração
+# → Certificados TLS/SSL
+# → Chaves públicas
+# → Dados de referência que não mudam
+# → Código-fonte em containers de teste</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Filesystem inteiro read-only</code><span class="cmd-tag">Hardening</span></div>
+              <pre><code># Container com TODO o filesystem read-only:
+docker run -d \
+  --read-only \
+  --name secure-app \
+  -v app-logs:/var/log \
+  --tmpfs /tmp \
+  --tmpfs /run \
+  minha-app:latest
+
+# --read-only: ninguém escreve na writable layer
+# -v app-logs:/var/log: logs vão para volume (persiste)
+# --tmpfs /tmp: diretório temporário em RAM
+# --tmpfs /run: PID files em RAM
+
+# ✅ Benefícios:
+# → Atacante não pode modificar binários
+# → Não pode instalar malware
+# → Não pode alterar configurações
+# → Container é verdadeiramente imutável
+
+# ⚠️ Pode quebrar apps que escrevem em paths inesperados
+# Teste bem antes de aplicar!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Segurança: Cuidado com o que você monta</h3>
+          <p>Bind mounts podem ser um risco de segurança significativo se mal configurados. O container ganha acesso direto ao filesystem do host:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Riscos de segurança</code><span class="cmd-tag">⚠️ Atenção</span></div>
+              <pre><code># ❌ NUNCA faça isso — acesso total ao host:
+docker run -v /:/host ubuntu bash
+# Container pode ler/escrever QUALQUER arquivo do host!
+# Incluindo /etc/shadow, /etc/passwd, SSH keys...
+
+# ❌ Montar Docker socket — equivale a acesso root no host:
+docker run -v /var/run/docker.sock:/var/run/docker.sock docker
+# Container pode criar outros containers, acessar volumes, etc.
+# Use APENAS para ferramentas de CI/CD e monitoramento confiáveis
+
+# ❌ Montar diretórios sensíveis:
+docker run -v /etc:/etc ubuntu          # Configurações do sistema
+docker run -v ~/.ssh:/root/.ssh ubuntu  # Chaves SSH
+docker run -v /root:/root ubuntu        # Home do root
+
+# ✅ BOAS PRÁTICAS:
+# → Monte apenas o diretório mínimo necessário
+# → Use :ro sempre que possível
+# → Nunca monte / (raiz) ou /etc
+# → Em produção, prefira volumes nomeados
+# → Use --read-only no container quando possível
+# → Audite bind mounts em docker-compose.yml de terceiros</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Regra de segurança:</strong> Trate bind mounts como você trata <code>sudo</code> — use apenas quando necessário, com o mínimo de permissão possível, e sempre questione por que o acesso é necessário.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Performance de Bind Mounts por Plataforma</h3>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Plataforma</th>
+                <th>Performance</th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Linux nativo</strong></td>
+                <td>✅ Excelente (nativa)</td>
+                <td>Bind mount é direto no filesystem — zero overhead</td>
+              </tr>
+              <tr>
+                <td><strong>Docker Desktop (Mac)</strong></td>
+                <td>⚠️ Lenta (10-100x mais lenta)</td>
+                <td>Sincronização entre macOS e VM Linux via gRPC-FUSE/VirtioFS</td>
+              </tr>
+              <tr>
+                <td><strong>Docker Desktop (Windows)</strong></td>
+                <td>⚠️ Lenta</td>
+                <td>Tradução entre NTFS (Windows) e ext4 (Linux VM)</td>
+              </tr>
+              <tr>
+                <td><strong>WSL2 (Windows)</strong></td>
+                <td>✅ Boa (filesystem Linux)</td>
+                <td>Se o código estiver DENTRO do WSL2, performance é nativa</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>💡 Dica para Mac/Windows:</strong> Se performance de bind mount é um problema (projetos Node.js com milhares de arquivos), considere:
+            <ul>
+              <li>Usar <strong>mutagen</strong> ou <strong>Docker Sync</strong> para sincronização assíncrona</li>
+              <li>Mover <code>node_modules</code> para um volume (evita sync de milhares de arquivos)</li>
+              <li>Usar <strong>VirtioFS</strong> (Docker Desktop 4.15+) — muito mais rápido que gRPC-FUSE</li>
+              <li>Desenvolver dentro do WSL2 no Windows</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: TMPFS MOUNTS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">tmpfs</span>
+          <h2>tmpfs Mounts — Armazenamento em Memória</h2>
+          <p>tmpfs mounts armazenam dados exclusivamente na memória RAM do host. Os dados nunca são escritos em disco e desaparecem completamente quando o container para. Ideal para dados sensíveis e cache de alta performance.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Como tmpfs Funciona</h3>
+          <p>Um tmpfs mount cria um filesystem em memória dentro do container. É o tipo de armazenamento mais rápido (RAM) e mais volátil (sem persistência):</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>--tmpfs (sintaxe simples)</code><span class="cmd-tag">Rápido</span></div>
+              <pre><code># Montar tmpfs em /app/cache:
+docker run -d \
+  --name fast-cache \
+  --tmpfs /app/cache \
+  nginx:1.25
+
+# Com opções (tamanho e permissões):
+docker run -d \
+  --name secure-app \
+  --tmpfs /tmp:rw,noexec,nosuid,size=100m \
+  minha-app:latest
+
+# Opções disponíveis:
+# rw/ro      → leitura+escrita ou somente leitura
+# noexec     → não permite execução de binários
+# nosuid     → ignora bit SUID
+# size=XXm   → limite de tamanho em MB
+# mode=1777  → permissões do diretório
+
+# Verificar que é tmpfs:
+docker exec fast-cache df -h /app/cache
+# Filesystem  Size  Used  Avail  Use%  Mounted on
+# tmpfs       64M   0     64M    0%    /app/cache</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>--mount type=tmpfs</code><span class="cmd-tag">Explícito</span></div>
+              <pre><code># Sintaxe --mount (mais opções):
+docker run -d \
+  --name secure-app \
+  --mount type=tmpfs,target=/app/secrets,tmpfs-size=50m,tmpfs-mode=0700 \
+  minha-app:latest
+
+# Múltiplos tmpfs no mesmo container:
+docker run -d \
+  --name multi-tmpfs \
+  --mount type=tmpfs,target=/tmp,tmpfs-size=200m \
+  --mount type=tmpfs,target=/run,tmpfs-size=10m \
+  --mount type=tmpfs,target=/app/cache,tmpfs-size=500m \
+  minha-app:latest
+
+# tmpfs-size: limite em bytes (aceita sufixos k, m, g)
+# tmpfs-mode: permissões Unix (octal)
+
+# Sem limite de tamanho (usa toda RAM disponível):
+docker run -d \
+  --mount type=tmpfs,target=/cache \
+  minha-app:latest
+# ⚠️ Cuidado: pode consumir toda a RAM!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Casos de Uso para tmpfs</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Dados sensíveis temporários</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Cenário: API que processa tokens JWT
+# Os tokens nunca devem ir para disco
+
+docker run -d \
+  --name api-server \
+  --read-only \
+  --mount type=tmpfs,target=/app/sessions,tmpfs-size=100m \
+  --mount type=tmpfs,target=/tmp,tmpfs-size=50m \
+  -e JWT_SECRET_FILE=/app/secrets/jwt.key \
+  minha-api:latest
+
+# Benefícios:
+# → Tokens de sessão ficam APENAS na RAM
+# → Se o container for comprometido, dados sensíveis
+#   não podem ser extraídos do disco
+# → Após reiniciar, sessões são limpas automaticamente
+# → Forensics no host não encontra esses dados
+
+# Cenário: processar arquivos com dados pessoais (LGPD):
+docker run --rm \
+  --mount type=tmpfs,target=/processing,tmpfs-size=1g \
+  -v input-data:/input:ro \
+  data-processor:latest \
+  python process.py --input /input --temp /processing</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cache de alta performance</code><span class="cmd-tag">Performance</span></div>
+              <pre><code># Cenário: aplicação com cache pesado
+# Não precisa persistir, mas precisa ser RÁPIDO
+
+docker run -d \
+  --name cache-heavy-app \
+  --mount type=tmpfs,target=/app/cache,tmpfs-size=2g \
+  -v app-data:/app/data \
+  minha-app:latest
+
+# Velocidade comparativa:
+# tmpfs (RAM):  ~10 GB/s leitura
+# SSD NVMe:    ~3-5 GB/s leitura
+# HDD:         ~0.1-0.2 GB/s leitura
+# → tmpfs é 2-100x mais rápido!
+
+# Cenário: build de compilação (arquivos intermediários):
+docker run --rm \
+  --mount type=tmpfs,target=/build,tmpfs-size=4g \
+  -v $(pwd)/src:/src:ro \
+  -v $(pwd)/output:/output \
+  gcc:13 \
+  sh -c "cd /build && cmake /src && make -j$(nproc) && cp app /output/"
+
+# Arquivos de build ficam na RAM → compilação mais rápida
+# Apenas resultado final vai para output (disco)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Limitações do tmpfs</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>O que você precisa saber</code><span class="cmd-tag">Limitações</span></div>
+              <pre><code># Limitações do tmpfs:
+
+1. NÃO PERSISTE — dados perdidos ao parar container
+   docker stop meu-container  → dados tmpfs = GONE
+
+2. NÃO COMPARTILHÁVEL — apenas um container pode usar
+   # Cada container tem seu próprio tmpfs independente
+   # Diferente de volumes, não pode ser montado em múltiplos containers
+
+3. CONSOME RAM do host
+   # Se tmpfs-size=2g e container usa 2g, são 2g a MENOS de RAM para o host
+   # OOM Killer pode matar processos se RAM acabar
+
+4. APENAS LINUX
+   # Em Docker Desktop (Mac/Windows), tmpfs funciona na VM Linux
+   # Não no host real — mas o efeito prático é o mesmo
+
+5. NÃO APARECE em 'docker volume ls'
+   # tmpfs não é um "volume" — é um mount especial
+   # Não tem backup, não tem inspect
+
+# Verificar uso de tmpfs em um container:
+docker inspect --format='{{.HostConfig.Tmpfs}}' meu-container
+# ou
+docker inspect meu-container | grep -A5 "Tmpfs"</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: PERSISTÊNCIA PARA BANCOS DE DADOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Bancos de Dados</span>
+          <h2>Persistência para Bancos de Dados</h2>
+          <p>Bancos de dados em containers são o caso de uso mais crítico para volumes. Sem persistência adequada, você perde todos os dados ao reiniciar. Veja como configurar corretamente os bancos mais populares.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>PostgreSQL com Volume Nomeado</h3>
+          <p>PostgreSQL armazena todos os dados em <code>/var/lib/postgresql/data</code>. Este diretório DEVE ser um volume:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>PostgreSQL — setup completo com persistência</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># 1. Criar volume dedicado para PostgreSQL:
+docker volume create pgdata-producao
+
+# 2. Executar PostgreSQL com volume:
+docker run -d \
+  --name postgres-prod \
+  -v pgdata-producao:/var/lib/postgresql/data \
+  -e POSTGRES_DB=minha_aplicacao \
+  -e POSTGRES_USER=app_user \
+  -e POSTGRES_PASSWORD=senha_segura_123 \
+  -e POSTGRES_INITDB_ARGS="--encoding=UTF8 --locale=pt_BR.UTF-8" \
+  -e PGDATA=/var/lib/postgresql/data/pgdata \
+  -p 5432:5432 \
+  --restart unless-stopped \
+  postgres:16-alpine
+
+# 3. Criar tabelas e inserir dados:
+docker exec -it postgres-prod psql -U app_user -d minha_aplicacao -c "
+  CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    criado_em TIMESTAMP DEFAULT NOW()
+  );
+  INSERT INTO usuarios (nome, email) VALUES
+    ('João Silva', 'joao@example.com'),
+    ('Maria Santos', 'maria@example.com');
+"
+
+# 4. TESTE DE PERSISTÊNCIA — remover e recriar container:
+docker stop postgres-prod && docker rm postgres-prod
+
+# 5. Recriar container apontando para o MESMO volume:
+docker run -d \
+  --name postgres-prod \
+  -v pgdata-producao:/var/lib/postgresql/data \
+  -e POSTGRES_DB=minha_aplicacao \
+  -e POSTGRES_USER=app_user \
+  -e POSTGRES_PASSWORD=senha_segura_123 \
+  -e PGDATA=/var/lib/postgresql/data/pgdata \
+  -p 5432:5432 \
+  --restart unless-stopped \
+  postgres:16-alpine
+
+# 6. Verificar que dados sobreviveram:
+docker exec postgres-prod psql -U app_user -d minha_aplicacao -c "SELECT * FROM usuarios;"
+#  id |     nome      |       email        |      criado_em
+# ----+---------------+--------------------+---------------------
+#   1 | João Silva    | joao@example.com   | 2024-01-15 10:30:00
+#   2 | Maria Santos  | maria@example.com  | 2024-01-15 10:30:00
+# ✅ DADOS INTACTOS!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>MySQL/MariaDB com Volume</h3>
+          <p>MySQL armazena dados em <code>/var/lib/mysql</code>:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>MySQL 8.0</code><span class="cmd-tag">Setup</span></div>
+              <pre><code># Criar volume para MySQL:
+docker volume create mysql-data
+
+# Executar MySQL com persistência:
+docker run -d \
+  --name mysql-prod \
+  -v mysql-data:/var/lib/mysql \
+  -v $(pwd)/mysql-config:/etc/mysql/conf.d:ro \
+  -e MYSQL_ROOT_PASSWORD=root_seguro_123 \
+  -e MYSQL_DATABASE=ecommerce \
+  -e MYSQL_USER=app \
+  -e MYSQL_PASSWORD=app_seguro_456 \
+  -e MYSQL_CHARACTER_SET_SERVER=utf8mb4 \
+  -e MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci \
+  -p 3306:3306 \
+  --restart unless-stopped \
+  mysql:8.0
+
+# Arquivo de configuração customizado:
+# mysql-config/custom.cnf:
+# [mysqld]
+# innodb_buffer_pool_size = 1G
+# max_connections = 200
+# slow_query_log = 1
+# slow_query_log_file = /var/lib/mysql/slow.log
+
+# Verificar:
+docker exec mysql-prod mysql -uapp -papp_seguro_456 \
+  -e "SHOW DATABASES;"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>MariaDB</code><span class="cmd-tag">Setup</span></div>
+              <pre><code># MariaDB — similar ao MySQL:
+docker volume create mariadb-data
+
+docker run -d \
+  --name mariadb-prod \
+  -v mariadb-data:/var/lib/mysql \
+  -e MARIADB_ROOT_PASSWORD=root_seguro \
+  -e MARIADB_DATABASE=app_db \
+  -e MARIADB_USER=app \
+  -e MARIADB_PASSWORD=app_pass \
+  -p 3306:3306 \
+  --restart unless-stopped \
+  mariadb:11
+
+# Script de inicialização (roda apenas no primeiro start):
+# Coloque arquivos .sql ou .sh em /docker-entrypoint-initdb.d/
+docker run -d \
+  --name mariadb-prod \
+  -v mariadb-data:/var/lib/mysql \
+  -v $(pwd)/init-scripts:/docker-entrypoint-initdb.d:ro \
+  -e MARIADB_ROOT_PASSWORD=root_seguro \
+  mariadb:11
+
+# init-scripts/01-schema.sql será executado automaticamente
+# na primeira inicialização</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>MongoDB com Volume</h3>
+          <p>MongoDB armazena dados em <code>/data/db</code> e configs em <code>/data/configdb</code>:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>MongoDB com persistência completa</code><span class="cmd-tag">NoSQL</span></div>
+              <pre><code># Criar volumes para dados e configuração:
+docker volume create mongo-data
+docker volume create mongo-config
+
+# Executar MongoDB:
+docker run -d \
+  --name mongodb-prod \
+  -v mongo-data:/data/db \
+  -v mongo-config:/data/configdb \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=admin_seguro_789 \
+  -e MONGO_INITDB_DATABASE=minha_app \
+  -p 27017:27017 \
+  --restart unless-stopped \
+  mongo:7
+
+# Com WiredTiger cache configurado:
+docker run -d \
+  --name mongodb-prod \
+  -v mongo-data:/data/db \
+  -v mongo-config:/data/configdb \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=admin_seguro_789 \
+  -p 27017:27017 \
+  --restart unless-stopped \
+  mongo:7 \
+  --wiredTigerCacheSizeGB 2 \
+  --auth
+
+# Testar conexão:
+docker exec -it mongodb-prod mongosh \
+  -u admin -p admin_seguro_789 \
+  --eval "db.stats()"
+
+# Inserir dados de teste:
+docker exec -it mongodb-prod mongosh \
+  -u admin -p admin_seguro_789 --authenticationDatabase admin \
+  minha_app --eval '
+  db.produtos.insertMany([
+    { nome: "Notebook", preco: 4500, estoque: 50 },
+    { nome: "Mouse", preco: 89, estoque: 200 },
+    { nome: "Teclado", preco: 250, estoque: 150 }
+  ])'</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Redis com Persistência</h3>
+          <p>Redis é in-memory, mas oferece opções de persistência (RDB snapshots e AOF). Sem volume, dados são perdidos ao reiniciar:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Redis com RDB + AOF</code><span class="cmd-tag">Persistência</span></div>
+              <pre><code># Volume para dados do Redis:
+docker volume create redis-data
+
+# Redis com persistência AOF (append-only file):
+docker run -d \
+  --name redis-prod \
+  -v redis-data:/data \
+  -p 6379:6379 \
+  --restart unless-stopped \
+  redis:7-alpine \
+  redis-server \
+    --appendonly yes \
+    --appendfsync everysec \
+    --save 900 1 \
+    --save 300 10 \
+    --save 60 10000 \
+    --maxmemory 256mb \
+    --maxmemory-policy allkeys-lru
+
+# Explicação das opções:
+# --appendonly yes    → Habilita AOF (log de operações)
+# --appendfsync everysec → Sync a cada segundo
+# --save 900 1       → Snapshot se 1 key mudar em 15min
+# --save 300 10      → Snapshot se 10 keys mudarem em 5min
+# --save 60 10000    → Snapshot se 10000 keys mudarem em 1min
+# --maxmemory 256mb  → Limite de memória
+# --maxmemory-policy → Estratégia quando atingir limite</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Redis com config file</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># redis.conf customizado:
+# bind 0.0.0.0
+# protected-mode yes
+# requirepass minha_senha_redis
+# maxmemory 512mb
+# maxmemory-policy allkeys-lfu
+# appendonly yes
+# appendfilename "appendonly.aof"
+# save 3600 1
+# save 300 100
+
+# Usar config file via bind mount:
+docker run -d \
+  --name redis-prod \
+  -v redis-data:/data \
+  -v $(pwd)/redis.conf:/usr/local/etc/redis/redis.conf:ro \
+  -p 6379:6379 \
+  --restart unless-stopped \
+  redis:7-alpine \
+  redis-server /usr/local/etc/redis/redis.conf
+
+# Testar persistência:
+docker exec redis-prod redis-cli SET chave "valor"
+docker stop redis-prod && docker rm redis-prod
+# Recriar...
+docker exec redis-prod redis-cli GET chave
+# "valor" ← Persistiu via AOF!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Boas Práticas para Bancos de Dados em Containers</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Checklist de produção para bancos em Docker</code><span class="cmd-tag">Importante</span></div>
+              <pre><code># ✅ FAÇA:
+1. SEMPRE use volumes nomeados para dados do banco
+2. Configure --restart unless-stopped (ou always)
+3. Use variáveis de ambiente ou secrets para senhas
+4. Defina limites de recursos (--memory, --cpus)
+5. Implemente backup automatizado
+6. Monitore espaço em disco do volume
+7. Use imagens com tag fixa (postgres:16, não :latest)
+8. Separe dados de configuração em volumes diferentes
+9. Teste o processo de restore regularmente
+10. Use healthcheck para monitorar disponibilidade
+
+# ❌ NÃO FAÇA:
+1. Armazenar dados na writable layer (sem volume)
+2. Usar bind mounts para dados de banco em produção
+3. Compartilhar volume entre múltiplas instâncias do banco
+4. Ignorar backups ("o volume persiste" ≠ backup)
+5. Usar senhas em texto no docker run (use secrets/env files)
+6. Expor porta do banco para 0.0.0.0 (use rede interna)
+7. Rodar sem limites de memória (banco pode consumir tudo)
+8. Atualizar versão major sem testar migração
+
+# Exemplo completo de produção:
+docker run -d \
+  --name postgres-prod \
+  --network backend-net \
+  --ip 172.18.0.10 \
+  -v pgdata:/var/lib/postgresql/data \
+  -v pg-config:/etc/postgresql:ro \
+  --env-file .env.postgres \
+  --memory 2g \
+  --cpus 2 \
+  --restart unless-stopped \
+  --health-cmd="pg_isready -U postgres" \
+  --health-interval=10s \
+  --health-timeout=5s \
+  --health-retries=5 \
+  postgres:16-alpine</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: ESTRATÉGIAS DE BACKUP -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Backup</span>
+          <h2>Estratégias de Backup</h2>
+          <p>Volumes persistem dados, mas NÃO são backup. Se o disco falha, o volume vai junto. Implementar uma estratégia de backup robusta é essencial para dados críticos em produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Backup de Volume com Container Auxiliar</h3>
+          <p>A técnica mais comum e confiável: usar um container temporário que monta o volume e cria um arquivo compactado:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Padrão de backup com container auxiliar</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># BACKUP GENÉRICO DE QUALQUER VOLUME:
+
+# Sintaxe geral:
+docker run --rm \
+  -v NOME_DO_VOLUME:/source:ro \
+  -v /caminho/backups:/backup \
+  alpine:3.19 \
+  tar czf /backup/NOME-$(date +%Y%m%d-%H%M%S).tar.gz -C /source .
+
+# Exemplo real — backup do PostgreSQL:
+docker run --rm \
+  -v pgdata:/source:ro \
+  -v /opt/backups/postgres:/backup \
+  alpine:3.19 \
+  tar czf /backup/pgdata-$(date +%Y%m%d-%H%M%S).tar.gz -C /source .
+
+# Exemplo — backup do MongoDB:
+docker run --rm \
+  -v mongo-data:/source:ro \
+  -v /opt/backups/mongo:/backup \
+  alpine:3.19 \
+  tar czf /backup/mongo-$(date +%Y%m%d-%H%M%S).tar.gz -C /source .
+
+# Exemplo — backup com compressão xz (menor, mais lento):
+docker run --rm \
+  -v pgdata:/source:ro \
+  -v /opt/backups:/backup \
+  alpine:3.19 \
+  sh -c "apk add --no-cache xz && tar cf - -C /source . | xz -9 > /backup/pgdata-$(date +%Y%m%d).tar.xz"
+
+# IMPORTANTE: Para bancos de dados em produção, prefira
+# ferramentas nativas (pg_dump, mysqldump, mongodump)
+# ao invés de backup raw dos arquivos do volume!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Backup Nativo de Bancos de Dados</h3>
+          <p>Para bancos de dados, o backup dos dados em formato nativo é mais seguro e portável do que copiar os arquivos brutos do volume:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>pg_dump (PostgreSQL)</code><span class="cmd-tag">Nativo</span></div>
+              <pre><code># Backup completo com pg_dump:
+docker exec postgres-prod \
+  pg_dump -U app_user -d minha_aplicacao \
+  --format=custom \
+  --file=/tmp/backup.dump
+
+# Copiar para o host:
+docker cp postgres-prod:/tmp/backup.dump \
+  ./backups/pg-$(date +%Y%m%d).dump
+
+# Ou em um único comando (pipe):
+docker exec postgres-prod \
+  pg_dump -U app_user minha_aplicacao \
+  | gzip > ./backups/pg-$(date +%Y%m%d).sql.gz
+
+# Backup de TODOS os databases:
+docker exec postgres-prod \
+  pg_dumpall -U postgres \
+  | gzip > ./backups/pg-all-$(date +%Y%m%d).sql.gz
+
+# Restore:
+gunzip -c ./backups/pg-20240115.sql.gz | \
+  docker exec -i postgres-prod \
+  psql -U app_user -d minha_aplicacao
+
+# Restore de format custom:
+docker cp ./backups/pg-20240115.dump postgres-prod:/tmp/
+docker exec postgres-prod \
+  pg_restore -U app_user -d minha_aplicacao \
+  --clean --if-exists /tmp/backup.dump</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>mysqldump / mongodump</code><span class="cmd-tag">Nativo</span></div>
+              <pre><code># MySQL — backup com mysqldump:
+docker exec mysql-prod \
+  mysqldump -u root -p'root_seguro_123' \
+  --all-databases --single-transaction \
+  | gzip > ./backups/mysql-$(date +%Y%m%d).sql.gz
+
+# MySQL — restore:
+gunzip -c ./backups/mysql-20240115.sql.gz | \
+  docker exec -i mysql-prod \
+  mysql -u root -p'root_seguro_123'
+
+# MongoDB — backup com mongodump:
+docker exec mongodb-prod \
+  mongodump \
+  --username admin \
+  --password admin_seguro_789 \
+  --authenticationDatabase admin \
+  --out /tmp/mongo-backup
+
+# Copiar para host:
+docker cp mongodb-prod:/tmp/mongo-backup \
+  ./backups/mongo-$(date +%Y%m%d)/
+
+# MongoDB — restore:
+docker cp ./backups/mongo-20240115/ mongodb-prod:/tmp/restore/
+docker exec mongodb-prod \
+  mongorestore \
+  --username admin \
+  --password admin_seguro_789 \
+  --authenticationDatabase admin \
+  /tmp/restore/</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker cp — Copiar Arquivos de/para Containers</h3>
+          <p>O comando <code>docker cp</code> permite copiar arquivos entre o host e um container (mesmo parado):</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker cp</code><span class="cmd-tag">Transferência</span></div>
+              <pre><code># Copiar DO container PARA o host:
+docker cp meu-container:/var/log/app.log ./logs/
+docker cp meu-container:/app/data/ ./backup-data/
+
+# Copiar DO host PARA o container:
+docker cp ./config.yml meu-container:/app/config.yml
+docker cp ./scripts/ meu-container:/app/scripts/
+
+# Funciona mesmo com container PARADO:
+docker stop postgres-prod
+docker cp postgres-prod:/var/lib/postgresql/data/ ./pg-backup/
+docker start postgres-prod
+
+# Copiar com preservação de permissões:
+docker cp --archive meu-container:/app/uploads ./uploads-backup/
+
+# Cenários de uso:
+# → Extrair logs de um container com problemas
+# → Copiar arquivo de configuração para dentro do container
+# → Backup rápido de arquivos específicos
+# → Debug: injetar ferramentas de diagnóstico
+
+# ⚠️ Limitações:
+# → Não funciona com symlinks que apontam para fora do container
+# → Não preserva contexto SELinux
+# → Para dados grandes, volumes são mais eficientes</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Backup Automatizado com Cron + Container</h3>
+          <p>Em produção, backups devem ser automáticos. Combine cron jobs com containers para criar backups periódicos:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Cron no host</code><span class="cmd-tag">Automação</span></div>
+              <pre><code># Script de backup: /opt/scripts/backup-postgres.sh
+#!/bin/bash
+set -e
+
+BACKUP_DIR="/opt/backups/postgres"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+RETENTION_DAYS=7
+
+# Criar diretório se não existe
+mkdir -p ${BACKUP_DIR}
+
+# Backup via pg_dump
+docker exec postgres-prod \
+  pg_dump -U app_user -d minha_aplicacao \
+  --format=custom \
+  > ${BACKUP_DIR}/backup-${TIMESTAMP}.dump
+
+# Comprimir
+gzip ${BACKUP_DIR}/backup-${TIMESTAMP}.dump
+
+# Limpar backups antigos
+find ${BACKUP_DIR} -name "*.dump.gz" \
+  -mtime +${RETENTION_DAYS} -delete
+
+echo "[$(date)] Backup concluído: backup-${TIMESTAMP}.dump.gz"
+
+# Adicionar ao crontab:
+# crontab -e
+# 0 2 * * * /opt/scripts/backup-postgres.sh >> /var/log/backup.log 2>&1
+# (Executa todo dia às 2h da manhã)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Container de backup dedicado</code><span class="cmd-tag">Elegante</span></div>
+              <pre><code># Dockerfile para container de backup:
+# FROM alpine:3.19
+# RUN apk add --no-cache postgresql16-client gzip
+# COPY backup.sh /usr/local/bin/backup.sh
+# RUN chmod +x /usr/local/bin/backup.sh
+# ENTRYPOINT ["crond", "-f", "-l", "2"]
+
+# Ou usar imagem pronta com cron:
+docker run -d \
+  --name backup-scheduler \
+  --network backend-net \
+  -v backups:/backups \
+  -e PGHOST=postgres-prod \
+  -e PGUSER=app_user \
+  -e PGPASSWORD=senha_segura_123 \
+  -e PGDATABASE=minha_aplicacao \
+  alpine:3.19 \
+  sh -c '
+    apk add --no-cache postgresql16-client gzip &&
+    echo "0 */6 * * * pg_dump -Fc > /backups/pg-\$(date +\%Y\%m\%d-\%H\%M).dump" \
+      | crontab - &&
+    crond -f -l 2
+  '
+
+# Resultado: backup a cada 6 horas automaticamente
+
+# Verificar cron está funcionando:
+docker exec backup-scheduler crontab -l
+docker exec backup-scheduler ls -la /backups/</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Lembre-se:</strong> Backup não é backup até que você tenha testado o <strong>restore</strong>! Agende testes periódicos de restauração para garantir que seus backups são válidos. Um backup corrompido ou incompleto é pior que nenhum backup (dá falsa segurança).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: BOAS PRÁTICAS DE MERCADO -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Boas Práticas</span>
+          <h2>Boas Práticas de Mercado</h2>
+          <p>Após entender os mecanismos de persistência, veja as práticas adotadas por empresas e equipes maduras para gerenciar dados em containers de forma segura, organizada e escalável.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Regra #1: Nunca armazene dados importantes na camada de escrita</h3>
+          <p>A camada de escrita do container é efêmera por design. Qualquer dado ali será perdido ao remover o container:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Onde dados devem e não devem ficar</code><span class="cmd-tag">Fundamental</span></div>
+              <pre><code># ❌ ERRADO — dados na writable layer:
+docker run -d --name postgres postgres:16
+# Dados em /var/lib/postgresql/data → writable layer
+# docker rm postgres → DADOS PERDIDOS!
+
+# ❌ ERRADO — logs importantes sem volume:
+docker run -d --name app minha-app:latest
+# Logs em /var/log/app → writable layer
+# docker rm app → LOGS PERDIDOS!
+
+# ❌ ERRADO — uploads de usuário sem volume:
+docker run -d --name web minha-web:latest
+# Uploads em /app/uploads → writable layer
+# docker rm web → UPLOADS PERDIDOS!
+
+# ✅ CORRETO — tudo com volume:
+docker run -d \
+  --name postgres \
+  -v pgdata:/var/lib/postgresql/data \
+  postgres:16
+
+docker run -d \
+  --name app \
+  -v app-logs:/var/log/app \
+  -v app-uploads:/app/uploads \
+  minha-app:latest
+
+# REGRA: Se o dado importa → Volume
+# Camada de escrita é apenas para dados temporários descartáveis</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Regra #2: Volumes nomeados em produção (não bind mounts)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Por que volumes > bind mounts em prod</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># Volumes nomeados são melhores para produção:
+
+✅ 1. Portabilidade
+   Volume funciona igual em Linux, Mac, Windows
+   Bind mount depende de paths específicos do host
+
+✅ 2. Gerenciamento pelo Docker
+   docker volume ls/inspect/rm/prune
+   Bind mount: gerenciamento manual
+
+✅ 3. Performance consistente
+   Volumes têm performance nativa em qualquer OS
+   Bind mounts são lentos no Mac/Windows
+
+✅ 4. Segurança
+   Volumes ficam em /var/lib/docker/volumes/
+   Bind mounts expõem paths arbitrários do host
+
+✅ 5. Volume drivers
+   Volumes suportam NFS, cloud storage, etc.
+   Bind mounts: apenas filesystem local
+
+✅ 6. Sem problemas de permissão
+   Docker gerencia permissões internamente
+   Bind mounts: conflitos de uid/gid frequentes</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Quando bind mounts são aceitáveis</code><span class="cmd-tag">Exceções</span></div>
+              <pre><code># Bind mounts são OK para:
+
+💻 1. Desenvolvimento local
+   -v $(pwd)/src:/app/src  (hot-reload)
+
+📄 2. Arquivos de configuração read-only
+   -v ./nginx.conf:/etc/nginx/nginx.conf:ro
+   -v ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+🔐 3. Certificados/secrets do host
+   -v /etc/letsencrypt:/certs:ro
+
+📊 4. Diretórios de log do host (centralização)
+   -v /var/log/containers:/var/log/app
+
+🔧 5. Docker socket (ferramentas de CI/CD)
+   -v /var/run/docker.sock:/var/run/docker.sock
+   ⚠️ Com muita cautela!
+
+# Padrão recomendado em produção:
+# DADOS → Volume nomeado
+# CONFIG → Bind mount read-only (ou ConfigMap no K8s)
+# SECRETS → Docker secrets (ou Vault)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Regra #3: Separar dados de aplicação de configuração</h3>
+          <p>Não misture dados persistentes com arquivos de configuração no mesmo volume. Separe por responsabilidade:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Separação de responsabilidades</code><span class="cmd-tag">Organização</span></div>
+              <pre><code># ❌ RUIM — tudo junto:
+docker run -d \
+  -v app-tudo:/app \
+  minha-app:latest
+# Mistura: código + config + dados + logs no mesmo volume
+
+# ✅ BOM — separado por responsabilidade:
+docker run -d \
+  --name minha-app \
+  -v app-data:/app/data \
+  -v app-uploads:/app/uploads \
+  -v app-logs:/var/log/app \
+  -v $(pwd)/config/app.yml:/app/config/app.yml:ro \
+  --tmpfs /tmp \
+  minha-app:latest
+
+# Estrutura clara:
+# /app/data/     → Volume: dados persistentes da aplicação
+# /app/uploads/  → Volume: arquivos enviados por usuários
+# /var/log/app/  → Volume: logs (pode ser rotacionado)
+# /app/config/   → Bind mount RO: configuração (versionada no git)
+# /tmp/          → tmpfs: temporários (rápido, não persiste)
+
+# Benefícios:
+# → Backup seletivo (apenas volumes de dados)
+# → Config versionada no git (não no volume)
+# → Logs podem ter política de retenção diferente
+# → Temporários nunca ocupam disco</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Regra #4: Labels e Organização de Volumes</h3>
+          <p>Em ambientes com dezenas de containers, organize volumes com labels para facilitar gerenciamento e limpeza:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Convenção de nomenclatura</code><span class="cmd-tag">Padrão</span></div>
+              <pre><code># Padrão de nomes: projeto-servico-tipo
+docker volume create ecommerce-postgres-data
+docker volume create ecommerce-redis-data
+docker volume create ecommerce-app-uploads
+docker volume create ecommerce-nginx-logs
+docker volume create blog-postgres-data
+docker volume create blog-app-uploads
+
+# Listar volumes de um projeto:
+docker volume ls | grep ecommerce
+# local   ecommerce-postgres-data
+# local   ecommerce-redis-data
+# local   ecommerce-app-uploads
+# local   ecommerce-nginx-logs
+
+# Fácil de identificar, fácil de gerenciar!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Labels para metadados</code><span class="cmd-tag">Organização</span></div>
+              <pre><code># Criar volumes com labels:
+docker volume create \
+  --label com.empresa.projeto=ecommerce \
+  --label com.empresa.ambiente=producao \
+  --label com.empresa.backup=diario \
+  --label com.empresa.dono=time-backend \
+  ecommerce-postgres-data
+
+# Filtrar por labels:
+docker volume ls --filter label=com.empresa.projeto=ecommerce
+docker volume ls --filter label=com.empresa.backup=diario
+docker volume ls --filter label=com.empresa.ambiente=dev
+
+# Script de backup baseado em labels:
+# "Faça backup de todos os volumes com label backup=diario"
+for vol in $(docker volume ls --filter label=com.empresa.backup=diario -q); do
+  docker run --rm \
+    -v ${vol}:/source:ro \
+    -v /opt/backups:/backup \
+    alpine tar czf /backup/${vol}-$(date +%Y%m%d).tar.gz -C /source .
+done
+
+# Cleanup baseado em labels:
+docker volume ls --filter label=com.empresa.ambiente=dev --filter dangling=true -q | \
+  xargs -r docker volume rm</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Regra #5: Monitoramento de Uso de Disco</h3>
+          <p>Volumes crescem silenciosamente. Monitore o uso de disco para evitar surpresas:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Comandos de monitoramento</code><span class="cmd-tag">Operações</span></div>
+              <pre><code># Visão geral do espaço usado pelo Docker:
+docker system df
+TYPE            TOTAL   ACTIVE   SIZE      RECLAIMABLE
+Images          15      5        4.2GB     2.8GB (66%)
+Containers      8       3        250MB     200MB (80%)
+Local Volumes   12      4        8.5GB     3.2GB (37%)
+Build Cache     20      0        1.1GB     1.1GB (100%)
+
+# Detalhes por volume:
+docker system df -v
+# Mostra cada volume, seu tamanho e se está em uso
+
+# Tamanho de um volume específico (Linux):
+sudo du -sh /var/lib/docker/volumes/pgdata/_data/
+# 2.3G  /var/lib/docker/volumes/pgdata/_data/
+
+# Script de alerta — volumes grandes:
+#!/bin/bash
+THRESHOLD_GB=10
+for vol in $(docker volume ls -q); do
+  SIZE=$(sudo du -s /var/lib/docker/volumes/${vol}/_data/ 2>/dev/null | awk '{print $1}')
+  SIZE_GB=$((SIZE / 1048576))
+  if [ ${SIZE_GB} -gt ${THRESHOLD_GB} ]; then
+    echo "⚠️ ALERTA: Volume '${vol}' tem ${SIZE_GB}GB (limite: ${THRESHOLD_GB}GB)"
+  fi
+done
+
+# Limpeza segura:
+docker volume prune  # Remove volumes não referenciados
+docker system prune --volumes  # Limpeza completa (cuidado!)
+
+# 💡 Em produção, integre com Prometheus/Grafana:
+# node_exporter expõe métricas de disco
+# Alertas quando /var/lib/docker/ ultrapassa threshold</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Resumo: Checklist de Boas Práticas</h3>
+          <div class="info-box highlight">
+            <strong>📋 Checklist para produção:</strong>
+            <ul>
+              <li>☐ Todos os dados importantes estão em volumes nomeados</li>
+              <li>☐ Volumes têm nomenclatura padronizada (projeto-serviço-tipo)</li>
+              <li>☐ Labels aplicadas para organização e automação</li>
+              <li>☐ Configuração separada de dados (config = bind mount RO ou secrets)</li>
+              <li>☐ Backup automatizado com retenção definida</li>
+              <li>☐ Restore testado periodicamente</li>
+              <li>☐ Monitoramento de espaço em disco ativo</li>
+              <li>☐ Volumes de desenvolvimento não misturados com produção</li>
+              <li>☐ Containers com <code>--read-only</code> quando possível</li>
+              <li>☐ tmpfs para dados sensíveis temporários</li>
+              <li>☐ Documentação de quais volumes pertencem a qual serviço</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 9: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Hora de colocar a mão na massa! Cada exercício cobre um cenário real de persistência. Tente resolver sozinho antes de ver a solução.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: PostgreSQL com Dados Persistentes</h3>
+          <p><strong>Objetivo:</strong> Configurar PostgreSQL com volume, criar dados, remover o container e provar que os dados sobrevivem.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Exercício 1</span></div>
+              <pre><code># TAREFAS:
+# 1. Crie um volume chamado "exercicio-pgdata"
+# 2. Inicie um container PostgreSQL 16 com:
+#    - Volume montado em /var/lib/postgresql/data
+#    - Database: loja_virtual
+#    - Usuário: loja_admin
+#    - Senha: loja_pass_2024
+#    - Porta: 5433 (para não conflitar com instalação local)
+# 3. Crie uma tabela "produtos" com colunas: id, nome, preco, estoque
+# 4. Insira 3 produtos
+# 5. Pare e REMOVA o container
+# 6. Crie um NOVO container com o MESMO volume
+# 7. Verifique que os dados estão lá
+# 8. Limpe tudo ao final (container + volume)</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução</code><span class="cmd-tag">Resposta</span></div>
+              <pre><code># 1. Criar volume:
+docker volume create exercicio-pgdata
+
+# 2. Iniciar PostgreSQL:
+docker run -d \
+  --name pg-exercicio \
+  -v exercicio-pgdata:/var/lib/postgresql/data \
+  -e POSTGRES_DB=loja_virtual \
+  -e POSTGRES_USER=loja_admin \
+  -e POSTGRES_PASSWORD=loja_pass_2024 \
+  -p 5433:5432 \
+  postgres:16-alpine
+
+# Aguardar inicialização (5-10 segundos):
+sleep 10
+
+# 3. Criar tabela:
+docker exec pg-exercicio psql -U loja_admin -d loja_virtual -c "
+  CREATE TABLE produtos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(200) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    estoque INTEGER DEFAULT 0
+  );
+"
+
+# 4. Inserir produtos:
+docker exec pg-exercicio psql -U loja_admin -d loja_virtual -c "
+  INSERT INTO produtos (nome, preco, estoque) VALUES
+    ('Notebook Dell Inspiron 15', 4299.90, 25),
+    ('Mouse Logitech MX Master 3', 549.00, 100),
+    ('Monitor LG UltraWide 34\"', 3199.00, 15);
+"
+
+# Verificar:
+docker exec pg-exercicio psql -U loja_admin -d loja_virtual -c "SELECT * FROM produtos;"
+
+# 5. Parar e REMOVER container:
+docker stop pg-exercicio && docker rm pg-exercicio
+
+# 6. Criar NOVO container com MESMO volume:
+docker run -d \
+  --name pg-exercicio-novo \
+  -v exercicio-pgdata:/var/lib/postgresql/data \
+  -e POSTGRES_DB=loja_virtual \
+  -e POSTGRES_USER=loja_admin \
+  -e POSTGRES_PASSWORD=loja_pass_2024 \
+  -p 5433:5432 \
+  postgres:16-alpine
+
+sleep 10
+
+# 7. Verificar dados:
+docker exec pg-exercicio-novo psql -U loja_admin -d loja_virtual -c "SELECT * FROM produtos;"
+#  id |           nome            |  preco  | estoque
+# ----+---------------------------+---------+---------
+#   1 | Notebook Dell Inspiron 15 | 4299.90 |      25
+#   2 | Mouse Logitech MX Master 3|  549.00 |     100
+#   3 | Monitor LG UltraWide 34"  | 3199.00 |      15
+# ✅ DADOS PERSISTIRAM!
+
+# 8. Limpar:
+docker stop pg-exercicio-novo && docker rm pg-exercicio-novo
+docker volume rm exercicio-pgdata</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Volume Compartilhado entre 2 Containers</h3>
+          <p><strong>Objetivo:</strong> Demonstrar que dois containers podem acessar o mesmo volume simultaneamente — um escrevendo, outro lendo.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Exercício 2</span></div>
+              <pre><code># TAREFAS:
+# 1. Crie um volume chamado "volume-compartilhado"
+# 2. Inicie o Container A (writer):
+#    - Monta o volume em /shared
+#    - A cada 3 segundos, escreve timestamp em /shared/log.txt
+# 3. Inicie o Container B (reader):
+#    - Monta o MESMO volume em /dados (read-only)
+#    - Lê e exibe o conteúdo de /dados/log.txt
+# 4. Verifique que B consegue ler o que A escreveu
+# 5. Pare A e verifique que os dados ainda estão no volume
+# 6. Limpe tudo</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução</code><span class="cmd-tag">Resposta</span></div>
+              <pre><code># 1. Criar volume:
+docker volume create volume-compartilhado
+
+# 2. Container A — WRITER (escreve a cada 3s):
+docker run -d \
+  --name writer \
+  -v volume-compartilhado:/shared \
+  alpine:3.19 \
+  sh -c 'while true; do echo "[$(date)] Heartbeat do writer" >> /shared/log.txt; sleep 3; done'
+
+# 3. Container B — READER (read-only):
+docker run -d \
+  --name reader \
+  -v volume-compartilhado:/dados:ro \
+  alpine:3.19 \
+  sh -c 'while true; do echo "=== Últimas 5 linhas ==="; tail -5 /dados/log.txt; sleep 5; done'
+
+# 4. Verificar — esperar 10-15 segundos e checar:
+sleep 15
+docker logs reader
+# === Últimas 5 linhas ===
+# [Mon Jan 15 10:30:03 UTC 2024] Heartbeat do writer
+# [Mon Jan 15 10:30:06 UTC 2024] Heartbeat do writer
+# [Mon Jan 15 10:30:09 UTC 2024] Heartbeat do writer
+# [Mon Jan 15 10:30:12 UTC 2024] Heartbeat do writer
+# [Mon Jan 15 10:30:15 UTC 2024] Heartbeat do writer
+# ✅ Reader está lendo o que Writer escreve!
+
+# Verificar que reader não pode escrever (read-only):
+docker exec reader sh -c "echo 'teste' > /dados/log.txt"
+# sh: can't create /dados/log.txt: Read-only file system ✅
+
+# 5. Parar writer — dados permanecem no volume:
+docker stop writer
+docker exec reader cat /dados/log.txt | wc -l
+# (mostra quantidade de linhas — dados persistem)
+
+# 6. Limpar:
+docker stop reader writer 2>/dev/null
+docker rm reader writer 2>/dev/null
+docker volume rm volume-compartilhado</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Backup e Restore de um Volume</h3>
+          <p><strong>Objetivo:</strong> Praticar o workflow completo de backup e restore usando container auxiliar.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Exercício 3</span></div>
+              <pre><code># TAREFAS:
+# 1. Crie um volume "dados-importantes" com alguns arquivos
+# 2. Faça backup do volume para um arquivo .tar.gz no host
+# 3. Remova o volume original (simular desastre)
+# 4. Crie um novo volume "dados-restaurados"
+# 5. Restaure o backup no novo volume
+# 6. Verifique que os dados estão intactos
+# 7. Limpe tudo</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução</code><span class="cmd-tag">Resposta</span></div>
+              <pre><code># 1. Criar volume e popular com dados:
+docker volume create dados-importantes
+
+docker run --rm \
+  -v dados-importantes:/data \
+  alpine:3.19 \
+  sh -c '
+    mkdir -p /data/documentos /data/imagens
+    echo "Relatório financeiro Q4 2024" > /data/documentos/relatorio.txt
+    echo "Lista de clientes VIP" > /data/documentos/clientes.txt
+    echo "PNG_FAKE_DATA_LOGO" > /data/imagens/logo.png
+    echo "Configuração do sistema" > /data/config.yml
+    echo "=== Conteúdo criado ==="
+    find /data -type f
+  '
+
+# 2. Fazer BACKUP:
+mkdir -p ./backups
+
+docker run --rm \
+  -v dados-importantes:/source:ro \
+  -v $(pwd)/backups:/backup \
+  alpine:3.19 \
+  tar czf /backup/dados-importantes-backup.tar.gz -C /source .
+
+echo "Backup criado: $(ls -lh ./backups/dados-importantes-backup.tar.gz)"
+
+# 3. SIMULAR DESASTRE — remover volume original:
+docker volume rm dados-importantes
+echo "Volume original REMOVIDO! 💥"
+
+# 4. Criar novo volume para restore:
+docker volume create dados-restaurados
+
+# 5. RESTAURAR backup:
+docker run --rm \
+  -v dados-restaurados:/target \
+  -v $(pwd)/backups:/backup:ro \
+  alpine:3.19 \
+  sh -c "cd /target && tar xzf /backup/dados-importantes-backup.tar.gz"
+
+echo "Restore concluído!"
+
+# 6. Verificar dados restaurados:
+docker run --rm \
+  -v dados-restaurados:/data:ro \
+  alpine:3.19 \
+  sh -c '
+    echo "=== Arquivos restaurados ==="
+    find /data -type f
+    echo ""
+    echo "=== Conteúdo dos documentos ==="
+    cat /data/documentos/relatorio.txt
+    cat /data/documentos/clientes.txt
+    cat /data/config.yml
+  '
+# ✅ Todos os arquivos e conteúdos restaurados!
+
+# 7. Limpar:
+docker volume rm dados-restaurados
+rm -rf ./backups/dados-importantes-backup.tar.gz</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Development Setup com Bind Mount (Hot-Reload)</h3>
+          <p><strong>Objetivo:</strong> Configurar um ambiente de desenvolvimento com hot-reload usando bind mounts — a experiência mais comum do dia a dia.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Exercício 4</span></div>
+              <pre><code># TAREFAS:
+# 1. Crie uma pasta "meu-site" com um arquivo index.html básico
+# 2. Inicie um container Nginx com bind mount dessa pasta
+# 3. Acesse http://localhost:8080 e veja o site
+# 4. Edite o index.html NO HOST (sem tocar no container)
+# 5. Atualize o browser — a mudança deve aparecer INSTANTANEAMENTE
+# 6. Demonstre que isso funciona para hot-reload
+# 7. Limpe tudo</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução</code><span class="cmd-tag">Resposta</span></div>
+              <pre><code># 1. Criar estrutura do projeto:
+mkdir -p meu-site
+
+cat > meu-site/index.html &lt;&lt;'EOF'
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Meu Site Docker&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: Arial; text-align: center; padding: 50px; background: #1a1a2e; color: #eee; }
+    h1 { color: #00d4aa; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Versão 1.0&lt;/h1&gt;
+  &lt;p&gt;Este site está rodando em um container Docker!&lt;/p&gt;
+  &lt;p&gt;Edite este arquivo no host e atualize o browser.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF
+
+# 2. Iniciar Nginx com bind mount:
+docker run -d \
+  --name web-hotreload \
+  -v $(pwd)/meu-site:/usr/share/nginx/html:ro \
+  -p 8080:80 \
+  nginx:1.25-alpine
+
+# 3. Testar:
+echo "Acesse: http://localhost:8080"
+curl -s http://localhost:8080 | grep "h1"
+# &lt;h1&gt;Versão 1.0&lt;/h1&gt;
+
+# 4. Editar NO HOST (simular desenvolvimento):
+sed -i 's/Versão 1.0/Versão 2.0 - Hot Reload!/g' meu-site/index.html
+# Ou abra no VS Code e edite manualmente
+
+# 5. Verificar mudança INSTANTÂNEA (sem reiniciar container!):
+curl -s http://localhost:8080 | grep "h1"
+# &lt;h1&gt;Versão 2.0 - Hot Reload!&lt;/h1&gt;
+# ✅ Mudança refletida instantaneamente!
+
+# O container NÃO foi reiniciado — Nginx serve o arquivo
+# diretamente do bind mount, que é o mesmo arquivo do host!
+
+# 6. Mais uma edição para provar:
+echo '&lt;p style="color:yellow"&gt;Adicionado em tempo real!&lt;/p&gt;' >> meu-site/index.html
+curl -s http://localhost:8080 | grep "tempo real"
+# &lt;p style="color:yellow"&gt;Adicionado em tempo real!&lt;/p&gt; ✅
+
+# 7. Limpar:
+docker stop web-hotreload && docker rm web-hotreload
+rm -rf meu-site
+
+# 💡 Este é o padrão para desenvolvimento com Docker:
+# Edite no host → Container reflete → Browser atualiza
+# Funciona para: React, Vue, Angular, Flask, Django, Express, etc.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que vem no próximo módulo</h3>
+          <div class="info-box">
+            <strong>Módulo 04: Redes Docker (Networking)</strong> — Você vai aprender como containers se comunicam entre si e com o mundo externo, entender bridge networks, host networking, overlay networks, DNS interno do Docker e configurar redes customizadas para microsserviços.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Próximo passo</span>
+          <h2>Pronto para dominar redes Docker?</h2>
+          <p>No Módulo 04 você vai aprender como containers se comunicam, configurar redes customizadas e entender o DNS interno do Docker.</p>
+        </div>
+        <a href="modulo-04.html" class="button primary">Ir para Módulo 04 →</a>
       </div>
     </section>
   </main>
