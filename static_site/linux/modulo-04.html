@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Linux Módulo 04: Redes, Serviços e Pacotes</title>
+  <title>CloudTrilhas — Linux Módulo 04: Avançado — Redes, Serviços e Pacotes</title>
+  <meta name="description" content="Guia completo sobre redes no Linux, configuração de interfaces, firewall (iptables/ufw), SSH, systemd, gerenciamento de pacotes e cron jobs." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,23 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-03.html" class="nav-link">← Anterior</a>
         <a href="modulo-05.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,140 +38,1732 @@
       <div class="container training-hero-content">
         <span class="pill">🐧 Linux — Módulo 04</span>
         <h1>Avançado: Redes, Serviços e Pacotes</h1>
-        <p>Configuração de rede, gerenciamento de serviços com systemd, SSH e gerenciamento de pacotes.</p>
+        <p>Domine a configuração de rede no Linux, proteja servidores com firewall, gerencie serviços com systemd, automatize tarefas com cron e administre pacotes como um profissional.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Iniciante</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Básico</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Intermediário</small></a>
+        <a href="modulo-04.html" class="progress-node active"><span>04</span><small>Avançado</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Profissional</small></a>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 1: NETWORKING BASICS -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Rede</span>
+          <h2>Networking Básico — Diagnóstico e Inspeção</h2>
+          <p>Os comandos de rede são essenciais para troubleshooting de conectividade, diagnóstico de problemas DNS e análise de tráfego em servidores Linux.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Rede e Diagnóstico</h3>
+          <h3>ip — Ferramenta moderna de rede</h3>
+          <p>O comando <code>ip</code> substituiu o antigo <code>ifconfig</code>. É a ferramenta padrão para gerenciar interfaces, endereços e rotas no Linux moderno.</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>ip addr / ip route</code><span class="cmd-tag">Rede</span></div>
-              <pre><code>ip addr show          # interfaces e IPs
-ip route show         # tabela de rotas
-ip link set eth0 up   # ativa interface</code></pre>
+              <div class="command-header"><code>ip addr — Endereços IP</code><span class="cmd-tag">Endereços</span></div>
+              <pre><code># Listar todas as interfaces e IPs:
+ip addr show
+ip a                      # forma abreviada
+
+# Mostrar apenas interface específica:
+ip addr show eth0
+ip a show dev ens33
+
+# Informações resumidas:
+ip -br addr               # brief format (limpo)
+# lo      UNKNOWN  127.0.0.1/8
+# eth0    UP       192.168.1.100/24
+
+# Adicionar IP manualmente (temporário):
+sudo ip addr add 192.168.1.200/24 dev eth0
+
+# Remover IP:
+sudo ip addr del 192.168.1.200/24 dev eth0
+
+# Ativar/desativar interface:
+sudo ip link set eth0 up
+sudo ip link set eth0 down
+
+# Ver apenas IPv4:
+ip -4 addr show
+
+# Ver apenas IPv6:
+ip -6 addr show
+
+# Informações da interface (MAC, MTU, estado):
+ip link show eth0</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>ping / traceroute</code><span class="cmd-tag">Diagnóstico</span></div>
-              <pre><code>ping -c 4 google.com
+              <div class="command-header"><code>ip route — Tabela de rotas</code><span class="cmd-tag">Rotas</span></div>
+              <pre><code># Ver tabela de rotas:
+ip route show
+ip r                      # forma abreviada
+# default via 192.168.1.1 dev eth0
+# 192.168.1.0/24 dev eth0 proto kernel
+
+# Qual rota será usada para um destino?
+ip route get 8.8.8.8
+# 8.8.8.8 via 192.168.1.1 dev eth0
+
+# Adicionar rota estática:
+sudo ip route add 10.0.0.0/8 via 192.168.1.1
+
+# Adicionar rota default (gateway):
+sudo ip route add default via 192.168.1.1
+
+# Remover rota:
+sudo ip route del 10.0.0.0/8
+
+# Ver tabela ARP (vizinhos):
+ip neigh show
+ip n
+
+# Limpar cache ARP:
+sudo ip neigh flush all
+
+# Ver estatísticas da interface:
+ip -s link show eth0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>ss — Socket Statistics (substituto do netstat)</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ss — Conexões e portas</code><span class="cmd-tag">Sockets</span></div>
+              <pre><code># Portas TCP em escuta:
+ss -tlnp
+# -t = TCP
+# -l = listening (em escuta)
+# -n = numérico (sem resolver DNS)
+# -p = processo associado
+
+# Portas UDP em escuta:
+ss -ulnp
+
+# Todas as conexões TCP estabelecidas:
+ss -tnp state established
+
+# Conexões em um estado específico:
+ss state time-wait
+ss state close-wait
+ss state syn-sent
+
+# Filtrar por porta:
+ss -tlnp | grep :80
+ss -tlnp sport = :443
+
+# Filtrar por IP destino:
+ss -tnp dst 10.0.0.1
+
+# Contar conexões por estado:
+ss -s
+# Total: 285
+# TCP: 42 (estab 15, closed 2, ...)
+
+# Quem está conectado na porta 22 (SSH)?
+ss -tnp sport = :22
+
+# Conexões do nginx:
+ss -tnp | grep nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>netstat (legado) — Referência</code><span class="cmd-tag">Legado</span></div>
+              <pre><code># ⚠️ netstat está deprecated, use ss!
+# Mas ainda aparece em provas e scripts antigos:
+
+# Equivalências ss ↔ netstat:
+ss -tlnp      ↔  netstat -tlnp
+ss -ulnp      ↔  netstat -ulnp
+ss -s         ↔  netstat -s
+ss -tnp       ↔  netstat -tnp
+
+# Portas em escuta (netstat):
+netstat -tlnp
+# Proto  Local Address    Foreign    State    PID/Program
+# tcp    0.0.0.0:22       0.0.0.0:*  LISTEN   1234/sshd
+# tcp    0.0.0.0:80       0.0.0.0:*  LISTEN   5678/nginx
+
+# Todas as conexões:
+netstat -anp
+
+# Estatísticas:
+netstat -s
+
+# Tabela de rotas (legado):
+netstat -rn   ↔  ip route show
+route -n      ↔  ip route show
+
+# Instalar (se necessário):
+sudo apt install net-tools</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Diagnóstico de conectividade</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ping — Teste de conectividade</code><span class="cmd-tag">ICMP</span></div>
+              <pre><code># Ping básico (Ctrl+C para parar):
+ping google.com
+
+# Número limitado de pacotes (-c):
+ping -c 4 192.168.1.1
+
+# Intervalo personalizado (-i):
+ping -i 0.5 192.168.1.1    # a cada 0.5s
+
+# Timeout por pacote (-W):
+ping -W 2 -c 3 10.0.0.1    # timeout 2s
+
+# Tamanho do pacote (-s):
+ping -s 1472 192.168.1.1   # testa MTU
+
+# Ping com timestamp:
+ping -c 5 -D google.com
+
+# Verificar se host está vivo (silencioso):
+ping -c 1 -W 1 host &>/dev/null && echo "UP" || echo "DOWN"
+
+# Ping em rede local (descobrir hosts):
+for i in {1..254}; do
+  ping -c 1 -W 1 192.168.1.$i &>/dev/null && \
+    echo "192.168.1.$i está ativo"
+done</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>traceroute — Rota dos pacotes</code><span class="cmd-tag">Traceroute</span></div>
+              <pre><code># Traceroute padrão (UDP):
 traceroute google.com
-# ttl, latência, saltos</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>ss / netstat</code><span class="cmd-tag">Conexões</span></div>
-              <pre><code>ss -tuln              # portas em escuta
-ss -tunap             # com PID do processo
-ss -tuln | grep :80   # quem usa porta 80</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>curl</code><span class="cmd-tag">HTTP</span></div>
-              <pre><code>curl https://api.github.com
-curl -I https://google.com   # headers
-curl -X POST -d "data" url
-curl -H "Auth: Bearer TOKEN" url</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>nslookup / dig</code><span class="cmd-tag">DNS</span></div>
-              <pre><code>nslookup google.com
-dig google.com +short
-dig google.com MX     # registros email</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>ufw (Firewall)</code><span class="cmd-tag">Segurança</span></div>
-              <pre><code>sudo ufw enable
-sudo ufw allow 22/tcp
-sudo ufw allow 80/tcp
-sudo ufw status</code></pre>
+# 1  gateway (192.168.1.1)    1.234 ms
+# 2  isp-router (10.0.0.1)   5.678 ms
+# 3  * * *                    (filtrado)
+# 4  google-edge              12.345 ms
+
+# Traceroute com ICMP (-I):
+sudo traceroute -I google.com
+
+# Traceroute TCP (-T, porta específica):
+sudo traceroute -T -p 443 google.com
+
+# Número máximo de hops (-m):
+traceroute -m 15 destino.com
+
+# Alternativa moderna — mtr (combina ping + traceroute):
+mtr google.com              # interativo
+mtr -r -c 10 google.com    # relatório (10 ciclos)
+
+# mtr mostra perda de pacotes por hop:
+# HOST                Loss%  Snt  Last  Avg  Best  Wrst
+# 1. gateway          0.0%   10   1.2   1.1  0.9   1.5
+# 2. isp              5.0%   10   5.3   5.8  4.2   8.1
+# 3. destino          0.0%   10  12.1  11.8 10.5  14.2
+
+# Instalar mtr:
+sudo apt install mtr-tiny</code></pre>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Serviços (systemd)</h3>
-          <div class="command-card wide">
-            <div class="command-header"><code>systemctl</code><span class="cmd-tag">Essencial</span></div>
-            <pre><code>sudo systemctl status nginx       # status detalhado
-sudo systemctl start nginx        # inicia
-sudo systemctl stop nginx         # para
-sudo systemctl restart nginx      # reinicia
-sudo systemctl reload nginx       # recarrega config
-sudo systemctl enable nginx       # inicia no boot
-sudo systemctl enable --now nginx # habilita E inicia
-
-# Logs do serviço
-sudo journalctl -u nginx -f       # tempo real
-sudo journalctl -u nginx --since "1 hour ago"</code></pre>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>3. SSH e Transferência</h3>
+          <h3>DNS — dig e nslookup</h3>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>ssh</code><span class="cmd-tag">Remoto</span></div>
-              <pre><code>ssh usuario@192.168.1.100
-ssh -p 2222 user@servidor.com
-ssh -i ~/.ssh/chave user@host</code></pre>
+              <div class="command-header"><code>dig — DNS lookup detalhado</code><span class="cmd-tag">DNS</span></div>
+              <pre><code># Consulta DNS básica:
+dig google.com
+
+# Apenas a resposta (+short):
+dig +short google.com
+# 142.250.79.46
+
+# Tipo de registro específico:
+dig google.com A          # IPv4
+dig google.com AAAA       # IPv6
+dig google.com MX         # Mail servers
+dig google.com NS         # Name servers
+dig google.com TXT        # TXT records
+dig google.com CNAME      # Aliases
+dig google.com SOA        # Start of Authority
+
+# Usar DNS específico (@):
+dig @8.8.8.8 meusite.com
+dig @1.1.1.1 meusite.com
+
+# Consulta reversa (IP → nome):
+dig -x 8.8.8.8
+
+# Trace completo (resolver desde root):
+dig +trace google.com
+
+# Verificar propagação DNS:
+dig @8.8.8.8 +short meudominio.com
+dig @1.1.1.1 +short meudominio.com
+dig @208.67.222.222 +short meudominio.com
+
+# Ver TTL:
+dig +noall +answer google.com
+
+# Todas as informações:
+dig +noall +answer +authority +additional google.com ANY</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>ssh-keygen</code><span class="cmd-tag">Chaves</span></div>
-              <pre><code>ssh-keygen -t ed25519 -C "email"
-ssh-copy-id usuario@servidor
-# Login sem senha!</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>scp / rsync</code><span class="cmd-tag">Transferência</span></div>
-              <pre><code>scp arquivo.txt user@srv:/home/
-scp -r pasta/ user@srv:/opt/
-rsync -avz pasta/ user@srv:/backup/
-rsync -avz --delete origem/ destino/</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Cron</code><span class="cmd-tag">Agendamento</span></div>
-              <pre><code>crontab -e    # editar
-crontab -l    # listar
-# min hora dia mês semana comando
-30 2 * * * /scripts/backup.sh
-*/5 * * * * /scripts/monitor.sh
-0 8 * * 1-5 /scripts/relatorio.sh</code></pre>
+              <div class="command-header"><code>nslookup — Consulta DNS simples</code><span class="cmd-tag">nslookup</span></div>
+              <pre><code># Consulta básica:
+nslookup google.com
+# Server:   127.0.0.53
+# Address:  127.0.0.53#53
+# Name:     google.com
+# Address:  142.250.79.46
+
+# Usando servidor DNS específico:
+nslookup google.com 8.8.8.8
+
+# Tipo de registro:
+nslookup -type=MX google.com
+nslookup -type=NS google.com
+nslookup -type=TXT google.com
+
+# Consulta reversa:
+nslookup 8.8.8.8
+
+# host — alternativa mais simples:
+host google.com
+host -t MX google.com
+host -t NS google.com
+host 8.8.8.8              # reversa
+
+# Verificar resolução local:
+getent hosts google.com
+# Usa a mesma cadeia de resolução do sistema
+# (inclui /etc/hosts + DNS)
+
+# Limpar cache DNS local:
+sudo systemd-resolve --flush-caches
+# ou
+sudo resolvectl flush-caches
+
+# Ver status do resolver:
+resolvectl status</code></pre>
             </div>
           </div>
-        </div>
-
-        <div class="topic-block">
-          <h3>4. Gerenciamento de Pacotes</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>APT (Debian/Ubuntu)</code><span class="cmd-tag">Pacotes</span></div>
-              <pre><code>sudo apt update
-sudo apt upgrade
-sudo apt install nginx
-sudo apt remove nginx
-sudo apt autoremove
-apt search nginx</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>DNF/YUM (RHEL)</code><span class="cmd-tag">Pacotes</span></div>
-              <pre><code>sudo dnf update
-sudo dnf install nginx
-sudo dnf remove nginx
-sudo dnf search nginx
-sudo dnf list installed</code></pre>
-            </div>
+          <div class="info-box highlight">
+            <strong>🔍 Fluxo de resolução DNS no Linux:</strong>
+            <pre><code>Aplicação → /etc/nsswitch.conf → /etc/hosts → systemd-resolved → /etc/resolv.conf → DNS Server
+                                      ↓
+                              Ordem de busca:
+                              1. /etc/hosts (local, sem rede)
+                              2. Cache do systemd-resolved
+                              3. DNS configurado em /etc/resolv.conf
+                              4. DNS do DHCP ou manual</code></pre>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- SEÇÃO 2: CONFIGURAÇÃO DE REDE -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Configuração</span>
+          <h2>Configuração de Rede</h2>
+          <p>Configurar interfaces de rede, IP estático, DHCP e DNS é fundamental para administração de servidores. No Ubuntu moderno, usamos Netplan como camada de configuração.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Netplan — Configuração moderna (Ubuntu 18.04+)</h3>
+          <p>Netplan é o sistema de configuração de rede padrão do Ubuntu. Usa arquivos YAML em <code>/etc/netplan/</code> e gera configurações para NetworkManager ou systemd-networkd.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>IP Estático com Netplan</code><span class="cmd-tag">Static IP</span></div>
+              <pre><code># Arquivo: /etc/netplan/01-netcfg.yaml
+# ou: /etc/netplan/00-installer-config.yaml
+
+network:
+  version: 2
+  renderer: networkd      # ou NetworkManager
+  ethernets:
+    ens33:                 # nome da interface
+      dhcp4: no
+      addresses:
+        - 192.168.1.100/24
+      routes:
+        - to: default
+          via: 192.168.1.1
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4
+        search:
+          - meudominio.local
+
+# Aplicar configuração:
+sudo netplan apply
+
+# Testar antes de aplicar (reverte em 120s):
+sudo netplan try
+
+# Ver configuração gerada:
+sudo netplan get
+
+# Validar YAML:
+sudo netplan generate</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>DHCP com Netplan</code><span class="cmd-tag">DHCP</span></div>
+              <pre><code># Configuração DHCP (padrão):
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens33:
+      dhcp4: yes
+      dhcp6: no
+
+# DHCP com DNS manual override:
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: yes
+      dhcp4-overrides:
+        use-dns: no       # ignora DNS do DHCP
+      nameservers:
+        addresses:
+          - 1.1.1.1
+          - 1.0.0.1
+
+# Múltiplas interfaces:
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: yes
+    ens34:
+      dhcp4: no
+      addresses:
+        - 10.0.0.50/24
+
+# WiFi com Netplan:
+network:
+  version: 2
+  wifis:
+    wlp2s0:
+      dhcp4: yes
+      access-points:
+        "MinhaRede":
+          password: "senhasegura123"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>DNS — /etc/resolv.conf e systemd-resolved</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Configuração DNS</code><span class="cmd-tag">DNS Config</span></div>
+              <pre><code># /etc/resolv.conf — Arquivo de resolução DNS
+# ⚠️ No Ubuntu moderno, é gerenciado pelo systemd-resolved!
+# Não edite diretamente — use Netplan ou resolvectl
+
+# Ver o resolv.conf real:
+cat /etc/resolv.conf
+# nameserver 127.0.0.53        ← systemd-resolved local stub
+# search meudominio.local
+
+# Para ver os DNS reais em uso:
+resolvectl status
+# ou
+systemd-resolve --status
+
+# Configurar DNS permanente via Netplan (recomendado):
+# Edite /etc/netplan/01-netcfg.yaml e adicione:
+#   nameservers:
+#     addresses: [8.8.8.8, 1.1.1.1]
+
+# /etc/hosts — Resolução local (prioridade sobre DNS)
+cat /etc/hosts
+# 127.0.0.1       localhost
+# 192.168.1.50    servidor-dev    dev
+# 10.0.0.100      banco-prod      db
+
+# Adicionar entrada:
+echo "192.168.1.200  app-server" | sudo tee -a /etc/hosts
+
+# /etc/nsswitch.conf — Ordem de resolução
+grep hosts /etc/nsswitch.conf
+# hosts: files mdns4_minimal [NOTFOUND=return] dns
+# ↑ "files" = /etc/hosts primeiro, depois "dns"
+
+# Hostname:
+hostnamectl
+hostnamectl set-hostname meu-servidor
+# Editar /etc/hostname para persistência</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Dica:</strong> Em servidores de produção, sempre configure DNS redundante (mínimo 2 nameservers). Use <code>dig</code> para testar a resolução após mudanças. Evite depender apenas do DNS do provedor — use 8.8.8.8, 1.1.1.1 ou 9.9.9.9 como backup.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Interfaces de rede — Conceitos</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Nomenclatura e conceitos</code><span class="cmd-tag">Interfaces</span></div>
+              <pre><code># Nomenclatura moderna (Predictable Network Interface Names):
+# ens33   = Ethernet, slot PCI 33
+# enp0s3  = Ethernet, bus PCI 0, slot 3
+# eno1    = Ethernet onboard #1
+# wlp2s0  = Wireless, bus PCI 2, slot 0
+# lo      = Loopback (127.0.0.1)
+# docker0 = Bridge do Docker
+# br-xxx  = Bridge criada manualmente
+# veth... = Virtual ethernet (containers)
+
+# Nomenclatura legada (desabilitada por padrão):
+# eth0, eth1, wlan0 (não recomendado)
+
+# Ver todas as interfaces:
+ip link show
+# 1: lo: &lt;LOOPBACK,UP&gt; mtu 65536
+# 2: ens33: &lt;BROADCAST,MULTICAST,UP&gt; mtu 1500
+# 3: docker0: &lt;NO-CARRIER,BROADCAST&gt; mtu 1500
+
+# Estados da interface:
+# UP        = ativa e funcionando
+# DOWN      = desativada
+# NO-CARRIER = sem cabo/sem conexão física
+# LOWER_UP  = camada física conectada
+
+# Ver velocidade e duplex:
+ethtool ens33
+# Speed: 1000Mb/s
+# Duplex: Full
+# Link detected: yes
+
+# Instalar ethtool:
+sudo apt install ethtool</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: FIREWALL -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Firewall</span>
+          <h2>Firewall — iptables e UFW</h2>
+          <p>O firewall é a primeira linha de defesa de um servidor. No Linux, iptables é o motor por trás do firewall do kernel, e UFW (Uncomplicated Firewall) é a interface simplificada para o dia a dia.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>iptables — Fundamentos</h3>
+          <p>iptables opera com chains (INPUT, OUTPUT, FORWARD) e policies (ACCEPT, DROP, REJECT). Cada pacote de rede passa pelas regras na ordem até encontrar um match.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>iptables — Conceitos e visualização</code><span class="cmd-tag">iptables</span></div>
+              <pre><code># Estrutura: tabelas → chains → regras
+# Tabela filter (padrão):
+#   INPUT    = pacotes destinados ao servidor
+#   OUTPUT   = pacotes saindo do servidor
+#   FORWARD  = pacotes passando pelo servidor (router)
+
+# Ver regras atuais:
+sudo iptables -L -n -v
+# -L = list, -n = numérico, -v = verbose
+
+# Ver com números de regra:
+sudo iptables -L --line-numbers
+
+# Ver regras em formato para script:
+sudo iptables -S
+
+# Política padrão (o que acontece se nenhuma regra bater):
+sudo iptables -P INPUT DROP      # negar tudo por padrão
+sudo iptables -P OUTPUT ACCEPT   # permitir saída
+sudo iptables -P FORWARD DROP    # negar forward
+
+# ⚠️ CUIDADO: -P INPUT DROP pode te trancar fora!
+# Sempre adicione regra SSH ANTES de mudar policy!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>iptables — Regras comuns</code><span class="cmd-tag">Regras</span></div>
+              <pre><code># Permitir loopback:
+sudo iptables -A INPUT -i lo -j ACCEPT
+
+# Permitir conexões já estabelecidas:
+sudo iptables -A INPUT -m state \
+  --state ESTABLISHED,RELATED -j ACCEPT
+
+# Permitir SSH (porta 22):
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Permitir HTTP e HTTPS:
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Permitir ping (ICMP):
+sudo iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+# Bloquear IP específico:
+sudo iptables -A INPUT -s 192.168.1.50 -j DROP
+
+# Permitir range de IPs:
+sudo iptables -A INPUT -s 10.0.0.0/24 -p tcp --dport 3306 -j ACCEPT
+
+# Limitar rate (anti brute-force SSH):
+sudo iptables -A INPUT -p tcp --dport 22 \
+  -m connlimit --connlimit-above 3 -j REJECT
+
+# Deletar regra por número:
+sudo iptables -D INPUT 5
+
+# Limpar TODAS as regras:
+sudo iptables -F
+
+# Salvar regras (persistir):
+sudo apt install iptables-persistent
+sudo netfilter-persistent save</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚡ Ordem das regras importa!</strong> iptables processa regras de cima para baixo. A primeira regra que faz match é executada. Coloque regras mais específicas primeiro e as genéricas (como DROP) por último.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>UFW — Uncomplicated Firewall</h3>
+          <p>UFW é a camada de abstração sobre iptables recomendada para Ubuntu. Muito mais simples de usar no dia a dia, mantendo a mesma segurança.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>UFW — Comandos essenciais</code><span class="cmd-tag">UFW Básico</span></div>
+              <pre><code># Instalar (geralmente já vem):
+sudo apt install ufw
+
+# Ver status:
+sudo ufw status
+sudo ufw status verbose
+sudo ufw status numbered       # com números
+
+# ⚠️ ANTES de ativar, permita SSH:
+sudo ufw allow ssh
+# ou
+sudo ufw allow 22/tcp
+
+# Ativar firewall:
+sudo ufw enable
+
+# Desativar:
+sudo ufw disable
+
+# Política padrão (recomendado):
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Permitir portas:
+sudo ufw allow 80/tcp          # HTTP
+sudo ufw allow 443/tcp         # HTTPS
+sudo ufw allow 3000            # TCP + UDP na porta 3000
+sudo ufw allow 8080:8090/tcp   # Range de portas
+
+# Permitir por nome de serviço:
+sudo ufw allow 'Nginx Full'    # HTTP + HTTPS
+sudo ufw allow 'OpenSSH'
+sudo ufw app list              # ver perfis disponíveis</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>UFW — Regras avançadas</code><span class="cmd-tag">UFW Avançado</span></div>
+              <pre><code># Permitir de IP específico:
+sudo ufw allow from 192.168.1.0/24
+
+# Permitir IP em porta específica:
+sudo ufw allow from 10.0.0.50 to any port 3306
+
+# Negar (bloquear):
+sudo ufw deny from 203.0.113.50
+sudo ufw deny in on eth0 to any port 25
+
+# Rejeitar (envia resposta ao cliente):
+sudo ufw reject 23/tcp
+
+# Deletar regra:
+sudo ufw status numbered
+sudo ufw delete 3              # por número
+sudo ufw delete allow 8080/tcp # por regra
+
+# Limitar conexões (anti brute-force):
+sudo ufw limit ssh
+# Bloqueia IPs com mais de 6 conexões em 30s
+
+# Logging:
+sudo ufw logging on
+sudo ufw logging medium        # low/medium/high/full
+# Logs em /var/log/ufw.log
+
+# Reset (remover todas as regras):
+sudo ufw reset
+
+# Regras para IPv6:
+# Editar /etc/default/ufw → IPV6=yes
+sudo ufw reload</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Setup de firewall para servidor web:</strong>
+            <pre><code># Script típico para servidor web:
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh               # SEMPRE primeiro!
+sudo ufw allow 'Nginx Full'     # HTTP + HTTPS
+sudo ufw limit ssh               # anti brute-force
+sudo ufw enable
+sudo ufw status verbose</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: SSH -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">SSH</span>
+          <h2>SSH — Acesso Remoto Seguro</h2>
+          <p>SSH (Secure Shell) é o protocolo padrão para administração remota de servidores Linux. Permite login seguro, transferência de arquivos e tunelamento de conexões — tudo criptografado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Conexão e autenticação</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>ssh — Conectar a servidores</code><span class="cmd-tag">Conexão</span></div>
+              <pre><code># Conexão básica:
+ssh usuario@192.168.1.100
+ssh root@meuservidor.com
+
+# Porta personalizada (-p):
+ssh -p 2222 admin@server.com
+
+# Verbose (debug de conexão):
+ssh -v usuario@server.com    # 1 nível
+ssh -vv usuario@server.com   # 2 níveis (mais detalhes)
+
+# Executar comando remoto (sem shell interativo):
+ssh user@server "uptime"
+ssh user@server "df -h && free -m"
+
+# Executar script local no servidor remoto:
+ssh user@server 'bash -s' < script_local.sh
+
+# Manter sessão viva (evitar timeout):
+ssh -o ServerAliveInterval=60 user@server
+
+# Usar chave privada específica (-i):
+ssh -i ~/.ssh/minha-chave.pem ec2-user@aws-instance
+
+# SSH sem verificar host key (lab apenas!):
+ssh -o StrictHostKeyChecking=no user@server
+
+# Escape sequences (dentro de sessão SSH):
+# ~.  = desconectar forçado
+# ~?  = listar escapes
+# ~~  = enviar ~ literal</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ssh-keygen — Gerar chaves</code><span class="cmd-tag">Chaves</span></div>
+              <pre><code># Gerar par de chaves (Ed25519 - recomendado):
+ssh-keygen -t ed25519 -C "email@exemplo.com"
+# Gera: ~/.ssh/id_ed25519 (privada)
+#        ~/.ssh/id_ed25519.pub (pública)
+
+# Gerar RSA 4096 bits:
+ssh-keygen -t rsa -b 4096 -C "email@exemplo.com"
+
+# Gerar com nome personalizado:
+ssh-keygen -t ed25519 -f ~/.ssh/servidor-prod
+
+# Sem passphrase (automação):
+ssh-keygen -t ed25519 -f ~/.ssh/deploy-key -N ""
+
+# Copiar chave pública para o servidor:
+ssh-copy-id usuario@192.168.1.100
+ssh-copy-id -i ~/.ssh/id_ed25519.pub user@server
+ssh-copy-id -p 2222 user@server
+
+# O que ssh-copy-id faz:
+# Adiciona sua chave pública ao arquivo
+# ~/.ssh/authorized_keys do servidor
+
+# Verificar fingerprint da chave:
+ssh-keygen -l -f ~/.ssh/id_ed25519.pub
+# 256 SHA256:abc123... email@exemplo.com (ED25519)
+
+# Mudar passphrase de chave existente:
+ssh-keygen -p -f ~/.ssh/id_ed25519
+
+# Permissões corretas (obrigatório!):
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519        # privada
+chmod 644 ~/.ssh/id_ed25519.pub    # pública
+chmod 600 ~/.ssh/authorized_keys</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>SSH Config — Atalhos para conexões</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>~/.ssh/config — Configuração de hosts</code><span class="cmd-tag">Config</span></div>
+              <pre><code># Arquivo: ~/.ssh/config
+# Permite criar "atalhos" para conexões frequentes
+
+# Servidor de produção:
+Host prod
+    HostName 54.123.45.67
+    User ubuntu
+    Port 22
+    IdentityFile ~/.ssh/aws-prod.pem
+    ServerAliveInterval 60
+
+# Servidor de desenvolvimento:
+Host dev
+    HostName 192.168.1.100
+    User devops
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+
+# Jump host (bastion):
+Host bastion
+    HostName 52.10.20.30
+    User admin
+    IdentityFile ~/.ssh/bastion.pem
+
+Host interno-via-bastion
+    HostName 10.0.1.50
+    User app
+    ProxyJump bastion
+
+# Wildcard para todos os servidores AWS:
+Host *.aws
+    User ec2-user
+    IdentityFile ~/.ssh/aws-key.pem
+    StrictHostKeyChecking no
+
+# Configuração global:
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    AddKeysToAgent yes
+
+# USO: agora basta digitar:
+ssh prod            # em vez de: ssh -i ~/.ssh/aws-prod.pem ubuntu@54.123.45.67
+ssh dev             # em vez de: ssh -p 2222 devops@192.168.1.100</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>SSH Tunneling — Port Forwarding</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>-L — Local Port Forward</code><span class="cmd-tag">Local Tunnel</span></div>
+              <pre><code># Cenário: acessar serviço remoto via porta local
+# Sintaxe: ssh -L local_port:destino:remote_port user@server
+
+# Acessar banco remoto na porta local 5432:
+ssh -L 5432:localhost:5432 user@db-server
+# Agora: psql -h localhost -p 5432
+
+# Acessar painel admin que só aceita localhost:
+ssh -L 8080:localhost:9090 user@server
+# Agora abra: http://localhost:8080
+
+# Acessar host interno via jump:
+ssh -L 3306:10.0.1.50:3306 user@bastion
+# Acessa MySQL do host interno via bastion
+
+# Rodar em background (-fN = background, sem shell):
+ssh -fNL 5432:localhost:5432 user@db-server
+
+# Múltiplos tunnels na mesma conexão:
+ssh -L 5432:localhost:5432 \
+    -L 6379:localhost:6379 \
+    user@server</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>-R — Remote Port Forward</code><span class="cmd-tag">Remote Tunnel</span></div>
+              <pre><code># Cenário: expor serviço local para o servidor remoto
+# Sintaxe: ssh -R remote_port:localhost:local_port user@server
+
+# Expor app local (porta 3000) na porta 8080 do servidor:
+ssh -R 8080:localhost:3000 user@server
+# Agora no servidor: curl http://localhost:8080
+
+# Útil para:
+# - Mostrar app local para colega remoto
+# - Webhook testing (expor localhost)
+# - Bypass de NAT
+
+# Dynamic port forwarding (SOCKS proxy):
+ssh -D 9090 user@server
+# Configura browser para proxy SOCKS5 localhost:9090
+# Todo tráfego passa pelo servidor (VPN simples)
+
+# Manter tunnel ativo com autossh:
+sudo apt install autossh
+autossh -M 0 -fNL 5432:localhost:5432 user@server
+# Reconecta automaticamente se cair</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Transferência de arquivos — scp e rsync</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>scp — Cópia segura</code><span class="cmd-tag">scp</span></div>
+              <pre><code># Local → Remoto:
+scp arquivo.txt user@server:/home/user/
+scp -r pasta/ user@server:/opt/
+
+# Remoto → Local:
+scp user@server:/var/log/app.log ./
+scp -r user@server:/opt/backup/ ./local/
+
+# Entre dois servidores:
+scp user@srv1:/dados/file user@srv2:/backup/
+
+# Porta personalizada:
+scp -P 2222 arquivo.txt user@server:/tmp/
+
+# Com chave específica:
+scp -i ~/.ssh/key.pem file user@server:/path/
+
+# Preservar atributos:
+scp -p arquivo.txt user@server:/path/</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>rsync — Sincronização inteligente</code><span class="cmd-tag">rsync</span></div>
+              <pre><code># rsync > scp: transfere apenas diferenças!
+
+# Sync local → remoto:
+rsync -avz /var/www/ user@server:/var/www/
+# -a = archive (preserva tudo)
+# -v = verbose
+# -z = compressão durante transferência
+
+# Sync remoto → local:
+rsync -avz user@server:/var/log/ ./logs/
+
+# Com progresso:
+rsync -avz --progress origem/ destino/
+
+# Excluir padrões:
+rsync -avz --exclude='*.log' \
+  --exclude='node_modules' /app/ user@server:/app/
+
+# Deletar arquivos no destino que não existem na origem:
+rsync -avz --delete /origem/ user@server:/destino/
+# ⚠️ CUIDADO: pode deletar dados no destino!
+
+# Dry-run (simular sem executar):
+rsync -avzn --delete /origem/ destino/
+
+# Limitar bandwidth:
+rsync -avz --bwlimit=5000 origem/ destino/  # 5MB/s
+
+# Porta SSH diferente:
+rsync -avz -e "ssh -p 2222" /dados/ user@server:/backup/
+
+# Backup incremental com hardlinks:
+rsync -avz --link-dest=../yesterday \
+  /dados/ /backups/today/</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 rsync vs scp:</strong> Use <code>scp</code> para cópias simples e pontuais. Use <code>rsync</code> para sincronização, backups incrementais e transferências de grandes volumes — ele só transmite as diferenças, economizando tempo e bandwidth.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: SYSTEMD -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Systemd</span>
+          <h2>Systemd — Gerenciamento de Serviços</h2>
+          <p>Systemd é o sistema de init padrão no Linux moderno. Controla inicialização do sistema, gerencia serviços (daemons), logs, timers e muito mais. systemctl é seu principal comando.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>systemctl — Controle de serviços</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>systemctl — Operações com serviços</code><span class="cmd-tag">Controle</span></div>
+              <pre><code># Iniciar serviço:
+sudo systemctl start nginx
+
+# Parar serviço:
+sudo systemctl stop nginx
+
+# Reiniciar (para e inicia):
+sudo systemctl restart nginx
+
+# Recarregar configuração (sem downtime):
+sudo systemctl reload nginx
+
+# Reload-or-restart (tenta reload primeiro):
+sudo systemctl reload-or-restart nginx
+
+# Habilitar no boot (inicia automaticamente):
+sudo systemctl enable nginx
+
+# Desabilitar do boot:
+sudo systemctl disable nginx
+
+# Habilitar E iniciar de uma vez:
+sudo systemctl enable --now nginx
+
+# Ver status detalhado:
+sudo systemctl status nginx
+# ● nginx.service - A high performance web server
+#   Loaded: loaded (/lib/systemd/system/nginx.service)
+#   Active: active (running) since Mon 2024-01-15 10:00:00
+#   Main PID: 1234 (nginx)
+#   Tasks: 5 (limit: 4915)
+#   Memory: 12.5M
+#   CGroup: /system.slice/nginx.service
+#           ├─1234 nginx: master process
+#           └─1235 nginx: worker process
+
+# Verificar se está ativo (para scripts):
+systemctl is-active nginx    # retorna "active" ou "inactive"
+systemctl is-enabled nginx   # retorna "enabled" ou "disabled"
+systemctl is-failed nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>systemctl — Listagem e análise</code><span class="cmd-tag">Listar</span></div>
+              <pre><code># Listar todos os serviços:
+systemctl list-units --type=service
+
+# Apenas serviços ativos:
+systemctl list-units --type=service --state=active
+
+# Serviços que falharam:
+systemctl list-units --type=service --state=failed
+systemctl --failed
+
+# Listar unit files (instalados):
+systemctl list-unit-files --type=service
+
+# Dependências de um serviço:
+systemctl list-dependencies nginx
+
+# Ver arquivo de configuração do serviço:
+systemctl cat nginx
+
+# Editar serviço (override):
+sudo systemctl edit nginx
+# Cria override em /etc/systemd/system/nginx.service.d/
+
+# Recarregar após editar unit files:
+sudo systemctl daemon-reload
+
+# Mascarar serviço (impedir de iniciar):
+sudo systemctl mask bluetooth
+sudo systemctl unmask bluetooth
+
+# Analisar tempo de boot:
+systemd-analyze
+systemd-analyze blame        # serviços mais lentos
+systemd-analyze critical-chain</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>journalctl — Logs do sistema</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>journalctl — Consultar logs</code><span class="cmd-tag">Logs</span></div>
+              <pre><code># Todos os logs (mais antigos primeiro):
+journalctl
+
+# Logs mais recentes primeiro:
+journalctl -r
+
+# Últimas N linhas:
+journalctl -n 50
+
+# Seguir em tempo real (como tail -f):
+journalctl -f
+
+# Logs de um serviço específico:
+journalctl -u nginx
+journalctl -u nginx -f        # follow
+journalctl -u nginx -n 100   # últimas 100
+
+# Logs desde o último boot:
+journalctl -b
+
+# Logs do boot anterior:
+journalctl -b -1
+
+# Filtrar por prioridade:
+journalctl -p err            # apenas errors+
+journalctl -p warning        # warnings+
+# Prioridades: emerg, alert, crit, err, warning, notice, info, debug
+
+# Filtrar por tempo:
+journalctl --since "2024-01-15 10:00:00"
+journalctl --since "1 hour ago"
+journalctl --since today
+journalctl --since yesterday --until today
+
+# Filtrar por PID:
+journalctl _PID=1234
+
+# Output em formato JSON:
+journalctl -u nginx -o json-pretty
+
+# Uso de disco dos logs:
+journalctl --disk-usage
+
+# Limpar logs antigos:
+sudo journalctl --vacuum-time=7d    # manter 7 dias
+sudo journalctl --vacuum-size=500M  # limitar a 500MB</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>journalctl — Cenários práticos</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># Debug: por que um serviço falhou?
+sudo systemctl status meu-app
+# → mostra últimas linhas de log
+journalctl -u meu-app -n 50 --no-pager
+
+# Monitorar múltiplos serviços:
+journalctl -u nginx -u php-fpm -f
+
+# Kernel messages (equivalente dmesg):
+journalctl -k
+journalctl --dmesg
+
+# Logs de SSH (tentativas de login):
+journalctl -u sshd | grep "Failed password"
+journalctl -u sshd | grep "Accepted"
+
+# Logs do cron:
+journalctl -u cron
+
+# Erros do último boot:
+journalctl -b -p err
+
+# Exportar logs para arquivo:
+journalctl -u nginx --since today > nginx-hoje.log
+
+# Configurar persistência de logs:
+# Editar /etc/systemd/journald.conf:
+# [Journal]
+# Storage=persistent        # salvar em disco
+# SystemMaxUse=1G           # máximo 1GB
+# MaxRetentionSec=30day     # manter 30 dias
+sudo systemctl restart systemd-journald</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Criar serviço customizado</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Criando um service unit file</code><span class="cmd-tag">Custom Service</span></div>
+              <pre><code># Arquivo: /etc/systemd/system/minha-app.service
+[Unit]
+Description=Minha Aplicação Node.js
+Documentation=https://github.com/meu/app
+After=network.target          # iniciar após rede estar pronta
+Wants=postgresql.service      # dependência opcional
+Requires=redis.service        # dependência obrigatória
+
+[Service]
+Type=simple                    # simple, forking, oneshot, notify
+User=appuser                   # usuário para executar
+Group=appgroup
+WorkingDirectory=/opt/minha-app
+Environment=NODE_ENV=production
+Environment=PORT=3000
+EnvironmentFile=/opt/minha-app/.env   # carregar variáveis de arquivo
+
+ExecStartPre=/usr/bin/npm install     # executar antes de iniciar
+ExecStart=/usr/bin/node server.js     # comando principal
+ExecReload=/bin/kill -HUP $MAINPID    # comando de reload
+
+# Restart automático em caso de falha:
+Restart=on-failure
+RestartSec=5                   # esperar 5s antes de reiniciar
+StartLimitBurst=3              # máximo 3 restarts
+StartLimitIntervalSec=60      # dentro de 60s
+
+# Limites de recursos:
+LimitNOFILE=65536
+MemoryMax=512M
+CPUQuota=50%
+
+# Segurança:
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/minha-app/data
+
+# Logging:
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=minha-app
+
+[Install]
+WantedBy=multi-user.target     # equivalente a "runlevel 3/5"
+
+# ─── APÓS CRIAR O ARQUIVO: ───
+sudo systemctl daemon-reload            # recarregar systemd
+sudo systemctl enable --now minha-app   # habilitar e iniciar
+sudo systemctl status minha-app         # verificar status
+journalctl -u minha-app -f             # ver logs em tempo real</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Tipos de serviço:</strong>
+            <ul style="margin-top:8px;padding-left:20px">
+              <li><code>simple</code> — Processo principal roda no foreground (Node.js, Python)</li>
+              <li><code>forking</code> — Processo faz fork e o pai termina (Apache, nginx com daemon mode)</li>
+              <li><code>oneshot</code> — Executa uma vez e termina (scripts de inicialização)</li>
+              <li><code>notify</code> — Envia notificação quando pronto (systemd-aware apps)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6: GERENCIAMENTO DE PACOTES -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Pacotes</span>
+          <h2>Gerenciamento de Pacotes</h2>
+          <p>O gerenciamento de pacotes é como o Linux instala, atualiza e remove software. No Ubuntu/Debian, o ecossistema APT é o padrão, com dpkg como camada de baixo nível.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>APT — Advanced Package Tool</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>apt — Operações essenciais</code><span class="cmd-tag">APT</span></div>
+              <pre><code># Atualizar lista de pacotes disponíveis:
+sudo apt update
+# Baixa informações dos repositórios
+# NÃO instala nada, apenas atualiza o catálogo
+
+# Atualizar pacotes instalados:
+sudo apt upgrade
+# Instala versões mais recentes dos pacotes atuais
+
+# Full upgrade (pode remover pacotes obsoletos):
+sudo apt full-upgrade
+
+# Instalar pacote:
+sudo apt install nginx
+sudo apt install nginx php-fpm mysql-server  # múltiplos
+
+# Instalar versão específica:
+sudo apt install nginx=1.24.0-1ubuntu1
+
+# Instalar sem confirmação:
+sudo apt install -y curl wget git
+
+# Remover pacote (mantém configs):
+sudo apt remove nginx
+
+# Remover pacote + configurações:
+sudo apt purge nginx
+
+# Remover dependências órfãs:
+sudo apt autoremove
+
+# Limpar cache de downloads:
+sudo apt clean         # remove todos os .deb do cache
+sudo apt autoclean     # remove apenas versões antigas
+
+# Update + upgrade em uma linha:
+sudo apt update && sudo apt upgrade -y</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>apt — Busca e informações</code><span class="cmd-tag">Consulta</span></div>
+              <pre><code># Buscar pacotes:
+apt search nginx
+apt search "web server"
+
+# Informações detalhadas:
+apt show nginx
+# Package: nginx
+# Version: 1.24.0-1ubuntu1
+# Depends: libc6, libpcre3, ...
+# Description: ...
+
+# Listar versões disponíveis:
+apt list -a nginx
+
+# Listar pacotes instalados:
+apt list --installed
+apt list --installed | grep php
+
+# Pacotes atualizáveis:
+apt list --upgradable
+
+# De qual pacote vem um arquivo?
+dpkg -S /usr/bin/curl
+# curl: /usr/bin/curl
+
+# Listar arquivos de um pacote:
+dpkg -L nginx
+
+# Verificar se pacote está instalado:
+dpkg -l | grep nginx
+apt list --installed 2>/dev/null | grep nginx
+
+# Simular instalação (dry-run):
+apt install --simulate nginx
+
+# Congelar versão (impedir atualização):
+sudo apt-mark hold nginx
+sudo apt-mark unhold nginx
+apt-mark showhold</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>dpkg — Gerenciador de baixo nível</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>dpkg — Pacotes .deb</code><span class="cmd-tag">dpkg</span></div>
+              <pre><code># Instalar .deb local:
+sudo dpkg -i pacote.deb
+
+# Se falhar por dependências:
+sudo dpkg -i pacote.deb
+sudo apt install -f        # resolver dependências
+
+# Remover pacote:
+sudo dpkg -r pacote
+sudo dpkg --purge pacote   # + configs
+
+# Listar pacotes instalados:
+dpkg -l
+dpkg -l | grep nginx
+
+# Status de um pacote:
+dpkg -s nginx
+
+# Listar arquivos de um pacote:
+dpkg -L nginx
+
+# Extrair .deb sem instalar:
+dpkg -x pacote.deb /tmp/extraido/
+
+# Reconfigurar pacote:
+sudo dpkg-reconfigure tzdata    # timezone
+sudo dpkg-reconfigure locales   # idioma</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Repositórios e Snap</code><span class="cmd-tag">Repos</span></div>
+              <pre><code># Adicionar repositório PPA:
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update
+
+# Adicionar repositório externo (exemplo Docker):
+# 1. Baixar chave GPG:
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# 2. Adicionar repositório:
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list
+
+# 3. Instalar:
+sudo apt update
+sudo apt install docker-ce
+
+# Remover repositório:
+sudo add-apt-repository --remove ppa:ondrej/php
+
+# Ver repositórios configurados:
+cat /etc/apt/sources.list
+ls /etc/apt/sources.list.d/
+
+# === SNAP ===
+# Pacotes universais e autoatualizáveis:
+snap find node         # buscar
+sudo snap install node --classic
+snap list              # instalados
+sudo snap refresh      # atualizar todos
+sudo snap remove node  # remover
+snap info node         # detalhes</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>📋 Resumo — Quando usar cada ferramenta:</strong>
+            <table class="styled-table" style="margin-top:12px">
+              <thead><tr><th>Ferramenta</th><th>Quando usar</th></tr></thead>
+              <tbody>
+                <tr><td><code>apt</code></td><td>99% das operações do dia a dia (instalar, remover, atualizar)</td></tr>
+                <tr><td><code>dpkg</code></td><td>Instalar .deb local, listar arquivos de pacote, troubleshooting</td></tr>
+                <tr><td><code>snap</code></td><td>Software que precisa de versão mais recente ou isolamento</td></tr>
+                <tr><td><code>PPA/repos</code></td><td>Quando precisa de versão mais nova que a do Ubuntu oficial</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7: CRON JOBS -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Cron</span>
+          <h2>Cron Jobs — Agendamento de Tarefas</h2>
+          <p>Cron é o agendador de tarefas do Linux. Permite executar scripts e comandos automaticamente em horários definidos — essencial para backups, limpeza de logs, monitoramento e automação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Sintaxe do crontab</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Formato da expressão cron</code><span class="cmd-tag">Sintaxe</span></div>
+              <pre><code># ┌───────────── minuto (0-59)
+# │ ┌───────────── hora (0-23)
+# │ │ ┌───────────── dia do mês (1-31)
+# │ │ │ ┌───────────── mês (1-12 ou jan-dec)
+# │ │ │ │ ┌───────────── dia da semana (0-7, 0 e 7 = domingo, ou sun-sat)
+# │ │ │ │ │
+# * * * * * comando_a_executar
+
+# Caracteres especiais:
+# *     = qualquer valor
+# ,     = lista (1,3,5 = seg, qua, sex)
+# -     = range (1-5 = segunda a sexta)
+# /     = intervalo (*/5 = a cada 5)
+
+# EXEMPLOS:
+# ┌─ min  hora  dia  mês  sem  comando
+  0  2    *     *    *    /opt/backup.sh          # Diário às 02:00
+  */5 *   *     *    *    /opt/health-check.sh    # A cada 5 minutos
+  0  */4  *     *    *    /opt/sync.sh            # A cada 4 horas
+  30 8    *     *    1-5  /opt/relatorio.sh       # Seg-Sex às 08:30
+  0  0    1     *    *    /opt/mensal.sh          # Dia 1 de cada mês à 00:00
+  0  6    *     *    0    /opt/semanal.sh         # Todo domingo às 06:00
+  0  0    1     1    *    /opt/anual.sh           # 1 de janeiro à 00:00
+  */15 *  *     *    *    /opt/monitor.sh         # A cada 15 minutos
+  0  9-18 *     *    1-5  /opt/horario-comercial.sh  # Seg-Sex, 9h-18h, a cada hora</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Atalhos do cron:</strong>
+            <pre><code>@reboot    → Executar uma vez ao iniciar o sistema
+@yearly    → 0 0 1 1 * (uma vez por ano, 1 jan 00:00)
+@monthly   → 0 0 1 * * (uma vez por mês, dia 1 00:00)
+@weekly    → 0 0 * * 0 (uma vez por semana, domingo 00:00)
+@daily     → 0 0 * * * (uma vez por dia, 00:00)
+@hourly    → 0 * * * * (uma vez por hora, minuto 0)
+
+# Exemplo com atalho:
+@daily /opt/backup.sh
+@reboot /opt/start-app.sh</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Gerenciamento do crontab</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>crontab — Comandos de gerenciamento</code><span class="cmd-tag">Gerenciar</span></div>
+              <pre><code># Editar crontab do usuário atual:
+crontab -e
+
+# Ver crontab atual:
+crontab -l
+
+# Remover crontab (CUIDADO!):
+crontab -r
+
+# Editar crontab de outro usuário:
+sudo crontab -u www-data -e
+sudo crontab -u root -l
+
+# Criar crontab a partir de arquivo:
+crontab meu-crontab.txt
+
+# Exportar para backup:
+crontab -l > crontab-backup.txt
+
+# Variáveis de ambiente no crontab:
+# ⚠️ cron NÃO carrega seu .bashrc!
+# Defina variáveis no início do crontab:
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=admin@empresa.com        # enviar output por email
+HOME=/home/deploy
+
+# Cron com log:
+* * * * * /opt/script.sh >> /var/log/meu-cron.log 2>&1
+# >> = append output
+# 2>&1 = redirecionar erros também
+
+# Cron silencioso (sem output):
+0 2 * * * /opt/backup.sh > /dev/null 2>&1</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Diretórios /etc/cron.*</code><span class="cmd-tag">Sistema</span></div>
+              <pre><code># Cron do sistema (diretórios automáticos):
+/etc/cron.d/         # arquivos cron com formato especial
+/etc/cron.daily/     # scripts executados diariamente
+/etc/cron.hourly/    # scripts executados a cada hora
+/etc/cron.weekly/    # scripts executados semanalmente
+/etc/cron.monthly/   # scripts executados mensalmente
+
+# Para cron.daily/weekly/monthly: basta colocar
+# um script executável no diretório!
+sudo cp meu-script.sh /etc/cron.daily/
+sudo chmod +x /etc/cron.daily/meu-script.sh
+
+# ⚠️ Nomes NÃO podem ter . (ponto) no nome!
+# meu-backup     ✓ (funciona)
+# meu-backup.sh  ✗ (NÃO executa!)
+
+# /etc/cron.d/ — formato com campo de usuário:
+# Arquivo: /etc/cron.d/meu-job
+*/5 * * * * root /opt/scripts/check.sh
+
+# /etc/crontab — crontab do sistema:
+cat /etc/crontab
+
+# === ANACRON ===
+# Anacron executa jobs perdidos (máquinas que desligam)
+cat /etc/anacrontab
+# período  delay(min)  id       comando
+# 1        5           daily    run-parts /etc/cron.daily
+# 7        10          weekly   run-parts /etc/cron.weekly
+# 30       15          monthly  run-parts /etc/cron.monthly
+
+# Verificar logs do cron:
+grep CRON /var/log/syslog
+journalctl -u cron</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo prático: Cron para backup automático</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Setup completo de backup agendado</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code># 1. Criar o script de backup:
+cat > /opt/scripts/backup-daily.sh << 'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+
+BACKUP_DIR="/opt/backups"
+DATE=$(date +%Y%m%d-%H%M%S)
+LOG="/var/log/backup-daily.log"
+RETENTION=7
+
+log() { echo "[$(date '+%F %T')] $1" >> "$LOG"; }
+
+log "=== Backup diário iniciado ==="
+
+# Backup de dados:
+tar czf "$BACKUP_DIR/app-$DATE.tar.gz" /var/www/app/ 2>> "$LOG"
+
+# Backup de banco:
+pg_dump -U postgres meudb | gzip > "$BACKUP_DIR/db-$DATE.sql.gz" 2>> "$LOG"
+
+# Limpar backups antigos:
+find "$BACKUP_DIR" -name "*.gz" -mtime +$RETENTION -delete
+
+log "=== Backup diário concluído ==="
+SCRIPT
+
+# 2. Tornar executável:
+chmod +x /opt/scripts/backup-daily.sh
+
+# 3. Testar manualmente:
+/opt/scripts/backup-daily.sh
+
+# 4. Adicionar ao crontab:
+crontab -e
+# Adicionar:
+0 2 * * * /opt/scripts/backup-daily.sh >> /var/log/backup-daily.log 2>&1
+
+# 5. Verificar se foi adicionado:
+crontab -l
+
+# 6. Monitorar execução:
+tail -f /var/log/backup-daily.log</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 8: EXERCÍCIOS -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Aplique os conhecimentos de redes, firewall, SSH e systemd em cenários reais de administração de servidores.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Configurar firewall para servidor web</h3>
+          <p>Configure o UFW para um servidor que roda Nginx (HTTP/HTTPS) e SSH. A política padrão deve negar tráfego de entrada. Aplique rate limiting no SSH para prevenir brute-force. Verifique o status final.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code># Resetar configuração:
+sudo ufw reset
+
+# Definir políticas padrão:
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Permitir SSH com rate limiting:
+sudo ufw limit 22/tcp
+
+# Permitir HTTP e HTTPS:
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+
+# Ativar o firewall:
+sudo ufw enable
+
+# Verificar status:
+sudo ufw status verbose
+# Status: active
+# Default: deny (incoming), allow (outgoing)
+# 22/tcp    LIMIT IN    Anywhere
+# 80/tcp    ALLOW IN    Anywhere
+# 443/tcp   ALLOW IN    Anywhere</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Criar serviço systemd para aplicação</h3>
+          <p>Crie um service unit file para uma aplicação Python (Flask) que roda na porta 5000 com gunicorn. O serviço deve: usar o usuário "webapp", reiniciar automaticamente em caso de falha, e iniciar após a rede estar pronta. Habilite e verifique o serviço.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code># 1. Criar o unit file:
+sudo cat > /etc/systemd/system/flask-app.service << 'EOF'
+[Unit]
+Description=Flask Application with Gunicorn
+After=network.target
+
+[Service]
+Type=simple
+User=webapp
+Group=webapp
+WorkingDirectory=/opt/flask-app
+Environment=FLASK_ENV=production
+ExecStart=/opt/flask-app/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
+Restart=on-failure
+RestartSec=5
+StartLimitBurst=3
+StartLimitIntervalSec=60
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=flask-app
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 2. Recarregar systemd:
+sudo systemctl daemon-reload
+
+# 3. Habilitar e iniciar:
+sudo systemctl enable --now flask-app
+
+# 4. Verificar status:
+sudo systemctl status flask-app
+
+# 5. Ver logs:
+journalctl -u flask-app -f</code></pre>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: SSH seguro + cron de backup</h3>
+          <p>Configure SSH com chave Ed25519 para um servidor remoto (sem senha), crie um alias no SSH config chamado "prod-server", e agende um rsync diário às 03:00 que sincroniza <code>/var/www</code> para o servidor remoto em <code>/backups/web</code>.</p>
+          <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+          <pre style="margin-top:8px"><code># 1. Gerar chave SSH:
+ssh-keygen -t ed25519 -f ~/.ssh/prod-key -N "" -C "backup@meuservidor"
+
+# 2. Copiar chave para o servidor:
+ssh-copy-id -i ~/.ssh/prod-key.pub admin@54.100.200.50
+
+# 3. Configurar SSH config (~/.ssh/config):
+cat >> ~/.ssh/config << 'EOF'
+Host prod-server
+    HostName 54.100.200.50
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/prod-key
+    ServerAliveInterval 60
+EOF
+
+# 4. Testar conexão:
+ssh prod-server "hostname && uptime"
+
+# 5. Criar script de backup:
+cat > /opt/scripts/sync-web.sh << 'SCRIPT'
+#!/bin/bash
+set -euo pipefail
+LOG="/var/log/sync-web.log"
+echo "[$(date)] Iniciando sync..." >> "$LOG"
+rsync -avz --delete /var/www/ prod-server:/backups/web/ >> "$LOG" 2>&1
+echo "[$(date)] Sync concluído." >> "$LOG"
+SCRIPT
+chmod +x /opt/scripts/sync-web.sh
+
+# 6. Agendar no cron (03:00 diariamente):
+(crontab -l; echo "0 3 * * * /opt/scripts/sync-web.sh") | crontab -
+
+# 7. Verificar:
+crontab -l | grep sync-web</code></pre>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐧 Próximo passo</span>
+          <h2>Pronto para automação e administração profissional?</h2>
+          <p>No Módulo 05 você aprenderá monitoramento avançado, gerenciamento de discos, shell scripting profissional, segurança e tuning de performance.</p>
+        </div>
+        <a href="modulo-05.html" class="button primary">Ir para Módulo 05 →</a>
       </div>
     </section>
   </main>

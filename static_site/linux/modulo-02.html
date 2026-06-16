@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Linux Módulo 02: Permissões, Usuários e Processos</title>
+  <title>CloudTrilhas — Linux Módulo 02: Básico — Permissões, Usuários e Processos</title>
+  <meta name="description" content="Guia completo sobre permissões Linux (rwx, chmod, chown), gerenciamento de usuários e grupos, controle de processos, prioridades e redirecionamento de I/O." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,10 +18,9 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../linux.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-01.html" class="nav-link">← Anterior</a>
         <a href="modulo-03.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
@@ -42,122 +42,2632 @@
       <div class="container training-hero-content">
         <span class="pill">🐧 Linux — Módulo 02</span>
         <h1>Básico: Permissões, Usuários e Processos</h1>
-        <p>O Linux é multiusuário. Cada arquivo tem dono, grupo e permissões que controlam quem pode ler, escrever ou executar.</p>
+        <p>Domine o sistema de permissões do Linux, gerencie usuários e grupos, controle processos em execução e entenda redirecionamento de I/O. Estes são os pilares fundamentais da administração de qualquer servidor Linux.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Iniciante</small></a>
+        <a href="modulo-02.html" class="progress-node active"><span>02</span><small>Básico</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Intermediário</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Avançado</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Profissional</small></a>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: SISTEMA DE PERMISSÕES LINUX -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Permissões</span>
+          <h2>Sistema de Permissões Linux</h2>
+          <p>O Linux possui um sistema de permissões poderoso e elegante que controla quem pode ler, escrever e executar cada arquivo e diretório. Entender permissões é fundamental para segurança, deploy de aplicações e administração de servidores.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Sistema de Permissões</h3>
+          <h3>Modelo rwx — A base de tudo</h3>
+          <p>Cada arquivo e diretório no Linux possui três conjuntos de permissões, cada um com três bits:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>r — Read (Leitura)</code><span class="cmd-tag">4</span></div>
+              <p><strong>Arquivo:</strong> Permite ler o conteúdo do arquivo (cat, less, head).</p>
+              <p><strong>Diretório:</strong> Permite listar o conteúdo do diretório (ls).</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>w — Write (Escrita)</code><span class="cmd-tag">2</span></div>
+              <p><strong>Arquivo:</strong> Permite modificar ou apagar o conteúdo do arquivo.</p>
+              <p><strong>Diretório:</strong> Permite criar, renomear ou deletar arquivos dentro dele.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>x — Execute (Execução)</code><span class="cmd-tag">1</span></div>
+              <p><strong>Arquivo:</strong> Permite executar o arquivo como programa ou script.</p>
+              <p><strong>Diretório:</strong> Permite entrar no diretório (cd) e acessar seus arquivos.</p>
+            </div>
+          </div>
           <div class="info-box highlight">
-            <strong>Entendendo <code>ls -l</code>:</strong>
-            <pre><code>-rwxr-xr-- 1 joao devs 4096 Jan 15 10:30 script.sh
-│ │   │   │        │         │
-│ │   │   │        │         └─ Nome
-│ │   │   └─ Outros (r--)    └─ Grupo dono
-│ │   └─ Grupo (r-x)
-│ └─ Dono (rwx)
-└─ Tipo (- arquivo, d diretório, l link)</code></pre>
+            <strong>⚠️ Atenção com diretórios:</strong> As permissões funcionam de forma diferente para diretórios! Um diretório sem <code>x</code> é inacessível (não pode fazer <code>cd</code> nele), mesmo que tenha <code>r</code>. Um diretório sem <code>r</code> mas com <code>x</code> permite acessar arquivos se souber o nome, mas não listar.
           </div>
-          <div class="permissions-table">
-            <table>
-              <thead><tr><th>Octal</th><th>Permissões</th><th>Uso típico</th></tr></thead>
-              <tbody>
-                <tr><td><code>755</code></td><td>rwxr-xr-x</td><td>Scripts, diretórios</td></tr>
-                <tr><td><code>644</code></td><td>rw-r--r--</td><td>Arquivos de texto, configs</td></tr>
-                <tr><td><code>700</code></td><td>rwx------</td><td>Arquivos privados</td></tr>
-                <tr><td><code>600</code></td><td>rw-------</td><td>Chaves SSH, senhas</td></tr>
-              </tbody>
-            </table>
-          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Os três níveis de permissão (UGO)</h3>
+          <p>As permissões são aplicadas em três níveis, definindo quem pode fazer o quê:</p>
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>chmod</code><span class="cmd-tag">Permissões</span></div>
-              <p>Altera permissões de arquivos e diretórios.</p>
-              <pre><code>chmod 755 script.sh        # dono=rwx, grupo=r-x, outros=r-x
-chmod 600 chave_privada    # apenas dono lê/escreve
-chmod u+x script.sh        # adiciona execução ao dono
-chmod -R 755 pasta/        # recursivo</code></pre>
+            <div class="command-card">
+              <div class="command-header"><code>u — User (Dono)</code><span class="cmd-tag">Owner</span></div>
+              <p>O usuário que criou o arquivo (ou a quem foi atribuído com chown). Tem o primeiro conjunto de permissões.</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>chown</code><span class="cmd-tag">Propriedade</span></div>
-              <p>Altera dono e grupo.</p>
-              <pre><code>chown joao arquivo.txt
-chown joao:devs arquivo.txt
-chown -R joao:devs pasta/</code></pre>
+              <div class="command-header"><code>g — Group (Grupo)</code><span class="cmd-tag">Group</span></div>
+              <p>Todos os usuários que pertencem ao grupo associado ao arquivo. Segundo conjunto de permissões.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>o — Others (Outros)</code><span class="cmd-tag">World</span></div>
+              <p>Todos os demais usuários do sistema que não são o dono nem pertencem ao grupo. Terceiro conjunto.</p>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Gerenciamento de Usuários</h3>
+          <h3>Diagrama Visual das Permissões</h3>
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>useradd</code><span class="cmd-tag">Usuários</span></div>
-              <pre><code>sudo useradd -m -s /bin/bash joao
-sudo useradd -m -G sudo,docker joao</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>usermod</code><span class="cmd-tag">Usuários</span></div>
-              <pre><code>sudo usermod -aG docker joao  # SEMPRE -aG!
-sudo usermod -aG sudo joao</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>passwd</code><span class="cmd-tag">Senha</span></div>
-              <pre><code>passwd              # sua senha
-sudo passwd joao    # senha de outro</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>id / groups</code><span class="cmd-tag">Consulta</span></div>
-              <pre><code>id joao
-groups joao
-who     # quem está logado</code></pre>
+            <div class="command-card wide">
+              <div class="command-header"><code>Anatomia completa de uma permissão</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>  Tipo   User(Dono)  Group(Grupo)  Others(Outros)
+   │      │ │ │        │ │ │         │ │ │
+   │      r w x        r w x         r w x
+   │      │ │ │        │ │ │         │ │ │
+   ▼      ▼ ▼ ▼        ▼ ▼ ▼         ▼ ▼ ▼
+   -      r w x        r - x         r - -
+   │      └──┬──┘      └──┬──┘       └──┬──┘
+   │         │             │             │
+   │     Dono pode     Grupo pode    Outros podem
+   │     ler+escrever  ler+executar  apenas ler
+   │     +executar     (sem escrita)  (sem escrita/exec)
+   │
+   └── Tipo de arquivo:
+       -  = arquivo regular
+       d  = diretório
+       l  = link simbólico
+       b  = block device
+       c  = character device
+       p  = pipe (FIFO)
+       s  = socket
+
+Resultado: -rwxr-xr-- (754 em octal)</code></pre>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Gerenciamento de Processos</h3>
+          <h3>Notação Simbólica vs Octal</h3>
+          <p>Existem duas formas de representar permissões — ambas são equivalentes:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Simbólica</th><th>Octal</th><th>Significado</th><th>Uso Típico</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>rwxrwxrwx</code></td><td><code>777</code></td><td>Todos podem tudo</td><td>⚠️ NUNCA use em produção</td></tr>
+              <tr><td><code>rwxr-xr-x</code></td><td><code>755</code></td><td>Dono: tudo; Grupo/Outros: ler+executar</td><td>Diretórios, scripts executáveis</td></tr>
+              <tr><td><code>rwxr-x---</code></td><td><code>750</code></td><td>Dono: tudo; Grupo: ler+executar; Outros: nada</td><td>Diretórios de aplicação</td></tr>
+              <tr><td><code>rwx------</code></td><td><code>700</code></td><td>Apenas o dono pode tudo</td><td>Diretório ~/.ssh, scripts privados</td></tr>
+              <tr><td><code>rw-r--r--</code></td><td><code>644</code></td><td>Dono: ler+escrever; Grupo/Outros: ler</td><td>Arquivos de configuração, HTML, CSS</td></tr>
+              <tr><td><code>rw-r-----</code></td><td><code>640</code></td><td>Dono: ler+escrever; Grupo: ler; Outros: nada</td><td>Configs com dados sensíveis</td></tr>
+              <tr><td><code>rw-------</code></td><td><code>600</code></td><td>Apenas o dono pode ler e escrever</td><td>Chaves SSH, .env, senhas</td></tr>
+              <tr><td><code>r--------</code></td><td><code>400</code></td><td>Apenas o dono pode ler (sem escrita)</td><td>Chaves privadas (AWS .pem)</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>💡 Como calcular octal mentalmente:</strong>
+            <pre><code># Cada permissão tem um valor:
+r = 4    w = 2    x = 1    - = 0
+
+# Some os valores para cada nível (U, G, O):
+rwx = 4+2+1 = 7
+r-x = 4+0+1 = 5
+r-- = 4+0+0 = 4
+--- = 0+0+0 = 0
+
+# Exemplos:
+rwxr-xr-- = 7|5|4 = 754
+rw-rw-r-- = 6|6|4 = 664
+rwx------ = 7|0|0 = 700</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>ls -l — Como ler a saída completa</h3>
+          <p>O comando <code>ls -l</code> mostra todas as informações sobre um arquivo, incluindo permissões:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>ps aux</code><span class="cmd-tag">Essencial</span></div>
-              <p>Lista todos os processos do sistema.</p>
-              <pre><code>ps aux                    # todos os processos
-ps aux | grep nginx       # filtra por nome
-ps aux --sort=-%cpu | head -10  # top 10 CPU</code></pre>
+              <div class="command-header"><code>Decompondo a saída de ls -l</code><span class="cmd-tag">Leitura</span></div>
+              <pre><code>$ ls -la /var/www/
+total 16
+drwxr-xr-x  4 root     root     4096 Jan 15 10:30 .
+drwxr-xr-x 14 root     root     4096 Jan 10 08:00 ..
+drwxr-x---  3 www-data devops   4096 Jan 15 10:30 app
+-rw-r--r--  1 www-data www-data  612 Jan 14 09:15 index.html
+-rwxr-x---  1 deploy   devops   2048 Jan 15 10:28 deploy.sh
+-rw-------  1 root     root      256 Jan 12 11:00 .env
+lrwxrwxrwx  1 root     root       11 Jan 10 08:00 html -> /var/www/app
+
+# Decomposição de uma linha:
+# -rwxr-x--- 1 deploy devops 2048 Jan 15 10:28 deploy.sh
+#  │││││││││  │  │       │     │      │           │
+#  ││││││││╰─ Others: --- (nenhuma permissão)     │
+#  │││││││                                         │
+#  ││││╰╰╰── Group: r-x (ler + executar)         │
+#  │││╰───── User: rwx (ler + escrever + executar)│
+#  ││                                              │
+#  │╰──────── Tipo: - (arquivo regular)           │
+#  │                                              │
+#  │     1 = hard links                          Nome
+#  │     deploy = dono (user owner)
+#  │     devops = grupo (group owner)
+#  │     2048 = tamanho em bytes
+#  │     Jan 15 10:28 = última modificação</code></pre>
             </div>
-            <div class="command-card">
-              <div class="command-header"><code>kill</code><span class="cmd-tag danger">Processos</span></div>
-              <pre><code>kill 1234       # TERM (gracioso)
-kill -9 1234    # KILL (forçado)
-killall nginx   # mata por nome</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>top / htop</code><span class="cmd-tag">Monitor</span></div>
-              <p>Monitor em tempo real. <kbd>q</kbd>=sair, <kbd>M</kbd>=memória, <kbd>P</kbd>=CPU.</p>
-              <pre><code>top
-htop  # versão melhorada</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Background</code><span class="cmd-tag">Jobs</span></div>
-              <pre><code>comando &        # executa em background
-jobs             # lista jobs
-fg %1            # traz para frente
-nohup ./script.sh &  # sobrevive ao logout</code></pre>
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Identificando tipos de arquivo pelo primeiro caractere</code><span class="cmd-tag">Tipos</span></div>
+              <pre><code>$ ls -la /dev/ | head -20
+crw-rw-rw-  1 root root    1,  3 Jan 15 00:00 null      # c = character device
+brw-rw----  1 root disk    8,  0 Jan 15 00:00 sda       # b = block device
+lrwxrwxrwx  1 root root       15 Jan 15 00:00 stderr -> /proc/self/fd/2  # l = symlink
+srw-rw-rw-  1 root root        0 Jan 15 00:00 log       # s = socket
+prw-r--r--  1 root root        0 Jan 15 00:00 pipe      # p = named pipe (FIFO)
+drwxr-xr-x  2 root root     4096 Jan 15 00:00 pts       # d = diretório
+-rw-r--r--  1 root root      220 Jan 15 00:00 motd      # - = arquivo regular</code></pre>
             </div>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>Permissões Especiais: SUID, SGID e Sticky Bit</h3>
+          <p>Além do rwx básico, existem três permissões especiais que controlam comportamentos avançados:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>SUID (Set User ID)</code><span class="cmd-tag">4000</span></div>
+              <p>Quando executado, o processo roda com as permissões do <strong>dono do arquivo</strong>, não do usuário que executou.</p>
+              <pre><code># Exemplo clássico: passwd
+$ ls -l /usr/bin/passwd
+-rwsr-xr-x 1 root root 68208 ...
+#   ^
+# 's' no lugar de 'x' do dono = SUID ativo
+
+# Por que? passwd precisa escrever em /etc/shadow
+# que é de propriedade do root. SUID permite que
+# qualquer usuário execute passwd como root.
+
+# Definir SUID:
+chmod u+s programa
+chmod 4755 programa
+
+# PERIGO: SUID em scripts ou binários inseguros
+# é uma vulnerabilidade grave de segurança!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>SGID (Set Group ID)</code><span class="cmd-tag">2000</span></div>
+              <p><strong>Em arquivo:</strong> Executa com permissões do grupo do arquivo. <strong>Em diretório:</strong> Novos arquivos herdam o grupo do diretório.</p>
+              <pre><code># Em diretório (mais comum):
+$ ls -ld /var/www/projeto
+drwxrwsr-x 2 root devops 4096 ...
+#      ^
+# 's' no lugar de 'x' do grupo = SGID
+
+# Todo arquivo criado dentro herda grupo "devops"
+# Sem SGID: arquivo herdaria grupo primário do usuário
+touch /var/www/projeto/novo.txt
+ls -l /var/www/projeto/novo.txt
+# -rw-r--r-- 1 joao devops ... novo.txt
+#                    ^^^^^^ herdou do diretório!
+
+# Definir SGID:
+chmod g+s diretorio/
+chmod 2775 diretorio/</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Sticky Bit</code><span class="cmd-tag">1000</span></div>
+              <p>Em diretórios com sticky bit, apenas o <strong>dono do arquivo</strong> (ou root) pode deletar/renomear seus próprios arquivos — mesmo que outros tenham permissão de escrita no diretório.</p>
+              <pre><code># Exemplo clássico: /tmp
+$ ls -ld /tmp
+drwxrwxrwt 15 root root 4096 ...
+#        ^
+# 't' no lugar de 'x' de others = Sticky Bit
+
+# Todos podem criar arquivos em /tmp (rwx para others)
+# Mas cada usuário só pode deletar SEUS próprios arquivos
+# Sem sticky bit, qualquer um poderia deletar arquivos de outros
+
+# Definir Sticky Bit:
+chmod +t diretorio/
+chmod 1777 diretorio/
+
+# Cenário prático: diretório compartilhado de upload
+mkdir /srv/uploads
+chmod 1777 /srv/uploads
+# Todos podem fazer upload, ninguém deleta arquivo dos outros</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Resumo das permissões especiais (octal):</strong>
+            <pre><code># Octal com 4 dígitos: [especial][user][group][others]
+4755  →  SUID + rwxr-xr-x      (s no user)
+2775  →  SGID + rwxrwxr-x      (s no group)
+1777  →  Sticky + rwxrwxrwx    (t no others)
+6755  →  SUID+SGID + rwxr-xr-x (s no user E group)
+
+# Letras maiúsculas indicam ERRO (bit especial sem x correspondente):
+# 'S' = SUID definido mas sem x no user (inútil)
+# 'S' = SGID definido mas sem x no group (inútil)
+# 'T' = Sticky definido mas sem x no others (inútil)</code></pre>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Navigation -->
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: CHMOD — ALTERAR PERMISSÕES -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">chmod</span>
+          <h2>chmod — Alterar Permissões</h2>
+          <p>O comando <code>chmod</code> (change mode) altera as permissões de arquivos e diretórios. Ele aceita duas notações: simbólica (mais legível) e octal (mais rápida). Dominar ambas é essencial.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Modo Simbólico — Legível e flexível</h3>
+          <p>A notação simbólica usa letras para especificar quem, qual operação e qual permissão:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sintaxe: chmod [quem][operação][permissão] arquivo</code><span class="cmd-tag">Simbólico</span></div>
+              <pre><code># QUEM:
+# u = user (dono)
+# g = group (grupo)
+# o = others (outros)
+# a = all (todos = u+g+o)
+
+# OPERAÇÃO:
+# + = adicionar permissão
+# - = remover permissão
+# = = definir exatamente (remove outras)
+
+# PERMISSÃO:
+# r = read    w = write    x = execute
+# s = SUID/SGID    t = sticky bit
+
+# ═══════════════════════════════════════════════════
+# EXEMPLOS PRÁTICOS:
+# ═══════════════════════════════════════════════════
+
+# Adicionar permissão de execução para o dono
+chmod u+x script.sh
+# Antes: -rw-r--r--  →  Depois: -rwxr--r--
+
+# Remover escrita do grupo e outros
+chmod go-w arquivo.txt
+# Antes: -rw-rw-rw-  →  Depois: -rw-r--r--
+
+# Definir permissão exata para outros (apenas leitura)
+chmod o=r arquivo.txt
+# Antes: -rwxrwxrwx  →  Depois: -rwxrwxr--
+
+# Adicionar leitura para todos
+chmod a+r documento.pdf
+# Antes: -rw-------  →  Depois: -rw-r--r--
+
+# Remover todas as permissões de outros
+chmod o= confidencial.txt
+# Antes: -rw-r--r--  →  Depois: -rw-r-----
+
+# Múltiplas operações separadas por vírgula
+chmod u+x,g+rx,o-rwx deploy.sh
+# Antes: -rw-r--r--  →  Depois: -rwxr-x---
+
+# Definir permissões exatas para todos os níveis
+chmod u=rwx,g=rx,o= app.sh
+# Resultado: -rwxr-x---
+
+# Adicionar SUID
+chmod u+s /usr/local/bin/programa
+# Resultado: -rwsr-xr-x
+
+# Adicionar SGID a diretório
+chmod g+s /var/www/projeto/
+# Resultado: drwxrwsr-x
+
+# Adicionar Sticky Bit
+chmod +t /srv/shared/
+# Resultado: drwxrwxrwt</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Modo Octal — Rápido e direto</h3>
+          <p>A notação octal define todas as permissões de uma vez com 3 ou 4 dígitos:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sintaxe: chmod [octal] arquivo</code><span class="cmd-tag">Octal</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# PERMISSÕES MAIS USADAS NO DIA A DIA:
+# ═══════════════════════════════════════════════════
+
+# 755 — Diretórios e scripts executáveis
+chmod 755 deploy.sh
+# -rwxr-xr-x  (dono: tudo, grupo/outros: ler+executar)
+
+# 644 — Arquivos regulares (configs, HTML, código)
+chmod 644 index.html
+# -rw-r--r--  (dono: ler+escrever, grupo/outros: ler)
+
+# 700 — Diretórios privados
+chmod 700 ~/.ssh
+# drwx------  (apenas o dono pode acessar)
+
+# 600 — Arquivos sensíveis (chaves, senhas)
+chmod 600 ~/.ssh/id_rsa
+chmod 600 .env
+# -rw-------  (apenas o dono pode ler e escrever)
+
+# 400 — Arquivos read-only sensíveis
+chmod 400 chave-aws.pem
+# -r--------  (apenas o dono pode ler, nem escrever)
+
+# 775 — Diretórios de grupo (equipe compartilha)
+chmod 775 /var/www/projeto
+# drwxrwxr-x  (dono+grupo: tudo, outros: ler+executar)
+
+# 664 — Arquivos compartilhados com grupo
+chmod 664 documento.txt
+# -rw-rw-r--  (dono+grupo: ler+escrever, outros: ler)
+
+# 750 — Diretório de aplicação (grupo pode ler)
+chmod 750 /opt/app
+# drwxr-x---  (dono: tudo, grupo: ler+exec, outros: nada)
+
+# 640 — Configs com dados sensíveis (grupo pode ler)
+chmod 640 /etc/app/database.yml
+# -rw-r-----  (dono: ler+escrever, grupo: ler, outros: nada)
+
+# Com permissões especiais (4 dígitos):
+chmod 4755 /usr/local/bin/app   # SUID
+chmod 2775 /var/www/projeto     # SGID
+chmod 1777 /tmp                 # Sticky</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>chmod -R — Recursivo</h3>
+          <p>A flag <code>-R</code> aplica permissões recursivamente a todos os arquivos e subdiretórios:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Aplicação recursiva — Cuidados</code><span class="cmd-tag">Recursivo</span></div>
+              <pre><code># Aplicar 755 a tudo recursivamente
+chmod -R 755 /var/www/site/
+# ⚠️ PROBLEMA: arquivos ficam com +x (executáveis) desnecessariamente!
+
+# SOLUÇÃO CORRETA: separar diretórios de arquivos com find
+# Diretórios: 755 (precisam de x para serem acessados)
+find /var/www/site -type d -exec chmod 755 {} \;
+
+# Arquivos: 644 (não precisam de x, apenas ler)
+find /var/www/site -type f -exec chmod 644 {} \;
+
+# Scripts: apenas os .sh ganham execução
+find /var/www/site -type f -name "*.sh" -exec chmod 755 {} \;
+
+# Alternativa mais rápida com find + xargs:
+find /var/www/site -type d | xargs chmod 755
+find /var/www/site -type f | xargs chmod 644
+
+# chmod -R com simbólico (mais seguro):
+# Adicionar execução em diretórios sem afetar arquivos
+chmod -R a+X /var/www/site/
+# X (maiúsculo) = adiciona x APENAS em diretórios e arquivos que JÁ têm x</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Regra de ouro:</strong> Nunca use <code>chmod -R 777</code> em produção. Isso é a primeira coisa que um invasor procura. Se algo "não funciona" e a solução sugerida na internet é <code>chmod 777</code>, o problema real está em outro lugar (ownership ou configuração de serviço).
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Cenários Práticos de Permissões</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Deploy de Aplicação Web</code><span class="cmd-tag">Web</span></div>
+              <pre><code># Estrutura de um site/app:
+/var/www/meusite/
+├── index.html      # 644
+├── style.css       # 644
+├── app.js          # 644
+├── uploads/        # 775 (grupo www-data)
+├── logs/           # 775
+└── deploy.sh       # 750
+
+# Configuração completa:
+chown -R deploy:www-data /var/www/meusite
+find /var/www/meusite -type d -exec chmod 755 {} \;
+find /var/www/meusite -type f -exec chmod 644 {} \;
+chmod 775 /var/www/meusite/uploads
+chmod 750 /var/www/meusite/deploy.sh</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Proteção de Chaves SSH</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># SSH é MUITO exigente com permissões
+# Se estiverem erradas, a conexão falha!
+
+# Diretório .ssh:
+chmod 700 ~/.ssh
+
+# Chave privada (DEVE ser 600 ou 400):
+chmod 600 ~/.ssh/id_rsa
+chmod 600 ~/.ssh/id_ed25519
+
+# Chave pública:
+chmod 644 ~/.ssh/id_rsa.pub
+
+# Arquivo authorized_keys:
+chmod 600 ~/.ssh/authorized_keys
+
+# Arquivo config:
+chmod 600 ~/.ssh/config
+
+# Chaves AWS (.pem):
+chmod 400 ~/chaves/minha-ec2.pem</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Scripts de Automação</code><span class="cmd-tag">DevOps</span></div>
+              <pre><code># Scripts que apenas o dono pode executar:
+chmod 700 backup.sh
+chmod 700 restore-db.sh
+
+# Scripts que a equipe pode executar:
+chmod 750 deploy.sh
+chmod 750 restart-service.sh
+
+# Cron jobs (apenas dono):
+chmod 600 /etc/cron.d/meu-job
+
+# Configs de app (grupo ops pode ler):
+chmod 640 /etc/app/production.yml
+chmod 640 /etc/app/.env</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Diretório de Projeto (Equipe)</code><span class="cmd-tag">Team</span></div>
+              <pre><code># Cenário: time de devs trabalha junto
+# Grupo "devteam" compartilha o projeto
+
+# Criar diretório com SGID (herdar grupo):
+mkdir /srv/projeto
+chown root:devteam /srv/projeto
+chmod 2775 /srv/projeto
+
+# SGID garante que novos arquivos criados
+# por qualquer dev terão grupo "devteam"
+# Sem SGID, cada arquivo teria o grupo
+# primário de quem criou.
+
+# Resultado:
+su joao
+touch /srv/projeto/feature.py
+ls -l /srv/projeto/feature.py
+# -rw-rw-r-- 1 joao devteam ... feature.py
+#                    ^^^^^^^ herdou!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Tabela de Permissões Mais Comuns</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Octal</th><th>Simbólica</th><th>Uso</th><th>Exemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>777</code></td><td><code>rwxrwxrwx</code></td><td>⚠️ Tudo para todos (EVITE)</td><td>Nunca em produção</td></tr>
+              <tr><td><code>755</code></td><td><code>rwxr-xr-x</code></td><td>Diretórios públicos, scripts</td><td>/var/www, deploy.sh</td></tr>
+              <tr><td><code>750</code></td><td><code>rwxr-x---</code></td><td>Diretórios de app (grupo lê)</td><td>/opt/app</td></tr>
+              <tr><td><code>700</code></td><td><code>rwx------</code></td><td>Diretórios privados</td><td>~/.ssh, ~/scripts</td></tr>
+              <tr><td><code>664</code></td><td><code>rw-rw-r--</code></td><td>Arquivos colaborativos</td><td>Código compartilhado</td></tr>
+              <tr><td><code>644</code></td><td><code>rw-r--r--</code></td><td>Arquivos regulares</td><td>index.html, config</td></tr>
+              <tr><td><code>640</code></td><td><code>rw-r-----</code></td><td>Configs sensíveis (grupo lê)</td><td>database.yml</td></tr>
+              <tr><td><code>600</code></td><td><code>rw-------</code></td><td>Arquivos sensíveis privados</td><td>.env, id_rsa, authorized_keys</td></tr>
+              <tr><td><code>400</code></td><td><code>r--------</code></td><td>Somente leitura pelo dono</td><td>Chaves .pem (AWS)</td></tr>
+              <tr><td><code>2775</code></td><td><code>rwxrwsr-x</code></td><td>Diretório de equipe (SGID)</td><td>/srv/projeto</td></tr>
+              <tr><td><code>1777</code></td><td><code>rwxrwxrwt</code></td><td>Compartilhado (Sticky)</td><td>/tmp, /srv/uploads</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: CHOWN E CHGRP -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Ownership</span>
+          <h2>chown e chgrp — Alterar Dono e Grupo</h2>
+          <p>Permissões definem o que pode ser feito; ownership define quem é afetado por cada nível de permissão. Alterar o dono e grupo de arquivos é essencial em deploys, configuração de serviços e compartilhamento entre equipes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>chown — Alterar dono e/ou grupo</h3>
+          <p><code>chown</code> (change owner) modifica o proprietário e opcionalmente o grupo de um arquivo ou diretório. <strong>Requer root/sudo.</strong></p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sintaxe: chown [opções] [dono][:grupo] arquivo(s)</code><span class="cmd-tag">Proprietário</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# FORMAS DE USO DO CHOWN:
+# ═══════════════════════════════════════════════════
+
+# Mudar apenas o dono:
+sudo chown joao arquivo.txt
+# Antes: -rw-r--r-- 1 root root  →  Depois: -rw-r--r-- 1 joao root
+
+# Mudar dono E grupo (separador ':' ou '.'):
+sudo chown joao:devops arquivo.txt
+# Antes: -rw-r--r-- 1 root root  →  Depois: -rw-r--r-- 1 joao devops
+
+sudo chown joao.devops arquivo.txt   # mesmo efeito com '.'
+
+# Mudar apenas o grupo (: antes do grupo, sem user):
+sudo chown :www-data arquivo.txt
+# Antes: -rw-r--r-- 1 joao root  →  Depois: -rw-r--r-- 1 joao www-data
+
+# Mudar dono e definir grupo como grupo primário do novo dono:
+sudo chown joao: arquivo.txt
+# Se grupo primário de joao é "joao":
+# Antes: -rw-r--r-- 1 root root  →  Depois: -rw-r--r-- 1 joao joao</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>chown -R — Recursivo para diretórios</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Aplicação recursiva em diretórios inteiros</code><span class="cmd-tag">Recursivo</span></div>
+              <pre><code># Mudar dono de todo o diretório e seu conteúdo:
+sudo chown -R www-data:www-data /var/www/site/
+
+# Verbose (-v): mostra cada arquivo alterado
+sudo chown -Rv deploy:devops /opt/app/
+# changed '/opt/app/' from root:root to deploy:devops
+# changed '/opt/app/main.py' from root:root to deploy:devops
+# changed '/opt/app/config.yml' from root:root to deploy:devops
+
+# Preservar grupo dos subdiretórios existentes, mudar só dono:
+sudo chown -R deploy /opt/app/
+# Apenas o user muda, group fica como estava
+
+# --reference: copiar ownership de outro arquivo
+sudo chown --reference=/var/www/site/index.html novo-arquivo.html
+# novo-arquivo.html terá o mesmo dono e grupo de index.html
+
+# Combinação com find para ser seletivo:
+# Mudar dono apenas dos diretórios:
+find /var/www -type d -exec sudo chown root:www-data {} \;
+
+# Mudar dono apenas dos arquivos .py:
+find /opt/app -name "*.py" -exec sudo chown deploy:devops {} \;</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>chgrp — Alterar apenas o grupo</h3>
+          <p><code>chgrp</code> (change group) é um atalho para mudar apenas o grupo, sem alterar o dono:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sintaxe: chgrp [opções] grupo arquivo(s)</code><span class="cmd-tag">Grupo</span></div>
+              <pre><code># Mudar grupo de um arquivo:
+sudo chgrp devops deploy.sh
+# Antes: -rwxr-x--- 1 deploy root  →  Depois: -rwxr-x--- 1 deploy devops
+
+# Mudar grupo recursivamente:
+sudo chgrp -R www-data /var/www/uploads/
+
+# Verbose:
+sudo chgrp -Rv devops /srv/projeto/
+# changed group of '/srv/projeto/' from root to devops
+# changed group of '/srv/projeto/app.py' from root to devops
+
+# Usando referência:
+sudo chgrp --reference=/var/www/site /var/www/novo-site
+
+# Nota: chgrp é equivalente a "chown :grupo arquivo"
+# Mas chgrp pode ser usado sem sudo se o usuário
+# pertence ao grupo de destino (depende da distro).</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Cenários Práticos de Ownership</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Deploy de Aplicação</code><span class="cmd-tag">Deploy</span></div>
+              <pre><code># Cenário: App Node.js com Nginx como proxy
+# Usuário deploy faz o deploy
+# Nginx roda como www-data
+# Equipe devops precisa acessar
+
+# Estrutura:
+/opt/app/              → deploy:devops (750)
+/opt/app/node_modules/ → deploy:devops (750)
+/opt/app/public/       → deploy:www-data (755)
+/opt/app/logs/         → deploy:devops (775)
+/opt/app/.env          → deploy:deploy (600)
+
+# Comandos:
+sudo chown -R deploy:devops /opt/app
+sudo chown -R deploy:www-data /opt/app/public
+chmod 600 /opt/app/.env
+chmod 775 /opt/app/logs</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Ownership de Logs</code><span class="cmd-tag">Logs</span></div>
+              <pre><code># Cenário: Aplicação gera logs que
+# devem ser legíveis pelo time de ops
+
+# App roda como user "app":
+/var/log/myapp/
+├── app.log        → app:ops (640)
+├── error.log      → app:ops (640)
+├── access.log     → app:ops (640)
+└── debug.log      → app:app (600)
+
+# Setup:
+sudo mkdir -p /var/log/myapp
+sudo chown app:ops /var/log/myapp
+sudo chmod 750 /var/log/myapp
+
+# Logrotate mantém ownership:
+# /etc/logrotate.d/myapp
+# create 640 app ops</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Projeto Compartilhado (Equipe)</code><span class="cmd-tag">Team</span></div>
+              <pre><code># Cenário: Equipe de devs colabora no
+# mesmo repositório no servidor
+
+# Criar grupo e adicionar membros:
+sudo groupadd devteam
+sudo usermod -aG devteam joao
+sudo usermod -aG devteam maria
+sudo usermod -aG devteam pedro
+
+# Setup do diretório com SGID:
+sudo mkdir /srv/projeto
+sudo chown root:devteam /srv/projeto
+sudo chmod 2775 /srv/projeto
+
+# Todos criam arquivos com grupo devteam:
+# Qualquer membro pode editar arquivos
+# dos outros membros da equipe.</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Serviço Systemd</code><span class="cmd-tag">Systemd</span></div>
+              <pre><code># Cenário: App que roda como serviço
+# com usuário de sistema dedicado
+
+# Criar usuário de sistema (sem home, sem shell):
+sudo useradd --system --no-create-home \
+  --shell /usr/sbin/nologin myapp
+
+# Setup de diretórios:
+sudo mkdir -p /opt/myapp /var/log/myapp
+sudo chown -R myapp:myapp /opt/myapp
+sudo chown -R myapp:myapp /var/log/myapp
+
+# Config sensível (apenas root pode editar):
+sudo chown root:myapp /etc/myapp/config.yml
+sudo chmod 640 /etc/myapp/config.yml
+# root edita, app apenas lê (grupo myapp: r--)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Dica de segurança:</strong> O princípio do <strong>menor privilégio</strong> se aplica a ownership. Cada serviço deve rodar com seu próprio usuário dedicado, com acesso apenas ao que precisa. Nunca rode aplicações como root — se a aplicação for comprometida, o invasor terá acesso total ao sistema.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: USUÁRIOS E GRUPOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Usuários</span>
+          <h2>Usuários e Grupos</h2>
+          <p>Linux é um sistema multiusuário desde sua concepção. Gerenciar usuários e grupos é fundamental para segurança, controle de acesso e administração de servidores. Cada processo roda como um usuário, cada arquivo pertence a um dono e grupo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Arquivos fundamentais — /etc/passwd, /etc/shadow, /etc/group</h3>
+          <p>Toda informação sobre usuários e grupos é armazenada em três arquivos de texto plano:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>/etc/passwd — Informações dos usuários</code><span class="cmd-tag">Público</span></div>
+              <pre><code># Formato: usuario:x:UID:GID:comentário:home:shell
+# O 'x' indica que a senha está em /etc/shadow
+
+$ cat /etc/passwd | grep -v "nologin" | head -10
+root:x:0:0:root:/root:/bin/bash
+joao:x:1000:1000:João Silva:/home/joao:/bin/bash
+maria:x:1001:1001:Maria Santos:/home/maria:/bin/zsh
+deploy:x:1002:1002:Deploy User:/home/deploy:/bin/bash
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+
+# Campos:
+# 1. Username (login)
+# 2. 'x' = senha em /etc/shadow (historicamente ficava aqui)
+# 3. UID (User ID) — root=0, sistema=1-999, humanos≥1000
+# 4. GID (Group ID primário)
+# 5. GECOS (nome completo, info de contato)
+# 6. Home directory
+# 7. Shell de login (/usr/sbin/nologin = não pode logar)
+
+# Consultar seu próprio registro:
+getent passwd $USER
+# joao:x:1000:1000:João Silva:/home/joao:/bin/bash</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>/etc/shadow — Senhas (criptografadas)</code><span class="cmd-tag">Restrito</span></div>
+              <pre><code># Apenas root pode ler! (chmod 640, owner root:shadow)
+# Formato: usuario:hash:lastchg:min:max:warn:inactive:expire:reserved
+
+$ sudo cat /etc/shadow | head -5
+root:$6$xyz...abc:19500:0:99999:7:::
+joao:$6$abc...xyz:19520:0:90:7:30::
+maria:$y$j9T$def...ghi:19525:0:90:7:30::
+deploy:!:19500:::::
+www-data:*:19000:::::
+
+# Campos:
+# 1. Username
+# 2. Hash da senha ($6$=SHA-512, $y$=yescrypt, !=bloqueado, *=sem senha)
+# 3. Dias desde 01/01/1970 até última mudança de senha
+# 4. Mínimo de dias entre mudanças de senha
+# 5. Máximo de dias que a senha é válida
+# 6. Dias de aviso antes da expiração
+# 7. Dias após expiração até conta ser desabilitada
+# 8. Data de expiração da conta
+# 9. Reservado
+
+# Verificar política de senha:
+sudo chage -l joao
+# Last password change                : Jan 15, 2024
+# Password expires                    : Apr 15, 2024
+# Account expires                     : never</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>/etc/group — Definição de grupos</code><span class="cmd-tag">Grupos</span></div>
+              <pre><code># Formato: grupo:x:GID:membros
+
+$ cat /etc/group | grep -E "^(root|sudo|devops|docker)"
+root:x:0:
+sudo:x:27:joao,maria
+devops:x:1010:joao,maria,pedro
+docker:x:998:joao,deploy
+www-data:x:33:
+
+# Campos:
+# 1. Nome do grupo
+# 2. 'x' = senha de grupo (raramente usado, em /etc/gshadow)
+# 3. GID (Group ID)
+# 4. Lista de membros ADICIONAIS (separados por vírgula)
+#    Nota: o grupo primário do usuário (definido em /etc/passwd)
+#    não aparece listado aqui!
+
+# Listar todos os grupos de um usuário:
+groups joao
+# joao : joao sudo devops docker
+
+# Ou com mais detalhes:
+id joao
+# uid=1000(joao) gid=1000(joao) groups=1000(joao),27(sudo),1010(devops),998(docker)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>useradd vs adduser — Criar usuários</h3>
+          <p>Existem dois comandos para criar usuários — um é low-level, outro é amigável:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>useradd — Low-level (todas distros)</code><span class="cmd-tag">Manual</span></div>
+              <pre><code># useradd é o comando base — presente em TODAS
+# as distribuições Linux. Mais controle, menos
+# automação (não cria home por padrão em algumas).
+
+# Criar usuário com home e shell:
+sudo useradd -m -s /bin/bash joao
+# -m = criar /home/joao
+# -s = definir shell
+
+# Criar com opções completas:
+sudo useradd -m -s /bin/bash \
+  -c "João Silva" \
+  -G sudo,devops,docker \
+  -e 2025-12-31 \
+  joao
+
+# -c = comentário (nome completo)
+# -G = grupos secundários (lista)
+# -e = data de expiração da conta
+
+# Criar usuário de sistema (sem home, sem login):
+sudo useradd --system --no-create-home \
+  --shell /usr/sbin/nologin \
+  --home-dir /opt/myapp \
+  myapp
+
+# Definir senha após criar:
+sudo passwd joao
+# New password: ****
+# Retype new password: ****</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>adduser — High-level (Debian/Ubuntu)</code><span class="cmd-tag">Interativo</span></div>
+              <pre><code># adduser é um wrapper amigável do useradd
+# Disponível em Debian, Ubuntu e derivados
+# Faz tudo automaticamente (home, grupo, senha)
+
+# Criar usuário interativamente:
+sudo adduser maria
+# Adding user 'maria' ...
+# Adding new group 'maria' (1001) ...
+# Adding new user 'maria' (1001) ...
+# Creating home directory '/home/maria' ...
+# Copying files from '/etc/skel' ...
+# New password: ****
+# Retype new password: ****
+# Full Name []: Maria Santos
+# Room Number []:
+# Work Phone []:
+# Home Phone []:
+# Other []:
+# Is the information correct? [Y/n] Y
+
+# Diferenças chave:
+# ┌──────────────┬──────────────────────┐
+# │   useradd    │      adduser         │
+# ├──────────────┼──────────────────────┤
+# │ Low-level    │ High-level (wrapper) │
+# │ Todas distros│ Debian/Ubuntu        │
+# │ Não interativo│ Interativo          │
+# │ Não cria home│ Cria home + copia    │
+# │  (sem -m)    │  /etc/skel           │
+# │ Não pede     │ Pede senha           │
+# │  senha       │  automaticamente     │
+# └──────────────┴──────────────────────┘</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>usermod — Modificar usuário existente</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>usermod — Modificações comuns</code><span class="cmd-tag">Modificar</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# MODIFICAR USUÁRIO EXISTENTE:
+# ═══════════════════════════════════════════════════
+
+# Adicionar a grupos secundários (MANTER os existentes com -a):
+sudo usermod -aG docker joao
+sudo usermod -aG sudo,devops joao
+# ⚠️ SEMPRE use -aG (append). Sem -a, SUBSTITUI todos os grupos!
+
+# Mudar shell:
+sudo usermod -s /usr/bin/zsh joao
+
+# Mudar home directory:
+sudo usermod -d /home/joao-novo -m joao
+# -m = move conteúdo da home antiga para a nova
+
+# Mudar username:
+sudo usermod -l joao-novo joao
+# Login muda, mas home e UID ficam os mesmos
+
+# Mudar UID:
+sudo usermod -u 2000 joao
+
+# Bloquear conta (desabilitar login):
+sudo usermod -L joao          # Lock (adiciona ! na senha)
+sudo usermod -U joao          # Unlock (remove !)
+
+# Definir data de expiração:
+sudo usermod -e 2025-06-30 temporario
+
+# Mudar grupo primário:
+sudo usermod -g devops joao
+
+# Ver resultado:
+id joao
+# uid=1000(joao) gid=1010(devops) groups=1010(devops),27(sudo),998(docker)</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ ERRO CLÁSSICO: usermod -G sem -a</strong>
+            <pre><code># ERRADO — Remove joao de TODOS os grupos e coloca apenas em docker:
+sudo usermod -G docker joao
+# joao perdeu sudo, devops, e todos os outros grupos!
+
+# CORRETO — Adiciona docker mantendo os grupos existentes:
+sudo usermod -aG docker joao
+# joao agora tem docker + todos os grupos anteriores
+
+# Se cometeu o erro, adicione os grupos de volta:
+sudo usermod -aG sudo,devops,docker joao</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>userdel — Remover usuário</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Remoção de usuários — Cuidados</code><span class="cmd-tag">Remover</span></div>
+              <pre><code># Remover usuário (mantém home e arquivos):
+sudo userdel joao
+
+# Remover usuário E deletar home directory:
+sudo userdel -r joao
+# ⚠️ IRREVERSÍVEL! Deleta /home/joao e mail spool
+
+# Remover mesmo se o usuário está logado:
+sudo userdel -f joao    # Force (perigoso)
+
+# Antes de remover, verifique processos ativos:
+ps -u joao
+# Se houver processos, mate-os primeiro:
+sudo pkill -u joao
+
+# Boa prática: bloquear antes de remover
+sudo usermod -L joao        # 1. Bloqueia login
+sudo pkill -u joao          # 2. Mata processos
+sudo userdel -r joao        # 3. Remove
+
+# Equivalente amigável (Debian/Ubuntu):
+sudo deluser --remove-home joao</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Gerenciamento de Grupos</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>groupadd — Criar grupos</code><span class="cmd-tag">Criar</span></div>
+              <pre><code># Criar grupo simples:
+sudo groupadd devops
+sudo groupadd frontend
+sudo groupadd backend
+sudo groupadd dba
+
+# Criar com GID específico:
+sudo groupadd -g 2000 deploy
+
+# Criar grupo de sistema (GID < 1000):
+sudo groupadd --system monitoring
+
+# Verificar criação:
+getent group devops
+# devops:x:1010:</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>groupmod / groupdel</code><span class="cmd-tag">Modificar</span></div>
+              <pre><code># Renomear grupo:
+sudo groupmod -n operations devops
+# devops agora se chama operations
+
+# Mudar GID:
+sudo groupmod -g 2010 operations
+
+# Deletar grupo:
+sudo groupdel frontend
+# ⚠️ Falha se é grupo primário de algum usuário
+# Precisa mudar grupo primário dos membros antes
+
+# Listar membros de um grupo:
+getent group devops
+# devops:x:1010:joao,maria,pedro
+
+# Ou usando:
+grep "^devops:" /etc/group</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Comandos de consulta: id, whoami, groups</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Informações do usuário atual e outros</code><span class="cmd-tag">Consulta</span></div>
+              <pre><code># Quem sou eu?
+$ whoami
+joao
+
+# Meu UID e GID:
+$ id
+uid=1000(joao) gid=1000(joao) groups=1000(joao),27(sudo),998(docker),1010(devops)
+
+# Apenas UID:
+$ id -u
+1000
+
+# Apenas nome do user:
+$ id -un
+joao
+
+# Apenas grupos:
+$ id -G        # GIDs numéricos
+1000 27 998 1010
+
+$ id -Gn       # Nomes dos grupos
+joao sudo docker devops
+
+# Info de outro usuário:
+$ id maria
+uid=1001(maria) gid=1001(maria) groups=1001(maria),27(sudo),1010(devops)
+
+# Grupos de um usuário:
+$ groups
+joao sudo docker devops
+
+$ groups maria
+maria : maria sudo devops
+
+# Quem está logado no sistema:
+$ who
+joao     pts/0        2024-01-15 10:30 (192.168.1.100)
+maria    pts/1        2024-01-15 11:00 (192.168.1.101)
+
+$ w      # mais detalhes (uptime, load, o que cada um está fazendo)
+ 10:45:23 up 45 days,  3:20,  2 users,  load average: 0.08, 0.12, 0.09
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+joao     pts/0    192.168.1.100    10:30    2.00s  0.05s  0.00s w
+maria    pts/1    192.168.1.101    11:00    5:00   0.03s  0.01s vim main.py</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>su e sudo — Elevação de privilégios</h3>
+          <p>Existem duas formas de executar comandos como outro usuário:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>su — Switch User (mudar de usuário)</code><span class="cmd-tag">su</span></div>
+              <pre><code># Mudar para root (pede senha do ROOT):
+su -
+# Password: [senha do root]
+# Agora é root! (#)
+
+# Mudar para outro usuário:
+su - maria
+# Password: [senha da maria]
+
+# O '-' carrega o ambiente completo do usuário:
+su - joao    # login shell (carrega .bashrc, PATH, etc)
+su joao      # sem '-' = shell simples (herda ambiente atual)
+
+# Executar um comando como outro usuário:
+su - deploy -c "cd /opt/app && ./restart.sh"
+
+# Problemas com su:
+# 1. Precisa compartilhar senha do root/usuário
+# 2. Não há log de quem fez o quê
+# 3. Acesso "tudo ou nada"
+# 4. Difícil auditar</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>sudo — Superuser Do (recomendado)</code><span class="cmd-tag">sudo</span></div>
+              <pre><code># Executar comando como root (pede SUA senha):
+sudo apt update
+# [sudo] password for joao: [sua senha]
+
+# Abrir shell root:
+sudo -i     # login shell como root
+sudo -s     # shell simples como root
+
+# Executar como outro usuário:
+sudo -u deploy ./restart.sh
+sudo -u www-data touch /var/www/test.html
+
+# Vantagens do sudo sobre su:
+# 1. Usa SUA senha (não compartilha root)
+# 2. Tudo é logado em /var/log/auth.log
+# 3. Permissões granulares (sudoers)
+# 4. Pode dar acesso a comandos específicos
+# 5. Timeout (não fica como root para sempre)
+
+# Editar sudoers (SEMPRE usar visudo!):
+sudo visudo
+# Nunca edite /etc/sudoers diretamente!
+# visudo valida a sintaxe antes de salvar.</code></pre>
+            </div>
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>/etc/sudoers — Configuração do sudo</code><span class="cmd-tag">Sudoers</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# FORMATO: quem  onde=(como_quem)  o_que
+# ═══════════════════════════════════════════════════
+
+# Acesso total (padrão para grupo sudo/wheel):
+%sudo   ALL=(ALL:ALL) ALL
+# %sudo = membros do grupo sudo
+# ALL=(ALL:ALL) = de qualquer host, como qualquer user:grupo
+# ALL = qualquer comando
+
+# Usuário específico com acesso total:
+joao    ALL=(ALL:ALL) ALL
+
+# Sem pedir senha:
+deploy  ALL=(ALL) NOPASSWD: ALL
+
+# Comandos específicos sem senha:
+joao    ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx
+joao    ALL=(ALL) NOPASSWD: /usr/bin/docker *
+
+# Múltiplos comandos:
+maria   ALL=(ALL) NOPASSWD: /usr/bin/apt update, /usr/bin/apt upgrade
+
+# Grupo com acesso limitado:
+%devops ALL=(ALL) /usr/bin/systemctl, /usr/bin/journalctl, /usr/bin/docker
+
+# ═══════════════════════════════════════════════════
+# BOAS PRÁTICAS:
+# ═══════════════════════════════════════════════════
+
+# 1. Use diretório /etc/sudoers.d/ (modular):
+sudo visudo -f /etc/sudoers.d/devops
+# Conteúdo: %devops ALL=(ALL) NOPASSWD: /usr/bin/docker *
+
+# 2. Testar se funciona:
+sudo -l      # lista o que você pode fazer com sudo
+# User joao may run the following commands:
+#     (ALL : ALL) ALL
+
+# 3. Ver log de uso do sudo:
+sudo grep "sudo" /var/log/auth.log | tail -20</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: GERENCIAMENTO DE PROCESSOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Processos</span>
+          <h2>Gerenciamento de Processos</h2>
+          <p>Tudo que roda no Linux é um processo — desde o kernel até seu editor de texto. Entender como visualizar, controlar e terminar processos é essencial para administrar servidores, debugar problemas de performance e gerenciar aplicações em produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que é um Processo?</h3>
+          <p>Um processo é uma instância de um programa em execução. Cada processo tem:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>PID — Process ID</code><span class="cmd-tag">Identidade</span></div>
+              <p>Número único que identifica o processo. O primeiro processo (init/systemd) tem PID 1. Todo novo processo recebe um PID sequencial.</p>
+              <pre><code># Ver PID do shell atual:
+echo $$
+# 12345
+
+# PID do último processo em background:
+echo $!
+# 12400</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>PPID — Parent Process ID</code><span class="cmd-tag">Pai</span></div>
+              <p>PID do processo que criou este processo (processo pai). Forma uma árvore de processos com PID 1 na raiz.</p>
+              <pre><code># Ver árvore de processos:
+pstree -p
+# systemd(1)─┬─sshd(850)───sshd(12300)───bash(12345)
+#             ├─nginx(900)─┬─nginx(901)
+#             │            └─nginx(902)
+#             └─postgres(950)───postgres(951)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Estados de um Processo</code><span class="cmd-tag">Estado</span></div>
+              <p>Cada processo está em um estado que define seu comportamento atual:</p>
+              <pre><code># Estados possíveis (coluna STAT no ps):
+R = Running    (executando ou pronto)
+S = Sleeping   (aguardando evento/I/O)
+D = Disk sleep (I/O ininterruptível)
+T = Stopped    (parado, Ctrl+Z)
+Z = Zombie     (finalizado, pai não leu)
+I = Idle       (kernel thread idle)
+
+# Modificadores:
+< = alta prioridade (nice negativo)
+N = baixa prioridade (nice positivo)
+s = líder de sessão
+l = multi-threaded
++ = foreground process group</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Informações do Processo</code><span class="cmd-tag">Metadados</span></div>
+              <p>Cada processo carrega informações completas sobre seu contexto de execução:</p>
+              <pre><code># Informações via /proc/[PID]:
+ls /proc/12345/
+# cmdline  → comando que iniciou
+# status   → estado detalhado
+# fd/      → file descriptors abertos
+# environ  → variáveis de ambiente
+# cwd      → diretório de trabalho
+
+# Ver comando de um processo:
+cat /proc/12345/cmdline | tr '\0' ' '
+# /usr/bin/python3 app.py --port 8080
+
+# Ver uso de memória:
+cat /proc/12345/status | grep VmRSS
+# VmRSS: 45000 kB</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>ps — Process Status (visualizar processos)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ps aux — O mais usado (estilo BSD)</code><span class="cmd-tag">BSD</span></div>
+              <pre><code># Listar TODOS os processos do sistema:
+$ ps aux
+USER       PID %CPU %MEM    VSZ   RSS TTY   STAT START   TIME COMMAND
+root         1  0.0  0.1 168940 11204 ?     Ss   Jan10   0:15 /sbin/init
+root       850  0.0  0.0  15432  5200 ?     Ss   Jan10   0:00 sshd: /usr/sbin/sshd
+www-data   901  0.0  0.3 142280 25600 ?     S    Jan10   2:30 nginx: worker process
+postgres   950  0.0  0.5 215000 45000 ?     Ss   Jan10   0:45 postgres: main
+joao     12345  0.0  0.0   8960  5200 pts/0 Ss   10:30   0:00 -bash
+joao     12400  2.5  1.2 850000 98000 pts/0 Sl+  10:35   0:12 node app.js
+
+# Campos:
+# USER    = dono do processo
+# PID     = Process ID
+# %CPU    = uso de CPU (instantâneo)
+# %MEM    = uso de memória (% da RAM total)
+# VSZ     = memória virtual alocada (KB)
+# RSS     = memória física real usada (KB)
+# TTY     = terminal associado (? = sem terminal/daemon)
+# STAT    = estado do processo
+# START   = quando iniciou
+# TIME    = tempo total de CPU consumido
+# COMMAND = comando que iniciou o processo
+
+# Filtrar processos específicos:
+ps aux | grep nginx
+ps aux | grep -v grep | grep nginx   # remove o próprio grep da saída
+
+# Ordenar por uso de memória (top consumers):
+ps aux --sort=-%mem | head -10
+
+# Ordenar por uso de CPU:
+ps aux --sort=-%cpu | head -10</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>ps -ef — Estilo System V (mostra PPID)</code><span class="cmd-tag">SysV</span></div>
+              <pre><code># Formato System V — mostra hierarquia (PPID):
+$ ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 Jan10 ?        00:00:15 /sbin/init
+root       850     1  0 Jan10 ?        00:00:00 sshd: /usr/sbin/sshd
+root     12300   850  0 10:30 ?        00:00:00 sshd: joao [priv]
+joao     12345 12300  0 10:30 pts/0    00:00:00 -bash
+joao     12400 12345  2 10:35 pts/0    00:00:12 node app.js
+
+# PPID mostra quem criou quem:
+# init(1) → sshd(850) → sshd(12300) → bash(12345) → node(12400)
+
+# Filtrar por usuário:
+ps -ef -u joao
+ps -ef -u www-data,postgres
+
+# Ver árvore hierárquica:
+ps -ef --forest
+# root       850     1  0 Jan10 ?   00:00:00 sshd
+# root     12300   850  0 10:30 ?   00:00:00  \_ sshd: joao
+# joao     12345 12300  0 10:30 pts/0 00:00:00      \_ -bash
+# joao     12400 12345  2 10:35 pts/0 00:00:12          \_ node app.js</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>ps -o — Formato personalizado</code><span class="cmd-tag">Custom</span></div>
+              <pre><code># Definir exatamente quais colunas mostrar:
+ps -eo pid,ppid,user,%cpu,%mem,stat,cmd --sort=-%cpu | head -15
+#   PID  PPID USER     %CPU %MEM STAT CMD
+# 12400 12345 joao      2.5  1.2 Sl+  node app.js
+#   950     1 postgres  0.5  0.5 Ss   postgres: main
+#   901   900 www-data  0.3  0.3 S    nginx: worker
+
+# Processos com mais threads:
+ps -eo pid,user,nlwp,cmd --sort=-nlwp | head -10
+# nlwp = Number of Light Weight Processes (threads)
+
+# Processos de um serviço específico:
+ps -C nginx -o pid,ppid,user,%cpu,%mem,stat,cmd
+#   PID  PPID USER     %CPU %MEM STAT CMD
+#   900     1 root      0.0  0.1 Ss   nginx: master process
+#   901   900 www-data  0.3  0.3 S    nginx: worker process
+#   902   900 www-data  0.2  0.3 S    nginx: worker process
+
+# Ver processos com porta de rede:
+ps -eo pid,user,cmd | grep -E "node|nginx|postgres"
+
+# Campos disponíveis (ver todos: ps L):
+# pid, ppid, pgid, sid, tty, user, group
+# %cpu, %mem, vsz, rss, stat, ni (nice)
+# etime (elapsed time), cputime, cmd, args</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>top e htop — Monitoramento interativo em tempo real</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>top — Nativo em todo Linux</code><span class="cmd-tag">Nativo</span></div>
+              <pre><code># Executar top:
+top
+
+# Cabeçalho mostra:
+# uptime, load average
+# tasks: total, running, sleeping, stopped, zombie
+# CPU: us(user), sy(system), id(idle), wa(IO wait)
+# Mem: total, free, used, buff/cache
+# Swap: total, free, used
+
+# Atalhos interativos dentro do top:
+# q     = sair
+# M     = ordenar por memória
+# P     = ordenar por CPU
+# T     = ordenar por tempo de CPU
+# k     = kill processo (pede PID)
+# r     = renice processo
+# u     = filtrar por usuário
+# 1     = mostrar cada CPU individual
+# c     = mostrar caminho completo do comando
+# V     = mostrar em árvore (forest)
+# H     = mostrar threads
+
+# Executar top não-interativo (para scripts):
+top -bn1 | head -20
+# -b = batch mode (saída para pipe)
+# -n1 = uma iteração apenas</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>htop — Top melhorado (instalar)</code><span class="cmd-tag">Visual</span></div>
+              <pre><code># Instalar htop:
+sudo apt install htop    # Debian/Ubuntu
+sudo dnf install htop    # RHEL/Fedora
+
+# Executar:
+htop
+
+# Vantagens sobre top:
+# ✅ Interface colorida com barras de uso
+# ✅ Scroll vertical e horizontal
+# ✅ Árvore de processos visual
+# ✅ Mouse funciona (clicar para selecionar)
+# ✅ Busca incremental (F3 ou /)
+# ✅ Filtro por usuário (F5)
+# ✅ Kill com F9 (menu de sinais)
+# ✅ Configurável (F2)
+# ✅ Mostra CPUs individuais em barras
+
+# Atalhos úteis no htop:
+# F2 = Setup (configurar colunas, cores)
+# F3 = Search (buscar processo)
+# F4 = Filter (filtrar lista)
+# F5 = Tree (modo árvore)
+# F6 = Sort (escolher coluna de ordenação)
+# F9 = Kill (enviar sinal ao processo)
+# F10 = Quit
+# u  = filtrar por usuário
+# t  = toggle tree/list</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Alternativas modernas ao top:</strong>
+            <pre><code># btop++ (mais bonito, mais info):
+sudo apt install btop
+
+# glances (Python, web interface):
+pip install glances
+glances              # terminal
+glances -w           # web server em :61208
+
+# Monitoramento rápido de recursos:
+vmstat 1 5           # memória e CPU a cada 1s por 5 iterações
+iostat 1 5           # I/O de disco
+free -h              # memória total/usada/livre
+uptime               # load average</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>kill, killall, pkill — Enviar sinais a processos</h3>
+          <p>No Linux, processos são controlados através de <strong>sinais</strong>. O mais comum é pedir que um processo termine, mas existem muitos sinais com diferentes significados:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sinais mais importantes</code><span class="cmd-tag">Sinais</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# SINAIS FUNDAMENTAIS:
+# ═══════════════════════════════════════════════════
+
+# SIGTERM (15) — Terminação educada (padrão)
+# O processo recebe o sinal e pode fazer cleanup:
+# - Fechar conexões de banco
+# - Salvar estado
+# - Liberar recursos
+# - Terminar gracefully
+kill 12400          # envia SIGTERM (padrão)
+kill -15 12400      # explícito: SIGTERM
+kill -SIGTERM 12400 # por nome
+
+# SIGKILL (9) — Morte imediata (irrecusável)
+# O kernel mata o processo instantaneamente.
+# O processo NÃO pode capturar, ignorar ou fazer cleanup.
+# USE APENAS como último recurso!
+kill -9 12400       # SIGKILL
+kill -KILL 12400    # por nome
+
+# SIGHUP (1) — Hangup (recarregar config)
+# Muitos daemons interpretam como "recarregue sua configuração"
+kill -HUP 900       # nginx recarrega config
+kill -1 900         # mesmo efeito
+
+# SIGSTOP (19) — Pausar processo (irrecusável)
+kill -STOP 12400    # congela o processo
+kill -CONT 12400    # descongela (continua)
+
+# SIGINT (2) — Interrupção (equivale a Ctrl+C)
+kill -INT 12400
+
+# ═══════════════════════════════════════════════════
+# TABELA COMPLETA DE SINAIS ÚTEIS:
+# ═══════════════════════════════════════════════════
+# Sinal    Número   Ação               Capturável?
+# SIGHUP     1      Recarregar/terminar   Sim
+# SIGINT     2      Interromper (Ctrl+C)  Sim
+# SIGQUIT    3      Quit + core dump      Sim
+# SIGKILL    9      Matar imediatamente   NÃO
+# SIGTERM   15      Terminar educado      Sim
+# SIGSTOP   19      Pausar                NÃO
+# SIGCONT   18      Continuar             Sim
+# SIGUSR1   10      User-defined 1        Sim
+# SIGUSR2   12      User-defined 2        Sim
+
+# Listar todos os sinais:
+kill -l</code></pre>
+            </div>
+          </div>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>kill — Por PID</code><span class="cmd-tag">PID</span></div>
+              <pre><code># Matar processo específico pelo PID:
+kill 12400          # SIGTERM (educado)
+kill -9 12400       # SIGKILL (forçado)
+
+# Matar múltiplos PIDs:
+kill 12400 12401 12402
+
+# Matar todos os processos de um grupo:
+kill -TERM -12400   # PID negativo = process group
+
+# Workflow recomendado:
+# 1. Tente SIGTERM primeiro:
+kill 12400
+# 2. Espere 5 segundos
+sleep 5
+# 3. Verifique se morreu:
+ps -p 12400
+# 4. Se não morreu, use SIGKILL:
+kill -9 12400</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>killall e pkill — Por nome</code><span class="cmd-tag">Nome</span></div>
+              <pre><code># killall — mata por nome EXATO do processo:
+killall nginx           # mata todos os "nginx"
+killall -9 node         # SIGKILL em todos "node"
+killall -u joao         # mata tudo do user joao
+killall -i firefox      # pede confirmação (-i)
+
+# pkill — mata por padrão (regex parcial):
+pkill node              # qualquer processo com "node"
+pkill -f "app.js"       # busca no comando completo (-f)
+pkill -u deploy         # todos os processos do user
+pkill -t pts/3          # todos no terminal pts/3
+pkill -P 12345          # filhos do processo 12345
+
+# pgrep — encontrar PIDs (complemento do pkill):
+pgrep nginx             # lista PIDs do nginx
+pgrep -u joao           # PIDs dos processos do joao
+pgrep -a node           # PIDs + linha de comando
+pgrep -c nginx          # conta processos nginx
+
+# Diferença killall vs pkill:
+# killall "node"  → match EXATO no nome
+# pkill "nod"     → match PARCIAL (regex)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Foreground vs Background — Controle de Jobs</h3>
+          <p>O shell pode rodar processos em primeiro plano (foreground) ou segundo plano (background):</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Controle completo de jobs</code><span class="cmd-tag">Jobs</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# FOREGROUND: Processo ocupa o terminal
+# Você não pode digitar outros comandos enquanto roda
+# ═══════════════════════════════════════════════════
+
+# Rodar em foreground (padrão):
+./backup.sh              # terminal fica bloqueado até terminar
+ping google.com          # Ctrl+C para parar
+
+# ═══════════════════════════════════════════════════
+# BACKGROUND: Processo roda "por trás" do terminal
+# O terminal fica livre para outros comandos
+# ═══════════════════════════════════════════════════
+
+# Iniciar direto em background (& no final):
+./backup.sh &
+# [1] 12500                    ← job number e PID
+# O terminal fica livre!
+
+# Mover processo de foreground para background:
+./processo-longo.sh      # está rodando em foreground...
+# Pressione Ctrl+Z          ← SUSPENDE (para) o processo
+# [1]+  Stopped   ./processo-longo.sh
+bg                       # retoma em background
+# [1]+ ./processo-longo.sh &
+
+# Mover processo de background para foreground:
+fg                       # traz o último job para foreground
+fg %1                    # traz job número 1 para foreground
+fg %2                    # traz job número 2
+
+# ═══════════════════════════════════════════════════
+# LISTAR E GERENCIAR JOBS:
+# ═══════════════════════════════════════════════════
+
+# Ver jobs ativos no shell atual:
+jobs
+# [1]+  Running   ./backup.sh &
+# [2]-  Stopped   vim arquivo.txt
+# [3]   Running   tail -f /var/log/syslog &
+
+jobs -l    # mostra PID também
+# [1]+ 12500 Running   ./backup.sh &
+# [2]- 12501 Stopped   vim arquivo.txt
+
+# Referências de jobs:
+# %1    = job número 1
+# %+    = job mais recente (mesmo que %%)
+# %-    = penúltimo job
+# %abc  = job cujo comando começa com "abc"
+# %?xyz = job cujo comando contém "xyz"
+
+# Exemplo completo:
+sleep 100 &              # job 1 em background
+sleep 200 &              # job 2 em background
+vim &                    # job 3 (suspenso automaticamente)
+jobs
+# [1]   Running   sleep 100 &
+# [2]-  Running   sleep 200 &
+# [3]+  Stopped   vim
+fg %1                    # traz sleep 100 para foreground
+# Ctrl+C                 # mata o sleep 100</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>nohup e disown — Sobreviver ao logout</h3>
+          <p>Processos em background normalmente morrem quando você fecha o terminal (SIGHUP). Use <code>nohup</code> ou <code>disown</code> para mantê-los rodando:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>nohup — No Hangup</code><span class="cmd-tag">Persistente</span></div>
+              <pre><code># nohup ignora SIGHUP (não morre no logout)
+# Output vai para nohup.out por padrão
+
+nohup ./processo-longo.sh &
+# [1] 12600
+# nohup: ignoring input and appending output to 'nohup.out'
+
+# Redirecionar output para arquivo específico:
+nohup ./backup.sh > /var/log/backup.log 2>&1 &
+
+# Descartar output completamente:
+nohup ./daemon.sh > /dev/null 2>&1 &
+
+# Verificar se está rodando:
+ps aux | grep processo-longo
+# joao 12600 ... ./processo-longo.sh
+
+# Agora pode fechar o terminal!
+# O processo continua rodando.
+
+# Ver output:
+tail -f nohup.out</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>disown — Desassociar do shell</code><span class="cmd-tag">Desassociar</span></div>
+              <pre><code># disown remove o job da tabela do shell
+# O processo não recebe SIGHUP no logout
+
+# Cenário: esqueceu o nohup!
+./processo-longo.sh      # já está rodando...
+# Ctrl+Z                 # suspende
+bg                       # retoma em background
+disown                   # desassocia do shell
+# Agora pode fechar o terminal!
+
+# disown com job específico:
+disown %1                # desassocia job 1
+disown %2                # desassocia job 2
+disown -a                # desassocia TODOS os jobs
+
+# disown -h (não remove da tabela, apenas ignora SIGHUP):
+disown -h %1
+
+# Diferença nohup vs disown:
+# nohup = usar ANTES de iniciar (preventivo)
+# disown = usar DEPOIS de iniciar (remediar)
+
+# Para processos de longa duração, considere:
+# - tmux / screen (melhor opção!)
+# - systemd service
+# - supervisord</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Melhor prática — tmux/screen:</strong> Para processos interativos de longa duração, use <code>tmux</code> ou <code>screen</code>. Eles criam sessões que sobrevivem ao logout e permitem reconectar depois:
+            <pre><code># tmux (recomendado):
+tmux new -s deploy       # cria sessão "deploy"
+./deploy-longo.sh        # executa dentro da sessão
+# Ctrl+B, D              # desacopla (detach) — processo continua!
+tmux attach -t deploy    # reconecta à sessão depois
+
+# screen:
+screen -S backup         # cria sessão "backup"
+./backup-completo.sh     # executa
+# Ctrl+A, D              # desacopla
+screen -r backup         # reconecta</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: PRIORIDADE DE PROCESSOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Prioridade</span>
+          <h2>Prioridade de Processos — nice e renice</h2>
+          <p>O kernel Linux distribui tempo de CPU entre processos usando um sistema de prioridades. Você pode influenciar essa distribuição com os comandos <code>nice</code> e <code>renice</code>, garantindo que processos críticos tenham preferência sobre tarefas menos urgentes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Entendendo Nice Values</h3>
+          <p>O "niceness" (gentileza) de um processo determina sua prioridade de agendamento. Quanto mais "gentil" (nice), mais cede CPU para outros:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Escala de nice: -20 a 19</code><span class="cmd-tag">Escala</span></div>
+              <pre><code># ═══════════════════════════════════════════════════
+# ESCALA DE NICE VALUES:
+# ═══════════════════════════════════════════════════
+
+# -20 ─── ALTA prioridade (menos "gentil" — exige mais CPU)
+# -10 ─── Prioridade alta
+#   0 ─── Padrão (default para todos os processos)
+#  10 ─── Prioridade baixa
+#  19 ─── BAIXA prioridade (mais "gentil" — cede CPU)
+
+# Regras:
+# 1. Qualquer usuário pode AUMENTAR nice (0→19, reduzir prioridade)
+# 2. Apenas root pode DIMINUIR nice (0→-20, aumentar prioridade)
+# 3. Processos de sistema geralmente rodam com nice 0 ou negativo
+# 4. Tarefas de manutenção devem usar nice alto (10-19)
+
+# Ver nice value de processos:
+ps -eo pid,ni,user,cmd | head -20
+#   PID  NI USER     CMD
+#     1   0 root     /sbin/init
+#   850   0 root     sshd
+# 12400   0 joao     node app.js
+# 12500  19 joao     /usr/bin/updatedb
+
+# No top/htop: coluna NI (Nice)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>nice — Iniciar processo com prioridade específica</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Iniciar processos com nice definido</code><span class="cmd-tag">nice</span></div>
+              <pre><code># Sintaxe: nice -n [valor] comando
+
+# Iniciar backup com baixa prioridade (não atrapalha produção):
+nice -n 19 tar czf /backup/site.tar.gz /var/www/
+# O backup usa CPU apenas quando ninguém mais precisa
+
+# Iniciar processo com prioridade padrão (nice 0):
+nice ./app.sh
+# nice sem -n usa 10 por padrão!
+
+# Iniciar com prioridade explícita:
+nice -n 10 ./processar-relatorios.sh
+nice -n 15 find / -name "*.log" -mtime +30 -delete
+
+# Alta prioridade (requer root):
+sudo nice -n -10 ./processo-critico.sh
+sudo nice -n -20 ./real-time-processor
+
+# Cenário: compilação pesada sem afetar produção
+nice -n 19 make -j$(nproc)
+# Usa todos os cores, mas com prioridade mínima
+
+# Cenário: indexação do locate (já usa nice internamente)
+nice -n 19 updatedb</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>renice — Alterar prioridade de processo em execução</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Mudar prioridade de processos ativos</code><span class="cmd-tag">renice</span></div>
+              <pre><code># Sintaxe: renice [prioridade] -p PID
+
+# Reduzir prioridade de um processo que está consumindo CPU:
+renice 10 -p 12400
+# 12400 (process ID) old priority 0, new priority 10
+
+# Aumentar prioridade (requer root):
+sudo renice -5 -p 12400
+# 12400 (process ID) old priority 10, new priority -5
+
+# Mudar prioridade de TODOS os processos de um usuário:
+sudo renice 15 -u joao
+# Todos os processos de joao ficam com nice 15
+
+# Mudar prioridade de um grupo:
+sudo renice 10 -g devops
+
+# Cenário prático — Processo travando o servidor:
+# 1. Identificar o processo pesado:
+top     # → vejo que PID 5500 está usando 95% de CPU
+
+# 2. Reduzir prioridade imediatamente:
+sudo renice 19 -p 5500
+# Sistema volta a responder enquanto o processo continua rodando
+
+# 3. Ou renice pelo htop:
+# Selecione o processo → F7 (nice +1) ou F8 (nice -1)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Cenários Práticos de Prioridade</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Backups noturnos</code><span class="cmd-tag">Backup</span></div>
+              <pre><code># Backup que não impacta a aplicação:
+nice -n 19 ionice -c3 \
+  rsync -az /data/ /backup/
+
+# ionice -c3 = I/O priority idle
+# (só usa disco quando ninguém precisa)
+
+# No cron:
+# 0 2 * * * nice -n 19 /opt/scripts/backup.sh</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Compilação em servidor de produção</code><span class="cmd-tag">Build</span></div>
+              <pre><code># Compilar código sem afetar serviço:
+nice -n 15 make -j4
+
+# Se já está compilando e está pesado:
+pgrep -f "make" | xargs renice 19
+# ou
+renice 19 -p $(pgrep -f "cc1plus")
+
+# Monitorar impacto:
+watch -n1 'ps -eo ni,pid,%cpu,cmd --sort=-%cpu | head'</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Processo de produção crítico</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># App de produção com prioridade alta:
+sudo nice -n -10 ./app-producao
+
+# Garantir que nginx tenha prioridade:
+sudo renice -5 -p $(pgrep -f "nginx: master")
+
+# Database com prioridade sobre outros:
+sudo renice -10 -p $(pgrep -f "postgres")</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Manutenção sem impacto</code><span class="cmd-tag">Manut.</span></div>
+              <pre><code># Limpar logs antigos com prioridade mínima:
+nice -n 19 find /var/log -name "*.gz" \
+  -mtime +90 -delete
+
+# Atualizar banco de dados do locate:
+nice -n 19 updatedb
+
+# Verificação de disco:
+sudo nice -n 19 ionice -c3 \
+  fsck -n /dev/sdb1
+
+# Scan de vírus:
+nice -n 15 clamscan -r /home/</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 ionice — Prioridade de I/O (disco):</strong> Além de CPU, você pode controlar a prioridade de acesso ao disco:
+            <pre><code># Classes de I/O:
+# -c1 = Real-time (usar com cuidado!)
+# -c2 = Best-effort (padrão, com prioridade 0-7)
+# -c3 = Idle (só usa disco quando ninguém precisa)
+
+ionice -c3 -p 12500          # processo existente → idle I/O
+ionice -c3 dd if=/dev/sda of=/backup/disk.img   # novo processo
+nice -n 19 ionice -c3 rsync -az /src/ /dst/     # CPU + I/O baixa</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: REDIRECIONAMENTO DE I/O -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">I/O</span>
+          <h2>Redirecionamento de I/O (Introdução)</h2>
+          <p>Todo processo no Linux possui três canais de comunicação padrão: stdin, stdout e stderr. Redirecionar esses canais é uma das habilidades mais poderosas do shell — permite conectar programas, salvar saídas, filtrar erros e automatizar tarefas complexas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Os três canais padrão (File Descriptors)</h3>
+          <p>Quando qualquer processo inicia, ele automaticamente recebe três "canais" de comunicação:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>stdin (FD 0) — Entrada padrão</code><span class="cmd-tag">Input</span></div>
+              <p>De onde o processo lê dados de entrada. Por padrão, é o <strong>teclado</strong>.</p>
+              <pre><code># Exemplos de stdin:
+cat                  # espera input do teclado
+read variavel        # lê uma linha do teclado
+grep "erro"          # sem arquivo, lê do stdin
+
+# Redirecionar stdin de arquivo:
+cat < arquivo.txt    # lê de arquivo, não teclado
+sort < dados.txt     # sort lê de dados.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>stdout (FD 1) — Saída padrão</code><span class="cmd-tag">Output</span></div>
+              <p>Para onde o processo envia sua saída normal. Por padrão, é o <strong>terminal</strong>.</p>
+              <pre><code># Exemplos de stdout:
+echo "hello"         # imprime no terminal
+ls -la               # lista no terminal
+cat arquivo.txt      # conteúdo no terminal
+
+# Redirecionar stdout para arquivo:
+echo "hello" > arquivo.txt
+ls -la > listagem.txt
+cat /etc/passwd > backup-passwd.txt</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>stderr (FD 2) — Saída de erro</code><span class="cmd-tag">Erro</span></div>
+              <p>Para onde o processo envia mensagens de erro e diagnóstico. Por padrão, é o <strong>terminal</strong> (mesmo destino que stdout, mas canal separado).</p>
+              <pre><code># Exemplos de stderr:
+ls /diretorio-inexistente       # "No such file or directory" vai para stderr
+cat arquivo-que-nao-existe      # erro vai para stderr
+grep "texto" /sem-permissao     # "Permission denied" vai para stderr
+
+# Por que separar stdout de stderr?
+# Permite tratar saída normal e erros de forma diferente:
+ls /var /inexistente > saida.txt 2> erros.txt
+# stdout (listagem de /var) → saida.txt
+# stderr (erro do /inexistente) → erros.txt
+
+# No terminal parece tudo junto, mas são canais diferentes!</code></pre>
+            </div>
+          </div>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Diagrama de fluxo de I/O</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>                    ┌─────────────────────┐
+  ┌─────────┐       │                     │       ┌──────────────┐
+  │ Teclado │──────▶│  stdin (FD 0)       │       │              │
+  │ Arquivo │──────▶│                     │──────▶│ Terminal     │
+  │ Pipe    │──────▶│     PROCESSO        │       │ Arquivo      │
+  └─────────┘       │                     │──────▶│ Pipe         │
+                    │  stdout (FD 1) ─────│──────▶│ /dev/null    │
+                    │  stderr (FD 2) ─────│──────▶│              │
+                    │                     │       └──────────────┘
+                    └─────────────────────┘
+
+  Redirecionamento permite mudar de onde vem (stdin)
+  e para onde vai (stdout/stderr) de qualquer processo.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Operadores de Redirecionamento</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>> — Redirecionar stdout (sobrescrever)</code><span class="cmd-tag">Sobrescrever</span></div>
+              <pre><code># Envia stdout para arquivo (CRIA ou SOBRESCREVE):
+echo "Linha 1" > arquivo.txt
+# arquivo.txt agora contém: "Linha 1"
+
+echo "Linha 2" > arquivo.txt
+# arquivo.txt agora contém: "Linha 2"
+# ⚠️ "Linha 1" foi PERDIDA!
+
+# Outros exemplos:
+ls -la /etc > listagem.txt
+date > timestamp.txt
+whoami > usuario.txt
+cat /etc/passwd > backup-passwd.txt
+ps aux > processos.txt
+
+# Criar arquivo vazio:
+> arquivo-vazio.txt
+# Equivale a: truncate -s 0 arquivo-vazio.txt</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>>> — Redirecionar stdout (append)</code><span class="cmd-tag">Append</span></div>
+              <pre><code># Envia stdout para arquivo (ADICIONA ao final):
+echo "Linha 1" > log.txt     # cria com "Linha 1"
+echo "Linha 2" >> log.txt    # adiciona "Linha 2"
+echo "Linha 3" >> log.txt    # adiciona "Linha 3"
+
+# log.txt agora contém:
+# Linha 1
+# Linha 2
+# Linha 3
+
+# Cenário: construir arquivo incrementalmente
+echo "=== Relatório $(date) ===" > relatorio.txt
+echo "" >> relatorio.txt
+echo "Processos:" >> relatorio.txt
+ps aux >> relatorio.txt
+echo "" >> relatorio.txt
+echo "Disco:" >> relatorio.txt
+df -h >> relatorio.txt
+
+# Cenário: log com timestamp
+echo "[$(date)] Deploy iniciado" >> /var/log/deploy.log
+echo "[$(date)] Deploy finalizado" >> /var/log/deploy.log</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>2> — Redirecionar stderr</code><span class="cmd-tag">Erros</span></div>
+              <pre><code># Enviar APENAS erros para arquivo:
+find / -name "*.conf" 2> erros.txt
+# Resultado no terminal: lista dos .conf encontrados
+# erros.txt: "Permission denied" e outros erros
+
+# Descartar erros completamente:
+find / -name "*.conf" 2> /dev/null
+# Mostra apenas resultados, sem mensagens de erro
+
+# Append de erros:
+comando_falho 2>> /var/log/erros.log
+
+# Cenário: script que ignora erros:
+rm arquivo-inexistente 2> /dev/null
+# Não mostra erro, não interrompe o script
+
+# Separar stdout e stderr em arquivos diferentes:
+./meu-script.sh > output.log 2> error.log
+# output.log = saída normal
+# error.log = apenas erros</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>2>&1 — Combinar stderr com stdout</code><span class="cmd-tag">Combinar</span></div>
+              <pre><code># Enviar stdout E stderr para o MESMO destino:
+./script.sh > tudo.log 2>&1
+# stdout → tudo.log
+# stderr → vai para onde stdout está → tudo.log
+
+# ⚠️ ORDEM IMPORTA:
+# CORRETO: > arquivo 2>&1
+./script.sh > log.txt 2>&1     # ✅ ambos vão para log.txt
+
+# ERRADO: 2>&1 > arquivo
+./script.sh 2>&1 > log.txt     # ❌ stderr vai pro terminal!
+# Porque 2>&1 aponta stderr para onde stdout ESTÁ (terminal)
+# Depois > muda stdout para arquivo, mas stderr não acompanha
+
+# Sintaxe moderna (bash 4+):
+./script.sh &> tudo.log        # equivale a > tudo.log 2>&1
+./script.sh &>> tudo.log       # append de ambos
+
+# Cenário: cron job (capturar toda saída):
+0 2 * * * /opt/backup.sh > /var/log/backup.log 2>&1
+
+# Cenário: verificar se comando funciona:
+which terraform > /dev/null 2>&1 && echo "Instalado" || echo "Não encontrado"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Redirecionamento de stdin (<)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>< — Input de arquivo</code><span class="cmd-tag">Input</span></div>
+              <pre><code># Redirecionar stdin de um arquivo:
+sort < nomes.txt              # sort lê de nomes.txt ao invés do teclado
+wc -l < /var/log/syslog       # conta linhas do arquivo
+tr 'a-z' 'A-Z' < input.txt   # converte para maiúscula
+
+# Na prática, muitos comandos aceitam arquivo como argumento:
+sort nomes.txt                # funciona igual (sort abre o arquivo)
+sort < nomes.txt              # sort lê do stdin (shell abre o arquivo)
+# A diferença é sutil: com <, o shell abre o arquivo
+
+# Combinando input e output:
+sort < desordenado.txt > ordenado.txt
+tr 'a-z' 'A-Z' < minusculo.txt > maiusculo.txt
+grep "ERROR" < app.log > erros-filtrados.txt
+
+# Here String (<<<) — string como stdin:
+grep "admin" <<< "admin:x:1000:1000:Admin:/home/admin:/bin/bash"
+# Útil para testar sem criar arquivo
+
+# Cenário: enviar email com conteúdo de arquivo
+mail -s "Relatório" admin@empresa.com < relatorio.txt
+
+# Cenário: importar SQL
+mysql -u root database < dump.sql
+psql -U postgres -d mydb < schema.sql</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>/dev/null — O buraco negro do Linux</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>/dev/null — Descartar qualquer saída</code><span class="cmd-tag">Descarte</span></div>
+              <pre><code># /dev/null é um "arquivo" especial que:
+# - Aceita qualquer input (descarta tudo)
+# - Quando lido, retorna EOF imediatamente
+
+# ═══════════════════════════════════════════════════
+# USOS COMUNS:
+# ═══════════════════════════════════════════════════
+
+# 1. Silenciar stdout (só ver erros):
+apt update > /dev/null
+# Mostra apenas erros no terminal
+
+# 2. Silenciar stderr (só ver saída normal):
+find / -name "*.log" 2>/dev/null
+# Mostra resultados sem "Permission denied"
+
+# 3. Silenciar TUDO (rodar silenciosamente):
+./script.sh > /dev/null 2>&1
+# Nenhuma saída no terminal (útil em cron)
+
+# 4. Verificar se comando existe (sem output):
+which docker > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "Docker instalado"
+fi
+
+# 5. Esvaziar arquivo sem deletar:
+cat /dev/null > /var/log/app.log
+# ou simplesmente: > /var/log/app.log
+# Arquivo fica com 0 bytes (preserva permissões e inode)
+
+# 6. Gerar "nada" como input:
+cat /dev/null | command   # stdin vazio
+
+# 7. Descarte em scripts de deploy:
+git pull > /dev/null 2>&1 || { echo "ERRO: git pull falhou"; exit 1; }
+
+# Outro arquivo especial útil:
+# /dev/zero — fonte infinita de bytes zero
+# /dev/random — fonte de dados aleatórios
+# /dev/urandom — fonte rápida de dados pseudo-aleatórios</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplos Práticos Combinados</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Scripts e Automação</code><span class="cmd-tag">Scripts</span></div>
+              <pre><code># Script de deploy com logging:
+#!/bin/bash
+LOG="/var/log/deploy.log"
+
+echo "[$(date)] Iniciando deploy..." >> $LOG
+
+git pull origin main >> $LOG 2>&1
+if [ $? -ne 0 ]; then
+    echo "[$(date)] ERRO: git pull" >> $LOG
+    exit 1
+fi
+
+npm install >> $LOG 2>&1
+npm run build >> $LOG 2>&1
+
+echo "[$(date)] Deploy concluído" >> $LOG</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Cron Jobs</code><span class="cmd-tag">Cron</span></div>
+              <pre><code># Cron silencioso (sem emails):
+0 * * * * /opt/check.sh > /dev/null 2>&1
+
+# Cron com log:
+0 2 * * * /opt/backup.sh >> /var/log/backup.log 2>&1
+
+# Cron que só loga erros:
+*/5 * * * * /opt/monitor.sh > /dev/null 2>> /var/log/monitor-errors.log
+
+# Separar stdout e stderr:
+0 3 * * * /opt/cleanup.sh \
+  > /var/log/cleanup.log \
+  2> /var/log/cleanup-errors.log</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Debug e Troubleshooting</code><span class="cmd-tag">Debug</span></div>
+              <pre><code># Capturar apenas erros de um serviço:
+systemctl status nginx 2> /tmp/nginx-debug.txt
+
+# Salvar saída de strace para análise:
+strace -o /tmp/trace.log ./meu-programa
+
+# Capturar erros de compilação:
+make 2> erros-compilacao.txt
+
+# Log com timestamp automático:
+./app 2>&1 | while read line; do
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $line"
+done >> /var/log/app.log</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Testes Condicionais</code><span class="cmd-tag">Condição</span></div>
+              <pre><code># Verificar se programa existe:
+if command -v docker > /dev/null 2>&1; then
+    echo "Docker disponível"
+    docker --version
+else
+    echo "Docker não instalado"
+fi
+
+# Verificar se porta está aberta:
+if nc -z localhost 80 2>/dev/null; then
+    echo "Porta 80 aberta"
+fi
+
+# Verificar se arquivo é legível:
+if cat /etc/shadow > /dev/null 2>&1; then
+    echo "Tenho acesso"
+else
+    echo "Sem permissão"
+fi</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>📋 Resumo dos operadores de redirecionamento:</strong>
+            <pre><code>comando > arquivo      # stdout → arquivo (sobrescreve)
+comando >> arquivo     # stdout → arquivo (append)
+comando 2> arquivo     # stderr → arquivo (sobrescreve)
+comando 2>> arquivo    # stderr → arquivo (append)
+comando &> arquivo     # stdout+stderr → arquivo (sobrescreve)
+comando &>> arquivo    # stdout+stderr → arquivo (append)
+comando > arq 2>&1     # stdout+stderr → arquivo (compatível)
+comando < arquivo      # stdin ← arquivo
+comando <<< "string"   # stdin ← string (here string)
+comando > /dev/null    # descartar stdout
+comando 2> /dev/null   # descartar stderr
+comando &> /dev/null   # descartar tudo</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Coloque em prática tudo que aprendeu neste módulo. Cada exercício simula um cenário real de administração Linux. Tente resolver antes de olhar a solução!</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Criar Usuário com Permissões Específicas</h3>
+          <p><strong>Cenário:</strong> Sua empresa contratou um novo desenvolvedor chamado "carlos". Ele precisa:</p>
+          <ul>
+            <li>Ter uma conta no servidor com shell bash</li>
+            <li>Pertencer aos grupos "devteam" e "docker"</li>
+            <li>Ter acesso sudo para reiniciar serviços (systemctl restart)</li>
+            <li>Ter um diretório de projetos em /srv/carlos com permissões adequadas</li>
+          </ul>
+          <details>
+            <summary>Ver Solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>Solução completa</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># 1. Criar os grupos (se não existirem):
+sudo groupadd devteam 2>/dev/null
+sudo groupadd docker 2>/dev/null
+
+# 2. Criar o usuário com home e shell bash:
+sudo useradd -m -s /bin/bash -c "Carlos Silva" carlos
+
+# 3. Definir senha:
+sudo passwd carlos
+
+# 4. Adicionar aos grupos secundários:
+sudo usermod -aG devteam,docker carlos
+
+# 5. Configurar sudo para reiniciar serviços:
+sudo visudo -f /etc/sudoers.d/carlos
+# Conteúdo:
+# carlos ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart *
+
+# 6. Criar diretório de projetos:
+sudo mkdir -p /srv/carlos
+
+# 7. Definir ownership e permissões:
+sudo chown carlos:devteam /srv/carlos
+sudo chmod 750 /srv/carlos
+
+# 8. Verificar tudo:
+id carlos
+# uid=1003(carlos) gid=1003(carlos) groups=1003(carlos),998(docker),1010(devteam)
+
+ls -ld /srv/carlos
+# drwxr-x--- 2 carlos devteam 4096 ... /srv/carlos
+
+sudo -l -U carlos
+# User carlos may run the following commands:
+#     (ALL) NOPASSWD: /usr/bin/systemctl restart *</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Configurar Permissões de Projeto (Dev + Ops)</h3>
+          <p><strong>Cenário:</strong> Configure a estrutura de um projeto web onde:</p>
+          <ul>
+            <li>O time de desenvolvimento ("devteam") pode ler e escrever código</li>
+            <li>O time de operações ("ops") pode ler código e executar scripts de deploy</li>
+            <li>O servidor web (www-data) pode apenas ler arquivos estáticos</li>
+            <li>Novos arquivos criados por qualquer dev devem herdar o grupo "devteam"</li>
+            <li>Ninguém de fora dos times pode acessar o projeto</li>
+          </ul>
+
+          <details>
+            <summary>Ver Solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>Solução completa</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># 1. Criar grupos:
+sudo groupadd devteam
+sudo groupadd ops
+
+# 2. Criar estrutura de diretórios:
+sudo mkdir -p /srv/projeto/{src,public,scripts,logs}
+
+# 3. Configurar ownership com SGID para herança de grupo:
+sudo chown -R root:devteam /srv/projeto
+sudo chmod 2770 /srv/projeto        # SGID + rwxrwx---
+sudo chmod 2770 /srv/projeto/src    # devs escrevem aqui
+
+# 4. Diretório público (www-data pode ler):
+sudo chown root:www-data /srv/projeto/public
+sudo chmod 2755 /srv/projeto/public  # SGID + rwxr-xr-x
+
+# 5. Scripts de deploy (ops pode executar):
+sudo chown root:ops /srv/projeto/scripts
+sudo chmod 2750 /srv/projeto/scripts  # SGID + rwxr-x---
+
+# 6. Logs (ops e devs podem ler):
+sudo chown root:devteam /srv/projeto/logs
+sudo chmod 2770 /srv/projeto/logs
+
+# 7. Adicionar ops ao grupo devteam para ler código:
+sudo usermod -aG devteam operador1
+
+# 8. Permissões de arquivos dentro:
+find /srv/projeto/src -type f -exec chmod 660 {} \;
+find /srv/projeto/public -type f -exec chmod 644 {} \;
+find /srv/projeto/scripts -type f -name "*.sh" -exec chmod 750 {} \;
+
+# 9. Verificação:
+ls -la /srv/projeto/
+# drwxrws--- 6 root devteam  4096 ... .
+# drwxrws--- 2 root devteam  4096 ... src
+# drwxr-sr-x 2 root www-data 4096 ... public
+# drwxr-s--- 2 root ops      4096 ... scripts
+# drwxrws--- 2 root devteam  4096 ... logs
+
+# Teste: dev cria arquivo, grupo é herdado:
+su - joao
+touch /srv/projeto/src/novo.py
+ls -l /srv/projeto/src/novo.py
+# -rw-rw---- 1 joao devteam ... novo.py  ✓ grupo herdado!</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Gerenciar Processos (Encontrar, Background, Matar)</h3>
+          <p><strong>Cenário:</strong> Um servidor está com problemas de performance. Você precisa:</p>
+          <ul>
+            <li>Identificar os 5 processos que mais consomem CPU</li>
+            <li>Encontrar todos os processos do usuário "deploy"</li>
+            <li>Um processo Python está travado — encontre e termine-o gracefully</li>
+            <li>Inicie um monitoramento de logs em background que sobreviva ao logout</li>
+            <li>Reduza a prioridade de um processo de backup que está impactando a aplicação</li>
+          </ul>
+
+          <details>
+            <summary>Ver Solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>Solução completa</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># 1. Top 5 processos por CPU:
+ps aux --sort=-%cpu | head -6
+# (head -6 porque a primeira linha é o cabeçalho)
+
+# Alternativa:
+ps -eo pid,user,%cpu,%mem,cmd --sort=-%cpu | head -6
+
+# 2. Processos do usuário "deploy":
+ps -u deploy -f
+# ou
+ps aux | grep "^deploy"
+
+# 3. Encontrar e matar processo Python travado:
+# Encontrar:
+pgrep -a python
+# 15200 python3 process_data.py (este está travado)
+
+# Verificar detalhes:
+ps -fp 15200
+# UID  PID  PPID  C STIME TTY  TIME     CMD
+# deploy 15200 1  0 08:00 ?  02:30:00 python3 process_data.py
+
+# Terminar gracefully (SIGTERM):
+kill 15200
+
+# Esperar 10 segundos:
+sleep 10
+
+# Verificar se morreu:
+ps -p 15200 > /dev/null 2>&1 && echo "Ainda vivo" || echo "Morto"
+
+# Se ainda vivo, forçar:
+kill -9 15200
+
+# 4. Monitoramento em background que sobrevive ao logout:
+nohup tail -f /var/log/app/production.log > /tmp/monitor-output.log 2>&1 &
+# Ou melhor, com timestamp:
+nohup sh -c 'tail -f /var/log/app/production.log | while read line; do echo "[$(date +%H:%M:%S)] $line"; done' > /tmp/monitor.log 2>&1 &
+
+# Verificar:
+jobs -l
+ps aux | grep "tail -f"
+
+# 5. Reduzir prioridade do backup:
+# Encontrar processo de backup:
+pgrep -a backup
+# 18000 /bin/bash /opt/scripts/backup.sh
+
+# Reduzir prioridade:
+renice 19 -p 18000
+# 18000 (process ID) old priority 0, new priority 19
+
+# Também reduzir I/O priority:
+sudo ionice -c3 -p 18000
+
+# Verificar:
+ps -o pid,ni,cmd -p 18000
+#   PID  NI CMD
+# 18000  19 /bin/bash /opt/scripts/backup.sh  ✓</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Redirecionamento de Logs</h3>
+          <p><strong>Cenário:</strong> Você precisa configurar o logging de uma aplicação:</p>
+          <ul>
+            <li>Executar um script de health check que salva stdout em success.log e stderr em errors.log</li>
+            <li>Criar um script de monitoramento que descarta stdout mas salva erros</li>
+            <li>Combinar logs de múltiplos serviços em um único arquivo com timestamp</li>
+            <li>Esvaziar um log que cresceu demais sem deletar o arquivo</li>
+          </ul>
+
+          <details>
+            <summary>Ver Solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>Solução completa</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># 1. Health check com stdout e stderr separados:
+/opt/scripts/health-check.sh > /var/log/health/success.log 2> /var/log/health/errors.log
+
+# Com append (para cron job que roda a cada minuto):
+/opt/scripts/health-check.sh >> /var/log/health/success.log 2>> /var/log/health/errors.log
+
+# Em cron:
+# */1 * * * * /opt/scripts/health-check.sh >> /var/log/health/success.log 2>> /var/log/health/errors.log
+
+# 2. Monitoramento que descarta stdout mas salva erros:
+/opt/scripts/monitor-services.sh > /dev/null 2>> /var/log/monitor-errors.log
+
+# Com timestamp em cada erro:
+/opt/scripts/monitor-services.sh > /dev/null 2>&1 | \
+  while read line; do echo "[$(date '+%F %T')] $line"; done >> /var/log/monitor-errors.log
+
+# Alternativa mais simples:
+/opt/scripts/monitor-services.sh > /dev/null 2>> >(while read l; do echo "$(date +%F_%T) $l"; done >> /var/log/monitor-errors.log)
+
+# 3. Combinar logs de múltiplos serviços:
+{
+  echo "=== NGINX ===" 
+  tail -5 /var/log/nginx/error.log 2>/dev/null
+  echo ""
+  echo "=== APP ===" 
+  tail -5 /var/log/app/production.log 2>/dev/null
+  echo ""
+  echo "=== DATABASE ===" 
+  tail -5 /var/log/postgresql/postgresql-main.log 2>/dev/null
+} > /tmp/combined-status-$(date +%Y%m%d_%H%M%S).log
+
+# Script de coleta com timestamp:
+#!/bin/bash
+LOG="/var/log/services-combined.log"
+echo "[$(date)] === Coleta de logs ===" >> $LOG
+echo "[$(date)] --- Nginx ---" >> $LOG
+tail -20 /var/log/nginx/error.log >> $LOG 2>&1
+echo "[$(date)] --- App ---" >> $LOG
+tail -20 /var/log/app/error.log >> $LOG 2>&1
+echo "[$(date)] === Fim ===" >> $LOG
+
+# 4. Esvaziar log sem deletar (preserva inode, permissões, ownership):
+# Método 1 — Mais usado:
+> /var/log/app/huge-log.log
+
+# Método 2 — Explícito:
+cat /dev/null > /var/log/app/huge-log.log
+
+# Método 3 — Com truncate:
+truncate -s 0 /var/log/app/huge-log.log
+
+# Método 4 — Manter últimas 1000 linhas:
+tail -1000 /var/log/app/huge-log.log > /tmp/temp-log.txt
+cat /tmp/temp-log.txt > /var/log/app/huge-log.log
+rm /tmp/temp-log.txt
+
+# Verificar resultado:
+ls -l /var/log/app/huge-log.log
+# -rw-r--r-- 1 app app 0 Jan 15 15:00 huge-log.log
+# Tamanho zerado, mas arquivo preservado!</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Resumo do Módulo 02</h3>
+          <div class="command-grid">
+            <div class="checklist-card">
+              <h4>🔐 Permissões</h4>
+              <ul>
+                <li>Modelo rwx (read, write, execute)</li>
+                <li>Três níveis: user, group, others</li>
+                <li>Notação simbólica e octal</li>
+                <li>Permissões especiais: SUID, SGID, Sticky</li>
+                <li>chmod (simbólico e octal)</li>
+                <li>chown e chgrp</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>👥 Usuários e Grupos</h4>
+              <ul>
+                <li>/etc/passwd, /etc/shadow, /etc/group</li>
+                <li>useradd, adduser, usermod, userdel</li>
+                <li>groupadd, groupmod, groupdel</li>
+                <li>id, whoami, groups, who, w</li>
+                <li>su vs sudo (/etc/sudoers)</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>⚙️ Processos</h4>
+              <ul>
+                <li>PID, PPID, estados (R, S, D, T, Z)</li>
+                <li>ps aux, ps -ef, ps -o personalizado</li>
+                <li>top, htop (monitoramento interativo)</li>
+                <li>kill, killall, pkill (SIGTERM vs SIGKILL)</li>
+                <li>Foreground, background (&amp;, jobs, fg, bg)</li>
+                <li>nohup, disown (sobreviver ao logout)</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>🔄 I/O e Prioridade</h4>
+              <ul>
+                <li>stdin (0), stdout (1), stderr (2)</li>
+                <li>Redirecionamento: &gt;, &gt;&gt;, 2&gt;, 2&gt;&amp;1, &lt;</li>
+                <li>/dev/null (descarte de saída)</li>
+                <li>nice e renice (-20 a 19)</li>
+                <li>ionice (prioridade de I/O)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="info-box highlight" style="margin-top:2rem">
+            <strong>📊 Estatísticas deste módulo:</strong>
+            <pre><code>Comandos aprendidos: ~35 (chmod, chown, chgrp, useradd, adduser, usermod, userdel, groupadd, groupmod, groupdel, id, whoami, groups, who, w, su, sudo, visudo, ps, top, htop, kill, killall, pkill, pgrep, jobs, fg, bg, nohup, disown, nice, renice, ionice, pstree, chage)
+Conceitos dominados: Permissões rwx, ownership, SUID/SGID/Sticky, gerenciamento de usuários/grupos, processos, sinais, jobs, prioridade, redirecionamento de I/O
+Tempo estimado de prática: 3-4 horas
+Próximo módulo: Pipes, filtros de texto, compactação, gerenciamento de pacotes e variáveis de ambiente</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA: PRÓXIMO MÓDULO -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      <div class="container" style="text-align:center;padding:60px 0">
+        <h2 style="margin-bottom:8px">Pronto para o próximo nível?</h2>
+        <p style="color:var(--text-secondary);margin-bottom:24px">No Módulo 03 você aprenderá sobre pipes, filtros de texto (grep, sed, awk, cut, sort), compactação, gerenciamento de pacotes e variáveis de ambiente — ferramentas que transformam o terminal numa fábrica de produtividade.</p>
+        <a href="modulo-03.html" class="button primary" style="font-size:1.1rem;padding:14px 32px">Avançar para Módulo 03: Intermediário →</a>
       </div>
     </section>
   </main>
