@@ -37,6 +37,18 @@ resource "aws_iam_role_policy" "dynamodb_write" {
           "dynamodb:PutItem"
         ]
         Resource = var.dynamodb_table_arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = var.sns_topic_arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
+        Resource = "*"
       }
     ]
   })
@@ -56,6 +68,7 @@ resource "aws_lambda_function" "this" {
     variables = {
       LEADS_TABLE_NAME = var.dynamodb_table_name
       PDF_BASE_URL     = var.pdf_base_url
+      SNS_TOPIC_ARN    = var.sns_topic_arn
     }
   }
 

@@ -25,3 +25,8 @@ variable "dynamodb_table_arn" {
 variable "pdf_base_url" {
   type = string
 }
+
+variable "sns_topic_arn" {
+  type        = string
+  description = "ARN do SNS topic para notificações de download"
+}

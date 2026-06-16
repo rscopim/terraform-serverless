@@ -127,6 +127,10 @@ function showResult() {
   var total = activeQuestions.length;
   var percent = Math.round((score / total) * 100);
 
+  // ===== REGISTRA RESULTADO DO SIMULADO =====
+  trackSimuladoResult(score, total);
+  // ===== FIM REGISTRO =====
+
   document.getElementById('finalScore').textContent = score + '/' + total;
   document.getElementById('finalPercent').textContent = percent + '%';
   document.getElementById('resultFill').style.width = percent + '%';
@@ -163,19 +167,42 @@ document.getElementById('confirmBtn').addEventListener('click', confirmAnswer);
 document.getElementById('nextBtn').addEventListener('click', nextQuestion);
 
 // ===== TRACKING DE ACESSO AOS SIMULADOS (custo zero — usa API existente) =====
-// Registra no DynamoDB quando o aluno inicia um simulado
 function trackSimuladoAccess() {
   var page = window.location.pathname.split('/').slice(-2).join('/');
-  var apiUrl = (typeof API_ENDPOINT !== 'undefined') ? API_ENDPOINT : 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
+  var apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
   try {
     fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: 'simulado-tracking',
+        type: 'simulado-access',
+        page: page,
+        name: 'anonymous',
         email: 'tracking@cloudtrilhas.internal',
         consent: true,
-        material: 'SIMULADO:' + page
+        material: page
+      })
+    }).catch(function() {});
+  } catch(e) {}
+}
+
+// Registra resultado do simulado com score
+function trackSimuladoResult(score, total) {
+  var page = window.location.pathname.split('/').slice(-2).join('/');
+  var apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
+  try {
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'simulado-result',
+        page: page,
+        name: 'anonymous',
+        email: 'tracking@cloudtrilhas.internal',
+        consent: true,
+        material: page,
+        score: score,
+        total: total
       })
     }).catch(function() {});
   } catch(e) {}
