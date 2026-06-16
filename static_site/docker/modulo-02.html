@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Docker Módulo 02: Imagens e Dockerfile</title>
+  <title>CloudTrilhas — Docker Módulo 02: Imagens Docker e Dockerfile</title>
+  <meta name="description" content="Guia completo sobre imagens Docker e Dockerfile: sistema de camadas, cache, todas as instruções, multi-stage build, otimização e exemplos práticos do mercado." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,23 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-01.html" class="nav-link">← Anterior</a>
         <a href="modulo-03.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,490 +37,2330 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 02</span>
-        <h1>Imagens e Dockerfile</h1>
-        <p>Domine o gerenciamento de imagens Docker e aprenda a construir imagens customizadas com Dockerfile — a base para containerizar qualquer aplicação.</p>
+        <h1>Imagens Docker e Dockerfile</h1>
+        <p>Domine o sistema de camadas, entenda como o cache funciona, aprenda todas as instruções do Dockerfile, construa imagens otimizadas com multi-stage build e publique no Docker Hub como um profissional.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node active"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: O QUE É UMA IMAGEM DOCKER -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
-
-        <!-- O que é uma imagem -->
-        <div class="topic-block">
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
           <h2>O que é uma Imagem Docker?</h2>
-          <p>Uma imagem Docker é um pacote somente-leitura composto por <strong>camadas (layers)</strong>. Cada instrução no Dockerfile cria uma nova camada. Camadas são compartilhadas entre imagens, economizando espaço e acelerando downloads.</p>
+          <p>Uma imagem Docker é um pacote imutável, leve e autocontido que contém tudo necessário para executar uma aplicação: código, runtime, bibliotecas, variáveis de ambiente e configurações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Analogia: A Receita vs O Prato</h3>
+          <p>Para entender imagens Docker, pense em uma receita de bolo:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Imagem Docker = Receita</code><span class="cmd-tag">Analogia</span></div>
+              <p>A imagem é como uma <strong>receita completa e congelada</strong> — contém todas as instruções e ingredientes necessários. Ela não muda. Você pode distribuir cópias para qualquer pessoa, e o resultado será sempre o mesmo.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Container = Prato Pronto</code><span class="cmd-tag">Analogia</span></div>
+              <p>O container é o <strong>prato sendo preparado/consumido</strong> — é a receita em execução. Cada vez que você "faz a receita", cria um novo prato independente. Você pode ter vários pratos da mesma receita simultaneamente.</p>
+            </div>
+          </div>
           <div class="info-box">
-            <strong>Cache de camadas:</strong> O Docker reutiliza camadas que não mudaram. Se você alterar apenas a última instrução do Dockerfile, todas as camadas anteriores vêm do cache — tornando builds subsequentes muito mais rápidos.
+            <strong>💡 Conceito fundamental:</strong> Uma imagem é <strong>imutável</strong> (read-only). Quando você executa uma imagem, Docker cria um container com uma camada de escrita no topo. Qualquer modificação feita no container acontece apenas nessa camada — a imagem original permanece intacta.
           </div>
         </div>
 
-        <!-- Comandos de imagem -->
         <div class="topic-block">
-          <h2>Comandos para Gerenciar Imagens</h2>
+          <h3>Sistema de Camadas (Layers) — O Coração das Imagens</h3>
+          <p>Imagens Docker não são um único arquivo monolítico. Elas são compostas por <strong>camadas empilhadas</strong>, onde cada camada representa uma mudança no filesystem. Isso é o que torna Docker tão eficiente.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Anatomia de uma imagem em camadas</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────┐
+│          CONTAINER (camada de escrita - efêmera)            │
+│  Logs, arquivos temporários, dados de sessão               │
+├─────────────────────────────────────────────────────────────┤  ← Tudo acima é R/W
+│  Layer 6: COPY . /app/              [2.1 MB]  ← Seu código │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 5: RUN pip install -r req..  [45 MB]   ← Deps       │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 4: COPY requirements.txt .   [1 KB]    ← Arquivo    │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 3: WORKDIR /app              [0 B]     ← Metadata   │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 2: RUN apt-get install ...   [15 MB]   ← Pacotes SO │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 1: FROM python:3.12-slim     [120 MB]  ← Base        │
+└─────────────────────────────────────────────────────────────┘
+                    Todas as layers são READ-ONLY
+
+Total da imagem: ~182 MB (soma das camadas)
+10 containers rodando = 182 MB + (10 × poucos KB da camada RW)</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚡ Por que camadas são geniais?</strong>
+            <ul>
+              <li><strong>Compartilhamento:</strong> Se 10 imagens usam <code>python:3.12-slim</code> como base, o disco armazena essa camada <strong>uma única vez</strong></li>
+              <li><strong>Cache de build:</strong> Ao reconstruir uma imagem, Docker reutiliza camadas que não mudaram — builds são muito mais rápidos</li>
+              <li><strong>Downloads eficientes:</strong> Ao fazer pull de uma imagem, Docker baixa apenas as camadas que você ainda não possui</li>
+              <li><strong>Versionamento implícito:</strong> Cada camada tem um hash SHA256 — integridade garantida</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Como o Cache de Build Funciona</h3>
+          <p>O cache é um dos conceitos mais importantes para builds eficientes. Docker verifica cada instrução do Dockerfile de cima para baixo e, para cada uma, decide: "posso reutilizar o resultado anterior?"</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Regras do Cache</code><span class="cmd-tag">Importante</span></div>
+              <pre><code># Docker verifica o cache seguindo estas regras:
+
+1. Se a instrução anterior usou cache → verifica se esta também pode usar
+2. Para RUN: compara o TEXTO do comando (string exata)
+3. Para COPY/ADD: compara o CHECKSUM dos arquivos copiados
+4. Se UMA camada invalida o cache → TODAS as camadas seguintes são reconstruídas
+
+# Exemplo prático — POR QUE a ordem importa:
+
+# ❌ RUIM: qualquer mudança no código invalida o pip install
+COPY . /app/                  ← Muda a cada commit (invalida cache)
+RUN pip install -r requirements.txt  ← Reinstala TUDO toda vez
+
+# ✅ BOM: só reinstala quando requirements.txt muda
+COPY requirements.txt .       ← Só muda quando adiciona dependência
+RUN pip install -r requirements.txt  ← Cache válido na maioria dos builds
+COPY . /app/                  ← Código muda sempre, mas deps já estão prontas</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Regra de ouro:</strong> Coloque instruções que mudam com <strong>menos frequência primeiro</strong> (SO, dependências) e instruções que mudam <strong>frequentemente por último</strong> (código-fonte). Isso maximiza o aproveitamento do cache.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Imagem vs Container — Imutável vs Mutável</h3>
+          <p>Esta é uma distinção fundamental que muitos confundem:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>Imagem</th><th>Container</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Natureza</strong></td><td>Template imutável (read-only)</td><td>Instância em execução (read-write)</td></tr>
+              <tr><td><strong>Estado</strong></td><td>Não tem estado — é sempre igual</td><td>Tem estado — pode mudar durante execução</td></tr>
+              <tr><td><strong>Analogia</strong></td><td>Classe em POO</td><td>Objeto/instância da classe</td></tr>
+              <tr><td><strong>Criação</strong></td><td><code>docker build</code> ou <code>docker pull</code></td><td><code>docker run</code> ou <code>docker create</code></td></tr>
+              <tr><td><strong>Armazenamento</strong></td><td>Layers compartilhadas no disco</td><td>Layer RW individual + referência à imagem</td></tr>
+              <tr><td><strong>Persistência</strong></td><td>Permanente até ser removida</td><td>Efêmero — dados perdidos ao remover</td></tr>
+              <tr><td><strong>Quantidade</strong></td><td>Uma imagem pode gerar N containers</td><td>Cada container vem de uma imagem</td></tr>
+            </tbody>
+          </table>
+          <pre><code># Uma imagem → múltiplos containers
+docker run -d --name web1 nginx:1.25    # Container 1 da mesma imagem
+docker run -d --name web2 nginx:1.25    # Container 2 da mesma imagem
+docker run -d --name web3 nginx:1.25    # Container 3 da mesma imagem
+
+# Todos compartilham as mesmas layers da imagem
+# Cada um tem sua própria camada de escrita independente</code></pre>
+        </div>
+
+        <div class="topic-block">
+          <h3>Image ID vs Tag vs Digest — Identificadores</h3>
+          <p>Uma imagem pode ser identificada de três formas diferentes:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>docker images</code><span class="cmd-tag">Listar</span></div>
-              <p>Lista todas as imagens locais com tamanho, tag e ID.</p>
-              <pre><code># Listar imagens
-docker images
+              <div class="command-header"><code>Image ID (SHA256)</code><span class="cmd-tag">Hash</span></div>
+              <p>Identificador único gerado a partir do conteúdo da imagem. Qualquer mudança gera um ID diferente. É o identificador mais confiável.</p>
+              <pre><code># Image ID (abreviado para 12 chars):
+sha256:a1b2c3d4e5f6...
 
-# Filtrar por nome
-docker images nginx
-
-# Mostrar apenas IDs
-docker images -q</code></pre>
+# Usar pelo ID:
+docker run a1b2c3d4e5f6
+docker rmi sha256:a1b2c3...</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>docker pull</code><span class="cmd-tag">Baixar</span></div>
-              <p>Baixa uma imagem do registry (Docker Hub por padrão).</p>
-              <pre><code># Baixar última versão
-docker pull nginx
+              <div class="command-header"><code>Tag (nome:versão)</code><span class="cmd-tag">Label</span></div>
+              <p>Nome legível dado à imagem. É um "ponteiro" que pode mudar — a tag <code>latest</code> aponta para imagens diferentes ao longo do tempo. <strong>Tags são mutáveis!</strong></p>
+              <pre><code># Formato: registry/repositório:tag
+nginx:1.25.3
+python:3.12-slim
+meuuser/minha-app:v2.1.0
+ghcr.io/org/api:latest
 
-# Baixar versão específica
-docker pull nginx:1.25-alpine
-
-# Baixar de registry privado
-docker pull meu-registry.com/app:v2.0</code></pre>
+# Se não especificar tag, assume :latest
+docker pull nginx  # = docker pull nginx:latest</code></pre>
             </div>
+            <div class="command-card">
+              <div class="command-header"><code>Digest (SHA256 do manifest)</code><span class="cmd-tag">Imutável</span></div>
+              <p>Hash do manifesto da imagem no registry. Diferente do Image ID local, o digest identifica a imagem de forma <strong>imutável e globalmente única</strong> no registry.</p>
+              <pre><code># Digest = garantia de que é EXATAMENTE aquela imagem
+nginx@sha256:abc123def456...
+
+# Usar em produção para pinagem segura:
+docker pull nginx@sha256:abc123...
+
+# Ver digest de uma imagem:
+docker inspect --format='{{.RepoDigests}}' nginx</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Cuidado com :latest em produção!</strong>
+            <pre><code># Hoje:   nginx:latest → nginx@sha256:aaa111...  (versão 1.25.3)
+# Amanhã: nginx:latest → nginx@sha256:bbb222...  (versão 1.25.4)
+
+# Em produção, SEMPRE use tags específicas ou digests:
+✅ nginx:1.25.3
+✅ nginx@sha256:abc123def456...
+❌ nginx:latest  ← Pode mudar sem aviso!</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: GERENCIANDO IMAGENS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Comandos</span>
+          <h2>Gerenciando Imagens Docker</h2>
+          <p>Domine os comandos essenciais para listar, baixar, versionar, publicar e limpar imagens no seu ambiente de trabalho.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker images / docker image ls — Listar imagens locais</h3>
+          <p>Visualize todas as imagens armazenadas na sua máquina:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker images</code><span class="cmd-tag">Listar</span></div>
+              <pre><code># Listar todas as imagens
+docker images
+docker image ls   # Formato novo (equivalente)
+
+# Saída típica:
+REPOSITORY          TAG       IMAGE ID       CREATED        SIZE
+nginx               1.25      a1b2c3d4e5f6   2 days ago     187MB
+python              3.12      b2c3d4e5f6a7   5 days ago     1.01GB
+python              3.12-slim c3d4e5f6a7b8   5 days ago     150MB
+minha-app           latest    d4e5f6a7b8c9   10 min ago     89MB
+&lt;none&gt;              &lt;none&gt;    e5f6a7b8c9d0   1 hour ago     200MB  ← "dangling"
+
+# Filtrar por nome:
+docker images nginx
+docker images "minha-*"
+
+# Mostrar apenas IDs (útil para scripts):
+docker images -q
+
+# Mostrar com digest:
+docker images --digests
+
+# Filtrar dangling images (sem tag):
+docker images -f "dangling=true"
+
+# Ver tamanho real (compartilhado vs único):
+docker system df -v</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 O que são "dangling images"?</strong> São imagens sem tag (<code>&lt;none&gt;:&lt;none&gt;</code>) — geralmente restos de builds anteriores onde uma nova imagem assumiu a tag. São seguras para remover.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker pull — Baixar imagens de um Registry</h3>
+          <p>Busca imagens de um registry (Docker Hub por padrão) e armazena localmente:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker pull</code><span class="cmd-tag">Download</span></div>
+              <pre><code># Pull básico (do Docker Hub):
+docker pull nginx
+docker pull nginx:1.25.3
+docker pull python:3.12-slim
+
+# Pull com digest (imutável):
+docker pull nginx@sha256:abc123...
+
+# Pull de registry privado:
+docker pull ghcr.io/minha-org/api:v2.0
+docker pull 123456789.dkr.ecr.us-east-1.amazonaws.com/app:latest
+docker pull registry.gitlab.com/user/project:main
+
+# Pull de todas as tags (raramente necessário):
+docker pull --all-tags nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Como o pull funciona</code><span class="cmd-tag">Interno</span></div>
+              <pre><code># Quando você executa docker pull nginx:1.25
+
+1. Docker resolve nginx → docker.io/library/nginx:1.25
+2. Contata o registry (Docker Hub)
+3. Baixa o manifest (lista de layers)
+4. Para cada layer:
+   - Se já existe localmente → SKIP ✓
+   - Se não existe → download
+5. Verifica integridade (SHA256)
+6. Armazena no storage local
+
+# É por isso que o 2º pull de imagem similar é rápido:
+docker pull python:3.12       # 1.01GB — lento
+docker pull python:3.12-slim  # Apenas layers diferentes — rápido!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker tag — Renomear e versionar imagens</h3>
+          <p>Cria um novo nome/tag que aponta para a mesma imagem (não duplica dados):</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker tag</code><span class="cmd-tag">Versionar</span></div>
+              <pre><code># Sintaxe: docker tag IMAGEM_ORIGEM NOVO_NOME:TAG
+
+# Adicionar tag de versão:
+docker tag minha-app:latest minha-app:v1.0.0
+docker tag minha-app:latest minha-app:v1.0
+docker tag minha-app:latest minha-app:v1
+
+# Preparar para push em registry:
+docker tag minha-app:v1.0.0 meuuser/minha-app:v1.0.0
+docker tag minha-app:v1.0.0 ghcr.io/minha-org/minha-app:v1.0.0
+
+# Tag com informações do ambiente:
+docker tag api:latest api:prod-2024-01-15
+docker tag api:latest api:commit-a1b2c3d
+
+# Verificar — ambas apontam para o mesmo Image ID:
+docker images | grep minha-app
+minha-app    latest    d4e5f6a7b8c9   10 min ago   89MB
+minha-app    v1.0.0    d4e5f6a7b8c9   10 min ago   89MB  ← Mesmo ID!</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Boas práticas de tagging:</strong> Use Semantic Versioning (v1.2.3), inclua tags múltiplas (v1, v1.2, v1.2.3) e adicione o SHA do commit para rastreabilidade. Em CI/CD, nunca use apenas <code>:latest</code>.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker push — Publicar imagens em um Registry</h3>
+          <p>Envia uma imagem local para um registry remoto (Docker Hub, GHCR, ECR, etc.):</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker push</code><span class="cmd-tag">Upload</span></div>
+              <pre><code># 1. Fazer login no registry:
+docker login                           # Docker Hub
+docker login ghcr.io                   # GitHub Container Registry
+docker login 123456.dkr.ecr.us-east-1.amazonaws.com  # AWS ECR
+
+# 2. Tagear a imagem com seu namespace:
+docker tag minha-app:v1.0.0 meuuser/minha-app:v1.0.0
+
+# 3. Push!
+docker push meuuser/minha-app:v1.0.0
+
+# Push de todas as tags de um repositório:
+docker push --all-tags meuuser/minha-app
+
+# O que acontece durante o push:
+Pushing layer 1/5 [======>   ] 120MB/120MB
+Pushing layer 2/5 [=====>    ] 10MB/15MB
+Layer 3/5 already exists  ← Registry já tem!
+...</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Workflow completo de publicação</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code># Workflow completo — do build ao registry:
+
+# 1. Build da imagem
+docker build -t minha-api:v2.1.0 .
+
+# 2. Testar localmente
+docker run -d -p 8080:8080 minha-api:v2.1.0
+curl http://localhost:8080/health  # OK!
+
+# 3. Tagear para o registry
+docker tag minha-api:v2.1.0 \
+  ghcr.io/minha-org/minha-api:v2.1.0
+docker tag minha-api:v2.1.0 \
+  ghcr.io/minha-org/minha-api:latest
+
+# 4. Push
+docker push ghcr.io/minha-org/minha-api:v2.1.0
+docker push ghcr.io/minha-org/minha-api:latest
+
+# 5. Em produção, pull pela tag específica:
+docker pull ghcr.io/minha-org/minha-api:v2.1.0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker rmi / docker image prune — Remover imagens</h3>
+          <p>Limpe imagens que não são mais necessárias para liberar espaço em disco:</p>
+          <div class="command-grid">
             <div class="command-card">
               <div class="command-header"><code>docker rmi</code><span class="cmd-tag">Remover</span></div>
-              <p>Remove imagens locais. Falha se houver containers usando a imagem.</p>
-              <pre><code># Remover imagem
-docker rmi nginx:1.25-alpine
+              <pre><code># Remover imagem específica:
+docker rmi nginx:1.25
+docker rmi a1b2c3d4e5f6   # Por ID
 
-# Forçar remoção
-docker rmi -f nginx
+# Remover múltiplas:
+docker rmi nginx python redis
 
-# Remover imagens sem tag (dangling)
+# Forçar remoção (mesmo com container parado):
+docker rmi -f minha-app:old
+
+# Remover TODAS as imagens (cuidado!):
+docker rmi $(docker images -q)
+
+# Remover imagens de um repositório específico:
+docker rmi $(docker images meuuser/api -q)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker image prune</code><span class="cmd-tag">Limpeza</span></div>
+              <pre><code># Remover dangling images (sem tag):
 docker image prune
+# → Remove: &lt;none&gt;:&lt;none&gt; images
 
-# Remover TODAS as imagens não utilizadas
-docker image prune -a</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker tag</code><span class="cmd-tag">Taguear</span></div>
-              <p>Cria uma nova tag (alias) para uma imagem existente.</p>
-              <pre><code># Taguear para push
-docker tag minha-app:latest meu-user/minha-app:v1.0
+# Remover TODAS imagens não usadas por containers:
+docker image prune -a
+# ⚠️ Remove tudo que não está em uso!
 
-# Taguear para registry privado
-docker tag minha-app:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/minha-app:v1.0</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker push</code><span class="cmd-tag">Enviar</span></div>
-              <p>Envia uma imagem local para um registry remoto.</p>
-              <pre><code># Login no Docker Hub
-docker login
+# Filtrar por idade:
+docker image prune -a --filter "until=24h"
+docker image prune -a --filter "until=720h"  # 30 dias
 
-# Push para Docker Hub
-docker push meu-user/minha-app:v1.0
-
-# Push para ECR (AWS)
-docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/minha-app:v1.0</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker history</code><span class="cmd-tag">Histórico</span></div>
-              <p>Mostra as camadas de uma imagem e os comandos que as criaram.</p>
-              <pre><code># Ver camadas da imagem
-docker history nginx
-
-# Sem truncar comandos
-docker history --no-trunc nginx</code></pre>
+# Limpeza completa do sistema:
+docker system prune -a --volumes
+# Remove: containers parados + imagens não usadas
+#        + volumes órfãos + networks não usadas
+# ⚠️ CUIDADO: irreversível!</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Dockerfile -->
         <div class="topic-block">
-          <h2>Estrutura do Dockerfile</h2>
-          <p>O Dockerfile é um arquivo de texto com instruções sequenciais para construir uma imagem. Cada instrução cria uma camada.</p>
+          <h3>docker history — Ver camadas de uma imagem</h3>
+          <p>Inspecione como uma imagem foi construída, camada por camada:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker history</code><span class="cmd-tag">Inspecionar</span></div>
+              <pre><code># Ver histórico de camadas:
+docker history nginx:1.25
 
+IMAGE          CREATED       CREATED BY                                      SIZE
+a1b2c3d4e5f6   2 days ago   CMD ["nginx" "-g" "daemon off;"]                0B
+&lt;missing&gt;      2 days ago   EXPOSE map[80/tcp:{}]                           0B
+&lt;missing&gt;      2 days ago   STOPSIGNAL SIGQUIT                              0B
+&lt;missing&gt;      2 days ago   RUN /bin/sh -c set -x && apt-get update...     62.1MB
+&lt;missing&gt;      2 days ago   COPY file:xyz... in /docker-entrypoint.d/       4.62kB
+&lt;missing&gt;      2 days ago   COPY file:abc... in /docker-entrypoint.d/       3.02kB
+&lt;missing&gt;      5 days ago   /bin/sh -c #(nop) ADD file:def... in /          77.8MB
+
+# Sem truncar os comandos:
+docker history --no-trunc nginx:1.25
+
+# Formato customizado:
+docker history --format "{{.CreatedBy}}: {{.Size}}" nginx:1.25
+
+# 💡 Útil para: entender por que uma imagem é grande,
+# encontrar camadas desnecessárias, auditar imagens de terceiros</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker save / docker load — Exportar e importar imagens</h3>
+          <p>Transfira imagens entre máquinas sem usar um registry (útil para ambientes air-gapped):</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>FROM</code><span class="cmd-tag">Obrigatório</span></div>
-              <p>Define a imagem base. Sempre é a primeira instrução.</p>
-              <pre><code>FROM node:20-alpine
-FROM python:3.12-slim
+              <div class="command-header"><code>docker save</code><span class="cmd-tag">Exportar</span></div>
+              <pre><code># Exportar imagem para arquivo tar:
+docker save nginx:1.25 > nginx-1.25.tar
+docker save -o nginx-1.25.tar nginx:1.25
+
+# Exportar múltiplas imagens:
+docker save -o stack.tar nginx:1.25 redis:7 postgres:16
+
+# Comprimir (recomendado):
+docker save nginx:1.25 | gzip > nginx-1.25.tar.gz
+docker save nginx:1.25 | xz > nginx-1.25.tar.xz  # Menor
+
+# Ver conteúdo do tar (sem extrair):
+tar -tf nginx-1.25.tar | head -20</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker load</code><span class="cmd-tag">Importar</span></div>
+              <pre><code># Importar imagem de arquivo tar:
+docker load < nginx-1.25.tar
+docker load -i nginx-1.25.tar
+
+# Importar comprimido:
+gunzip -c nginx-1.25.tar.gz | docker load
+xz -d -c nginx-1.25.tar.xz | docker load
+
+# Saída:
+Loaded image: nginx:1.25
+
+# Cenários de uso:
+# → Servidor sem internet (air-gapped)
+# → Transferir para Raspberry Pi na rede local
+# → Backup de imagens customizadas
+# → Compartilhar imagem por pendrive/SCP</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 save/load vs export/import:</strong> <code>docker save</code> preserva layers, tags e histórico (é a forma correta para imagens). <code>docker export</code> exporta o filesystem de um <em>container</em> como um único layer (perde histórico e metadata).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: DOCKERFILE — TODAS AS INSTRUÇÕES -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Dockerfile</span>
+          <h2>Dockerfile — Todas as Instruções</h2>
+          <p>O Dockerfile é a receita que define como construir uma imagem Docker. Cada instrução cria uma camada na imagem final. Domine cada uma delas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>FROM — Imagem Base</h3>
+          <p>Toda imagem começa com <code>FROM</code>. Define a imagem base sobre a qual você constrói. É a primeira instrução obrigatória do Dockerfile.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>FROM</code><span class="cmd-tag">Base</span></div>
+              <pre><code># Sintaxe:
+FROM imagem:tag
+FROM imagem@digest
+FROM imagem:tag AS nome_do_stage
+
+# Exemplos comuns:
 FROM ubuntu:22.04
-FROM scratch  # imagem vazia</code></pre>
+FROM python:3.12-slim
+FROM node:20-alpine
+FROM golang:1.22 AS builder
+FROM scratch  # Imagem vazia — para binários estáticos
+
+# Com plataforma específica:
+FROM --platform=linux/amd64 python:3.12-slim
+FROM --platform=linux/arm64 node:20-alpine</code></pre>
             </div>
             <div class="command-card">
+              <div class="command-header"><code>Escolhendo a imagem base</code><span class="cmd-tag">Decisão</span></div>
+              <pre><code># Variantes comuns:
+python:3.12        → Debian full (1.0GB) — dev/debug
+python:3.12-slim   → Debian minimal (150MB) — produção
+python:3.12-alpine → Alpine Linux (50MB) — mínimo
+
+# Trade-offs:
+# Full   = mais pacotes, mais fácil, mais pesada
+# Slim   = equilíbrio ideal para 90% dos casos
+# Alpine = mínima, mas pode ter incompatibilidades
+#          (musl vs glibc — cuidado com Python/Node)
+
+# Regra para produção:
+✅ Use -slim como padrão
+✅ Use -alpine se tiver certeza de compatibilidade
+❌ Nunca use :latest em produção
+❌ Evite full exceto para debugging</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>RUN — Executar Comandos</h3>
+          <p><code>RUN</code> executa comandos durante o build da imagem. Cada <code>RUN</code> cria uma nova camada. Usado para instalar pacotes, configurar o ambiente, compilar código.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Formas de uso</code><span class="cmd-tag">Sintaxe</span></div>
+              <pre><code># Shell form (usa /bin/sh -c):
+RUN apt-get update
+RUN pip install flask
+
+# Exec form (sem shell — mais preciso):
+RUN ["apt-get", "update"]
+RUN ["pip", "install", "flask"]
+
+# Multi-line com \ (legibilidade):
+RUN apt-get update && \
+    apt-get install -y \
+      curl \
+      wget \
+      vim && \
+    rm -rf /var/lib/apt/lists/*</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Boas práticas de RUN</code><span class="cmd-tag">Importante</span></div>
+              <pre><code># ❌ RUIM: cada RUN = nova camada + cache ineficiente
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt-get install -y wget
+RUN rm -rf /var/lib/apt/lists/*
+# = 4 camadas, cache do apt não é limpo na mesma layer!
+
+# ✅ BOM: encadeie com && em um único RUN
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl \
+      wget && \
+    rm -rf /var/lib/apt/lists/*
+# = 1 camada, limpeza efetiva, imagem menor
+
+# 💡 --no-install-recommends evita pacotes sugeridos
+# 💡 rm -rf /var/lib/apt/lists/* limpa o cache do apt
+# 💡 Ambos DEVEM estar no mesmo RUN para ter efeito</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Por que a limpeza deve estar no mesmo RUN?</strong> Cada <code>RUN</code> cria uma layer imutável. Se você instala pacotes em um RUN e limpa em outro, a layer anterior <strong>ainda contém os arquivos</strong>! A remoção cria uma "whiteout" na nova layer, mas o tamanho total da imagem não diminui.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>COPY vs ADD — Copiar Arquivos</h3>
+          <p>Ambos copiam arquivos do contexto de build para a imagem, mas com diferenças importantes:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>COPY</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># Copia arquivos/diretórios do host para a imagem
+# Simples, previsível, transparente
+
+COPY requirements.txt .
+COPY src/ /app/src/
+COPY package.json package-lock.json ./
+COPY --chown=appuser:appuser . /app/
+
+# Com multi-stage (copiar do outro stage):
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=0 /go/bin/app /app
+
+# Wildcards:
+COPY *.py /app/
+COPY config*.yml /etc/app/</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ADD</code><span class="cmd-tag">Extras</span></div>
+              <pre><code># Faz tudo que COPY faz, MAIS:
+# 1. Descompacta arquivos tar automaticamente
+# 2. Aceita URLs como fonte
+
+ADD app.tar.gz /app/       # Descompacta automaticamente!
+ADD https://example.com/file.txt /app/  # Download de URL
+
+# ⚠️ Problemas com ADD:
+# → URL não usa cache de build
+# → Comportamento implícito (descompacta sem pedir)
+# → Menos previsível em code review
+
+# Quando usar ADD:
+# → APENAS quando precisa descompactar tar local
+# → Para URLs, prefira: RUN curl -o ... ou RUN wget
+
+# Regra: USE COPY a menos que precise
+# das features extras do ADD</code></pre>
+            </div>
+          </div>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Feature</th><th>COPY</th><th>ADD</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Copiar arquivos locais</td><td>✅ Sim</td><td>✅ Sim</td></tr>
+              <tr><td>Copiar diretórios</td><td>✅ Sim</td><td>✅ Sim</td></tr>
+              <tr><td>Descompactar .tar/.gz</td><td>❌ Não</td><td>✅ Sim (automático)</td></tr>
+              <tr><td>Baixar de URL</td><td>❌ Não</td><td>✅ Sim</td></tr>
+              <tr><td>Copiar de outro stage</td><td>✅ --from=</td><td>❌ Não</td></tr>
+              <tr><td>Previsibilidade</td><td>✅ Alta</td><td>⚠️ Comportamento implícito</td></tr>
+              <tr><td><strong>Recomendação</strong></td><td><strong>✅ Use sempre</strong></td><td>⚠️ Apenas para descompactar tar</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>WORKDIR — Diretório de Trabalho</h3>
+          <p>Define o diretório padrão para as instruções subsequentes (<code>RUN</code>, <code>COPY</code>, <code>CMD</code>, <code>ENTRYPOINT</code>). Se não existir, é criado automaticamente.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
               <div class="command-header"><code>WORKDIR</code><span class="cmd-tag">Diretório</span></div>
-              <p>Define o diretório de trabalho para instruções subsequentes (RUN, CMD, COPY, etc.).</p>
-              <pre><code>WORKDIR /app
-# Cria o diretório se não existir</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>COPY</code><span class="cmd-tag">Copiar</span></div>
-              <p>Copia arquivos/diretórios do contexto de build para a imagem.</p>
-              <pre><code># Copiar arquivo específico
-COPY package.json .
+              <pre><code># Definir diretório de trabalho:
+WORKDIR /app
 
-# Copiar tudo
-COPY . .
+# A partir daqui, tudo é relativo a /app:
+COPY . .          # = COPY . /app/
+RUN npm install   # Executa em /app
+CMD ["node", "server.js"]  # Executa em /app
 
-# Copiar com permissões
-COPY --chown=node:node . .</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>ADD</code><span class="cmd-tag">Adicionar</span></div>
-              <p>Similar ao COPY, mas também extrai arquivos .tar e aceita URLs. Prefira COPY na maioria dos casos.</p>
-              <pre><code># Extrair tar automaticamente
-ADD app.tar.gz /app/
+# Pode usar múltiplos WORKDIR:
+WORKDIR /app
+WORKDIR src        # Agora em /app/src
+WORKDIR ../config  # Agora em /app/config
 
-# Baixar de URL (evite — prefira curl no RUN)
-ADD https://example.com/file.txt /app/</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>RUN</code><span class="cmd-tag">Executar</span></div>
-              <p>Executa comandos durante o build. Cada RUN cria uma nova camada.</p>
-              <pre><code># Instalar dependências
-RUN apt-get update && apt-get install -y \
-    curl \
-    vim \
-  && rm -rf /var/lib/apt/lists/*
+# ❌ RUIM: usar cd em RUN (não persiste entre layers!)
+RUN cd /app && npm install   # Funciona, mas é feio
+RUN npm start                # Volta para / !
 
-# Instalar pacotes Node.js
-RUN npm ci --only=production</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>CMD</code><span class="cmd-tag">Comando padrão</span></div>
-              <p>Define o comando padrão ao iniciar o container. Pode ser sobrescrito no <code>docker run</code>.</p>
-              <pre><code># Forma exec (recomendada)
-CMD ["node", "server.js"]
+# ✅ BOM: usar WORKDIR
+WORKDIR /app
+RUN npm install
+RUN npm start     # Ainda em /app ✓
 
-# Forma shell
-CMD npm start</code></pre>
+# 💡 WORKDIR aceita variáveis de ambiente:
+ENV APP_HOME=/opt/myapp
+WORKDIR $APP_HOME</code></pre>
             </div>
-            <div class="command-card">
-              <div class="command-header"><code>ENTRYPOINT</code><span class="cmd-tag">Ponto de entrada</span></div>
-              <p>Define o executável principal do container. Não é facilmente sobrescrito.</p>
-              <pre><code># Container como executável
-ENTRYPOINT ["python", "app.py"]
+          </div>
+        </div>
 
-# Combinado com CMD (args padrão)
-ENTRYPOINT ["python", "app.py"]
-CMD ["--port", "8000"]</code></pre>
-            </div>
+        <div class="topic-block">
+          <h3>ENV vs ARG — Variáveis de Ambiente vs Build Arguments</h3>
+          <p>Ambos definem variáveis, mas com escopo e persistência diferentes:</p>
+          <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>EXPOSE</code><span class="cmd-tag">Porta</span></div>
-              <p>Documenta a porta que o container escuta. Não publica a porta — é apenas metadata.</p>
-              <pre><code>EXPOSE 3000
-EXPOSE 8080/tcp
-EXPOSE 8443/udp</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>ENV</code><span class="cmd-tag">Variável</span></div>
-              <p>Define variáveis de ambiente disponíveis no build E no container em execução.</p>
-              <pre><code>ENV NODE_ENV=production
-ENV PORT=3000
-ENV APP_HOME=/app</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>ARG</code><span class="cmd-tag">Build arg</span></div>
-              <p>Define variáveis disponíveis apenas durante o build. Não persiste no container final.</p>
-              <pre><code>ARG NODE_VERSION=20
-FROM node:${NODE_VERSION}-alpine
+              <div class="command-header"><code>ENV</code><span class="cmd-tag">Runtime</span></div>
+              <pre><code># ENV persiste na imagem final e nos containers
 
+# Definir variáveis de ambiente:
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV APP_VERSION=2.1.0
+
+# Múltiplas em uma linha:
+ENV NODE_ENV=production \
+    PORT=8080 \
+    APP_VERSION=2.1.0
+
+# Usando em instruções posteriores:
+ENV INSTALL_DIR=/opt/app
+WORKDIR $INSTALL_DIR
+RUN echo "Instalando em $INSTALL_DIR"
+
+# Disponível em RUNTIME (dentro do container):
+docker run minha-app
+# → process.env.NODE_ENV = "production"
+# → process.env.PORT = "8080"
+
+# Override no docker run:
+docker run -e PORT=9090 minha-app</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ARG</code><span class="cmd-tag">Build-time</span></div>
+              <pre><code># ARG só existe durante o build — NÃO vai para a imagem
+
+# Definir build argument:
+ARG PYTHON_VERSION=3.12
 ARG BUILD_DATE
-LABEL build-date=$BUILD_DATE</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>VOLUME</code><span class="cmd-tag">Volume</span></div>
-              <p>Cria um ponto de montagem para dados persistentes.</p>
-              <pre><code>VOLUME /data
-VOLUME ["/var/log", "/data"]</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>USER</code><span class="cmd-tag">Segurança</span></div>
-              <p>Define o usuário para executar instruções subsequentes e o container. Evite rodar como root.</p>
-              <pre><code># Criar e usar usuário não-root
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>LABEL</code><span class="cmd-tag">Metadata</span></div>
-              <p>Adiciona metadados à imagem (autor, versão, descrição).</p>
-              <pre><code>LABEL maintainer="dev@example.com"
-LABEL version="1.0"
-LABEL description="API de pagamentos"</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>HEALTHCHECK</code><span class="cmd-tag">Saúde</span></div>
-              <p>Define como verificar se o container está saudável.</p>
-              <pre><code>HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1</code></pre>
+ARG GIT_SHA
+
+# Usar durante o build:
+FROM python:${PYTHON_VERSION}-slim
+ARG BUILD_DATE
+LABEL build-date=$BUILD_DATE
+
+# Passar valor no build:
+docker build \
+  --build-arg PYTHON_VERSION=3.11 \
+  --build-arg BUILD_DATE=$(date -I) \
+  --build-arg GIT_SHA=$(git rev-parse HEAD) \
+  -t minha-app .
+
+# ⚠️ ARG antes do FROM tem escopo especial:
+ARG BASE_IMAGE=python:3.12
+FROM ${BASE_IMAGE}
+# Após FROM, esse ARG não existe mais!
+# Precisa redeclarar se quiser usar:
+ARG BASE_IMAGE</code></pre>
             </div>
           </div>
-        </div>
-
-        <!-- ENTRYPOINT vs CMD -->
-        <div class="topic-block">
-          <h2>ENTRYPOINT vs CMD</h2>
           <table class="styled-table">
             <thead>
-              <tr><th>Aspecto</th><th>CMD</th><th>ENTRYPOINT</th></tr>
+              <tr><th>Característica</th><th>ENV</th><th>ARG</th></tr>
             </thead>
             <tbody>
-              <tr><td>Sobrescrito por</td><td>Argumentos no <code>docker run</code></td><td>Flag <code>--entrypoint</code></td></tr>
-              <tr><td>Uso típico</td><td>Argumentos padrão</td><td>Executável principal</td></tr>
-              <tr><td>Combinação</td><td colspan="2">ENTRYPOINT define o comando, CMD define argumentos padrão</td></tr>
+              <tr><td><strong>Disponível no build</strong></td><td>✅ Sim</td><td>✅ Sim</td></tr>
+              <tr><td><strong>Disponível no runtime</strong></td><td>✅ Sim</td><td>❌ Não</td></tr>
+              <tr><td><strong>Persiste na imagem</strong></td><td>✅ Sim (metadata)</td><td>❌ Não</td></tr>
+              <tr><td><strong>Override no run</strong></td><td><code>docker run -e VAR=val</code></td><td>N/A</td></tr>
+              <tr><td><strong>Override no build</strong></td><td>Não diretamente</td><td><code>--build-arg VAR=val</code></td></tr>
+              <tr><td><strong>Uso típico</strong></td><td>Configuração da app</td><td>Versões, tokens de build</td></tr>
+              <tr><td><strong>Segurança</strong></td><td>Visível com docker inspect</td><td>⚠️ Visível no history!</td></tr>
             </tbody>
           </table>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Exemplo combinado</code><span class="cmd-tag">Padrão</span></div>
-              <pre><code>ENTRYPOINT ["python", "manage.py"]
-CMD ["runserver", "0.0.0.0:8000"]
+          <div class="info-box highlight">
+            <strong>⚠️ NUNCA coloque secrets em ARG ou ENV!</strong> Ambos ficam visíveis no histórico da imagem (<code>docker history</code>). Para secrets no build, use <code>docker build --secret</code> (BuildKit) ou variáveis de ambiente do CI/CD.
+          </div>
+        </div>
 
-# docker run app → python manage.py runserver 0.0.0.0:8000
-# docker run app migrate → python manage.py migrate</code></pre>
+        <div class="topic-block">
+          <h3>EXPOSE — Documentar Portas</h3>
+          <p><code>EXPOSE</code> é <strong>apenas documentação</strong>. Não abre nem publica portas. Informa quais portas o container escuta.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>EXPOSE</code><span class="cmd-tag">Documentação</span></div>
+              <pre><code># Documentar portas que a aplicação usa:
+EXPOSE 8080
+EXPOSE 443
+EXPOSE 3000/tcp
+EXPOSE 5432/udp
+
+# ⚠️ EXPOSE NÃO:
+# → Abre portas no host
+# → Publica portas externamente
+# → Faz binding de portas
+# → É necessário para a app funcionar
+
+# O que EXPOSE FAZ:
+# → Documenta a intenção (para outros devs)
+# → Funciona com docker run -P (publica todas as EXPOSE)
+# → Aparece em docker inspect e docker ps
+
+# Publicar portas (quem faz o trabalho real):
+docker run -p 8080:8080 minha-app    # Binding manual
+docker run -P minha-app               # Publica todas as EXPOSE em portas aleatórias
+
+# Exemplo prático:
+EXPOSE 8080
+# Sem -p no docker run: porta 8080 existe DENTRO do container
+#                       mas NÃO é acessível de fora
+# Com -p 8080:8080: agora sim, acessível em localhost:8080</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- ARG vs ENV -->
         <div class="topic-block">
-          <h2>ARG vs ENV</h2>
+          <h3>CMD vs ENTRYPOINT — O Comando Principal</h3>
+          <p>Ambos definem o que executar quando o container inicia, mas com comportamentos fundamentalmente diferentes:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>CMD</code><span class="cmd-tag">Padrão</span></div>
+              <pre><code># CMD define o comando PADRÃO — pode ser sobrescrito
+
+# Exec form (recomendado):
+CMD ["python", "app.py"]
+CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]
+
+# Shell form (usa /bin/sh -c):
+CMD python app.py
+CMD node server.js
+
+# CMD é SUBSTITUÍDO por argumentos do docker run:
+# Dockerfile: CMD ["python", "app.py"]
+docker run minha-app              # Executa: python app.py
+docker run minha-app bash         # Executa: bash (CMD ignorado!)
+docker run minha-app python test.py  # Executa: python test.py
+
+# Apenas o ÚLTIMO CMD vale:
+CMD ["echo", "primeiro"]
+CMD ["echo", "segundo"]   # ← Só este executa</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>ENTRYPOINT</code><span class="cmd-tag">Fixo</span></div>
+              <pre><code># ENTRYPOINT define o comando FIXO — não é substituído
+
+# Exec form (recomendado):
+ENTRYPOINT ["python"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Com ENTRYPOINT, argumentos do docker run são ADICIONADOS:
+# Dockerfile: ENTRYPOINT ["python"]
+docker run minha-app app.py       # Executa: python app.py
+docker run minha-app -c "print(1)"  # Executa: python -c "print(1)"
+
+# ENTRYPOINT + CMD = Padrão com override parcial:
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+# docker run minha-app         → python app.py
+# docker run minha-app test.py → python test.py
+#                                 (CMD substituído, ENTRYPOINT mantido)
+
+# Para sobrescrever ENTRYPOINT no run:
+docker run --entrypoint bash minha-app</code></pre>
+            </div>
+          </div>
           <table class="styled-table">
             <thead>
-              <tr><th>Aspecto</th><th>ARG</th><th>ENV</th></tr>
+              <tr><th>Cenário</th><th>CMD</th><th>ENTRYPOINT</th><th>ENTRYPOINT + CMD</th></tr>
             </thead>
             <tbody>
-              <tr><td>Disponível no build</td><td>✅ Sim</td><td>✅ Sim</td></tr>
-              <tr><td>Disponível no container</td><td>❌ Não</td><td>✅ Sim</td></tr>
-              <tr><td>Definido via CLI</td><td><code>--build-arg</code></td><td><code>-e</code> no run</td></tr>
-              <tr><td>Persiste na imagem</td><td>❌ Não</td><td>✅ Sim</td></tr>
+              <tr><td><code>docker run app</code></td><td>Executa CMD</td><td>Executa ENTRYPOINT</td><td>ENTRYPOINT + CMD args</td></tr>
+              <tr><td><code>docker run app X</code></td><td>Executa X (CMD ignorado)</td><td>ENTRYPOINT X</td><td>ENTRYPOINT + X (CMD substituído)</td></tr>
+              <tr><td><strong>Uso típico</strong></td><td>App que aceita comando alternativo</td><td>App que é sempre o mesmo binário</td><td>Binário fixo + flags opcionais</td></tr>
+              <tr><td><strong>Exemplo</strong></td><td>CMD ["npm", "start"]</td><td>ENTRYPOINT ["java", "-jar"]</td><td>ENTRYPOINT ["python"] CMD ["app.py"]</td></tr>
             </tbody>
           </table>
-        </div>
+          <div class="info-box">
+            <strong>💡 Exec form vs Shell form:</strong>
+            <pre><code># Exec form: ["executable", "arg1", "arg2"]
+CMD ["node", "server.js"]
+# → PID 1 = node (recebe signals corretamente, graceful shutdown)
 
-        <!-- HEALTHCHECK -->
-        <div class="topic-block">
-          <h2>HEALTHCHECK — Exemplo Completo</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>HEALTHCHECK</code><span class="cmd-tag">Monitoramento</span></div>
-              <p>O Docker verifica periodicamente a saúde do container. Status: <code>healthy</code>, <code>unhealthy</code>, <code>starting</code>.</p>
-              <pre><code>FROM node:20-alpine
-WORKDIR /app
-COPY . .
-RUN npm ci --only=production
-EXPOSE 3000
+# Shell form: command arg1 arg2
+CMD node server.js
+# → PID 1 = /bin/sh -c "node server.js"
+# → node é filho do sh (NÃO recebe SIGTERM diretamente!)
+# → Container pode não fazer graceful shutdown!
 
-HEALTHCHECK --interval=30s \
-  --timeout=10s \
-  --start-period=10s \
-  --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
-
-CMD ["node", "server.js"]</code></pre>
-            </div>
+# SEMPRE use exec form em produção!</code></pre>
           </div>
         </div>
 
-        <!-- USER Security -->
         <div class="topic-block">
-          <h2>USER — Segurança com Usuário Não-Root</h2>
+          <h3>USER — Segurança de Processos</h3>
+          <p>Define qual usuário executa as instruções subsequentes e o container em runtime. <strong>Nunca rode containers como root em produção.</strong></p>
           <div class="command-grid">
-            <div class="command-card">
+            <div class="command-card wide">
               <div class="command-header"><code>USER</code><span class="cmd-tag">Segurança</span></div>
-              <p>Nunca execute containers como root em produção. Crie um usuário dedicado.</p>
-              <pre><code>FROM node:20-alpine
+              <pre><code># Criar usuário e mudar contexto:
+RUN groupadd -r appuser && \
+    useradd -r -g appuser -d /app -s /sbin/nologin appuser
 
-# Criar usuário não-root
-RUN addgroup -S appgroup && \
-    adduser -S appuser -G appgroup
+# Dar permissões antes de mudar de usuário:
+COPY --chown=appuser:appuser . /app/
+# ou:
+RUN chown -R appuser:appuser /app
 
-WORKDIR /app
-COPY --chown=appuser:appgroup . .
-RUN npm ci --only=production
-
-# Trocar para usuário não-root
+# Mudar para o novo usuário (tudo abaixo roda como appuser):
 USER appuser
 
-EXPOSE 3000
-CMD ["node", "server.js"]</code></pre>
+# Verificar no container:
+# $ whoami → appuser
+# $ id → uid=1000(appuser) gid=1000(appuser)
+
+# Por que NÃO rodar como root em produção:
+# 1. Se um atacante escapar do container, terá root no host
+# 2. Principle of Least Privilege (PoLP)
+# 3. Muitos registries/orquestradores exigem (ex: OpenShift)
+# 4. Compliance e auditoria
+
+# Exemplo completo:
+FROM python:3.12-slim
+RUN groupadd -r app && useradd -r -g app -d /app app
+WORKDIR /app
+COPY --chown=app:app requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY --chown=app:app . .
+USER app
+EXPOSE 8080
+CMD ["python", "app.py"]</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- docker build -->
         <div class="topic-block">
-          <h2>docker build — Construir Imagens</h2>
+          <h3>HEALTHCHECK — Monitoramento de Saúde</h3>
+          <p>Define como Docker verifica se o container está funcionando corretamente (não apenas rodando, mas <em>saudável</em>):</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>docker build</code><span class="cmd-tag">Build</span></div>
-              <p>Constrói uma imagem a partir de um Dockerfile e um contexto de build.</p>
-              <pre><code># Build básico (Dockerfile no diretório atual)
-docker build -t minha-app:v1.0 .
+              <div class="command-header"><code>HEALTHCHECK</code><span class="cmd-tag">Saúde</span></div>
+              <pre><code># Sintaxe completa:
+HEALTHCHECK --interval=30s \
+            --timeout=10s \
+            --start-period=5s \
+            --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
 
-# Especificar Dockerfile diferente
-docker build -f Dockerfile.prod -t minha-app:prod .
+# Parâmetros:
+# --interval    = Frequência da checagem (default: 30s)
+# --timeout     = Tempo máximo de resposta (default: 30s)
+# --start-period = Tempo de graça na inicialização (default: 0s)
+# --retries     = Tentativas antes de "unhealthy" (default: 3)
 
-# Passar build arguments
-docker build --build-arg NODE_VERSION=20 -t minha-app .
+# Exit codes:
+# 0 = healthy
+# 1 = unhealthy
 
-# Build sem cache (forçar rebuild completo)
-docker build --no-cache -t minha-app .
+# Desabilitar healthcheck herdado:
+HEALTHCHECK NONE</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Exemplos práticos</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code># API REST:
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:8080/api/health || exit 1
 
-# Ver output detalhado do build
-docker build --progress=plain -t minha-app .
+# Aplicação Node.js (sem curl):
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"
 
-# Múltiplas tags
-docker build -t minha-app:latest -t minha-app:v1.0 .</code></pre>
+# PostgreSQL:
+HEALTHCHECK --interval=10s --timeout=5s \
+  CMD pg_isready -U postgres || exit 1
+
+# Redis:
+HEALTHCHECK --interval=10s --timeout=3s \
+  CMD redis-cli ping | grep -q PONG || exit 1
+
+# Verificar status:
+docker ps
+# CONTAINER  IMAGE    STATUS
+# abc123     api      Up 5 min (healthy)
+# def456     db       Up 5 min (unhealthy)</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- .dockerignore -->
         <div class="topic-block">
-          <h2>.dockerignore</h2>
+          <h3>LABEL — Metadata da Imagem</h3>
+          <p>Adiciona metadados à imagem em formato chave=valor. Não afeta o funcionamento, mas é essencial para organização e automação:</p>
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>.dockerignore</code><span class="cmd-tag">Otimização</span></div>
-              <p>Exclui arquivos do contexto de build. Reduz tamanho, acelera build e evita copiar dados sensíveis.</p>
-              <pre><code># Dependências (serão instaladas no build)
-node_modules/
-__pycache__/
-venv/
+            <div class="command-card wide">
+              <div class="command-header"><code>LABEL</code><span class="cmd-tag">Metadata</span></div>
+              <pre><code># Adicionar labels (OCI standard):
+LABEL org.opencontainers.image.title="Minha API"
+LABEL org.opencontainers.image.description="API REST para gerenciamento de tarefas"
+LABEL org.opencontainers.image.version="2.1.0"
+LABEL org.opencontainers.image.authors="dev@empresa.com"
+LABEL org.opencontainers.image.source="https://github.com/org/repo"
+LABEL org.opencontainers.image.created="2024-01-15T10:30:00Z"
 
+# Múltiplas em uma instrução (1 layer):
+LABEL org.opencontainers.image.title="Minha API" \
+      org.opencontainers.image.version="2.1.0" \
+      org.opencontainers.image.authors="dev@empresa.com"
+
+# Labels customizadas:
+LABEL com.empresa.team="backend"
+LABEL com.empresa.environment="production"
+
+# Usar com ARG para valores dinâmicos:
+ARG BUILD_DATE
+ARG GIT_SHA
+LABEL org.opencontainers.image.created=$BUILD_DATE \
+      org.opencontainers.image.revision=$GIT_SHA
+
+# Consultar labels:
+docker inspect --format='{{json .Config.Labels}}' minha-app
+
+# Filtrar imagens por label:
+docker images --filter "label=com.empresa.team=backend"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>VOLUME — Pontos de Montagem</h3>
+          <p>Declara que um diretório deve ser tratado como volume (dados persistentes que sobrevivem ao container):</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>VOLUME</code><span class="cmd-tag">Persistência</span></div>
+              <pre><code># Declarar volumes:
+VOLUME /data
+VOLUME /var/log/app
+VOLUME ["/data", "/var/log/app"]
+
+# O que VOLUME faz:
+# 1. Cria um ponto de montagem no path especificado
+# 2. Dados escritos ali são armazenados FORA do container layer
+# 3. Sobrevivem ao docker rm (se usado named volume)
+# 4. Não são incluídos em docker commit
+
+# ⚠️ Cuidado: VOLUME no Dockerfile cria um ANONYMOUS volume
+# Se você não montar explicitamente, Docker cria um volume sem nome
+# que é difícil de gerenciar. Prefira:
+
+# No Dockerfile:
+VOLUME /data
+
+# No docker run (melhor controle):
+docker run -v meus-dados:/data minha-app       # Named volume
+docker run -v /host/path:/data minha-app       # Bind mount
+
+# 💡 Em geral, é melhor NÃO usar VOLUME no Dockerfile
+# e deixar o operador decidir no docker run ou compose.
+# VOLUME no Dockerfile impede que layers posteriores modifiquem o path!</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: .dockerignore -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Build Context</span>
+          <h2>.dockerignore — Controlando o Contexto de Build</h2>
+          <p>O arquivo .dockerignore define quais arquivos e diretórios NÃO devem ser enviados para o Docker daemon durante o build. É essencial para segurança, performance e tamanho da imagem.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que é o Build Context?</h3>
+          <p>Quando você executa <code>docker build .</code>, o Docker envia <strong>todo o conteúdo do diretório</strong> (o "contexto") para o daemon. Sem .dockerignore, isso inclui tudo — node_modules, .git, arquivos de teste, secrets...</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>O problema sem .dockerignore</code><span class="cmd-tag">Problema</span></div>
+              <pre><code># Sem .dockerignore — o que acontece:
+$ docker build -t minha-app .
+Sending build context to Docker daemon  2.1GB  ← 😱
+
+# O que foi enviado:
+node_modules/     → 500MB (será reinstalado pelo npm install!)
+.git/             → 800MB (histórico completo do git)
+dist/             → 50MB  (será reconstruído no build!)
+*.log             → 100MB (logs desnecessários)
+.env              → 1KB   (⚠️ SECRETS EXPOSTOS!)
+tests/            → 20MB  (não precisa em produção)
+
+# Com .dockerignore:
+$ docker build -t minha-app .
+Sending build context to Docker daemon  5.2MB  ← ✅
+
+# Benefícios:
+# → Build 100x mais rápido (menos dados para enviar)
+# → Imagem menor (COPY . não inclui lixo)
+# → Segurança (secrets não vazam para a imagem)
+# → Cache mais eficiente (menos invalidação)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo Completo de .dockerignore</h3>
+          <p>Um .dockerignore profissional para projetos reais:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>.dockerignore</code><span class="cmd-tag">Arquivo</span></div>
+              <pre><code># ==============================
 # Controle de versão
-.git/
+# ==============================
+.git
 .gitignore
+.gitattributes
 
-# IDE e editor
-.vscode/
-.idea/
-*.swp
+# ==============================
+# Dependências (serão reinstaladas no build)
+# ==============================
+node_modules
+vendor/
+__pycache__
+*.pyc
+.venv
+venv
 
-# Ambiente e segredos
+# ==============================
+# Build artifacts (serão reconstruídos)
+# ==============================
+dist
+build
+*.egg-info
+target/
+
+# ==============================
+# Ambiente e secrets (NUNCA incluir!)
+# ==============================
 .env
 .env.*
 *.pem
 *.key
+credentials/
+secrets/
 
-# Build artifacts
-dist/
-build/
-*.log
+# ==============================
+# IDE e sistema operacional
+# ==============================
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 
-# Docker
+# ==============================
+# Testes e documentação (não vão para prod)
+# ==============================
+tests/
+test/
+__tests__/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output
+htmlcov/
+docs/
+*.md
+!README.md
+
+# ==============================
+# Docker (evita recursão)
+# ==============================
 Dockerfile*
 docker-compose*
-.dockerignore</code></pre>
+.dockerignore
+
+# ==============================
+# CI/CD
+# ==============================
+.github
+.gitlab-ci.yml
+Jenkinsfile
+.circleci
+
+# ==============================
+# Logs e dados temporários
+# ==============================
+*.log
+logs/
+tmp/
+temp/</code></pre>
             </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Impacto na Segurança:</strong> Sem .dockerignore, um <code>COPY . /app/</code> no Dockerfile copia seus arquivos <code>.env</code>, chaves SSH, tokens e credenciais para DENTRO da imagem. Qualquer pessoa com acesso à imagem pode extrair esses dados com <code>docker run imagem cat /app/.env</code>.
           </div>
         </div>
 
-        <!-- Exemplo Node.js -->
         <div class="topic-block">
-          <h2>Exemplo Completo — Dockerfile Node.js</h2>
+          <h3>Sintaxe e Padrões</h3>
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Dockerfile</code><span class="cmd-tag">Node.js</span></div>
-              <pre><code># Imagem base leve
-FROM node:20-alpine
+            <div class="command-card wide">
+              <div class="command-header"><code>Regras de sintaxe</code><span class="cmd-tag">Referência</span></div>
+              <pre><code># Padrões glob (similar ao .gitignore):
+*.log           # Qualquer arquivo .log
+**/*.log        # .log em qualquer subdiretório
+temp*           # Qualquer coisa começando com "temp"
+*/temp*         # temp* em subdiretórios de 1 nível
 
-# Metadados
-LABEL maintainer="dev@example.com"
-LABEL version="1.0"
+# Exceções (include de volta):
+*.md            # Ignora todos os .md
+!README.md      # MAS inclui README.md
 
-# Criar usuário não-root
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Diretórios:
+node_modules    # Ignora o diretório node_modules
+node_modules/   # Equivalente
 
-# Diretório de trabalho
-WORKDIR /app
+# Comentários:
+# Isso é um comentário
 
-# Copiar apenas package files primeiro (cache de dependências)
-COPY package.json package-lock.json ./
-
-# Instalar dependências
-RUN npm ci --only=production && npm cache clean --force
-
-# Copiar código da aplicação
-COPY --chown=appuser:appgroup . .
-
-# Variáveis de ambiente
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Trocar para usuário não-root
-USER appuser
-
-# Documentar porta
-EXPOSE 3000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
-
-# Comando de inicialização
-CMD ["node", "server.js"]</code></pre>
+# Ordem importa para exceções:
+*.js            # Ignora todos .js
+!src/**/*.js    # Mas inclui os de src/
+# Resultado: inclui src/app.js, exclui test/app.js</code></pre>
             </div>
           </div>
         </div>
-
-        <!-- Exemplo Python -->
-        <div class="topic-block">
-          <h2>Exemplo Completo — Dockerfile Python</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Dockerfile</code><span class="cmd-tag">Python</span></div>
-              <pre><code># Imagem base slim
-FROM python:3.12-slim
-
-# Metadados
-LABEL maintainer="dev@example.com"
-
-# Evitar criação de .pyc e buffering
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-  && rm -rf /var/lib/apt/lists/*
-
-# Criar usuário não-root
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
-
-# Diretório de trabalho
-WORKDIR /app
-
-# Copiar e instalar dependências Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Copiar código
-COPY --chown=appuser:appgroup . .
-
-# Trocar para usuário não-root
-USER appuser
-
-# Porta
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-# Iniciar aplicação
-ENTRYPOINT ["python"]
-CMD ["app.py", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: MULTI-STAGE BUILD -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Avançado</span>
+          <h2>Multi-Stage Build</h2>
+          <p>A técnica mais poderosa para criar imagens mínimas de produção. Separe o ambiente de build do ambiente de runtime e reduza suas imagens de GBs para MBs.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>O Problema: Imagens Enormes com Toolchain de Build</h3>
+          <p>Para compilar uma aplicação, você precisa de ferramentas (compilador, SDK, dependências de build). Mas em produção, só precisa do binário/artefato final. Sem multi-stage, tudo vai para a imagem:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sem Multi-Stage — O problema</code><span class="cmd-tag danger">Problema</span></div>
+              <pre><code># ❌ Dockerfile SEM multi-stage (Go):
+FROM golang:1.22              # 800MB de SDK + ferramentas
+WORKDIR /app
+COPY . .
+RUN go build -o server .     # Compila o binário (15MB)
+CMD ["./server"]
+
+# Resultado: imagem de ~815MB
+# Contém: Go SDK, compilador, código-fonte, ferramentas de build
+# Tudo desnecessário em produção!
+# Superfície de ataque ENORME
+
+# ❌ Dockerfile SEM multi-stage (Node.js):
+FROM node:20                  # 1.1GB
+WORKDIR /app
+COPY package*.json ./
+RUN npm install               # Inclui devDependencies!
+COPY . .
+RUN npm run build             # Gera /app/dist
+CMD ["node", "dist/server.js"]
+
+# Resultado: ~1.3GB
+# Contém: Node completo, código fonte, devDependencies, TypeScript compiler...</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>A Solução: Multi-Stage Build</h3>
+          <p>Use múltiplos <code>FROM</code> no mesmo Dockerfile. Cada FROM inicia um "stage". O stage final contém apenas o necessário para rodar a aplicação:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Conceito visual</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────┐
+│  STAGE 1: "builder"                                          │
+│  FROM golang:1.22 AS builder                                 │
+│                                                              │
+│  Contém: SDK, compilador, código-fonte, deps de build        │
+│  Faz: compila o código → gera binário                        │
+│  Tamanho: ~800MB                                             │
+│  ❌ NÃO vai para a imagem final                              │
+├──────────────────────────┬──────────────────────────────────┤
+│                          │ COPY --from=builder               │
+│                          ▼ (copia só o binário)              │
+├─────────────────────────────────────────────────────────────┤
+│  STAGE 2: "runtime" (IMAGEM FINAL)                           │
+│  FROM alpine:3.19                                            │
+│                                                              │
+│  Contém: SO mínimo + binário compilado                       │
+│  Tamanho: ~15MB ✅                                           │
+│  → Vai para produção                                         │
+└─────────────────────────────────────────────────────────────┘
+
+# De 800MB para 15MB — redução de 98%!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo: Go (compilado)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Multi-stage para Go</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code># ==================== STAGE 1: Build ====================
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /build
+
+# Cache de dependências (muda pouco)
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Código-fonte (muda frequentemente)
+COPY . .
+
+# Compilar binário estático (sem dependências de runtime)
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -ldflags="-w -s" -o /app/server ./cmd/server
+
+# ==================== STAGE 2: Runtime ====================
+FROM alpine:3.19
+
+# Certificados SSL (para HTTPS)
+RUN apk --no-cache add ca-certificates
+
+# Usuário não-root
+RUN adduser -D -H appuser
+USER appuser
+
+WORKDIR /app
+
+# Copiar APENAS o binário do stage de build
+COPY --from=builder /app/server .
+
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+
+CMD ["./server"]
+
+# Resultado:
+# Stage 1 (builder): ~800MB — descartado
+# Stage 2 (final):   ~15MB  — vai para produção ✅</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo: Node.js (interpretado)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Multi-stage para Node.js</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code># ==================== STAGE 1: Deps + Build ====================
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Instalar TODAS as dependências (incluindo devDependencies)
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Build (TypeScript → JavaScript, bundling, etc.)
+COPY . .
+RUN npm run build
+# Agora temos /app/dist com o código compilado
+
+# ==================== STAGE 2: Produção ====================
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Instalar APENAS dependências de produção
+COPY package.json package-lock.json ./
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Copiar código compilado do stage anterior
+COPY --from=builder /app/dist ./dist
+
+# Segurança
+RUN addgroup -S app && adduser -S app -G app
+USER app
+
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+CMD ["node", "dist/server.js"]
+
+# Resultado:
+# Sem multi-stage: ~1.3GB (node full + devDeps + source + build tools)
+# Com multi-stage: ~180MB (node alpine + prodDeps + dist apenas)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo: Python (com compilação de dependências)</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Multi-stage para Python</code><span class="cmd-tag">Exemplo</span></div>
+              <pre><code># ==================== STAGE 1: Build de dependências ====================
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+# Instalar dependências de compilação (gcc, headers, etc.)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      gcc \
+      libpq-dev \
+      python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Instalar deps Python em diretório isolado
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# ==================== STAGE 2: Runtime ====================
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Copiar APENAS os pacotes instalados (sem gcc, sem headers!)
+COPY --from=builder /install /usr/local
+
+# Instalar apenas runtime libraries (libpq para psycopg2)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Código da aplicação
+COPY . .
+
+# Segurança
+RUN groupadd -r app && useradd -r -g app app
+USER app
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "app:create_app()"]
+
+# Resultado:
+# Sem multi-stage: ~450MB (gcc, headers, dev packages)
+# Com multi-stage: ~180MB (apenas runtime + deps compiladas)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Comparação de Tamanhos</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Linguagem</th><th>Sem Multi-Stage</th><th>Com Multi-Stage</th><th>Redução</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Go</strong></td><td>~815 MB</td><td>~15 MB (alpine) / ~7 MB (scratch)</td><td>98%</td></tr>
+              <tr><td><strong>Node.js</strong></td><td>~1.3 GB</td><td>~180 MB</td><td>86%</td></tr>
+              <tr><td><strong>Python</strong></td><td>~450 MB</td><td>~180 MB</td><td>60%</td></tr>
+              <tr><td><strong>Java (Spring)</strong></td><td>~700 MB</td><td>~200 MB</td><td>71%</td></tr>
+              <tr><td><strong>Rust</strong></td><td>~1.5 GB</td><td>~10 MB (scratch)</td><td>99%</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <strong>💡 Dica extra:</strong> Para Go e Rust (que geram binários estáticos), você pode usar <code>FROM scratch</code> no stage final — uma imagem literalmente vazia de 0 bytes! A imagem final contém APENAS seu binário.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: OTIMIZAÇÃO DE IMAGENS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Performance</span>
+          <h2>Otimização de Imagens — Boas Práticas de Mercado</h2>
+          <p>Aprenda as técnicas que times de engenharia em empresas como Google, Netflix e Spotify usam para criar imagens Docker eficientes, seguras e rápidas de construir.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1. Ordem das Instruções — Cache Optimization</h3>
+          <p>A regra mais importante: <strong>coloque o que muda menos primeiro</strong>. Quando uma camada invalida o cache, todas as camadas seguintes são reconstruídas.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>❌ Ordem ruim</code><span class="cmd-tag danger">Anti-pattern</span></div>
+              <pre><code># Qualquer mudança no código (COPY .)
+# invalida TUDO abaixo — inclusive npm install!
+
+FROM node:20-alpine
+WORKDIR /app
+COPY . .                    ← Muda a cada commit
+RUN npm install             ← Reinstala SEMPRE
+EXPOSE 3000
+CMD ["node", "server.js"]
+
+# Build time: ~2 minutos toda vez
+# Deps são reinstaladas em cada build 😫</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>✅ Ordem otimizada</code><span class="cmd-tag">Best Practice</span></div>
+              <pre><code># Separa dependências do código
+# npm install usa cache na maioria dos builds!
+
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./  ← Muda raramente
+RUN npm ci                              ← Cache válido!
+COPY . .                                ← Muda sempre (ok, é a última)
+EXPOSE 3000
+CMD ["node", "server.js"]
+
+# Build time: ~10 segundos (quando só código muda)
+# Deps usam cache — só reinstala quando package.json muda ✅</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Ordem ideal de instruções:</strong>
+            <pre><code>1. FROM (imagem base)
+2. Instalar pacotes do SO (apt-get)         ← Muda quase nunca
+3. Copiar arquivos de lock/requirements      ← Muda quando adiciona dep
+4. Instalar dependências da linguagem        ← Cache muito valioso
+5. Copiar código-fonte                       ← Muda a cada commit
+6. Build/compilação
+7. CMD/ENTRYPOINT</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2. Combinar RUN com && — Reduzir Camadas</h3>
+          <p>Cada <code>RUN</code> cria uma layer. Combine comandos relacionados para reduzir o número de layers e garantir que limpezas sejam efetivas:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>❌ Múltiplos RUN</code><span class="cmd-tag danger">Anti-pattern</span></div>
+              <pre><code># 4 layers — limpeza na layer 4 NÃO remove
+# o cache da layer 1!
+RUN apt-get update
+RUN apt-get install -y curl wget
+RUN apt-get install -y git
+RUN rm -rf /var/lib/apt/lists/*
+
+# Tamanho: ~150MB (cache ainda na layer 1)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>✅ RUN único com &&</code><span class="cmd-tag">Best Practice</span></div>
+              <pre><code># 1 layer — limpeza efetiva!
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl \
+      wget \
+      git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Tamanho: ~80MB (cache removido na mesma layer)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3. Usar Imagens Slim/Alpine</h3>
+          <p>A escolha da imagem base tem o maior impacto no tamanho final:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Imagem Base</th><th>Tamanho</th><th>Quando Usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>python:3.12</code></td><td>~1.0 GB</td><td>Desenvolvimento, debugging, quando precisa de pacotes do Debian</td></tr>
+              <tr><td><code>python:3.12-slim</code></td><td>~150 MB</td><td>✅ Produção (90% dos casos)</td></tr>
+              <tr><td><code>python:3.12-alpine</code></td><td>~50 MB</td><td>Quando tamanho é crítico e não há incompatibilidade com musl</td></tr>
+              <tr><td><code>node:20</code></td><td>~1.1 GB</td><td>Desenvolvimento</td></tr>
+              <tr><td><code>node:20-slim</code></td><td>~200 MB</td><td>✅ Produção</td></tr>
+              <tr><td><code>node:20-alpine</code></td><td>~130 MB</td><td>✅ Produção (Node funciona bem com Alpine)</td></tr>
+              <tr><td><code>ubuntu:22.04</code></td><td>~77 MB</td><td>Quando precisa de SO general-purpose</td></tr>
+              <tr><td><code>alpine:3.19</code></td><td>~7 MB</td><td>Base mínima para Go, Rust, binários estáticos</td></tr>
+              <tr><td><code>scratch</code></td><td>0 B</td><td>Binários estáticos compilados (Go, Rust)</td></tr>
+              <tr><td><code>distroless</code></td><td>~20 MB</td><td>Segurança máxima — sem shell, sem package manager</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box highlight">
+            <strong>⚠️ Cuidado com Alpine e Python:</strong> Alpine usa <code>musl</code> em vez de <code>glibc</code>. Pacotes Python com extensões C (numpy, pandas, psycopg2) podem precisar ser compilados do zero em Alpine, tornando o build mais lento e a imagem nem sempre menor. Para Python, <code>-slim</code> é geralmente a melhor escolha.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4. Não Instalar Pacotes Desnecessários</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Princípio do mínimo necessário</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># ❌ Instalar pacotes "por via das dúvidas":
+RUN apt-get update && apt-get install -y \
+    vim \         # Não precisa em produção!
+    nano \        # Editor? Em container?
+    htop \        # Debug? Use docker exec se necessário
+    man \         # Manuais? Sério?
+    ssh \         # SSH em container? Anti-pattern!
+    build-essential  # Compilador? Só se for compilar algo
+
+# ✅ Instalar APENAS o necessário:
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# --no-install-recommends: não instala pacotes "sugeridos"
+# Cada pacote = mais MBs + mais CVEs + mais superfície de ataque
+
+# 💡 Para debugging em produção:
+# Use docker exec -it container sh
+# Ou instale ferramentas em runtime: 
+# docker exec container apt-get install -y tcpdump</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5. Limpar Cache na Mesma Camada</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>apt (Debian/Ubuntu)</code><span class="cmd-tag">Limpeza</span></div>
+              <pre><code># Limpar cache do apt:
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      pacote1 pacote2 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* \
+           /tmp/* \
+           /var/tmp/*</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>pip (Python)</code><span class="cmd-tag">Limpeza</span></div>
+              <pre><code># Limpar cache do pip:
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Ou se precisar de cache para multi-run:
+RUN pip install -r requirements.txt && \
+    rm -rf /root/.cache/pip
+
+# Poetry:
+RUN poetry install --no-dev && \
+    rm -rf /root/.cache/pypoetry</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>npm (Node.js)</code><span class="cmd-tag">Limpeza</span></div>
+              <pre><code># Limpar cache do npm:
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Yarn:
+RUN yarn install --production && \
+    yarn cache clean
+
+# pnpm:
+RUN pnpm install --prod && \
+    pnpm store prune</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>apk (Alpine)</code><span class="cmd-tag">Limpeza</span></div>
+              <pre><code># Alpine não mantém cache por padrão com --no-cache:
+RUN apk add --no-cache \
+      curl \
+      ca-certificates
+
+# Se usar virtual packages (build deps temporárias):
+RUN apk add --no-cache --virtual .build-deps \
+      gcc musl-dev python3-dev && \
+    pip install --no-cache-dir -r requirements.txt && \
+    apk del .build-deps</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6. Checklist de Otimização</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>📦 Tamanho</h4>
+              <ul>
+                <li>✅ Usar imagem base slim/alpine</li>
+                <li>✅ Multi-stage build para compilação</li>
+                <li>✅ .dockerignore completo</li>
+                <li>✅ Limpar caches na mesma layer</li>
+                <li>✅ --no-install-recommends</li>
+                <li>✅ Remover docs/man pages</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>⚡ Performance de Build</h4>
+              <ul>
+                <li>✅ Ordem otimizada para cache</li>
+                <li>✅ Copiar lock files antes do código</li>
+                <li>✅ Reduzir número de layers</li>
+                <li>✅ BuildKit habilitado</li>
+                <li>✅ Cache mount para deps</li>
+                <li>✅ Paralelizar quando possível</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>🔒 Segurança</h4>
+              <ul>
+                <li>✅ USER não-root</li>
+                <li>✅ Tags específicas (não :latest)</li>
+                <li>✅ Sem secrets em ARG/ENV</li>
+                <li>✅ HEALTHCHECK definido</li>
+                <li>✅ Scan de vulnerabilidades</li>
+                <li>✅ Imagens distroless se possível</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: EXEMPLOS COMPLETOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Prática</span>
+          <h2>Exemplos Completos — Dockerfiles de Produção</h2>
+          <p>Dockerfiles prontos para produção com explicação detalhada de cada linha. Copie, adapte e use como referência nos seus projetos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Python Flask — API REST Completa</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Dockerfile — Python Flask</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ============================================================
+# Dockerfile para Python Flask — Produção
+# ============================================================
+
+# Stage 1: Build de dependências com compilação
+FROM python:3.12-slim AS builder
+
+# Dependências de build (necessárias para compilar pacotes como psycopg2)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      gcc \
+      libpq-dev \
+      python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Instalar dependências em diretório isolado
+# (copia apenas o resultado para o stage final)
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# ============================================================
+# Stage 2: Runtime mínimo
+FROM python:3.12-slim
+
+# Metadata (OCI standard)
+LABEL org.opencontainers.image.title="Flask API" \
+      org.opencontainers.image.description="API REST com Flask e PostgreSQL" \
+      org.opencontainers.image.version="1.0.0"
+
+# Runtime libraries apenas (libpq para psycopg2, sem gcc!)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      libpq5 \
+      curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copiar dependências Python compiladas do builder
+COPY --from=builder /install /usr/local
+
+# Criar usuário não-root
+RUN groupadd -r flask && useradd -r -g flask -d /app flask
+
+WORKDIR /app
+
+# Copiar código da aplicação
+COPY --chown=flask:flask . .
+
+# Variáveis de ambiente
+ENV FLASK_APP=app \
+    FLASK_ENV=production \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Mudar para usuário não-root
+USER flask
+
+# Documentar porta
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+# Usar gunicorn em produção (nunca flask run!)
+CMD ["gunicorn", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--threads", "2", \
+     "--timeout", "120", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "app:create_app()"]</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Por que cada decisão:</strong>
+            <ul>
+              <li><code>python:3.12-slim</code> — Equilíbrio ideal entre tamanho e compatibilidade</li>
+              <li><code>--prefix=/install</code> — Permite copiar apenas os pacotes para o stage final</li>
+              <li><code>PYTHONUNBUFFERED=1</code> — Logs aparecem imediatamente (sem buffer)</li>
+              <li><code>PYTHONDONTWRITEBYTECODE=1</code> — Não gera .pyc (desnecessário em container)</li>
+              <li><code>gunicorn</code> — Server WSGI de produção (flask run é apenas para dev!)</li>
+              <li><code>--workers 4</code> — Regra: 2 × CPU cores + 1</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Node.js Express — Multi-stage com TypeScript</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Dockerfile — Node.js Express + TypeScript</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ============================================================
+# Dockerfile para Node.js Express + TypeScript — Produção
+# ============================================================
+
+# Stage 1: Instalar TODAS deps + compilar TypeScript
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copiar apenas arquivos de dependências (cache optimization)
+COPY package.json package-lock.json tsconfig.json ./
+
+# Instalar todas as deps (incluindo devDependencies para compilação)
+RUN npm ci
+
+# Copiar código-fonte TypeScript
+COPY src/ ./src/
+
+# Compilar TypeScript → JavaScript
+RUN npm run build
+# Resultado: /app/dist/ com JS puro
+
+# ============================================================
+# Stage 2: Deps de produção apenas
+FROM node:20-alpine AS deps
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+# Instalar APENAS dependências de produção
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# ============================================================
+# Stage 3: Runtime mínimo
+FROM node:20-alpine
+
+# Metadata
+LABEL org.opencontainers.image.title="Express API" \
+      org.opencontainers.image.version="2.0.0"
+
+# Segurança: dumb-init para PID 1 correto
+RUN apk add --no-cache dumb-init
+
+# Criar usuário não-root
+RUN addgroup -S app && adduser -S app -G app
+
+WORKDIR /app
+
+# Copiar deps de produção do stage 2
+COPY --from=deps --chown=app:app /app/node_modules ./node_modules
+
+# Copiar código compilado do stage 1
+COPY --from=builder --chown=app:app /app/dist ./dist
+
+# Copiar package.json (necessário para node)
+COPY --chown=app:app package.json ./
+
+# Variáveis de ambiente
+ENV NODE_ENV=production \
+    PORT=3000
+
+# Usuário não-root
+USER app
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "const http = require('http'); const options = { hostname: 'localhost', port: 3000, path: '/health', timeout: 4000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"
+
+# dumb-init garante que signals (SIGTERM) sejam propagados corretamente
+CMD ["dumb-init", "node", "dist/server.js"]</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Por que 3 stages?</strong>
+            <ul>
+              <li><strong>Stage 1 (builder):</strong> Compila TypeScript — precisa de devDependencies (typescript, ts-node, types)</li>
+              <li><strong>Stage 2 (deps):</strong> Instala apenas prodDependencies — sem typescript, sem types</li>
+              <li><strong>Stage 3 (runtime):</strong> Junta código compilado + prodDeps — mínimo possível</li>
+              <li><code>dumb-init</code> — Garante que SIGTERM é propagado corretamente (graceful shutdown)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Java Spring Boot — Multi-stage com Maven</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Dockerfile — Java Spring Boot + Maven</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ============================================================
+# Dockerfile para Java Spring Boot — Produção
+# ============================================================
+
+# Stage 1: Build com Maven
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+# Cache de dependências Maven (muda raramente)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+# ↑ Baixa TODAS as deps — cache válido até pom.xml mudar
+
+# Código-fonte (muda frequentemente)
+COPY src/ ./src/
+
+# Compilar e empacotar (skip tests — rodam no CI separadamente)
+RUN mvn package -DskipTests -B
+# Resultado: /build/target/app.jar
+
+# ============================================================
+# Stage 2: Runtime com JRE (não JDK!)
+FROM eclipse-temurin:21-jre-alpine
+
+# Metadata
+LABEL org.opencontainers.image.title="Spring Boot API" \
+      org.opencontainers.image.version="3.0.0"
+
+# Criar usuário não-root
+RUN addgroup -S spring && adduser -S spring -G spring
+
+WORKDIR /app
+
+# Copiar apenas o JAR do stage de build (não o código-fonte, não o Maven!)
+COPY --from=builder --chown=spring:spring /build/target/*.jar app.jar
+
+# Variáveis JVM otimizadas para containers
+ENV JAVA_OPTS="-XX:+UseContainerSupport \
+               -XX:MaxRAMPercentage=75.0 \
+               -XX:InitialRAMPercentage=50.0 \
+               -Djava.security.egd=file:/dev/./urandom"
+
+USER spring
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+
+# Exec form com shell expansion para JAVA_OPTS
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Decisões chave para Java:</strong>
+            <ul>
+              <li><code>eclipse-temurin:21-jre-alpine</code> — JRE (não JDK!) em Alpine — de 700MB para 200MB</li>
+              <li><code>mvn dependency:go-offline</code> — Baixa deps separadamente para cache eficiente</li>
+              <li><code>-XX:+UseContainerSupport</code> — JVM respeita limites de memória do container</li>
+              <li><code>-XX:MaxRAMPercentage=75.0</code> — Heap usa 75% da RAM disponível (deixa 25% para non-heap)</li>
+              <li><code>start-period=40s</code> — Java demora para iniciar (Spring Boot ~20-30s)</li>
+              <li><code>/actuator/health</code> — Endpoint padrão do Spring Boot Actuator</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Pratique o que aprendeu com exercícios progressivos. Cada um foca em um aspecto diferente do que foi ensinado neste módulo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Criar Dockerfile para App Python</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Iniciante</span></div>
+              <pre><code># Objetivo: Criar um Dockerfile de produção para esta aplicação Flask
+
+# Estrutura do projeto:
+my-flask-app/
+├── app.py
+├── requirements.txt
+├── templates/
+│   └── index.html
+└── static/
+    └── style.css
+
+# app.py:
+from flask import Flask, render_template
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/health')
+def health():
+    return {'status': 'healthy'}, 200
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
+
+# requirements.txt:
+flask==3.0.0
+gunicorn==21.2.0
+
+# REQUISITOS DO DOCKERFILE:
+# 1. Use python:3.12-slim como base
+# 2. Crie um usuário não-root
+# 3. Instale dependências com --no-cache-dir
+# 4. Use WORKDIR
+# 5. Configure HEALTHCHECK
+# 6. Use gunicorn como servidor (não flask run)
+# 7. Defina variáveis de ambiente apropriadas
+# 8. Documente a porta com EXPOSE</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Solução:</strong>
+            <pre><code>FROM python:3.12-slim
+
+LABEL org.opencontainers.image.title="Flask App"
+
+RUN groupadd -r flask && useradd -r -g flask -d /app flask && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=flask:flask . .
+
+ENV FLASK_APP=app \
+    FLASK_ENV=production \
+    PYTHONUNBUFFERED=1
+
+USER flask
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "app:app"]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Otimizar Imagem de 1GB para &lt;100MB</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Intermediário</span></div>
+              <pre><code># Este Dockerfile produz uma imagem de ~1.2GB.
+# Sua missão: reduzir para menos de 100MB sem quebrar a funcionalidade.
+
+# ❌ Dockerfile RUIM (1.2GB):
+FROM node:20
+
+WORKDIR /app
+
+# Copia TUDO (incluindo node_modules local, .git, etc.)
+COPY . .
+
+# Instala tudo (incluindo devDependencies)
+RUN npm install
+
+# Build
+RUN npm run build
+
+# Roda como root
+CMD ["node", "dist/index.js"]
+
+# PROBLEMAS para resolver:
+# 1. Imagem base enorme (node:20 = 1.1GB)
+# 2. Sem .dockerignore (copia node_modules, .git)
+# 3. devDependencies na imagem final
+# 4. Código-fonte TypeScript na imagem final
+# 5. Rodando como root
+# 6. Sem healthcheck
+# 7. Cache de npm na imagem
+
+# DICA: Use multi-stage build!</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Solução:</strong>
+            <pre><code># .dockerignore:
+node_modules
+.git
+dist
+*.md
+.env*
+tests/
+.vscode
+
+# Dockerfile otimizado (~95MB):
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json tsconfig.json ./
+RUN npm ci
+COPY src/ ./src/
+RUN npm run build
+
+FROM node:20-alpine
+WORKDIR /app
+RUN addgroup -S app && adduser -S app -G app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production && npm cache clean --force
+COPY --from=builder --chown=app:app /app/dist ./dist
+ENV NODE_ENV=production
+USER app
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD node -e "require('http').get('http://localhost:3000/health', r => process.exit(r.statusCode === 200 ? 0 : 1))"
+CMD ["node", "dist/index.js"]
+
+# De 1.2GB para ~95MB — redução de 92%! 🎉</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Multi-stage Build para Go</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Intermediário</span></div>
+              <pre><code># Crie um Dockerfile multi-stage para esta aplicação Go.
+# Objetivo: imagem final menor que 15MB.
+
+# main.go:
+package main
+
+import (
+    "fmt"
+    "log"
+    "net/http"
+    "os"
+)
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, `{"status":"healthy"}`)
+}
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+    name := os.Getenv("APP_NAME")
+    if name == "" {
+        name = "World"
+    }
+    fmt.Fprintf(w, "Hello, %s!", name)
+}
+
+func main() {
+    http.HandleFunc("/health", healthHandler)
+    http.HandleFunc("/", helloHandler)
+
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
+    }
+
+    log.Printf("Server starting on port %s", port)
+    log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+# go.mod:
+module hello-server
+go 1.22
+
+# REQUISITOS:
+# 1. Stage 1: Compilar com golang:1.22-alpine
+# 2. Binário estático (CGO_ENABLED=0)
+# 3. Usar -ldflags="-w -s" para reduzir tamanho
+# 4. Stage 2: Usar alpine:3.19 ou scratch
+# 5. Certificados SSL (ca-certificates)
+# 6. Usuário não-root
+# 7. HEALTHCHECK
+# 8. ENV para APP_NAME e PORT</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Solução:</strong>
+            <pre><code># Dockerfile (~12MB com alpine, ~7MB com scratch):
+FROM golang:1.22-alpine AS builder
+WORKDIR /build
+COPY go.mod ./
+# Se tivesse go.sum: COPY go.sum ./
+# RUN go mod download
+COPY main.go .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -ldflags="-w -s" -o /app/server .
+
+FROM alpine:3.19
+RUN apk --no-cache add ca-certificates && \
+    adduser -D -H appuser
+WORKDIR /app
+COPY --from=builder /app/server .
+ENV APP_NAME="Docker Student" \
+    PORT=8080
+USER appuser
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+CMD ["./server"]
+
+# Teste:
+# docker build -t hello-go .
+# docker run -p 8080:8080 -e APP_NAME="DevOps Pro" hello-go
+# curl http://localhost:8080 → "Hello, DevOps Pro!"
+# docker images hello-go → ~12MB ✅</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Publicar Imagem no Docker Hub</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># Objetivo: Build, tag e push de uma imagem para o Docker Hub
+# Este exercício usa a imagem do Exercício 3.
+
+# PASSOS:
+# 1. Criar conta no Docker Hub (https://hub.docker.com)
+# 2. Fazer login via CLI
+# 3. Build com tag adequada
+# 4. Push para seu repositório
+# 5. Verificar no Docker Hub
+# 6. Pull em outra máquina (ou após docker rmi)
+
+# Comandos na sequência:
+
+# 1. Login no Docker Hub:
+docker login
+# Username: seuuser
+# Password: ***
+
+# 2. Build com tag do registry:
+docker build -t seuuser/hello-go:v1.0.0 .
+docker build -t seuuser/hello-go:latest .
+# Ou tagear depois:
+docker tag hello-go:latest seuuser/hello-go:v1.0.0
+
+# 3. Push:
+docker push seuuser/hello-go:v1.0.0
+docker push seuuser/hello-go:latest
+
+# 4. Verificar:
+# Acesse https://hub.docker.com/r/seuuser/hello-go
+
+# 5. Testar pull (simular outra máquina):
+docker rmi seuuser/hello-go:v1.0.0
+docker run -p 8080:8080 seuuser/hello-go:v1.0.0
+# Docker faz pull automaticamente e executa!
+
+# 6. Boas práticas de publicação:
+# → Sempre inclua README no Docker Hub
+# → Use tags semânticas (v1.0.0, v1.0, v1)
+# → Configure automated builds com GitHub
+# → Adicione labels OCI na imagem
+# → Nunca publique secrets na imagem!</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Segurança ao publicar:</strong> Antes de fazer push, verifique se a imagem não contém secrets:
+            <pre><code># Inspecionar arquivos na imagem:
+docker run --rm seuuser/hello-go:v1.0.0 ls -la
+docker run --rm seuuser/hello-go:v1.0.0 env
+docker run --rm seuuser/hello-go:v1.0.0 cat /etc/passwd
+
+# Verificar com ferramentas de segurança:
+docker scout cves seuuser/hello-go:v1.0.0
+# ou
+trivy image seuuser/hello-go:v1.0.0</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que vem no próximo módulo</h3>
+          <div class="info-box">
+            <strong>Módulo 03: Volumes e Persistência de Dados</strong> — Você vai aprender como gerenciar dados em containers Docker, entender a diferença entre volumes, bind mounts e tmpfs, configurar persistência para bancos de dados e implementar estratégias de backup.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Próximo passo</span>
+          <h2>Pronto para dominar persistência de dados?</h2>
+          <p>No Módulo 03 você vai aprender a gerenciar volumes, bind mounts e garantir que seus dados sobrevivam aos containers.</p>
+        </div>
+        <a href="modulo-03.html" class="button primary">Ir para Módulo 03 →</a>
       </div>
     </section>
   </main>

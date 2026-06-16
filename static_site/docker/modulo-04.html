@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Docker Módulo 04: Redes no Docker</title>
+  <meta name="description" content="Guia completo sobre redes no Docker: bridge, host, overlay, macvlan, DNS interno, port mapping, comunicação entre containers, arquitetura de rede e troubleshooting." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,23 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-03.html" class="nav-link">← Anterior</a>
         <a href="modulo-05.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,347 +38,3274 @@
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 04</span>
         <h1>Redes no Docker</h1>
-        <p>Entenda como containers se comunicam entre si e com o mundo externo. Domine drivers de rede, DNS interno, port mapping e crie arquiteturas multi-container robustas.</p>
+        <p>Domine o networking do Docker: entenda como containers se comunicam entre si e com o mundo externo, configure redes bridge customizadas com DNS automático, publique portas, isole serviços com múltiplas redes e diagnostique problemas de conectividade como um profissional.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node active"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: NETWORKING NO DOCKER — VISÃO GERAL -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
-
-        <!-- Por que redes importam -->
-        <div class="topic-block">
-          <h2>Por que Redes Docker Importam?</h2>
-          <p>Em aplicações reais, containers precisam se comunicar: uma API precisa acessar o banco de dados, um frontend precisa chamar o backend, um cache Redis precisa ser acessível por múltiplos serviços. O Docker fornece um sistema de rede completo com isolamento, DNS automático e diferentes drivers para diferentes cenários.</p>
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
+          <h2>Networking no Docker — Visão Geral</h2>
+          <p>Containers precisam se comunicar — com outros containers, com o host e com o mundo externo. O Docker implementa um modelo de networking robusto e flexível que permite isolar, conectar e publicar serviços de forma controlada.</p>
         </div>
 
-        <!-- Drivers de Rede -->
         <div class="topic-block">
-          <h2>Drivers de Rede</h2>
+          <h3>Por que Containers Precisam de Rede?</h3>
+          <p>Em aplicações modernas, um único container raramente opera sozinho. Uma aplicação típica envolve múltiplos serviços que precisam se comunicar:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Cenário real: aplicação web típica</code><span class="cmd-tag">Arquitetura</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                        APLICAÇÃO WEB MODERNA                              │
+│                                                                          │
+│   Usuário (Browser)                                                      │
+│        │                                                                 │
+│        ▼                                                                 │
+│   ┌─────────┐         ┌─────────────┐         ┌─────────────┐          │
+│   │  Nginx  │────────▶│  App (Node) │────────▶│  PostgreSQL │          │
+│   │  :80    │         │  :3000      │         │  :5432      │          │
+│   └─────────┘         └──────┬──────┘         └─────────────┘          │
+│                               │                                          │
+│                               ▼                                          │
+│                        ┌─────────────┐                                   │
+│                        │    Redis    │                                    │
+│                        │    :6379    │                                    │
+│                        └─────────────┘                                   │
+│                                                                          │
+│   Cada caixa = 1 container                                               │
+│   Cada seta = comunicação de rede                                        │
+│                                                                          │
+│   NECESSIDADES DE REDE:                                                  │
+│   • Nginx → App: proxy reverso (porta 3000)                              │
+│   • App → PostgreSQL: queries SQL (porta 5432)                           │
+│   • App → Redis: cache/sessões (porta 6379)                              │
+│   • Nginx ← Usuário: acesso externo (porta 80)                          │
+│   • PostgreSQL: NÃO deve ser acessível externamente                      │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Princípio fundamental:</strong> O Docker permite que você controle exatamente QUEM pode falar com QUEM. Containers na mesma rede se comunicam livremente; containers em redes diferentes são isolados por padrão. Isso é segurança por design.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Container Network Model (CNM)</h3>
+          <p>O Docker implementa o <strong>Container Network Model (CNM)</strong> — uma especificação que define como networking funciona para containers. O CNM tem três componentes fundamentais:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Network Sandbox</code><span class="cmd-tag">Isolamento</span></div>
+              <pre><code># NETWORK SANDBOX
+# ═══════════════════════════════════
+# É o ambiente de rede ISOLADO de cada container.
+# Contém:
+#   • Interface(s) de rede virtual (veth)
+#   • Tabela de rotas própria
+#   • Configuração DNS própria (/etc/resolv.conf)
+#   • Regras de firewall (iptables)
+#
+# Implementado via Linux Network Namespaces
+#
+# Analogia: cada container tem seu próprio
+# "computador virtual" com placa de rede,
+# tabela de rotas e DNS independentes.
+#
+# Verificar namespace de rede:
+docker exec meu-container cat /etc/resolv.conf
+docker exec meu-container ip addr
+docker exec meu-container ip route</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Endpoint</code><span class="cmd-tag">Conexão</span></div>
+              <pre><code># ENDPOINT
+# ═══════════════════════════════════
+# É a "porta de entrada" que conecta um
+# container (Sandbox) a uma rede (Network).
+#
+# Implementado como um par de interfaces
+# virtuais (veth pair):
+#   • Uma ponta dentro do container (eth0)
+#   • Outra ponta na bridge do host (vethXXX)
+#
+# Um container pode ter MÚLTIPLOS endpoints
+# (conectado a várias redes simultaneamente)
+#
+# Analogia: o cabo de rede que liga o
+# computador ao switch. Cada cabo é um endpoint.
+#
+# Ver endpoints de um container:
+docker inspect --format \
+  '{{json .NetworkSettings.Networks}}' \
+  meu-container | jq</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Network</code><span class="cmd-tag">Infraestrutura</span></div>
+              <pre><code># NETWORK
+# ═══════════════════════════════════════════════════════════════
+# É a infraestrutura de conectividade que agrupa endpoints.
+# Containers no mesmo Network podem se comunicar diretamente.
+#
+# Implementada como:
+#   • Bridge virtual (Linux bridge) para redes bridge
+#   • Overlay network (VXLAN) para redes multi-host
+#   • Conexão direta ao host para rede host
+#
+# Características:
+#   • Tem seu próprio subnet (ex: 172.18.0.0/16)
+#   • Pode ter servidor DNS embutido
+#   • Isola tráfego de outras networks
+#   • Pode ter políticas de acesso
+#
+# Analogia: o switch/VLAN que conecta múltiplos computadores.
+# Quem está no mesmo switch pode se comunicar.
+# Quem está em switches diferentes não pode (sem roteamento).
+#
+# Listar networks:
+docker network ls</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Diagrama Completo do CNM</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Container Network Model — Arquitetura</code><span class="cmd-tag">CNM</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                     CONTAINER NETWORK MODEL (CNM)                             │
+│                                                                              │
+│  ┌────────────────────┐    ┌────────────────────┐    ┌──────────────────┐   │
+│  │   SANDBOX (App)    │    │  SANDBOX (Redis)   │    │  SANDBOX (DB)    │   │
+│  │                    │    │                    │    │                  │   │
+│  │  ┌──────────────┐  │    │  ┌──────────────┐  │    │  ┌────────────┐  │   │
+│  │  │  eth0        │  │    │  │  eth0        │  │    │  │  eth0      │  │   │
+│  │  │ 172.18.0.2   │  │    │  │ 172.18.0.3   │  │    │  │ 172.19.0.2 │  │   │
+│  │  └──────┬───────┘  │    │  └──────┬───────┘  │    │  └─────┬──────┘  │   │
+│  │         │ endpoint  │    │         │ endpoint  │    │        │endpoint │   │
+│  └─────────┼──────────┘    └─────────┼──────────┘    └────────┼─────────┘   │
+│            │                          │                         │             │
+│            ▼                          ▼                         ▼             │
+│  ┌─────────────────────────────────────────────┐    ┌──────────────────────┐ │
+│  │         NETWORK: "app-frontend"              │    │ NETWORK: "app-backend"│ │
+│  │         subnet: 172.18.0.0/16               │    │ subnet: 172.19.0.0/16│ │
+│  │         driver: bridge                       │    │ driver: bridge       │ │
+│  └─────────────────────────────────────────────┘    └──────────────────────┘ │
+│                                                                              │
+│  FLUXO DE COMUNICAÇÃO:                                                       │
+│  App ←→ Redis: ✅ mesma rede (app-frontend)                                 │
+│  App ←→ DB:   ❌ redes diferentes (precisa conectar App à app-backend)       │
+│  Redis ←→ DB: ❌ redes diferentes (isolamento de segurança)                  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Analogia: Cada Container tem sua Própria Placa de Rede Virtual</h3>
+          <p>Para entender o networking Docker, pense em cada container como um <strong>computador independente</strong> conectado a um switch virtual:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Analogia: Escritório com VLANs</code><span class="cmd-tag">Analogia</span></div>
+              <pre><code>MUNDO REAL (Escritório)              │  DOCKER (Containers)
+═══════════════════════════════════ │ ═══════════════════════════════════
+                                    │
+Computador com placa de rede        │  Container com Network Sandbox
+  → Tem IP próprio                  │    → Tem IP próprio (172.18.0.x)
+  → Tem MAC address                 │    → Tem MAC virtual
+  → Tem DNS configurado             │    → Tem DNS Docker embutido
+                                    │
+Cabo de rede (porta no switch)      │  Endpoint (veth pair)
+  → Conecta PC ao switch            │    → Conecta container à bridge
+  → Um cabo por rede/VLAN           │    → Um endpoint por network
+                                    │
+Switch / VLAN                       │  Docker Network (bridge)
+  → Agrupa PCs que podem falar      │    → Agrupa containers que podem falar
+  → Isola de outras VLANs           │    → Isola de outras networks
+  → Tem seu subnet                  │    → Tem seu subnet
+                                    │
+Router (para sair da rede)          │  NAT/iptables (para sair do host)
+  → Conecta VLANs entre si          │    → docker network connect
+  → Dá acesso à internet            │    → Masquerade para internet
+
+REGRA DE OURO:
+  Mesma rede = podem conversar
+  Redes diferentes = isolados (a menos que você conecte explicitamente)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Networks Padrão do Docker</h3>
+          <p>Quando você instala o Docker, três redes são criadas automaticamente:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker network ls — Redes padrão</code><span class="cmd-tag">Default</span></div>
+              <pre><code># Listar redes (em uma instalação limpa):
+docker network ls
+
+NETWORK ID     NAME      DRIVER    SCOPE
+a1b2c3d4e5f6   bridge    bridge    local    ← Rede padrão (docker0)
+d7e8f9a0b1c2   host      host      local    ← Rede do host diretamente
+f3a4b5c6d7e8   none      null      local    ← Sem rede
+
+# Estas 3 redes NÃO podem ser removidas:
+docker network rm bridge
+# Error: bridge is a pre-defined network and cannot be removed
+
+# BRIDGE (padrão):
+# → Todo container sem --network especificado entra aqui
+# → Subnet padrão: 172.17.0.0/16
+# → Gateway: 172.17.0.1 (docker0 no host)
+# → Containers se comunicam por IP (NÃO por nome!)
+
+# HOST:
+# → Container usa a rede do host diretamente
+# → Sem isolamento de rede
+# → Sem port mapping (porta do container = porta do host)
+
+# NONE:
+# → Container sem qualquer interface de rede
+# → Totalmente isolado
+# → Apenas interface loopback (lo)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Importante:</strong> A rede <code>bridge</code> padrão (docker0) tem uma limitação séria: containers <strong>NÃO conseguem se encontrar pelo nome</strong>. Para DNS automático, você precisa criar uma <strong>rede bridge customizada</strong>. Veremos isso em detalhes na Seção 3.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: TIPOS DE REDE (NETWORK DRIVERS) -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Drivers</span>
+          <h2>Tipos de Rede (Network Drivers)</h2>
+          <p>O Docker suporta múltiplos drivers de rede, cada um projetado para cenários específicos. Escolher o driver correto é fundamental para performance, segurança e funcionalidade da sua aplicação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Bridge — Rede Privada Interna (Padrão)</h3>
+          <p>O driver <strong>bridge</strong> cria uma rede privada interna no host. Containers conectados à mesma bridge podem se comunicar entre si. É o driver padrão e o mais utilizado para containers em um único host.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Bridge — Como funciona</code><span class="cmd-tag">Padrão</span></div>
+              <pre><code># DRIVER: bridge
+# ═══════════════════════════════════
+#
+# COMO FUNCIONA:
+# 1. Docker cria uma Linux bridge (switch virtual)
+# 2. Cada container recebe um veth pair:
+#    - Uma ponta no container (eth0)
+#    - Outra ponta na bridge (vethXXXXX)
+# 3. Bridge faz switching L2 entre containers
+# 4. NAT/masquerade permite acesso à internet
+#
+# CARACTERÍSTICAS:
+# ✅ Isolamento de rede por padrão
+# ✅ DNS automático (user-defined bridges)
+# ✅ Port mapping para acesso externo (-p)
+# ✅ Múltiplas bridges = segmentação
+# ✅ Funciona em qualquer OS
+#
+# LIMITAÇÕES:
+# ⚠️ Apenas containers no MESMO host
+# ⚠️ Bridge padrão não tem DNS por nome
+# ⚠️ Performance ligeiramente menor que host
+
+# Criar container na bridge padrão:
+docker run -d --name web nginx
+
+# Criar em bridge customizada:
+docker network create minha-rede
+docker run -d --name web --network minha-rede nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Bridge — Diagrama de rede</code><span class="cmd-tag">Arquitetura</span></div>
+              <pre><code>┌─────────── HOST ───────────────────┐
+│                                    │
+│  ┌──────┐  ┌──────┐  ┌──────┐    │
+│  │ App  │  │Redis │  │Nginx │    │
+│  │ eth0 │  │ eth0 │  │ eth0 │    │
+│  │.0.2  │  │.0.3  │  │.0.4  │    │
+│  └──┬───┘  └──┬───┘  └──┬───┘    │
+│     │veth     │veth     │veth    │
+│     │         │         │         │
+│  ┌──▼─────────▼─────────▼──┐     │
+│  │    BRIDGE (172.18.0.1)   │     │
+│  │    (switch virtual L2)   │     │
+│  └────────────┬─────────────┘     │
+│               │                    │
+│          iptables NAT              │
+│               │                    │
+│  ┌────────────▼─────────────┐     │
+│  │    eth0 (rede física)    │     │
+│  │    192.168.1.100         │     │
+│  └──────────────────────────┘     │
+└────────────────────────────────────┘
+
+Comunicação INTERNA: L2 switching (rápido)
+Comunicação EXTERNA: NAT + iptables</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Host — Compartilha Rede do Host</h3>
+          <p>O driver <strong>host</strong> remove completamente o isolamento de rede entre o container e o host. O container usa diretamente a stack de rede do host (mesmos interfaces, IPs, portas).</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Host — Como funciona</code><span class="cmd-tag">Performance</span></div>
+              <pre><code># DRIVER: host
+# ═══════════════════════════════════
+#
+# COMO FUNCIONA:
+# 1. Container NÃO recebe namespace de rede próprio
+# 2. Container usa diretamente as interfaces do host
+# 3. Sem NAT, sem bridge, sem overhead
+# 4. Porta do container = porta do host
+#
+# CARACTERÍSTICAS:
+# ✅ Performance máxima de rede
+# ✅ Sem overhead de NAT/bridge
+# ✅ Latência mínima
+# ✅ Ideal para network-intensive apps
+#
+# LIMITAÇÕES:
+# ⚠️ SEM isolamento de rede
+# ⚠️ Conflito de portas com host/outros containers
+# ⚠️ Port mapping (-p) NÃO funciona (ignorado)
+# ⚠️ Funciona APENAS em Linux (Mac/Win usa VM)
+# ⚠️ Menor segurança
+
+# Usar rede host:
+docker run -d --network host nginx
+# Nginx escuta na porta 80 do HOST diretamente
+
+# Verificar: container vê interfaces do host
+docker run --network host --rm alpine ip addr
+# Mostra eth0, wlan0, etc. do HOST</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Host — Quando usar</code><span class="cmd-tag">Casos de uso</span></div>
+              <pre><code># QUANDO USAR host:
+#
+# 1. Load Balancers de alta performance
+#    → HAProxy, Nginx como LB, Traefik
+#    → Evita double-NAT
+#
+# 2. Aplicações que precisam ver tráfego raw
+#    → Network monitoring (Wireshark, tcpdump)
+#    → IDS/IPS (Snort, Suricata)
+#
+# 3. Serviços que usam muitas portas dinâmicas
+#    → FTP (portas passivas)
+#    → SIP/VoIP
+#
+# 4. Performance crítica (microsegundos importam)
+#    → Trading systems
+#    → Gaming servers
+#
+# QUANDO NÃO USAR:
+# ✗ Aplicações web normais (use bridge)
+# ✗ Quando precisa rodar múltiplas instâncias
+# ✗ Quando segurança é prioridade
+# ✗ Em Mac/Windows (não funciona como esperado)
+
+# Exemplo: Prometheus + Node Exporter
+docker run -d --network host \
+  --name node-exporter \
+  prom/node-exporter</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>None — Sem Rede</h3>
+          <p>O driver <strong>none</strong> desabilita toda a conectividade de rede do container. O container fica completamente isolado — não pode enviar nem receber pacotes (exceto loopback).</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>None — Container sem rede</code><span class="cmd-tag">Isolamento</span></div>
+              <pre><code># DRIVER: none
+# ═══════════════════════════════════
+#
+# COMO FUNCIONA:
+# 1. Container recebe namespace de rede VAZIO
+# 2. Apenas interface loopback (lo, 127.0.0.1)
+# 3. Sem conectividade com host ou outros containers
+# 4. Sem acesso à internet
+#
+# CARACTERÍSTICAS:
+# ✅ Isolamento total de rede
+# ✅ Segurança máxima
+# ✅ Nenhuma superfície de ataque de rede
+#
+# CASOS DE USO:
+# • Processamento batch (não precisa de rede)
+# • Geração de relatórios/PDFs
+# • Criptografia/assinatura de documentos
+# • Testes que devem ser offline
+# • Containers com dados sensíveis
+
+# Usar rede none:
+docker run --network none --rm alpine ip addr
+# 1: lo: <LOOPBACK,UP>  ← Apenas loopback!
+#     inet 127.0.0.1/8
+
+# Sem acesso externo:
+docker run --network none --rm alpine ping 8.8.8.8
+# ping: sendto: Network unreachable</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>None — Exemplo prático</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Cenário: processar dados sensíveis sem risco de vazamento
+#
+# Arquivo no host é montado via volume,
+# processado SEM REDE, resultado salvo no volume.
+
+# 1. Container sem rede processando dados sensíveis:
+docker run --network none \
+  -v dados-entrada:/input:ro \
+  -v dados-saida:/output \
+  minha-app-processamento
+
+# O container:
+# ✅ Lê dados do volume /input
+# ✅ Processa (criptografa, gera relatório, etc.)
+# ✅ Salva resultado em /output
+# ❌ NÃO PODE enviar dados para fora (sem rede!)
+
+# 2. Geração de PDF isolada:
+docker run --network none \
+  -v ./relatorios:/data \
+  weasyprint \
+  /data/template.html /data/output.pdf
+
+# 3. Compilação segura (build sandbox):
+docker run --network none \
+  -v ./src:/src:ro \
+  -v ./build:/output \
+  gcc:latest \
+  gcc /src/main.c -o /output/app</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Overlay — Multi-Host (Swarm/Kubernetes)</h3>
+          <p>O driver <strong>overlay</strong> permite comunicação entre containers em <strong>hosts diferentes</strong>. Cria uma rede virtual (VXLAN) que encapsula pacotes entre os nós de um cluster.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Overlay — Rede multi-host</code><span class="cmd-tag">Cluster</span></div>
+              <pre><code># DRIVER: overlay
+# ═══════════════════════════════════
+#
+# COMO FUNCIONA:
+# 1. Usa VXLAN para encapsular tráfego L2 sobre L3
+# 2. Containers em hosts diferentes parecem estar
+#    na mesma rede local
+# 3. Requer Docker Swarm ou orquestrador
+# 4. Controle plane distribuído (gossip protocol)
+#
+# CARACTERÍSTICAS:
+# ✅ Comunicação multi-host transparente
+# ✅ Criptografia opcional (--opt encrypted)
+# ✅ Service discovery integrado
+# ✅ Load balancing (routing mesh)
+#
+# LIMITAÇÕES:
+# ⚠️ Requer Swarm mode ou orquestrador
+# ⚠️ Overhead de encapsulamento VXLAN
+# ⚠️ Mais complexo de troubleshootar
+# ⚠️ Latência maior que bridge local
+
+# Requer Swarm inicializado:
+docker swarm init
+
+# Criar overlay network:
+docker network create \
+  --driver overlay \
+  --subnet 10.0.0.0/24 \
+  --opt encrypted \
+  rede-overlay
+
+# Deploy de serviço na overlay:
+docker service create \
+  --name api --network rede-overlay \
+  --replicas 3 minha-api:latest</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Overlay — Diagrama multi-host</code><span class="cmd-tag">Cluster</span></div>
+              <pre><code>┌────────── HOST 1 ─────────┐   ┌────────── HOST 2 ─────────┐
+│                            │   │                            │
+│  ┌─────┐     ┌─────┐     │   │     ┌─────┐     ┌─────┐  │
+│  │App-1│     │App-2│     │   │     │App-3│     │ DB  │  │
+│  │10.0 │     │10.0 │     │   │     │10.0 │     │10.0 │  │
+│  │.0.2 │     │.0.3 │     │   │     │.0.4 │     │.0.5 │  │
+│  └──┬──┘     └──┬──┘     │   │     └──┬──┘     └──┬──┘  │
+│     │            │         │   │        │            │     │
+│  ┌──▼────────────▼───┐    │   │   ┌────▼────────────▼──┐ │
+│  │ OVERLAY NETWORK    │    │   │   │  OVERLAY NETWORK   │ │
+│  │ (VXLAN tunnel)     │────┼───┼───│  (VXLAN tunnel)   │ │
+│  └────────────────────┘    │   │   └────────────────────┘ │
+│                            │   │                            │
+│  eth0: 192.168.1.10       │   │  eth0: 192.168.1.20      │
+└────────────────────────────┘   └────────────────────────────┘
+             │                                │
+             └────── Rede Física ─────────────┘
+                   (underlay network)
+
+App-1 → App-3: comunicação transparente via VXLAN
+  Pacote: [Ethernet][IP-host][UDP:4789][VXLAN][payload]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Macvlan — IP Real na Rede Física</h3>
+          <p>O driver <strong>macvlan</strong> atribui um endereço MAC real e um IP da rede física do host ao container. O container aparece como um dispositivo físico na rede local.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Macvlan — IP na rede física</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># DRIVER: macvlan
+# ═══════════════════════════════════
+#
+# COMO FUNCIONA:
+# 1. Container recebe MAC address próprio
+# 2. Container recebe IP da rede LAN do host
+# 3. Aparece como dispositivo físico na rede
+# 4. Switch físico "vê" o container diretamente
+#
+# CARACTERÍSTICAS:
+# ✅ Container com IP "real" na LAN
+# ✅ Sem NAT — comunicação direta
+# ✅ Performance muito alta
+# ✅ Ideal para migração de apps legadas
+#
+# LIMITAÇÕES:
+# ⚠️ Requer modo promíscuo na interface
+# ⚠️ Limite de MACs por porta no switch
+# ⚠️ Container ↔ Host NÃO se comunicam (!)
+# ⚠️ Não funciona em clouds (AWS, Azure)
+# ⚠️ Configuração de rede mais complexa
+
+# Criar rede macvlan:
+docker network create -d macvlan \
+  --subnet=192.168.1.0/24 \
+  --gateway=192.168.1.1 \
+  -o parent=eth0 \
+  rede-macvlan
+
+# Container com IP da LAN:
+docker run -d --network rede-macvlan \
+  --ip 192.168.1.200 \
+  --name servidor-legado nginx
+
+# Agora na LAN: ping 192.168.1.200 → responde!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Macvlan — Quando usar</code><span class="cmd-tag">Casos de uso</span></div>
+              <pre><code># QUANDO USAR macvlan:
+#
+# 1. Migração de apps legadas
+#    → App espera IP fixo na LAN
+#    → Não pode usar NAT/port mapping
+#    → Ex: sistemas ERP, impressoras de rede
+#
+# 2. Aplicações que precisam de IP real
+#    → Serviços DHCP (precisa estar na LAN)
+#    → DNS autoritativo para a LAN
+#    → Servidores NFS/SMB
+#
+# 3. Integração com infraestrutura existente
+#    → Container precisa ser "visto" na LAN
+#    → Firewalls baseados em IP da LAN
+#    → VLANs existentes
+#
+# MODOS:
+# • bridge (padrão): containers na mesma VLAN
+# • 802.1q trunk: containers em VLANs diferentes
+
+# Macvlan com VLAN tagging:
+docker network create -d macvlan \
+  --subnet=10.10.10.0/24 \
+  --gateway=10.10.10.1 \
+  -o parent=eth0.100 \
+  rede-vlan100
+
+# parent=eth0.100 → VLAN 100 no eth0</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Tabela Comparativa — Qual Driver Usar?</h3>
           <table class="styled-table">
             <thead>
-              <tr><th>Driver</th><th>Descrição</th><th>Uso Ideal</th></tr>
+              <tr>
+                <th>Driver</th>
+                <th>Escopo</th>
+                <th>Isolamento</th>
+                <th>Performance</th>
+                <th>DNS</th>
+                <th>Quando Usar</th>
+              </tr>
             </thead>
             <tbody>
               <tr>
                 <td><strong>bridge</strong></td>
-                <td>Rede padrão. Cria uma bridge virtual no host. Containers na mesma bridge se comunicam.</td>
-                <td>Comunicação entre containers no mesmo host</td>
+                <td>Single host</td>
+                <td>✅ Alto</td>
+                <td>Boa</td>
+                <td>✅ (user-defined)</td>
+                <td>99% dos casos em host único</td>
               </tr>
               <tr>
                 <td><strong>host</strong></td>
-                <td>Remove isolamento de rede. Container usa a rede do host diretamente.</td>
-                <td>Performance máxima, sem overhead de NAT</td>
+                <td>Single host</td>
+                <td>❌ Nenhum</td>
+                <td>Máxima</td>
+                <td>Host DNS</td>
+                <td>Performance crítica, load balancers</td>
               </tr>
               <tr>
                 <td><strong>none</strong></td>
-                <td>Desabilita toda conectividade de rede.</td>
-                <td>Containers que não precisam de rede (batch jobs isolados)</td>
+                <td>Single host</td>
+                <td>✅ Total</td>
+                <td>N/A</td>
+                <td>❌</td>
+                <td>Batch processing, segurança</td>
               </tr>
               <tr>
                 <td><strong>overlay</strong></td>
-                <td>Conecta containers em múltiplos hosts Docker (Swarm/Kubernetes).</td>
-                <td>Clusters multi-host, Docker Swarm</td>
+                <td>Multi-host</td>
+                <td>✅ Alto</td>
+                <td>Média</td>
+                <td>✅ Sim</td>
+                <td>Clusters Swarm/K8s</td>
               </tr>
               <tr>
                 <td><strong>macvlan</strong></td>
-                <td>Atribui um endereço MAC ao container, fazendo-o aparecer como dispositivo físico na rede.</td>
-                <td>Integração com rede física, aplicações legadas</td>
+                <td>Single host</td>
+                <td>✅ Médio</td>
+                <td>Alta</td>
+                <td>❌</td>
+                <td>Apps legadas, IP na LAN</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box highlight">
+            <strong>🎯 Regra prática:</strong> Se você está rodando containers em um único host (que é 90% dos casos de desenvolvimento e muitas aplicações em produção), use <strong>bridge network customizada</strong>. É simples, seguro e oferece DNS automático. Overlay só quando tiver cluster, host só quando precisar de performance extrema, macvlan só para cenários muito específicos.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: BRIDGE NETWORK — PROFUNDO -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Bridge</span>
+          <h2>Bridge Network — Guia Completo</h2>
+          <p>A rede bridge é o driver mais utilizado no Docker. Entender a diferença entre a bridge padrão e bridges customizadas é crucial para configurar comunicação correta entre containers com DNS automático e isolamento adequado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Bridge Padrão (docker0) vs User-Defined Bridge</h3>
+          <p>Docker oferece duas categorias de bridge network. A diferença entre elas é <strong>enorme</strong> em termos de funcionalidade:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Bridge Padrão (docker0)</code><span class="cmd-tag">Limitada</span></div>
+              <pre><code># BRIDGE PADRÃO (docker0)
+# ═══════════════════════════════════
+# É a rede "bridge" que existe por padrão.
+# Todo container sem --network usa esta rede.
+
+# Características:
+# ❌ SEM DNS automático por nome
+# ❌ Todos os containers juntos (sem isolamento)
+# ❌ Precisa usar --link (deprecado) ou IP fixo
+# ❌ Não pode desconectar container em runtime
+# ⚠️ Compartilhada por TODOS os containers
+
+# Demonstração — DNS NÃO funciona:
+docker run -d --name app1 alpine sleep 3600
+docker run -d --name app2 alpine sleep 3600
+
+# Tentar comunicar por nome:
+docker exec app1 ping app2
+# ping: bad address 'app2'  ← ❌ NÃO RESOLVE!
+
+# Só funciona por IP:
+docker inspect -f '{{.NetworkSettings.IPAddress}}' app2
+# 172.17.0.3
+docker exec app1 ping 172.17.0.3
+# PING 172.17.0.3: 64 bytes ← ✅ funciona
+
+# Problema: IP muda quando container reinicia!
+docker stop app2 && docker rm app2
+docker run -d --name app2 alpine sleep 3600
+# app2 agora pode ter IP diferente (172.17.0.4)
+
+# Limpar:
+docker stop app1 app2 && docker rm app1 app2</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>User-Defined Bridge</code><span class="cmd-tag">Recomendada</span></div>
+              <pre><code># USER-DEFINED BRIDGE (Customizada)
+# ═══════════════════════════════════
+# Rede criada por você com docker network create.
+# SEMPRE use esta em vez da padrão!
+
+# Características:
+# ✅ DNS automático por nome de container
+# ✅ Isolamento (só containers da rede se veem)
+# ✅ Conectar/desconectar em runtime
+# ✅ Configuração customizável (subnet, gateway)
+# ✅ Melhor isolamento entre projetos
+
+# Demonstração — DNS FUNCIONA:
+docker network create minha-rede
+
+docker run -d --name app1 --network minha-rede \
+  alpine sleep 3600
+docker run -d --name app2 --network minha-rede \
+  alpine sleep 3600
+
+# Comunicar por nome:
+docker exec app1 ping app2
+# PING app2 (172.18.0.3): 64 bytes ← ✅ FUNCIONA!
+
+docker exec app2 ping app1
+# PING app1 (172.18.0.2): 64 bytes ← ✅ FUNCIONA!
+
+# DNS resolve automaticamente!
+docker exec app1 nslookup app2
+# Name: app2  Address: 172.18.0.3
+
+# Limpar:
+docker stop app1 app2 && docker rm app1 app2
+docker network rm minha-rede</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Regra de ouro:</strong> NUNCA use a bridge padrão (docker0) para comunicação entre containers. SEMPRE crie uma rede customizada. A bridge padrão existe por retrocompatibilidade, mas é considerada prática ruim em qualquer cenário profissional.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Por que User-Defined Bridge é Melhor — Comparação Detalhada</h3>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Funcionalidade</th>
+                <th>Bridge Padrão (docker0)</th>
+                <th>User-Defined Bridge</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Resolução DNS</strong></td>
+                <td>❌ Não resolve por nome</td>
+                <td>✅ DNS automático por nome de container</td>
+              </tr>
+              <tr>
+                <td><strong>Isolamento</strong></td>
+                <td>❌ Todos compartilham a mesma rede</td>
+                <td>✅ Cada rede é isolada</td>
+              </tr>
+              <tr>
+                <td><strong>Conectar/Desconectar</strong></td>
+                <td>❌ Precisa recriar o container</td>
+                <td>✅ docker network connect/disconnect em runtime</td>
+              </tr>
+              <tr>
+                <td><strong>Configuração</strong></td>
+                <td>❌ Não configurável</td>
+                <td>✅ Subnet, gateway, labels, opções customizadas</td>
+              </tr>
+              <tr>
+                <td><strong>--link</strong></td>
+                <td>⚠️ Necessário (deprecado)</td>
+                <td>✅ Desnecessário (DNS nativo)</td>
+              </tr>
+              <tr>
+                <td><strong>Variáveis de ambiente</strong></td>
+                <td>⚠️ Compartilhadas via --link</td>
+                <td>✅ Não expõe entre containers</td>
+              </tr>
+              <tr>
+                <td><strong>Segurança</strong></td>
+                <td>❌ Todos os containers se veem</td>
+                <td>✅ Segmentação por rede</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Comandos de Rede -->
         <div class="topic-block">
-          <h2>Comandos para Gerenciar Redes</h2>
+          <h3>Criando Redes Customizadas — docker network create</h3>
+          <p>O comando <code>docker network create</code> permite criar redes com controle total sobre a configuração:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>docker network ls</code><span class="cmd-tag">Listar</span></div>
-              <p>Lista todas as redes Docker disponíveis.</p>
-              <pre><code>docker network ls
+              <div class="command-header"><code>Criação básica e com opções</code><span class="cmd-tag">Criar</span></div>
+              <pre><code># Criação simples (Docker escolhe subnet):
+docker network create app-network
+# Docker atribui subnet automaticamente
+# (172.18.0.0/16, 172.19.0.0/16, etc.)
 
-# Saída padrão:
-# NETWORK ID     NAME      DRIVER    SCOPE
-# a1b2c3d4e5f6   bridge    bridge    local
-# f6e5d4c3b2a1   host      host      local
-# 1a2b3c4d5e6f   none      null      local</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker network create</code><span class="cmd-tag">Criar</span></div>
-              <p>Cria uma rede customizada. Redes customizadas têm DNS automático entre containers.</p>
-              <pre><code># Criar rede bridge customizada
-docker network create minha-rede
+# Criação com subnet específico:
+docker network create \
+  --subnet 10.0.1.0/24 \
+  --gateway 10.0.1.1 \
+  backend-network
 
-# Criar com subnet específica
+# Criação com range de IPs:
+docker network create \
+  --subnet 10.0.2.0/24 \
+  --ip-range 10.0.2.128/25 \
+  --gateway 10.0.2.1 \
+  frontend-network
+# Containers recebem IPs entre 10.0.2.128 e 10.0.2.255
+
+# Com labels para organização:
+docker network create \
+  --label projeto=ecommerce \
+  --label ambiente=production \
+  --label team=backend \
+  ecommerce-internal
+
+# Com opções avançadas do driver:
 docker network create \
   --driver bridge \
+  --opt com.docker.network.bridge.name=br-custom \
+  --opt com.docker.network.bridge.enable_icc=true \
+  --opt com.docker.network.bridge.enable_ip_masquerade=true \
+  custom-bridge</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Opções avançadas de configuração</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># Rede interna (sem acesso à internet):
+docker network create \
+  --internal \
+  --subnet 10.0.99.0/24 \
+  rede-interna
+# Containers nesta rede NÃO acessam internet
+# Ideal para bancos de dados
+
+# Verificar:
+docker run --rm --network rede-interna alpine \
+  ping -c 1 8.8.8.8
+# ping: sendto: Network unreachable ← sem internet
+
+# Rede com IPv6:
+docker network create \
+  --ipv6 \
   --subnet 172.20.0.0/16 \
-  --gateway 172.20.0.1 \
-  minha-rede
+  --subnet 2001:db8::/64 \
+  rede-dualstack
 
-# Criar rede overlay (Swarm)
-docker network create --driver overlay minha-overlay</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker network inspect</code><span class="cmd-tag">Inspecionar</span></div>
-              <p>Mostra detalhes da rede: subnet, gateway, containers conectados, etc.</p>
-              <pre><code>docker network inspect minha-rede
+# Rede com MTU customizado:
+docker network create \
+  --opt com.docker.network.driver.mtu=9000 \
+  rede-jumbo-frames
 
-# Ver apenas containers conectados
-docker network inspect minha-rede --format '{{json .Containers}}'</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker network rm</code><span class="cmd-tag">Remover</span></div>
-              <p>Remove uma rede. Falha se houver containers conectados.</p>
-              <pre><code># Remover rede
-docker network rm minha-rede
+# Desabilitar ICC (Inter-Container Communication):
+docker network create \
+  --opt com.docker.network.bridge.enable_icc=false \
+  rede-sem-icc
+# Containers não se comunicam entre si!
+# Apenas via port mapping publicado
 
-# Remover múltiplas
-docker network rm rede1 rede2</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker network connect</code><span class="cmd-tag">Conectar</span></div>
-              <p>Conecta um container em execução a uma rede adicional.</p>
-              <pre><code># Conectar container a rede
-docker network connect minha-rede meu-container
-
-# Conectar com IP fixo
-docker network connect --ip 172.20.0.10 minha-rede meu-container</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker network disconnect</code><span class="cmd-tag">Desconectar</span></div>
-              <p>Remove um container de uma rede.</p>
-              <pre><code># Desconectar container
-docker network disconnect minha-rede meu-container
-
-# Forçar desconexão
-docker network disconnect -f minha-rede meu-container</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker network prune</code><span class="cmd-tag">Limpar</span></div>
-              <p>Remove todas as redes não utilizadas.</p>
-              <pre><code>docker network prune
-
-# Sem confirmação
-docker network prune -f</code></pre>
+# OPÇÕES DISPONÍVEIS:
+# enable_icc: comunicação entre containers (true/false)
+# enable_ip_masquerade: NAT para internet (true/false)
+# host_binding_ipv4: IP para bind de portas
+# com.docker.network.bridge.name: nome da bridge Linux
+# com.docker.network.driver.mtu: tamanho do MTU</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Comunicação entre containers -->
         <div class="topic-block">
-          <h2>Comunicação entre Containers</h2>
-
-          <h3>Bridge Padrão vs Bridge Customizada</h3>
+          <h3>Conectando Containers à Rede</h3>
+          <p>Há duas formas de conectar containers a uma rede: no momento da criação (<code>--network</code>) ou depois (<code>docker network connect</code>):</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Bridge padrão</code><span class="cmd-tag">❌ Sem DNS</span></div>
-              <p>Na rede bridge padrão, containers só se comunicam por IP. Não há resolução DNS por nome.</p>
-              <pre><code># Containers na bridge padrão
-docker run -d --name app1 nginx
-docker run -d --name app2 nginx
-
-# Comunicação apenas por IP (não por nome)
-docker exec app1 ping app2  # ❌ FALHA
-
-# Precisa descobrir o IP manualmente
-docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' app2
-# → 172.17.0.3
-docker exec app1 ping 172.17.0.3  # ✓ Funciona</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Bridge customizada</code><span class="cmd-tag">✅ DNS automático</span></div>
-              <p>Em redes customizadas, o Docker fornece DNS automático. Containers se encontram pelo nome.</p>
-              <pre><code># Criar rede customizada
-docker network create app-network
-
-# Containers na rede customizada
-docker run -d --name app1 --network app-network nginx
-docker run -d --name app2 --network app-network nginx
-
-# Comunicação por nome ✓
-docker exec app1 ping app2  # ✓ Funciona!
-docker exec app2 ping app1  # ✓ Funciona!
-
-# DNS resolve automaticamente
-docker exec app1 nslookup app2
-# → Address: 172.18.0.3</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Exemplo Prático -->
-        <div class="topic-block">
-          <h2>Exemplo Prático — App + Redis + PostgreSQL</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Arquitetura multi-container</code><span class="cmd-tag">Exemplo completo</span></div>
-              <p>Três containers se comunicando via DNS na mesma rede customizada.</p>
-              <pre><code># 1. Criar rede da aplicação
-docker network create app-stack
-
-# 2. Iniciar PostgreSQL
-docker run -d \
-  --name postgres \
-  --network app-stack \
-  -e POSTGRES_USER=app \
-  -e POSTGRES_PASSWORD=secret \
-  -e POSTGRES_DB=myapp \
-  -v pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
-
-# 3. Iniciar Redis
-docker run -d \
-  --name redis \
-  --network app-stack \
-  redis:7-alpine
-
-# 4. Iniciar aplicação (conecta ao DB e cache por nome)
-docker run -d \
-  --name api \
-  --network app-stack \
-  -e DATABASE_URL=postgresql://app:secret@postgres:5432/myapp \
-  -e REDIS_URL=redis://redis:6379 \
-  -p 3000:3000 \
-  minha-api:latest
-
-# 5. Verificar conectividade
-docker exec api ping postgres   # ✓
-docker exec api ping redis      # ✓
-
-# 6. Ver containers na rede
-docker network inspect app-stack --format '{{range .Containers}}{{.Name}} {{end}}'
-# → postgres redis api</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Host Network -->
-        <div class="topic-block">
-          <h2>Rede Host</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>--network host</code><span class="cmd-tag">Sem isolamento</span></div>
-              <p>O container compartilha a rede do host. Sem NAT, sem port mapping — a porta do container é a porta do host diretamente. Apenas Linux.</p>
-              <pre><code># Container usa rede do host diretamente
-docker run -d --network host nginx
-
-# Nginx agora escuta na porta 80 do HOST
-# Não precisa de -p (port mapping)
-curl http://localhost:80  # ✓ Acessa o nginx
-
-# Útil para: monitoramento, performance máxima
-# Desvantagem: sem isolamento de rede</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- None Network -->
-        <div class="topic-block">
-          <h2>Rede None</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>--network none</code><span class="cmd-tag">Isolado</span></div>
-              <p>Container completamente isolado da rede. Apenas interface loopback disponível.</p>
-              <pre><code># Container sem rede
-docker run -d --network none alpine sleep 3600
-
-# Verificar — apenas loopback
-docker exec -it $(docker ps -q -l) ip addr
-# → Apenas lo (127.0.0.1)
-
-# Uso: processamento batch, tarefas que não precisam de rede</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Port Mapping -->
-        <div class="topic-block">
-          <h2>Port Mapping (Mapeamento de Portas)</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>-p (publish)</code><span class="cmd-tag">Portas</span></div>
-              <p>Mapeia portas do host para portas do container, permitindo acesso externo.</p>
-              <pre><code># host:container
-docker run -d -p 8080:80 nginx
-
-# Múltiplas portas
-docker run -d -p 8080:80 -p 8443:443 nginx
-
-# Porta aleatória do host
-docker run -d -p 80 nginx
-
-# Bind em interface específica
-docker run -d -p 127.0.0.1:8080:80 nginx
-
-# Bind em interface específica com porta aleatória
-docker run -d -p 127.0.0.1::80 nginx
-
-# Range de portas
-docker run -d -p 8000-8010:8000-8010 minha-app
-
-# UDP
-docker run -d -p 5353:53/udp dns-server</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker port</code><span class="cmd-tag">Verificar</span></div>
-              <p>Mostra o mapeamento de portas de um container.</p>
-              <pre><code># Ver portas mapeadas
-docker port meu-nginx
-
-# Saída:
-# 80/tcp -> 0.0.0.0:8080
-# 443/tcp -> 0.0.0.0:8443
-
-# Porta específica
-docker port meu-nginx 80
-# → 0.0.0.0:8080</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- DNS Aliases -->
-        <div class="topic-block">
-          <h2>DNS Aliases (--network-alias)</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>--network-alias</code><span class="cmd-tag">DNS</span></div>
-              <p>Permite que múltiplos containers respondam pelo mesmo nome DNS. Útil para load balancing básico e service discovery.</p>
-              <pre><code># Criar rede
+              <div class="command-header"><code>Na criação (--network)</code><span class="cmd-tag">Comum</span></div>
+              <pre><code># Método mais comum — definir na criação:
 docker network create app-net
 
-# Dois containers com mesmo alias
-docker run -d \
-  --name web1 \
+# Container já inicia na rede customizada:
+docker run -d --name api \
   --network app-net \
-  --network-alias web \
-  nginx
+  node:20-alpine
 
-docker run -d \
-  --name web2 \
+docker run -d --name db \
   --network app-net \
-  --network-alias web \
-  nginx
+  postgres:16
 
-# Resolver alias — retorna IPs de ambos (round-robin DNS)
-docker run --rm --network app-net alpine nslookup web
-# → Name: web  Address: 172.18.0.2
-# → Name: web  Address: 172.18.0.3
+# API pode acessar DB pelo nome:
+docker exec api ping db
+# ✅ Funciona!
 
-# Requisições para "web" são distribuídas entre web1 e web2
-docker run --rm --network app-net alpine wget -qO- http://web</code></pre>
+# Com IP fixo na rede:
+docker run -d --name cache \
+  --network app-net \
+  --ip 172.18.0.100 \
+  redis:7
+
+# Com alias de rede (nome alternativo):
+docker run -d --name postgres-primary \
+  --network app-net \
+  --network-alias db \
+  --network-alias database \
+  postgres:16
+# Pode ser acessado por: postgres-primary, db, database</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Em runtime (network connect)</code><span class="cmd-tag">Dinâmico</span></div>
+              <pre><code># Conectar container EXISTENTE a uma rede:
+docker network connect app-net meu-container
+
+# Conectar com IP fixo:
+docker network connect \
+  --ip 172.18.0.50 \
+  app-net meu-container
+
+# Conectar com alias:
+docker network connect \
+  --alias api-server \
+  app-net meu-container
+
+# Container em MÚLTIPLAS redes:
+docker network create frontend-net
+docker network create backend-net
+
+docker run -d --name api --network frontend-net nginx
+
+# Adicionar segunda rede:
+docker network connect backend-net api
+# Agora api está em frontend-net E backend-net!
+
+# Verificar redes do container:
+docker inspect api --format \
+  '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+# frontend-net backend-net
+
+# Desconectar de uma rede:
+docker network disconnect frontend-net api
+# api agora só está em backend-net</code></pre>
             </div>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>DNS Interno — Containers se Encontram pelo Nome</h3>
+          <p>O DNS embutido do Docker é um dos recursos mais poderosos das redes customizadas. Ele permite que containers se descubram automaticamente pelo nome, sem precisar conhecer IPs:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Como o DNS interno funciona</code><span class="cmd-tag">DNS</span></div>
+              <pre><code># O Docker roda um servidor DNS embutido em 127.0.0.11
+# Ele resolve automaticamente:
+#   • Nome do container → IP do container
+#   • Network aliases → IP do container
+#   • Service names (em Swarm) → IPs dos containers
+
+# Verificar DNS resolver no container:
+docker run --rm --network app-net alpine cat /etc/resolv.conf
+# nameserver 127.0.0.11    ← DNS embutido do Docker
+# ndots:0
+
+# RESOLUÇÃO POR NOME DE CONTAINER:
+docker network create demo-net
+
+docker run -d --name webserver --network demo-net nginx
+docker run -d --name appserver --network demo-net alpine sleep 3600
+
+docker exec appserver nslookup webserver
+# Server:    127.0.0.11
+# Address:   127.0.0.11:53
+#
+# Non-authoritative answer:
+# Name: webserver
+# Address: 172.20.0.2
+
+docker exec appserver ping -c 2 webserver
+# PING webserver (172.20.0.2): 56 data bytes
+# 64 bytes from 172.20.0.2: seq=0 ttl=64 time=0.123 ms
+
+# RESOLUÇÃO POR ALIAS:
+docker run -d --name postgres-master \
+  --network demo-net \
+  --network-alias db \
+  --network-alias postgres \
+  postgres:16
+
+# Qualquer um destes nomes funciona:
+docker exec appserver ping postgres-master  # ✅ nome do container
+docker exec appserver ping db               # ✅ alias
+docker exec appserver ping postgres         # ✅ alias
+
+# MÚLTIPLOS CONTAINERS COM MESMO ALIAS (round-robin DNS):
+docker run -d --name api-1 --network demo-net --network-alias api alpine sleep 3600
+docker run -d --name api-2 --network demo-net --network-alias api alpine sleep 3600
+docker run -d --name api-3 --network demo-net --network-alias api alpine sleep 3600
+
+# DNS retorna múltiplos IPs (load balancing básico):
+docker exec appserver nslookup api
+# Name: api  Address: 172.20.0.5
+# Name: api  Address: 172.20.0.6
+# Name: api  Address: 172.20.0.7
+
+# Limpar:
+docker stop webserver appserver postgres-master api-1 api-2 api-3
+docker rm webserver appserver postgres-master api-1 api-2 api-3
+docker network rm demo-net</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Dica profissional:</strong> Use nomes descritivos para containers e aliases para que o DNS reflita a arquitetura. Ex: <code>--name postgres-primary --network-alias db</code>. Assim, sua aplicação conecta em <code>db:5432</code> e você pode trocar o banco sem alterar o código.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Demonstração Prática: 2 Containers se Comunicando por Nome</h3>
+          <p>Vamos criar um cenário completo onde um servidor web e um cliente se comunicam usando DNS automático:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Prática completa: servidor + cliente via DNS</code><span class="cmd-tag">Hands-on</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# DEMONSTRAÇÃO: App Python se comunicando com Redis via nome DNS
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Criar a rede:
+docker network create app-demo
+
+# 2. Iniciar Redis na rede (será o "servidor"):
+docker run -d \
+  --name redis-server \
+  --network app-demo \
+  redis:7-alpine
+
+# 3. Verificar que o Redis está rodando:
+docker exec redis-server redis-cli ping
+# PONG
+
+# 4. Iniciar um container Python que se conecta ao Redis pelo NOME:
+docker run -it --rm \
+  --name python-client \
+  --network app-demo \
+  python:3.12-slim bash
+
+# Dentro do container Python:
+pip install redis
+python3 -c "
+import redis
+# Conecta usando o NOME do container (DNS resolve automaticamente!)
+r = redis.Redis(host='redis-server', port=6379)
+r.set('mensagem', 'Olá do container Python!')
+print('Salvo no Redis:', r.get('mensagem').decode())
+print('Ping:', r.ping())
+"
+# Saída:
+# Salvo no Redis: Olá do container Python!
+# Ping: True
+
+# 5. De outro terminal, verificar os dados no Redis:
+docker exec redis-server redis-cli get mensagem
+# "Olá do container Python!"
+
+# 6. Testar resolução DNS:
+docker run --rm --network app-demo alpine nslookup redis-server
+# Name: redis-server
+# Address: 172.20.0.2
+
+# 7. Limpar:
+docker stop redis-server && docker rm redis-server
+docker network rm app-demo
+
+# ═══════════════════════════════════════════════════════════════
+# A MÁGICA: python conectou em 'redis-server' (nome) em vez de IP!
+# Se o Redis reiniciar com IP diferente, ainda funciona!
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Navigation -->
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: COMUNICAÇÃO ENTRE CONTAINERS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Comunicação</span>
+          <h2>Comunicação entre Containers</h2>
+          <p>Conectar containers entre si é uma das tarefas mais comuns no Docker. Vamos explorar os métodos disponíveis, entender por que --link é deprecado e dominar o padrão correto com user-defined bridges e DNS automático.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>--link (Deprecado — NÃO USAR)</h3>
+          <p>O <code>--link</code> foi a primeira solução do Docker para comunicação entre containers. Está <strong>deprecado desde Docker 1.9</strong> e não deve ser usado em nenhum cenário novo:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>--link — Por que NÃO usar</code><span class="cmd-tag">❌ Deprecado</span></div>
+              <pre><code># ❌ NÃO FAÇA ISSO (código legado):
+docker run -d --name db postgres:16
+docker run -d --name app --link db:database myapp
+
+# O --link fazia:
+# 1. Adicionava entrada no /etc/hosts do container
+# 2. Injetava variáveis de ambiente com dados do linked
+# 3. Permitia comunicação na bridge padrão
+
+# PROBLEMAS do --link:
+# ❌ Só funciona na bridge padrão
+# ❌ Unidirecional (app→db, mas db não vê app)
+# ❌ Variáveis de ambiente expostas (inseguro)
+# ❌ Não funciona entre hosts (não escala)
+# ❌ Não dinâmico (precisa recriar para mudar)
+# ❌ Será REMOVIDO em versões futuras do Docker
+# ❌ Não funciona com Docker Compose v3+
+
+# Se você vir --link em tutoriais/projetos:
+# → É um sinal de que o tutorial está DESATUALIZADO
+# → Substitua por user-defined bridge network</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Migração: --link → network</code><span class="cmd-tag">✅ Correto</span></div>
+              <pre><code># ═══════════════════════════════════
+# ANTES (deprecado):
+# ═══════════════════════════════════
+docker run -d --name db postgres:16
+docker run -d --name app \
+  --link db:database myapp
+# app conecta em "database:5432"
+
+# ═══════════════════════════════════
+# DEPOIS (correto):
+# ═══════════════════════════════════
+docker network create app-net
+
+docker run -d --name db \
+  --network app-net \
+  --network-alias database \
+  postgres:16
+
+docker run -d --name app \
+  --network app-net \
+  myapp
+# app conecta em "database:5432" ← MESMO código!
+# OU conecta em "db:5432" (nome do container)
+
+# VANTAGENS da migração:
+# ✅ Bidirecional (app↔db)
+# ✅ DNS automático
+# ✅ Isolamento por rede
+# ✅ Conectar/desconectar em runtime
+# ✅ Funciona com Compose, Swarm, etc.
+# ✅ Múltiplos aliases</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>User-Defined Bridge com DNS — Método Correto</h3>
+          <p>O padrão recomendado para comunicação entre containers é criar uma rede bridge customizada. O DNS automático resolve nomes de containers para seus IPs dinamicamente:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Padrão correto: App + Banco na mesma rede</code><span class="cmd-tag">Best Practice</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CENÁRIO: Aplicação Node.js + PostgreSQL + Redis
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Criar a rede para o projeto:
+docker network create --subnet 172.25.0.0/16 projeto-ecommerce
+
+# 2. Iniciar o PostgreSQL:
+docker run -d \
+  --name postgres \
+  --network projeto-ecommerce \
+  --network-alias db \
+  -e POSTGRES_USER=app \
+  -e POSTGRES_PASSWORD=secret123 \
+  -e POSTGRES_DB=ecommerce \
+  -v pgdata:/var/lib/postgresql/data \
+  postgres:16
+
+# 3. Iniciar o Redis:
+docker run -d \
+  --name redis \
+  --network projeto-ecommerce \
+  --network-alias cache \
+  -v redisdata:/data \
+  redis:7-alpine redis-server --appendonly yes
+
+# 4. Iniciar a aplicação Node.js:
+docker run -d \
+  --name api \
+  --network projeto-ecommerce \
+  -e DATABASE_URL=postgresql://app:secret123@db:5432/ecommerce \
+  -e REDIS_URL=redis://cache:6379 \
+  -p 3000:3000 \
+  minha-api:latest
+
+# ═══════════════════════════════════════════════════════════════
+# COMUNICAÇÃO (tudo via DNS):
+#
+# api → db:5432     (PostgreSQL) ← alias do container postgres
+# api → cache:6379  (Redis)      ← alias do container redis
+# api → postgres:5432            ← nome do container (também funciona)
+# api → redis:6379               ← nome do container (também funciona)
+#
+# Externo → api:3000             ← port mapping para acesso do usuário
+# Externo → db:5432              ← ❌ NÃO exposto (sem -p)! SEGURO!
+# Externo → redis:6379           ← ❌ NÃO exposto (sem -p)! SEGURO!
+# ═══════════════════════════════════════════════════════════════
+
+# 5. Verificar comunicação:
+docker exec api ping -c 1 db       # ✅ resolve para IP do postgres
+docker exec api ping -c 1 cache    # ✅ resolve para IP do redis
+docker exec api ping -c 1 redis    # ✅ resolve (nome do container)
+
+# 6. Verificar DNS:
+docker exec api nslookup db
+# Name: db  Address: 172.25.0.2
+
+docker exec api nslookup cache
+# Name: cache  Address: 172.25.0.3</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker network connect/disconnect — Gerenciamento em Runtime</h3>
+          <p>Uma das grandes vantagens das user-defined bridges é poder conectar e desconectar containers de redes <strong>sem parar ou recriar</strong> o container:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>connect — Adicionar à rede</code><span class="cmd-tag">Runtime</span></div>
+              <pre><code># Cenário: container precisa acessar nova rede
+# (ex: temporariamente acessar banco de outro projeto)
+
+# Container rodando em rede-A:
+docker run -d --name app --network rede-A nginx
+
+# Adicionar à rede-B (sem parar!):
+docker network connect rede-B app
+
+# Agora app está em AMBAS as redes:
+docker inspect app --format \
+  '{{range $k,$v := .NetworkSettings.Networks}}
+   {{$k}}: {{$v.IPAddress}}
+   {{end}}'
+# rede-A: 172.18.0.2
+# rede-B: 172.19.0.4
+
+# Container pode acessar containers de rede-A E rede-B
+
+# Com IP fixo na nova rede:
+docker network connect --ip 172.19.0.100 rede-B app
+
+# Com alias na nova rede:
+docker network connect --alias proxy rede-B app</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>disconnect — Remover da rede</code><span class="cmd-tag">Runtime</span></div>
+              <pre><code># Remover container de uma rede (sem parar!):
+docker network disconnect rede-B app
+
+# Forçar desconexão (útil se container travado):
+docker network disconnect -f rede-B app
+
+# ═══════════════════════════════════════
+# CASO DE USO REAL: Manutenção de banco
+# ═══════════════════════════════════════
+
+# Situação: precisa fazer manutenção no DB
+# sem que a app continue fazendo queries
+
+# 1. Desconectar o DB da rede da app:
+docker network disconnect app-net postgres
+# Agora a app não consegue mais acessar o banco!
+
+# 2. Fazer manutenção:
+docker exec postgres pg_dump -U app ecommerce > backup.sql
+# ... outras operações de manutenção ...
+
+# 3. Reconectar:
+docker network connect app-net postgres
+# App volta a acessar o banco automaticamente!
+
+# ═══════════════════════════════════════
+# CASO DE USO: Debug de container
+# ═══════════════════════════════════════
+# Criar container temporário na rede para debug:
+docker run -it --rm \
+  --network app-net \
+  --name debugger \
+  nicolaka/netshoot
+# Agora tem acesso a todas as ferramentas de rede
+# curl, dig, nslookup, tcpdump, iperf, etc.</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Padrão útil:</strong> Use <code>docker network connect</code> para dar a um container acesso a múltiplas redes. Exemplo: um API Gateway conectado à rede pública (recebe requests) E à rede privada (acessa backend). Isso implementa segmentação de rede sem complexidade.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: PORT MAPPING (PUBLICAÇÃO DE PORTAS) -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Portas</span>
+          <h2>Port Mapping (Publicação de Portas)</h2>
+          <p>Por padrão, containers não são acessíveis de fora do host. Para expor serviços para o mundo externo (ou para o host), é necessário mapear portas do container para portas do host. Isso é o "port mapping" ou "port publishing".</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Conceito: Por que Port Mapping é Necessário?</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Container isolado vs Container publicado</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code>═══════════════════════════════════════════════════════════════════════
+SEM PORT MAPPING (padrão):
+═══════════════════════════════════════════════════════════════════════
+
+  Usuário (browser)                    Container (Nginx :80)
+       │                                     │
+       └──── http://localhost:80 ────────── ❌ Connection refused
+                                              │
+  O container escuta na porta 80,             │
+  mas na interface INTERNA da bridge.         │
+  O host NÃO roteia tráfego para lá.         │
+
+═══════════════════════════════════════════════════════════════════════
+COM PORT MAPPING (-p 8080:80):
+═══════════════════════════════════════════════════════════════════════
+
+  Usuário (browser)          iptables/NAT          Container (Nginx :80)
+       │                         │                       │
+       └── http://localhost:8080 ──▶ DNAT ──▶ 172.17.0.2:80
+                                 │                       │
+  Docker cria regra iptables:    │                       │
+  "tráfego na porta 8080 do     │                       │
+   host vai para porta 80       │                       │
+   do container"                 │                       │
+
+═══════════════════════════════════════════════════════════════════════
+RESUMO:
+  -p HOST_PORT:CONTAINER_PORT
+  -p 8080:80 → host:8080 mapeia para container:80
+═══════════════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>-p host:container — Bind Específico</h3>
+          <p>A forma mais comum de publicar portas. Você define exatamente qual porta do host mapeia para qual porta do container:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Mapeamento explícito</code><span class="cmd-tag">-p</span></div>
+              <pre><code># Sintaxe: -p [IP_HOST:]PORTA_HOST:PORTA_CONTAINER[/PROTOCOLO]
+
+# Básico: porta 8080 do host → porta 80 do container
+docker run -d -p 8080:80 nginx
+# Acesso: http://localhost:8080
+
+# Mesma porta no host e container:
+docker run -d -p 80:80 nginx
+# Acesso: http://localhost:80
+
+# Múltiplas portas:
+docker run -d \
+  -p 80:80 \
+  -p 443:443 \
+  nginx
+# HTTP: http://localhost:80
+# HTTPS: https://localhost:443
+
+# Porta alta mapeada para porta baixa:
+docker run -d -p 3000:80 nginx
+# Acesso: http://localhost:3000
+
+# Múltiplos containers em portas diferentes:
+docker run -d -p 8081:80 --name site1 nginx
+docker run -d -p 8082:80 --name site2 nginx
+docker run -d -p 8083:80 --name site3 nginx
+# site1: http://localhost:8081
+# site2: http://localhost:8082
+# site3: http://localhost:8083</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Verificar portas mapeadas</code><span class="cmd-tag">Inspecionar</span></div>
+              <pre><code># Ver portas de todos os containers:
+docker ps
+# PORTS
+# 0.0.0.0:8080->80/tcp
+
+# Ver portas de um container específico:
+docker port meu-container
+# 80/tcp -> 0.0.0.0:8080
+# 443/tcp -> 0.0.0.0:8443
+
+# Ver porta específica:
+docker port meu-container 80
+# 0.0.0.0:8080
+
+# Formato detalhado via inspect:
+docker inspect --format \
+  '{{range $p,$conf := .NetworkSettings.Ports}}
+   {{$p}} -> {{(index $conf 0).HostPort}}
+   {{end}}' meu-container
+
+# Testar se porta está acessível:
+curl -I http://localhost:8080
+# HTTP/1.1 200 OK
+
+# Listar portas em uso no host:
+ss -tlnp | grep docker
+# ou
+netstat -tlnp | grep docker</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>-p container (Porta Aleatória no Host)</h3>
+          <p>Quando você especifica apenas a porta do container, Docker escolhe uma porta aleatória no host (range alto: 32768-60999):</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Porta aleatória do host</code><span class="cmd-tag">Dinâmico</span></div>
+              <pre><code># Sintaxe: -p CONTAINER_PORT (sem host port)
+docker run -d -p 80 --name web nginx
+
+# Docker escolhe porta aleatória:
+docker port web
+# 80/tcp -> 0.0.0.0:32769
+
+# Acesso: http://localhost:32769
+
+# Útil para:
+# • Testes onde não importa a porta
+# • Ambientes com muitas instâncias
+# • CI/CD (evita conflitos)
+
+# Múltiplos containers na mesma porta interna:
+docker run -d -p 80 --name web1 nginx  # host: 32769
+docker run -d -p 80 --name web2 nginx  # host: 32770
+docker run -d -p 80 --name web3 nginx  # host: 32771
+# Sem conflito! Docker escolhe portas diferentes.
+
+# Descobrir a porta atribuída:
+docker inspect --format \
+  '{{(index (index .NetworkSettings.Ports "80/tcp") 0).HostPort}}' web1
+# 32769</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>-P (publicar todas as EXPOSE)</code><span class="cmd-tag">Publish All</span></div>
+              <pre><code># -P (maiúsculo) publica TODAS as portas
+# declaradas com EXPOSE no Dockerfile
+
+# Exemplo: Dockerfile do Nginx tem EXPOSE 80
+docker run -d -P --name web nginx
+
+docker port web
+# 80/tcp -> 0.0.0.0:32768
+
+# Para imagem com múltiplos EXPOSE:
+# (ex: imagem com EXPOSE 80 443 8080)
+docker run -d -P --name multi my-multi-port-app
+
+docker port multi
+# 80/tcp -> 0.0.0.0:32770
+# 443/tcp -> 0.0.0.0:32771
+# 8080/tcp -> 0.0.0.0:32772
+
+# ⚠️ IMPORTANTE:
+# EXPOSE no Dockerfile é apenas DOCUMENTAÇÃO!
+# Não publica a porta automaticamente no run.
+# Você precisa de -p ou -P para publicar.
+#
+# EXPOSE 80 → informa que o app usa porta 80
+# -p 8080:80 → realmente publica a porta
+# -P → publica todas as EXPOSE com portas aleatórias
+
+# Quando usar -P:
+# • Desenvolvimento rápido
+# • Quando não importa qual porta do host
+# • Testes automatizados</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Bind em Interface Específica</h3>
+          <p>Por padrão, <code>-p</code> faz bind em <strong>todas as interfaces</strong> (0.0.0.0), tornando o container acessível de qualquer IP do host. Você pode restringir a uma interface específica para maior segurança:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Bind por interface</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># PADRÃO: bind em todas as interfaces (0.0.0.0)
+docker run -d -p 8080:80 nginx
+# Equivalente a:
+docker run -d -p 0.0.0.0:8080:80 nginx
+# Acessível de: localhost, LAN, internet (se exposto)
+
+# ═══════════════════════════════════
+# RESTRITO: apenas localhost (loopback)
+# ═══════════════════════════════════
+docker run -d -p 127.0.0.1:8080:80 nginx
+# Acessível APENAS de: localhost
+# NÃO acessível da LAN ou internet!
+
+# QUANDO USAR 127.0.0.1:
+# • Serviços que só devem ser acessados localmente
+# • Bancos de dados em desenvolvimento
+# • Admin panels, dashboards internos
+# • Reverse proxy é o ponto de entrada público
+
+# Exemplo: DB acessível só localmente:
+docker run -d \
+  -p 127.0.0.1:5432:5432 \
+  postgres:16
+# Só apps no mesmo host acessam o DB
+
+# ═══════════════════════════════════
+# RESTRITO: interface específica
+# ═══════════════════════════════════
+docker run -d -p 192.168.1.100:8080:80 nginx
+# Acessível APENAS via IP 192.168.1.100
+# Útil em servidores com múltiplas interfaces</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>IPv6 e ranges de portas</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># ═══════════════════════════════════
+# IPv6:
+# ═══════════════════════════════════
+docker run -d -p [::1]:8080:80 nginx
+# Bind em localhost IPv6
+
+docker run -d -p [::]:8080:80 nginx
+# Bind em todas interfaces IPv6
+
+# ═══════════════════════════════════
+# Range de portas:
+# ═══════════════════════════════════
+docker run -d -p 8080-8083:80-83 nginx
+# Mapeia:
+#   host:8080 → container:80
+#   host:8081 → container:81
+#   host:8082 → container:82
+#   host:8083 → container:83
+
+# ═══════════════════════════════════
+# Combinações comuns:
+# ═══════════════════════════════════
+
+# Web público + admin privado:
+docker run -d \
+  -p 80:80 \
+  -p 127.0.0.1:9090:9090 \
+  my-app
+# Porta 80: acessível de qualquer lugar
+# Porta 9090: apenas localhost (admin)
+
+# Múltiplas interfaces:
+docker run -d \
+  -p 192.168.1.100:80:80 \
+  -p 10.0.0.1:80:80 \
+  nginx
+# Acessível nas duas redes internas
+# Mas NÃO na interface pública</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>TCP vs UDP</h3>
+          <p>Por padrão, port mapping usa TCP. Para serviços que usam UDP (DNS, jogos, streaming), você precisa especificar explicitamente:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Especificando protocolo TCP/UDP</code><span class="cmd-tag">Protocolo</span></div>
+              <pre><code># PADRÃO: TCP (não precisa especificar)
+docker run -d -p 8080:80 nginx           # TCP implícito
+docker run -d -p 8080:80/tcp nginx       # TCP explícito (mesmo resultado)
+
+# UDP: precisa especificar
+docker run -d -p 53:53/udp bind9         # DNS (UDP)
+docker run -d -p 514:514/udp syslog      # Syslog (UDP)
+
+# TCP + UDP na mesma porta:
+docker run -d \
+  -p 53:53/tcp \
+  -p 53:53/udp \
+  bind9
+# DNS usa ambos os protocolos
+
+# Cenários comuns com UDP:
+# • DNS: porta 53 (TCP + UDP)
+# • DHCP: porta 67-68 (UDP)
+# • SNMP: porta 161-162 (UDP)
+# • Syslog: porta 514 (UDP)
+# • Gaming servers: portas variáveis (UDP)
+# • VoIP/SIP: porta 5060 (UDP)
+# • QUIC/HTTP3: porta 443 (UDP)
+
+# Exemplo: servidor de jogo
+docker run -d \
+  -p 27015:27015/tcp \
+  -p 27015:27015/udp \
+  -p 27020:27020/udp \
+  gameserver
+
+# Verificar protocolo nas portas:
+docker port meu-container
+# 53/tcp -> 0.0.0.0:53
+# 53/udp -> 0.0.0.0:53
+# 80/tcp -> 0.0.0.0:8080</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>⚠️ Segurança com port mapping:</strong> Quando você publica uma porta com <code>-p</code>, Docker adiciona regras no iptables que <strong>bypassam o firewall do host</strong> (UFW, firewalld). Mesmo que UFW bloqueie a porta, Docker a expõe! Para evitar isso, sempre use <code>127.0.0.1:PORT:PORT</code> para serviços internos, ou configure <code>DOCKER_IPTABLES=false</code> e gerencie manualmente.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: HOST NETWORK E NONE NETWORK -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Avançado</span>
+          <h2>Host Network e None Network — Detalhado</h2>
+          <p>Além do bridge, os drivers host e none atendem cenários específicos onde performance máxima ou isolamento total são necessários. Vamos explorar cada um em profundidade com casos de uso reais.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Host Network — Container usa Rede do Host Diretamente</h3>
+          <p>Com <code>--network host</code>, o container <strong>não recebe namespace de rede próprio</strong>. Ele compartilha diretamente a stack de rede do host — mesmas interfaces, mesmos IPs, mesmas portas:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Host network — Comportamento</code><span class="cmd-tag">Sem NAT</span></div>
+              <pre><code># Container com rede host:
+docker run -d --network host --name web nginx
+
+# Nginx escuta diretamente na porta 80 do HOST:
+curl http://localhost:80
+# ✅ Funciona! Sem port mapping.
+
+# -p É IGNORADO com host network:
+docker run -d --network host -p 9090:80 nginx
+# WARNING: Published ports are discarded when
+# using host network mode
+# Nginx ainda escuta na :80 do host
+
+# Container vê interfaces do host:
+docker run --rm --network host alpine ip addr
+# 1: lo: <LOOPBACK,UP>
+# 2: eth0: <BROADCAST> ... inet 192.168.1.100/24
+# 3: wlan0: <BROADCAST> ... inet 192.168.1.101/24
+# (mesmas interfaces que "ip addr" no host!)
+
+# Container vê as mesmas portas:
+docker run --rm --network host alpine netstat -tlnp
+# (mostra TODAS as portas abertas do host)
+
+# ⚠️ CONFLITO DE PORTAS:
+docker run -d --network host --name web1 nginx
+docker run -d --network host --name web2 nginx
+# ❌ web2 falha: porta 80 já em uso!
+# (Nginx do web1 já ocupa porta 80 do host)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Host network — Performance</code><span class="cmd-tag">Benchmark</span></div>
+              <pre><code># ═══════════════════════════════════
+# BENCHMARK: Bridge vs Host
+# ═══════════════════════════════════
+
+# Bridge (com NAT):
+# Pacote: Container → veth → bridge → iptables → eth0
+# Overhead: ~5-10% latência adicional
+# Throughput: ~95% da rede nativa
+
+# Host (sem NAT):
+# Pacote: Container → eth0 (direto!)
+# Overhead: ~0% (nativo)
+# Throughput: ~100% da rede nativa
+
+# ═══════════════════════════════════
+# QUANDO USAR HOST NETWORK:
+# ═══════════════════════════════════
+
+# 1. Load Balancers (Nginx, HAProxy, Traefik):
+docker run -d --network host \
+  --name traefik \
+  traefik:v2.10 \
+  --entryPoints.web.address=:80 \
+  --entryPoints.websecure.address=:443
+
+# 2. Monitoring que precisa ver tráfego do host:
+docker run -d --network host \
+  --name prometheus \
+  prom/prometheus
+
+# 3. Service Mesh sidecars:
+docker run -d --network host \
+  --name envoy-proxy \
+  envoyproxy/envoy
+
+# 4. Network tools:
+docker run -it --rm --network host \
+  nicolaka/netshoot \
+  tcpdump -i eth0 port 80</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Nota sobre Mac/Windows:</strong> Em macOS e Windows, Docker roda dentro de uma VM Linux. <code>--network host</code> conecta o container à rede <strong>da VM</strong>, não do Mac/Windows. Portanto, host networking funciona de forma diferente (e menos útil) fora do Linux.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>None Network — Container Totalmente Isolado</h3>
+          <p>Com <code>--network none</code>, o container recebe um namespace de rede <strong>vazio</strong>. Apenas a interface loopback (127.0.0.1) existe. Nenhuma comunicação externa é possível:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>None network — Isolamento total</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Container completamente sem rede:
+docker run --rm --network none alpine ip addr
+# 1: lo: <LOOPBACK,UP,LOWER_UP>
+#     inet 127.0.0.1/8
+# NADA MAIS! Sem eth0, sem conectividade.
+
+# Sem acesso à internet:
+docker run --rm --network none alpine \
+  wget -T 3 http://google.com
+# wget: bad address 'google.com'
+
+# Sem acesso a outros containers:
+docker run --rm --network none alpine \
+  ping -c 1 172.17.0.2
+# PING 172.17.0.2: sendto: Network unreachable
+
+# Apenas loopback funciona:
+docker run --rm --network none alpine \
+  ping -c 1 127.0.0.1
+# 64 bytes from 127.0.0.1: seq=0 ttl=64 ✅
+
+# ═══════════════════════════════════
+# COMO TROCAR DADOS SEM REDE?
+# ═══════════════════════════════════
+# Use VOLUMES! Dados entram/saem via filesystem:
+docker run --network none \
+  -v ./input:/data/input:ro \
+  -v ./output:/data/output \
+  my-secure-processor
+
+# Dados em ./input → processados → resultado em ./output
+# Tudo sem qualquer acesso à rede!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>None network — Casos de uso reais</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ═══════════════════════════════════
+# CASO 1: Processamento de dados sensíveis
+# ═══════════════════════════════════
+# Dados de cartão de crédito, CPF, etc.
+# Container processa sem risco de vazamento:
+docker run --network none \
+  -v dados-sensiveis:/input:ro \
+  -v resultado:/output \
+  processador-pci-dss
+
+# ═══════════════════════════════════
+# CASO 2: Build/compilação segura
+# ═══════════════════════════════════
+# Compilar código sem acesso à rede
+# (previne supply-chain attacks):
+docker run --network none \
+  -v ./src:/src:ro \
+  -v ./artifacts:/dist \
+  rust:1.75 cargo build --release
+
+# ═══════════════════════════════════
+# CASO 3: Geração de documentos/PDFs
+# ═══════════════════════════════════
+docker run --network none \
+  -v ./templates:/templates:ro \
+  -v ./output:/output \
+  pandoc/latex \
+  /templates/relatorio.md -o /output/relatorio.pdf
+
+# ═══════════════════════════════════
+# CASO 4: Testes unitários isolados
+# ═══════════════════════════════════
+# Garantir que testes não dependem de rede:
+docker run --network none \
+  -v ./projeto:/app \
+  node:20 npm test
+
+# Se algum teste falhar = dependência de rede
+# (indica teste mal escrito)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Resumo Visual: Bridge vs Host vs None</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Comparação visual dos 3 drivers principais</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>═══════════════════════════════════════════════════════════════════════════
+                        BRIDGE (padrão)
+═══════════════════════════════════════════════════════════════════════════
+  ┌─── Container ───┐         ┌─── Container ───┐
+  │  eth0: 172.18.0.2│         │  eth0: 172.18.0.3│
+  └────────┬────────┘         └────────┬────────┘
+           │ veth                        │ veth
+  ┌────────▼────────────────────────────▼────────┐
+  │              Bridge (172.18.0.1)               │   ← Switch virtual
+  └──────────────────────┬───────────────────────┘
+                         │ NAT (iptables)
+  ┌──────────────────────▼───────────────────────┐
+  │              Host Network Stack                │
+  └───────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════
+                        HOST (sem isolamento)
+═══════════════════════════════════════════════════════════════════════════
+  ┌─── Container ───────────────────────────────────────────────────────┐
+  │                                                                      │
+  │  Usa diretamente: eth0, wlan0, etc. do host                         │
+  │  IP = IP do host | Portas = portas do host | Sem NAT                │
+  │                                                                      │
+  └──────────────────────────┬──────────────────────────────────────────┘
+                             │ (compartilha)
+  ┌──────────────────────────▼───────────────────────────────────────────┐
+  │                      Host Network Stack                                │
+  └────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════
+                        NONE (isolamento total)
+═══════════════════════════════════════════════════════════════════════════
+  ┌─── Container ───┐
+  │  lo: 127.0.0.1  │
+  │  (NADA MAIS!)   │
+  │                  │     ╳ Sem conexão com nada
+  └──────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │                      Host Network Stack                                │
+  └────────────────────────────────────────────────────────────────────────┘
+═══════════════════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: GERENCIAMENTO DE REDES (COMANDOS) -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Comandos</span>
+          <h2>Gerenciamento de Redes — Comandos Essenciais</h2>
+          <p>O Docker CLI fornece um conjunto completo de comandos para criar, inspecionar, gerenciar e limpar redes. Dominar esses comandos é fundamental para administrar ambientes Docker em desenvolvimento e produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker network create — Criar Redes</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Todas as opções de criação</code><span class="cmd-tag">create</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# docker network create [OPTIONS] NETWORK_NAME
+# ═══════════════════════════════════════════════════════════════
+
+# Criação simples:
+docker network create minha-rede
+
+# Com todas as opções:
+docker network create \
+  --driver bridge \                    # Driver (bridge, overlay, macvlan, none)
+  --subnet 10.10.0.0/24 \             # Subnet da rede
+  --ip-range 10.10.0.128/25 \         # Range de IPs para containers
+  --gateway 10.10.0.1 \               # Gateway da rede
+  --aux-address "dns=10.10.0.2" \     # IPs reservados (não atribuídos a containers)
+  --internal \                         # Sem acesso à internet
+  --ipv6 \                            # Habilitar IPv6
+  --label env=production \            # Labels para organização
+  --label team=backend \
+  --opt com.docker.network.bridge.name=br-prod \  # Nome da bridge no Linux
+  --opt com.docker.network.bridge.enable_icc=true \  # Inter-container comm
+  --opt com.docker.network.bridge.enable_ip_masquerade=true \  # NAT
+  --opt com.docker.network.driver.mtu=1500 \  # MTU
+  producao-backend
+
+# Exemplos práticos:
+
+# Rede para desenvolvimento:
+docker network create dev-net
+
+# Rede para banco de dados (sem internet):
+docker network create --internal --subnet 10.0.100.0/24 db-net
+
+# Rede com subnet específico para evitar conflitos:
+docker network create --subnet 172.30.0.0/16 staging-net
+
+# Rede com IPv6:
+docker network create --ipv6 --subnet "fd00::/64" ipv6-net</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker network ls — Listar Redes</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Listar e filtrar redes</code><span class="cmd-tag">ls</span></div>
+              <pre><code># Listar todas as redes:
+docker network ls
+
+NETWORK ID     NAME            DRIVER    SCOPE
+a1b2c3d4e5f6   bridge          bridge    local
+d7e8f9a0b1c2   host            host      local
+f3a4b5c6d7e8   none            null      local
+1a2b3c4d5e6f   app-net         bridge    local
+7g8h9i0j1k2l   db-internal     bridge    local
+
+# Filtrar por driver:
+docker network ls --filter driver=bridge
+
+# Filtrar por nome (wildcard):
+docker network ls --filter name=app
+
+# Filtrar por label:
+docker network ls --filter label=env=production
+
+# Filtrar por scope:
+docker network ls --filter scope=local
+docker network ls --filter scope=swarm
+
+# Filtrar "dangling" (sem containers):
+docker network ls --filter dangling=true
+
+# Formato customizado:
+docker network ls --format "table {{.ID}}\t{{.Name}}\t{{.Driver}}\t{{.Scope}}"
+
+# Apenas IDs (útil para scripts):
+docker network ls -q
+
+# JSON format:
+docker network ls --format json</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker network inspect</code><span class="cmd-tag">inspect</span></div>
+              <pre><code># Inspecionar uma rede específica:
+docker network inspect app-net
+
+# Saída (JSON):
+[{
+  "Name": "app-net",
+  "Id": "1a2b3c4d5e6f7g8h9i0j...",
+  "Created": "2024-01-15T10:30:00.000Z",
+  "Scope": "local",
+  "Driver": "bridge",
+  "EnableIPv6": false,
+  "IPAM": {
+    "Driver": "default",
+    "Config": [{
+      "Subnet": "172.18.0.0/16",
+      "Gateway": "172.18.0.1"
+    }]
+  },
+  "Internal": false,
+  "Options": {},
+  "Labels": {},
+  "Containers": {
+    "abc123...": {
+      "Name": "api",
+      "IPv4Address": "172.18.0.2/16",
+      "MacAddress": "02:42:ac:12:00:02"
+    },
+    "def456...": {
+      "Name": "redis",
+      "IPv4Address": "172.18.0.3/16",
+      "MacAddress": "02:42:ac:12:00:03"
+    }
+  }
+}]
+
+# Extrair informações específicas:
+docker network inspect --format \
+  '{{.IPAM.Config}}' app-net
+
+# Ver apenas containers na rede:
+docker network inspect --format \
+  '{{range .Containers}}{{.Name}}: {{.IPv4Address}}
+  {{end}}' app-net</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker network rm e prune — Remover Redes</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Remover redes específicas</code><span class="cmd-tag">rm</span></div>
+              <pre><code># Remover uma rede:
+docker network rm app-net
+
+# ⚠️ Erro se rede tem containers conectados:
+# Error: network app-net has active endpoints
+# Solução: desconectar ou parar containers primeiro
+
+# Remover múltiplas:
+docker network rm net1 net2 net3
+
+# Remover por ID:
+docker network rm 1a2b3c4d5e6f
+
+# ═══════════════════════════════════
+# PRUNE — Limpar redes não usadas
+# ═══════════════════════════════════
+docker network prune
+
+# WARNING! This will remove all custom networks
+# not used by at least one container.
+# Are you sure? [y/N] y
+
+# Prune com filtro:
+docker network prune --filter label=env=dev
+# Remove apenas redes de dev não usadas
+
+# Prune sem confirmação:
+docker network prune -f
+
+# ⚠️ Prune NÃO remove:
+# • bridge (padrão)
+# • host
+# • none
+# • Redes com containers conectados</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>connect / disconnect</code><span class="cmd-tag">Gerenciar</span></div>
+              <pre><code># Conectar container a uma rede:
+docker network connect minha-rede meu-container
+
+# Conectar com IP específico:
+docker network connect --ip 172.18.0.100 \
+  minha-rede meu-container
+
+# Conectar com alias:
+docker network connect --alias db-primary \
+  minha-rede meu-container
+
+# Desconectar container de uma rede:
+docker network disconnect minha-rede meu-container
+
+# Forçar desconexão:
+docker network disconnect -f minha-rede meu-container
+
+# ═══════════════════════════════════
+# SCRIPTS ÚTEIS
+# ═══════════════════════════════════
+
+# Listar containers em uma rede:
+docker network inspect app-net \
+  --format '{{range .Containers}}{{.Name}} {{end}}'
+
+# Listar redes de um container:
+docker inspect my-container \
+  --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+
+# IP de um container em rede específica:
+docker inspect my-container \
+  --format '{{.NetworkSettings.Networks.app_net.IPAddress}}'
+
+# Todos os IPs de um container (múltiplas redes):
+docker inspect my-container --format \
+  '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}={{$v.IPAddress}} {{end}}'</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Inspecionar Configuração de Rede de um Container</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Comandos de diagnóstico de rede de containers</code><span class="cmd-tag">Diagnóstico</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# INSPECIONAR REDE DE UM CONTAINER ESPECÍFICO
+# ═══════════════════════════════════════════════════════════════
+
+# Ver TODAS as informações de rede:
+docker inspect --format '{{json .NetworkSettings}}' meu-container | jq
+
+# IP Address:
+docker inspect -f '{{.NetworkSettings.IPAddress}}' meu-container
+# 172.17.0.2 (bridge padrão)
+
+# IP em rede específica:
+docker inspect -f '{{.NetworkSettings.Networks.app_net.IPAddress}}' meu-container
+# 172.18.0.5
+
+# MAC Address:
+docker inspect -f '{{.NetworkSettings.MacAddress}}' meu-container
+# 02:42:ac:11:00:02
+
+# Gateway:
+docker inspect -f '{{.NetworkSettings.Gateway}}' meu-container
+# 172.17.0.1
+
+# Portas publicadas:
+docker inspect -f '{{json .NetworkSettings.Ports}}' meu-container | jq
+# {"80/tcp": [{"HostIp":"0.0.0.0","HostPort":"8080"}]}
+
+# Todas as redes do container:
+docker inspect -f '{{json .NetworkSettings.Networks}}' meu-container | jq
+
+# ═══════════════════════════════════════════════════════════════
+# VER CONFIGURAÇÃO DE REDE DE DENTRO DO CONTAINER
+# ═══════════════════════════════════════════════════════════════
+
+# Interfaces:
+docker exec meu-container ip addr
+# ou: docker exec meu-container ifconfig
+
+# Tabela de rotas:
+docker exec meu-container ip route
+# default via 172.18.0.1 dev eth0
+# 172.18.0.0/16 dev eth0 proto kernel
+
+# DNS configurado:
+docker exec meu-container cat /etc/resolv.conf
+# nameserver 127.0.0.11 (DNS Docker)
+
+# Hostname:
+docker exec meu-container hostname
+# container-id ou --hostname definido
+
+# Hosts file:
+docker exec meu-container cat /etc/hosts
+# 127.0.0.1 localhost
+# 172.18.0.2 container-id
+
+# Conexões ativas:
+docker exec meu-container netstat -an
+# ou: docker exec meu-container ss -tlnp</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: CENÁRIOS PRÁTICOS DE ARQUITETURA -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Arquitetura</span>
+          <h2>Cenários Práticos de Arquitetura de Rede</h2>
+          <p>Vamos explorar cenários reais de como organizar redes Docker para aplicações em produção. Cada cenário demonstra como usar múltiplas redes para implementar segmentação, isolamento e segurança.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo 1: Frontend + Backend + Database (3 Redes Separadas)</h3>
+          <p>Uma aplicação web clássica com três camadas, cada uma em sua própria rede. O backend serve como ponte entre frontend e database:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Arquitetura 3-tier com redes isoladas</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CENÁRIO: E-commerce com 3 camadas de rede
+# ═══════════════════════════════════════════════════════════════
+#
+# REGRAS DE SEGURANÇA:
+# • Frontend NÃO acessa banco diretamente
+# • Database NÃO é exposto externamente
+# • Backend é a única ponte entre as camadas
+# • Apenas o Frontend/Nginx é acessível de fora
+#
+# ═══════════════════════════════════════════════════════════════
+
+# DIAGRAMA:
+#
+# ┌─────────────────────────────────────────────────────────────────┐
+# │                         HOST                                     │
+# │                                                                  │
+# │  ┌───────────── REDE: frontend-net ──────────────────────┐     │
+# │  │                                                         │     │
+# │  │   ┌─────────┐              ┌─────────────┐            │     │
+# │  │   │  Nginx  │◄────────────▶│  API (Node) │            │     │
+# │  │   │  :80    │              │  :3000      │            │     │
+# │  │   └────┬────┘              └──────┬──────┘            │     │
+# │  │        │                           │                    │     │
+# │  └────────┼───────────────────────────┼────────────────────┘     │
+# │           │ -p 80:80                  │                          │
+# │           │ -p 443:443                │ (está nas 2 redes)       │
+# │  ┌────────┼───────────────────────────┼────────────────────┐     │
+# │  │        │                           │                    │     │
+# │  │   ┌────────────────────────────────▼──────┐            │     │
+# │  │   │              API (Node)               │            │     │
+# │  │   │  Conectada em frontend-net E db-net    │            │     │
+# │  │   └──────────────────┬────────────────────┘            │     │
+# │  │                      │                                  │     │
+# │  │                      ▼                                  │     │
+# │  │   ┌──────────┐   ┌──────────┐                         │     │
+# │  │   │PostgreSQL│   │  Redis   │                         │     │
+# │  │   │  :5432   │   │  :6379   │                         │     │
+# │  │   └──────────┘   └──────────┘                         │     │
+# │  │                                                         │     │
+# │  └───────────── REDE: db-net (--internal) ────────────────┘     │
+# │                                                                  │
+# └─────────────────────────────────────────────────────────────────┘
+
+# IMPLEMENTAÇÃO:
+
+# 1. Criar as redes:
+docker network create frontend-net
+docker network create --internal db-net    # ← sem acesso à internet!
+
+# 2. Iniciar o banco de dados (apenas na rede db-net):
+docker run -d \
+  --name postgres \
+  --network db-net \
+  --network-alias db \
+  -e POSTGRES_PASSWORD=secreto \
+  -v pgdata:/var/lib/postgresql/data \
+  postgres:16
+
+# 3. Iniciar o Redis (apenas na rede db-net):
+docker run -d \
+  --name redis \
+  --network db-net \
+  --network-alias cache \
+  -v redisdata:/data \
+  redis:7-alpine
+
+# 4. Iniciar a API (em AMBAS as redes):
+docker run -d \
+  --name api \
+  --network frontend-net \
+  -e DATABASE_URL=postgresql://postgres:secreto@db:5432/postgres \
+  -e REDIS_URL=redis://cache:6379 \
+  minha-api:latest
+
+# Conectar API também na rede do banco:
+docker network connect db-net api
+
+# 5. Iniciar o Nginx (apenas frontend-net, exposto externamente):
+docker run -d \
+  --name nginx \
+  --network frontend-net \
+  -p 80:80 \
+  -p 443:443 \
+  -v ./nginx.conf:/etc/nginx/nginx.conf:ro \
+  nginx:alpine
+
+# ═══════════════════════════════════════════════════════════════
+# VERIFICAÇÃO DE ISOLAMENTO:
+# ═══════════════════════════════════════════════════════════════
+docker exec nginx ping db        # ❌ Nginx NÃO acessa DB (redes diferentes)
+docker exec nginx ping api       # ✅ Nginx acessa API (mesma rede frontend-net)
+docker exec api ping db          # ✅ API acessa DB (ambos em db-net)
+docker exec api ping nginx       # ✅ API acessa Nginx (ambos em frontend-net)
+docker exec postgres ping nginx  # ❌ DB NÃO acessa Nginx (redes diferentes)
+docker exec postgres ping api    # ✅ DB acessa API (ambos em db-net)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo 2: Microserviços com Rede Interna Isolada</h3>
+          <p>Em uma arquitetura de microserviços, cada serviço pode ter sua rede dedicada. Um API Gateway centraliza o acesso externo:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Microserviços com gateway centralizado</code><span class="cmd-tag">Microserviços</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CENÁRIO: Plataforma com 4 microserviços + API Gateway
+# ═══════════════════════════════════════════════════════════════
+#
+# ┌──────────────────────────────────────────────────────────────────┐
+# │                            HOST                                    │
+# │                                                                    │
+# │  ┌───────── gateway-net ─────────────────────────────────────┐   │
+# │  │                                                             │   │
+# │  │  ┌──────────────┐                                         │   │
+# │  │  │ API Gateway  │◄──── :80/:443 (único ponto de entrada)  │   │
+# │  │  │  (Traefik)   │                                         │   │
+# │  │  └──┬───┬───┬───┘                                         │   │
+# │  │     │   │   │                                              │   │
+# │  └─────┼───┼───┼──────────────────────────────────────────────┘   │
+# │         │   │   │                                                  │
+# │  ┌──────┼───┼───┼─── services-net (--internal) ───────────────┐   │
+# │  │      │   │   │                                              │   │
+# │  │      ▼   │   ▼                                             │   │
+# │  │  ┌──────┐│┌───────┐  ┌──────────┐  ┌──────────┐          │   │
+# │  │  │Users ││ │Orders │  │ Products │  │Payments │          │   │
+# │  │  │:3001 ││ │:3002  │  │ :3003    │  │ :3004   │          │   │
+# │  │  └──┬───┘│ └───┬───┘  └────┬─────┘  └────┬────┘          │   │
+# │  │     │    │     │            │              │               │   │
+# │  └─────┼────┼─────┼────────────┼──────────────┼───────────────┘   │
+# │         │    │     │            │              │                    │
+# │  ┌──────┼────┼─────┼────────────┼──────────────┼── data-net ────┐  │
+# │  │      ▼    ▼     ▼            ▼              ▼               │  │
+# │  │  ┌──────┐  ┌──────┐  ┌──────────┐  ┌─────────┐           │  │
+# │  │  │Postgres│ │MongoDB│  │ Redis    │  │RabbitMQ │           │  │
+# │  │  │:5432  │  │:27017│  │ :6379    │  │ :5672   │           │  │
+# │  │  └───────┘  └──────┘  └──────────┘  └─────────┘           │  │
+# │  │                                                             │  │
+# │  └───────────────── (--internal, sem internet) ────────────────┘  │
+# │                                                                    │
+# └──────────────────────────────────────────────────────────────────┘
+
+# IMPLEMENTAÇÃO:
+
+# 1. Criar redes:
+docker network create gateway-net                    # Gateway ↔ Serviços
+docker network create --internal services-net        # Entre serviços
+docker network create --internal data-net            # Serviços ↔ Bancos
+
+# 2. Infraestrutura de dados (apenas data-net):
+docker run -d --name postgres --network data-net postgres:16
+docker run -d --name mongodb --network data-net mongo:7
+docker run -d --name redis --network data-net redis:7
+docker run -d --name rabbitmq --network data-net rabbitmq:3
+
+# 3. Microserviços (services-net + data-net):
+for svc in users orders products payments; do
+  docker run -d --name $svc --network services-net svc-$svc:latest
+  docker network connect data-net $svc
+done
+
+# 4. API Gateway (gateway-net + services-net):
+docker run -d --name gateway \
+  --network gateway-net \
+  -p 80:80 -p 443:443 \
+  traefik:v2.10
+
+docker network connect services-net gateway
+
+# RESULTADO:
+# • Gateway acessa serviços (gateway-net + services-net)
+# • Serviços acessam dados (services-net + data-net)
+# • Gateway NÃO acessa bancos diretamente
+# • Bancos NÃO acessam internet (--internal)
+# • Apenas porta 80/443 exposta externamente</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exemplo 3: Aplicação com Rede Pública + Privada</h3>
+          <p>Cenário simples e prático: uma rede para serviços públicos (acessíveis externamente) e outra para serviços privados (apenas internos):</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Rede pública + privada</code><span class="cmd-tag">Segmentação</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CENÁRIO: Blog WordPress com segmentação de rede
+# ═══════════════════════════════════════════════════════════════
+#
+# ┌──────────────────────────────────────────────────────────┐
+# │                                                            │
+# │  REDE PÚBLICA (public-net)                                │
+# │  ─────────────────────────                                │
+# │  ┌─────────────┐    ┌──────────────┐                     │
+# │  │   Nginx     │───▶│  WordPress   │                     │
+# │  │   :80/:443  │    │   :9000      │                     │
+# │  │  -p 80:80   │    │              │                     │
+# │  └─────────────┘    └──────┬───────┘                     │
+# │                             │                              │
+# └─────────────────────────────┼──────────────────────────────┘
+#                               │ (WordPress está nas 2 redes)
+# ┌─────────────────────────────┼──────────────────────────────┐
+# │                             │                              │
+# │  REDE PRIVADA (private-net, --internal)                   │
+# │  ──────────────────────────────────────                   │
+# │                             ▼                              │
+# │  ┌──────────────┐    ┌──────────────┐                    │
+# │  │   MariaDB    │    │  Memcached   │                    │
+# │  │   :3306      │    │   :11211     │                    │
+# │  └──────────────┘    └──────────────┘                    │
+# │                                                            │
+# │  ⛔ Sem acesso à internet                                 │
+# │  ⛔ Não acessível de fora                                 │
+# │                                                            │
+# └────────────────────────────────────────────────────────────┘
+
+# IMPLEMENTAÇÃO:
+
+# 1. Criar redes:
+docker network create public-net
+docker network create --internal private-net
+
+# 2. Banco e cache (rede privada apenas):
+docker run -d --name mariadb \
+  --network private-net \
+  --network-alias db \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  -e MYSQL_DATABASE=wordpress \
+  -v mariadb-data:/var/lib/mysql \
+  mariadb:11
+
+docker run -d --name memcached \
+  --network private-net \
+  --network-alias cache \
+  memcached:1.6
+
+# 3. WordPress (em ambas as redes):
+docker run -d --name wordpress \
+  --network public-net \
+  --network-alias wp \
+  -e WORDPRESS_DB_HOST=db:3306 \
+  -e WORDPRESS_DB_USER=root \
+  -e WORDPRESS_DB_PASSWORD=secret \
+  -e WORDPRESS_DB_NAME=wordpress \
+  -v wp-content:/var/www/html/wp-content \
+  wordpress:php8.2-fpm
+
+docker network connect private-net wordpress
+
+# 4. Nginx (rede pública, exposto):
+docker run -d --name nginx \
+  --network public-net \
+  -p 80:80 -p 443:443 \
+  -v ./nginx-wp.conf:/etc/nginx/conf.d/default.conf:ro \
+  nginx:alpine
+
+# SEGURANÇA ALCANÇADA:
+# ✅ MariaDB sem acesso à internet (--internal)
+# ✅ MariaDB sem porta exposta (sem -p)
+# ✅ Nginx não acessa banco (redes diferentes)
+# ✅ Apenas porta 80/443 acessível externamente
+# ✅ WordPress é a única ponte entre as camadas</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Boas Práticas de Arquitetura de Rede</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>✅ Faça</h4>
+              <ul>
+                <li>Crie redes separadas por responsabilidade</li>
+                <li>Use <code>--internal</code> para redes de dados</li>
+                <li>Exponha apenas o mínimo necessário com <code>-p</code></li>
+                <li>Use network aliases para desacoplar nomes</li>
+                <li>Documente a topologia de rede do projeto</li>
+                <li>Use labels para organizar redes</li>
+                <li>Bind em 127.0.0.1 para serviços internos</li>
+              </ul>
+            </div>
+            <div class="checklist-card">
+              <h4>❌ Não Faça</h4>
+              <ul>
+                <li>Colocar todos os containers na mesma rede</li>
+                <li>Usar a bridge padrão (docker0)</li>
+                <li>Expor portas de banco/cache externamente</li>
+                <li>Usar --link (deprecado)</li>
+                <li>Hardcodar IPs (use DNS)</li>
+                <li>Usar --network host sem necessidade real</li>
+                <li>Ignorar firewall/iptables com Docker</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 9: TROUBLESHOOTING DE REDE -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Debug</span>
+          <h2>Troubleshooting de Rede</h2>
+          <p>Problemas de rede são os mais comuns em ambientes Docker. Saber diagnosticar rapidamente por que containers não se comunicam, por que portas não respondem ou por que não há acesso à internet pode economizar horas de frustração.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Problema 1: Container Não Consegue Acessar Internet</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Diagnóstico: sem acesso à internet</code><span class="cmd-tag">Fix</span></div>
+              <pre><code># SINTOMA: container não baixa pacotes, não resolve DNS externo
+docker exec meu-container ping 8.8.8.8
+# ping: sendto: Network unreachable
+
+# ═══════════════════════════════════════════════════════════════
+# CHECKLIST DE DIAGNÓSTICO:
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Verificar se a rede é --internal:
+docker network inspect minha-rede --format '{{.Internal}}'
+# Se "true" → rede é interna, sem internet por design!
+# Solução: usar outra rede ou remover --internal
+
+# 2. Verificar IP forwarding no host:
+cat /proc/sys/net/ipv4/ip_forward
+# Deve ser "1". Se "0":
+sudo sysctl -w net.ipv4.ip_forward=1
+# Persistir: echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+
+# 3. Verificar regras iptables (NAT/masquerade):
+sudo iptables -t nat -L POSTROUTING -n -v
+# Deve ter regra MASQUERADE para subnet do Docker
+
+# 4. Verificar DNS dentro do container:
+docker exec meu-container cat /etc/resolv.conf
+# Deve ter: nameserver 127.0.0.11
+
+# Testar resolução DNS:
+docker exec meu-container nslookup google.com
+# Se falhar: problema de DNS
+
+# 5. Verificar conectividade por IP (bypass DNS):
+docker exec meu-container ping -c 1 8.8.8.8
+# Se ping por IP funciona mas DNS não → problema apenas de DNS
+
+# 6. Verificar se o daemon Docker tem DNS configurado:
+cat /etc/docker/daemon.json
+# Adicionar se necessário:
+# { "dns": ["8.8.8.8", "8.8.4.4"] }
+# Reiniciar: sudo systemctl restart docker
+
+# 7. Verificar se host tem internet:
+ping -c 1 8.8.8.8  # no host
+# Se host não tem internet, container também não terá
+
+# 8. Verificar se bridge está UP:
+ip link show docker0
+# Deve estar: state UP</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Problema 2: Containers Não se Comunicam entre Si</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Diagnóstico: containers não se alcançam</code><span class="cmd-tag">Fix</span></div>
+              <pre><code># SINTOMA: docker exec app ping db → falha
+# ═══════════════════════════════════════════════════════════════
+
+# 1. VERIFICAR SE ESTÃO NA MESMA REDE:
+docker inspect app --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+# Resultado: frontend-net
+
+docker inspect db --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+# Resultado: backend-net
+
+# ❌ PROBLEMA: estão em redes DIFERENTES!
+# SOLUÇÃO: colocar na mesma rede:
+docker network connect backend-net app
+# ou criar rede compartilhada
+
+# 2. VERIFICAR SE ESTÁ USANDO BRIDGE PADRÃO (sem DNS):
+docker inspect app --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+# Resultado: bridge
+
+# ❌ PROBLEMA: bridge padrão NÃO tem DNS por nome!
+# SOLUÇÃO: criar rede customizada:
+docker network create app-net
+docker network connect app-net app
+docker network connect app-net db
+docker network disconnect bridge app
+docker network disconnect bridge db
+
+# 3. TESTAR CONECTIVIDADE POR IP (confirmar que rede funciona):
+docker inspect db -f '{{.NetworkSettings.Networks.app_net.IPAddress}}'
+# 172.18.0.3
+
+docker exec app ping -c 1 172.18.0.3
+# Se funciona por IP mas não por nome → problema de DNS
+# Se não funciona nem por IP → problema de rede/rota
+
+# 4. VERIFICAR DNS:
+docker exec app nslookup db
+# Se "** server can't find db" → container não está na mesma rede
+
+# 5. VERIFICAR SE ICC ESTÁ DESABILITADO:
+docker network inspect app-net --format '{{.Options}}'
+# Se "com.docker.network.bridge.enable_icc:false" → comunicação bloqueada!
+# Solução: recriar rede sem essa opção
+
+# 6. VERIFICAR SE O CONTAINER DE DESTINO ESTÁ RODANDO:
+docker ps --filter name=db
+# Se não aparece → container está parado!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Problema 3: Porta Não Acessível de Fora</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Diagnóstico: porta não responde externamente</code><span class="cmd-tag">Fix</span></div>
+              <pre><code># SINTOMA: curl http://SERVIDOR:8080 → Connection refused (de outra máquina)
+# Mas funciona localmente: curl http://localhost:8080 ✅
+# ═══════════════════════════════════════════════════════════════
+
+# 1. VERIFICAR PORT MAPPING:
+docker port meu-container
+# 80/tcp -> 0.0.0.0:8080  ← OK, publicado em todas interfaces
+# 80/tcp -> 127.0.0.1:8080 ← PROBLEMA! Só acessível localmente!
+
+# SOLUÇÃO se bind em 127.0.0.1:
+docker stop meu-container && docker rm meu-container
+docker run -d -p 0.0.0.0:8080:80 meu-container
+# ou simplesmente: -p 8080:80 (default é 0.0.0.0)
+
+# 2. VERIFICAR SE O APP ESCUTA NO ENDEREÇO CORRETO:
+docker exec meu-container netstat -tlnp
+# Se app escuta em 127.0.0.1:80 → só aceita conexões locais!
+# Precisa escutar em 0.0.0.0:80
+
+# Exemplo: Flask/Node precisa bind em 0.0.0.0:
+# Flask: app.run(host='0.0.0.0', port=80)  ← correto
+# Flask: app.run(host='127.0.0.1', port=80) ← só localhost
+# Node: app.listen(80, '0.0.0.0')  ← correto
+
+# 3. VERIFICAR FIREWALL DO HOST:
+sudo ufw status
+# Se ativo, a porta pode estar bloqueada
+# ⚠️ MAS Docker geralmente bypassa UFW via iptables!
+
+# Verificar iptables:
+sudo iptables -L -n | grep 8080
+# Deve ter regra ACCEPT para a porta
+
+# 4. VERIFICAR SE CONTAINER ESTÁ RODANDO:
+docker ps --filter name=meu-container
+# Se não aparece → container caiu! Ver logs:
+docker logs meu-container
+
+# 5. VERIFICAR HEALTH DO SERVIÇO DENTRO DO CONTAINER:
+docker exec meu-container curl -s http://localhost:80
+# Se falha aqui → o serviço dentro do container tem problema
+
+# 6. VERIFICAR SE OUTRO PROCESSO USA A PORTA:
+sudo ss -tlnp | grep 8080
+# Se outro processo ocupa a porta no host → conflito!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Ferramentas de Diagnóstico</h3>
+          <p>Estas são as principais ferramentas para diagnosticar problemas de rede em containers:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Ferramentas dentro do container</code><span class="cmd-tag">Debug</span></div>
+              <pre><code># Muitos containers Alpine/slim não têm ferramentas.
+# Use uma imagem de debug:
+
+# netshoot — imagem com TODAS as ferramentas de rede:
+docker run -it --rm \
+  --network minha-rede \
+  --name debugger \
+  nicolaka/netshoot
+
+# Dentro do netshoot:
+ping outro-container        # Conectividade
+curl http://api:3000        # HTTP
+nslookup db                 # DNS
+dig @127.0.0.11 api        # DNS detalhado
+traceroute api              # Rota
+nc -zv db 5432             # Testar porta TCP
+tcpdump -i eth0            # Capturar pacotes
+iperf3 -c api              # Bandwidth
+mtr api                    # Traceroute contínuo
+ss -tlnp                   # Portas escutando
+
+# ═══════════════════════════════════
+# Instalar tools em container Alpine:
+docker exec meu-container \
+  apk add --no-cache curl bind-tools iputils
+
+# Instalar em Debian/Ubuntu:
+docker exec meu-container \
+  apt-get update && apt-get install -y \
+  curl dnsutils iputils-ping net-tools</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker network inspect para diagnóstico</code><span class="cmd-tag">Inspecionar</span></div>
+              <pre><code># ═══════════════════════════════════
+# DIAGNÓSTICO RÁPIDO COM INSPECT
+# ═══════════════════════════════════
+
+# Quais containers estão na rede?
+docker network inspect app-net \
+  --format '{{range .Containers}}
+  {{.Name}} = {{.IPv4Address}}{{end}}'
+# api = 172.18.0.2/16
+# redis = 172.18.0.3/16
+# postgres = 172.18.0.4/16
+
+# O container está na rede esperada?
+docker inspect api --format \
+  '{{.NetworkSettings.Networks.app_net.IPAddress}}'
+# 172.18.0.2 (ou vazio se não está na rede)
+
+# Qual gateway o container usa?
+docker inspect api --format \
+  '{{.NetworkSettings.Networks.app_net.Gateway}}'
+# 172.18.0.1
+
+# A rede é interna (sem internet)?
+docker network inspect app-net \
+  --format '{{.Internal}}'
+# false
+
+# Subnet da rede:
+docker network inspect app-net \
+  --format '{{(index .IPAM.Config 0).Subnet}}'
+# 172.18.0.0/16
+
+# ═══════════════════════════════════
+# SCRIPT: Mapear toda a topologia
+# ═══════════════════════════════════
+for net in $(docker network ls -q); do
+  echo "=== $(docker network inspect -f '{{.Name}}' $net) ==="
+  docker network inspect -f \
+    '{{range .Containers}}  {{.Name}}: {{.IPv4Address}}
+    {{end}}' $net
+done</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Resumo: Checklist de Troubleshooting</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Fluxo de diagnóstico de problemas de rede</code><span class="cmd-tag">Checklist</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════════════
+# FLUXO DE DIAGNÓSTICO — siga na ordem:
+# ═══════════════════════════════════════════════════════════════════════
+
+# PASSO 1: Container está rodando?
+docker ps --filter name=CONTAINER
+# Se não → docker logs CONTAINER (ver por que caiu)
+
+# PASSO 2: Container está na rede correta?
+docker inspect CONTAINER --format '{{json .NetworkSettings.Networks}}' | jq
+# Se não → docker network connect REDE CONTAINER
+
+# PASSO 3: Containers estão na MESMA rede?
+docker network inspect REDE --format '{{range .Containers}}{{.Name}} {{end}}'
+# Ambos devem aparecer
+
+# PASSO 4: DNS resolve?
+docker exec CONTAINER nslookup ALVO
+# Se não → verificar se é rede customizada (bridge padrão não tem DNS)
+
+# PASSO 5: Ping funciona?
+docker exec CONTAINER ping -c 1 ALVO
+# Se não → verificar ICC, iptables, rede --internal
+
+# PASSO 6: Porta responde?
+docker exec CONTAINER nc -zv ALVO PORTA
+# Se não → o serviço no container de destino pode estar down
+
+# PASSO 7: Serviço HTTP responde?
+docker exec CONTAINER curl -v http://ALVO:PORTA
+# Analise headers, códigos de erro, timeouts
+
+# PASSO 8: Se nada funcionar, use netshoot:
+docker run -it --rm --network REDE nicolaka/netshoot
+# tcpdump, iperf, dig, traceroute, ss, etc.
+# ═══════════════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 10: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Hora de praticar! Estes exercícios cobrem os conceitos mais importantes do módulo. Tente resolver cada um antes de olhar a solução. Lembre-se: errar faz parte do aprendizado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Criar Rede Bridge e Conectar 2 Containers com DNS</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio: Comunicação por DNS</code><span class="cmd-tag">Exercício 1</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# OBJETIVO:
+# Criar uma rede bridge customizada e demonstrar que dois
+# containers conseguem se comunicar usando nomes (DNS).
+# ═══════════════════════════════════════════════════════════════
+#
+# REQUISITOS:
+# 1. Criar uma rede chamada "exercicio-net" com subnet 172.28.0.0/16
+# 2. Iniciar container "servidor" (nginx:alpine) na rede
+# 3. Iniciar container "cliente" (alpine) na rede
+# 4. Do "cliente", fazer curl para "servidor" na porta 80
+# 5. Verificar que DNS resolve o nome "servidor"
+# 6. Limpar todos os recursos criados
+#
+# DICAS:
+# - Use docker network create com --subnet
+# - Use --network na criação dos containers
+# - Alpine precisa de curl instalado (apk add curl)
+# - Ou use: wget -qO- http://servidor
+#
+# TENTE RESOLVER ANTES DE VER A SOLUÇÃO!
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução do Exercício 1</code><span class="cmd-tag">Solução</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# SOLUÇÃO COMPLETA:
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Criar a rede:
+docker network create --subnet 172.28.0.0/16 exercicio-net
+
+# Verificar:
+docker network ls --filter name=exercicio
+docker network inspect exercicio-net --format '{{(index .IPAM.Config 0).Subnet}}'
+# 172.28.0.0/16 ✅
+
+# 2. Iniciar o servidor Nginx:
+docker run -d --name servidor --network exercicio-net nginx:alpine
+
+# 3. Iniciar o cliente Alpine:
+docker run -d --name cliente --network exercicio-net alpine sleep 3600
+
+# 4. Testar DNS (resolução de nome):
+docker exec cliente nslookup servidor
+# Name: servidor
+# Address: 172.28.0.2 ✅
+
+# 5. Testar conectividade HTTP:
+docker exec cliente wget -qO- http://servidor
+# <!DOCTYPE html>
+# <html>
+# <head><title>Welcome to nginx!</title>...  ✅
+
+# 6. Testar ping:
+docker exec cliente ping -c 3 servidor
+# PING servidor (172.28.0.2): 56 data bytes
+# 64 bytes from 172.28.0.2: seq=0 ttl=64 time=0.089 ms ✅
+
+# 7. Verificar que o reverso também funciona:
+docker exec servidor ping -c 1 cliente
+# PING cliente (172.28.0.3): 56 data bytes
+# 64 bytes from 172.28.0.3: seq=0 ttl=64 time=0.095 ms ✅
+
+# 8. Limpar:
+docker stop servidor cliente
+docker rm servidor cliente
+docker network rm exercicio-net
+
+# VERIFICAR QUE TUDO FOI LIMPO:
+docker network ls --filter name=exercicio
+# (vazio) ✅</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: App Node.js + Redis em Rede Customizada</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio: Aplicação real com Redis</code><span class="cmd-tag">Exercício 2</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# OBJETIVO:
+# Configurar uma aplicação Node.js que se conecta ao Redis
+# usando DNS automático da rede Docker.
+# ═══════════════════════════════════════════════════════════════
+#
+# REQUISITOS:
+# 1. Criar rede "app-stack"
+# 2. Iniciar Redis com alias "cache"
+# 3. Iniciar container Node.js que conecta no Redis
+# 4. Gravar e ler dados no Redis via Node.js
+# 5. O Redis NÃO deve ter porta exposta externamente
+# 6. Verificar que o Redis não é acessível de fora
+#
+# DICAS:
+# - Redis: redis:7-alpine
+# - Node: node:20-alpine
+# - Pacote: ioredis ou redis
+# - Redis está na porta 6379
+# - Use --network-alias para o alias "cache"
+#
+# TENTE RESOLVER ANTES DE VER A SOLUÇÃO!
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução do Exercício 2</code><span class="cmd-tag">Solução</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# SOLUÇÃO COMPLETA:
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Criar a rede:
+docker network create app-stack
+
+# 2. Iniciar Redis (sem -p → não exposto externamente!):
+docker run -d \
+  --name redis \
+  --network app-stack \
+  --network-alias cache \
+  redis:7-alpine
+
+# 3. Verificar que Redis NÃO é acessível de fora:
+curl http://localhost:6379 2>&1
+# curl: (7) Failed to connect  ✅ (não está exposto)
+
+# 4. Verificar que Redis é acessível internamente:
+docker run --rm --network app-stack alpine \
+  sh -c "apk add --no-cache redis && redis-cli -h cache ping"
+# PONG ✅
+
+# 5. Criar e rodar script Node.js que usa Redis:
+docker run -it --rm \
+  --name app-node \
+  --network app-stack \
+  node:20-alpine sh -c '
+    # Instalar cliente Redis
+    npm init -y > /dev/null 2>&1
+    npm install ioredis --silent
+
+    # Script que conecta no Redis via DNS
+    node -e "
+      const Redis = require(\"ioredis\");
+      const redis = new Redis({ host: \"cache\", port: 6379 });
+
+      async function main() {
+        // Gravar dados
+        await redis.set(\"usuario:1\", JSON.stringify({
+          nome: \"Maria Silva\",
+          email: \"maria@email.com\"
+        }));
+        console.log(\"✅ Dados gravados no Redis\");
+
+        // Ler dados
+        const dados = await redis.get(\"usuario:1\");
+        console.log(\"✅ Dados lidos:\", JSON.parse(dados));
+
+        // Incrementar contador
+        await redis.incr(\"visitas\");
+        const visitas = await redis.get(\"visitas\");
+        console.log(\"✅ Contador de visitas:\", visitas);
+
+        // Info do servidor
+        const info = await redis.info(\"server\");
+        console.log(\"✅ Conectado em:\", info.split(\"\\n\")[1]);
+
+        await redis.quit();
+      }
+      main().catch(console.error);
+    "
+  '
+# Saída:
+# ✅ Dados gravados no Redis
+# ✅ Dados lidos: { nome: 'Maria Silva', email: 'maria@email.com' }
+# ✅ Contador de visitas: 1
+# ✅ Conectado em: redis_version:7.x.x
+
+# 6. Verificar dados persistem no Redis:
+docker exec redis redis-cli get "usuario:1"
+# {"nome":"Maria Silva","email":"maria@email.com"} ✅
+
+# 7. Limpar:
+docker stop redis && docker rm redis
+docker network rm app-stack</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Isolar Frontend de Backend com Redes Separadas</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio: Segmentação de rede</code><span class="cmd-tag">Exercício 3</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# OBJETIVO:
+# Implementar segmentação de rede onde o frontend (Nginx)
+# NÃO consegue acessar o banco de dados diretamente.
+# Apenas o backend (API) serve como ponte.
+# ═══════════════════════════════════════════════════════════════
+#
+# REQUISITOS:
+# 1. Criar rede "front-net" (acesso externo)
+# 2. Criar rede "back-net" (interna, sem internet)
+# 3. Nginx na front-net (exposto na porta 8080)
+# 4. API na front-net E back-net (ponte entre camadas)
+# 5. PostgreSQL na back-net apenas
+# 6. COMPROVAR que Nginx NÃO consegue pingar PostgreSQL
+# 7. COMPROVAR que API consegue pingar AMBOS
+#
+# TOPOLOGIA:
+# [Nginx] ←front-net→ [API] ←back-net→ [PostgreSQL]
+#
+# TENTE RESOLVER ANTES DE VER A SOLUÇÃO!
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução do Exercício 3</code><span class="cmd-tag">Solução</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# SOLUÇÃO COMPLETA:
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Criar as redes:
+docker network create front-net
+docker network create --internal back-net
+
+# 2. Iniciar PostgreSQL (apenas back-net):
+docker run -d \
+  --name postgres \
+  --network back-net \
+  --network-alias db \
+  -e POSTGRES_PASSWORD=secret \
+  postgres:16-alpine
+
+# 3. Iniciar a API (inicialmente em front-net):
+docker run -d \
+  --name api \
+  --network front-net \
+  --network-alias backend \
+  alpine sleep 3600
+
+# Conectar API também na back-net:
+docker network connect back-net api
+
+# 4. Iniciar Nginx (apenas front-net):
+docker run -d \
+  --name nginx \
+  --network front-net \
+  -p 8080:80 \
+  nginx:alpine
+
+# ═══════════════════════════════════════════════════════════════
+# COMPROVAÇÃO DE ISOLAMENTO:
+# ═══════════════════════════════════════════════════════════════
+
+# ✅ Nginx → API (mesma rede front-net):
+docker exec nginx ping -c 1 backend
+# PING backend (172.18.0.3): 64 bytes from 172.18.0.3 ✅
+
+# ❌ Nginx → PostgreSQL (redes diferentes!):
+docker exec nginx ping -c 1 -W 2 db
+# ping: bad address 'db'  ❌ (DNS não resolve — redes diferentes!)
+
+docker exec nginx ping -c 1 -W 2 postgres
+# ping: bad address 'postgres'  ❌
+
+# ✅ API → PostgreSQL (ambos em back-net):
+docker exec api ping -c 1 db
+# PING db (172.19.0.2): 64 bytes from 172.19.0.2 ✅
+
+# ✅ API → Nginx (ambos em front-net):
+docker exec api ping -c 1 nginx
+# PING nginx (172.18.0.2): 64 bytes from 172.18.0.2 ✅
+
+# ❌ PostgreSQL → Internet (rede --internal!):
+docker exec postgres ping -c 1 -W 2 8.8.8.8
+# ping: sendto: Network unreachable ❌ (sem internet, como esperado!)
+
+# ✅ API → Internet (está em front-net que tem internet):
+docker exec api ping -c 1 8.8.8.8
+# 64 bytes from 8.8.8.8 ✅
+
+# ═══════════════════════════════════════════════════════════════
+# RESUMO DO ISOLAMENTO:
+#   Nginx  → API: ✅    | Nginx  → DB: ❌
+#   API    → Nginx: ✅  | API    → DB: ✅
+#   DB     → Internet: ❌
+# ═══════════════════════════════════════════════════════════════
+
+# 5. Limpar:
+docker stop nginx api postgres
+docker rm nginx api postgres
+docker network rm front-net back-net</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Troubleshooting — Diagnosticar por que Containers Não se Comunicam</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Desafio: Encontrar e resolver o problema</code><span class="cmd-tag">Exercício 4</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CENÁRIO: Alguém configurou os containers abaixo, mas a
+# aplicação NÃO consegue conectar no banco de dados.
+# Você precisa encontrar o problema e corrigir.
+# ═══════════════════════════════════════════════════════════════
+#
+# SETUP (rode estes comandos para criar o cenário com problema):
+
+docker network create rede-app
+docker network create rede-dados
+
+# App na rede-app:
+docker run -d --name webapp \
+  --network rede-app \
+  alpine sleep 3600
+
+# Banco na rede-dados:
+docker run -d --name database \
+  --network rede-dados \
+  --network-alias db \
+  redis:7-alpine
+
+# SINTOMA:
+docker exec webapp ping -c 1 -W 2 db
+# ping: bad address 'db'  ← NÃO FUNCIONA!
+
+docker exec webapp ping -c 1 -W 2 database
+# ping: bad address 'database'  ← NÃO FUNCIONA!
+
+# ═══════════════════════════════════════════════════════════════
+# SUA MISSÃO:
+# 1. Diagnosticar por que não funciona
+# 2. Corrigir o problema (sem recriar os containers)
+# 3. Comprovar que a comunicação funciona após fix
+# ═══════════════════════════════════════════════════════════════
+#
+# TENTE RESOLVER ANTES DE VER A SOLUÇÃO!
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>Solução do Exercício 4</code><span class="cmd-tag">Solução</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# DIAGNÓSTICO:
+# ═══════════════════════════════════════════════════════════════
+
+# Passo 1: Verificar em qual rede cada container está:
+docker inspect webapp --format \
+  '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}: {{$v.IPAddress}} {{end}}'
+# rede-app: 172.18.0.2
+
+docker inspect database --format \
+  '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}: {{$v.IPAddress}} {{end}}'
+# rede-dados: 172.19.0.2
+
+# 🔍 PROBLEMA ENCONTRADO:
+# webapp está em "rede-app"
+# database está em "rede-dados"
+# São REDES DIFERENTES! Por isso não se comunicam!
+
+# ═══════════════════════════════════════════════════════════════
+# CORREÇÃO (sem recriar containers):
+# ═══════════════════════════════════════════════════════════════
+
+# Opção A: Conectar webapp na rede-dados:
+docker network connect rede-dados webapp
+
+# Opção B: Conectar database na rede-app:
+# docker network connect rede-app database
+
+# Opção C: Conectar ambos em uma rede compartilhada:
+# docker network create shared-net
+# docker network connect shared-net webapp
+# docker network connect shared-net database
+
+# ═══════════════════════════════════════════════════════════════
+# COMPROVAÇÃO:
+# ═══════════════════════════════════════════════════════════════
+
+# Após aplicar Opção A:
+docker exec webapp ping -c 1 db
+# PING db (172.19.0.2): 64 bytes ← ✅ FUNCIONA!
+
+docker exec webapp ping -c 1 database
+# PING database (172.19.0.2): 64 bytes ← ✅ FUNCIONA!
+
+# Verificar que webapp agora está em ambas as redes:
+docker inspect webapp --format \
+  '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}: {{$v.IPAddress}} {{end}}'
+# rede-app: 172.18.0.2  rede-dados: 172.19.0.3
+
+# ═══════════════════════════════════════════════════════════════
+# LIÇÃO APRENDIDA:
+# Containers em redes diferentes NÃO se comunicam!
+# Use "docker network connect" para adicionar container
+# a uma rede existente sem precisar recriá-lo.
+# ═══════════════════════════════════════════════════════════════
+
+# Limpar:
+docker stop webapp database
+docker rm webapp database
+docker network rm rede-app rede-dados</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que vem no próximo módulo</h3>
+          <div class="info-box">
+            <strong>Módulo 05: Docker Compose</strong> — Você vai aprender como definir aplicações multi-container em um único arquivo YAML, orquestrar serviços com dependências, gerenciar redes e volumes declarativamente, e subir toda uma stack com um único comando: <code>docker compose up</code>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Próximo passo</span>
+          <h2>Pronto para dominar Docker Compose?</h2>
+          <p>No Módulo 05 você vai aprender como definir aplicações multi-container com um arquivo YAML, gerenciar serviços, redes e volumes de forma declarativa e subir toda a stack com um único comando.</p>
+        </div>
+        <a href="modulo-05.html" class="button primary">Ir para Módulo 05 →</a>
       </div>
     </section>
   </main>

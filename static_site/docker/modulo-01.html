@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Docker Módulo 01: Conceitos Fundamentais e Instalação</title>
+  <meta name="description" content="Guia completo sobre Docker: o que é, por que usar, como funciona internamente, instalação passo a passo e primeiros comandos com exemplos práticos." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,20 +20,16 @@
         <a href="../docker.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
-      <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
+      <a href="../linux.html">Linux</a>
       <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
-      <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,72 +38,271 @@
       <div class="container training-hero-content">
         <span class="pill">🐳 Docker — Módulo 01</span>
         <h1>Conceitos Fundamentais e Instalação</h1>
-        <p>Entenda o que é Docker, por que ele revolucionou o desenvolvimento de software, instale no seu sistema e execute seus primeiros containers.</p>
+        <p>Entenda profundamente o que é Docker, como ele funciona por baixo dos panos, por que revolucionou o desenvolvimento de software, e execute seus primeiros containers com confiança.</p>
       </div>
     </section>
 
+    <!-- BARRA DE PROGRESSO -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node active"><span>01</span><small>Conceitos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Imagens</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Volumes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Redes</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Compose</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Segurança</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Produção</small></a>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: O QUE É DOCKER -->
+    <!-- ============================================================ -->
     <section class="module-section">
       <div class="container">
-
-        <!-- O que é Docker -->
-        <div class="topic-block">
+        <div class="module-header">
+          <span class="module-badge">Fundamentos</span>
           <h2>O que é Docker?</h2>
-          <p>Docker é uma plataforma de containerização que permite empacotar aplicações e suas dependências em unidades padronizadas chamadas <strong>containers</strong>. Diferente de máquinas virtuais, containers compartilham o kernel do sistema operacional host, tornando-os extremamente leves e rápidos.</p>
+          <p>Docker é uma plataforma open-source que automatiza o deploy de aplicações dentro de containers — ambientes leves, portáteis e isolados que contêm tudo que a aplicação precisa para rodar.</p>
         </div>
 
-        <!-- Por que Docker importa -->
         <div class="topic-block">
-          <h2>Por que Docker importa?</h2>
+          <h3>Explicação simples</h3>
+          <p>Imagine que você está mudando de casa. Você tem duas opções:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Consistência</code><span class="cmd-tag">Dev → Prod</span></div>
-              <p>"Funciona na minha máquina" deixa de ser problema. O container é idêntico em qualquer ambiente.</p>
+              <div class="command-header"><code>Sem Docker (VM)</code><span class="cmd-tag">Analogia</span></div>
+              <p>É como levar a <strong>casa inteira</strong> com você — paredes, telhado, fundação, encanamento. Funciona, mas é pesado, lento e consome muitos recursos.</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Isolamento</code><span class="cmd-tag">Segurança</span></div>
-              <p>Cada container tem seu próprio filesystem, rede e processos isolados do host e de outros containers.</p>
+              <div class="command-header"><code>Com Docker (Container)</code><span class="cmd-tag">Analogia</span></div>
+              <p>É como usar um <strong>container de mudança padronizado</strong> — você coloca apenas seus pertences dentro, e ele funciona em qualquer caminhão, navio ou trem. Leve, rápido e portátil.</p>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Em termos técnicos:</strong> Docker empacota sua aplicação + dependências + configurações em uma unidade padronizada (container) que roda de forma idêntica em qualquer lugar — seu notebook, um servidor na nuvem ou um cluster Kubernetes.
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O problema que Docker resolve</h3>
+          <p>Antes do Docker, desenvolvedores enfrentavam problemas constantes:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>"Funciona na minha máquina"</code><span class="cmd-tag danger">Problema</span></div>
+              <p>O desenvolvedor usa Python 3.11 no Mac, o servidor de produção tem Python 3.8 no Ubuntu. A aplicação quebra por incompatibilidade de versões, bibliotecas ausentes ou configurações diferentes.</p>
+              <pre><code># Dev: funciona perfeitamente
+python3 app.py  # Python 3.11
+
+# Prod: erro!
+python3 app.py  # Python 3.8 → ModuleNotFoundError</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Velocidade</code><span class="cmd-tag">Performance</span></div>
-              <p>Containers iniciam em segundos (vs minutos de uma VM). Ideal para CI/CD e microserviços.</p>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Portabilidade</code><span class="cmd-tag">Multi-cloud</span></div>
-              <p>Execute em qualquer lugar: laptop, servidor on-premises, AWS, Azure, GCP — sem alterações.</p>
+              <div class="command-header"><code>Com Docker: consistência total</code><span class="cmd-tag">Solução</span></div>
+              <p>O container inclui a versão exata do Python, todas as bibliotecas e configurações. É <strong>idêntico</strong> em qualquer ambiente.</p>
+              <pre><code># Mesmo container em qualquer lugar:
+docker run minha-app:v1.0
+
+# Dev, staging, prod — comportamento idêntico</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Conceitos-chave -->
         <div class="topic-block">
-          <h2>Conceitos-chave</h2>
+          <h3>Docker vs Máquinas Virtuais — Entenda a diferença de verdade</h3>
+          <p>Ambos oferecem isolamento, mas funcionam de formas fundamentalmente diferentes:</p>
           <table class="styled-table">
             <thead>
-              <tr><th>Conceito</th><th>Descrição</th></tr>
+              <tr><th>Característica</th><th>Máquina Virtual</th><th>Container Docker</th></tr>
             </thead>
             <tbody>
-              <tr><td><strong>Imagem</strong></td><td>Template somente-leitura com o sistema de arquivos e configurações. É o "blueprint" do container.</td></tr>
-              <tr><td><strong>Container</strong></td><td>Instância em execução de uma imagem. Possui estado próprio e pode ser iniciado, parado e removido.</td></tr>
-              <tr><td><strong>Dockerfile</strong></td><td>Arquivo de texto com instruções para construir uma imagem customizada passo a passo.</td></tr>
-              <tr><td><strong>Registry</strong></td><td>Repositório de imagens (Docker Hub, ECR, GCR). Permite compartilhar e versionar imagens.</td></tr>
-              <tr><td><strong>Volume</strong></td><td>Mecanismo para persistir dados além do ciclo de vida do container.</td></tr>
-              <tr><td><strong>Network</strong></td><td>Rede virtual que permite comunicação entre containers e com o mundo externo.</td></tr>
+              <tr><td><strong>O que virtualiza</strong></td><td>Hardware completo (CPU, RAM, disco, placa de rede)</td><td>Apenas o espaço de usuário (filesystem, processos, rede)</td></tr>
+              <tr><td><strong>Sistema Operacional</strong></td><td>Cada VM tem seu próprio SO completo (kernel + userland)</td><td>Compartilha o kernel do host, cada container tem seu userland</td></tr>
+              <tr><td><strong>Tamanho</strong></td><td>GBs (SO completo + aplicação)</td><td>MBs (apenas aplicação + dependências)</td></tr>
+              <tr><td><strong>Tempo de inicialização</strong></td><td>Minutos (boot do SO)</td><td>Segundos (apenas inicia o processo)</td></tr>
+              <tr><td><strong>Overhead de recursos</strong></td><td>Alto (cada VM reserva RAM e CPU)</td><td>Mínimo (compartilha recursos do host)</td></tr>
+              <tr><td><strong>Isolamento</strong></td><td>Forte (hardware virtualizado)</td><td>Bom (namespaces + cgroups do kernel)</td></tr>
+              <tr><td><strong>Portabilidade</strong></td><td>Limitada (formato de VM varia)</td><td>Total (imagem OCI funciona em qualquer runtime)</td></tr>
+              <tr><td><strong>Densidade</strong></td><td>~10 VMs por servidor</td><td>~100+ containers por servidor</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box highlight">
+            <strong>Quando usar cada um?</strong>
+            <pre><code>VM  → Precisa de SO diferente do host (ex: Windows no Linux)
+VM  → Requer isolamento máximo (compliance, multi-tenant hostil)
+VM  → Aplicações legadas que precisam de kernel específico
+
+Container → Microserviços e aplicações modernas
+Container → CI/CD e ambientes de desenvolvimento
+Container → Escalabilidade horizontal rápida
+Container → 95% dos casos de uso atuais</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Como Docker funciona por dentro</h3>
+          <p>Docker usa três tecnologias do kernel Linux para criar o isolamento:</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Namespaces</code><span class="cmd-tag">Isolamento</span></div>
+              <p>Criam visões isoladas dos recursos do sistema. Cada container "pensa" que é o único no servidor.</p>
+              <pre><code># Namespaces usados pelo Docker:
+PID  → Processos isolados (PID 1 dentro do container)
+NET  → Rede isolada (IP próprio, portas próprias)
+MNT  → Filesystem isolado (não vê arquivos do host)
+UTS  → Hostname próprio
+IPC  → Comunicação inter-processos isolada
+USER → Usuários isolados (root no container ≠ root no host)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>cgroups</code><span class="cmd-tag">Recursos</span></div>
+              <p>Limitam e contabilizam o uso de recursos (CPU, memória, I/O) por container. Impede que um container "devore" todos os recursos do host.</p>
+              <pre><code># Exemplo: limitar container a 512MB e 0.5 CPU
+docker run --memory=512m --cpus=0.5 nginx
+
+# Sem cgroups: um container com memory leak
+# derrubaria todo o servidor</code></pre>
+            </div>
+            <div class="command-card wide">
+              <div class="command-header"><code>UnionFS (OverlayFS)</code><span class="cmd-tag">Storage</span></div>
+              <p>Sistema de arquivos em camadas que permite que imagens Docker sejam eficientes. Cada instrução no Dockerfile cria uma camada somente-leitura. O container adiciona uma camada de escrita no topo.</p>
+              <pre><code># Imagem = camadas somente-leitura empilhadas:
+┌─────────────────────────────────┐
+│  Camada 5: COPY app.py /app/    │  ← Seu código
+├─────────────────────────────────┤
+│  Camada 4: RUN pip install ...  │  ← Dependências
+├─────────────────────────────────┤
+│  Camada 3: RUN apt-get update   │  ← Pacotes do SO
+├─────────────────────────────────┤
+│  Camada 2: ENV PYTHON=3.12      │  ← Configuração
+├─────────────────────────────────┤
+│  Camada 1: FROM python:3.12     │  ← Imagem base
+└─────────────────────────────────┘
+
+# Container = imagem + camada de escrita no topo:
+┌─────────────────────────────────┐
+│  Camada RW: logs, temp files    │  ← Escrita do container
+├─────────────────────────────────┤
+│  Imagem (somente-leitura)       │  ← Compartilhada entre containers
+└─────────────────────────────────┘</code></pre>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>💡 Por que isso importa na prática?</strong> Se você tem 10 containers rodando a mesma imagem base, o disco armazena a imagem <strong>uma única vez</strong>. Cada container adiciona apenas sua camada de escrita (poucos KB/MB). Isso é drasticamente mais eficiente que 10 VMs com 10 cópias do SO.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: ARQUITETURA DO DOCKER -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Arquitetura</span>
+          <h2>Arquitetura do Docker — Client, Daemon e Registry</h2>
+          <p>Docker usa uma arquitetura cliente-servidor. Entender cada componente é essencial para diagnosticar problemas e usar Docker de forma eficiente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Os 3 componentes principais</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Docker Client (CLI)</code><span class="cmd-tag">Interface</span></div>
+              <p>É o comando <code>docker</code> que você digita no terminal. Ele <strong>não executa nada</strong> — apenas envia instruções para o Docker Daemon via API REST.</p>
+              <pre><code># Você digita:
+docker run nginx
+
+# O Client traduz isso em uma chamada API:
+POST /containers/create {"Image": "nginx"}
+POST /containers/{id}/start</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Docker Daemon (dockerd)</code><span class="cmd-tag">Engine</span></div>
+              <p>O processo que <strong>realmente faz o trabalho</strong> — cria containers, gerencia imagens, configura redes e volumes. Roda como serviço em background.</p>
+              <pre><code># Verificar se o daemon está rodando:
+sudo systemctl status docker
+
+# O daemon escuta em:
+# Unix socket: /var/run/docker.sock (local)
+# TCP: tcp://0.0.0.0:2376 (remoto, com TLS)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Docker Registry</code><span class="cmd-tag">Armazenamento</span></div>
+              <p>Repositório centralizado de imagens. O <strong>Docker Hub</strong> é o registry público padrão. Empresas usam registries privados (AWS ECR, GitHub Container Registry, Harbor).</p>
+              <pre><code># Baixar imagem do Docker Hub:
+docker pull nginx:latest
+
+# Baixar de registry privado (AWS ECR):
+docker pull 123456789.dkr.ecr.us-east-1.amazonaws.com/minha-app:v1
+
+# Registries populares:
+# - Docker Hub (hub.docker.com) → público
+# - AWS ECR → privado na AWS
+# - GitHub ghcr.io → privado no GitHub
+# - Harbor → self-hosted</code></pre>
+            </div>
+          </div>
+          <div class="info-box highlight">
+            <strong>Fluxo completo de um docker run:</strong>
+            <pre><code>1. Você digita: docker run -d -p 80:80 nginx
+2. Docker Client → envia comando ao Daemon via socket
+3. Daemon verifica se imagem "nginx" existe localmente
+4. Se não existe → Daemon faz pull do Docker Hub (Registry)
+5. Daemon cria container: namespaces + cgroups + overlayfs
+6. Daemon configura rede: bridge network + port mapping (80→80)
+7. Daemon inicia o processo principal (nginx master)
+8. Container está rodando → Client exibe o container ID</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Conceitos-chave — Glossário completo</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Conceito</th><th>O que é</th><th>Analogia</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Imagem</strong></td><td>Template somente-leitura com filesystem e configurações. Definida por um Dockerfile.</td><td>É a "receita" — não muda depois de pronta</td></tr>
+              <tr><td><strong>Container</strong></td><td>Instância em execução de uma imagem. Tem estado, pode ser parado e removido.</td><td>É o "bolo" feito a partir da receita</td></tr>
+              <tr><td><strong>Dockerfile</strong></td><td>Arquivo texto com instruções sequenciais para construir uma imagem.</td><td>É o "passo a passo" da receita</td></tr>
+              <tr><td><strong>Layer (Camada)</strong></td><td>Cada instrução do Dockerfile gera uma camada. Camadas são cacheáveis e reutilizáveis.</td><td>Cada ingrediente adicionado à receita</td></tr>
+              <tr><td><strong>Registry</strong></td><td>Repositório remoto de imagens. Permite compartilhar e versionar.</td><td>É a "livraria de receitas" online</td></tr>
+              <tr><td><strong>Tag</strong></td><td>Rótulo de versão de uma imagem (ex: nginx:1.25, python:3.12-slim).</td><td>É a "edição" do livro de receitas</td></tr>
+              <tr><td><strong>Volume</strong></td><td>Armazenamento persistente independente do ciclo de vida do container.</td><td>É um "HD externo" plugado no container</td></tr>
+              <tr><td><strong>Network</strong></td><td>Rede virtual para comunicação entre containers.</td><td>É o "cabo de rede" ligando os containers</td></tr>
+              <tr><td><strong>Port Mapping</strong></td><td>Redireciona uma porta do host para uma porta dentro do container.</td><td>É a "recepção" que encaminha visitantes à sala correta</td></tr>
             </tbody>
           </table>
         </div>
+      </div>
+    </section>
 
-        <!-- Instalação -->
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: INSTALAÇÃO COMPLETA -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Instalação</span>
+          <h2>Instalação do Docker — Passo a Passo</h2>
+          <p>Instruções completas para Linux (Ubuntu/Debian), Windows e macOS. Siga exatamente a ordem dos comandos.</p>
+        </div>
+
         <div class="topic-block">
-          <h2>Instalação do Docker</h2>
-
-          <h3>Linux (Ubuntu/Debian)</h3>
+          <h3>Linux — Ubuntu / Debian (Método Oficial)</h3>
+          <p>Nunca instale Docker via <code>apt install docker.io</code> — essa versão é desatualizada. Use sempre o repositório oficial do Docker:</p>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Remover versões antigas</code><span class="cmd-tag">Limpeza</span></div>
-              <pre><code>sudo apt-get remove docker docker-engine docker.io containerd runc</code></pre>
+              <div class="command-header"><code>Passo 1: Remover versões antigas</code><span class="cmd-tag">Limpeza</span></div>
+              <p>Remove qualquer instalação anterior que possa conflitar.</p>
+              <pre><code>sudo apt-get remove -y docker docker-engine docker.io containerd runc 2>/dev/null
+sudo apt-get autoremove -y</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Instalar dependências</code><span class="cmd-tag">Pré-requisitos</span></div>
+              <div class="command-header"><code>Passo 2: Instalar dependências</code><span class="cmd-tag">Pré-requisitos</span></div>
+              <p>Pacotes necessários para adicionar o repositório Docker com HTTPS.</p>
               <pre><code>sudo apt-get update
 sudo apt-get install -y \
   ca-certificates \
@@ -115,245 +311,522 @@ sudo apt-get install -y \
   lsb-release</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Adicionar chave GPG oficial</code><span class="cmd-tag">Repositório</span></div>
-              <pre><code>sudo mkdir -p /etc/apt/keyrings
+              <div class="command-header"><code>Passo 3: Adicionar chave GPG</code><span class="cmd-tag">Segurança</span></div>
+              <p>A chave GPG garante que os pacotes baixados são autênticos e não foram adulterados.</p>
+              <pre><code>sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg</code></pre>
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Adicionar repositório Docker</code><span class="cmd-tag">APT</span></div>
+              <div class="command-header"><code>Passo 4: Adicionar repositório</code><span class="cmd-tag">APT Source</span></div>
+              <p>Configura o APT para buscar Docker diretamente do repositório oficial.</p>
               <pre><code>echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Instalar Docker Engine</code><span class="cmd-tag">Instalação</span></div>
+              <div class="command-header"><code>Passo 5: Instalar Docker Engine</code><span class="cmd-tag">Instalação</span></div>
+              <p>Instala o Docker Engine, CLI, containerd e plugins (Buildx + Compose).</p>
               <pre><code>sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
+sudo apt-get install -y \
+  docker-ce \
+  docker-ce-cli \
+  containerd.io \
+  docker-buildx-plugin \
+  docker-compose-plugin</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Pós-instalação (sem sudo)</code><span class="cmd-tag">Permissões</span></div>
-              <pre><code>sudo usermod -aG docker $USER
-newgrp docker</code></pre>
+              <div class="command-header"><code>Passo 6: Configurar para uso sem sudo</code><span class="cmd-tag">Pós-instalação</span></div>
+              <p>Adiciona seu usuário ao grupo docker. <strong>Sem isso, todo comando docker precisa de sudo.</strong></p>
+              <pre><code># Adicionar usuário ao grupo docker
+sudo usermod -aG docker $USER
+
+# Aplicar mudança (ou faça logout/login)
+newgrp docker
+
+# Testar sem sudo:
+docker run hello-world</code></pre>
             </div>
           </div>
-
-          <h3>Windows</h3>
           <div class="info-box">
-            <p>Baixe e instale o <strong>Docker Desktop for Windows</strong> em <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">docker.com</a>. Requisitos: Windows 10/11 64-bit com WSL 2 habilitado ou Hyper-V.</p>
-          </div>
-
-          <h3>macOS</h3>
-          <div class="info-box">
-            <p>Baixe e instale o <strong>Docker Desktop for Mac</strong> em <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">docker.com</a>. Disponível para chips Intel e Apple Silicon (M1/M2/M3).</p>
+            <strong>⚠️ Segurança:</strong> Adicionar um usuário ao grupo <code>docker</code> é equivalente a dar acesso root ao sistema. O Docker daemon roda como root e quem tem acesso ao socket pode criar containers privilegiados. Em produção, use rootless Docker ou controle rigorosamente quem está no grupo.
           </div>
         </div>
 
-        <!-- Verificação -->
         <div class="topic-block">
-          <h2>Verificação da Instalação</h2>
+          <h3>Windows — Docker Desktop</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Requisitos e instalação</code><span class="cmd-tag">Windows 10/11</span></div>
+              <p>Docker Desktop no Windows usa WSL 2 (Windows Subsystem for Linux) como backend. É a forma recomendada.</p>
+              <pre><code># 1. Habilitar WSL 2 (PowerShell como Admin):
+wsl --install
+
+# 2. Reiniciar o computador
+
+# 3. Baixar Docker Desktop:
+# https://www.docker.com/products/docker-desktop/
+
+# 4. Instalar e seguir o wizard
+
+# 5. Verificar no PowerShell:
+docker --version
+docker run hello-world
+
+# Requisitos mínimos:
+# - Windows 10 versão 2004+ (Build 19041+) ou Windows 11
+# - 64-bit com virtualização habilitada na BIOS
+# - 4GB RAM mínimo (8GB recomendado)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>macOS — Docker Desktop</h3>
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Instalação via Homebrew ou Download</code><span class="cmd-tag">macOS</span></div>
+              <pre><code># Opção 1: Homebrew (recomendado)
+brew install --cask docker
+
+# Opção 2: Download manual
+# https://www.docker.com/products/docker-desktop/
+
+# Abra o Docker Desktop pelo Launchpad
+# Aguarde o ícone da baleia ficar estável na barra
+
+# Verificar:
+docker --version
+docker run hello-world
+
+# Funciona em Intel e Apple Silicon (M1/M2/M3/M4)
+# Mínimo: macOS 12 (Monterey) + 4GB RAM</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Verificação completa da instalação</h3>
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>docker --version</code><span class="cmd-tag">Versão</span></div>
-              <p>Exibe a versão instalada do Docker CLI.</p>
-              <pre><code>docker --version
-# Docker version 24.0.7, build afdd53b</code></pre>
+              <div class="command-header"><code>docker --version</code><span class="cmd-tag">Básico</span></div>
+              <p>Mostra a versão do CLI instalada.</p>
+              <pre><code>$ docker --version
+Docker version 27.0.3, build 7d4bcd8</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker compose version</code><span class="cmd-tag">Plugin</span></div>
+              <p>Verifica se o plugin Compose está instalado (v2, integrado ao CLI).</p>
+              <pre><code>$ docker compose version
+Docker Compose version v2.28.1</code></pre>
             </div>
             <div class="command-card">
               <div class="command-header"><code>docker info</code><span class="cmd-tag">Detalhes</span></div>
-              <p>Mostra informações detalhadas do Docker Engine: storage driver, runtime, plugins, etc.</p>
-              <pre><code>docker info</code></pre>
+              <p>Informações completas: storage driver, runtime, plugins, limites de recursos.</p>
+              <pre><code>$ docker info
+Server Version: 27.0.3
+Storage Driver: overlay2
+Logging Driver: json-file
+Cgroup Driver: systemd
+Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+CPUs: 4
+Total Memory: 7.654GiB</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>docker run hello-world</code><span class="cmd-tag">Teste</span></div>
-              <p>Baixa e executa a imagem de teste oficial. Se funcionar, sua instalação está correta.</p>
-              <pre><code>docker run hello-world</code></pre>
+              <div class="command-header"><code>docker run hello-world</code><span class="cmd-tag">Teste final</span></div>
+              <p>Se aparecer "Hello from Docker!" — tudo funcionando.</p>
+              <pre><code>$ docker run hello-world
+
+Hello from Docker!
+This message shows that your installation
+appears to be working correctly.
+
+# O que aconteceu por trás:
+# 1. Daemon não encontrou imagem "hello-world" localmente
+# 2. Fez pull do Docker Hub (registry padrão)
+# 3. Criou container a partir da imagem
+# 4. Container executou e imprimiu a mensagem
+# 5. Container encerrou (processo finalizou)</code></pre>
             </div>
           </div>
         </div>
-
-        <!-- Primeiros Comandos -->
-        <div class="topic-block">
-          <h2>Primeiros Comandos Essenciais</h2>
-
-          <h3>docker run — Criar e executar containers</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker run</code><span class="cmd-tag">Básico</span></div>
-              <p>Cria e inicia um container a partir de uma imagem.</p>
-              <pre><code># Execução simples
-docker run nginx
-
-# Modo interativo com terminal
-docker run -it ubuntu bash
-
-# Modo detached (background)
-docker run -d nginx
-
-# Mapear porta host:container
-docker run -d -p 8080:80 nginx
-
-# Nomear o container
-docker run -d --name meu-nginx -p 8080:80 nginx
-
-# Remover automaticamente ao parar
-docker run --rm -it alpine sh</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Flags importantes</code><span class="cmd-tag">Referência</span></div>
-              <table class="styled-table">
-                <thead><tr><th>Flag</th><th>Descrição</th></tr></thead>
-                <tbody>
-                  <tr><td><code>-it</code></td><td>Interativo + pseudo-TTY (terminal)</td></tr>
-                  <tr><td><code>-d</code></td><td>Detached — executa em background</td></tr>
-                  <tr><td><code>-p host:container</code></td><td>Mapeia porta do host para o container</td></tr>
-                  <tr><td><code>--name</code></td><td>Define um nome para o container</td></tr>
-                  <tr><td><code>--rm</code></td><td>Remove o container ao finalizar</td></tr>
-                  <tr><td><code>-e VAR=valor</code></td><td>Define variável de ambiente</td></tr>
-                  <tr><td><code>-v host:container</code></td><td>Monta volume ou bind mount</td></tr>
-                  <tr><td><code>--network</code></td><td>Conecta a uma rede específica</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <h3>docker ps — Listar containers</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker ps</code><span class="cmd-tag">Listar</span></div>
-              <p>Lista containers em execução. Use flags para ver todos ou filtrar.</p>
-              <pre><code># Containers em execução
-docker ps
-
-# Todos os containers (incluindo parados)
-docker ps -a
-
-# Apenas IDs dos containers
-docker ps -q
-
-# Todos os IDs (para scripts)
-docker ps -aq</code></pre>
-            </div>
-          </div>
-
-          <h3>docker stop / start / restart — Controlar containers</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker stop</code><span class="cmd-tag">Parar</span></div>
-              <p>Envia SIGTERM e depois SIGKILL (após timeout) para parar o container graciosamente.</p>
-              <pre><code># Parar um container
-docker stop meu-nginx
-
-# Parar múltiplos containers
-docker stop container1 container2
-
-# Parar todos os containers em execução
-docker stop $(docker ps -q)</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>docker start / restart</code><span class="cmd-tag">Iniciar</span></div>
-              <p>Inicia um container parado ou reinicia um container em execução.</p>
-              <pre><code># Iniciar container parado
-docker start meu-nginx
-
-# Reiniciar container
-docker restart meu-nginx</code></pre>
-            </div>
-          </div>
-
-          <h3>docker rm — Remover containers</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker rm</code><span class="cmd-tag">Remover</span></div>
-              <p>Remove containers parados. Use <code>-f</code> para forçar remoção de containers em execução.</p>
-              <pre><code># Remover container parado
-docker rm meu-nginx
-
-# Forçar remoção (mesmo em execução)
-docker rm -f meu-nginx
-
-# Remover todos os containers parados
-docker container prune
-
-# Remover todos os containers (forçado)
-docker rm -f $(docker ps -aq)</code></pre>
-            </div>
-          </div>
-
-          <h3>docker logs — Ver logs do container</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker logs</code><span class="cmd-tag">Logs</span></div>
-              <p>Exibe a saída (stdout/stderr) de um container. Essencial para debugging.</p>
-              <pre><code># Ver todos os logs
-docker logs meu-nginx
-
-# Seguir logs em tempo real (like tail -f)
-docker logs -f meu-nginx
-
-# Últimas N linhas
-docker logs --tail 50 meu-nginx
-
-# Com timestamps
-docker logs -t meu-nginx
-
-# Combinar flags
-docker logs -f --tail 100 -t meu-nginx</code></pre>
-            </div>
-          </div>
-
-          <h3>docker exec — Executar comandos em container ativo</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker exec</code><span class="cmd-tag">Executar</span></div>
-              <p>Executa um comando dentro de um container em execução. Ideal para debugging e administração.</p>
-              <pre><code># Abrir shell interativo
-docker exec -it meu-nginx bash
-
-# Executar comando único
-docker exec meu-nginx cat /etc/nginx/nginx.conf
-
-# Executar como root
-docker exec -u root meu-nginx apt-get update
-
-# Definir variável de ambiente
-docker exec -e MY_VAR=teste meu-nginx env</code></pre>
-            </div>
-          </div>
-
-          <h3>docker inspect — Detalhes do container</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>docker inspect</code><span class="cmd-tag">Inspecionar</span></div>
-              <p>Retorna informações detalhadas em JSON sobre um container, imagem, volume ou rede.</p>
-              <pre><code># Inspecionar container (JSON completo)
-docker inspect meu-nginx
-
-# Obter IP do container
-docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' meu-nginx
-
-# Ver mounts/volumes
-docker inspect --format '{{json .Mounts}}' meu-nginx
-
-# Ver variáveis de ambiente
-docker inspect --format '{{json .Config.Env}}' meu-nginx
-
-# Ver status
-docker inspect --format '{{.State.Status}}' meu-nginx</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: PRIMEIROS COMANDOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Prática</span>
+          <h2>Primeiros Comandos — Mão na massa</h2>
+          <p>Agora que Docker está instalado, vamos executar containers reais e entender cada comando em detalhe.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Ciclo de vida de um container</h3>
+          <div class="info-box highlight">
+            <strong>Entenda o fluxo:</strong>
+            <pre><code>docker pull   → Baixa imagem do registry
+docker run    → Cria + inicia container (faz pull se necessário)
+docker stop   → Para o container (SIGTERM → SIGKILL após 10s)
+docker start  → Reinicia container parado
+docker rm     → Remove container parado
+docker rmi    → Remove imagem local</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>docker run — O comando mais importante</h3>
+          <p><code>docker run</code> é o comando que você mais usará. Ele combina <code>create</code> + <code>start</code> em um único passo.</p>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Execução básica</code><span class="cmd-tag">Foreground</span></div>
+              <p>Executa e mostra a saída no terminal. Ctrl+C para parar.</p>
+              <pre><code># Rodar Nginx e ver logs no terminal
+docker run nginx
+
+# O terminal fica "preso" — é foreground mode
+# Ctrl+C para parar o container</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Execução em background (-d)</code><span class="cmd-tag">Detached</span></div>
+              <p>Executa em segundo plano. Libera o terminal imediatamente.</p>
+              <pre><code># -d = detached (background)
+docker run -d nginx
+
+# Retorna apenas o container ID:
+# a1b2c3d4e5f6...
+
+# Você pode continuar usando o terminal normalmente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Mapeamento de portas (-p)</code><span class="cmd-tag">Networking</span></div>
+              <p>Sem -p, o container é inacessível de fora. O -p cria um redirecionamento: porta do host → porta do container.</p>
+              <pre><code># Formato: -p HOST:CONTAINER
+docker run -d -p 8080:80 nginx
+
+# Agora acesse http://localhost:8080
+# O tráfego na porta 8080 do host
+# é redirecionado para porta 80 do container
+
+# Mapear múltiplas portas:
+docker run -d -p 3000:3000 -p 3001:3001 minha-app</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Nomeando containers (--name)</code><span class="cmd-tag">Organização</span></div>
+              <p>Sem --name, Docker gera nomes aleatórios. Nomeie para facilitar gerenciamento.</p>
+              <pre><code># Sem nome: boring_keller, angry_einstein...
+docker run -d nginx
+
+# Com nome: fácil de referenciar
+docker run -d --name meu-nginx -p 80:80 nginx
+
+# Agora você pode usar o nome:
+docker stop meu-nginx
+docker start meu-nginx
+docker logs meu-nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Variáveis de ambiente (-e)</code><span class="cmd-tag">Configuração</span></div>
+              <p>Passa configurações para dentro do container sem alterar a imagem. Padrão de 12-Factor Apps.</p>
+              <pre><code># Passar variáveis individuais:
+docker run -d \
+  --name meu-postgres \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=secret123 \
+  -e POSTGRES_DB=meubanco \
+  -p 5432:5432 \
+  postgres:16
+
+# A aplicação dentro do container lê essas variáveis
+# para se configurar automaticamente</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Modo interativo (-it)</code><span class="cmd-tag">Shell</span></div>
+              <p>Abre um terminal dentro do container. Útil para debug e exploração.</p>
+              <pre><code># -i = interactive (mantém stdin aberto)
+# -t = tty (aloca pseudo-terminal)
+docker run -it ubuntu:22.04 bash
+
+# Agora você está DENTRO do container:
+root@a1b2c3d4:/# whoami
+root
+root@a1b2c3d4:/# cat /etc/os-release
+# Ubuntu 22.04
+root@a1b2c3d4:/# exit
+# Voltou ao host</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Remoção automática (--rm)</code><span class="cmd-tag">Limpeza</span></div>
+              <p>Remove o container automaticamente quando ele para. Evita acúmulo de containers parados.</p>
+              <pre><code># Container é removido ao encerrar:
+docker run --rm -it python:3.12 python -c "print('Hello!')"
+
+# Útil para: testes rápidos, scripts one-shot,
+# comandos únicos, builds temporários</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Gerenciando containers em execução</h3>
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>docker ps</code><span class="cmd-tag">Listar</span></div>
+              <p>Lista containers em execução. Use <code>-a</code> para incluir parados.</p>
+              <pre><code># Apenas rodando:
+docker ps
+
+# Todos (incluindo parados):
+docker ps -a
+
+# Formato compacto (apenas IDs):
+docker ps -q
+
+# Saída formatada:
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker logs</code><span class="cmd-tag">Debug</span></div>
+              <p>Mostra a saída do container (stdout + stderr). Essencial para debugging.</p>
+              <pre><code># Todos os logs:
+docker logs meu-nginx
+
+# Últimas 50 linhas:
+docker logs --tail 50 meu-nginx
+
+# Acompanhar em tempo real (como tail -f):
+docker logs -f meu-nginx
+
+# Com timestamps:
+docker logs -t meu-nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker exec</code><span class="cmd-tag">Acessar</span></div>
+              <p>Executa um comando dentro de um container <strong>já em execução</strong>. Diferente de run que cria um novo.</p>
+              <pre><code># Abrir bash dentro de container rodando:
+docker exec -it meu-nginx bash
+
+# Executar comando único:
+docker exec meu-nginx cat /etc/nginx/nginx.conf
+
+# Ver processos dentro do container:
+docker exec meu-nginx ps aux</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker stop / kill</code><span class="cmd-tag">Parar</span></div>
+              <p><code>stop</code> = gracioso (SIGTERM, espera 10s, SIGKILL). <code>kill</code> = imediato (SIGKILL).</p>
+              <pre><code># Parar graciosamente (recomendado):
+docker stop meu-nginx
+
+# Forçar parada imediata:
+docker kill meu-nginx
+
+# Parar todos os containers de uma vez:
+docker stop $(docker ps -q)
+
+# Reiniciar:
+docker restart meu-nginx</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker rm / prune</code><span class="cmd-tag">Limpar</span></div>
+              <p>Remove containers parados. <code>prune</code> remove todos de uma vez.</p>
+              <pre><code># Remover container específico:
+docker rm meu-nginx
+
+# Remover forçando (mesmo rodando):
+docker rm -f meu-nginx
+
+# Remover TODOS os containers parados:
+docker container prune
+
+# Limpeza total (containers + imagens + volumes + redes):
+docker system prune -a --volumes
+# ⚠️ CUIDADO: remove tudo que não está em uso!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>docker inspect</code><span class="cmd-tag">Detalhes</span></div>
+              <p>Mostra TUDO sobre um container: configuração, rede, volumes, variáveis, estado.</p>
+              <pre><code># JSON completo:
+docker inspect meu-nginx
+
+# Pegar apenas o IP do container:
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' meu-nginx
+
+# Ver variáveis de ambiente:
+docker inspect -f '{{.Config.Env}}' meu-nginx</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: EXERCÍCIOS PRÁTICOS -->
+    <!-- ============================================================ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Exercícios</span>
+          <h2>Exercícios Práticos — Consolide seu aprendizado</h2>
+          <p>Execute cada exercício no seu terminal. A prática é essencial para fixar os conceitos.</p>
+        </div>
+
+        <div class="checklist-grid">
+          <div class="checklist-card">
+            <h4>Exercício 1: Servidor Web</h4>
+            <ol>
+              <li>Execute um Nginx em background na porta 8080</li>
+              <li>Acesse <code>http://localhost:8080</code> no navegador</li>
+              <li>Veja os logs do container</li>
+              <li>Pare e remova o container</li>
+            </ol>
+            <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+            <pre style="margin-top:8px"><code>docker run -d --name web -p 8080:80 nginx
+curl http://localhost:8080
+docker logs web
+docker stop web && docker rm web</code></pre>
+            </details>
+          </div>
+          <div class="checklist-card">
+            <h4>Exercício 2: Banco de Dados</h4>
+            <ol>
+              <li>Execute um PostgreSQL com senha definida</li>
+              <li>Conecte-se ao banco via <code>docker exec</code></li>
+              <li>Crie uma tabela e insira um registro</li>
+              <li>Pare o container e observe que os dados se perdem</li>
+            </ol>
+            <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+            <pre style="margin-top:8px"><code>docker run -d --name db \
+  -e POSTGRES_PASSWORD=secret \
+  -p 5432:5432 postgres:16
+
+docker exec -it db psql -U postgres -c \
+  "CREATE TABLE teste(id serial, nome text);
+   INSERT INTO teste(nome) VALUES('Docker');"
+
+docker stop db && docker rm db
+# Dados perdidos! (Módulo 03 ensina volumes)</code></pre>
+            </details>
+          </div>
+          <div class="checklist-card">
+            <h4>Exercício 3: Explorar um Container</h4>
+            <ol>
+              <li>Execute um Ubuntu interativo</li>
+              <li>Instale o <code>curl</code> dentro do container</li>
+              <li>Faça uma requisição HTTP</li>
+              <li>Observe que as alterações somem ao remover</li>
+            </ol>
+            <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+            <pre style="margin-top:8px"><code>docker run -it --rm ubuntu:22.04 bash
+
+# Dentro do container:
+apt-get update && apt-get install -y curl
+curl https://ifconfig.me  # Mostra IP do container
+exit  # Container removido automaticamente (--rm)</code></pre>
+            </details>
+          </div>
+          <div class="checklist-card">
+            <h4>Exercício 4: Múltiplos Containers</h4>
+            <ol>
+              <li>Execute 3 containers Nginx com nomes diferentes</li>
+              <li>Liste todos com <code>docker ps</code></li>
+              <li>Pare todos de uma vez</li>
+              <li>Remova todos de uma vez</li>
+            </ol>
+            <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;color:var(--primary-600);font-size:0.85rem">▶ Ver solução</summary>
+            <pre style="margin-top:8px"><code>docker run -d --name web1 -p 8081:80 nginx
+docker run -d --name web2 -p 8082:80 nginx
+docker run -d --name web3 -p 8083:80 nginx
+
+docker ps  # 3 containers rodando
+
+docker stop web1 web2 web3
+docker rm web1 web2 web3</code></pre>
+            </details>
+          </div>
+        </div>
+docker run -d --name web3 -p 8083:80 nginx
+
+docker ps  # 3 containers rodando
+
+docker stop web1 web2 web3
+docker rm web1 web2 web3</code></pre>
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top:32px">
+          <strong>🎯 Dica de ouro:</strong> Sempre use <code>--name</code> e <code>--rm</code> em containers de teste. O <code>--name</code> facilita gerenciar, e o <code>--rm</code> evita acúmulo de containers parados ocupando disco.
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: BOAS PRÁTICAS E PRÓXIMOS PASSOS -->
+    <!-- ============================================================ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Boas Práticas</span>
+          <h2>Boas Práticas desde o Dia 1</h2>
+          <p>Hábitos que vão te diferenciar como profissional desde o início.</p>
+        </div>
+
+        <div class="topic-block">
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Sempre nomeie containers</code><span class="cmd-tag">Organização</span></div>
+              <p>Containers sem nome geram nomes aleatórios que são impossíveis de lembrar. Use <code>--name</code> sempre.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Nunca use :latest em produção</code><span class="cmd-tag">Versionamento</span></div>
+              <p>A tag <code>:latest</code> muda sem aviso. Use versões específicas: <code>nginx:1.25</code>, <code>python:3.12-slim</code>.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Limpe regularmente</code><span class="cmd-tag">Manutenção</span></div>
+              <p>Imagens e containers acumulam e ocupam GBs. Execute <code>docker system prune</code> semanalmente.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Use imagens oficiais</code><span class="cmd-tag">Segurança</span></div>
+              <p>Prefira imagens com selo "Official" no Docker Hub. São mantidas, auditadas e atualizadas regularmente.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Prefira imagens slim/alpine</code><span class="cmd-tag">Performance</span></div>
+              <p><code>python:3.12</code> = 1GB. <code>python:3.12-slim</code> = 150MB. <code>python:3.12-alpine</code> = 50MB. Menos superfície de ataque.</p>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Um processo por container</code><span class="cmd-tag">Arquitetura</span></div>
+              <p>Cada container deve rodar apenas um processo principal. Banco separado do app. Nginx separado do PHP.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>O que vem no próximo módulo</h3>
+          <div class="info-box">
+            <strong>Módulo 02: Imagens Docker e Dockerfile</strong> — Você vai aprender a criar suas próprias imagens customizadas usando Dockerfile, entender o sistema de camadas em profundidade, otimizar builds com multi-stage e publicar imagens em registries.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="../docker.html" class="button secondary">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🐳 Próximo passo</span>
+          <h2>Pronto para criar suas próprias imagens?</h2>
+          <p>No Módulo 02 você vai dominar o Dockerfile e aprender a construir imagens eficientes e seguras.</p>
+        </div>
+        <a href="modulo-02.html" class="button primary">Ir para Módulo 02 →</a>
       </div>
     </section>
   </main>
