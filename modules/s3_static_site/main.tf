@@ -432,3 +432,19 @@ resource "aws_s3_object" "sitemap_xml" {
   content_type = "application/xml"
   etag         = filemd5("${path.root}/../../static_site/sitemap.xml")
 }
+
+resource "aws_s3_object" "trail_gate_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "trail-gate.js"
+  source       = "${path.root}/../../static_site/trail-gate.js"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.root}/../../static_site/trail-gate.js")
+}
+
+resource "aws_s3_object" "trail_gate_css" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "trail-gate.css"
+  source       = "${path.root}/../../static_site/trail-gate.css"
+  content_type = "text/css"
+  etag         = filemd5("${path.root}/../../static_site/trail-gate.css")
+}
