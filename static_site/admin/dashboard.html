@@ -260,6 +260,7 @@
                 <button class="period-btn" data-days="30">30 dias</button>
                 <button class="period-btn" data-days="90">90 dias</button>
                 <button class="btn-refresh" onclick="refreshData()">🔄 Atualizar</button>
+                <button class="btn-refresh" onclick="openPwdModal()">🔑 Senha</button>
             </div>
         </div>
 
@@ -382,12 +383,31 @@
             <p id="errorMessage">Não foi possível conectar à API.</p>
             <button onclick="refreshData()">Tentar Novamente</button>
         </div>
+
+        <!-- Change Password Modal -->
+        <div class="auth-overlay hidden" id="changePwdOverlay" style="background:rgba(15,23,42,0.9)">
+            <div class="auth-box">
+                <h2>🔑 Alterar Senha</h2>
+                <p style="color:#94a3b8;margin-bottom:1.5rem;">Defina uma nova senha de acesso ao painel</p>
+                <input type="password" id="currentPwd" placeholder="Senha atual" autocomplete="off">
+                <input type="password" id="newPwd" placeholder="Nova senha" autocomplete="off">
+                <input type="password" id="confirmPwd" placeholder="Confirmar nova senha" autocomplete="off">
+                <button onclick="changePassword()">Salvar Nova Senha</button>
+                <button onclick="closePwdModal()" style="background:#334155;margin-top:0.5rem;">Cancelar</button>
+                <p class="auth-error" id="pwdError"></p>
+            </div>
+        </div>
     </div>
 
     <script>
         // === Configuration ===
         const API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/analytics';
-        const PASSWORD_HASH = 'c02b18eba561dbbd4573637ca5597bef0852da8185509bf61df2086614a272e5';
+        const DEFAULT_PASSWORD_HASH = 'c02b18eba561dbbd4573637ca5597bef0852da8185509bf61df2086614a272e5';
+
+        // Usa hash salvo no localStorage ou o padrão
+        function getPasswordHash() {
+            return localStorage.getItem('ct_admin_pwd_hash') || DEFAULT_PASSWORD_HASH;
+        }
 
         let timelineChart = null;
         let trailsChart = null;
@@ -406,7 +426,7 @@
         async function authenticate() {
             const input = document.getElementById('authPassword').value;
             const hash = await hashPassword(input);
-            if (hash === PASSWORD_HASH) {
+            if (hash === getPasswordHash()) {
                 sessionStorage.setItem('ct_auth', 'true');
                 document.getElementById('authOverlay').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
@@ -720,6 +740,57 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // === Password Change ===
+        function openPwdModal() {
+            document.getElementById('changePwdOverlay').classList.remove('hidden');
+            document.getElementById('currentPwd').value = '';
+            document.getElementById('newPwd').value = '';
+            document.getElementById('confirmPwd').value = '';
+            document.getElementById('pwdError').style.display = 'none';
+            document.getElementById('currentPwd').focus();
+        }
+
+        function closePwdModal() {
+            document.getElementById('changePwdOverlay').classList.add('hidden');
+        }
+
+        async function changePassword() {
+            const errorEl = document.getElementById('pwdError');
+            const current = document.getElementById('currentPwd').value;
+            const newPwd = document.getElementById('newPwd').value;
+            const confirm = document.getElementById('confirmPwd').value;
+
+            errorEl.style.display = 'none';
+
+            // Validar senha atual
+            const currentHash = await hashPassword(current);
+            if (currentHash !== getPasswordHash()) {
+                errorEl.textContent = 'Senha atual incorreta.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Validar nova senha
+            if (newPwd.length < 6) {
+                errorEl.textContent = 'Nova senha deve ter no mínimo 6 caracteres.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (newPwd !== confirm) {
+                errorEl.textContent = 'As senhas não coincidem.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Salvar novo hash
+            const newHash = await hashPassword(newPwd);
+            localStorage.setItem('ct_admin_pwd_hash', newHash);
+
+            closePwdModal();
+            alert('Senha alterada com sucesso!');
         }
     </script>
 </body>
