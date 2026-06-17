@@ -67,6 +67,7 @@ jobs:
             environments/prod/hello_lambda.zip
             environments/prod/register_lead.zip
             environments/prod/download_metrics.zip
+            environments/prod/analytics.zip
 
   terraform-apply:
     name: Terraform Apply
