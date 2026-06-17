@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Terraform Módulo 03: VPC + EC2 + RDS (Avançado I)</title>
+  <title>CloudTrilhas — Terraform Módulo 03: RDS, IAM e Gerenciamento de Segredos</title>
+  <meta name="description" content="Guia completo sobre RDS, IAM e gerenciamento de segredos com Terraform: roles, policies, banco de dados relacional e secrets management." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../linux-training.css" />
 </head>
@@ -20,321 +21,3374 @@
         <a href="modulo-02.html" class="nav-link">← Anterior</a>
         <a href="modulo-04.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🏗️ Terraform — Módulo 03</span>
-        <h1>VPC + EC2 + RDS</h1>
-        <p>Adicione um banco de dados RDS MySQL à infraestrutura. Aprenda DB Subnet Groups, Security Groups com referência cruzada, variáveis sensíveis e Locals.</p>
+        <span class="pill">🔐 Terraform — Módulo 03</span>
+        <h1>RDS, IAM e Gerenciamento de Segredos</h1>
+        <p>Domine os três pilares de uma aplicação segura na AWS com Terraform: controle de acesso granular com IAM, bancos de dados relacionais gerenciados com RDS, e gerenciamento de segredos com Secrets Manager e SSM Parameter Store. Cada conceito é explicado com analogias, diagramas ASCII e código de produção.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>EC2 &amp; SG</small></a>
+        <a href="modulo-03.html" class="progress-node active"><span>03</span><small>RDS &amp; IAM</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>S3 &amp; State</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 1: LOCALS — TAGS E VALORES COMPUTADOS
+         ═══════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Organização</span>
+          <h2>1. Locals — Tags e Valores Computados</h2>
+          <p>O bloco <code>locals</code> permite definir valores intermediários que simplificam seu código, eliminam repetição e criam uma camada de abstração entre variáveis brutas e recursos. Pense neles como "variáveis privadas" do seu módulo.</p>
+        </div>
 
-        <!-- Locals -->
         <div class="topic-block">
-          <h2>Locals — Tags Reutilizáveis</h2>
-          <p>O bloco <code>locals</code> permite definir valores reutilizáveis dentro do módulo. Ideal para tags comuns que serão aplicadas em todos os recursos.</p>
+          <h3>1.1 O que são Locals?</h3>
+          <p>No Terraform, <code>variable</code> é a porta de entrada de dados (vem de fora). <code>local</code> é um valor computado internamente — não pode ser definido pelo usuário, apenas pelo código. É o lugar perfeito para transformações, concatenações e valores derivados.</p>
+
+          <div class="info-box highlight">
+            <strong>🏭 Analogia — A Linha de Montagem:</strong>
+            <p>Imagine uma fábrica: as <code>variables</code> são as matérias-primas que chegam de fornecedores externos (inputs). Os <code>locals</code> são as peças intermediárias fabricadas internamente — combinando matérias-primas para criar componentes prontos para uso. Os <code>resources</code> são os produtos finais montados com essas peças.</p>
+          </div>
+
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>locals { }</code><span class="cmd-tag">locals.tf</span></div>
-              <p>Defina um mapa de tags comuns para manter consistência em toda a infraestrutura.</p>
-              <pre><code>locals {
+            <div class="command-card wide">
+              <div class="command-header"><code>Locals vs Variables — Quando usar cada um</code><span class="cmd-tag">Conceito</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# VARIABLES — Inputs do módulo (configuráveis pelo usuário)
+# Pertencem à INTERFACE PÚBLICA do módulo
+# ═══════════════════════════════════════════════════════════════
+variable "environment" {
+  description = "Ambiente de deploy (dev, staging, prod)"
+  type        = string
+  default     = "dev"
+}
+
+variable "project" {
+  description = "Nome do projeto"
+  type        = string
+}
+
+variable "region" {
+  description = "Região AWS"
+  type        = string
+  default     = "us-east-1"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# LOCALS — Valores computados internamente (privados ao módulo)
+# NÃO podem ser sobrescritos de fora
+# ═══════════════════════════════════════════════════════════════
+locals {
+  # Valor derivado (concatenação de inputs)
+  name_prefix = "${var.project}-${var.environment}"
+
+  # Lógica condicional
+  is_production = var.environment == "prod"
+
+  # Mapa computado a partir de inputs
+  instance_type = local.is_production ? "t3.large" : "t3.micro"
+
+  # Tags reutilizáveis (DRY principle)
   common_tags = {
-    Project     = "cloudtrilhas"
+    Project     = var.project
     Environment = var.environment
     ManagedBy   = "terraform"
+    Team        = "platform"
   }
 }</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Uso das Tags</code><span class="cmd-tag">Referência</span></div>
-              <p>Aplique as tags em qualquer recurso usando <code>merge()</code> para combinar com tags específicas.</p>
-              <pre><code># Uso direto
-tags = local.common_tags
-
-# Merge com tags adicionais
-tags = merge(local.common_tags, {
-  Name = "meu-recurso"
-  Role = "database"
-})</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- DB Subnet Group -->
         <div class="topic-block">
-          <h2>DB Subnet Group</h2>
-          <p>O RDS exige um <strong>DB Subnet Group</strong> que define em quais subnets o banco pode ser provisionado. Para segurança, usamos as subnets privadas.</p>
+          <h3>1.2 Princípio DRY com Locals</h3>
+          <p>O princípio DRY (<em>Don't Repeat Yourself</em>) é fundamental em qualquer código. Com locals, você define um valor UMA vez e referencia em dezenas de recursos. Se precisar mudar, altera em um único lugar.</p>
+
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>aws_db_subnet_group</code><span class="cmd-tag">rds.tf</span></div>
-              <p>Agrupa as subnets privadas para que o RDS seja lançado em uma rede isolada sem acesso público.</p>
-              <pre><code>resource "aws_db_subnet_group" "main" {
-  name       = "${var.project_name}-db-subnet-group"
-  subnet_ids = [
-    aws_subnet.private_a.id,
-    aws_subnet.private_b.id
+            <div class="command-card wide">
+              <div class="command-header"><code>DRY com Locals — Antes vs Depois</code><span class="cmd-tag">Refatoração</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ❌ ANTES (sem locals) — Repetição em todo lugar
+# Se o formato do nome mudar, precisa alterar em 15+ recursos!
+# ═══════════════════════════════════════════════════════════════
+resource "aws_security_group" "web" {
+  name = "myapp-prod-web-sg"  # Repetindo projeto + env + tipo
+  tags = {
+    Project     = "myapp"       # Repetindo
+    Environment = "prod"        # Repetindo
+    ManagedBy   = "terraform"   # Repetindo
+  }
+}
+
+resource "aws_instance" "web" {
+  tags = {
+    Name        = "myapp-prod-web-server"  # Repetindo padrão
+    Project     = "myapp"                  # Repetindo
+    Environment = "prod"                   # Repetindo
+    ManagedBy   = "terraform"              # Repetindo
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ✅ DEPOIS (com locals) — Zero repetição, fácil manutenção
+# ═══════════════════════════════════════════════════════════════
+locals {
+  name_prefix = "${var.project}-${var.environment}"
+
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+    Team        = var.team
+    CostCenter  = var.cost_center
+  }
+}
+
+resource "aws_security_group" "web" {
+  name = "${local.name_prefix}-web-sg"
+  tags = merge(local.common_tags, { Name = "${local.name_prefix}-web-sg" })
+}
+
+resource "aws_instance" "web" {
+  tags = merge(local.common_tags, { Name = "${local.name_prefix}-web-server" })
+}
+
+# Resultado: se mudar var.project ou var.environment,
+# TODOS os recursos são atualizados automaticamente!</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 Locals Avançados — Transformações e Lógica</h3>
+          <p>Locals não são apenas para strings simples. Você pode usar funções, condicionais, loops e até data sources dentro deles:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Locals Avançados — Computações Complexas</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Locals com lógica complexa para um projeto real
+# ═══════════════════════════════════════════════════════════════
+locals {
+  # ─── Informações da conta ─────────────────────────────────────
+  account_id = data.aws_caller_identity.current.account_id
+  region     = data.aws_region.current.name
+
+  # ─── Lógica condicional ───────────────────────────────────────
+  is_production  = var.environment == "prod"
+  is_development = var.environment == "dev"
+
+  # ─── Sizing baseado no ambiente ───────────────────────────────
+  db_instance_class = local.is_production ? "db.r6g.large" : "db.t3.micro"
+  db_multi_az       = local.is_production ? true : false
+  db_backup_days    = local.is_production ? 35 : 7
+
+  # ─── CIDR blocks computados ───────────────────────────────────
+  vpc_cidr = "10.${var.environment == "prod" ? 0 : 1}.0.0/16"
+
+  public_subnets = [
+    for i, az in data.aws_availability_zones.available.names :
+    cidrsubnet(local.vpc_cidr, 8, i)
   ]
 
+  private_subnets = [
+    for i, az in data.aws_availability_zones.available.names :
+    cidrsubnet(local.vpc_cidr, 8, i + 100)
+  ]
+
+  # ─── Tags computadas com timestamp ───────────────────────────
+  common_tags = merge(
+    {
+      Project     = var.project
+      Environment = var.environment
+      ManagedBy   = "terraform"
+      Region      = local.region
+      AccountId   = local.account_id
+    },
+    var.extra_tags  # Tags adicionais passadas como variável
+  )
+
+  # ─── Naming conventions ───────────────────────────────────────
+  resource_name = "${var.project}-${var.environment}-${local.region}"
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Cuidado com Locals Excessivos:</strong>
+            <p>Não crie locals para TUDO. Se um valor é usado apenas uma vez, não precisa de local. Use locals quando: (1) o valor é usado em 2+ recursos, (2) há lógica/transformação envolvida, ou (3) melhora a legibilidade significativamente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 2: IAM — IDENTITY AND ACCESS MANAGEMENT
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Segurança</span>
+          <h2>2. IAM — Identity and Access Management</h2>
+          <p>IAM é o sistema nervoso de segurança da AWS. Controla QUEM pode fazer O QUÊ em QUAIS recursos. Sem IAM bem configurado, sua infraestrutura é uma casa com todas as portas abertas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 Conceitos Fundamentais do IAM</h3>
+          <p>Antes de criar policies com Terraform, é essencial entender profundamente como IAM funciona. Vamos usar uma analogia completa.</p>
+
+          <div class="info-box highlight">
+            <strong>🏢 Analogia — O Prédio Corporativo:</strong>
+            <p>Imagine a AWS como um enorme prédio corporativo com centenas de salas (serviços). O IAM é o sistema de segurança desse prédio:</p>
+            <ul>
+              <li><strong>Users</strong> = Funcionários com crachá pessoal (pessoas reais)</li>
+              <li><strong>Groups</strong> = Departamentos (Marketing, TI, Financeiro) — permissões em lote</li>
+              <li><strong>Roles</strong> = Crachás temporários para visitantes ou robôs (serviços AWS)</li>
+              <li><strong>Policies</strong> = Regras escritas no crachá ("pode entrar na sala 301, mas só para ler documentos")</li>
+              <li><strong>Principal</strong> = Qualquer entidade que pode autenticar (user, role, account, service)</li>
+            </ul>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Arquitetura IAM — Diagrama ASCII</code><span class="cmd-tag">Conceitual</span></div>
+              <pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                        AWS ACCOUNT                                   │
+│                                                                     │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                         IAM                                   │   │
+│  │                                                               │   │
+│  │  ┌─────────┐    ┌─────────────┐    ┌──────────────────────┐  │   │
+│  │  │  USERS  │    │   GROUPS    │    │       ROLES          │  │   │
+│  │  │─────────│    │─────────────│    │──────────────────────│  │   │
+│  │  │ ricardo │───▶│ Developers  │    │ ec2-app-role         │  │   │
+│  │  │ maria   │    │ DevOps      │    │ lambda-exec-role     │  │   │
+│  │  │ ci-bot  │    │ Admins      │    │ github-actions-role  │  │   │
+│  │  └─────────┘    └──────┬──────┘    └──────────┬───────────┘  │   │
+│  │                         │                      │              │   │
+│  │                         ▼                      ▼              │   │
+│  │              ┌─────────────────────────────────────────┐      │   │
+│  │              │            POLICIES                      │      │   │
+│  │              │─────────────────────────────────────────│      │   │
+│  │              │  {                                       │      │   │
+│  │              │    "Effect": "Allow",                    │      │   │
+│  │              │    "Action": "s3:GetObject",             │      │   │
+│  │              │    "Resource": "arn:aws:s3:::bucket/*"   │      │   │
+│  │              │  }                                       │      │   │
+│  │              └─────────────────────────────────────────┘      │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
+│  │    S3    │  │   EC2    │  │   RDS    │  │  Lambda  │  ...      │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘           │
+└─────────────────────────────────────────────────────────────────────┘
+
+FLUXO DE AUTORIZAÇÃO:
+  Principal → Autenticação → Política Avaliada → Allow/Deny → Recurso</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 Princípio de Menor Privilégio (Least Privilege)</h3>
+          <p>A regra de ouro do IAM: <strong>conceda apenas as permissões mínimas necessárias para realizar uma tarefa</strong>. Nunca use <code>*</code> em produção sem justificativa documentada.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Evolução de uma Policy — Do Pior ao Melhor</code><span class="cmd-tag">Boas Práticas</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ❌ NÍVEL 1 — Admin (NUNCA em produção para serviços)
+# Dá acesso a TUDO. Se comprometido, atacante controla a conta inteira.
+# ═══════════════════════════════════════════════════════════════
+{
+  "Effect": "Allow",
+  "Action": "*",
+  "Resource": "*"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ⚠️ NÍVEL 2 — Serviço amplo (ainda ruim)
+# Limita ao serviço S3, mas permite TUDO no S3 (delete, create bucket...)
+# ═══════════════════════════════════════════════════════════════
+{
+  "Effect": "Allow",
+  "Action": "s3:*",
+  "Resource": "*"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ✅ NÍVEL 3 — Ação específica + recurso específico (CORRETO)
+# Só pode ler objetos de UM bucket específico. Nada mais.
+# ═══════════════════════════════════════════════════════════════
+{
+  "Effect": "Allow",
+  "Action": [
+    "s3:GetObject",
+    "s3:ListBucket"
+  ],
+  "Resource": [
+    "arn:aws:s3:::meu-bucket-app",
+    "arn:aws:s3:::meu-bucket-app/*"
+  ]
+}
+
+# ═══════════════════════════════════════════════════════════════
+# 🏆 NÍVEL 4 — Com conditions (EXCELENTE)
+# Mesmo nível 3, mas só funciona se a request vier de uma VPC específica
+# ═══════════════════════════════════════════════════════════════
+{
+  "Effect": "Allow",
+  "Action": ["s3:GetObject"],
+  "Resource": ["arn:aws:s3:::meu-bucket-app/*"],
+  "Condition": {
+    "StringEquals": {
+      "aws:SourceVpc": "vpc-0abc123def456"
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 Estrutura de um Policy Document</h3>
+          <p>Toda IAM Policy segue a mesma estrutura JSON. Entender cada campo é essencial para criar policies corretas:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Anatomia Completa de um Policy Document</code><span class="cmd-tag">Referência</span></div>
+              <pre><code>{
+  "Version": "2012-10-17",          // Sempre use esta versão (mais recente)
+  "Statement": [
+    {
+      // ─── SID (Statement ID) ─────────────────────────────────
+      // Identificador opcional, mas recomendado para legibilidade
+      "Sid": "AllowS3ReadAccess",
+
+      // ─── EFFECT ─────────────────────────────────────────────
+      // "Allow" = Permitir  |  "Deny" = Negar (Deny SEMPRE vence)
+      "Effect": "Allow",
+
+      // ─── PRINCIPAL ──────────────────────────────────────────
+      // QUEM pode executar (só em resource-based policies)
+      // Em identity-based policies, o principal é implícito (quem tem a policy)
+      // "Principal": {"Service": "lambda.amazonaws.com"},
+      // "Principal": {"AWS": "arn:aws:iam::123456789012:role/MyRole"},
+      // "Principal": "*",  ← Qualquer um (CUIDADO!)
+
+      // ─── ACTION ─────────────────────────────────────────────
+      // O QUE pode fazer (API calls específicas)
+      "Action": [
+        "s3:GetObject",           // Ler objetos
+        "s3:PutObject",           // Escrever objetos
+        "s3:ListBucket",          // Listar conteúdo do bucket
+        "s3:DeleteObject"         // Deletar objetos
+      ],
+      // Wildcards: "s3:Get*" = todas as ações Get do S3
+      // "s3:*" = TODAS as ações do S3 (evitar!)
+
+      // ─── RESOURCE ───────────────────────────────────────────
+      // EM QUAIS recursos (ARNs específicos)
+      "Resource": [
+        "arn:aws:s3:::meu-bucket",      // O bucket em si (para ListBucket)
+        "arn:aws:s3:::meu-bucket/*"     // Objetos dentro (para Get/Put/Delete)
+      ],
+      // "*" = todos os recursos (evitar em produção!)
+
+      // ─── CONDITION ──────────────────────────────────────────
+      // Condições extras (opcional, mas poderoso)
+      "Condition": {
+        "StringEquals": {
+          "s3:prefix": ["uploads/", "reports/"]   // Só essas pastas
+        },
+        "IpAddress": {
+          "aws:SourceIp": "10.0.0.0/8"           // Só da rede interna
+        },
+        "Bool": {
+          "aws:SecureTransport": "true"           // Só via HTTPS
+        }
+      }
+    }
+  ]
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>📋 Regras de Avaliação de Policies:</strong>
+            <ul>
+              <li><strong>Deny Explícito</strong> SEMPRE vence sobre Allow (em qualquer policy)</li>
+              <li><strong>Sem permissão</strong> = Deny implícito (tudo é negado por padrão)</li>
+              <li><strong>Múltiplas policies</strong> são avaliadas juntas (union de Allows, intersection com Denys)</li>
+              <li><strong>Resource-based + Identity-based</strong> = ambas precisam Allow (exceto mesmo account)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 AWS-Managed vs Customer-Managed Policies</h3>
+          <p>A AWS oferece centenas de policies pré-prontas. Mas para produção, policies customizadas são quase sempre melhores:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>AWS-Managed</th>
+                <th>Customer-Managed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Quem mantém</td>
+                <td>AWS (atualizada automaticamente)</td>
+                <td>Você (controle total)</td>
+              </tr>
+              <tr>
+                <td>Granularidade</td>
+                <td>Geralmente ampla (todas as ações do serviço)</td>
+                <td>Exata para sua necessidade</td>
+              </tr>
+              <tr>
+                <td>Exemplos</td>
+                <td>AmazonS3ReadOnlyAccess, AmazonRDSFullAccess</td>
+                <td>app-s3-upload-only, lambda-dynamo-read</td>
+              </tr>
+              <tr>
+                <td>Princípio Least Privilege</td>
+                <td>⚠️ Quase nunca atende (permissões em excesso)</td>
+                <td>✅ Você define exatamente o necessário</td>
+              </tr>
+              <tr>
+                <td>Uso recomendado</td>
+                <td>Desenvolvimento, prototipagem, admins</td>
+                <td>Produção, serviços automatizados</td>
+              </tr>
+              <tr>
+                <td>Risco</td>
+                <td>AWS pode adicionar permissões sem você saber</td>
+                <td>Você controla cada mudança</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 3: IAM ROLES E POLICIES COM TERRAFORM
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Terraform + IAM</span>
+          <h2>3. IAM Roles e Policies com Terraform</h2>
+          <p>Agora vamos traduzir os conceitos IAM em código Terraform. Cada recurso tem um papel específico na cadeia de confiança e permissões.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 Trust Relationship — Quem pode "vestir" a Role</h3>
+          <p>Uma <strong>IAM Role</strong> é como um crachá de visitante. Antes de alguém usá-lo, precisa existir uma <strong>trust relationship</strong> (política de confiança) que define QUEM pode assumir essa role.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Trust Relationship — Diagrama de Fluxo</code><span class="cmd-tag">Conceitual</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# FLUXO DE ASSUME ROLE:
+#
+#   ┌──────────┐      "Posso usar      ┌──────────────┐
+#   │ SERVIÇO  │  ──────essa role?────▶ │   IAM ROLE   │
+#   │ (Lambda) │                        │──────────────│
+#   └──────────┘                        │ Trust Policy │
+#                                       │ (assume_role)│
+#        ▲                              └──────┬───────┘
+#        │                                     │
+#        │  ✅ "Sim, Lambda está               │
+#        │     na trust policy"                 ▼
+#        │                              ┌──────────────┐
+#        │                              │  PERMISSIONS │
+#        └──── recebe credenciais ──────│   POLICIES   │
+#              temporárias (STS)        │──────────────│
+#                                       │ s3:GetObject │
+#                                       │ logs:Put*    │
+#                                       └──────────────┘
+#
+# Duas partes distintas:
+# 1. TRUST POLICY (assume_role_policy) = QUEM pode assumir
+# 2. PERMISSIONS POLICY (attached)     = O QUE pode fazer
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 aws_iam_role — Criando uma Role</h3>
+          <p>O recurso <code>aws_iam_role</code> cria a role e define sua trust policy (quem pode assumir). É o primeiro passo.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>aws_iam_role — Role para Lambda</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# IAM Role que pode ser assumida pelo serviço Lambda
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role" "lambda_execution" {
+  name = "${local.name_prefix}-lambda-exec-role"
+
+  # Trust Policy — Define QUEM pode assumir esta role
+  # Neste caso: o serviço Lambda da AWS
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowLambdaAssume"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"  # Serviço Lambda
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  # Tags para organização
   tags = merge(local.common_tags, {
-    Name = "${var.project_name}-db-subnet-group"
+    Name = "${local.name_prefix}-lambda-exec-role"
+    Role = "lambda-execution"
+  })
+}
+
+# ═══════════════════════════════════════════════════════════════
+# IAM Role para EC2 (Instance Profile)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role" "ec2_app" {
+  name = "${local.name_prefix}-ec2-app-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowEC2Assume"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"  # Serviço EC2
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-ec2-app-role"
   })
 }</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- RDS Security Group -->
         <div class="topic-block">
-          <h2>RDS Security Group — Referência Cruzada</h2>
-          <p>O Security Group do RDS permite tráfego <strong>apenas</strong> da instância EC2, usando <code>source_security_group_id</code> em vez de CIDR blocks. Isso garante que somente a EC2 autorizada acesse o banco.</p>
+          <h3>3.3 aws_iam_policy — Definindo Permissões</h3>
+          <p>Depois de criar a role, precisamos definir O QUE ela pode fazer. Isso é feito com <code>aws_iam_policy</code>:</p>
+
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>aws_security_group</code><span class="cmd-tag">sg-rds.tf</span></div>
-              <p>Permite porta 3306 (MySQL) apenas do Security Group da EC2 — referência cruzada entre SGs.</p>
-              <pre><code>resource "aws_security_group" "rds" {
-  name        = "${var.project_name}-rds-sg"
-  description = "Security group for RDS MySQL"
+            <div class="command-card wide">
+              <div class="command-header"><code>aws_iam_policy — Policies Customizadas</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Policy customizada — Lambda pode ler S3 e escrever logs
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_policy" "lambda_s3_logs" {
+  name        = "${local.name_prefix}-lambda-s3-logs"
+  description = "Permite Lambda ler S3 e escrever CloudWatch Logs"
+  path        = "/app/"  # Organiza policies em "pastas" no IAM
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "CloudWatchLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${local.region}:${local.account_id}:*"
+      },
+      {
+        Sid    = "S3ReadOnly"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.app_data.arn,
+          "${aws_s3_bucket.app_data.arn}/*"
+        ]
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-lambda-s3-logs"
+  })
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Policy para EC2 — Acessar Secrets Manager e SSM
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_policy" "ec2_secrets_access" {
+  name        = "${local.name_prefix}-ec2-secrets"
+  description = "Permite EC2 ler segredos da aplicação"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ReadAppSecrets"
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = [
+          "arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.name_prefix}/*"
+        ]
+      },
+      {
+        Sid    = "ReadSSMParameters"
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ]
+        Resource = [
+          "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${var.project}/${var.environment}/*"
+        ]
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 aws_iam_role_policy_attachment — Conectando Role + Policy</h3>
+          <p>Role e Policy são criadas separadamente. O recurso <code>aws_iam_role_policy_attachment</code> faz a conexão (attach):</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Attachment — Conectando as peças</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Attach policy customizada à role Lambda
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role_policy_attachment" "lambda_s3_logs" {
+  role       = aws_iam_role.lambda_execution.name
+  policy_arn = aws_iam_policy.lambda_s3_logs.arn
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Attach policy AWS-managed (para desenvolvimento rápido)
+# Use apenas em dev — em prod, crie policy customizada!
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role_policy_attachment" "lambda_basic" {
+  role       = aws_iam_role.lambda_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Attach policy customizada à role EC2
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role_policy_attachment" "ec2_secrets" {
+  role       = aws_iam_role.ec2_app.name
+  policy_arn = aws_iam_policy.ec2_secrets_access.arn
+}
+
+# ═══════════════════════════════════════════════════════════════
+# IMPORTANTE: Uma role pode ter até 10 policies attached!
+# Se precisar de mais, combine statements em menos policies.
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 aws_iam_instance_profile — IAM para EC2</h3>
+          <p>EC2 instances não usam roles diretamente. Elas precisam de um <strong>Instance Profile</strong> — um "wrapper" que permite à instância assumir a role:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Instance Profile — Ponte entre EC2 e IAM Role</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Instance Profile é o "adaptador" entre EC2 e IAM Role
+#
+#   EC2 Instance ──▶ Instance Profile ──▶ IAM Role ──▶ Policies
+#
+# Sem Instance Profile, a EC2 NÃO consegue assumir a role!
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_instance_profile" "ec2_app" {
+  name = "${local.name_prefix}-ec2-app-profile"
+  role = aws_iam_role.ec2_app.name
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-ec2-app-profile"
+  })
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Uso na EC2 Instance
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = local.instance_type
+
+  # Instance Profile permite à EC2 usar credenciais da IAM Role
+  # O SDK da AWS dentro da instância obtém credenciais automaticamente!
+  iam_instance_profile = aws_iam_instance_profile.ec2_app.name
+
+  subnet_id              = aws_subnet.private[0].id
+  vpc_security_group_ids = [aws_security_group.app.id]
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"  # IMDSv2 obrigatório (segurança!)
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-app-server"
+  })
+
+  # Garante que a policy está attached antes de criar instância
+  depends_on = [aws_iam_role_policy_attachment.ec2_secrets]
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Dentro da EC2, a aplicação acessa segredos assim:
+#
+#   import boto3
+#   client = boto3.client('secretsmanager')
+#   secret = client.get_secret_value(SecretId='myapp/prod/db-password')
+#
+# NÃO precisa de access keys! O SDK usa as credenciais da role
+# automaticamente via Instance Metadata Service (IMDS).
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ NUNCA use Access Keys em EC2!</strong>
+            <p>Se sua instância EC2 precisa acessar outros serviços AWS, use <strong>sempre</strong> IAM Roles via Instance Profile. Colocar Access Keys dentro da instância (em variáveis de ambiente ou arquivos) é um risco de segurança grave — se a instância for comprometida, as keys podem ser roubadas e usadas de qualquer lugar. Com roles, as credenciais são temporárias e rotacionadas automaticamente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 4: IAM PARA SERVIÇOS AWS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Casos de Uso</span>
+          <h2>4. IAM para Serviços AWS</h2>
+          <p>Cada serviço AWS tem necessidades específicas de IAM. Vamos ver os casos mais comuns: Lambda, ECS, GitHub Actions (OIDC) e acesso cross-account.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 IAM Role para Lambda — Completa</h3>
+          <p>Lambda é o caso mais comum. A role precisa de trust para <code>lambda.amazonaws.com</code> e policies para os recursos que a função acessa:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Lambda Role Completa — DynamoDB + S3 + Logs</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Role completa para Lambda que processa uploads S3,
+# escreve em DynamoDB e envia para SQS
+# ═══════════════════════════════════════════════════════════════
+
+# 1. IAM Role com trust policy
+resource "aws_iam_role" "lambda_processor" {
+  name = "${local.name_prefix}-lambda-processor"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "LambdaAssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+# 2. Policy customizada com permissões mínimas
+resource "aws_iam_policy" "lambda_processor" {
+  name = "${local.name_prefix}-lambda-processor-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "CloudWatchLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${local.name_prefix}-processor:*"
+        ]
+      },
+      {
+        Sid    = "S3ReadUploads"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:HeadObject"
+        ]
+        Resource = "${aws_s3_bucket.uploads.arn}/*"
+      },
+      {
+        Sid    = "DynamoDBWrite"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:GetItem"
+        ]
+        Resource = aws_dynamodb_table.records.arn
+      },
+      {
+        Sid    = "SQSSendMessage"
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = aws_sqs_queue.notifications.arn
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+# 3. Attachment
+resource "aws_iam_role_policy_attachment" "lambda_processor" {
+  role       = aws_iam_role.lambda_processor.name
+  policy_arn = aws_iam_policy.lambda_processor.arn
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 IAM Role para ECS Tasks</h3>
+          <p>ECS tem dois tipos de role: <strong>Task Execution Role</strong> (para o ECS Agent puxar imagens e criar logs) e <strong>Task Role</strong> (para o container acessar serviços AWS):</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ECS — Task Execution Role + Task Role</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ECS Task Execution Role — para o ECS Agent (infraestrutura)
+# Permite: puxar imagens ECR, criar log streams, ler secrets
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role" "ecs_task_execution" {
+  name = "${local.name_prefix}-ecs-execution"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+# Policy AWS-managed para execution role (aceitável aqui)
+resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Adicionando acesso a secrets (para variáveis de ambiente do container)
+resource "aws_iam_policy" "ecs_secrets" {
+  name = "${local.name_prefix}-ecs-secrets"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "secretsmanager:GetSecretValue",
+        "ssm:GetParameters"
+      ]
+      Resource = [
+        "arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.name_prefix}/*",
+        "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${var.project}/*"
+      ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execution_secrets" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = aws_iam_policy.ecs_secrets.arn
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ECS Task Role — para o container da aplicação
+# Permite a aplicação acessar outros serviços AWS
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role" "ecs_task" {
+  name = "${local.name_prefix}-ecs-task"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_policy" "ecs_task_app" {
+  name = "${local.name_prefix}-ecs-task-app"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "S3Access"
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:PutObject"]
+        Resource = "${aws_s3_bucket.app_data.arn}/*"
+      },
+      {
+        Sid      = "SQSAccess"
+        Effect   = "Allow"
+        Action   = ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage"]
+        Resource = aws_sqs_queue.tasks.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_app" {
+  role       = aws_iam_role.ecs_task.name
+  policy_arn = aws_iam_policy.ecs_task_app.arn
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 GitHub Actions OIDC — CI/CD sem Access Keys</h3>
+          <p>O padrão moderno para CI/CD é usar <strong>OIDC</strong> (OpenID Connect). O GitHub Actions prova sua identidade para a AWS sem precisar de access keys estáticas — muito mais seguro!</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>GitHub Actions OIDC — Deploy sem Secrets</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# FLUXO OIDC:
+#
+#  GitHub Actions                    AWS
+#  ┌────────────┐                   ┌────────────────┐
+#  │ Workflow    │──── JWT Token ───▶│ IAM OIDC       │
+#  │ (job)      │                   │ Provider       │
+#  └────────────┘                   └───────┬────────┘
+#                                           │
+#                                           ▼ Valida token
+#                                   ┌────────────────┐
+#                                   │  IAM Role      │
+#                                   │ (trust policy  │
+#                                   │  verifica org, │
+#                                   │  repo, branch) │
+#                                   └───────┬────────┘
+#                                           │
+#                                           ▼ Credenciais temporárias
+#                                   ┌────────────────┐
+#                                   │  Deploy (S3,   │
+#                                   │  CloudFront,   │
+#                                   │  Lambda...)    │
+#                                   └────────────────┘
+# ═══════════════════════════════════════════════════════════════
+
+# 1. OIDC Provider (criar UMA vez por conta AWS)
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
+
+  client_id_list = ["sts.amazonaws.com"]
+
+  # Thumbprint do certificado GitHub (atualizar periodicamente)
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+
+  tags = merge(local.common_tags, {
+    Name = "github-actions-oidc"
+  })
+}
+
+# 2. IAM Role para GitHub Actions
+resource "aws_iam_role" "github_actions" {
+  name = "${local.name_prefix}-github-actions"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.github.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          # Apenas tokens para este audience
+          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        }
+        StringLike = {
+          # RESTRIÇÃO CRÍTICA: apenas repo e branch específicos!
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main"
+        }
+      }
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+# 3. Policy com permissões para deploy
+resource "aws_iam_policy" "github_actions_deploy" {
+  name = "${local.name_prefix}-github-deploy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3Deploy"
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.site.arn,
+          "${aws_s3_bucket.site.arn}/*"
+        ]
+      },
+      {
+        Sid    = "CloudFrontInvalidation"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateInvalidation"
+        ]
+        Resource = aws_cloudfront_distribution.site.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_deploy" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.github_actions_deploy.arn
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>🔐 Por que OIDC é superior a Access Keys para CI/CD:</strong>
+            <ul>
+              <li><strong>Sem secrets estáticos</strong> — Não há access keys para vazar em logs ou repositórios</li>
+              <li><strong>Credenciais temporárias</strong> — Expiram em minutos, não em anos</li>
+              <li><strong>Granular</strong> — Pode restringir por repo, branch, environment e tag</li>
+              <li><strong>Auditável</strong> — CloudTrail registra qual workflow assumiu a role</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 Cross-Account Access</h3>
+          <p>Em organizações com múltiplas contas AWS (dev, staging, prod), uma conta pode assumir roles em outra:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Cross-Account — Conta Dev acessando Prod</code><span class="cmd-tag">Multi-Account</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CENÁRIO: Conta de CI/CD (111111111111) precisa deploy na
+#          conta de Produção (999999999999)
+#
+#  Conta CI/CD (111)          Conta Prod (999)
+#  ┌────────────────┐         ┌─────────────────────┐
+#  │ Role: deployer │──STS──▶ │ Role: deploy-target │
+#  │                │         │ Trust: conta 111    │
+#  └────────────────┘         └─────────────────────┘
+# ═══════════════════════════════════════════════════════════════
+
+# NA CONTA DE PRODUÇÃO (999999999999):
+resource "aws_iam_role" "cross_account_deploy" {
+  name = "${local.name_prefix}-cross-account-deploy"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        # Permite que a conta de CI/CD assuma esta role
+        AWS = "arn:aws:iam::111111111111:role/ci-cd-deployer"
+      }
+      Action = "sts:AssumeRole"
+      Condition = {
+        StringEquals = {
+          # Exige MFA ou external ID para segurança extra
+          "sts:ExternalId" = var.external_id
+        }
+      }
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+# Permissões na conta de produção
+resource "aws_iam_policy" "cross_account_deploy" {
+  name = "${local.name_prefix}-cross-account-permissions"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["s3:PutObject", "s3:DeleteObject"]
+      Resource = "${aws_s3_bucket.prod_site.arn}/*"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_deploy" {
+  role       = aws_iam_role.cross_account_deploy.name
+  policy_arn = aws_iam_policy.cross_account_deploy.arn
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 5: RDS — BANCO DE DADOS RELACIONAL
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Banco de Dados</span>
+          <h2>5. RDS — Banco de Dados Relacional</h2>
+          <p>O Amazon RDS (Relational Database Service) gerencia bancos de dados para você — patching, backups, failover, replicação. Você foca no schema e nas queries, a AWS cuida da infraestrutura.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 O que é RDS e por que usar?</h3>
+          <p>Instalar e manter um banco de dados em EC2 exige trabalho significativo: patching do OS e do DB, configurar backups, monitorar disco, gerenciar failover. O RDS automatiza <strong>tudo isso</strong>.</p>
+
+          <div class="info-box highlight">
+            <strong>🏨 Analogia — Hotel vs Acampar:</strong>
+            <p>Banco de dados em EC2 é como acampar: você monta a barraca, faz o fogo, busca água, limpa tudo. RDS é como um hotel: você chega, usa o quarto (banco), e o hotel cuida de limpeza (patching), café da manhã (backups), e segurança (monitoramento). Você paga um pouco mais, mas seu tempo vai para o que importa.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>EC2 + DB Manual vs RDS — O que você não precisa fazer</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# RESPONSABILIDADES: EC2 Manual vs RDS
+# ═══════════════════════════════════════════════════════════════
+#
+# ┌─────────────────────────────┬──────────────┬─────────────┐
+# │ Tarefa                      │ EC2 (Manual) │ RDS (AWS)   │
+# ├─────────────────────────────┼──────────────┼─────────────┤
+# │ Instalar DB engine          │ VOCÊ         │ AWS         │
+# │ Patch do sistema operacional│ VOCÊ         │ AWS         │
+# │ Patch do banco de dados     │ VOCÊ         │ AWS         │
+# │ Backups automáticos         │ VOCÊ         │ AWS         │
+# │ Point-in-time recovery      │ VOCÊ (difícil)│ AWS (1 click)│
+# │ Multi-AZ failover           │ VOCÊ (muito) │ AWS (auto)  │
+# │ Read replicas               │ VOCÊ         │ AWS         │
+# │ Monitoramento               │ VOCÊ         │ AWS         │
+# │ Encryption at rest          │ VOCÊ         │ AWS (1 flag)│
+# │ Resize (scale up)           │ VOCÊ (downtime)│ AWS (min)  │
+# │ Schema e queries            │ VOCÊ         │ VOCÊ        │
+# │ Performance tuning          │ VOCÊ         │ VOCÊ        │
+# └─────────────────────────────┴──────────────┴─────────────┘
+#
+# RDS custa ~20-30% mais que EC2 equivalente, mas economiza
+# dezenas de horas/mês em operação. Para 99% dos casos, vale.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 Engines Disponíveis</h3>
+          <p>RDS suporta múltiplos engines. Cada um tem características, preços e funcionalidades diferentes:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Engine</th>
+                <th>Versões</th>
+                <th>Caso de Uso</th>
+                <th>Custo</th>
+                <th>Observações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>PostgreSQL</strong></td>
+                <td>13, 14, 15, 16</td>
+                <td>Apps modernas, JSONB, extensões</td>
+                <td>$$</td>
+                <td>Mais extensível, excelente para dados complexos</td>
+              </tr>
+              <tr>
+                <td><strong>MySQL</strong></td>
+                <td>8.0, 8.4</td>
+                <td>Web apps, WordPress, legacy</td>
+                <td>$$</td>
+                <td>Mais popular, enorme ecossistema</td>
+              </tr>
+              <tr>
+                <td><strong>Aurora PostgreSQL</strong></td>
+                <td>13, 14, 15, 16</td>
+                <td>Alta performance, auto-scaling</td>
+                <td>$$$</td>
+                <td>5x mais rápido que PostgreSQL padrão</td>
+              </tr>
+              <tr>
+                <td><strong>Aurora MySQL</strong></td>
+                <td>8.0</td>
+                <td>Alta performance MySQL</td>
+                <td>$$$</td>
+                <td>3x mais rápido que MySQL padrão</td>
+              </tr>
+              <tr>
+                <td><strong>MariaDB</strong></td>
+                <td>10.6, 10.11</td>
+                <td>Fork do MySQL, open source puro</td>
+                <td>$$</td>
+                <td>Compatível com MySQL, sem Oracle</td>
+              </tr>
+              <tr>
+                <td><strong>Oracle</strong></td>
+                <td>19c, 21c</td>
+                <td>Enterprise, legacy corporativo</td>
+                <td>$$$$</td>
+                <td>Licenciamento complexo</td>
+              </tr>
+              <tr>
+                <td><strong>SQL Server</strong></td>
+                <td>2019, 2022</td>
+                <td>Ecossistema Microsoft, .NET</td>
+                <td>$$$$</td>
+                <td>Express edition é gratuita (limitada)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💡 Recomendação para novos projetos:</strong>
+            <p><strong>PostgreSQL</strong> é a melhor escolha para a maioria dos casos. É open source, tem excelente suporte a JSON (JSONB), extensões poderosas (PostGIS, pgvector), e a comunidade é enorme. Se precisa de alta performance e budget permite, <strong>Aurora PostgreSQL</strong> é a evolução natural.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 Instance Classes</h3>
+          <p>Assim como EC2, RDS tem instance classes que definem CPU, memória e performance de rede:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>RDS Instance Classes — Guia de Escolha</code><span class="cmd-tag">Referência</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# INSTANCE CLASSES PARA RDS
+# ═══════════════════════════════════════════════════════════════
+#
+# ┌──────────────────┬────────┬────────┬─────────────────────────┐
+# │ Classe           │ vCPUs  │ RAM    │ Caso de Uso             │
+# ├──────────────────┼────────┼────────┼─────────────────────────┤
+# │ db.t3.micro      │ 2      │ 1 GB   │ Free tier, testes       │
+# │ db.t3.small      │ 2      │ 2 GB   │ Dev, apps pequenas      │
+# │ db.t3.medium     │ 2      │ 4 GB   │ Dev/Staging             │
+# │ db.t3.large      │ 2      │ 8 GB   │ Prod pequena            │
+# │ db.r6g.large     │ 2      │ 16 GB  │ Prod, otimizado memória │
+# │ db.r6g.xlarge    │ 4      │ 32 GB  │ Prod média              │
+# │ db.r6g.2xlarge   │ 8      │ 64 GB  │ Prod grande             │
+# │ db.r6g.4xlarge   │ 16     │ 128 GB │ Prod muito grande       │
+# └──────────────────┴────────┴────────┴─────────────────────────┘
+#
+# REGRAS:
+# • db.t3/t4g = Burstable (bom custo-benefício para cargas variáveis)
+# • db.r6g/r7g = Memory-optimized (bancos grandes, muitas queries)
+# • db.m6g/m7g = General purpose (equilíbrio entre CPU e RAM)
+# • Sufixo "g" = Graviton (ARM) → 20% mais barato, mesma performance
+#
+# DICA: Comece com db.t3.small/medium em dev, escale conforme
+# métricas reais (CloudWatch: CPUUtilization, FreeableMemory)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 Multi-AZ vs Read Replicas</h3>
+          <p>São conceitos diferentes que servem propósitos diferentes:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Multi-AZ vs Read Replicas — Diagrama</code><span class="cmd-tag">Arquitetura</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# MULTI-AZ — Alta Disponibilidade (failover automático)
+# ═══════════════════════════════════════════════════════════════
+#
+#   Aplicação ──▶ Endpoint DNS (não muda) ──▶ Primary (AZ-a)
+#                                                   │
+#                                          Replicação SÍNCRONA
+#                                                   │
+#                                                   ▼
+#                                            Standby (AZ-b)
+#                                            (NÃO acessível)
+#
+#   Se Primary falha → DNS aponta para Standby em ~60s
+#   OBJETIVO: Resiliência (não melhora performance de leitura!)
+#   CUSTO: 2x o preço (duas instâncias rodando)
+#
+# ═══════════════════════════════════════════════════════════════
+# READ REPLICAS — Performance de Leitura (scale-out)
+# ═══════════════════════════════════════════════════════════════
+#
+#   Aplicação (writes) ──▶ Primary ──┬── Replicação ASSÍNCRONA
+#                                    │
+#   Aplicação (reads)  ──▶ Replica 1 ┤
+#   Aplicação (reads)  ──▶ Replica 2 ┤
+#   Aplicação (reads)  ──▶ Replica 3 ┘
+#
+#   Cada replica tem seu próprio endpoint de leitura
+#   OBJETIVO: Distribuir carga de leitura (melhora performance!)
+#   CUSTO: Custo por cada replica (mas independente do primary)
+#   NOTA: Replicação é ASSÍNCRONA → pode haver lag de ms a segundos
+#
+# ═══════════════════════════════════════════════════════════════
+# PRODUÇÃO IDEAL: Multi-AZ + Read Replicas (combinar ambos)
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 Storage Types</h3>
+          <p>RDS oferece diferentes tipos de storage com características de performance distintas:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>IOPS</th>
+                <th>Throughput</th>
+                <th>Caso de Uso</th>
+                <th>Custo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>gp3</strong></td>
+                <td>3.000 base (até 16.000)</td>
+                <td>125 MB/s (até 1.000)</td>
+                <td>Maioria das cargas de trabalho</td>
+                <td>$</td>
+              </tr>
+              <tr>
+                <td><strong>gp2</strong> (legado)</td>
+                <td>Escala com tamanho (3 IOPS/GB)</td>
+                <td>Até 250 MB/s</td>
+                <td>Legacy, evitar em novos projetos</td>
+                <td>$</td>
+              </tr>
+              <tr>
+                <td><strong>io2</strong></td>
+                <td>Até 256.000</td>
+                <td>Até 4.000 MB/s</td>
+                <td>Bancos transacionais pesados, low-latency</td>
+                <td>$$$$</td>
+              </tr>
+              <tr>
+                <td><strong>io2 Block Express</strong></td>
+                <td>Até 256.000</td>
+                <td>Até 4.000 MB/s</td>
+                <td>Cargas extremas (grandes enterprises)</td>
+                <td>$$$$$</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💡 Recomendação:</strong>
+            <p>Use <strong>gp3</strong> para 95% dos casos. Ele oferece performance consistente independente do tamanho do volume, e você pode aumentar IOPS e throughput independentemente. Só mude para io2 se CloudWatch mostrar gargalo de I/O comprovado.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 6: RDS COM TERRAFORM
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Terraform + RDS</span>
+          <h2>6. RDS com Terraform</h2>
+          <p>Vamos criar uma infraestrutura RDS completa e pronta para produção: subnet group, parameter group, instance e todas as configurações de segurança e backup.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 aws_db_subnet_group — Onde o RDS vive</h3>
+          <p>RDS precisa saber em quais subnets pode ser lançado. O <code>db_subnet_group</code> define isso — sempre use subnets <strong>privadas</strong> em múltiplas AZs:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>DB Subnet Group — Subnets privadas</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Subnet Group para RDS — SEMPRE em subnets PRIVADAS
+# RDS NUNCA deve ter IP público ou estar em subnet pública!
+# ═══════════════════════════════════════════════════════════════
+
+# Subnets privadas para o banco (mínimo 2 AZs para Multi-AZ)
+resource "aws_subnet" "database" {
+  count             = 2
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 200)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-subnet-${count.index + 1}"
+    Tier = "database"
+  })
+}
+
+# DB Subnet Group — agrupa as subnets para uso do RDS
+resource "aws_db_subnet_group" "main" {
+  name        = "${local.name_prefix}-db-subnet-group"
+  description = "Subnets privadas para RDS - ${var.environment}"
+  subnet_ids  = aws_subnet.database[*].id
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-subnet-group"
+  })
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 Parameter Groups e Option Groups</h3>
+          <p>Parameter Groups permitem customizar configurações do engine (PostgreSQL, MySQL) sem precisar de acesso SSH ao servidor:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Parameter Group — Tuning do PostgreSQL</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Parameter Group — Configurações do engine PostgreSQL
+# Equivalente a editar postgresql.conf, mas gerenciado pela AWS
+# ═══════════════════════════════════════════════════════════════
+resource "aws_db_parameter_group" "postgres" {
+  name        = "${local.name_prefix}-postgres16-params"
+  family      = "postgres16"  # Deve corresponder ao engine_version
+  description = "Custom parameters para PostgreSQL 16 - ${var.environment}"
+
+  # ─── Performance ──────────────────────────────────────────────
+  parameter {
+    name  = "shared_preload_libraries"
+    value = "pg_stat_statements,auto_explain"
+    # pg_stat_statements: monitora performance de queries
+    # auto_explain: loga planos de queries lentas
+  }
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "1000"  # Log queries que demoram > 1 segundo
+  }
+
+  parameter {
+    name  = "idle_in_transaction_session_timeout"
+    value = "60000"  # Kill transações idle > 60s (evita locks)
+  }
+
+  # ─── Conexões ─────────────────────────────────────────────────
+  parameter {
+    name  = "max_connections"
+    value = local.is_production ? "200" : "50"
+    # CUIDADO: cada conexão usa ~10MB RAM
+    # db.t3.micro (1GB) → max 50-80 conexões
+    # db.r6g.large (16GB) → max 200-500 conexões
+  }
+
+  # ─── Logging ──────────────────────────────────────────────────
+  parameter {
+    name  = "log_connections"
+    value = "1"  # Log todas as conexões (útil para auditoria)
+  }
+
+  parameter {
+    name  = "log_disconnections"
+    value = "1"  # Log todas as desconexões
+  }
+
+  # ─── SSL ──────────────────────────────────────────────────────
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"  # FORÇAR SSL — nunca permitir conexões sem criptografia
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-postgres16-params"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 aws_db_instance — RDS Completo para Produção</h3>
+          <p>Agora vamos juntar tudo em uma instância RDS production-ready com todas as boas práticas:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>RDS PostgreSQL — Production-Ready</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# RDS PostgreSQL — Configuração completa para produção
+# ═══════════════════════════════════════════════════════════════
+resource "aws_db_instance" "main" {
+  # ─── Identificação ────────────────────────────────────────────
+  identifier = "${local.name_prefix}-postgres"  # Nome no console AWS
+  db_name    = "app_database"                   # Nome do database inicial
+
+  # ─── Engine ───────────────────────────────────────────────────
+  engine         = "postgres"
+  engine_version = "16.4"               # Versão específica (não use "16" genérico)
+  instance_class = local.db_instance_class  # Definido em locals baseado no env
+
+  # ─── Credenciais ──────────────────────────────────────────────
+  username = "app_admin"
+  # NUNCA coloque password no código! Use Secrets Manager (seção 9)
+  manage_master_user_password = true  # AWS gerencia e rotaciona a senha!
+
+  # ─── Storage ──────────────────────────────────────────────────
+  allocated_storage     = 50           # GB inicial
+  max_allocated_storage = 200          # Auto-scale até 200GB
+  storage_type          = "gp3"        # Melhor custo-benefício
+  storage_encrypted     = true         # SEMPRE encriptar em produção
+  kms_key_id           = aws_kms_key.rds.arn  # KMS key própria (não default)
+
+  # ─── Rede ─────────────────────────────────────────────────────
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.database.id]
+  publicly_accessible    = false  # NUNCA público em produção!
+  port                   = 5432
+
+  # ─── Alta Disponibilidade ─────────────────────────────────────
+  multi_az = local.db_multi_az  # true em prod, false em dev
+
+  # ─── Backup ───────────────────────────────────────────────────
+  backup_retention_period   = local.db_backup_days  # 35 dias em prod
+  backup_window             = "03:00-04:00"         # UTC — madrugada no Brasil
+  copy_tags_to_snapshot     = true
+  delete_automated_backups  = false  # Manter backups mesmo após delete
+  final_snapshot_identifier = "${local.name_prefix}-final-${formatdate("YYYY-MM-DD", timestamp())}"
+  skip_final_snapshot       = false  # SEMPRE criar snapshot final
+
+  # ─── Manutenção ───────────────────────────────────────────────
+  maintenance_window          = "Sun:04:00-Sun:05:00"  # Domingo de madrugada
+  auto_minor_version_upgrade  = true   # Patches automáticos de segurança
+  allow_major_version_upgrade = false  # Major upgrades = manual (testar antes!)
+
+  # ─── Monitoramento ────────────────────────────────────────────
+  monitoring_interval          = 60  # Enhanced Monitoring a cada 60s
+  monitoring_role_arn          = aws_iam_role.rds_monitoring.arn
+  performance_insights_enabled = true  # Performance Insights (gratuito 7 dias)
+  performance_insights_retention_period = local.is_production ? 731 : 7  # dias
+
+  enabled_cloudwatch_logs_exports = [
+    "postgresql",      # Logs gerais do PostgreSQL
+    "upgrade"          # Logs de upgrade
+  ]
+
+  # ─── Parameter Group ──────────────────────────────────────────
+  parameter_group_name = aws_db_parameter_group.postgres.name
+
+  # ─── Proteção ─────────────────────────────────────────────────
+  deletion_protection = local.is_production  # Impede terraform destroy acidental
+
+  # ─── Tags ─────────────────────────────────────────────────────
+  tags = merge(local.common_tags, {
+    Name     = "${local.name_prefix}-postgres"
+    Engine   = "postgresql-16"
+    Backup   = "daily"
+    Critical = local.is_production ? "yes" : "no"
+  })
+
+  # ─── Lifecycle ────────────────────────────────────────────────
+  lifecycle {
+    prevent_destroy = true  # Segurança extra contra destruição acidental
+    ignore_changes  = [
+      engine_version  # Não reverter minor patches aplicados automaticamente
+    ]
+  }
+
+  # Garante que subnet group e SG existem antes
+  depends_on = [
+    aws_db_subnet_group.main,
+    aws_security_group.database
+  ]
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ manage_master_user_password = true (Recomendado!):</strong>
+            <p>A partir do Terraform AWS Provider 5.x, você pode usar <code>manage_master_user_password = true</code>. A AWS gera automaticamente uma senha forte, armazena no Secrets Manager e rotaciona periodicamente. Muito mais seguro que definir a senha no código!</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 IAM Role para Enhanced Monitoring</h3>
+          <p>Enhanced Monitoring precisa de uma role IAM para enviar métricas ao CloudWatch:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Role para RDS Enhanced Monitoring</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# IAM Role para RDS Enhanced Monitoring
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role" "rds_monitoring" {
+  name = "${local.name_prefix}-rds-monitoring"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "monitoring.rds.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "rds_monitoring" {
+  role       = aws_iam_role.rds_monitoring.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 7: SECURITY GROUP PARA RDS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Segurança de Rede</span>
+          <h2>7. Security Group para RDS</h2>
+          <p>O Security Group do banco de dados é a primeira linha de defesa. Ele deve ser o mais restritivo possível: apenas a aplicação pode acessar o banco, e o banco NUNCA tem acesso à internet.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 Princípio: Cross-Reference Security Groups</h3>
+          <p>Em vez de liberar CIDRs (faixas de IP), referencie o Security Group da aplicação. Assim, qualquer instância que pertença ao SG da app automaticamente ganha acesso ao banco:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Arquitetura de SGs — App → Database</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CROSS-REFERENCE SECURITY GROUPS
+# ═══════════════════════════════════════════════════════════════
+#
+#   Internet
+#      │
+#      ▼
+#  ┌──────────────────────┐
+#  │   ALB Security Group │  ← Aceita 80/443 de 0.0.0.0/0
+#  │   (sg-alb-xxxxx)     │
+#  └──────────┬───────────┘
+#             │ porta 8080
+#             ▼
+#  ┌──────────────────────┐
+#  │   App Security Group │  ← Aceita APENAS de sg-alb
+#  │   (sg-app-xxxxx)     │
+#  └──────────┬───────────┘
+#             │ porta 5432
+#             ▼
+#  ┌──────────────────────┐
+#  │    DB Security Group │  ← Aceita APENAS de sg-app
+#  │   (sg-db-xxxxx)      │  ← SEM acesso à internet (sem egress 0.0.0.0/0)
+#  └──────────────────────┘
+#
+# RESULTADO:
+# • Atacante na internet NÃO acessa a app diretamente
+# • App NÃO acessa o banco se não estiver no SG correto
+# • Banco NÃO tem acesso à internet (nenhuma rota de saída)
+# • Se escalar para 10 instâncias de app, TODAS acessam o DB
+#   automaticamente (pertencem ao mesmo SG)
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 Security Group do Database — Implementação</h3>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Security Group RDS — Máxima Restrição</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Security Group para RDS — princípio de menor acesso
+# ═══════════════════════════════════════════════════════════════
+resource "aws_security_group" "database" {
+  name_prefix = "${local.name_prefix}-db-sg-"
+  description = "RDS PostgreSQL - aceita conexoes apenas da app"
   vpc_id      = aws_vpc.main.id
 
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-sg"
+    Tier = "database"
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# ─── Ingress: APENAS da aplicação ───────────────────────────────
+resource "aws_security_group_rule" "db_from_app" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  description              = "PostgreSQL from application tier only"
+  security_group_id        = aws_security_group.database.id
+  source_security_group_id = aws_security_group.app.id  # ← Cross-reference!
+}
+
+# ─── Ingress: Bastion Host (para manutenção) ─────────────────────
+resource "aws_security_group_rule" "db_from_bastion" {
+  count                    = var.enable_bastion ? 1 : 0  # Só se bastion existir
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  description              = "PostgreSQL from bastion host for maintenance"
+  security_group_id        = aws_security_group.database.id
+  source_security_group_id = aws_security_group.bastion[0].id
+}
+
+# ─── Egress: NENHUM (banco não precisa de internet) ───────────────
+# Diferente de EC2, o RDS NÃO precisa de egress para funcionar!
+# O serviço RDS gerencia comunicação interna pela rede da AWS.
+# NÃO adicionar egress 0.0.0.0/0 aqui!
+
+# Se precisar de acesso a S3 (para import/export), use VPC Endpoint:
+# resource "aws_vpc_endpoint" "s3" { ... }
+
+# ═══════════════════════════════════════════════════════════════
+# ERROS COMUNS A EVITAR:
+# ═══════════════════════════════════════════════════════════════
+#
+# ❌ ERRADO: Liberar CIDR amplo
+# cidr_blocks = ["10.0.0.0/16"]  # Toda a VPC acessa o banco!
+#
+# ❌ ERRADO: Liberar internet
+# cidr_blocks = ["0.0.0.0/0"]   # QUALQUER UM acessa o banco!
+#
+# ❌ ERRADO: Egress amplo para banco
+# egress { cidr_blocks = ["0.0.0.0/0"] }  # Banco não precisa sair
+#
+# ✅ CORRETO: Cross-reference por SG
+# source_security_group_id = sg-app  # Apenas membros do SG app
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 Rede Completa para RDS — Sem Acesso à Internet</h3>
+          <p>O RDS deve viver em subnets privadas sem rota para internet. Aqui está a configuração de rede completa:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Route Table Privada — Sem Internet Gateway</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Route Table para subnets de banco de dados
+# NENHUMA rota para Internet Gateway ou NAT Gateway!
+# ═══════════════════════════════════════════════════════════════
+resource "aws_route_table" "database" {
+  vpc_id = aws_vpc.main.id
+
+  # Sem nenhuma rota externa — apenas tráfego local da VPC
+  # A rota local (10.0.0.0/16 → local) é adicionada automaticamente
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-rt"
+    Tier = "database"
+  })
+}
+
+# Associar subnets de banco à route table isolada
+resource "aws_route_table_association" "database" {
+  count          = length(aws_subnet.database)
+  subnet_id      = aws_subnet.database[count.index].id
+  route_table_id = aws_route_table.database.id
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Network ACL extra (camada adicional de defesa)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_network_acl" "database" {
+  vpc_id     = aws_vpc.main.id
+  subnet_ids = aws_subnet.database[*].id
+
+  # Permitir PostgreSQL APENAS das subnets da app
   ingress {
-    description              = "MySQL from EC2"
-    from_port                = 3306
-    to_port                  = 3306
-    protocol                 = "tcp"
-    source_security_group_id = aws_security_group.ec2.id
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "10.0.0.0/24"  # Subnet da app (ajustar conforme seu CIDR)
+    from_port  = 5432
+    to_port    = 5432
+  }
+
+  # Ephemeral ports para resposta
+  egress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "10.0.0.0/24"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  # Deny explícito para todo o resto
+  ingress {
+    protocol   = "-1"
+    rule_no    = 999
+    action     = "deny"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol   = "-1"
+    rule_no    = 999
+    action     = "deny"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 
   tags = merge(local.common_tags, {
-    Name = "${var.project_name}-rds-sg"
+    Name = "${local.name_prefix}-db-nacl"
   })
 }</code></pre>
             </div>
-            <div class="command-card">
-              <div class="command-header"><code>Referência Cruzada</code><span class="cmd-tag">Conceito</span></div>
-              <p>Em vez de abrir para um CIDR, referenciamos o SG da EC2 diretamente. Se o IP da EC2 mudar, a regra continua válida.</p>
-              <pre><code># ❌ Evite — IP pode mudar
-cidr_blocks = ["10.0.1.50/32"]
+          </div>
 
-# ✅ Correto — referência ao SG
-source_security_group_id = aws_security_group.ec2.id</code></pre>
-            </div>
+          <div class="info-box warning">
+            <strong>⚠️ Defesa em Profundidade:</strong>
+            <p>Segurança de banco de dados usa múltiplas camadas: (1) Subnet privada sem rota para internet, (2) Security Group restritivo, (3) Network ACL, (4) Senha forte com rotação, (5) SSL obrigatório, (6) deletion_protection. Se uma camada falhar, as outras ainda protegem o banco.</p>
           </div>
         </div>
-
-        <!-- RDS Instance -->
-        <div class="topic-block">
-          <h2>RDS Instance — MySQL 8.0</h2>
-          <p>O recurso <code>aws_db_instance</code> provisiona o banco de dados gerenciado. Configuramos criptografia, backup e isolamento de rede.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>aws_db_instance</code><span class="cmd-tag">rds.tf</span></div>
-              <p>Instância RDS MySQL com todas as boas práticas de segurança e isolamento.</p>
-              <pre><code>resource "aws_db_instance" "main" {
-  identifier     = "${var.project_name}-mysql"
-  engine         = "mysql"
-  engine_version = "8.0"
-  instance_class = var.db_instance_class
-
-  allocated_storage = var.db_allocated_storage
-  storage_type      = "gp3"
-
-  db_name  = var.db_name
-  username = var.db_username
-  password = var.db_password
-
-  db_subnet_group_name   = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [aws_security_group.rds.id]
-
-  multi_az            = false
-  publicly_accessible = false
-  skip_final_snapshot = true
-
-  backup_retention_period = var.db_backup_retention
-  storage_encrypted       = true
-
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-mysql"
-    Role = "database"
-  })
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Parâmetros Importantes</code><span class="cmd-tag">Referência</span></div>
-              <table class="styled-table">
-                <thead><tr><th>Parâmetro</th><th>Descrição</th></tr></thead>
-                <tbody>
-                  <tr><td><code>storage_type = "gp3"</code></td><td>SSD de nova geração, melhor custo-benefício</td></tr>
-                  <tr><td><code>multi_az = false</code></td><td>Lab: single AZ. Produção: use true</td></tr>
-                  <tr><td><code>publicly_accessible = false</code></td><td>Sem IP público — acesso apenas via VPC</td></tr>
-                  <tr><td><code>skip_final_snapshot = true</code></td><td>Lab: sem snapshot ao destruir. Produção: false</td></tr>
-                  <tr><td><code>storage_encrypted = true</code></td><td>Criptografia at-rest com KMS padrão</td></tr>
-                  <tr><td><code>backup_retention_period</code></td><td>Dias de retenção de backups automáticos</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sensitive Variables -->
-        <div class="topic-block">
-          <h2>Variáveis Sensíveis</h2>
-          <p>Senhas e segredos <strong>nunca</strong> devem ser commitados no código. O Terraform oferece o atributo <code>sensitive = true</code> para proteger valores no output.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>variable "db_password"</code><span class="cmd-tag">variables.tf</span></div>
-              <p>Declare a variável como sensível para que o Terraform oculte seu valor nos logs e outputs.</p>
-              <pre><code>variable "db_password" {
-  description = "Password for the RDS MySQL instance"
-  type        = string
-  sensitive   = true
-
-  validation {
-    condition     = length(var.db_password) >= 8
-    error_message = "A senha deve ter no mínimo 8 caracteres."
-  }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Formas de Passar o Valor</code><span class="cmd-tag">Segurança</span></div>
-              <p>Existem várias formas seguras de fornecer variáveis sensíveis sem expor no código.</p>
-              <pre><code># Opção 1: Variável de ambiente (recomendado em CI/CD)
-export TF_VAR_db_password="MinhaSenhaSegura123!"
-terraform apply
-
-# Opção 2: Arquivo .tfvars (NÃO commitar!)
-# secrets.tfvars
-db_password = "MinhaSenhaSegura123!"
-
-terraform apply -var-file="secrets.tfvars"
-
-# Opção 3: Prompt interativo
-terraform apply
-# var.db_password
-#   Enter a value: ********
-
-# Opção 4: AWS Secrets Manager (produção)
-data "aws_secretsmanager_secret_version" "db" {
-  secret_id = "prod/db/password"
-}
-# Uso: data.aws_secretsmanager_secret_version.db.secret_string</code></pre>
-            </div>
-          </div>
-          <div class="info-box">
-            <p>⚠️ <strong>Importante:</strong> Adicione <code>*.tfvars</code> e <code>.terraform/</code> ao seu <code>.gitignore</code>. Nunca commite arquivos com senhas no repositório.</p>
-          </div>
-        </div>
-
-        <!-- Outputs -->
-        <div class="topic-block">
-          <h2>Outputs — Endpoint e Porta</h2>
-          <p>Outputs exportam valores úteis após o <code>terraform apply</code>. O endpoint do RDS é essencial para configurar a aplicação na EC2.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>output</code><span class="cmd-tag">outputs.tf</span></div>
-              <p>Exporte o endpoint e a porta do banco para uso na configuração da aplicação.</p>
-              <pre><code>output "db_endpoint" {
-  description = "RDS MySQL endpoint address"
-  value       = aws_db_instance.main.endpoint
-}
-
-output "db_port" {
-  description = "RDS MySQL port"
-  value       = aws_db_instance.main.port
-}
-
-output "db_name" {
-  description = "Database name"
-  value       = aws_db_instance.main.db_name
-}
-
-# Exemplo de uso na EC2 (user_data):
-# mysql -h ${output.db_endpoint} -P ${output.db_port} \
-#   -u ${var.db_username} -p${var.db_password} ${var.db_name}</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Architecture Diagram -->
-        <div class="topic-block">
-          <h2>Diagrama de Arquitetura</h2>
-          <p>Visão geral da comunicação entre EC2 (subnet pública) e RDS (subnet privada) dentro da VPC.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Arquitetura VPC + EC2 + RDS</code><span class="cmd-tag">Diagrama</span></div>
-              <pre><code>┌─────────────────────────────────────────────────────────────┐
-│                         VPC (10.0.0.0/16)                   │
-│                                                             │
-│  ┌─────────────────────────┐  ┌─────────────────────────┐  │
-│  │   Public Subnet A       │  │   Public Subnet B       │  │
-│  │   10.0.1.0/24           │  │   10.0.2.0/24           │  │
-│  │                         │  │                         │  │
-│  │  ┌───────────────────┐  │  │                         │  │
-│  │  │     EC2 Instance  │  │  │                         │  │
-│  │  │   (Web Server)    │  │  │                         │  │
-│  │  │   SG: porta 80,22 │  │  │                         │  │
-│  │  └────────┬──────────┘  │  │                         │  │
-│  └───────────┼─────────────┘  └─────────────────────────┘  │
-│              │ porta 3306                                    │
-│              │ (source_security_group_id)                    │
-│  ┌───────────┼─────────────┐  ┌─────────────────────────┐  │
-│  │   Private Subnet A      │  │   Private Subnet B      │  │
-│  │   10.0.3.0/24           │  │   10.0.4.0/24           │  │
-│  │           ▼             │  │                         │  │
-│  │  ┌───────────────────┐  │  │  ┌───────────────────┐  │  │
-│  │  │   RDS MySQL       │  │  │  │   RDS (standby)   │  │  │
-│  │  │   (Primary)       │  │  │  │   (Multi-AZ)      │  │  │
-│  │  │   SG: porta 3306  │  │  │  │                   │  │  │
-│  │  └───────────────────┘  │  │  └───────────────────┘  │  │
-│  └─────────────────────────┘  └─────────────────────────┘  │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │              DB Subnet Group                         │    │
-│  │         (Private Subnet A + Private Subnet B)       │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-         │
-    Internet Gateway
-         │
-      Internet</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 8: GERENCIAMENTO DE SEGREDOS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Segredos</span>
+          <h2>8. Gerenciamento de Segredos</h2>
+          <p>Senhas, API keys, tokens e certificados são os dados mais sensíveis da sua infraestrutura. Nunca devem estar em código, variáveis de ambiente estáticas ou repositórios Git. Vamos explorar as opções seguras.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 Por que NUNCA Hardcode?</h3>
+          <p>Colocar segredos diretamente no código (hardcode) é o erro mais perigoso que existe em infraestrutura:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>O Desastre do Hardcode — Cenário Real</code><span class="cmd-tag">PERIGO</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ❌ NUNCA FAÇA ISSO — Hardcode de segredos
+# ═══════════════════════════════════════════════════════════════
+
+# CENÁRIO: Dev coloca senha no código "temporariamente"
+resource "aws_db_instance" "main" {
+  username = "admin"
+  password = "SuperSecreta123!"   # ← DESASTRE POTENCIAL
+}
+
+# O QUE ACONTECE:
+# 1. Código vai para o Git (git add . → git push)
+# 2. Mesmo se remover depois, fica no histórico do Git PARA SEMPRE
+# 3. terraform.tfstate armazena o valor em PLAIN TEXT
+# 4. Se state está em S3, qualquer pessoa com acesso ao bucket lê a senha
+# 5. Bots escaneiam repositórios públicos em segundos buscando credentials
+# 6. Resultado: banco comprometido, dados vazados, empresa na mídia
+#
+# IMPACTO REAL (casos documentados):
+# • Uber (2016): Credenciais no GitHub → dados de 57M usuários
+# • Capital One (2019): Credenciais IAM expostas → 100M registros
+# • Samsung (2022): Credenciais hardcoded → código fonte vazado
+#
+# ═══════════════════════════════════════════════════════════════
+# ✅ O QUE FAZER INSTEAD:
+# ═══════════════════════════════════════════════════════════════
+#
+# Opção 1: AWS gerencia a senha
+resource "aws_db_instance" "main" {
+  manage_master_user_password = true  # AWS cria e rotaciona
+}
+#
+# Opção 2: Referência ao Secrets Manager
+resource "aws_db_instance" "main" {
+  password = data.aws_secretsmanager_secret_version.db.secret_string
+}
+#
+# Opção 3: Variable com sensitive = true (mínimo aceitável)
+resource "aws_db_instance" "main" {
+  password = var.db_password  # Passado via -var ou TF_VAR_
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 Métodos de Gerenciamento — Comparação</h3>
+          <p>Existem várias abordagens para gerenciar segredos com Terraform. Cada uma tem trade-offs:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Método</th>
+                <th>Segurança</th>
+                <th>Rotação</th>
+                <th>Custo</th>
+                <th>Complexidade</th>
+                <th>Quando Usar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>terraform.tfvars (sensitive)</strong></td>
+                <td>⭐⭐</td>
+                <td>Manual</td>
+                <td>Grátis</td>
+                <td>Baixa</td>
+                <td>Dev local, projetos pequenos</td>
+              </tr>
+              <tr>
+                <td><strong>Variáveis de Ambiente (TF_VAR_)</strong></td>
+                <td>⭐⭐⭐</td>
+                <td>Manual</td>
+                <td>Grátis</td>
+                <td>Baixa</td>
+                <td>CI/CD pipelines</td>
+              </tr>
+              <tr>
+                <td><strong>AWS Secrets Manager</strong></td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>Automática</td>
+                <td>$0.40/secret/mês</td>
+                <td>Média</td>
+                <td>Produção, bancos, APIs</td>
+              </tr>
+              <tr>
+                <td><strong>SSM Parameter Store</strong></td>
+                <td>⭐⭐⭐⭐</td>
+                <td>Manual</td>
+                <td>Grátis (standard)</td>
+                <td>Baixa</td>
+                <td>Configs, endpoints, feature flags</td>
+              </tr>
+              <tr>
+                <td><strong>HashiCorp Vault</strong></td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>Automática</td>
+                <td>$$$$ (self-hosted)</td>
+                <td>Alta</td>
+                <td>Multi-cloud, compliance rigoroso</td>
+              </tr>
+              <tr>
+                <td><strong>manage_master_user_password</strong></td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>Automática</td>
+                <td>Incluído no Secrets Manager</td>
+                <td>Mínima</td>
+                <td>Senhas de RDS (melhor opção!)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 Método 1: Variables com sensitive = true</h3>
+          <p>O método mais simples. O valor não aparece no terminal durante plan/apply, mas AINDA está no state file:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Variable Sensitive — Mínimo Aceitável</code><span class="cmd-tag">Básico</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# variables.tf — Definição com sensitive = true
+# ═══════════════════════════════════════════════════════════════
+variable "db_password" {
+  description = "Senha master do banco de dados"
+  type        = string
+  sensitive   = true  # Oculta em plan/apply output
+
+  validation {
+    condition     = length(var.db_password) >= 16
+    error_message = "Senha deve ter no mínimo 16 caracteres."
+  }
+}
+
+variable "api_key" {
+  description = "Chave da API externa"
+  type        = string
+  sensitive   = true
+}
+
+# ═══════════════════════════════════════════════════════════════
+# COMO PASSAR O VALOR (sem colocar no código):
+# ═══════════════════════════════════════════════════════════════
+
+# Opção A: Variável de ambiente (CI/CD)
+# export TF_VAR_db_password="MinhaSenh@Forte2024!"
+# terraform apply
+
+# Opção B: Flag -var (interativo)
+# terraform apply -var="db_password=MinhaSenh@Forte2024!"
+
+# Opção C: Arquivo .tfvars NÃO versionado
+# terraform apply -var-file="secrets.tfvars"
+#
+# secrets.tfvars (NO .gitignore!):
+# db_password = "MinhaSenh@Forte2024!"
+# api_key     = "sk-1234567890abcdef"
+
+# ═══════════════════════════════════════════════════════════════
+# .gitignore OBRIGATÓRIO:
+# ═══════════════════════════════════════════════════════════════
+# *.tfvars       ← TODOS os .tfvars (ou pelo menos secrets.tfvars)
+# .terraform/
+# *.tfstate
+# *.tfstate.backup</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Limitação de sensitive = true:</strong>
+            <p>O atributo <code>sensitive = true</code> apenas oculta o valor no OUTPUT do terminal. O valor AINDA é armazenado em plain text no arquivo <code>terraform.tfstate</code>! Por isso, <strong>sempre</strong> use backend remoto (S3) com encriptação e controle de acesso rigoroso para o state file.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 Método 2: SSM Parameter Store</h3>
+          <p>SSM Parameter Store é gratuito (standard tier) e integra nativamente com todos os serviços AWS. Ideal para configurações e segredos simples:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>SSM Parameter Store — Criar e Ler</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# CRIAR parâmetros no SSM Parameter Store
+# ═══════════════════════════════════════════════════════════════
+
+# Parâmetro simples (não encriptado) — para configs não-sensíveis
+resource "aws_ssm_parameter" "app_config_url" {
+  name        = "/${var.project}/${var.environment}/api/url"
+  description = "URL da API backend"
+  type        = "String"
+  value       = "https://api.${var.domain}/v1"
+
+  tags = local.common_tags
+}
+
+# Parâmetro seguro (encriptado com KMS) — para segredos
+resource "aws_ssm_parameter" "db_connection_string" {
+  name        = "/${var.project}/${var.environment}/db/connection-string"
+  description = "Connection string do banco de dados"
+  type        = "SecureString"       # Encriptado com KMS!
+  value       = "postgresql://${aws_db_instance.main.username}:${var.db_password}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}"
+  key_id      = aws_kms_key.app.arn  # KMS key customizada
+
+  tags = local.common_tags
+}
+
+# ═══════════════════════════════════════════════════════════════
+# LER parâmetros existentes (data source)
+# ═══════════════════════════════════════════════════════════════
+data "aws_ssm_parameter" "external_api_key" {
+  name = "/${var.project}/shared/external-api-key"
+  # Parâmetro criado manualmente no console ou por outro módulo
+}
+
+# Uso em outro recurso:
+# data.aws_ssm_parameter.external_api_key.value
+
+# ═══════════════════════════════════════════════════════════════
+# HIERARQUIA DE PARÂMETROS (recomendada):
+# ═══════════════════════════════════════════════════════════════
+# /projeto/ambiente/serviço/chave
+#
+# /myapp/prod/db/host
+# /myapp/prod/db/port
+# /myapp/prod/db/password
+# /myapp/prod/api/key
+# /myapp/prod/api/url
+# /myapp/dev/db/host
+# /myapp/dev/db/password
+#
+# Permite buscar TODOS os parâmetros de um ambiente:
+# aws ssm get-parameters-by-path --path "/myapp/prod/" --recursive</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 9: AWS SECRETS MANAGER
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Secrets Manager</span>
+          <h2>9. aws_secretsmanager_secret</h2>
+          <p>AWS Secrets Manager é a solução enterprise para segredos: rotação automática, versionamento, auditoria via CloudTrail, e integração nativa com RDS, Redshift e DocumentDB.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 Criar Segredos com Terraform</h3>
+          <p>No Secrets Manager, a criação é feita em dois passos: (1) criar o "container" (secret), (2) criar o "conteúdo" (version):</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Secrets Manager — Criar e Popular</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# PASSO 1: Criar o Secret (container)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_secretsmanager_secret" "db_credentials" {
+  name        = "${local.name_prefix}/db/credentials"
+  description = "Credenciais master do banco PostgreSQL"
+
+  # Encriptação com KMS key customizada (recomendado)
+  kms_key_id = aws_kms_key.secrets.arn
+
+  # Dias para recuperação após deletar (proteção contra exclusão acidental)
+  recovery_window_in_days = local.is_production ? 30 : 7
+
+  # Forçar delete sem recovery (APENAS para dev/testes)
+  # force_overwrite_replica_secret = true
+
+  tags = merge(local.common_tags, {
+    Name        = "${local.name_prefix}/db/credentials"
+    AutoRotate  = "true"
+    Application = var.project
+  })
+}
+
+# ═══════════════════════════════════════════════════════════════
+# PASSO 2: Popular com o valor (version)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_secretsmanager_secret_version" "db_credentials" {
+  secret_id = aws_secretsmanager_secret.db_credentials.id
+
+  # Valor do segredo — formato JSON para múltiplos campos
+  secret_string = jsonencode({
+    username = aws_db_instance.main.username
+    password = var.db_password
+    engine   = "postgres"
+    host     = aws_db_instance.main.address
+    port     = aws_db_instance.main.port
+    dbname   = aws_db_instance.main.db_name
+    # URL completa para facilitar uso em aplicações
+    url      = "postgresql://${aws_db_instance.main.username}:${var.db_password}@${aws_db_instance.main.address}:${aws_db_instance.main.port}/${aws_db_instance.main.db_name}"
+  })
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Secret para API keys externas
+# ═══════════════════════════════════════════════════════════════
+resource "aws_secretsmanager_secret" "api_keys" {
+  name        = "${local.name_prefix}/api/external-keys"
+  description = "API keys de serviços externos (Stripe, SendGrid, etc)"
+  kms_key_id  = aws_kms_key.secrets.arn
+
+  recovery_window_in_days = 14
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}/api/external-keys"
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "api_keys" {
+  secret_id = aws_secretsmanager_secret.api_keys.id
+
+  secret_string = jsonencode({
+    stripe_secret_key  = var.stripe_secret_key
+    sendgrid_api_key   = var.sendgrid_api_key
+    slack_webhook_url  = var.slack_webhook_url
+  })
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 Ler Segredos com Data Source</h3>
+          <p>Para ler segredos existentes (criados manualmente ou por outro módulo), use data sources:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Data Source — Lendo Secrets Existentes</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Ler secret existente (criado manualmente ou por outro módulo)
+# ═══════════════════════════════════════════════════════════════
+data "aws_secretsmanager_secret" "existing_db" {
+  name = "production/database/master"
+}
+
+data "aws_secretsmanager_secret_version" "existing_db" {
+  secret_id = data.aws_secretsmanager_secret.existing_db.id
+}
+
+# Parsear o JSON do secret
+locals {
+  db_creds = jsondecode(data.aws_secretsmanager_secret_version.existing_db.secret_string)
+}
+
+# Usar os valores individualmente
+resource "aws_db_instance" "from_secret" {
+  username = local.db_creds.username
+  password = local.db_creds.password
+  # ...
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Uso em ECS Task Definition (injetar como variável de ambiente)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_ecs_task_definition" "app" {
+  family = "${local.name_prefix}-app"
+
+  container_definitions = jsonencode([{
+    name  = "app"
+    image = "${aws_ecr_repository.app.repository_url}:latest"
+
+    # Secrets injetados diretamente do Secrets Manager!
+    secrets = [
+      {
+        name      = "DB_PASSWORD"
+        valueFrom = "${aws_secretsmanager_secret.db_credentials.arn}:password::"
+      },
+      {
+        name      = "DB_HOST"
+        valueFrom = "${aws_secretsmanager_secret.db_credentials.arn}:host::"
+      },
+      {
+        name      = "STRIPE_KEY"
+        valueFrom = "${aws_secretsmanager_secret.api_keys.arn}:stripe_secret_key::"
+      }
+    ]
+
+    # Configurações não-sensíveis podem ser environment variables normais
+    environment = [
+      { name = "APP_ENV", value = var.environment },
+      { name = "LOG_LEVEL", value = "info" }
+    ]
+  }])
+
+  execution_role_arn = aws_iam_role.ecs_task_execution.arn
+  task_role_arn      = aws_iam_role.ecs_task.arn
+  # ...
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 Rotação Automática de Segredos</h3>
+          <p>A rotação automática é o grande diferencial do Secrets Manager em relação ao SSM Parameter Store. Uma Lambda rotaciona a senha periodicamente sem downtime:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Rotação Automática — Lambda + Secrets Manager</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Rotação automática de senha do RDS
+# A AWS fornece Lambdas prontas para RDS!
+# ═══════════════════════════════════════════════════════════════
+
+# Configurar rotação automática
+resource "aws_secretsmanager_secret_rotation" "db_credentials" {
+  secret_id           = aws_secretsmanager_secret.db_credentials.id
+  rotation_lambda_arn = aws_lambda_function.secret_rotation.arn
+
+  rotation_rules {
+    # Rotacionar a cada 30 dias
+    automatically_after_days = 30
+    # schedule_expression = "rate(30 days)"  # Alternativa com cron
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Lambda de rotação (AWS fornece templates prontos)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_lambda_function" "secret_rotation" {
+  function_name = "${local.name_prefix}-secret-rotation"
+  description   = "Rotaciona senha do RDS PostgreSQL"
+
+  # AWS mantém um repositório com rotation lambdas prontas
+  # https://github.com/aws-samples/aws-secrets-manager-rotation-lambdas
+  filename         = data.archive_file.rotation_lambda.output_path
+  source_code_hash = data.archive_file.rotation_lambda.output_base64sha256
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.11"
+  timeout          = 30
+
+  role = aws_iam_role.rotation_lambda.arn
+
+  # A Lambda precisa acessar o banco e o Secrets Manager
+  vpc_config {
+    subnet_ids         = aws_subnet.private[*].id
+    security_group_ids = [aws_security_group.rotation_lambda.id]
+  }
+
+  environment {
+    variables = {
+      SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.${local.region}.amazonaws.com"
+    }
+  }
+
+  tags = local.common_tags
+}
+
+# Permissão para Secrets Manager invocar a Lambda
+resource "aws_lambda_permission" "secrets_manager" {
+  statement_id  = "AllowSecretsManagerInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.secret_rotation.function_name
+  principal     = "secretsmanager.amazonaws.com"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# FLUXO DA ROTAÇÃO:
+#
+#  Secrets Manager → Invoca Lambda → Lambda:
+#    1. create_secret: Gera nova senha
+#    2. set_secret: Atualiza no RDS (ALTER USER ... PASSWORD)
+#    3. test_secret: Testa conexão com nova senha
+#    4. finish_secret: Promove nova versão como AWSCURRENT
+#
+#  Se qualquer etapa falhar → rollback para senha anterior
+#  Aplicações buscam AWSCURRENT → sempre pegam a senha válida
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 Alternativa mais simples — manage_master_user_password:</strong>
+            <p>Se seu objetivo é apenas rotacionar a senha do RDS, use <code>manage_master_user_password = true</code> no recurso <code>aws_db_instance</code>. A AWS cuida de TUDO: cria o secret, configura a Lambda de rotação e gerencia as versões. Você não precisa criar nada disso manualmente!</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 KMS Key para Encriptação de Segredos</h3>
+          <p>Por padrão, Secrets Manager usa a key <code>aws/secretsmanager</code>. Para produção, crie uma KMS key dedicada com política de acesso restrita:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>KMS Key Dedicada para Secrets</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# KMS Key para encriptar segredos da aplicação
+# ═══════════════════════════════════════════════════════════════
+resource "aws_kms_key" "secrets" {
+  description             = "KMS key para segredos do ${var.project}"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true  # Rotação anual automática da key material
+
+  # Policy da key — quem pode usar e administrar
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootAccountFullAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowAppRolesToDecrypt"
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            aws_iam_role.ec2_app.arn,
+            aws_iam_role.lambda_execution.arn,
+            aws_iam_role.ecs_task_execution.arn
+          ]
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-secrets-key"
+  })
+}
+
+resource "aws_kms_alias" "secrets" {
+  name          = "alias/${local.name_prefix}-secrets"
+  target_key_id = aws_kms_key.secrets.key_id
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 10: OUTPUTS SENSÍVEIS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Outputs</span>
+          <h2>10. Outputs Sensíveis</h2>
+          <p>Outputs no Terraform expõem valores para uso externo (outros módulos, CI/CD, humanos). Quando o valor é sensível, precisamos de cuidados extras para não vazar informações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.1 sensitive = true em Outputs</h3>
+          <p>Assim como variáveis, outputs podem ser marcados como sensíveis. Isso oculta o valor no terminal mas mantém disponível programaticamente:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Outputs Sensíveis — Definição e Acesso</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# outputs.tf — Outputs do módulo de banco de dados
+# ═══════════════════════════════════════════════════════════════
+
+# Output NÃO sensível — endpoint do banco (host:port)
+output "db_endpoint" {
+  description = "Endpoint do RDS PostgreSQL (host:port)"
+  value       = aws_db_instance.main.endpoint
+}
+
+# Output NÃO sensível — apenas o hostname
+output "db_host" {
+  description = "Hostname do RDS (sem porta)"
+  value       = aws_db_instance.main.address
+}
+
+# Output SENSÍVEL — connection string completa
+output "db_connection_string" {
+  description = "Connection string completa (contém senha)"
+  value       = "postgresql://${aws_db_instance.main.username}:${var.db_password}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}"
+  sensitive   = true  # ← Oculto no terminal!
+}
+
+# Output SENSÍVEL — ARN do secret (pode ser usado por outros módulos)
+output "db_secret_arn" {
+  description = "ARN do secret com credenciais do banco"
+  value       = aws_secretsmanager_secret.db_credentials.arn
+  # Este não precisa ser sensitive pois é apenas um ARN (identificador)
+  # Mas se preferir cautela extra:
+  # sensitive = true
+}
+
+# Output SENSÍVEL — senha master
+output "db_master_password" {
+  description = "Senha master do banco (apenas para referência interna)"
+  value       = var.db_password
+  sensitive   = true
+}
+
+# ═══════════════════════════════════════════════════════════════
+# O QUE ACONTECE NO TERMINAL:
+# ═══════════════════════════════════════════════════════════════
+#
+# $ terraform output
+# db_endpoint          = "myapp-prod-postgres.xxxx.us-east-1.rds.amazonaws.com:5432"
+# db_host              = "myapp-prod-postgres.xxxx.us-east-1.rds.amazonaws.com"
+# db_connection_string = &lt;sensitive&gt;   ← Oculto!
+# db_master_password   = &lt;sensitive&gt;   ← Oculto!
+# db_secret_arn        = "arn:aws:secretsmanager:us-east-1:123456:secret:myapp-prod/db/credentials-AbC123"
+#
+# ═══════════════════════════════════════════════════════════════
+# COMO ACESSAR VALORES SENSÍVEIS:
+# ═══════════════════════════════════════════════════════════════
+#
+# Opção 1: terraform output com -raw (mostra valor individual)
+# $ terraform output -raw db_connection_string
+# postgresql://admin:SenhaForte@host:5432/app_database
+#
+# Opção 2: terraform output -json (formato JSON, inclui sensíveis)
+# $ terraform output -json | jq -r '.db_connection_string.value'
+#
+# Opção 3: Em CI/CD, redirecionar para variável de ambiente
+# $ export DB_URL=$(terraform output -raw db_connection_string)
+#
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.2 Passando Outputs Sensíveis entre Módulos</h3>
+          <p>Quando módulos precisam compartilhar valores sensíveis, a cadeia de <code>sensitive</code> deve ser mantida em cada nível:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Propagação de Sensitive entre Módulos</code><span class="cmd-tag">Módulos</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# MÓDULO: modules/database/outputs.tf
+# ═══════════════════════════════════════════════════════════════
+output "connection_string" {
+  description = "Connection string do banco"
+  value       = "postgresql://${var.username}:${var.password}@${aws_db_instance.main.endpoint}/${var.db_name}"
+  sensitive   = true  # Marcar como sensível no módulo filho
+}
+
+output "secret_arn" {
+  description = "ARN do secret no Secrets Manager"
+  value       = aws_secretsmanager_secret.credentials.arn
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ROOT: main.tf — Usando o módulo
+# ═══════════════════════════════════════════════════════════════
+module "database" {
+  source = "./modules/database"
+
+  environment = var.environment
+  project     = var.project
+  username    = "app_admin"
+  password    = var.db_password  # Variable sensitive → módulo
+  db_name     = "app_database"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ROOT: Passando para outro módulo
+# ═══════════════════════════════════════════════════════════════
+module "application" {
+  source = "./modules/application"
+
+  # Output sensível do módulo database → input do módulo application
+  db_connection_string = module.database.connection_string
+  db_secret_arn        = module.database.secret_arn
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ROOT: outputs.tf — Expondo para fora
+# ═══════════════════════════════════════════════════════════════
+output "database_endpoint" {
+  description = "Endpoint do banco (não sensível)"
+  value       = module.database.endpoint  # Sem senha = ok
+}
+
+output "database_connection" {
+  description = "Connection string (sensível)"
+  value       = module.database.connection_string
+  sensitive   = true  # DEVE manter sensitive ao propagar!
+}
+
+# ═══════════════════════════════════════════════════════════════
+# REGRA: Se um output do módulo filho é sensitive,
+# qualquer output do root que use esse valor TAMBÉM deve ser
+# sensitive. Terraform EXIGE isso — dá erro se não marcar!
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.3 Padrão Recomendado: Passar ARN em vez de Valor</h3>
+          <p>Em vez de passar senhas entre módulos, passe o <strong>ARN do secret</strong>. A aplicação busca o valor em runtime:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Padrão ARN — Mais Seguro que Passar Valores</code><span class="cmd-tag">Boas Práticas</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ❌ EVITAR: Passar a senha como string entre módulos
+# (valor fica no state de TODOS os módulos que tocam nela)
+# ═══════════════════════════════════════════════════════════════
+module "app" {
+  db_password = var.db_password  # Valor em plain text no state
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ✅ PREFERIR: Passar o ARN do secret — app busca em runtime
+# (valor NÃO fica no Terraform state — apenas o identificador)
+# ═══════════════════════════════════════════════════════════════
+module "app" {
+  db_secret_arn = module.database.secret_arn  # Apenas o ARN (referência)
+}
+
+# No módulo de aplicação, o ECS/Lambda usa o ARN para buscar:
+resource "aws_ecs_task_definition" "app" {
+  container_definitions = jsonencode([{
+    secrets = [{
+      name      = "DB_PASSWORD"
+      valueFrom = "${var.db_secret_arn}:password::"  # Busca em runtime!
+    }]
+  }])
+}
+
+# VANTAGENS:
+# 1. Senha NÃO está no Terraform state
+# 2. Rotação funciona automaticamente (app sempre busca a versão atual)
+# 3. Audit trail: CloudTrail registra cada acesso ao secret
+# 4. Granularidade: IAM controla quem pode ler o secret</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>📋 Resumo — Hierarquia de Segurança para Segredos:</strong>
+            <ol>
+              <li><strong>Melhor:</strong> <code>manage_master_user_password = true</code> (AWS gerencia tudo)</li>
+              <li><strong>Muito bom:</strong> Secrets Manager + rotação + KMS dedicada</li>
+              <li><strong>Bom:</strong> SSM Parameter Store SecureString + IAM restritivo</li>
+              <li><strong>Aceitável:</strong> Variable sensitive + TF_VAR_ em CI/CD + state encriptado</li>
+              <li><strong>Inaceitável:</strong> Hardcode no código ou .tfvars versionado</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 11: EXERCÍCIOS PRÁTICOS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Prática</span>
+          <h2>11. Exercícios Práticos</h2>
+          <p>Coloque em prática tudo que aprendeu neste módulo. Cada exercício constrói sobre o anterior, formando uma infraestrutura completa com IAM, RDS e gerenciamento de segredos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — IAM Roles e Policies para Lambda</h3>
+          <p><strong>Objetivo:</strong> Criar uma IAM Role completa para uma Lambda que lê de um bucket S3 específico, escreve em uma tabela DynamoDB e gera logs no CloudWatch. Seguir o princípio de menor privilégio.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>IAM Role com trust policy para Lambda</li>
+            <li>Policy customizada (não usar AWS-managed) com 3 statements separados</li>
+            <li>Cada statement com Sid descritivo</li>
+            <li>Resources específicos (não usar <code>*</code>)</li>
+            <li>Attachment da policy à role</li>
+            <li>Locals com tags e name_prefix</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>iam-lambda.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# Exercício 1 — IAM Role e Policy para Lambda
+# ═══════════════════════════════════════════════════════════════
+
+# Locals
+locals {
+  name_prefix = "${var.project}-${var.environment}"
+  account_id  = data.aws_caller_identity.current.account_id
+  region      = data.aws_region.current.name
+
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+}
+
+# Data sources
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+# ─── IAM Role ──────────────────────────────────────────────────
+resource "aws_iam_role" "lambda_processor" {
+  name = "${local.name_prefix}-lambda-processor"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "AllowLambdaServiceAssume"
+      Effect    = "Allow"
+      Principal = { Service = "lambda.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-lambda-processor"
+  })
+}
+
+# ─── IAM Policy (customizada, least privilege) ─────────────────
+resource "aws_iam_policy" "lambda_processor" {
+  name        = "${local.name_prefix}-lambda-processor-policy"
+  description = "Permite Lambda: logs, S3 read, DynamoDB write"
+  path        = "/app/${var.environment}/"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "CloudWatchLogsAccess"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${local.name_prefix}-processor",
+          "arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/${local.name_prefix}-processor:*"
+        ]
+      },
+      {
+        Sid    = "S3ReadFromUploadsBucket"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:HeadObject"
+        ]
+        Resource = "arn:aws:s3:::${local.name_prefix}-uploads/*"
+      },
+      {
+        Sid    = "DynamoDBWriteToRecordsTable"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:BatchWriteItem"
+        ]
+        Resource = "arn:aws:dynamodb:${local.region}:${local.account_id}:table/${local.name_prefix}-records"
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+# ─── Attachment ────────────────────────────────────────────────
+resource "aws_iam_role_policy_attachment" "lambda_processor" {
+  role       = aws_iam_role.lambda_processor.name
+  policy_arn = aws_iam_policy.lambda_processor.arn
+}
+
+# ─── Outputs ──────────────────────────────────────────────────
+output "lambda_role_arn" {
+  description = "ARN da IAM Role da Lambda"
+  value       = aws_iam_role.lambda_processor.arn
+}
+
+output "lambda_role_name" {
+  description = "Nome da IAM Role da Lambda"
+  value       = aws_iam_role.lambda_processor.name
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — RDS PostgreSQL Completo</h3>
+          <p><strong>Objetivo:</strong> Criar uma instância RDS PostgreSQL production-ready com todas as boas práticas: subnet group, parameter group, security group cross-reference, backups, monitoring e encryption.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>DB Subnet Group com 2 subnets privadas em AZs diferentes</li>
+            <li>Parameter Group com SSL forçado e log de queries lentas</li>
+            <li>Security Group que aceita conexão APENAS do SG da aplicação</li>
+            <li>RDS com Multi-AZ condicional (baseado no ambiente)</li>
+            <li>Storage gp3 com auto-scaling</li>
+            <li>Enhanced Monitoring habilitado</li>
+            <li><code>manage_master_user_password = true</code></li>
+            <li>deletion_protection em produção</li>
+            <li>prevent_destroy lifecycle</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>rds.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# Exercício 2 — RDS PostgreSQL Production-Ready
+# ═══════════════════════════════════════════════════════════════
+
+locals {
+  is_production     = var.environment == "prod"
+  db_instance_class = local.is_production ? "db.r6g.large" : "db.t3.small"
+  db_multi_az       = local.is_production
+  db_backup_days    = local.is_production ? 35 : 7
+}
+
+# ─── Subnets Privadas para DB ─────────────────────────────────
+resource "aws_subnet" "database" {
+  count             = 2
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 200)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-${count.index + 1}"
+    Tier = "database"
+  })
+}
+
+# ─── DB Subnet Group ──────────────────────────────────────────
+resource "aws_db_subnet_group" "main" {
+  name        = "${local.name_prefix}-db-subnets"
+  description = "Subnets privadas para RDS"
+  subnet_ids  = aws_subnet.database[*].id
+  tags        = merge(local.common_tags, { Name = "${local.name_prefix}-db-subnets" })
+}
+
+# ─── Parameter Group ──────────────────────────────────────────
+resource "aws_db_parameter_group" "postgres" {
+  name   = "${local.name_prefix}-pg16"
+  family = "postgres16"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"
+  }
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "1000"
+  }
+
+  parameter {
+    name  = "shared_preload_libraries"
+    value = "pg_stat_statements"
+  }
+
+  parameter {
+    name  = "idle_in_transaction_session_timeout"
+    value = "60000"
+  }
+
+  tags = local.common_tags
+  lifecycle { create_before_destroy = true }
+}
+
+# ─── Security Group ───────────────────────────────────────────
+resource "aws_security_group" "database" {
+  name_prefix = "${local.name_prefix}-db-"
+  description = "RDS - apenas conexoes da app"
+  vpc_id      = aws_vpc.main.id
+  tags        = merge(local.common_tags, { Name = "${local.name_prefix}-db-sg" })
+  lifecycle { create_before_destroy = true }
+}
+
+resource "aws_security_group_rule" "db_ingress_app" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  description              = "PostgreSQL from app tier"
+  security_group_id        = aws_security_group.database.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+# ─── IAM Role para Enhanced Monitoring ─────────────────────────
+resource "aws_iam_role" "rds_monitoring" {
+  name = "${local.name_prefix}-rds-monitoring"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "monitoring.rds.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "rds_monitoring" {
+  role       = aws_iam_role.rds_monitoring.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+}
+
+# ─── RDS Instance ─────────────────────────────────────────────
+resource "aws_db_instance" "main" {
+  identifier     = "${local.name_prefix}-postgres"
+  engine         = "postgres"
+  engine_version = "16.4"
+  instance_class = local.db_instance_class
+
+  db_name  = "app_database"
+  username = "app_admin"
+  manage_master_user_password = true
+
+  allocated_storage     = 50
+  max_allocated_storage = 200
+  storage_type          = "gp3"
+  storage_encrypted     = true
+
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.database.id]
+  publicly_accessible    = false
+  multi_az               = local.db_multi_az
+  port                   = 5432
+
+  parameter_group_name = aws_db_parameter_group.postgres.name
+
+  backup_retention_period  = local.db_backup_days
+  backup_window            = "03:00-04:00"
+  maintenance_window       = "Sun:04:00-Sun:05:00"
+  copy_tags_to_snapshot    = true
+  skip_final_snapshot      = false
+  final_snapshot_identifier = "${local.name_prefix}-final"
+  deletion_protection      = local.is_production
+
+  monitoring_interval          = 60
+  monitoring_role_arn          = aws_iam_role.rds_monitoring.arn
+  performance_insights_enabled = true
+
+  auto_minor_version_upgrade  = true
+  allow_major_version_upgrade = false
+
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  tags = merge(local.common_tags, {
+    Name   = "${local.name_prefix}-postgres"
+    Engine = "postgresql-16"
+  })
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [engine_version]
+  }
+}
+
+# ─── Outputs ──────────────────────────────────────────────────
+output "rds_endpoint" {
+  value = aws_db_instance.main.endpoint
+}
+
+output "rds_address" {
+  value = aws_db_instance.main.address
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — Secrets Manager + KMS</h3>
+          <p><strong>Objetivo:</strong> Criar uma infraestrutura completa de gerenciamento de segredos: KMS key dedicada, secrets no Secrets Manager, e configurar a aplicação (ECS) para consumir os secrets em runtime.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>KMS Key dedicada com policy restritiva</li>
+            <li>Secret no Secrets Manager para credenciais do banco (formato JSON)</li>
+            <li>Secret para API keys externas</li>
+            <li>ECS Task Definition que referencia os secrets por ARN</li>
+            <li>IAM policy para ECS Task Execution Role ler os secrets</li>
+            <li>Output do ARN do secret (não-sensível) e connection string (sensível)</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>secrets.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# Exercício 3 — Secrets Manager + KMS + ECS
+# ═══════════════════════════════════════════════════════════════
+
+# ─── KMS Key para Secrets ──────────────────────────────────────
+resource "aws_kms_key" "secrets" {
+  description             = "Encriptação de segredos - ${var.project}"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "RootAccess"
+        Effect    = "Allow"
+        Principal = { AWS = "arn:aws:iam::${local.account_id}:root" }
+        Action    = "kms:*"
+        Resource  = "*"
+      },
+      {
+        Sid       = "ECSDecryptAccess"
+        Effect    = "Allow"
+        Principal = { AWS = aws_iam_role.ecs_task_execution.arn }
+        Action    = ["kms:Decrypt", "kms:DescribeKey"]
+        Resource  = "*"
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, { Name = "${local.name_prefix}-secrets-kms" })
+}
+
+resource "aws_kms_alias" "secrets" {
+  name          = "alias/${local.name_prefix}-secrets"
+  target_key_id = aws_kms_key.secrets.key_id
+}
+
+# ─── Secret: Credenciais do Banco ──────────────────────────────
+resource "aws_secretsmanager_secret" "db_credentials" {
+  name                    = "${local.name_prefix}/db/credentials"
+  description             = "Credenciais master do PostgreSQL"
+  kms_key_id              = aws_kms_key.secrets.arn
+  recovery_window_in_days = local.is_production ? 30 : 7
+  tags                    = merge(local.common_tags, { Name = "${local.name_prefix}/db/credentials" })
+}
+
+resource "aws_secretsmanager_secret_version" "db_credentials" {
+  secret_id = aws_secretsmanager_secret.db_credentials.id
+  secret_string = jsonencode({
+    username = aws_db_instance.main.username
+    password = var.db_password
+    host     = aws_db_instance.main.address
+    port     = aws_db_instance.main.port
+    dbname   = aws_db_instance.main.db_name
+    engine   = "postgres"
+  })
+}
+
+# ─── Secret: API Keys Externas ─────────────────────────────────
+resource "aws_secretsmanager_secret" "api_keys" {
+  name                    = "${local.name_prefix}/api/keys"
+  description             = "API keys de servicos externos"
+  kms_key_id              = aws_kms_key.secrets.arn
+  recovery_window_in_days = 14
+  tags                    = merge(local.common_tags, { Name = "${local.name_prefix}/api/keys" })
+}
+
+resource "aws_secretsmanager_secret_version" "api_keys" {
+  secret_id = aws_secretsmanager_secret.api_keys.id
+  secret_string = jsonencode({
+    stripe_key  = var.stripe_secret_key
+    sendgrid_key = var.sendgrid_api_key
+  })
+}
+
+# ─── IAM Policy para ECS ler Secrets ──────────────────────────
+resource "aws_iam_policy" "ecs_read_secrets" {
+  name = "${local.name_prefix}-ecs-read-secrets"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ReadSecrets"
+        Effect = "Allow"
+        Action = ["secretsmanager:GetSecretValue"]
+        Resource = [
+          aws_secretsmanager_secret.db_credentials.arn,
+          aws_secretsmanager_secret.api_keys.arn
+        ]
+      },
+      {
+        Sid    = "DecryptWithKMS"
+        Effect = "Allow"
+        Action = ["kms:Decrypt"]
+        Resource = [aws_kms_key.secrets.arn]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_read_secrets" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = aws_iam_policy.ecs_read_secrets.arn
+}
+
+# ─── ECS Task Definition com Secrets ──────────────────────────
+resource "aws_ecs_task_definition" "app" {
+  family                   = "${local.name_prefix}-app"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 256
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([{
+    name  = "app"
+    image = "${local.account_id}.dkr.ecr.${local.region}.amazonaws.com/${local.name_prefix}-app:latest"
+    portMappings = [{ containerPort = 8080, protocol = "tcp" }]
+
+    secrets = [
+      { name = "DB_HOST", valueFrom = "${aws_secretsmanager_secret.db_credentials.arn}:host::" },
+      { name = "DB_PASSWORD", valueFrom = "${aws_secretsmanager_secret.db_credentials.arn}:password::" },
+      { name = "DB_USER", valueFrom = "${aws_secretsmanager_secret.db_credentials.arn}:username::" },
+      { name = "STRIPE_KEY", valueFrom = "${aws_secretsmanager_secret.api_keys.arn}:stripe_key::" }
+    ]
+
+    environment = [
+      { name = "APP_ENV", value = var.environment },
+      { name = "DB_PORT", value = "5432" },
+      { name = "DB_NAME", value = "app_database" }
+    ]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = "/ecs/${local.name_prefix}-app"
+        "awslogs-region"        = local.region
+        "awslogs-stream-prefix" = "app"
+      }
+    }
+  }])
+
+  tags = local.common_tags
+}
+
+# ─── Outputs ──────────────────────────────────────────────────
+output "db_secret_arn" {
+  description = "ARN do secret de credenciais do banco"
+  value       = aws_secretsmanager_secret.db_credentials.arn
+}
+
+output "api_keys_secret_arn" {
+  description = "ARN do secret de API keys"
+  value       = aws_secretsmanager_secret.api_keys.arn
+}
+
+output "kms_key_arn" {
+  description = "ARN da KMS key de secrets"
+  value       = aws_kms_key.secrets.arn
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — GitHub Actions OIDC + Deploy Seguro</h3>
+          <p><strong>Objetivo:</strong> Configurar acesso OIDC para GitHub Actions deploy em S3 + CloudFront invalidation, sem usar access keys estáticas. Implementar restrição por repositório e branch.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>OIDC Provider para GitHub Actions</li>
+            <li>IAM Role com trust policy restritiva (org, repo, branch main apenas)</li>
+            <li>Policy com permissões mínimas: S3 PutObject/DeleteObject e CloudFront CreateInvalidation</li>
+            <li>Conditions usando StringEquals e StringLike</li>
+            <li>Output do Role ARN para uso no workflow YAML</li>
+            <li>Exemplo de workflow GitHub Actions que usa a role</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>github-oidc.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# Exercício 4 — GitHub Actions OIDC
+# ═══════════════════════════════════════════════════════════════
+
+variable "github_org" {
+  description = "Organização ou usuário GitHub"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "Nome do repositório"
+  type        = string
+}
+
+# ─── OIDC Provider ─────────────────────────────────────────────
+resource "aws_iam_openid_connect_provider" "github" {
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+
+  tags = merge(local.common_tags, { Name = "github-actions-oidc" })
+}
+
+# ─── IAM Role para GitHub Actions ─────────────────────────────
+resource "aws_iam_role" "github_actions" {
+  name = "${local.name_prefix}-github-actions-deploy"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "AllowGitHubOIDC"
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.github.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        }
+        StringLike = {
+          # SOMENTE branch main do repositório específico
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main"
+        }
+      }
+    }]
+  })
+
+  # Limitar duração da sessão (máximo 1 hora para deploy)
+  max_session_duration = 3600
+
+  tags = merge(local.common_tags, {
+    Name    = "${local.name_prefix}-github-deploy"
+    Purpose = "CI/CD"
+  })
+}
+
+# ─── Deploy Policy ─────────────────────────────────────────────
+resource "aws_iam_policy" "github_deploy" {
+  name        = "${local.name_prefix}-github-deploy-policy"
+  description = "Permite deploy de site estático via GitHub Actions"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3SiteDeployment"
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${local.name_prefix}-site",
+          "arn:aws:s3:::${local.name_prefix}-site/*"
+        ]
+      },
+      {
+        Sid    = "CloudFrontInvalidation"
+        Effect = "Allow"
+        Action = ["cloudfront:CreateInvalidation"]
+        Resource = "arn:aws:cloudfront::${local.account_id}:distribution/*"
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "github_deploy" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.github_deploy.arn
+}
+
+# ─── Output para uso no workflow ───────────────────────────────
+output "github_actions_role_arn" {
+  description = "ARN da role para configurar no GitHub Actions workflow"
+  value       = aws_iam_role.github_actions.arn
+}
+
+# ═══════════════════════════════════════════════════════════════
+# EXEMPLO de .github/workflows/deploy.yml:
+# ═══════════════════════════════════════════════════════════════
+#
+# name: Deploy Site
+# on:
+#   push:
+#     branches: [main]
+#
+# permissions:
+#   id-token: write   # Necessário para OIDC
+#   contents: read
+#
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           role-to-assume: arn:aws:iam::123456789012:role/myapp-prod-github-actions-deploy
+#           aws-region: us-east-1
+#
+#       - name: Deploy to S3
+#         run: aws s3 sync ./build s3://myapp-prod-site --delete
+#
+#       - name: Invalidate CloudFront
+#         run: |
+#           aws cloudfront create-invalidation \
+#             --distribution-id ${{ secrets.CF_DISTRIBUTION_ID }} \
+#             --paths "/*"
+# ═══════════════════════════════════════════════════════════════</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CTA — PRÓXIMO MÓDULO
+         ═══════════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🏗️ Próximo passo</span>
+          <h2>Pronto para S3, Remote State e Módulos?</h2>
+          <p>No Módulo 04 você aprenderá a criar buckets S3 com políticas avançadas, configurar Remote State para trabalho em equipe e organizar código em módulos reutilizáveis — a chave para infraestrutura escalável e manutenível.</p>
+        </div>
+        <a href="modulo-04.html" class="button primary">Ir para Módulo 04 →</a>
       </div>
     </section>
   </main>
@@ -343,7 +3397,7 @@ output "db_name" {
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

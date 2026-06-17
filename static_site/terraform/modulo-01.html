@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Terraform Módulo 01: VPC Completa</title>
+  <title>CloudTrilhas — Terraform Módulo 01: Fundamentos e VPC Completa</title>
+  <meta name="description" content="Guia completo sobre Terraform: IaC, HCL, providers, variáveis e criação de VPC completa na AWS com subnets, gateways e route tables." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../linux-training.css" />
 </head>
@@ -19,20 +20,16 @@
         <a href="../terraform.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -40,255 +37,3196 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🏗️ Terraform — Módulo 01</span>
-        <h1>VPC Completa</h1>
-        <p>Crie uma VPC completa na AWS com subnets públicas e privadas, Internet Gateway, NAT Gateway e Route Tables. Aprenda a estrutura de arquivos Terraform e os comandos essenciais.</p>
+        <h1>Fundamentos e VPC Completa</h1>
+        <p>Domine os fundamentos do Terraform desde a instalação até a criação de uma VPC completa na AWS. Aprenda Infrastructure as Code de forma prática, entendendo cada conceito com analogias, diagramas e exemplos reais de produção.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node active"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>EC2 &amp; SG</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>RDS &amp; IAM</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>S3 &amp; State</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 1: O QUE É TERRAFORM?
+         ═══════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Conceitos Fundamentais</span>
+          <h2>1. O que é Terraform?</h2>
+          <p>Entenda Infrastructure as Code (IaC), por que o Terraform se tornou o padrão da indústria e como ele se compara com outras ferramentas do mercado.</p>
+        </div>
 
-        <!-- Estrutura de Arquivos Terraform -->
         <div class="topic-block">
-          <h2>Estrutura de Arquivos Terraform</h2>
-          <p>Um projeto Terraform bem organizado separa responsabilidades em arquivos distintos. Essa convenção facilita a manutenção e colaboração em equipe.</p>
+          <h3>1.1 Infrastructure as Code (IaC) — A Revolução</h3>
+          <p>Antes da IaC, engenheiros configuravam servidores manualmente — clicando em consoles web, rodando comandos SSH um a um, documentando passos em wikis que ficavam desatualizadas em semanas. Esse processo era lento, propenso a erros e impossível de reproduzir de forma consistente.</p>
+          <p><strong>Infrastructure as Code</strong> é o paradigma onde toda a infraestrutura é descrita em arquivos de código versionáveis, auditáveis e reproduzíveis. Assim como você versiona código da aplicação no Git, a infraestrutura também vive em repositórios.</p>
+
+          <div class="info-box highlight">
+            <strong>🏗️ Analogia — A Planta do Edifício:</strong>
+            <p>Imagine construir um prédio de 20 andares sem planta arquitetônica. Cada pedreiro faria do seu jeito, não haveria padrão, e se o prédio precisasse ser reconstruído em outro terreno, seria impossível replicá-lo. O Terraform é a <em>planta arquitetônica</em> da sua infraestrutura — descreve exatamente o que deve existir, onde, e como os componentes se conectam.</p>
+          </div>
+
+          <h4>Benefícios Concretos da IaC:</h4>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Manual (Console/CLI)</th>
+                <th>Infrastructure as Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Reprodutibilidade</td><td>❌ Depende de documentação</td><td>✅ 100% reproduzível</td></tr>
+              <tr><td>Versionamento</td><td>❌ Sem histórico</td><td>✅ Git com diff e blame</td></tr>
+              <tr><td>Code Review</td><td>❌ Impossível</td><td>✅ Pull Requests</td></tr>
+              <tr><td>Velocidade</td><td>❌ Minutos/horas por recurso</td><td>✅ Centenas de recursos em minutos</td></tr>
+              <tr><td>Consistência</td><td>❌ Drift inevitável</td><td>✅ Estado desejado garantido</td></tr>
+              <tr><td>Disaster Recovery</td><td>❌ Reconstrução manual</td><td>✅ terraform apply e pronto</td></tr>
+              <tr><td>Colaboração</td><td>❌ "Quem mexeu nisso?"</td><td>✅ Commits com autor e motivo</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 O que é Terraform Especificamente?</h3>
+          <p>Terraform é uma ferramenta de IaC open-source criada pela <strong>HashiCorp</strong> em 2014. Escrita em Go, ela permite provisionar e gerenciar infraestrutura em qualquer cloud (AWS, Azure, GCP) e centenas de outros serviços (GitHub, Datadog, Kubernetes, etc.) usando uma linguagem declarativa chamada <strong>HCL</strong> (HashiCorp Configuration Language).</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Conceito Central</code><span class="cmd-tag">Declarativo</span></div>
+              <pre><code># Você declara O QUE quer — não COMO fazer
+# Terraform calcula os passos necessários automaticamente
+
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {
+    Name        = "vpc-producao"
+    Environment = "production"
+    ManagedBy   = "terraform"
+  }
+}
+
+# Resultado: Terraform verifica o estado atual,
+# compara com o desejado, e executa apenas as mudanças necessárias</code></pre>
+            </div>
+          </div>
+
+          <h4>Características Principais:</h4>
+          <ul>
+            <li><strong>Multi-Cloud:</strong> Um único workflow para AWS, Azure, GCP, e 3000+ providers</li>
+            <li><strong>Declarativo:</strong> Descreva o estado final desejado, não os passos</li>
+            <li><strong>Idempotente:</strong> Rodar múltiplas vezes produz o mesmo resultado</li>
+            <li><strong>Plano de Execução:</strong> Mostra exatamente o que será alterado antes de aplicar</li>
+            <li><strong>Grafo de Dependências:</strong> Entende a ordem de criação/destruição automaticamente</li>
+            <li><strong>State Management:</strong> Mantém um mapa entre código e recursos reais</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 Declarativo vs Imperativo</h3>
+          <p>Essa distinção é fundamental para entender por que o Terraform funciona da forma que funciona.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Imperativo (Ansible, Scripts)</th>
+                <th>Declarativo (Terraform, CloudFormation)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Você descreve</td><td>OS PASSOS para chegar ao resultado</td><td>O RESULTADO final desejado</td></tr>
+              <tr><td>Analogia</td><td>"Vire à direita, ande 200m, vire à esquerda..."</td><td>"Quero estar no restaurante X"</td></tr>
+              <tr><td>Idempotência</td><td>Você precisa implementar</td><td>Built-in (automática)</td></tr>
+              <tr><td>Drift Detection</td><td>Difícil</td><td>Nativo (plan mostra diferenças)</td></tr>
+              <tr><td>Exemplo</td><td>"Crie a VPC, depois crie a subnet..."</td><td>"Deve existir uma VPC com esta subnet"</td></tr>
+            </tbody>
+          </table>
+
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>File Tree</code><span class="cmd-tag">Estrutura</span></div>
-              <pre><code>vpc-project/
-├── main.tf            # Recursos principais (VPC, subnets, gateways)
-├── variables.tf       # Declaração de variáveis de entrada
-├── outputs.tf         # Valores de saída após apply
-├── providers.tf       # Configuração do provider AWS
-└── terraform.tfvars   # Valores das variáveis (não commitar secrets)</code></pre>
+              <div class="command-header"><code>Imperativo (Shell Script)</code><span class="cmd-tag">Passos</span></div>
+              <pre><code># Precisa verificar se já existe
+# Precisa tratar erros em cada passo
+# Rodar 2x pode causar duplicação
+
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+aws ec2 create-subnet --vpc-id $VPC_ID \
+  --cidr-block 10.0.1.0/24
+aws ec2 create-internet-gateway
+aws ec2 attach-internet-gateway \
+  --vpc-id $VPC_ID --igw-id $IGW_ID</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Responsabilidades</code><span class="cmd-tag">Convenção</span></div>
-              <table class="styled-table">
-                <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
-                <tbody>
-                  <tr><td><strong>main.tf</strong></td><td>Recursos de infraestrutura (resource blocks)</td></tr>
-                  <tr><td><strong>variables.tf</strong></td><td>Inputs do módulo com tipo, descrição e default</td></tr>
-                  <tr><td><strong>outputs.tf</strong></td><td>Valores exportados para uso externo ou referência</td></tr>
-                  <tr><td><strong>providers.tf</strong></td><td>Provider, versão do Terraform e backend</td></tr>
-                  <tr><td><strong>terraform.tfvars</strong></td><td>Valores concretos das variáveis para o ambiente</td></tr>
-                </tbody>
-              </table>
+              <div class="command-header"><code>Declarativo (Terraform)</code><span class="cmd-tag">Estado</span></div>
+              <pre><code># Descreve o resultado final
+# Terraform calcula o que precisa fazer
+# Rodar 2x = "No changes needed"
+
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+resource "aws_subnet" "public" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+}
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+}</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Provider AWS -->
         <div class="topic-block">
-          <h2>Provider AWS</h2>
-          <p>O bloco <code>terraform</code> define a versão mínima e os providers necessários. O bloco <code>provider</code> configura a região e credenciais.</p>
+          <h3>1.4 Terraform vs Outras Ferramentas</h3>
+          <p>O mercado de IaC é rico em opções. Cada ferramenta tem seus pontos fortes. Entender as diferenças ajuda a justificar a escolha do Terraform.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Critério</th>
+                <th>Terraform</th>
+                <th>CloudFormation</th>
+                <th>Pulumi</th>
+                <th>Ansible</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Tipo</td><td>Declarativo</td><td>Declarativo</td><td>Imperativo/Declarativo</td><td>Imperativo</td></tr>
+              <tr><td>Multi-Cloud</td><td>✅ Nativo</td><td>❌ Só AWS</td><td>✅ Nativo</td><td>✅ Via módulos</td></tr>
+              <tr><td>Linguagem</td><td>HCL</td><td>JSON/YAML</td><td>Python/TS/Go/C#</td><td>YAML</td></tr>
+              <tr><td>State</td><td>Arquivo .tfstate</td><td>Gerenciado AWS</td><td>Pulumi Cloud/Self</td><td>Sem state</td></tr>
+              <tr><td>Plan/Preview</td><td>✅ terraform plan</td><td>⚠️ Change Sets</td><td>✅ pulumi preview</td><td>⚠️ --check mode</td></tr>
+              <tr><td>Curva de Aprendizado</td><td>Média</td><td>Alta (YAML verboso)</td><td>Depende da linguagem</td><td>Baixa</td></tr>
+              <tr><td>Comunidade</td><td>Enorme (40k+ stars)</td><td>Grande (AWS only)</td><td>Crescente</td><td>Enorme</td></tr>
+              <tr><td>Melhor Para</td><td>Infraestrutura multi-cloud</td><td>All-in AWS</td><td>Devs que preferem code</td><td>Config management</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💡 Por que escolher Terraform?</strong>
+            <ul>
+              <li><strong>Portabilidade:</strong> Se amanhã migrar de AWS para GCP, o workflow e a linguagem são os mesmos</li>
+              <li><strong>Ecossistema:</strong> 3000+ providers no Terraform Registry — desde AWS até PagerDuty</li>
+              <li><strong>Maturidade:</strong> 10+ anos de desenvolvimento, adoção massiva na indústria</li>
+              <li><strong>Plan:</strong> O comando <code>terraform plan</code> é o melhor "preview" do mercado</li>
+              <li><strong>Módulos:</strong> Reutilize infraestrutura como componentes — DRY para infra</li>
+            </ul>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Quando NÃO usar Terraform:</strong>
+            <ul>
+              <li>Configuração <em>dentro</em> de servidores (instalar pacotes, configurar apps) → Use <strong>Ansible</strong></li>
+              <li>Aplicação 100% AWS sem planos de multi-cloud e equipe já domina CF → <strong>CloudFormation</strong> pode bastar</li>
+              <li>Equipe de devs que não quer aprender HCL → Considere <strong>Pulumi</strong> (Python/TypeScript)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 Terraform — Open Source vs Enterprise</h3>
+          <p>A HashiCorp oferece diferentes versões do Terraform:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Terraform CLI (Open Source)</th>
+                <th>Terraform Cloud (Free Tier)</th>
+                <th>Terraform Enterprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Plan/Apply</td><td>✅ Local</td><td>✅ Remote</td><td>✅ Remote</td></tr>
+              <tr><td>State Management</td><td>Local ou backend S3</td><td>✅ Gerenciado</td><td>✅ Gerenciado</td></tr>
+              <tr><td>Colaboração</td><td>Via Git</td><td>✅ Workspaces</td><td>✅ + SSO/RBAC</td></tr>
+              <tr><td>Policy as Code</td><td>❌</td><td>⚠️ Limitado</td><td>✅ Sentinel</td></tr>
+              <tr><td>Private Registry</td><td>❌</td><td>✅</td><td>✅</td></tr>
+              <tr><td>Custo</td><td>Grátis</td><td>Grátis até 500 resources</td><td>$$$ Licença</td></tr>
+            </tbody>
+          </table>
+
+          <p>Neste curso, usaremos o <strong>Terraform CLI (open source)</strong> com state remoto no S3 — a abordagem mais comum em empresas de médio porte.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 2: COMO O TERRAFORM FUNCIONA
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Arquitetura Interna</span>
+          <h2>2. Como o Terraform Funciona</h2>
+          <p>Entenda a arquitetura interna do Terraform: providers, state file, o ciclo plan/apply e o grafo de dependências que torna tudo possível.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 Arquitetura do Terraform</h3>
+          <p>O Terraform possui uma arquitetura elegante baseada em três componentes principais:</p>
+
+          <div class="info-box highlight">
+            <strong>🔧 Arquitetura em Camadas:</strong>
+            <pre><code>
+┌─────────────────────────────────────────────────────────────┐
+│                    TERRAFORM CORE                             │
+│  (Binário Go — lê HCL, gera grafo, gerencia state)          │
+├─────────────────────────────────────────────────────────────┤
+│                    PROVIDER PLUGINS                           │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │   AWS    │  │  Azure   │  │   GCP    │  │  GitHub  │   │
+│  │ Provider │  │ Provider │  │ Provider │  │ Provider │   │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
+├───────┼──────────────┼──────────────┼──────────────┼────────┤
+│       ▼              ▼              ▼              ▼         │
+│              CLOUD PROVIDER APIs                              │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │ AWS API  │  │Azure API │  │ GCP API  │  │GitHub API│   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
+            </code></pre>
+          </div>
+
+          <h4>Componentes Explicados:</h4>
+          <ul>
+            <li><strong>Terraform Core:</strong> O binário principal. Lê arquivos .tf, constrói o grafo de dependências, gerencia o state e orquestra os providers. Não sabe nada sobre AWS ou Azure — delega tudo aos providers.</li>
+            <li><strong>Providers:</strong> Plugins que implementam a comunicação com APIs externas. O provider AWS, por exemplo, traduz <code>resource "aws_vpc"</code> em chamadas para a API EC2 da AWS.</li>
+            <li><strong>State File:</strong> Arquivo JSON que mapeia seus recursos declarados no código para os recursos reais existentes na cloud. É o "cérebro" do Terraform.</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 O State File — O GPS do Terraform</h3>
+          <p>O state é possivelmente o conceito mais importante (e mais incompreendido) do Terraform. Sem ele, o Terraform não saberia o que já existe na cloud.</p>
+
+          <div class="info-box highlight">
+            <strong>🗺️ Analogia — GPS do Projeto:</strong>
+            <p>Imagine que você está dirigindo para um destino (estado desejado). O state file é seu GPS — ele sabe exatamente onde você está agora (estado atual). O <code>terraform plan</code> é a rota calculada entre sua posição atual e o destino. Sem GPS, você não sabe onde está e não pode calcular o caminho.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>terraform.tfstate</code><span class="cmd-tag">Exemplo Simplificado</span></div>
+              <pre><code>{
+  "version": 4,
+  "terraform_version": "1.7.0",
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "vpc-0abc123def456789",
+            "cidr_block": "10.0.0.0/16",
+            "enable_dns_hostnames": true,
+            "tags": {
+              "Name": "vpc-producao"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ NUNCA faça isso com o State:</strong>
+            <ul>
+              <li>❌ Editar manualmente o arquivo .tfstate</li>
+              <li>❌ Deletar o state sem backup (você "perde" todos os recursos)</li>
+              <li>❌ Armazenar state apenas localmente em projetos com equipe</li>
+              <li>❌ Commitar o state no Git (pode conter secrets!)</li>
+              <li>✅ Use remote backend (S3 + DynamoDB) para projetos reais</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 O Ciclo de Vida: Init → Plan → Apply</h3>
+          <p>Todo workflow do Terraform segue um ciclo previsível de três etapas:</p>
+
+          <div class="info-box highlight">
+            <strong>🔄 Ciclo de Vida do Terraform:</strong>
+            <pre><code>
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│              │     │              │     │              │
+│  terraform   │────▶│  terraform   │────▶│  terraform   │
+│    init      │     │    plan      │     │    apply     │
+│              │     │              │     │              │
+└──────────────┘     └──────────────┘     └──────────────┘
+       │                    │                    │
+       ▼                    ▼                    ▼
+ • Baixa providers    • Lê .tf files      • Executa o plano
+ • Inicializa backend • Lê state atual    • Chama APIs cloud
+ • Baixa módulos      • Calcula diff      • Atualiza state
+ • Cria .terraform/   • Mostra mudanças   • Reporta resultado
+            </code></pre>
+          </div>
+
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>providers.tf</code><span class="cmd-tag">Configuração</span></div>
-              <pre><code>terraform {
-  required_version = ">= 1.5.0"
+              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicialização</span></div>
+              <pre><code># Primeira coisa a rodar em qualquer projeto
+# Idempotente — pode rodar várias vezes
 
+$ terraform init
+
+Initializing the backend...
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 5.0"...
+- Installing hashicorp/aws v5.31.0...
+- Installed hashicorp/aws v5.31.0
+
+Terraform has been successfully initialized!</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Preview</span></div>
+              <pre><code># Mostra EXATAMENTE o que será feito
+# NUNCA modifica nada — é seguro rodar
+
+$ terraform plan
+
+Terraform will perform the following actions:
+
+  # aws_vpc.main will be created
+  + resource "aws_vpc" "main" {
+      + cidr_block       = "10.0.0.0/16"
+      + id               = (known after apply)
+      + instance_tenancy = "default"
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Execução</span></div>
+              <pre><code># Executa as mudanças planejadas
+# Pede confirmação interativa (ou use -auto-approve em CI/CD)
+
+$ terraform apply
+
+Terraform will perform the following actions:
+  # aws_vpc.main will be created
+  + resource "aws_vpc" "main" { ... }
+
+Do you want to perform these actions?
+  Enter a value: yes
+
+aws_vpc.main: Creating...
+aws_vpc.main: Creation complete after 3s [id=vpc-0abc123def456789]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 Grafo de Dependências</h3>
+          <p>O Terraform constrói automaticamente um <strong>DAG</strong> (Directed Acyclic Graph) — um grafo direcionado sem ciclos — que determina a ordem de criação e destruição dos recursos.</p>
+
+          <div class="info-box highlight">
+            <strong>📊 Exemplo de Grafo de Dependências:</strong>
+            <pre><code>
+                    ┌─────────────┐
+                    │   aws_vpc   │
+                    │    main     │
+                    └──────┬──────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+      ┌──────────────┐ ┌──────────┐ ┌──────────────┐
+      │ aws_subnet   │ │ aws_igw  │ │ aws_subnet   │
+      │   public     │ │   main   │ │   private    │
+      └──────┬───────┘ └────┬─────┘ └──────┬───────┘
+              │              │              │
+              ▼              ▼              ▼
+      ┌──────────────┐ ┌──────────┐ ┌──────────────┐
+      │ aws_route    │ │aws_nat_gw│ │ aws_route    │
+      │ table_public │ │          │ │ table_private│
+      └──────────────┘ └──────────┘ └──────────────┘
+
+Ordem de CRIAÇÃO:  VPC → Subnets + IGW → Route Tables + NAT
+Ordem de DESTRUIÇÃO: inversa (NAT → Subnets → VPC)
+            </code></pre>
+          </div>
+
+          <p><strong>Referências implícitas</strong> criam dependências automáticas. Quando você escreve <code>vpc_id = aws_vpc.main.id</code>, o Terraform sabe que a subnet depende da VPC. Em casos raros onde não há referência direta, use <code>depends_on</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 3: INSTALAÇÃO E CONFIGURAÇÃO
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Setup do Ambiente</span>
+          <h2>3. Instalação e Configuração</h2>
+          <p>Instale o Terraform no seu sistema operacional, configure credenciais AWS e use tfenv para gerenciar múltiplas versões.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 Instalação no Linux (Ubuntu/Debian)</h3>
+          <p>A HashiCorp mantém repositórios APT oficiais para distribuições baseadas em Debian:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Instalação via APT (Recomendado)</code><span class="cmd-tag">Linux</span></div>
+              <pre><code># 1. Instalar dependências necessárias
+sudo apt-get update && sudo apt-get install -y \
+  gnupg \
+  software-properties-common \
+  curl
+
+# 2. Adicionar a chave GPG da HashiCorp
+curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+  sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+# 3. Adicionar o repositório oficial
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+  https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+  sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+# 4. Instalar o Terraform
+sudo apt-get update && sudo apt-get install terraform
+
+# 5. Verificar a instalação
+terraform -version
+# Terraform v1.7.x on linux_amd64</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 Instalação no macOS</h3>
+          <p>No macOS, a forma mais simples é via Homebrew:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Instalação via Homebrew</code><span class="cmd-tag">macOS</span></div>
+              <pre><code># Instalar Homebrew (se ainda não tiver)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Adicionar o tap da HashiCorp
+brew tap hashicorp/tap
+
+# Instalar Terraform
+brew install hashicorp/tap/terraform
+
+# Atualizar para versão mais recente
+brew upgrade hashicorp/tap/terraform
+
+# Verificar instalação
+terraform -version
+# Terraform v1.7.x on darwin_arm64</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 Instalação no Windows</h3>
+          <p>No Windows, recomendamos usar o <strong>Chocolatey</strong> ou download manual:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Via Chocolatey</code><span class="cmd-tag">Windows</span></div>
+              <pre><code># PowerShell como Administrador
+
+# Instalar via Chocolatey
+choco install terraform
+
+# Verificar instalação
+terraform -version
+
+# Atualizar
+choco upgrade terraform</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Download Manual</code><span class="cmd-tag">Windows</span></div>
+              <pre><code># 1. Baixe de: releases.hashicorp.com/terraform
+# 2. Extraia o .zip (contém terraform.exe)
+# 3. Mova para C:\tools\terraform\
+# 4. Adicione ao PATH:
+#    Sistema → Variáveis de Ambiente →
+#    Path → Novo → C:\tools\terraform\
+# 5. Abra novo terminal e teste:
+terraform -version</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 tfenv — Gerenciador de Versões</h3>
+          <p>Em projetos reais, diferentes repositórios podem exigir versões diferentes do Terraform. O <strong>tfenv</strong> resolve isso (similar ao nvm para Node.js ou pyenv para Python).</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Instalação e Uso do tfenv</code><span class="cmd-tag">Versões</span></div>
+              <pre><code># Instalar tfenv (Linux/macOS)
+git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Listar versões disponíveis
+tfenv list-remote
+
+# Instalar versão específica
+tfenv install 1.7.0
+tfenv install 1.6.6
+
+# Definir versão global (padrão)
+tfenv use 1.7.0
+
+# Definir versão por projeto (cria .terraform-version)
+echo "1.7.0" > .terraform-version
+
+# Listar versões instaladas
+tfenv list
+# * 1.7.0 (set by /home/user/projeto/.terraform-version)
+#   1.6.6
+
+# O tfenv lê .terraform-version automaticamente!
+# Ao entrar na pasta do projeto, usa a versão correta</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 Best Practice:</strong>
+            <p>Sempre inclua um arquivo <code>.terraform-version</code> na raiz do seu projeto. Isso garante que toda a equipe use a mesma versão, evitando incompatibilidades de state e syntax.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 Configurar Credenciais AWS</h3>
+          <p>O Terraform precisa de credenciais para se comunicar com a API da AWS. Existem várias formas de fornecê-las:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Configurar AWS CLI + Credenciais</code><span class="cmd-tag">Autenticação</span></div>
+              <pre><code># 1. Instalar AWS CLI v2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# 2. Configurar credenciais (NÃO use root account!)
+aws configure
+# AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
+# AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+# Default region name [None]: us-east-1
+# Default output format [None]: json
+
+# Isso cria dois arquivos:
+# ~/.aws/credentials  → chaves de acesso
+# ~/.aws/config       → região e formato padrão
+
+# 3. Verificar configuração
+aws sts get-caller-identity
+# {
+#   "UserId": "AIDAEXAMPLE",
+#   "Account": "123456789012",
+#   "Arn": "arn:aws:iam::123456789012:user/terraform-user"
+# }</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Segurança de Credenciais:</strong>
+            <ul>
+              <li>❌ NUNCA coloque access keys em arquivos .tf ou em código</li>
+              <li>❌ NUNCA commite credenciais no Git</li>
+              <li>✅ Use AWS CLI profiles ou variáveis de ambiente</li>
+              <li>✅ Em CI/CD, use OIDC (GitHub Actions) ou IAM Roles</li>
+              <li>✅ Para EC2/ECS, use Instance Profiles / Task Roles</li>
+              <li>✅ Crie um IAM user dedicado para Terraform com permissões mínimas</li>
+            </ul>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Via Variáveis de Ambiente</code><span class="cmd-tag">Alternativa</span></div>
+              <pre><code># Exportar credenciais temporárias
+export AWS_ACCESS_KEY_ID="AKIAEXAMPLE"
+export AWS_SECRET_ACCESS_KEY="secret"
+export AWS_DEFAULT_REGION="us-east-1"
+
+# Terraform detecta automaticamente
+terraform plan</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Via AWS Profile</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># ~/.aws/credentials
+[terraform-dev]
+aws_access_key_id = AKIAEXAMPLE
+aws_secret_access_key = secret
+
+# No provider Terraform:
+provider "aws" {
+  region  = "us-east-1"
+  profile = "terraform-dev"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 4: ESTRUTURA DE ARQUIVOS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Organização</span>
+          <h2>4. Estrutura de Arquivos</h2>
+          <p>Aprenda a convenção de nomes e organização de arquivos que a comunidade Terraform adota como padrão em projetos de produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 Convenção de Arquivos</h3>
+          <p>O Terraform lê <strong>todos</strong> os arquivos <code>.tf</code> de um diretório como se fossem um único arquivo. A separação em múltiplos arquivos é uma convenção para organização humana — o Terraform não se importa com nomes de arquivos.</p>
+
+          <div class="info-box highlight">
+            <strong>📁 Estrutura Padrão de Projeto Terraform:</strong>
+            <pre><code>
+terraform-vpc-project/
+├── .terraform-version      # Versão do Terraform (tfenv)
+├── .gitignore              # Ignorar .terraform/, *.tfstate, etc.
+├── README.md               # Documentação do projeto
+├── providers.tf            # Bloco terraform {} e provider {}
+├── variables.tf            # Declaração de TODAS as variáveis
+├── terraform.tfvars        # Valores das variáveis (não commitado)
+├── main.tf                 # Recursos principais (VPC, Subnets)
+├── outputs.tf              # Outputs do projeto
+├── data.tf                 # Data sources (AMIs, AZs, etc.)
+├── locals.tf               # Variáveis locais calculadas
+└── versions.tf             # (alternativa) required_providers
+
+Após terraform init:
+├── .terraform/             # Providers baixados (não commitar!)
+│   └── providers/
+│       └── registry.terraform.io/
+│           └── hashicorp/aws/5.31.0/
+├── .terraform.lock.hcl     # Lock de versões (COMMITAR!)
+└── terraform.tfstate       # State local (não commitar!)
+            </code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 O Papel de Cada Arquivo</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Arquivo</th>
+                <th>Conteúdo</th>
+                <th>Commitar?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>providers.tf</code></td><td>Bloco terraform {}, required_providers, provider "aws" {}</td><td>✅ Sim</td></tr>
+              <tr><td><code>variables.tf</code></td><td>Declaração de variáveis (type, description, default, validation)</td><td>✅ Sim</td></tr>
+              <tr><td><code>terraform.tfvars</code></td><td>Valores das variáveis (pode conter dados sensíveis)</td><td>⚠️ Depende</td></tr>
+              <tr><td><code>main.tf</code></td><td>Recursos principais do projeto</td><td>✅ Sim</td></tr>
+              <tr><td><code>outputs.tf</code></td><td>Valores exportados (IDs, IPs, ARNs)</td><td>✅ Sim</td></tr>
+              <tr><td><code>data.tf</code></td><td>Data sources (consultas a recursos existentes)</td><td>✅ Sim</td></tr>
+              <tr><td><code>locals.tf</code></td><td>Variáveis locais computadas</td><td>✅ Sim</td></tr>
+              <tr><td><code>.terraform-version</code></td><td>Versão do Terraform para tfenv</td><td>✅ Sim</td></tr>
+              <tr><td><code>.terraform.lock.hcl</code></td><td>Lock file de providers (como package-lock.json)</td><td>✅ Sim</td></tr>
+              <tr><td><code>.terraform/</code></td><td>Diretório de cache (providers baixados)</td><td>❌ Não</td></tr>
+              <tr><td><code>*.tfstate</code></td><td>State file (pode conter secrets)</td><td>❌ Nunca</td></tr>
+              <tr><td><code>*.tfstate.backup</code></td><td>Backup do state anterior</td><td>❌ Nunca</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 .gitignore para Terraform</h3>
+          <p>Todo projeto Terraform deve ter um <code>.gitignore</code> adequado:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>.gitignore</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code># Diretório de providers e módulos (cache local)
+.terraform/
+
+# State files — NUNCA commitar (podem conter secrets)
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Variáveis que podem conter valores sensíveis
+# (descomente se seu .tfvars contém secrets)
+# *.tfvars
+
+# Override files (usados para config local temporária)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config file (contém tokens)
+.terraformrc
+terraform.rc
+
+# Planos salvos em arquivo (podem conter secrets)
+*.tfplan</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 Projetos Grandes — Organização por Ambiente</h3>
+          <p>Para projetos com múltiplos ambientes, a estrutura evolui:</p>
+
+          <div class="info-box highlight">
+            <strong>📁 Estrutura Multi-Ambiente:</strong>
+            <pre><code>
+infra/
+├── modules/                    # Módulos reutilizáveis
+│   ├── vpc/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── ec2/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+├── environments/
+│   ├── dev/
+│   │   ├── main.tf            # Chama módulos com valores dev
+│   │   ├── variables.tf
+│   │   ├── terraform.tfvars   # Valores para dev
+│   │   ├── providers.tf
+│   │   └── backend.tf         # State no S3 (bucket-dev)
+│   ├── staging/
+│   │   └── ...
+│   └── prod/
+│       ├── main.tf            # Chama módulos com valores prod
+│       ├── terraform.tfvars   # Valores para prod
+│       ├── providers.tf
+│       └── backend.tf         # State no S3 (bucket-prod)
+└── README.md
+            </code></pre>
+          </div>
+
+          <p>Essa estrutura permite que cada ambiente tenha seu próprio state isolado, enquanto os módulos garantem consistência na definição dos recursos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 5: HCL — HashiCorp Configuration Language
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Linguagem</span>
+          <h2>5. HCL — HashiCorp Configuration Language</h2>
+          <p>Domine a sintaxe da linguagem usada pelo Terraform: blocos, argumentos, expressões, tipos de dados, funções built-in e interpolação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 Anatomia de um Bloco HCL</h3>
+          <p>HCL é uma linguagem <strong>declarativa</strong> projetada para ser legível por humanos e máquinas. Tudo em HCL é organizado em <strong>blocos</strong>.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Estrutura de um Bloco</code><span class="cmd-tag">Sintaxe</span></div>
+              <pre><code># Anatomia completa de um bloco HCL:
+#
+# TIPO    LABEL_1    LABEL_2    CORPO
+# ↓       ↓          ↓          ↓
+resource "aws_vpc"   "main"    {
+  # ARGUMENTO = VALOR
+  cidr_block = "10.0.0.0/16"    # string
+  
+  # ARGUMENTO = EXPRESSÃO
+  enable_dns_hostnames = true    # boolean
+  
+  # BLOCO ANINHADO (sem =)
+  tags = {                       # map
+    Name        = "vpc-main"
+    Environment = var.environment
+    CreatedBy   = "terraform"
+  }
+}
+
+# Tipos de blocos mais comuns:
+# terraform {}      — Configuração do Terraform
+# provider ""  {}   — Configuração de providers
+# resource "" "" {} — Recursos a criar/gerenciar
+# data "" "" {}     — Data sources (consultas)
+# variable "" {}    — Variáveis de entrada
+# output "" {}      — Valores de saída
+# locals {}         — Variáveis locais
+# module "" {}      — Chamada de módulos</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 Tipos de Dados</h3>
+          <p>HCL suporta tipos primitivos e complexos (coleções):</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Tipos Primitivos e Complexos</code><span class="cmd-tag">Tipos</span></div>
+              <pre><code># ═══════════════════════════════════════════
+# TIPOS PRIMITIVOS
+# ═══════════════════════════════════════════
+
+# string — texto entre aspas duplas
+variable "region" {
+  type    = string
+  default = "us-east-1"
+}
+
+# number — inteiro ou decimal (sem aspas)
+variable "instance_count" {
+  type    = number
+  default = 3
+}
+
+# bool — true ou false (sem aspas)
+variable "enable_monitoring" {
+  type    = bool
+  default = true
+}
+
+# ═══════════════════════════════════════════
+# TIPOS DE COLEÇÃO
+# ═══════════════════════════════════════════
+
+# list(type) — sequência ordenada de valores do mesmo tipo
+variable "availability_zones" {
+  type    = list(string)
+  default = ["us-east-1a", "us-east-1b", "us-east-1c"]
+}
+# Acesso: var.availability_zones[0] → "us-east-1a"
+
+# map(type) — pares chave-valor do mesmo tipo
+variable "instance_tags" {
+  type = map(string)
+  default = {
+    Environment = "dev"
+    Team        = "platform"
+  }
+}
+# Acesso: var.instance_tags["Environment"] → "dev"
+
+# set(type) — como list, mas sem ordem e sem duplicatas
+variable "allowed_ports" {
+  type    = set(number)
+  default = [80, 443, 8080]
+}
+
+# ═══════════════════════════════════════════
+# TIPOS ESTRUTURAIS
+# ═══════════════════════════════════════════
+
+# object({}) — estrutura com campos nomeados e tipados
+variable "vpc_config" {
+  type = object({
+    cidr_block           = string
+    enable_dns_hostnames = bool
+    environment          = string
+    tags                 = map(string)
+  })
+  default = {
+    cidr_block           = "10.0.0.0/16"
+    enable_dns_hostnames = true
+    environment          = "production"
+    tags                 = { ManagedBy = "terraform" }
+  }
+}
+
+# tuple([]) — como list, mas cada posição tem tipo diferente
+variable "rule" {
+  type    = tuple([string, number, string])
+  default = ["tcp", 443, "0.0.0.0/0"]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 Expressões e Interpolação</h3>
+          <p>Expressões em HCL permitem computar valores dinamicamente:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Referências e Interpolação</code><span class="cmd-tag">Expressões</span></div>
+              <pre><code># ═══════════════════════════════════════════
+# REFERÊNCIAS — acessar valores de outros blocos
+# ═══════════════════════════════════════════
+
+# Referência a variável
+region = var.region
+
+# Referência a recurso (tipo.nome.atributo)
+subnet_id = aws_subnet.public.id
+
+# Referência a data source
+ami_id = data.aws_ami.ubuntu.id
+
+# Referência a local
+name = local.project_name
+
+# Referência a output de módulo
+vpc_id = module.vpc.vpc_id
+
+# ═══════════════════════════════════════════
+# INTERPOLAÇÃO — inserir expressões em strings
+# ═══════════════════════════════════════════
+
+# Sintaxe: "${expressão}"
+name = "vpc-${var.environment}-${var.region}"
+# Resultado: "vpc-production-us-east-1"
+
+# Concatenação com join
+cidr = "10.${var.second_octet}.0.0/16"
+
+# ═══════════════════════════════════════════
+# OPERADORES
+# ═══════════════════════════════════════════
+
+# Aritméticos: + - * / %
+count = var.instance_count * 2
+
+# Comparação: == != > >= < <=
+# Lógicos: && || !
+enable = var.environment == "production" && var.enable_ha
+
+# ═══════════════════════════════════════════
+# CONDICIONAIS (ternário)
+# ═══════════════════════════════════════════
+
+# Sintaxe: condição ? valor_se_true : valor_se_false
+instance_type = var.environment == "production" ? "t3.large" : "t3.micro"
+
+# Criar recurso condicionalmente
+count = var.create_nat_gateway ? 1 : 0
+
+# Conditional com lista
+subnet_ids = var.environment == "production" ? var.private_subnets : [var.private_subnets[0]]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 Funções Built-in</h3>
+          <p>Terraform oferece 100+ funções built-in organizadas por categoria. Não é possível criar funções customizadas — você usa as existentes:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Funções de String</code><span class="cmd-tag">String</span></div>
+              <pre><code># upper / lower — converter caixa
+upper("hello")   # "HELLO"
+lower("WORLD")   # "world"
+
+# format — formatação tipo printf
+format("vpc-%s-%s", var.env, var.region)
+# "vpc-prod-us-east-1"
+
+# join — juntar lista em string
+join(", ", ["a", "b", "c"])
+# "a, b, c"
+
+# split — dividir string em lista
+split(",", "a,b,c")
+# ["a", "b", "c"]
+
+# replace — substituir texto
+replace("hello-world", "-", "_")
+# "hello_world"
+
+# trimspace — remover espaços
+trimspace("  hello  ")
+# "hello"
+
+# substr — substring
+substr("terraform", 0, 5)
+# "terra"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Funções de Coleção</code><span class="cmd-tag">List/Map</span></div>
+              <pre><code># length — tamanho
+length(["a", "b", "c"])  # 3
+
+# element — acessar por índice (circular)
+element(["a","b","c"], 4) # "b"
+
+# concat — concatenar listas
+concat(["a"], ["b", "c"])
+# ["a", "b", "c"]
+
+# flatten — achatar lista de listas
+flatten([["a","b"],["c"]])
+# ["a", "b", "c"]
+
+# keys / values — chaves/valores de map
+keys({a=1, b=2})    # ["a", "b"]
+values({a=1, b=2})  # [1, 2]
+
+# merge — combinar maps
+merge({a=1}, {b=2}) # {a=1, b=2}
+
+# lookup — buscar em map com default
+lookup({a=1}, "b", 0) # 0
+
+# contains — verificar se contém
+contains(["a","b"], "a") # true
+
+# distinct — remover duplicatas
+distinct(["a","a","b"])  # ["a","b"]</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Funções Numéricas e IP</code><span class="cmd-tag">Numeric</span></div>
+              <pre><code># min / max
+min(5, 3, 9)   # 3
+max(5, 3, 9)   # 9
+
+# ceil / floor — arredondamento
+ceil(4.2)      # 5
+floor(4.9)     # 4
+
+# cidrsubnet — calcular sub-redes
+# cidrsubnet(prefix, newbits, netnum)
+cidrsubnet("10.0.0.0/16", 8, 0)
+# "10.0.0.0/24"
+cidrsubnet("10.0.0.0/16", 8, 1)
+# "10.0.1.0/24"
+cidrsubnet("10.0.0.0/16", 8, 2)
+# "10.0.2.0/24"
+
+# Muito usado para criar subnets!
+# /16 + 8 newbits = /24 subnets
+# netnum = qual subnet (0, 1, 2...)</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Funções de Encoding e Hash</code><span class="cmd-tag">Crypto</span></div>
+              <pre><code># base64encode / base64decode
+base64encode("hello")
+# "aGVsbG8="
+
+# jsonencode / jsondecode
+jsonencode({name = "test"})
+# '{"name":"test"}'
+
+# yamlencode
+yamlencode({ports = [80, 443]})
+
+# file — ler arquivo
+file("${path.module}/script.sh")
+
+# filebase64 — ler arquivo como base64
+filebase64("${path.module}/cert.pem")
+
+# templatefile — template com vars
+templatefile("user_data.sh", {
+  db_host = aws_db_instance.main.endpoint
+  db_name = var.db_name
+})
+
+# md5 / sha256 — hashes
+md5("content")
+sha256(file("app.zip"))</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 Dica — terraform console:</strong>
+            <p>Use <code>terraform console</code> para testar funções interativamente! É como um REPL para HCL:</p>
+            <pre><code>$ terraform console
+> cidrsubnet("10.0.0.0/16", 8, 3)
+"10.0.3.0/24"
+> format("vpc-%s-%02d", "prod", 1)
+"vpc-prod-01"
+> length(["a", "b", "c"])
+3</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 Loops e Iteração</h3>
+          <p>HCL oferece mecanismos poderosos para criar múltiplos recursos ou transformar dados:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>count, for_each, for expression</code><span class="cmd-tag">Loops</span></div>
+              <pre><code># ═══════════════════════════════════════════
+# COUNT — criar N cópias de um recurso
+# ═══════════════════════════════════════════
+resource "aws_subnet" "public" {
+  count             = 3   # Cria 3 subnets
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  
+  tags = {
+    Name = "subnet-public-${count.index + 1}"
+  }
+}
+# Acesso: aws_subnet.public[0].id, aws_subnet.public[1].id ...
+
+# ═══════════════════════════════════════════
+# FOR_EACH — criar recursos a partir de map/set
+# ═══════════════════════════════════════════
+variable "subnets" {
+  default = {
+    public-1  = { cidr = "10.0.1.0/24", az = "us-east-1a", public = true }
+    public-2  = { cidr = "10.0.2.0/24", az = "us-east-1b", public = true }
+    private-1 = { cidr = "10.0.10.0/24", az = "us-east-1a", public = false }
+  }
+}
+
+resource "aws_subnet" "this" {
+  for_each = var.subnets
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = each.value.cidr
+  availability_zone       = each.value.az
+  map_public_ip_on_launch = each.value.public
+
+  tags = { Name = "subnet-${each.key}" }
+}
+# Acesso: aws_subnet.this["public-1"].id
+
+# ═══════════════════════════════════════════
+# FOR EXPRESSION — transformar coleções
+# ═══════════════════════════════════════════
+# Gerar lista de IDs
+subnet_ids = [for s in aws_subnet.this : s.id]
+
+# Gerar map filtrado
+public_subnets = {
+  for k, s in aws_subnet.this : k => s.id
+  if s.map_public_ip_on_launch == true
+}
+
+# Transformar lista em outra lista
+upper_names = [for name in var.names : upper(name)]</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ count vs for_each — Quando usar qual?</strong>
+            <ul>
+              <li><strong>count:</strong> Use para recursos idênticos onde só muda o índice. Problema: remover item do meio reordena tudo!</li>
+              <li><strong>for_each:</strong> Use quando cada recurso tem identidade própria (nome). Remover um item não afeta os outros.</li>
+              <li><strong>Regra geral:</strong> Prefira <code>for_each</code> em 90% dos casos. Use <code>count</code> apenas para condicional (count = 0 ou 1).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 6: PROVIDER AWS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Provider</span>
+          <h2>6. Provider AWS</h2>
+          <p>Configure o provider AWS corretamente: versões, regiões, default_tags, múltiplos providers com alias para deploy multi-região.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 Bloco terraform e required_providers</h3>
+          <p>O bloco <code>terraform {}</code> é onde você configura o próprio Terraform: versão mínima, providers necessários e backend para o state.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>providers.tf — Configuração Completa</code><span class="cmd-tag">Obrigatório</span></div>
+              <pre><code># ═══════════════════════════════════════════
+# BLOCO TERRAFORM — Configuração do próprio Terraform
+# ═══════════════════════════════════════════
+terraform {
+  # Versão mínima do Terraform CLI necessária
+  required_version = ">= 1.6.0"
+
+  # Providers necessários e suas versões
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source  = "hashicorp/aws"        # Registry/organização/nome
+      version = "~> 5.30"              # >= 5.30, < 6.0 (minor updates OK)
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+  }
+
+  # Backend para armazenar o state remotamente
+  # (Detalhado no Módulo 04)
+  backend "s3" {
+    bucket         = "meu-terraform-state-123456"
+    key            = "vpc/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}
+
+# ═══════════════════════════════════════════
+# PROVIDER AWS — Configuração da conexão com AWS
+# ═══════════════════════════════════════════
+provider "aws" {
+  region = var.aws_region   # Região padrão para recursos
+
+  # Tags aplicadas AUTOMATICAMENTE a todos os recursos
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+      ManagedBy   = "terraform"
+      Repository  = "github.com/meu-org/infra-vpc"
     }
   }
 }
 
+# ═══════════════════════════════════════════
+# PROVIDER RANDOM — Gerar valores aleatórios
+# ═══════════════════════════════════════════
+# Não precisa de configuração extra
+# Usado para suffixes únicos em nomes de recursos</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 Versionamento de Providers — Operadores:</strong>
+            <table class="styled-table">
+              <thead>
+                <tr><th>Operador</th><th>Significado</th><th>Exemplo</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>= 5.30.0</code></td><td>Versão EXATA</td><td>Apenas 5.30.0</td></tr>
+                <tr><td><code>>= 5.30</code></td><td>Maior ou igual</td><td>5.30, 5.31, 6.0, 7.0...</td></tr>
+                <tr><td><code>~> 5.30</code></td><td>Permite minor (recomendado)</td><td>5.30 a 5.99 (não 6.0)</td></tr>
+                <tr><td><code>>= 5.0, < 6.0</code></td><td>Range explícito</td><td>5.x qualquer</td></tr>
+              </tbody>
+            </table>
+            <p><strong>Recomendação:</strong> Use <code>~></code> (pessimistic constraint) — permite patches e features, bloqueia breaking changes.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 default_tags — Tagging Automático</h3>
+          <p>O <code>default_tags</code> é uma feature poderosa que aplica tags automaticamente a TODOS os recursos criados pelo provider. Isso garante governança e rastreabilidade:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Estratégia de Tags</code><span class="cmd-tag">Governança</span></div>
+              <pre><code># As default_tags são MESCLADAS com tags do recurso
+# Tags do recurso têm precedência em caso de conflito
+
 provider "aws" {
-  region = var.region
+  region = "us-east-1"
 
   default_tags {
     tags = {
-      Project     = var.project_name
-      ManagedBy   = "Terraform"
-      Environment = "dev"
+      # Quem gerencia este recurso?
+      ManagedBy = "terraform"
+      
+      # Qual projeto/produto?
+      Project = "cloudtrilhas"
+      
+      # Qual ambiente?
+      Environment = var.environment
+      
+      # Para controle de custos (AWS Cost Explorer)
+      CostCenter = "engineering"
+      
+      # Qual repositório contém o código?
+      Repository = "github.com/org/terraform-vpc"
+      
+      # Quando foi a última atualização?
+      LastUpdated = timestamp()
     }
+  }
+}
+
+# No recurso, você adiciona tags ESPECÍFICAS
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  
+  tags = {
+    Name = "vpc-${var.environment}"  # Tag específica deste recurso
+    # As default_tags são adicionadas automaticamente!
+  }
+}
+# Resultado: o recurso terá Name + TODAS as default_tags</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 Múltiplos Providers com Alias</h3>
+          <p>Às vezes você precisa criar recursos em múltiplas regiões (ex: CloudFront + ACM em us-east-1). Use <code>alias</code>:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Multi-Region com Alias</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># Provider padrão — us-east-1
+provider "aws" {
+  region = "us-east-1"
+  
+  default_tags {
+    tags = { ManagedBy = "terraform" }
+  }
+}
+
+# Provider alternativo — us-west-2 (DR / multi-region)
+provider "aws" {
+  alias  = "west"          # Identificador único
+  region = "us-west-2"
+  
+  default_tags {
+    tags = { ManagedBy = "terraform" }
+  }
+}
+
+# Provider para ACM (certificados CloudFront DEVEM ser us-east-1)
+provider "aws" {
+  alias  = "virginia"
+  region = "us-east-1"
+  
+  default_tags {
+    tags = { ManagedBy = "terraform" }
+  }
+}
+
+# ═══════════════════════════════════════════
+# USO — especificar qual provider usar
+# ═══════════════════════════════════════════
+
+# Usa provider padrão (us-east-1)
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+# Usa provider west (us-west-2)
+resource "aws_vpc" "dr" {
+  provider   = aws.west       # ← Especifica o alias
+  cidr_block = "10.1.0.0/16"
+}
+
+# Certificado ACM para CloudFront (DEVE ser us-east-1)
+resource "aws_acm_certificate" "cdn" {
+  provider          = aws.virginia
+  domain_name       = "cdn.example.com"
+  validation_method = "DNS"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 7: VARIABLES (INPUT)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Input Variables</span>
+          <h2>7. Variables (Input)</h2>
+          <p>Parametrize sua infraestrutura com variáveis tipadas, validadas e com valores sensíveis protegidos. Entenda a precedência de valores.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 Declaração de Variáveis</h3>
+          <p>Variáveis são a forma de parametrizar seus módulos Terraform. Elas tornam o código reutilizável para diferentes ambientes e configurações.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>variables.tf — Declarações Completas</code><span class="cmd-tag">Input</span></div>
+              <pre><code># ═══════════════════════════════════════════
+# VARIÁVEL SIMPLES — com tipo e default
+# ═══════════════════════════════════════════
+variable "aws_region" {
+  description = "Região AWS onde os recursos serão criados"
+  type        = string
+  default     = "us-east-1"
+}
+
+# ═══════════════════════════════════════════
+# VARIÁVEL SEM DEFAULT — obrigatória (deve ser fornecida)
+# ═══════════════════════════════════════════
+variable "environment" {
+  description = "Ambiente de deploy (dev, staging, production)"
+  type        = string
+  # Sem default = OBRIGATÓRIA
+}
+
+# ═══════════════════════════════════════════
+# VARIÁVEL COM VALIDAÇÃO — regras customizadas
+# ═══════════════════════════════════════════
+variable "environment" {
+  description = "Ambiente de deploy"
+  type        = string
+
+  validation {
+    condition     = contains(["dev", "staging", "production"], var.environment)
+    error_message = "Environment deve ser: dev, staging ou production."
+  }
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block da VPC (deve ser /16)"
+  type        = string
+  default     = "10.0.0.0/16"
+
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 0)) && tonumber(split("/", var.vpc_cidr)[1]) == 16
+    error_message = "O CIDR deve ser um bloco válido com máscara /16."
+  }
+}
+
+# ═══════════════════════════════════════════
+# VARIÁVEL SENSÍVEL — valor oculto nos logs
+# ═══════════════════════════════════════════
+variable "db_password" {
+  description = "Senha do banco de dados RDS"
+  type        = string
+  sensitive   = true   # Nunca aparece em plan/apply/logs
+}
+
+# ═══════════════════════════════════════════
+# VARIÁVEL COMPLEXA — object com tipos aninhados
+# ═══════════════════════════════════════════
+variable "subnet_config" {
+  description = "Configuração de subnets da VPC"
+  type = map(object({
+    cidr_block        = string
+    availability_zone = string
+    is_public         = bool
+    tags              = map(string)
+  }))
+  default = {
+    "public-1" = {
+      cidr_block        = "10.0.1.0/24"
+      availability_zone = "us-east-1a"
+      is_public         = true
+      tags              = { Tier = "public" }
+    }
+    "private-1" = {
+      cidr_block        = "10.0.10.0/24"
+      availability_zone = "us-east-1a"
+      is_public         = false
+      tags              = { Tier = "private" }
+    }
+  }
+}
+
+# ═══════════════════════════════════════════
+# VARIÁVEL NULLABLE
+# ═══════════════════════════════════════════
+variable "custom_ami" {
+  description = "AMI customizada (null = usa data source)"
+  type        = string
+  default     = null
+  nullable    = true
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 Formas de Passar Valores para Variáveis</h3>
+          <p>Existem múltiplas formas de fornecer valores, e o Terraform segue uma <strong>ordem de precedência</strong> específica:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform.tfvars</code><span class="cmd-tag">Arquivo</span></div>
+              <pre><code># terraform.tfvars
+# Carregado AUTOMATICAMENTE se existir
+
+aws_region   = "us-east-1"
+environment  = "production"
+vpc_cidr     = "10.0.0.0/16"
+project_name = "cloudtrilhas"
+
+# Para objetos complexos:
+subnet_config = {
+  "public-1" = {
+    cidr_block        = "10.0.1.0/24"
+    availability_zone = "us-east-1a"
+    is_public         = true
+    tags              = { Tier = "public" }
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Variáveis de Ambiente</code><span class="cmd-tag">TF_VAR_*</span></div>
+              <pre><code># Prefixo TF_VAR_ + nome da variável
+# Útil em CI/CD (GitHub Actions, etc.)
+
+export TF_VAR_aws_region="us-east-1"
+export TF_VAR_environment="production"
+export TF_VAR_db_password="S3cr3t!Pass"
+
+# Para tipos complexos, use JSON:
+export TF_VAR_tags='{"Env":"prod","Team":"platform"}'
+
+# No GitHub Actions:
+# env:
+#   TF_VAR_environment: production
+#   TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>📋 Ordem de Precedência (menor → maior prioridade):</strong>
+            <pre><code>
+1. default no variable {} block          ← Menor prioridade
+2. terraform.tfvars (automático)
+3. *.auto.tfvars (automático, alfabético)
+4. -var-file="custom.tfvars" (CLI)
+5. TF_VAR_* (variáveis de ambiente)
+6. -var="key=value" (CLI)                ← Maior prioridade
+
+Exemplo: se vpc_cidr tem default "10.0.0.0/16" em variables.tf,
+mas terraform.tfvars define "172.16.0.0/16",
+e você roda: terraform apply -var="vpc_cidr=192.168.0.0/16"
+→ O valor usado será "192.168.0.0/16" (maior precedência)
+            </code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 Validação Avançada de Variáveis</h3>
+          <p>A partir do Terraform 1.x, você pode adicionar múltiplas regras de validação:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Validações Complexas</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># Validar formato de CIDR
+variable "vpc_cidr" {
+  type = string
+
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 0))
+    error_message = "Deve ser um CIDR válido (ex: 10.0.0.0/16)."
+  }
+
+  validation {
+    condition     = tonumber(split("/", var.vpc_cidr)[1]) >= 16 && tonumber(split("/", var.vpc_cidr)[1]) <= 24
+    error_message = "A máscara deve estar entre /16 e /24."
+  }
+}
+
+# Validar nome do projeto (só letras, números, hifens)
+variable "project_name" {
+  type = string
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]{2,20}$", var.project_name))
+    error_message = "Nome deve ter 3-21 chars, iniciar com letra, conter apenas a-z, 0-9, -."
+  }
+}
+
+# Validar que lista não está vazia
+variable "availability_zones" {
+  type = list(string)
+
+  validation {
+    condition     = length(var.availability_zones) >= 2
+    error_message = "Deve especificar pelo menos 2 Availability Zones para alta disponibilidade."
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 8: VPC — REDE VIRTUAL NA AWS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Networking</span>
+          <h2>8. VPC — Rede Virtual na AWS</h2>
+          <p>Entenda profundamente os conceitos de rede da AWS: CIDR, subnets públicas e privadas, Internet Gateway, NAT Gateway, Route Tables e como tudo se conecta.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 O que é uma VPC?</h3>
+          <p>Uma <strong>VPC (Virtual Private Cloud)</strong> é uma rede virtual isolada dentro da AWS, dedicada à sua conta. É como ter seu próprio data center virtual na cloud, com controle total sobre endereçamento IP, subnets, roteamento e segurança.</p>
+
+          <div class="info-box highlight">
+            <strong>🏠 Analogia — VPC = Condomínio:</strong>
+            <p>Pense na VPC como um <strong>condomínio fechado</strong>:</p>
+            <ul>
+              <li><strong>VPC</strong> = O terreno do condomínio (espaço total de IPs)</li>
+              <li><strong>Subnets</strong> = Blocos/prédios dentro do condomínio</li>
+              <li><strong>Internet Gateway</strong> = Portão principal (acesso à internet)</li>
+              <li><strong>NAT Gateway</strong> = Portão de serviço (internos podem sair, externos não entram)</li>
+              <li><strong>Route Table</strong> = Placas de sinalização (para onde cada tráfego vai)</li>
+              <li><strong>Security Group</strong> = Porteiro de cada prédio (regras de entrada/saída)</li>
+              <li><strong>NACL</strong> = Muros entre os blocos (regras a nível de subnet)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 CIDR — Endereçamento IP</h3>
+          <p><strong>CIDR (Classless Inter-Domain Routing)</strong> define o range de IPs disponíveis na sua VPC. Entender CIDR é fundamental para planejar sua rede.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Entendendo CIDR</code><span class="cmd-tag">Networking</span></div>
+              <pre><code># CIDR = IP_BASE / BITS_DE_REDE
+# Exemplo: 10.0.0.0/16
+
+# O que significa /16?
+# 32 bits total - 16 bits rede = 16 bits para hosts
+# 2^16 = 65.536 endereços IP disponíveis
+
+# ═══════════════════════════════════════════
+# TABELA DE REFERÊNCIA CIDR
+# ═══════════════════════════════════════════
+# /16 = 65.536 IPs  → VPC (recomendado)
+# /20 = 4.096 IPs   → Subnet grande
+# /24 = 256 IPs     → Subnet padrão (251 usáveis*)
+# /28 = 16 IPs      → Subnet mínima para ELB
+# /32 = 1 IP        → Host único
+
+# * AWS reserva 5 IPs por subnet:
+#   .0   = Endereço de rede
+#   .1   = VPC Router
+#   .2   = DNS da AWS
+#   .3   = Reservado futuro
+#   .255 = Broadcast (não suportado, mas reservado)
+
+# ═══════════════════════════════════════════
+# RANGES PRIVADOS (RFC 1918) — Use estes para VPC!
+# ═══════════════════════════════════════════
+# 10.0.0.0/8      → 16.777.216 IPs (Classe A)
+# 172.16.0.0/12   → 1.048.576 IPs  (Classe B)
+# 192.168.0.0/16  → 65.536 IPs     (Classe C)
+
+# Para VPC AWS, use tipicamente:
+# 10.0.0.0/16 (mais comum)
+# 172.16.0.0/16
+# 192.168.0.0/16</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>📐 Planejamento de Subnets para VPC /16:</strong>
+            <pre><code>
+VPC: 10.0.0.0/16 (65.536 IPs)
+│
+├── Subnets Públicas (/24 = 251 IPs usáveis cada)
+│   ├── 10.0.1.0/24   → public-subnet-1a  (us-east-1a)
+│   ├── 10.0.2.0/24   → public-subnet-1b  (us-east-1b)
+│   └── 10.0.3.0/24   → public-subnet-1c  (us-east-1c)
+│
+├── Subnets Privadas (Aplicação) (/24)
+│   ├── 10.0.10.0/24  → private-subnet-1a (us-east-1a)
+│   ├── 10.0.11.0/24  → private-subnet-1b (us-east-1b)
+│   └── 10.0.12.0/24  → private-subnet-1c (us-east-1c)
+│
+└── Subnets Privadas (Banco de Dados) (/24)
+    ├── 10.0.20.0/24  → database-subnet-1a (us-east-1a)
+    ├── 10.0.21.0/24  → database-subnet-1b (us-east-1b)
+    └── 10.0.22.0/24  → database-subnet-1c (us-east-1c)
+
+Total usado: 9 subnets × 256 = 2.304 IPs
+Disponível: 65.536 - 2.304 = 63.232 IPs para crescimento
+            </code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 Arquitetura Completa de VPC</h3>
+          <p>Vamos visualizar como todos os componentes se conectam em uma VPC de produção:</p>
+
+          <div class="info-box highlight">
+            <strong>🌐 Arquitetura VPC Completa:</strong>
+            <pre><code>
+                              INTERNET
+                                 │
+                                 ▼
+                    ┌────────────────────────┐
+                    │   Internet Gateway     │
+                    │      (igw-xxx)         │
+                    └───────────┬────────────┘
+                                │
+                    ┌───────────┼───────────────────────────────────┐
+                    │           │          VPC 10.0.0.0/16          │
+                    │           ▼                                    │
+                    │  ┌─────────────────────────────────────────┐  │
+                    │  │     PUBLIC SUBNETS (Route → IGW)         │  │
+                    │  │                                          │  │
+                    │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ │  │
+                    │  │  │10.0.1.0  │ │10.0.2.0  │ │10.0.3.0  │ │  │
+                    │  │  │  /24     │ │  /24     │ │  /24     │ │  │
+                    │  │  │  ALB     │ │  NAT GW  │ │  Bastion │ │  │
+                    │  │  │  us-1a   │ │  us-1b   │ │  us-1c   │ │  │
+                    │  │  └────┬─────┘ └────┬─────┘ └──────────┘ │  │
+                    │  └───────┼────────────┼────────────────────┘  │
+                    │          │            │                        │
+                    │          ▼            ▼ (NAT Gateway)         │
+                    │  ┌─────────────────────────────────────────┐  │
+                    │  │    PRIVATE SUBNETS (Route → NAT)         │  │
+                    │  │                                          │  │
+                    │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ │  │
+                    │  │  │10.0.10.0 │ │10.0.11.0 │ │10.0.12.0 │ │  │
+                    │  │  │  /24     │ │  /24     │ │  /24     │ │  │
+                    │  │  │  EC2 App │ │  EC2 App │ │  EC2 App │ │  │
+                    │  │  │  us-1a   │ │  us-1b   │ │  us-1c   │ │  │
+                    │  │  └────┬─────┘ └────┬─────┘ └────┬─────┘ │  │
+                    │  └───────┼────────────┼────────────┼───────┘  │
+                    │          │            │            │           │
+                    │          ▼            ▼            ▼           │
+                    │  ┌─────────────────────────────────────────┐  │
+                    │  │   DATABASE SUBNETS (Sem Route → Internet)│  │
+                    │  │                                          │  │
+                    │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ │  │
+                    │  │  │10.0.20.0 │ │10.0.21.0 │ │10.0.22.0 │ │  │
+                    │  │  │  /24     │ │  /24     │ │  /24     │ │  │
+                    │  │  │  RDS     │ │  RDS     │ │  ElastiC │ │  │
+                    │  │  │  us-1a   │ │  us-1b   │ │  us-1c   │ │  │
+                    │  │  └──────────┘ └──────────┘ └──────────┘ │  │
+                    │  └─────────────────────────────────────────┘  │
+                    └───────────────────────────────────────────────┘
+
+FLUXO DE TRÁFEGO:
+→ Internet → IGW → Public Subnet (ALB) → Private Subnet (App) → DB Subnet
+← App precisa atualizar? → NAT Gateway → IGW → Internet (apt update, etc.)
+            </code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 Componentes da VPC Explicados</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Função</th>
+                <th>Analogia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>VPC</strong></td><td>Rede virtual isolada com range de IPs</td><td>Terreno do condomínio</td></tr>
+              <tr><td><strong>Subnet Pública</strong></td><td>Subnet com rota direta para Internet Gateway</td><td>Prédio com janela para rua</td></tr>
+              <tr><td><strong>Subnet Privada</strong></td><td>Subnet sem acesso direto da internet</td><td>Prédio interno do condomínio</td></tr>
+              <tr><td><strong>Internet Gateway</strong></td><td>Porta de entrada/saída para a internet pública</td><td>Portão principal</td></tr>
+              <tr><td><strong>NAT Gateway</strong></td><td>Permite que recursos privados acessem internet (outbound only)</td><td>Portão de serviço (só sai)</td></tr>
+              <tr><td><strong>Elastic IP</strong></td><td>IP público fixo (necessário para NAT Gateway)</td><td>Número de telefone fixo</td></tr>
+              <tr><td><strong>Route Table</strong></td><td>Regras de roteamento (para onde enviar tráfego)</td><td>Placas de sinalização</td></tr>
+              <tr><td><strong>Route</strong></td><td>Uma regra específica (destino → alvo)</td><td>Uma placa específica</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <strong>⚠️ Subnet Pública vs Privada — A Diferença Real:</strong>
+            <p>Não existe flag "pública" ou "privada" em uma subnet. O que define se uma subnet é pública ou privada é a <strong>Route Table associada</strong>:</p>
+            <ul>
+              <li><strong>Pública:</strong> Route Table tem rota <code>0.0.0.0/0 → Internet Gateway</code></li>
+              <li><strong>Privada:</strong> Route Table tem rota <code>0.0.0.0/0 → NAT Gateway</code> (ou nenhuma rota para internet)</li>
+            </ul>
+            <p>Além disso, <code>map_public_ip_on_launch = true</code> faz instâncias na subnet receberem IP público automaticamente (comum em subnets públicas).</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.5 NAT Gateway — Por que é Necessário?</h3>
+          <p>Recursos em subnets privadas (EC2, Lambda, ECS) frequentemente precisam acessar a internet para:</p>
+          <ul>
+            <li>Baixar atualizações de segurança (<code>apt update</code>)</li>
+            <li>Acessar APIs externas (Stripe, SendGrid, etc.)</li>
+            <li>Download de dependências (pip, npm, etc.)</li>
+            <li>Enviar métricas para ferramentas externas (Datadog, New Relic)</li>
+          </ul>
+          <p>O <strong>NAT Gateway</strong> permite esse tráfego de <em>saída</em> sem permitir tráfego de <em>entrada</em> não solicitado — mantendo a segurança.</p>
+
+          <div class="info-box warning">
+            <strong>💰 Custo do NAT Gateway:</strong>
+            <p>NAT Gateway custa ~$32/mês (fixo) + $0.045/GB de dados processados. Para ambientes de desenvolvimento, considere:</p>
+            <ul>
+              <li>Usar NAT Instance (EC2 t3.nano ~$3/mês) em dev</li>
+              <li>Compartilhar 1 NAT Gateway entre subnets em dev</li>
+              <li>Em produção: 1 NAT Gateway por AZ para alta disponibilidade</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 9: RECURSOS DA VPC EM TERRAFORM
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Hands-On</span>
+          <h2>9. Recursos da VPC em Terraform</h2>
+          <p>Implemente cada componente da VPC em Terraform com código production-ready: VPC, Subnets, Internet Gateway, NAT Gateway, Route Tables e associações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 aws_vpc — Criando a VPC</h3>
+          <p>O recurso raiz de toda a rede. Todos os outros componentes dependem dele.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>resource "aws_vpc"</code><span class="cmd-tag">VPC</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# VPC — Rede Virtual Principal
+# ═══════════════════════════════════════════════════════════════
+resource "aws_vpc" "main" {
+  # CIDR block — range de IPs da VPC
+  # /16 = 65.536 IPs — suficiente para crescer
+  cidr_block = var.vpc_cidr  # "10.0.0.0/16"
+
+  # Habilitar DNS hostname para instâncias
+  # Necessário para: RDS endpoints, EFS, ELB internal
+  enable_dns_hostnames = true
+
+  # Habilitar resolução DNS via Amazon DNS server
+  # Necessário para: Route 53 private hosted zones, VPC endpoints
+  enable_dns_support = true
+
+  # Instance tenancy — "default" = hardware compartilhado (mais barato)
+  # "dedicated" = hardware dedicado (compliance, ~6x mais caro)
+  instance_tenancy = "default"
+
+  tags = {
+    Name = "${var.project_name}-vpc-${var.environment}"
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# DATA SOURCE — Buscar AZs disponíveis na região
+# ═══════════════════════════════════════════════════════════════
+data "aws_availability_zones" "available" {
+  state = "available"
+
+  # Excluir Local Zones (geralmente mais caras)
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
+# Uso: data.aws_availability_zones.available.names
+# Resultado: ["us-east-1a", "us-east-1b", "us-east-1c", ...]</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 aws_subnet — Subnets Públicas e Privadas</h3>
+          <p>Subnets dividem a VPC em segmentos menores, cada um em uma Availability Zone diferente para alta disponibilidade.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Subnets Públicas (com for_each)</code><span class="cmd-tag">Public</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# LOCALS — Definir configuração das subnets
+# ═══════════════════════════════════════════════════════════════
+locals {
+  # Quantas AZs usar (normalmente 2-3)
+  az_count = min(length(data.aws_availability_zones.available.names), 3)
+
+  # Nomes das AZs que vamos usar
+  azs = slice(data.aws_availability_zones.available.names, 0, local.az_count)
+}
+
+# ═══════════════════════════════════════════════════════════════
+# SUBNETS PÚBLICAS — Uma por AZ
+# Estas hospedam: ALB, NAT Gateway, Bastion Host
+# ═══════════════════════════════════════════════════════════════
+resource "aws_subnet" "public" {
+  count = local.az_count
+
+  vpc_id = aws_vpc.main.id
+
+  # cidrsubnet("10.0.0.0/16", 8, 0) → "10.0.0.0/24"
+  # cidrsubnet("10.0.0.0/16", 8, 1) → "10.0.1.0/24"
+  # cidrsubnet("10.0.0.0/16", 8, 2) → "10.0.2.0/24"
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index)
+
+  # Distribuir entre AZs
+  availability_zone = local.azs[count.index]
+
+  # Instâncias lançadas aqui recebem IP público automaticamente
+  # (necessário para que ALB/Bastion sejam acessíveis)
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-${local.azs[count.index]}"
+    Tier = "public"
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Subnets Privadas (Aplicação + Database)</code><span class="cmd-tag">Private</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# SUBNETS PRIVADAS (Aplicação) — Uma por AZ
+# Estas hospedam: EC2 instances, ECS Tasks, Lambda (VPC)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_subnet" "private" {
+  count = local.az_count
+
+  vpc_id = aws_vpc.main.id
+
+  # Offset de 10 para separar das públicas
+  # cidrsubnet("10.0.0.0/16", 8, 10) → "10.0.10.0/24"
+  # cidrsubnet("10.0.0.0/16", 8, 11) → "10.0.11.0/24"
+  # cidrsubnet("10.0.0.0/16", 8, 12) → "10.0.12.0/24"
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+
+  availability_zone = local.azs[count.index]
+
+  # Sem IP público — tráfego de saída vai pelo NAT Gateway
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "${var.project_name}-private-${local.azs[count.index]}"
+    Tier = "private"
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# SUBNETS DATABASE — Uma por AZ
+# Estas hospedam: RDS, ElastiCache, DocumentDB
+# Isoladas — sem acesso internet (nem outbound)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_subnet" "database" {
+  count = local.az_count
+
+  vpc_id = aws_vpc.main.id
+
+  # Offset de 20
+  # cidrsubnet("10.0.0.0/16", 8, 20) → "10.0.20.0/24"
+  cidr_block = cidrsubnet(var.vpc_cidr, 8, count.index + 20)
+
+  availability_zone = local.azs[count.index]
+
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "${var.project_name}-database-${local.azs[count.index]}"
+    Tier = "database"
   }
 }</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Variables -->
         <div class="topic-block">
-          <h2>Variables</h2>
-          <p>Variáveis tornam o código reutilizável. Defina tipo, descrição e valores padrão para cada input.</p>
+          <h3>9.3 aws_internet_gateway — Acesso à Internet</h3>
+          <p>O Internet Gateway permite comunicação bidirecional entre recursos na VPC (com IP público) e a internet. Cada VPC pode ter apenas UM Internet Gateway.</p>
+
           <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>variables.tf</code><span class="cmd-tag">Inputs</span></div>
-              <pre><code>variable "project_name" {
-  description = "Nome do projeto para tags e nomenclatura"
-  type        = string
-  default     = "cloudtrilhas"
+            <div class="command-card wide">
+              <div class="command-header"><code>resource "aws_internet_gateway"</code><span class="cmd-tag">IGW</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# INTERNET GATEWAY — Porta para a Internet
+# ═══════════════════════════════════════════════════════════════
+resource "aws_internet_gateway" "main" {
+  # Associar à VPC (1 IGW por VPC)
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.project_name}-igw-${var.environment}"
+  }
 }
 
-variable "region" {
-  description = "Região AWS para deploy dos recursos"
+# O IGW por si só não faz nada!
+# É necessário criar uma ROTA na Route Table apontando para ele.
+# Sem a rota 0.0.0.0/0 → IGW, nenhum tráfego vai para internet.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 aws_eip + aws_nat_gateway — NAT para Subnets Privadas</h3>
+          <p>O NAT Gateway precisa de um Elastic IP (IP público fixo) e fica em uma subnet pública. Ele traduz endereços privados para públicos (outbound only).</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Elastic IP + NAT Gateway</code><span class="cmd-tag">NAT</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ELASTIC IP — IP público fixo para o NAT Gateway
+# ═══════════════════════════════════════════════════════════════
+resource "aws_eip" "nat" {
+  # Em produção: 1 EIP por AZ (alta disponibilidade)
+  # Em dev: 1 EIP compartilhado (economia)
+  count = var.environment == "production" ? local.az_count : 1
+
+  # domain = "vpc" indica que é um EIP para uso dentro de VPC
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.project_name}-eip-nat-${count.index + 1}"
+  }
+
+  # O EIP depende do IGW existir
+  # (sem IGW, o NAT não consegue rotear para internet)
+  depends_on = [aws_internet_gateway.main]
+}
+
+# ═══════════════════════════════════════════════════════════════
+# NAT GATEWAY — Tradução de endereço para subnets privadas
+# ═══════════════════════════════════════════════════════════════
+resource "aws_nat_gateway" "main" {
+  # Mesmo count do EIP
+  count = var.environment == "production" ? local.az_count : 1
+
+  # Associar o Elastic IP
+  allocation_id = aws_eip.nat[count.index].id
+
+  # NAT Gateway DEVE ficar em subnet PÚBLICA!
+  # (ele precisa de acesso direto à internet via IGW)
+  subnet_id = aws_subnet.public[count.index].id
+
+  tags = {
+    Name = "${var.project_name}-nat-${count.index + 1}"
+  }
+
+  # Garantir que IGW existe antes de criar o NAT
+  depends_on = [aws_internet_gateway.main]
+}
+
+# ═══════════════════════════════════════════════════════════════
+# RESUMO DO FLUXO:
+# Instância Privada (10.0.10.5)
+#   → Route Table: 0.0.0.0/0 → NAT Gateway
+#     → NAT traduz IP privado → EIP público
+#       → Internet Gateway → Internet
+# Resposta volta pelo mesmo caminho (connection tracking)
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.5 aws_route_table + aws_route — Regras de Roteamento</h3>
+          <p>Route Tables contêm regras que determinam para onde o tráfego de rede é direcionado. Cada subnet deve estar associada a exatamente uma route table.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Route Table Pública</code><span class="cmd-tag">Rotas</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ROUTE TABLE PÚBLICA — Todo tráfego externo vai para IGW
+# ═══════════════════════════════════════════════════════════════
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  # Rota local (10.0.0.0/16) é criada AUTOMATICAMENTE
+  # Não precisa declarar — permite comunicação dentro da VPC
+
+  tags = {
+    Name = "${var.project_name}-rt-public-${var.environment}"
+  }
+}
+
+# Rota padrão: todo tráfego não-VPC vai para Internet Gateway
+resource "aws_route" "public_internet" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"          # Qualquer destino
+  gateway_id             = aws_internet_gateway.main.id  # Via IGW
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ASSOCIAR Route Table Pública às Subnets Públicas
+# ═══════════════════════════════════════════════════════════════
+resource "aws_route_table_association" "public" {
+  count = local.az_count
+
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+# Resultado: todas as subnets públicas compartilham a mesma route table
+# que direciona tráfego 0.0.0.0/0 → IGW</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Route Table Privada (com NAT)</code><span class="cmd-tag">Private</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ROUTE TABLE PRIVADA — Tráfego externo vai para NAT Gateway
+# Em produção: 1 RT por AZ (cada uma aponta para NAT local)
+# Em dev: 1 RT compartilhada (aponta para único NAT)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_route_table" "private" {
+  count  = var.environment == "production" ? local.az_count : 1
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.project_name}-rt-private-${count.index + 1}"
+  }
+}
+
+# Rota: tráfego externo vai pelo NAT Gateway
+resource "aws_route" "private_nat" {
+  count = var.environment == "production" ? local.az_count : 1
+
+  route_table_id         = aws_route_table.private[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main[count.index].id
+}
+
+# Associar Route Table Privada às Subnets Privadas
+resource "aws_route_table_association" "private" {
+  count = local.az_count
+
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[
+    var.environment == "production" ? count.index : 0
+  ].id
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ROUTE TABLE DATABASE — Sem acesso à internet (mais segura)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_route_table" "database" {
+  vpc_id = aws_vpc.main.id
+
+  # SEM rota para 0.0.0.0/0 — isolamento total
+  # Subnets de database não precisam acessar internet
+
+  tags = {
+    Name = "${var.project_name}-rt-database-${var.environment}"
+  }
+}
+
+resource "aws_route_table_association" "database" {
+  count = local.az_count
+
+  subnet_id      = aws_subnet.database[count.index].id
+  route_table_id = aws_route_table.database.id
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>📝 Resumo das Route Tables:</strong>
+            <table class="styled-table">
+              <thead>
+                <tr><th>Route Table</th><th>Destino 0.0.0.0/0</th><th>Resultado</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Pública</td><td>→ Internet Gateway</td><td>Acesso bidirecional à internet</td></tr>
+                <tr><td>Privada</td><td>→ NAT Gateway</td><td>Apenas saída (outbound) para internet</td></tr>
+                <tr><td>Database</td><td>Sem rota</td><td>Sem acesso à internet (isolada)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 10: OUTPUTS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Outputs</span>
+          <h2>10. Outputs — Valores de Saída</h2>
+          <p>Exporte informações dos recursos criados para uso em outros módulos, scripts ou simplesmente para visualização no terminal.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.1 Declaração de Outputs</h3>
+          <p>Outputs são valores que o Terraform exibe após <code>terraform apply</code> e que podem ser consumidos por outros módulos ou ferramentas externas.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>outputs.tf — Completo</code><span class="cmd-tag">Export</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# OUTPUTS DA VPC
+# ═══════════════════════════════════════════════════════════════
+
+# ID da VPC — necessário para criar recursos dentro dela
+output "vpc_id" {
+  description = "ID da VPC criada"
+  value       = aws_vpc.main.id
+}
+
+# CIDR da VPC — útil para Security Groups e NACLs
+output "vpc_cidr_block" {
+  description = "CIDR block da VPC"
+  value       = aws_vpc.main.cidr_block
+}
+
+# IDs das Subnets Públicas — necessário para ALB, ECS services
+output "public_subnet_ids" {
+  description = "Lista de IDs das subnets públicas"
+  value       = aws_subnet.public[*].id
+}
+
+# IDs das Subnets Privadas — necessário para EC2, ECS tasks
+output "private_subnet_ids" {
+  description = "Lista de IDs das subnets privadas"
+  value       = aws_subnet.private[*].id
+}
+
+# IDs das Subnets de Database — necessário para RDS subnet group
+output "database_subnet_ids" {
+  description = "Lista de IDs das subnets de database"
+  value       = aws_subnet.database[*].id
+}
+
+# ID do Internet Gateway
+output "internet_gateway_id" {
+  description = "ID do Internet Gateway"
+  value       = aws_internet_gateway.main.id
+}
+
+# IDs dos NAT Gateways
+output "nat_gateway_ids" {
+  description = "Lista de IDs dos NAT Gateways"
+  value       = aws_nat_gateway.main[*].id
+}
+
+# Elastic IPs dos NAT Gateways
+output "nat_gateway_public_ips" {
+  description = "IPs públicos dos NAT Gateways"
+  value       = aws_eip.nat[*].public_ip
+}
+
+# Availability Zones utilizadas
+output "availability_zones" {
+  description = "AZs onde os recursos foram criados"
+  value       = local.azs
+}
+
+# ═══════════════════════════════════════════════════════════════
+# OUTPUT SENSÍVEL — valor oculto no terminal
+# ═══════════════════════════════════════════════════════════════
+output "db_connection_string" {
+  description = "Connection string do banco de dados"
+  value       = "postgresql://${var.db_user}:${var.db_password}@${aws_db_instance.main.endpoint}/${var.db_name}"
+  sensitive   = true  # Não aparece no terminal após apply
+}
+# Para ver: terraform output db_connection_string</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.2 Consumindo Outputs</h3>
+          <p>Outputs podem ser consumidos de várias formas:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Via CLI</code><span class="cmd-tag">Terminal</span></div>
+              <pre><code># Listar todos os outputs
+terraform output
+
+# Output específico (texto puro)
+terraform output vpc_id
+# "vpc-0abc123def456789"
+
+# Output em JSON (útil em scripts)
+terraform output -json
+
+# Output sensível
+terraform output db_connection_string
+# (sensitive — use -json para ver)
+
+terraform output -json db_connection_string
+# "postgresql://user:pass@host/db"
+
+# Usar em scripts Bash:
+VPC_ID=$(terraform output -raw vpc_id)
+echo "VPC criada: $VPC_ID"</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Entre Módulos</code><span class="cmd-tag">Composição</span></div>
+              <pre><code># No módulo que CONSOME a VPC:
+module "vpc" {
+  source      = "../modules/vpc"
+  environment = "production"
+  vpc_cidr    = "10.0.0.0/16"
+}
+
+# Acessar outputs do módulo:
+resource "aws_security_group" "app" {
+  vpc_id = module.vpc.vpc_id
+
+  # ...regras...
+}
+
+resource "aws_lb" "main" {
+  subnets = module.vpc.public_subnet_ids
+  # ...
+}
+
+resource "aws_db_subnet_group" "main" {
+  subnet_ids = module.vpc.database_subnet_ids
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.3 Boas Práticas de Outputs</h3>
+          <div class="info-box highlight">
+            <strong>💡 Dicas para Outputs Eficientes:</strong>
+            <ul>
+              <li>Sempre adicione <code>description</code> — documenta o que é e para que serve</li>
+              <li>Use <code>sensitive = true</code> para valores com secrets (senhas, tokens)</li>
+              <li>Exporte IDs, ARNs e endpoints — são os valores que outros módulos precisam</li>
+              <li>Use <code>[*].id</code> (splat expression) para exportar listas de IDs de recursos com count</li>
+              <li>Em módulos reutilizáveis, outputs são a "API" do módulo — pense como interface pública</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 11: COMANDOS TERRAFORM
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">CLI Reference</span>
+          <h2>11. Comandos Terraform — Referência Completa</h2>
+          <p>Domine os principais comandos do Terraform CLI: desde inicialização até inspeção de state e visualização de grafo de dependências.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.1 Comandos do Workflow Principal</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicialização</span></div>
+              <pre><code># Inicializar projeto (OBRIGATÓRIO antes de tudo)
+terraform init
+
+# Forçar reinicialização (re-download providers)
+terraform init -upgrade
+
+# Migrar backend (ex: local → S3)
+terraform init -migrate-state
+
+# Reconfigurar backend
+terraform init -reconfigure
+
+# Apenas baixar módulos/providers (sem backend)
+terraform init -backend=false
+
+# Flags úteis:
+# -input=false     → Não pedir input (CI/CD)
+# -no-color        → Sem cores (logs CI/CD)
+# -lock=false      → Não travar state</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform fmt</code><span class="cmd-tag">Formatação</span></div>
+              <pre><code># Formatar TODOS os arquivos .tf (in-place)
+terraform fmt
+
+# Verificar se está formatado (sem alterar)
+# Retorna exit code 0 se OK, 1 se precisa formatar
+terraform fmt -check
+
+# Formatar recursivamente (subdiretórios)
+terraform fmt -recursive
+
+# Mostrar diff do que será alterado
+terraform fmt -diff
+
+# Formatar apenas um arquivo
+terraform fmt main.tf
+
+# Em CI/CD (verificação):
+terraform fmt -check -recursive
+# Se falhar → PR rejeitado</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform validate</code><span class="cmd-tag">Validação</span></div>
+              <pre><code># Validar sintaxe e consistência
+# (NÃO conecta na cloud — apenas verifica código)
+terraform validate
+
+# Saída em JSON (para tools/CI)
+terraform validate -json
+
+# O que é verificado:
+# ✓ Sintaxe HCL válida
+# ✓ Tipos de variáveis corretos
+# ✓ Referências existentes
+# ✓ Blocos bem formados
+# ✓ Required arguments presentes
+
+# O que NÃO é verificado:
+# ✗ Se o recurso pode ser criado na AWS
+# ✗ Se as credenciais são válidas
+# ✗ Se os valores são permitidos pela API</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Preview</span></div>
+              <pre><code># Plano interativo (mostra no terminal)
+terraform plan
+
+# Salvar plano em arquivo (para apply exato)
+terraform plan -out=tfplan
+
+# Plano com variáveis específicas
+terraform plan -var="environment=prod"
+
+# Plano com arquivo de variáveis
+terraform plan -var-file="prod.tfvars"
+
+# Plano para DESTRUIR tudo
+terraform plan -destroy
+
+# Plano focado em recurso específico
+terraform plan -target=aws_vpc.main
+
+# Flags para CI/CD:
+terraform plan \
+  -input=false \
+  -no-color \
+  -out=tfplan
+
+# Símbolos no output:
+# + criar    ~ modificar (in-place)
+# - destruir  -/+ destruir e recriar</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Execução</span></div>
+              <pre><code># Apply interativo (pede confirmação)
+terraform apply
+
+# Apply sem confirmação (CI/CD)
+terraform apply -auto-approve
+
+# Apply a partir de plano salvo
+terraform plan -out=tfplan
+terraform apply tfplan
+
+# Apply com variáveis
+terraform apply -var="environment=prod"
+
+# Apply de recurso específico
+terraform apply -target=aws_vpc.main
+
+# Apply com paralelismo aumentado
+terraform apply -parallelism=20
+# (padrão é 10 recursos simultâneos)
+
+# Workflow CI/CD completo:
+terraform init -input=false
+terraform plan -input=false -out=tfplan
+terraform apply -input=false tfplan</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform destroy</code><span class="cmd-tag">Destruição</span></div>
+              <pre><code># Destruir TODOS os recursos (pede confirmação)
+terraform destroy
+
+# Destruir sem confirmação (CI/CD cleanup)
+terraform destroy -auto-approve
+
+# Destruir recurso específico
+terraform destroy -target=aws_nat_gateway.main
+
+# Preview da destruição
+terraform plan -destroy
+
+# ⚠️ CUIDADO:
+# - Valide que está no workspace correto
+# - Verifique qual .tfvars está carregado
+# - Em produção, SEMPRE revise o plano antes
+# - Recursos com prevent_destroy = true
+#   não serão destruídos (proteção)
+
+# Lifecycle block de proteção:
+# resource "aws_vpc" "main" {
+#   lifecycle {
+#     prevent_destroy = true
+#   }
+# }</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.2 Comandos de State</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform state list / show</code><span class="cmd-tag">Inspeção</span></div>
+              <pre><code># Listar TODOS os recursos no state
+terraform state list
+# aws_vpc.main
+# aws_subnet.public[0]
+# aws_subnet.public[1]
+# aws_subnet.private[0]
+# aws_internet_gateway.main
+
+# Detalhes de um recurso específico
+terraform state show aws_vpc.main
+# resource "aws_vpc" "main" {
+#   arn              = "arn:aws:ec2:..."
+#   cidr_block       = "10.0.0.0/16"
+#   id               = "vpc-0abc123"
+#   instance_tenancy = "default"
+#   tags = {
+#     Name = "my-vpc"
+#   }
+# }
+
+# Filtrar por padrão
+terraform state list | grep subnet</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform state mv / rm</code><span class="cmd-tag">Manipulação</span></div>
+              <pre><code># RENOMEAR recurso no state
+# (quando você renomeia no código sem destruir)
+terraform state mv \
+  aws_vpc.main \
+  aws_vpc.production
+
+# MOVER para módulo
+terraform state mv \
+  aws_vpc.main \
+  module.vpc.aws_vpc.main
+
+# REMOVER do state (Terraform "esquece" o recurso)
+# O recurso CONTINUA existindo na AWS!
+terraform state rm aws_vpc.main
+
+# IMPORTAR recurso existente para o state
+# (recurso criado manualmente no console)
+terraform import aws_vpc.main vpc-0abc123def
+
+# ⚠️ state mv e rm são operações PERIGOSAS
+# Sempre faça backup antes:
+terraform state pull > backup.tfstate</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.3 Comandos Auxiliares</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>terraform graph</code><span class="cmd-tag">Visualização</span></div>
+              <pre><code># Gerar grafo de dependências (formato DOT)
+terraform graph
+
+# Salvar e converter para imagem:
+terraform graph | dot -Tpng > graph.png
+
+# Apenas recursos de um tipo
+terraform graph -type=plan
+
+# Instalar Graphviz (necessário para dot):
+# Ubuntu: sudo apt install graphviz
+# macOS:  brew install graphviz
+
+# Alternativa online:
+# Cole o output DOT em: dreampuf.github.io/GraphvizOnline</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>terraform console / output</code><span class="cmd-tag">Debug</span></div>
+              <pre><code># Console interativo (REPL)
+terraform console
+
+# Testar expressões:
+> var.vpc_cidr
+"10.0.0.0/16"
+> cidrsubnet(var.vpc_cidr, 8, 1)
+"10.0.1.0/24"
+> length(var.availability_zones)
+3
+> aws_vpc.main.id
+"vpc-0abc123"
+
+# terraform output
+terraform output              # Todos
+terraform output vpc_id       # Específico
+terraform output -json        # Formato JSON
+terraform output -raw vpc_id  # Sem aspas
+
+# terraform providers
+terraform providers           # Listar providers usados
+
+# terraform workspace
+terraform workspace list      # Listar workspaces
+terraform workspace new dev   # Criar workspace
+terraform workspace select dev  # Trocar workspace</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>🔄 Workflow Completo Resumido:</strong>
+            <pre><code>
+# 1. Inicializar (uma vez, ou após mudar providers/backend)
+terraform init
+
+# 2. Formatar código
+terraform fmt -recursive
+
+# 3. Validar sintaxe
+terraform validate
+
+# 4. Planejar (SEMPRE antes de apply)
+terraform plan -out=tfplan
+
+# 5. Revisar o plano (ler atentamente!)
+
+# 6. Aplicar
+terraform apply tfplan
+
+# 7. Verificar outputs
+terraform output
+            </code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 12: EXERCÍCIOS PRÁTICOS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Prática</span>
+          <h2>12. Exercícios Práticos</h2>
+          <p>Coloque em prática tudo que aprendeu. Tente resolver sozinho antes de ver a solução — a luta com o código é onde o aprendizado acontece.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: VPC Básica com 2 Subnets</h3>
+          <p><strong>Objetivo:</strong> Criar uma VPC com CIDR 10.0.0.0/16, uma subnet pública e uma privada, em us-east-1a. Habilitar DNS hostnames.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>VPC com CIDR 10.0.0.0/16 e DNS hostnames habilitado</li>
+            <li>Subnet pública: 10.0.1.0/24 em us-east-1a, com auto-assign public IP</li>
+            <li>Subnet privada: 10.0.10.0/24 em us-east-1a, sem IP público</li>
+            <li>Todas as tags com formato: "exercicio-01-{recurso}"</li>
+            <li>Outputs: vpc_id, public_subnet_id, private_subnet_id</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>main.tf — Exercício 1</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════
+# providers.tf
+# ═══════════════════════════════════════════
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.30"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+  default_tags {
+    tags = {
+      ManagedBy = "terraform"
+      Exercise  = "01"
+    }
+  }
+}
+
+# ═══════════════════════════════════════════
+# main.tf
+# ═══════════════════════════════════════════
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {
+    Name = "exercicio-01-vpc"
+  }
+}
+
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "exercicio-01-public-subnet"
+    Tier = "public"
+  }
+}
+
+resource "aws_subnet" "private" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.10.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "exercicio-01-private-subnet"
+    Tier = "private"
+  }
+}
+
+# ═══════════════════════════════════════════
+# outputs.tf
+# ═══════════════════════════════════════════
+output "vpc_id" {
+  description = "ID da VPC"
+  value       = aws_vpc.main.id
+}
+
+output "public_subnet_id" {
+  description = "ID da subnet pública"
+  value       = aws_subnet.public.id
+}
+
+output "private_subnet_id" {
+  description = "ID da subnet privada"
+  value       = aws_subnet.private.id
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: VPC Completa com Internet Gateway e Roteamento</h3>
+          <p><strong>Objetivo:</strong> Expandir o exercício 1 adicionando Internet Gateway, Route Table pública e associação — permitindo que a subnet pública acesse a internet.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>Tudo do Exercício 1 +</li>
+            <li>Internet Gateway associado à VPC</li>
+            <li>Route Table pública com rota 0.0.0.0/0 → IGW</li>
+            <li>Associar a route table à subnet pública</li>
+            <li>Outputs adicionais: igw_id, public_route_table_id</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>main.tf — Exercício 2 (adições)</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># (Inclui tudo do Exercício 1, mais:)
+
+# ═══════════════════════════════════════════
+# Internet Gateway
+# ═══════════════════════════════════════════
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "exercicio-02-igw"
+  }
+}
+
+# ═══════════════════════════════════════════
+# Route Table Pública
+# ═══════════════════════════════════════════
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "exercicio-02-rt-public"
+  }
+}
+
+# Rota padrão → Internet Gateway
+resource "aws_route" "public_internet" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
+
+# Associar subnet pública à route table
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.public.id
+}
+
+# ═══════════════════════════════════════════
+# Outputs adicionais
+# ═══════════════════════════════════════════
+output "igw_id" {
+  description = "ID do Internet Gateway"
+  value       = aws_internet_gateway.main.id
+}
+
+output "public_route_table_id" {
+  description = "ID da Route Table pública"
+  value       = aws_route_table.public.id
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Adicionar NAT Gateway para Subnet Privada</h3>
+          <p><strong>Objetivo:</strong> Permitir que recursos na subnet privada acessem a internet (outbound) via NAT Gateway.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>Tudo dos exercícios anteriores +</li>
+            <li>Elastic IP para o NAT Gateway</li>
+            <li>NAT Gateway na subnet PÚBLICA</li>
+            <li>Route Table privada com rota 0.0.0.0/0 → NAT Gateway</li>
+            <li>Associar a route table privada à subnet privada</li>
+            <li>Outputs: nat_gateway_id, nat_public_ip</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>main.tf — Exercício 3 (adições)</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># (Inclui tudo dos Exercícios 1 e 2, mais:)
+
+# ═══════════════════════════════════════════
+# Elastic IP para NAT Gateway
+# ═══════════════════════════════════════════
+resource "aws_eip" "nat" {
+  domain = "vpc"
+
+  tags = {
+    Name = "exercicio-03-eip-nat"
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}
+
+# ═══════════════════════════════════════════
+# NAT Gateway (fica na subnet PÚBLICA!)
+# ═══════════════════════════════════════════
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public.id  # ← PÚBLICA!
+
+  tags = {
+    Name = "exercicio-03-nat"
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}
+
+# ═══════════════════════════════════════════
+# Route Table Privada
+# ═══════════════════════════════════════════
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "exercicio-03-rt-private"
+  }
+}
+
+# Rota: tráfego externo vai pelo NAT
+resource "aws_route" "private_nat" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main.id
+}
+
+# Associar subnet privada à route table privada
+resource "aws_route_table_association" "private" {
+  subnet_id      = aws_subnet.private.id
+  route_table_id = aws_route_table.private.id
+}
+
+# ═══════════════════════════════════════════
+# Outputs
+# ═══════════════════════════════════════════
+output "nat_gateway_id" {
+  description = "ID do NAT Gateway"
+  value       = aws_nat_gateway.main.id
+}
+
+output "nat_public_ip" {
+  description = "IP público do NAT Gateway"
+  value       = aws_eip.nat.public_ip
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: VPC Multi-AZ com Variáveis e Loops</h3>
+          <p><strong>Objetivo:</strong> Criar uma VPC production-ready com 3 AZs, usando variáveis, locals, count e cidrsubnet. Este exercício reúne TUDO do módulo.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>Variáveis: project_name, environment, vpc_cidr, az_count (com validação)</li>
+            <li>VPC com DNS habilitado</li>
+            <li>3 subnets públicas (10.0.0.0/24, 10.0.1.0/24, 10.0.2.0/24) usando count + cidrsubnet</li>
+            <li>3 subnets privadas (10.0.10.0/24, 10.0.11.0/24, 10.0.12.0/24) usando count + cidrsubnet</li>
+            <li>Internet Gateway + Route Table pública com associações</li>
+            <li>1 NAT Gateway (ambiente dev = economia) + Route Table privada com associações</li>
+            <li>Usar locals para calcular AZs disponíveis</li>
+            <li>Tags consistentes em todos os recursos</li>
+            <li>Outputs completos (vpc_id, subnet_ids, igw_id, nat_id)</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>Solução Completa — Exercício 4</code><span class="cmd-tag">Production-Ready</span></div>
+                <pre><code># ═══════════════════════════════════════════
+# providers.tf
+# ═══════════════════════════════════════════
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.30"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+      ManagedBy   = "terraform"
+    }
+  }
+}
+
+# ═══════════════════════════════════════════
+# variables.tf
+# ═══════════════════════════════════════════
+variable "aws_region" {
+  description = "Região AWS"
   type        = string
   default     = "us-east-1"
+}
+
+variable "project_name" {
+  description = "Nome do projeto (usado em tags e nomes)"
+  type        = string
+  default     = "exercicio-04"
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]{2,20}$", var.project_name))
+    error_message = "Nome deve ter 3-21 chars, iniciar com letra, conter apenas a-z, 0-9, -."
+  }
+}
+
+variable "environment" {
+  description = "Ambiente (dev, staging, production)"
+  type        = string
+  default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "staging", "production"], var.environment)
+    error_message = "Deve ser: dev, staging ou production."
+  }
 }
 
 variable "vpc_cidr" {
   description = "CIDR block da VPC"
   type        = string
   default     = "10.0.0.0/16"
+
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 0))
+    error_message = "Deve ser um CIDR válido."
+  }
 }
 
-variable "public_subnet_cidrs" {
-  description = "Lista de CIDRs para subnets públicas"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+variable "az_count" {
+  description = "Quantidade de Availability Zones (2-3)"
+  type        = number
+  default     = 3
+
+  validation {
+    condition     = var.az_count >= 2 && var.az_count <= 3
+    error_message = "Deve ser 2 ou 3."
+  }
 }
 
-variable "private_subnet_cidrs" {
-  description = "Lista de CIDRs para subnets privadas"
-  type        = list(string)
-  default     = ["10.0.10.0/24", "10.0.20.0/24"]
+# ═══════════════════════════════════════════
+# locals.tf
+# ═══════════════════════════════════════════
+locals {
+  azs = slice(
+    data.aws_availability_zones.available.names,
+    0,
+    var.az_count
+  )
 }
 
-variable "availability_zones" {
-  description = "Lista de AZs para distribuir as subnets"
-  type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
-}</code></pre>
-            </div>
-          </div>
-        </div>
+# ═══════════════════════════════════════════
+# data.tf
+# ═══════════════════════════════════════════
+data "aws_availability_zones" "available" {
+  state = "available"
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
 
-        <!-- VPC Resources -->
-        <div class="topic-block">
-          <h2>VPC Resources</h2>
-          <p>O <code>main.tf</code> contém todos os recursos da VPC. Usamos <code>count</code> para criar múltiplas subnets de forma dinâmica.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>VPC + Internet Gateway</code><span class="cmd-tag">Rede Base</span></div>
-              <pre><code>resource "aws_vpc" "main" {
+# ═══════════════════════════════════════════
+# main.tf — VPC
+# ═══════════════════════════════════════════
+resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
-  enable_dns_support   = true
   enable_dns_hostnames = true
+  enable_dns_support   = true
 
-  tags = {
-    Name = "${var.project_name}-vpc"
-  }
+  tags = { Name = "${var.project_name}-vpc" }
 }
 
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "${var.project_name}-igw"
-  }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Subnets Públicas</code><span class="cmd-tag">count</span></div>
-              <pre><code>resource "aws_subnet" "public" {
-  count = length(var.public_subnet_cidrs)
+# Subnets Públicas
+resource "aws_subnet" "public" {
+  count = var.az_count
 
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone       = var.availability_zones[count.index]
+  cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index)
+  availability_zone       = local.azs[count.index]
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.project_name}-public-${count.index + 1}"
+    Name = "${var.project_name}-public-${local.azs[count.index]}"
+    Tier = "public"
   }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Subnets Privadas</code><span class="cmd-tag">count</span></div>
-              <pre><code>resource "aws_subnet" "private" {
-  count = length(var.private_subnet_cidrs)
+}
 
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
-  availability_zone = var.availability_zones[count.index]
+# Subnets Privadas
+resource "aws_subnet" "private" {
+  count = var.az_count
 
-  tags = {
-    Name = "${var.project_name}-private-${count.index + 1}"
-  }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>NAT Gateway</code><span class="cmd-tag">Saída Privada</span></div>
-              <pre><code>resource "aws_eip" "nat" {
-  domain = "vpc"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  availability_zone       = local.azs[count.index]
+  map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.project_name}-nat-eip"
+    Name = "${var.project_name}-private-${local.azs[count.index]}"
+    Tier = "private"
   }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "${var.project_name}-igw" }
+}
+
+# Route Table Pública
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "${var.project_name}-rt-public" }
+}
+
+resource "aws_route" "public_internet" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id
+}
+
+resource "aws_route_table_association" "public" {
+  count          = var.az_count
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+
+# Elastic IP + NAT Gateway (1 para dev)
+resource "aws_eip" "nat" {
+  domain     = "vpc"
+  tags       = { Name = "${var.project_name}-eip-nat" }
+  depends_on = [aws_internet_gateway.main]
 }
 
 resource "aws_nat_gateway" "main" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
-
-  depends_on = [aws_internet_gateway.main]
-
-  tags = {
-    Name = "${var.project_name}-nat-gw"
-  }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Route Tables — Pública</code><span class="cmd-tag">Roteamento</span></div>
-              <pre><code>resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
-
-  tags = {
-    Name = "${var.project_name}-public-rt"
-  }
+  tags          = { Name = "${var.project_name}-nat" }
+  depends_on    = [aws_internet_gateway.main]
 }
 
-resource "aws_route_table_association" "public" {
-  count = length(var.public_subnet_cidrs)
-
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Route Tables — Privada</code><span class="cmd-tag">Roteamento</span></div>
-              <pre><code>resource "aws_route_table" "private" {
+# Route Table Privada
+resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
+  tags   = { Name = "${var.project_name}-rt-private" }
+}
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main.id
-  }
-
-  tags = {
-    Name = "${var.project_name}-private-rt"
-  }
+resource "aws_route" "private_nat" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main.id
 }
 
 resource "aws_route_table_association" "private" {
-  count = length(var.private_subnet_cidrs)
-
+  count          = var.az_count
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
-}</code></pre>
-            </div>
-          </div>
-        </div>
+}
 
-        <!-- Outputs -->
-        <div class="topic-block">
-          <h2>Outputs</h2>
-          <p>Outputs exportam valores importantes após o <code>terraform apply</code>. Úteis para referência e integração com outros módulos.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>outputs.tf</code><span class="cmd-tag">Saídas</span></div>
-              <pre><code>output "vpc_id" {
-  description = "ID da VPC criada"
+# ═══════════════════════════════════════════
+# outputs.tf
+# ═══════════════════════════════════════════
+output "vpc_id" {
+  description = "ID da VPC"
   value       = aws_vpc.main.id
+}
+
+output "vpc_cidr" {
+  description = "CIDR da VPC"
+  value       = aws_vpc.main.cidr_block
 }
 
 output "public_subnet_ids" {
@@ -301,123 +3239,57 @@ output "private_subnet_ids" {
   value       = aws_subnet.private[*].id
 }
 
-output "nat_gateway_ip" {
+output "internet_gateway_id" {
+  description = "ID do Internet Gateway"
+  value       = aws_internet_gateway.main.id
+}
+
+output "nat_gateway_id" {
+  description = "ID do NAT Gateway"
+  value       = aws_nat_gateway.main.id
+}
+
+output "nat_public_ip" {
   description = "IP público do NAT Gateway"
   value       = aws_eip.nat.public_ip
+}
+
+output "availability_zones" {
+  description = "AZs utilizadas"
+  value       = local.azs
 }</code></pre>
+              </div>
             </div>
-          </div>
+          </details>
         </div>
 
-        <!-- Comandos do Módulo -->
-        <div class="topic-block">
-          <h2>Comandos do Módulo</h2>
-          <p>Workflow completo do Terraform — da inicialização à destruição dos recursos.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicializar</span></div>
-              <p>Baixa providers, inicializa backend e prepara o diretório de trabalho.</p>
-              <pre><code>terraform init</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform fmt</code><span class="cmd-tag">Formatar</span></div>
-              <p>Formata os arquivos .tf seguindo o estilo canônico do Terraform.</p>
-              <pre><code>terraform fmt -recursive</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform validate</code><span class="cmd-tag">Validar</span></div>
-              <p>Verifica a sintaxe e consistência da configuração sem acessar APIs.</p>
-              <pre><code>terraform validate</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Planejar</span></div>
-              <p>Mostra o que será criado, alterado ou destruído — sem executar nada.</p>
-              <pre><code>terraform plan</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Aplicar</span></div>
-              <p>Executa as mudanças planejadas e cria/atualiza os recursos na AWS.</p>
-              <pre><code>terraform apply
+        <div class="info-box highlight">
+          <strong>🎯 Checklist de Validação dos Exercícios:</strong>
+          <pre><code>
+Antes de considerar o exercício concluído, verifique:
 
-# Auto-approve (sem confirmação)
-terraform apply -auto-approve</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform output</code><span class="cmd-tag">Saídas</span></div>
-              <p>Exibe os valores definidos nos outputs após o apply.</p>
-              <pre><code>terraform output
-
-# Output específico
-terraform output vpc_id</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform state list</code><span class="cmd-tag">Estado</span></div>
-              <p>Lista todos os recursos gerenciados no state file.</p>
-              <pre><code>terraform state list</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform state show</code><span class="cmd-tag">Detalhe</span></div>
-              <p>Mostra atributos detalhados de um recurso específico no state.</p>
-              <pre><code>terraform state show aws_vpc.main</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform destroy</code><span class="cmd-tag">Destruir</span></div>
-              <p>Remove todos os recursos gerenciados pelo Terraform. Use com cuidado!</p>
-              <pre><code>terraform destroy
-
-# Auto-approve
-terraform destroy -auto-approve</code></pre>
-            </div>
-          </div>
+□ terraform fmt -check         → Código formatado?
+□ terraform validate           → Sintaxe válida?
+□ terraform plan               → Plano sem erros?
+□ Outputs mostram valores?     → Dados acessíveis?
+□ Tags em TODOS os recursos?   → Governança OK?
+□ .gitignore inclui .terraform/ e *.tfstate?
+          </code></pre>
         </div>
-
-        <!-- Diagrama de Arquitetura -->
-        <div class="topic-block">
-          <h2>Diagrama de Arquitetura</h2>
-          <p>Visão geral da VPC completa criada neste módulo:</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>VPC Architecture</code><span class="cmd-tag">Diagrama</span></div>
-              <pre><code>┌─────────────────────────────────────────────────────────────┐
-│                        VPC 10.0.0.0/16                      │
-│                                                             │
-│  ┌─────────────────────────┐  ┌─────────────────────────┐  │
-│  │   Public Subnet (AZ-a)  │  │   Public Subnet (AZ-b)  │  │
-│  │      10.0.1.0/24        │  │      10.0.2.0/24        │  │
-│  │                         │  │                         │  │
-│  │  ┌───────────────────┐  │  │                         │  │
-│  │  │   NAT Gateway     │  │  │                         │  │
-│  │  └───────────────────┘  │  │                         │  │
-│  └────────────┬────────────┘  └─────────────────────────┘  │
-│               │                                             │
-│  ┌────────────┼────────────┐  ┌─────────────────────────┐  │
-│  │  Private Subnet (AZ-a)  │  │  Private Subnet (AZ-b)  │  │
-│  │      10.0.10.0/24       │  │      10.0.20.0/24       │  │
-│  │               │         │  │                         │  │
-│  │         (via NAT)       │  │       (via NAT)         │  │
-│  └─────────────────────────┘  └─────────────────────────┘  │
-│                                                             │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                  ┌────────┴────────┐
-                  │ Internet Gateway │
-                  └────────┬────────┘
-                           │
-                      ┌────┴────┐
-                      │ Internet │
-                      └─────────┘</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CTA — PRÓXIMO MÓDULO
+         ═══════════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="../terraform.html" class="button secondary">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🏗️ Próximo passo</span>
+          <h2>Pronto para EC2 e Security Groups?</h2>
+          <p>No Módulo 02 você aprenderá a provisionar instâncias EC2, configurar Security Groups, Key Pairs e User Data para automatizar a configuração de servidores.</p>
+        </div>
+        <a href="modulo-02.html" class="button primary">Ir para Módulo 02 →</a>
       </div>
     </section>
   </main>
@@ -426,7 +3298,7 @@ terraform destroy -auto-approve</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

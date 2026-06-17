@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Terraform Módulo 02: VPC + EC2</title>
+  <title>CloudTrilhas — Terraform Módulo 02: EC2, Security Groups e Data Sources</title>
+  <meta name="description" content="Guia completo sobre EC2 com Terraform: instâncias, security groups, key pairs, user data, data sources e lifecycle rules." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../linux-training.css" />
 </head>
@@ -20,20 +21,16 @@
         <a href="modulo-01.html" class="nav-link">← Anterior</a>
         <a href="modulo-03.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,79 +38,492 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🏗️ Terraform — Módulo 02</span>
-        <h1>VPC + EC2</h1>
-        <p>Adicione instâncias EC2 à sua VPC com Security Groups, Key Pairs e User Data. Aprenda Data Sources e funções Terraform.</p>
+        <h1>EC2, Security Groups e Data Sources</h1>
+        <p>Aprenda a provisionar instâncias EC2 completas na AWS com Terraform — desde a consulta dinâmica de AMIs com Data Sources até a configuração avançada de Security Groups, Key Pairs, User Data e Lifecycle Rules. Cada conceito é explicado com analogias, diagramas e código de produção.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node active"><span>02</span><small>EC2 &amp; SG</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>RDS &amp; IAM</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>S3 &amp; State</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 1: DATA SOURCES — CONSULTAR SEM CRIAR
+         ═══════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Consultas Dinâmicas</span>
+          <h2>1. Data Sources — Consultar sem Criar</h2>
+          <p>Data Sources permitem consultar informações de recursos existentes na AWS (ou em outros providers) sem criar ou modificar nada. São a ponte entre o mundo real e seu código Terraform.</p>
+        </div>
 
-        <!-- Data Source AMI -->
         <div class="topic-block">
-          <h2>Data Source AMI</h2>
-          <p>Data Sources permitem buscar informações da AWS sem criar recursos. Aqui buscamos a AMI mais recente do Amazon Linux 2023 dinamicamente.</p>
+          <h3>1.1 O que são Data Sources?</h3>
+          <p>No Terraform, tudo que começa com <code>resource</code> <strong>cria</strong> algo. Tudo que começa com <code>data</code> <strong>consulta</strong> algo que já existe. Essa distinção é fundamental.</p>
+          <p>Pense assim: você está montando um quebra-cabeça (sua infraestrutura). Algumas peças você fabrica do zero (<code>resource</code>). Outras peças já existem na mesa e você precisa apenas encontrá-las para encaixar (<code>data</code>).</p>
+
+          <div class="info-box highlight">
+            <strong>🔍 Analogia — O Catálogo da Biblioteca:</strong>
+            <p>Imagine que você está em uma biblioteca e precisa de um livro específico. Você não vai <em>criar</em> o livro — ele já existe. Você vai ao catálogo (data source), busca pelo título e autor (filters), e o catálogo retorna a localização exata do livro (atributos). Com essa localização, você pega o livro e usa no seu trabalho.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Sintaxe Básica — resource vs data</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# RESOURCE — Cria e gerencia um recurso
+# O Terraform é DONO desse recurso (pode criar, atualizar, destruir)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  tags       = { Name = "minha-vpc" }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# DATA SOURCE — Consulta um recurso existente
+# O Terraform NÃO gerencia esse recurso (apenas lê informações)
+# ═══════════════════════════════════════════════════════════════
+data "aws_vpc" "existing" {
+  filter {
+    name   = "tag:Name"
+    values = ["vpc-producao"]
+  }
+}
+
+# Uso: data.aws_vpc.existing.id  → retorna o ID da VPC encontrada
+# Se não encontrar nenhuma VPC com esse filtro → ERRO no plan</code></pre>
+            </div>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Resource</th>
+                <th>Data Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Prefixo</td><td><code>resource "tipo" "nome"</code></td><td><code>data "tipo" "nome"</code></td></tr>
+              <tr><td>Ação</td><td>Cria, atualiza, destrói</td><td>Apenas lê (read-only)</td></tr>
+              <tr><td>No State</td><td>✅ Armazena estado completo</td><td>✅ Armazena resultado da consulta</td></tr>
+              <tr><td>terraform destroy</td><td>Remove o recurso da cloud</td><td>Não faz nada (não é dono)</td></tr>
+              <tr><td>Referência</td><td><code>aws_vpc.main.id</code></td><td><code>data.aws_vpc.existing.id</code></td></tr>
+              <tr><td>Quando usar</td><td>Recursos que você quer gerenciar</td><td>Recursos pré-existentes ou compartilhados</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 aws_ami — Buscar AMI Dinamicamente</h3>
+          <p>O data source mais usado em projetos EC2. Em vez de hardcodar um AMI ID (que muda por região e é atualizado frequentemente), você busca dinamicamente a AMI mais recente que atende aos seus critérios.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>data "aws_ami" — AMI mais recente do Amazon Linux 2023</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Busca a AMI mais recente do Amazon Linux 2023
+# Isso garante que sempre teremos a última versão com patches
+# ═══════════════════════════════════════════════════════════════
+data "aws_ami" "amazon_linux_2023" {
+  # most_recent = true → Se múltiplas AMIs atendem aos filtros,
+  # retorna apenas a mais recente (pela data de criação)
+  most_recent = true
+
+  # owners → Quem publicou a AMI
+  # "amazon" = AMIs oficiais da AWS
+  # "self"   = AMIs da sua conta
+  # "123456789012" = AMIs de conta específica
+  owners = ["amazon"]
+
+  # filter → Critérios de busca (AND entre filtros)
+  filter {
+    name   = "name"
+    # Padrão de nome da AMI — usa wildcard (*)
+    # al2023-ami-2023.* → Amazon Linux 2023
+    # -kernel-6.1-*     → Kernel versão 6.1
+    # -x86_64           → Arquitetura x86 (64 bits)
+    values = ["al2023-ami-2023.*-kernel-6.1-x86_64"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]  # ou "arm64" para Graviton
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]  # Hardware Virtual Machine (padrão moderno)
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]  # Boot de EBS (não instance-store)
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Atributos disponíveis após a consulta:
+# ═══════════════════════════════════════════════════════════════
+# data.aws_ami.amazon_linux_2023.id          → "ami-0abcdef1234567890"
+# data.aws_ami.amazon_linux_2023.name        → "al2023-ami-2023.3.20240131.0-kernel-6.1-x86_64"
+# data.aws_ami.amazon_linux_2023.owner_id    → "137112412989"
+# data.aws_ami.amazon_linux_2023.creation_date → "2024-01-31T..."
+# data.aws_ami.amazon_linux_2023.description → "Amazon Linux 2023 AMI..."</code></pre>
+            </div>
+          </div>
+
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>data "aws_ami"</code><span class="cmd-tag">Data Source</span></div>
-              <pre><code>data "aws_ami" "amazon_linux" {
+              <div class="command-header"><code>Ubuntu 22.04 LTS</code><span class="cmd-tag">Canonical</span></div>
+              <pre><code># AMI oficial do Ubuntu 22.04 LTS
+data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
   }
+}
 
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}</code></pre>
+# Uso: data.aws_ami.ubuntu.id</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Referência</code><span class="cmd-tag">Uso</span></div>
-              <p>Use <code>data.aws_ami.amazon_linux.id</code> para referenciar o ID da AMI encontrada. Isso garante que sempre usamos a versão mais recente sem hardcoding.</p>
-              <pre><code># Acessar atributos do data source
-data.aws_ami.amazon_linux.id
-data.aws_ami.amazon_linux.name
-data.aws_ami.amazon_linux.description</code></pre>
+              <div class="command-header"><code>Windows Server 2022</code><span class="cmd-tag">Microsoft</span></div>
+              <pre><code># AMI oficial Windows Server 2022
+data "aws_ami" "windows" {
+  most_recent = true
+  owners      = ["801119661308"] # Microsoft
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+# Uso: data.aws_ami.windows.id</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Cuidado com most_recent em Produção:</strong>
+            <p>Usar <code>most_recent = true</code> significa que cada <code>terraform plan</code> pode retornar uma AMI diferente se a AWS publicou uma nova versão. Isso pode causar <strong>recreação da instância</strong> (já que mudar AMI = destroy + create). Em produção, considere fixar o AMI ID após o primeiro deploy ou usar filtros mais específicos.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 aws_availability_zones — Zonas Disponíveis</h3>
+          <p>Cada região AWS tem múltiplas Availability Zones. Em vez de hardcodar <code>["us-east-1a", "us-east-1b"]</code>, consulte dinamicamente:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>data "aws_availability_zones"</code><span class="cmd-tag">Dinâmico</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Busca todas as AZs disponíveis na região configurada no provider
+# ═══════════════════════════════════════════════════════════════
+data "aws_availability_zones" "available" {
+  # state = "available" → Apenas AZs ativas (exclui deprecated)
+  state = "available"
+
+  # Opcional: excluir Local Zones e Wavelength Zones
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
+# Atributos retornados:
+# data.aws_availability_zones.available.names
+#   → ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", ...]
+# data.aws_availability_zones.available.zone_ids
+#   → ["use1-az1", "use1-az2", "use1-az3", ...]
+
+# ═══════════════════════════════════════════════════════════════
+# Uso prático: criar subnets em cada AZ automaticamente
+# ═══════════════════════════════════════════════════════════════
+resource "aws_subnet" "public" {
+  # count = número de AZs disponíveis (geralmente 3-6)
+  count             = length(data.aws_availability_zones.available.names)
+  vpc_id            = aws_vpc.main.id
+  # cidrsubnet calcula CIDR automaticamente: 10.0.0.0/24, 10.0.1.0/24...
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
+  tags = {
+    Name = "subnet-public-${data.aws_availability_zones.available.names[count.index]}"
+  }
+}</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Security Group -->
         <div class="topic-block">
-          <h2>Security Group</h2>
-          <p>Security Groups atuam como firewall virtual para suas instâncias EC2. Defina regras de ingress (entrada) e egress (saída).</p>
+          <h3>1.4 aws_caller_identity e aws_region</h3>
+          <p>Dois data sources simples mas extremamente úteis para tornar seu código auto-referencial:</p>
+
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>aws_security_group</code><span class="cmd-tag">Firewall</span></div>
-              <pre><code>variable "my_ip" {
-  description = "Seu IP público para acesso SSH (formato: x.x.x.x/32)"
-  type        = string
+              <div class="command-header"><code>aws_caller_identity</code><span class="cmd-tag">Quem sou eu?</span></div>
+              <pre><code># Retorna informações sobre a conta
+# AWS autenticada atualmente
+data "aws_caller_identity" "current" {}
+
+# Atributos:
+# .account_id → "123456789012"
+# .arn        → "arn:aws:iam::123456789012:user/tf"
+# .user_id    → "AIDAEXAMPLE123"
+
+# Uso prático: construir ARNs dinamicamente
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+  
+  # ARN dinâmico para políticas IAM
+  s3_arn = "arn:aws:s3:::bucket-${local.account_id}"
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>aws_region</code><span class="cmd-tag">Onde estou?</span></div>
+              <pre><code># Retorna a região configurada
+# no provider AWS
+data "aws_region" "current" {}
+
+# Atributos:
+# .name        → "us-east-1"
+# .description → "US East (N. Virginia)"
+
+# Uso prático: endpoints regionais
+locals {
+  region = data.aws_region.current.name
+  
+  # Construir endpoint S3 regional
+  s3_endpoint = "s3.${local.region}.amazonaws.com"
+  
+  # Tags padronizadas
+  common_tags = {
+    Region    = local.region
+    AccountId = local.account_id
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 Por que usar data sources em vez de hardcodar?</strong>
+            <ul>
+              <li><strong>Portabilidade:</strong> O mesmo código funciona em qualquer região sem alteração</li>
+              <li><strong>Manutenção:</strong> AMI IDs mudam; data sources sempre pegam a versão atual</li>
+              <li><strong>Segurança:</strong> Não expor account IDs em variáveis — consulte dinamicamente</li>
+              <li><strong>DRY:</strong> Evita repetição de valores que podem ser derivados automaticamente</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 Outros Data Sources Úteis</h3>
+          <p>A AWS provider possui centenas de data sources. Aqui estão os mais usados no dia a dia:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Data Sources Essenciais</code><span class="cmd-tag">Referência</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Buscar VPC existente por tag
+# ═══════════════════════════════════════════════════════════════
+data "aws_vpc" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = ["vpc-producao"]
+  }
 }
 
-resource "aws_security_group" "web" {
-  name        = "${var.project_name}-web-sg"
-  description = "Security Group para instancia web"
-  vpc_id      = aws_vpc.main.id
+# ═══════════════════════════════════════════════════════════════
+# Buscar subnets de uma VPC por tag
+# ═══════════════════════════════════════════════════════════════
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
+  filter {
+    name   = "tag:Tier"
+    values = ["private"]
+  }
+}
+# Retorna: data.aws_subnets.private.ids → ["subnet-abc", "subnet-def"]
 
-  # HTTP
+# ═══════════════════════════════════════════════════════════════
+# Buscar Security Group existente
+# ═══════════════════════════════════════════════════════════════
+data "aws_security_group" "alb" {
+  filter {
+    name   = "group-name"
+    values = ["alb-sg-producao"]
+  }
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Buscar a última versão de um secret no Secrets Manager
+# ═══════════════════════════════════════════════════════════════
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = "producao/database/master-password"
+}
+# Uso: jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["password"]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 2: SECURITY GROUPS — FIREWALL VIRTUAL
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Segurança de Rede</span>
+          <h2>2. Security Groups — Firewall Virtual</h2>
+          <p>Security Groups são o firewall virtual da AWS que controla todo o tráfego de entrada e saída das suas instâncias. Entenda profundamente como funcionam, por que são stateful e como configurá-los corretamente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 O que é um Security Group?</h3>
+          <p>Um Security Group (SG) é um <strong>firewall virtual stateful</strong> que atua no nível da interface de rede (ENI). Ele controla quais conexões são permitidas para entrar (ingress) e sair (egress) de uma instância EC2, RDS, Lambda VPC, ELB, ou qualquer recurso com ENI.</p>
+
+          <div class="info-box highlight">
+            <strong>🏢 Analogia — O Porteiro do Prédio:</strong>
+            <p>Imagine que sua instância EC2 é um apartamento em um prédio. O Security Group é o <strong>porteiro</strong> na portaria. Quando alguém chega (ingress), o porteiro verifica a lista de visitantes autorizados. Se a pessoa está na lista (regra permite), entra. Se não está, é barrada.</p>
+            <p>A parte <strong>stateful</strong> funciona assim: se o porteiro autorizou a entrada de um visitante, ele automaticamente permite que esse visitante saia depois — sem precisar de uma regra separada de saída para respostas.</p>
+            <p>Cada regra de ingress é como uma instrução para o porteiro: "Deixe entrar qualquer pessoa que venha da empresa X (source) e esteja indo para o andar 443 (porta)."</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Fluxo de Tráfego com Security Group</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>
+┌─────────────────────────────────────────────────────────────────────┐
+│                         VPC (10.0.0.0/16)                           │
+│                                                                     │
+│   ┌─────────────────────────────────────────────────────────┐       │
+│   │              Security Group: web-sg                      │       │
+│   │                                                         │       │
+│   │   INGRESS (Entrada):                                    │       │
+│   │   ┌───────────────────────────────────────────┐         │       │
+│   │   │ Porta 80  ← 0.0.0.0/0  (HTTP de qualquer)│         │       │
+│   │   │ Porta 443 ← 0.0.0.0/0  (HTTPS de qualquer)│        │       │
+│   │   │ Porta 22  ← 10.0.0.0/16 (SSH só da VPC)  │         │       │
+│   │   └───────────────────────────────────────────┘         │       │
+│   │                                                         │       │
+│   │   ┌─────────────────┐                                   │       │
+│   │   │   EC2 Instance  │                                   │       │
+│   │   │   (web-server)  │                                   │       │
+│   │   └─────────────────┘                                   │       │
+│   │                                                         │       │
+│   │   EGRESS (Saída):                                       │       │
+│   │   ┌───────────────────────────────────────────┐         │       │
+│   │   │ Tudo     → 0.0.0.0/0  (permite toda saída)│         │       │
+│   │   └───────────────────────────────────────────┘         │       │
+│   │                                                         │       │
+│   └─────────────────────────────────────────────────────────┘       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+              </code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 Stateful vs Stateless — A Diferença Crucial</h3>
+          <p>Essa é uma das perguntas mais frequentes em entrevistas AWS e certificações:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Security Group (Stateful)</th>
+                <th>Network ACL (Stateless)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Nível</td><td>Instância (ENI)</td><td>Subnet</td></tr>
+              <tr><td>Stateful</td><td>✅ Sim — resposta automática</td><td>❌ Não — precisa regra de retorno</td></tr>
+              <tr><td>Regras</td><td>Apenas ALLOW (deny implícito)</td><td>ALLOW e DENY explícitos</td></tr>
+              <tr><td>Avaliação</td><td>Todas as regras são avaliadas</td><td>Regras avaliadas em ordem numérica</td></tr>
+              <tr><td>Default</td><td>Ingress: deny all / Egress: allow all</td><td>Allow all (in/out)</td></tr>
+              <tr><td>Associação</td><td>N instâncias podem usar 1 SG</td><td>Aplicada a toda a subnet</td></tr>
+              <tr><td>Múltiplos</td><td>Até 5 SGs por ENI (configurável)</td><td>1 NACL por subnet</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>🔄 O que "Stateful" significa na prática:</strong>
+            <pre><code>
+STATEFUL (Security Group):
+═══════════════════════════
+1. Cliente envia request na porta 443 (HTTPS)
+2. SG verifica regra de INGRESS → porta 443 permitida de 0.0.0.0/0 ✅
+3. Request chega na instância
+4. Instância responde na porta efêmera (ex: 49152)
+5. SG AUTOMATICAMENTE permite a resposta sair ✅ (não precisa regra de egress)
+
+STATELESS (Network ACL):
+═══════════════════════════
+1. Cliente envia request na porta 443
+2. NACL inbound verifica → regra 100 permite porta 443 ✅
+3. Request chega na subnet/instância
+4. Instância responde na porta efêmera (ex: 49152)
+5. NACL outbound verifica → PRECISA de regra permitindo portas efêmeras! ⚠️
+   Se não tiver regra para portas 1024-65535, resposta é BLOQUEADA ❌
+            </code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 Criando Security Groups com Terraform</h3>
+          <p>O recurso <code>aws_security_group</code> cria o grupo, e as regras podem ser definidas inline ou como recursos separados:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Security Group com Regras Inline</code><span class="cmd-tag">Básico</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Security Group para Web Server (HTTP + HTTPS + SSH restrito)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_security_group" "web" {
+  name        = "web-server-sg"
+  description = "Security group para servidores web - permite HTTP, HTTPS e SSH restrito"
+  vpc_id      = aws_vpc.main.id  # SG pertence a uma VPC específica
+
+  # ─── REGRAS DE ENTRADA (Ingress) ─────────────────────────────
+  
+  # Permite HTTP de qualquer lugar (para o site público)
   ingress {
     description = "HTTP from anywhere"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # IPv4 qualquer
   }
 
-  # HTTPS
+  # Permite HTTPS de qualquer lugar
   ingress {
     description = "HTTPS from anywhere"
     from_port   = 443
@@ -122,285 +532,2631 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # SSH - restrito ao seu IP
+  # SSH apenas da rede interna (NUNCA abra SSH para 0.0.0.0/0 em produção!)
   ingress {
-    description = "SSH from my IP"
+    description = "SSH from VPC only"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.my_ip]
+    cidr_blocks = [aws_vpc.main.cidr_block]  # Apenas de dentro da VPC
   }
 
-  # Egress - permitir todo tráfego de saída
+  # ─── REGRAS DE SAÍDA (Egress) ────────────────────────────────
+  
+  # Permite toda saída (padrão — instância pode acessar internet)
   egress {
-    description = "Allow all outbound"
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"          # -1 = todos os protocolos
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "web-server-sg"
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+
+  # Lifecycle: evita downtime ao atualizar regras
+  lifecycle {
+    create_before_destroy = true
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 Self-Referencing e Múltiplos SGs</h3>
+          <p><strong>Self-referencing</strong> permite que instâncias no mesmo Security Group se comuniquem entre si. Isso é comum em clusters onde todos os nós precisam conversar.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Self-Referencing e Source Security Group</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# SG para cluster de aplicação — permite comunicação interna
+# ═══════════════════════════════════════════════════════════════
+resource "aws_security_group" "app_cluster" {
+  name        = "app-cluster-sg"
+  description = "Permite comunicacao entre instancias do cluster"
+  vpc_id      = aws_vpc.main.id
+
+  # Self-referencing: instâncias com ESTE SG podem se comunicar
+  # em qualquer porta (útil para clusters Redis, Kafka, etc.)
+  ingress {
+    description = "All traffic from same security group"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true  # ← SELF REFERENCE
+  }
+
+  # Tráfego vindo do Load Balancer (outro SG)
+  ingress {
+    description     = "HTTP from ALB"
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    # Em vez de CIDR, referencia OUTRO Security Group
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.project_name}-web-sg"
-  }
-}</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Key Pair -->
-        <div class="topic-block">
-          <h2>Key Pair</h2>
-          <p>Key Pairs permitem acesso SSH às instâncias EC2. Use a função <code>file()</code> para ler a chave pública do disco.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>aws_key_pair</code><span class="cmd-tag">SSH</span></div>
-              <pre><code># Gerar key pair localmente (se ainda não tiver):
-# ssh-keygen -t ed25519 -f ~/.ssh/terraform-key -C "terraform"
-
-resource "aws_key_pair" "main" {
-  key_name   = "${var.project_name}-key"
-  public_key = file("~/.ssh/terraform-key.pub")
-
-  tags = {
-    Name = "${var.project_name}-key"
-  }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Função file()</code><span class="cmd-tag">Built-in</span></div>
-              <p>A função <code>file(path)</code> lê o conteúdo de um arquivo no disco local durante o plan/apply. Ideal para chaves públicas, scripts e templates.</p>
-              <pre><code># Exemplos de uso da função file()
-file("~/.ssh/id_rsa.pub")
-file("${path.module}/scripts/init.sh")
-file("${path.root}/configs/policy.json")</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- EC2 Instance -->
-        <div class="topic-block">
-          <h2>EC2 Instance</h2>
-          <p>O recurso <code>aws_instance</code> cria uma instância EC2 na subnet pública com todas as configurações de rede e inicialização.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>aws_instance</code><span class="cmd-tag">Compute</span></div>
-              <pre><code>resource "aws_instance" "web" {
-  ami                    = data.aws_ami.amazon_linux.id
-  instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public[0].id
-  key_name               = aws_key_pair.main.key_name
-  vpc_security_group_ids = [aws_security_group.web.id]
-
-  user_data = file("${path.module}/scripts/user-data.sh")
-
-  tags = {
-    Name = "${var.project_name}-web-server"
-  }
-}</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Alternativa: Heredoc</code><span class="cmd-tag">Inline</span></div>
-              <p>Para scripts curtos, você pode usar heredoc diretamente no user_data:</p>
-              <pre><code>resource "aws_instance" "web" {
-  ami                    = data.aws_ami.amazon_linux.id
-  instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public[0].id
-  key_name               = aws_key_pair.main.key_name
-  vpc_security_group_ids = [aws_security_group.web.id]
-
-  user_data = &lt;&lt;-EOF
-    #!/bin/bash
-    yum update -y
-    yum install -y httpd
-    systemctl start httpd
-    systemctl enable httpd
-    echo "&lt;h1&gt;Hello from Terraform!&lt;/h1&gt;" > /var/www/html/index.html
-  EOF
-
-  tags = {
-    Name = "${var.project_name}-web-server"
-  }
-}</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- User Data Script -->
-        <div class="topic-block">
-          <h2>User Data Script</h2>
-          <p>O User Data é executado automaticamente na primeira inicialização da instância (como root). Ideal para instalar pacotes e configurar serviços.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>scripts/user-data.sh</code><span class="cmd-tag">Bootstrap</span></div>
-              <pre><code>#!/bin/bash
-set -euxo pipefail
-
-# Atualizar pacotes do sistema
-yum update -y
-
-# Instalar Apache HTTP Server
-yum install -y httpd
-
-# Iniciar e habilitar o serviço
-systemctl start httpd
-systemctl enable httpd
-
-# Criar página inicial
-cat &lt;&lt;'HTML' > /var/www/html/index.html
-&lt;!DOCTYPE html&gt;
-&lt;html lang="pt-BR"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;title&gt;CloudTrilhas - EC2 com Terraform&lt;/title&gt;
-  &lt;style&gt;
-    body { font-family: sans-serif; text-align: center; padding: 50px; }
-    h1 { color: #2563eb; }
-  &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;h1&gt;🚀 EC2 provisionada com Terraform!&lt;/h1&gt;
-  &lt;p&gt;Hostname: $(hostname)&lt;/p&gt;
-  &lt;p&gt;IP Privado: $(hostname -I | awk '{print $1}')&lt;/p&gt;
-  &lt;p&gt;Data: $(date)&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-HTML
-
-echo "User data script completed successfully"</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Outputs -->
-        <div class="topic-block">
-          <h2>Outputs</h2>
-          <p>Outputs da instância EC2 para acesso e referência rápida.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>outputs.tf</code><span class="cmd-tag">Saídas</span></div>
-              <pre><code>output "instance_id" {
-  description = "ID da instância EC2"
-  value       = aws_instance.web.id
+  tags = { Name = "app-cluster-sg" }
 }
 
-output "public_ip" {
-  description = "IP público da instância"
-  value       = aws_instance.web.public_ip
-}
+# ═══════════════════════════════════════════════════════════════
+# Uma instância pode ter MÚLTIPLOS Security Groups
+# As regras são UNIDAS (OR) — se qualquer SG permite, passa
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.medium"
+  
+  # Múltiplos SGs — regras combinadas
+  vpc_security_group_ids = [
+    aws_security_group.app_cluster.id,  # Comunicação do cluster
+    aws_security_group.monitoring.id,    # Acesso do Prometheus
+    aws_security_group.ssh_bastion.id,   # SSH via bastion
+  ]
 
-output "public_dns" {
-  description = "DNS público da instância"
-  value       = aws_instance.web.public_dns
+  subnet_id = aws_subnet.private[0].id
+  tags      = { Name = "app-server-01" }
 }</code></pre>
             </div>
-            <div class="command-card">
-              <div class="command-header"><code>Acessar a instância</code><span class="cmd-tag">Uso</span></div>
-              <pre><code># Após terraform apply, acesse via SSH:
-ssh -i ~/.ssh/terraform-key ec2-user@$(terraform output -raw public_ip)
+          </div>
 
-# Ou acesse o web server no navegador:
-# http://$(terraform output -raw public_dns)</code></pre>
-            </div>
+          <div class="info-box warning">
+            <strong>⚠️ Best Practices de Security Groups:</strong>
+            <ul>
+              <li><strong>Least Privilege:</strong> Abra apenas as portas necessárias, para os sources necessários</li>
+              <li><strong>Nunca 0.0.0.0/0 para SSH:</strong> Use bastion host, VPN ou Systems Manager Session Manager</li>
+              <li><strong>Use source SG em vez de CIDR:</strong> Quando o tráfego vem de outro recurso AWS, referencie o SG dele</li>
+              <li><strong>Description em cada regra:</strong> Documente POR QUE cada regra existe</li>
+              <li><strong>Nomeie claramente:</strong> "web-server-sg" é melhor que "sg-1" ou "allow-all"</li>
+              <li><strong>Um SG por função:</strong> Não crie um SG gigante — separe por papel (web, app, db, monitoring)</li>
+            </ul>
           </div>
         </div>
-
-        <!-- Novos Comandos -->
-        <div class="topic-block">
-          <h2>Novos Comandos Aprendidos</h2>
-          <p>Comandos avançados para controle granular do Terraform.</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>terraform plan -out</code><span class="cmd-tag">Salvar Plano</span></div>
-              <p>Salva o plano de execução em um arquivo binário. Garante que o apply executará exatamente o que foi revisado.</p>
-              <pre><code># Salvar plano em arquivo
-terraform plan -out=plan.tfplan
-
-# Visualizar plano salvo
-terraform show plan.tfplan</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform apply plan.tfplan</code><span class="cmd-tag">Aplicar Plano</span></div>
-              <p>Aplica um plano salvo anteriormente. Não pede confirmação pois o plano já foi revisado.</p>
-              <pre><code># Aplicar plano salvo (sem prompt de confirmação)
-terraform apply plan.tfplan</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>terraform apply -target</code><span class="cmd-tag">Recurso Específico</span></div>
-              <p>Aplica mudanças apenas em um recurso específico. Útil para debugging e deploys parciais.</p>
-              <pre><code># Aplicar apenas a instância EC2
-terraform apply -target=aws_instance.web
-
-# Aplicar apenas o security group
-terraform apply -target=aws_security_group.web
-
-# Múltiplos targets
-terraform apply \
-  -target=aws_security_group.web \
-  -target=aws_instance.web</code></pre>
-            </div>
-          </div>
-          <div class="info-box">
-            <p>⚠️ <strong>Atenção:</strong> O uso de <code>-target</code> deve ser temporário. Em produção, sempre aplique o plano completo para manter o state consistente com a configuração.</p>
-          </div>
-        </div>
-
-        <!-- Diagrama de Arquitetura -->
-        <div class="topic-block">
-          <h2>Diagrama de Arquitetura</h2>
-          <p>Visão geral da VPC com instância EC2 na subnet pública:</p>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>VPC + EC2 Architecture</code><span class="cmd-tag">Diagrama</span></div>
-              <pre><code>┌─────────────────────────────────────────────────────────────┐
-│                        VPC 10.0.0.0/16                      │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              Public Subnet (AZ-a) 10.0.1.0/24       │   │
-│  │                                                     │   │
-│  │   ┌─────────────────────────────────────────────┐   │   │
-│  │   │           EC2 Instance (t3.micro)           │   │   │
-│  │   │                                             │   │   │
-│  │   │  AMI: Amazon Linux 2023                     │   │   │
-│  │   │  Security Group:                            │   │   │
-│  │   │    ✓ HTTP  (80)  ← 0.0.0.0/0              │   │   │
-│  │   │    ✓ HTTPS (443) ← 0.0.0.0/0              │   │   │
-│  │   │    ✓ SSH   (22)  ← seu_ip/32              │   │   │
-│  │   │                                             │   │   │
-│  │   │  User Data: Apache + index.html             │   │   │
-│  │   └─────────────────────────────────────────────┘   │   │
-│  │                                                     │   │
-│  └──────────────────────────┬──────────────────────────┘   │
-│                             │                               │
-│  ┌──────────────────────────┴──────────────────────────┐   │
-│  │            Private Subnet (AZ-a) 10.0.10.0/24       │   │
-│  │                  (recursos futuros)                  │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                      ┌────────┴────────┐
-                      │ Internet Gateway │
-                      └────────┬────────┘
-                               │
-                          ┌────┴────┐
-                          │ Internet │
-                          └─────────┘
-
-  Usuário → Internet → IGW → Public Subnet → EC2 (porta 80/443)
-  Admin  → Internet → IGW → Public Subnet → EC2 (porta 22/SSH)</code></pre>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 3: SECURITY GROUP RULES
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Regras Detalhadas</span>
+          <h2>3. Security Group Rules — Regras como Recursos</h2>
+          <p>Entenda a diferença entre definir regras inline e como recursos separados, padrões comuns para web servers, bastions e databases, e como usar CIDR blocks e source Security Groups.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 Inline Rules vs aws_security_group_rule</h3>
+          <p>O Terraform oferece duas formas de criar regras de Security Group. Cada uma tem vantagens e desvantagens:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Regras Inline (dentro do SG)</th>
+                <th>aws_security_group_rule (separado)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Definição</td><td>Bloco ingress/egress dentro do resource</td><td>Recurso independente referenciando o SG</td></tr>
+              <tr><td>Conflito</td><td>⚠️ Conflita com rules separadas</td><td>✅ Pode coexistir com outras rules</td></tr>
+              <tr><td>Módulos</td><td>❌ Não permite adicionar regras externamente</td><td>✅ Módulos podem adicionar regras ao SG</td></tr>
+              <tr><td>Legibilidade</td><td>✅ Tudo em um lugar</td><td>⚠️ Espalhado em vários recursos</td></tr>
+              <tr><td>Recomendação</td><td>Projetos simples e pequenos</td><td>Projetos grandes e modulares</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <strong>⚠️ NUNCA misture inline e rules separadas para o mesmo SG!</strong>
+            <p>Se você definir regras inline E usar <code>aws_security_group_rule</code> apontando para o mesmo Security Group, o Terraform entrará em um loop infinito de mudanças. O plan sempre mostrará alterações porque um tenta sobrescrever o outro. Escolha UM dos métodos e seja consistente.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>aws_security_group_rule — Regras como Recursos Separados</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# PADRÃO RECOMENDADO: SG vazio + regras separadas
+# Permite que módulos adicionem regras sem modificar o SG
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Security Group SEM regras inline
+resource "aws_security_group" "web" {
+  name        = "${var.project}-web-sg"
+  description = "Security group para servidores web"
+  vpc_id      = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.project}-web-sg"
+  }
+
+  # Importante: sem blocos ingress/egress aqui!
+}
+
+# 2. Regra de Ingress — HTTP
+resource "aws_security_group_rule" "web_http_ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow HTTP from internet"
+  security_group_id = aws_security_group.web.id  # ← A qual SG pertence
+}
+
+# 3. Regra de Ingress — HTTPS
+resource "aws_security_group_rule" "web_https_ingress" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow HTTPS from internet"
+  security_group_id = aws_security_group.web.id
+}
+
+# 4. Regra de Ingress — SSH apenas do bastion
+resource "aws_security_group_rule" "web_ssh_from_bastion" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  # Em vez de CIDR, referencia o SG do bastion host
+  source_security_group_id = aws_security_group.bastion.id
+  description              = "Allow SSH from bastion host only"
+  security_group_id        = aws_security_group.web.id
+}
+
+# 5. Regra de Egress — permite toda saída
+resource "aws_security_group_rule" "web_all_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic"
+  security_group_id = aws_security_group.web.id
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 CIDR Blocks Explicados</h3>
+          <p>CIDR (Classless Inter-Domain Routing) é a notação usada para definir ranges de IPs. Entender CIDRs é essencial para configurar Security Groups corretamente.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>CIDR</th>
+                <th>Range de IPs</th>
+                <th>Total de IPs</th>
+                <th>Uso Comum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>0.0.0.0/0</code></td><td>Todos os IPs (internet)</td><td>4.3 bilhões</td><td>Acesso público (HTTP/HTTPS)</td></tr>
+              <tr><td><code>10.0.0.0/16</code></td><td>10.0.0.0 — 10.0.255.255</td><td>65.536</td><td>CIDR da VPC inteira</td></tr>
+              <tr><td><code>10.0.1.0/24</code></td><td>10.0.1.0 — 10.0.1.255</td><td>256</td><td>Uma subnet</td></tr>
+              <tr><td><code>10.0.1.50/32</code></td><td>Apenas 10.0.1.50</td><td>1</td><td>IP específico (bastion)</td></tr>
+              <tr><td><code>192.168.0.0/16</code></td><td>192.168.0.0 — 192.168.255.255</td><td>65.536</td><td>Rede corporativa (VPN)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💡 Dica: /32 = IP único</strong>
+            <p>Quando você quer permitir tráfego de um IP específico (como seu IP de casa para SSH), use <code>/32</code>. Exemplo: <code>cidr_blocks = ["203.0.113.50/32"]</code> permite APENAS esse IP.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 Padrões Comuns de Security Groups</h3>
+          <p>Aqui estão configurações completas para os cenários mais frequentes:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Bastion Host</code><span class="cmd-tag">Jump Server</span></div>
+              <pre><code># SG para Bastion Host (ponto de entrada SSH)
+resource "aws_security_group" "bastion" {
+  name        = "bastion-sg"
+  description = "Bastion host - SSH from corporate"
+  vpc_id      = aws_vpc.main.id
+
+  # SSH apenas do IP corporativo/VPN
+  ingress {
+    description = "SSH from corporate VPN"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.corporate_cidrs
+    # Ex: ["200.150.100.0/24"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "bastion-sg" }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Database (RDS)</code><span class="cmd-tag">Privado</span></div>
+              <pre><code># SG para RDS — aceita APENAS da aplicação
+resource "aws_security_group" "database" {
+  name        = "database-sg"
+  description = "RDS - access from app only"
+  vpc_id      = aws_vpc.main.id
+
+  # PostgreSQL apenas do SG da aplicação
+  ingress {
+    description     = "PostgreSQL from app"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [
+      aws_security_group.app.id
+    ]
+  }
+
+  # SEM egress para internet (DB isolado)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+    # Só comunica dentro da VPC
+  }
+
+  tags = { Name = "database-sg" }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Arquitetura Completa — ALB → App → DB</code><span class="cmd-tag">Produção</span></div>
+              <pre><code>
+# Diagrama de SGs em cadeia (defense in depth):
+#
+#  Internet → [ALB-SG] → [APP-SG] → [DB-SG]
+#    │           │            │           │
+#    │    80,443 de 0.0.0.0/0 │   5432 de APP-SG apenas
+#    │           │            │           │
+#    │           └── 8080 de ALB-SG ──────┘
+#    │                        │
+#    └── SSH 22 bloqueado (usa SSM)
+
+# ALB Security Group
+resource "aws_security_group" "alb" {
+  name   = "alb-sg"
+  vpc_id = aws_vpc.main.id
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Internet → ALB
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = { Name = "alb-sg" }
+}
+
+# App Security Group — aceita SOMENTE do ALB
+resource "aws_security_group" "app" {
+  name   = "app-sg"
+  vpc_id = aws_vpc.main.id
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]  # ALB → App
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = { Name = "app-sg" }
+}
+
+# DB Security Group — aceita SOMENTE da App
+resource "aws_security_group" "db" {
+  name   = "db-sg"
+  vpc_id = aws_vpc.main.id
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]  # App → DB
+  }
+  tags = { Name = "db-sg" }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 4: KEY PAIRS — SSH AUTHENTICATION
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Autenticação</span>
+          <h2>4. Key Pairs — Autenticação SSH</h2>
+          <p>Entenda como funciona a autenticação por chaves SSH, como gerar key pairs, registrá-los na AWS com Terraform e as alternativas modernas como Systems Manager.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 Como Funciona a Autenticação SSH por Chaves</h3>
+          <p>A autenticação SSH por chaves é baseada em <strong>criptografia assimétrica</strong> — um par de chaves matematicamente relacionadas onde uma é pública (pode compartilhar) e outra é privada (NUNCA compartilhar).</p>
+
+          <div class="info-box highlight">
+            <strong>🔐 Analogia — A Chave de Casa:</strong>
+            <p>Imagine que a <strong>chave pública</strong> é a fechadura instalada na porta da sua casa (EC2). Qualquer um pode ver a fechadura, mas só quem tem a <strong>chave privada</strong> (que fica no bolso, protegida) consegue abrir. Você pode instalar cópias da mesma fechadura em várias casas (instâncias), mas a chave privada é única e pessoal.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Fluxo de Autenticação SSH</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>
+┌──────────────────────┐                    ┌──────────────────────┐
+│   Seu Computador     │                    │    EC2 Instance      │
+│                      │                    │                      │
+│  ~/.ssh/id_rsa       │ ── SSH Connect ──▶ │  ~/.ssh/authorized   │
+│  (Chave PRIVADA)     │                    │  _keys               │
+│  🔑 Secreta          │                    │  (Chave PÚBLICA)     │
+│                      │                    │  🔓 Pode compartilhar│
+└──────────────────────┘                    └──────────────────────┘
+         │                                            │
+         │  1. Cliente envia: "Quero conectar"        │
+         │─────────────────────────────────────────▶  │
+         │                                            │
+         │  2. Servidor envia desafio criptográfico   │
+         │  ◀─────────────────────────────────────────│
+         │                                            │
+         │  3. Cliente assina com chave PRIVADA       │
+         │─────────────────────────────────────────▶  │
+         │                                            │
+         │  4. Servidor verifica com chave PÚBLICA    │
+         │     Se bater → ACESSO CONCEDIDO ✅         │
+         │  ◀─────────────────────────────────────────│
+
+# Na AWS:
+# - Você registra a chave PÚBLICA no Key Pair
+# - AWS injeta no ~/.ssh/authorized_keys da instância no boot
+# - Você usa a chave PRIVADA para SSH
+              </code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 Gerar Chaves SSH Localmente</h3>
+          <p>O método mais seguro é gerar as chaves no seu computador — a chave privada nunca sai da sua máquina:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ssh-keygen — Gerar Par de Chaves</code><span class="cmd-tag">Terminal</span></div>
+              <pre><code># Gerar par de chaves RSA 4096 bits (mais seguro que 2048)
+ssh-keygen -t rsa -b 4096 -C "terraform@cloudtrilhas" -f ~/.ssh/terraform-key
+
+# Parâmetros explicados:
+# -t rsa     → Algoritmo RSA (compatível com tudo)
+# -b 4096    → 4096 bits (força criptográfica alta)
+# -C "..."   → Comentário (identificação da chave)
+# -f path    → Arquivo de saída (sem extensão = privada, .pub = pública)
+
+# Resultado:
+# ~/.ssh/terraform-key      ← Chave PRIVADA (chmod 600!)
+# ~/.ssh/terraform-key.pub  ← Chave PÚBLICA (registrar na AWS)
+
+# ALTERNATIVA: ED25519 (mais moderno e rápido)
+ssh-keygen -t ed25519 -C "terraform@cloudtrilhas" -f ~/.ssh/terraform-ed25519
+
+# Proteger a chave privada (OBRIGATÓRIO)
+chmod 600 ~/.ssh/terraform-key
+chmod 644 ~/.ssh/terraform-key.pub
+
+# Verificar o conteúdo da chave pública
+cat ~/.ssh/terraform-key.pub
+# ssh-rsa AAAAB3NzaC1yc2EAAAA... terraform@cloudtrilhas</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 Registrar Key Pair na AWS com Terraform</h3>
+          <p>Após gerar a chave localmente, registre a parte pública na AWS:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>Método 1: Arquivo Local</code><span class="cmd-tag">Recomendado</span></div>
+              <pre><code># Registra chave pública que já existe
+# no seu computador
+resource "aws_key_pair" "deployer" {
+  key_name   = "terraform-deployer"
+  
+  # Lê o conteúdo do arquivo .pub
+  public_key = file("~/.ssh/terraform-key.pub")
+
+  tags = {
+    Name      = "terraform-deployer"
+    ManagedBy = "terraform"
+  }
+}
+
+# Uso na instância:
+# key_name = aws_key_pair.deployer.key_name
+
+# Para conectar via SSH:
+# ssh -i ~/.ssh/terraform-key \
+#   ec2-user@<IP_PUBLICO></code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>Método 2: Variável</code><span class="cmd-tag">CI/CD</span></div>
+              <pre><code># Para CI/CD onde o arquivo não existe
+# no runner — passe como variável
+
+variable "ssh_public_key" {
+  description = "SSH public key content"
+  type        = string
+  sensitive   = true
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name   = "terraform-deployer"
+  public_key = var.ssh_public_key
+
+  tags = {
+    Name = "terraform-deployer"
+  }
+}
+
+# No CI/CD:
+# terraform apply \
+#   -var="ssh_public_key=$(cat key.pub)"</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Método 3: tls_private_key (Desenvolvimento Apenas!)</code><span class="cmd-tag">⚠️ Dev Only</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ⚠️  ATENÇÃO: Este método gera a chave PRIVADA no state file!
+#     Use APENAS para desenvolvimento/testes. Em produção, gere
+#     chaves externamente e importe apenas a pública.
+# ═══════════════════════════════════════════════════════════════
+
+# Gerar par de chaves via Terraform
+resource "tls_private_key" "dev_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# Registrar a chave pública na AWS
+resource "aws_key_pair" "dev" {
+  key_name   = "dev-key"
+  public_key = tls_private_key.dev_key.public_key_openssh
+}
+
+# Salvar chave privada localmente (para SSH)
+resource "local_file" "private_key" {
+  content         = tls_private_key.dev_key.private_key_pem
+  filename        = "${path.module}/dev-key.pem"
+  file_permission = "0600"  # Apenas owner pode ler
+}
+
+# Output para facilitar o SSH
+output "ssh_command" {
+  value = "ssh -i dev-key.pem ec2-user@${aws_instance.dev.public_ip}"
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ tls_private_key — Riscos em Produção:</strong>
+            <ul>
+              <li>A chave privada fica armazenada no <strong>state file</strong> em texto plano</li>
+              <li>Qualquer pessoa com acesso ao state tem acesso SSH às instâncias</li>
+              <li>Se o state estiver no S3 sem encryption, a chave está exposta</li>
+              <li><strong>Alternativa segura:</strong> AWS Systems Manager Session Manager (sem necessidade de SSH keys)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 Alternativa Moderna: AWS Systems Manager</h3>
+          <p>Em 2024+, a recomendação da AWS é usar <strong>Session Manager</strong> em vez de SSH direto. Isso elimina a necessidade de key pairs, portas SSH abertas e bastion hosts.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Session Manager — Sem SSH, Sem Key Pair</code><span class="cmd-tag">Moderno</span></div>
+              <pre><code># Com Session Manager, você NÃO precisa:
+# ❌ Key Pair
+# ❌ Security Group com porta 22
+# ❌ Bastion Host
+# ❌ IP público na instância
+
+# O que precisa:
+# ✅ IAM Instance Profile com permissão ssm
+# ✅ SSM Agent instalado (vem por padrão no Amazon Linux 2023)
+# ✅ Rota de saída para endpoints SSM (internet ou VPC endpoints)
+
+# IAM Role para Session Manager
+resource "aws_iam_role" "ssm_role" {
+  name = "ec2-ssm-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
+}
+
+# Política gerenciada da AWS para SSM
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# Instance Profile (para associar role à EC2)
+resource "aws_iam_instance_profile" "ssm" {
+  name = "ec2-ssm-profile"
+  role = aws_iam_role.ssm_role.name
+}
+
+# EC2 SEM key_name e SEM porta 22!
+resource "aws_instance" "secure" {
+  ami                  = data.aws_ami.amazon_linux_2023.id
+  instance_type        = "t3.micro"
+  iam_instance_profile = aws_iam_instance_profile.ssm.name
+  # SEM key_name → mais seguro!
+  # SG sem porta 22 → superfície de ataque reduzida
+
+  tags = { Name = "secure-instance" }
+}
+
+# Conectar via AWS CLI:
+# aws ssm start-session --target i-0abc123def456789</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 5: EC2 INSTANCE — COMPUTE
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Compute</span>
+          <h2>5. EC2 Instance — Servidor Virtual</h2>
+          <p>O recurso mais icônico da AWS. Aprenda a criar instâncias EC2 com Terraform entendendo cada argumento: instance types, AMI selection, networking, volumes EBS e instance profiles.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 Famílias e Tipos de Instância</h3>
+          <p>A AWS oferece centenas de tipos de instância. O nome segue um padrão: <strong>família + geração + tamanho</strong>. Exemplo: <code>t3.medium</code> = família T, geração 3, tamanho medium.</p>
+
+          <div class="info-box highlight">
+            <strong>📦 Decodificando o Nome da Instância:</strong>
+            <pre><code>
+  m 6 i . x l a r g e
+  │ │ │   │
+  │ │ │   └── Tamanho: nano < micro < small < medium < large < xlarge < 2xlarge...
+  │ │ │
+  │ │ └── Modificadores opcionais:
+  │ │     i = Intel, a = AMD, g = Graviton (ARM), n = network optimized
+  │ │     d = local NVMe SSD, e = extra memory, flex = flexible
+  │ │
+  │ └── Geração (quanto maior, mais novo e melhor custo/performance)
+  │
+  └── Família (propósito da instância):
+      T = Burstable (uso geral econômico)
+      M = General Purpose (uso geral balanceado)
+      C = Compute Optimized (CPU intensivo)
+      R = Memory Optimized (RAM intensivo)
+      I/D = Storage Optimized (I/O intensivo)
+      P/G = GPU (Machine Learning, renderização)
+            </code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Família</th>
+                <th>Uso Típico</th>
+                <th>Exemplos</th>
+                <th>vCPU/RAM Ratio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>T3/T3a</strong></td><td>Dev, testes, microserviços com tráfego variável</td><td>t3.micro, t3.small, t3.medium</td><td>1:2 (burstable)</td></tr>
+              <tr><td><strong>M6i/M7i</strong></td><td>Apps gerais, backends, APIs</td><td>m6i.large, m7i.xlarge</td><td>1:4 (balanceado)</td></tr>
+              <tr><td><strong>C6i/C7i</strong></td><td>Batch processing, encoding, gaming servers</td><td>c6i.xlarge, c7i.2xlarge</td><td>1:2 (mais CPU)</td></tr>
+              <tr><td><strong>R6i/R7i</strong></td><td>Caches (Redis), bancos in-memory, analytics</td><td>r6i.large, r7i.xlarge</td><td>1:8 (mais RAM)</td></tr>
+              <tr><td><strong>M6g/C6g</strong></td><td>Mesmos usos mas com ARM Graviton (20% mais barato)</td><td>m6g.medium, c6g.large</td><td>Igual mas ARM</td></tr>
+              <tr><td><strong>P4d/G5</strong></td><td>Machine Learning, HPC, renderização 3D</td><td>p4d.24xlarge, g5.xlarge</td><td>GPU attached</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💰 Dica de Economia:</strong>
+            <p>Para workloads que não exigem Intel específico, considere instâncias <strong>Graviton</strong> (sufixo 'g'): <code>m6g</code>, <code>c6g</code>, <code>r6g</code>. Elas oferecem até <strong>40% melhor custo-performance</strong> comparado com x86 equivalente. Amazon Linux 2023 e Ubuntu rodam nativamente em ARM.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 Criando uma EC2 Instance Completa</h3>
+          <p>Vamos criar uma instância EC2 de produção com todos os componentes necessários:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>aws_instance — Instância Completa de Produção</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# EC2 Instance — Web Server completo
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "web" {
+  # ─── AMI (Sistema Operacional) ────────────────────────────────
+  ami = data.aws_ami.amazon_linux_2023.id  # Consulta dinâmica (seção 1)
+
+  # ─── Tipo da Instância ────────────────────────────────────────
+  instance_type = var.instance_type  # Ex: "t3.small"
+
+  # ─── Networking ───────────────────────────────────────────────
+  subnet_id                   = aws_subnet.public[0].id  # Subnet onde será criada
+  vpc_security_group_ids      = [aws_security_group.web.id]  # SGs (lista)
+  associate_public_ip_address = true   # IP público (para subnet pública)
+
+  # ─── Autenticação SSH ─────────────────────────────────────────
+  key_name = aws_key_pair.deployer.key_name  # Key pair para SSH
+
+  # ─── IAM Role (permissões da instância) ───────────────────────
+  iam_instance_profile = aws_iam_instance_profile.web.name
+
+  # ─── Volume Raiz (EBS) ───────────────────────────────────────
+  root_block_device {
+    volume_type           = "gp3"     # General Purpose SSD v3 (melhor que gp2)
+    volume_size           = 20        # 20 GB
+    iops                  = 3000      # gp3 permite configurar IOPS
+    throughput            = 125       # MB/s
+    encrypted             = true      # SEMPRE encripte volumes!
+    delete_on_termination = true      # Deletar volume quando instância for destruída
+    
+    tags = {
+      Name = "web-server-root-volume"
+    }
+  }
+
+  # ─── Volume Adicional (dados da aplicação) ────────────────────
+  ebs_block_device {
+    device_name           = "/dev/sdf"  # Nome do device no Linux
+    volume_type           = "gp3"
+    volume_size           = 50           # 50 GB para dados
+    encrypted             = true
+    delete_on_termination = false        # PRESERVA dados se instância for destruída!
+
+    tags = {
+      Name = "web-server-data-volume"
+    }
+  }
+
+  # ─── User Data (script de bootstrap) ─────────────────────────
+  user_data = templatefile("${path.module}/scripts/user_data.sh", {
+    environment = var.environment
+    app_port    = var.app_port
+  })
+
+  # ─── Metadata Options (IMDSv2 — mais seguro) ─────────────────
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"  # Força IMDSv2 (previne SSRF)
+    http_put_response_hop_limit = 1
+  }
+
+  # ─── Monitoring ──────────────────────────────────────────────
+  monitoring = true  # Métricas detalhadas (1 min em vez de 5 min)
+
+  # ─── Tags ────────────────────────────────────────────────────
+  tags = {
+    Name        = "${var.project}-web-server"
+    Environment = var.environment
+    Role        = "web-server"
+    ManagedBy   = "terraform"
+    Backup      = "daily"
+  }
+
+  # ─── Lifecycle ───────────────────────────────────────────────
+  lifecycle {
+    # Se trocar AMI, cria nova instância ANTES de destruir a antiga
+    create_before_destroy = true
+    
+    # Ignorar mudanças no user_data (evita recreação desnecessária)
+    ignore_changes = [user_data]
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 Placement e Networking</h3>
+          <p>Onde sua instância fica na rede determina sua acessibilidade e segurança:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Decisão: Subnet Pública vs Privada</code><span class="cmd-tag">Arquitetura</span></div>
+              <pre><code>
+┌─────────────────────────────────────────────────────────────────┐
+│                        VPC (10.0.0.0/16)                         │
+│                                                                 │
+│  ┌─────────────────────────┐   ┌─────────────────────────┐     │
+│  │   SUBNET PÚBLICA        │   │   SUBNET PRIVADA        │     │
+│  │   10.0.1.0/24           │   │   10.0.10.0/24          │     │
+│  │                         │   │                         │     │
+│  │  ┌──────────┐           │   │  ┌──────────┐           │     │
+│  │  │  Bastion │ ← SSH     │   │  │   App    │ ← do ALB │     │
+│  │  │  NAT GW  │           │   │  │   DB     │ ← da App │     │
+│  │  │  ALB     │ ← HTTP/S  │   │  │  Worker  │           │     │
+│  │  └──────────┘           │   │  └──────────┘           │     │
+│  │                         │   │                         │     │
+│  │  Route: 0.0.0.0/0 → IGW│   │  Route: 0.0.0.0/0 → NAT│     │
+│  │  (Acesso direto internet)│   │  (Só saída, sem entrada)│     │
+│  └─────────────────────────┘   └─────────────────────────┘     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+REGRA DE OURO:
+- Subnet PÚBLICA: recursos que PRECISAM receber tráfego da internet
+  (ALB, bastion, NAT Gateway)
+- Subnet PRIVADA: recursos internos que NÃO devem ser acessados diretamente
+  (app servers, databases, workers, caches)
+              </code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Erros Comuns de Networking:</strong>
+            <ul>
+              <li><strong>EC2 sem IP público + subnet pública:</strong> Se <code>associate_public_ip_address = false</code> em subnet pública, a instância não terá IP público mesmo estando na subnet certa</li>
+              <li><strong>EC2 em subnet privada sem NAT:</strong> A instância não conseguirá acessar a internet (nem para instalar pacotes com yum/apt)</li>
+              <li><strong>SG sem egress:</strong> Se você remover a regra de egress padrão, a instância não pode fazer requisições HTTP de saída</li>
+              <li><strong>Usar security_group_ids em vez de vpc_security_group_ids:</strong> O primeiro é deprecated — sempre use <code>vpc_security_group_ids</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 EBS Volumes — Armazenamento</h3>
+          <p>Toda instância EC2 precisa de pelo menos um volume EBS (o root). Entenda os tipos disponíveis:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Uso</th>
+                <th>IOPS Max</th>
+                <th>Throughput Max</th>
+                <th>Custo (us-east-1)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>gp3</strong></td><td>Uso geral (recomendado)</td><td>16.000</td><td>1.000 MB/s</td><td>$0.08/GB/mês</td></tr>
+              <tr><td><strong>gp2</strong></td><td>Uso geral (legado)</td><td>16.000</td><td>250 MB/s</td><td>$0.10/GB/mês</td></tr>
+              <tr><td><strong>io2</strong></td><td>Databases de alta performance</td><td>64.000</td><td>1.000 MB/s</td><td>$0.125/GB + $0.065/IOPS</td></tr>
+              <tr><td><strong>st1</strong></td><td>Big data, logs (sequencial)</td><td>500</td><td>500 MB/s</td><td>$0.045/GB/mês</td></tr>
+              <tr><td><strong>sc1</strong></td><td>Arquivo frio (acesso raro)</td><td>250</td><td>250 MB/s</td><td>$0.015/GB/mês</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💡 gp3 vs gp2:</strong>
+            <p><code>gp3</code> é sempre melhor que <code>gp2</code> — custa 20% menos, oferece 3.000 IOPS e 125 MB/s de baseline (gp2 baseline é 100 IOPS por GB). Se você ainda tem volumes gp2, migre para gp3.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 6: USER DATA — BOOTSTRAP SCRIPTS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Automação</span>
+          <h2>6. User Data — Bootstrap Scripts</h2>
+          <p>User Data permite executar scripts automaticamente quando uma instância EC2 inicia pela primeira vez. Aprenda a usar com templatefile, cloud-init e como debugar problemas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 O que é User Data?</h3>
+          <p>User Data é um script que a AWS executa automaticamente <strong>apenas na primeira inicialização</strong> da instância (a menos que configure para rodar em todo boot). É executado como <strong>root</strong> e é a principal forma de configurar instâncias no primeiro boot.</p>
+
+          <div class="info-box highlight">
+            <strong>🚀 Analogia — O Manual de Boas-Vindas:</strong>
+            <p>Imagine que user_data é o "manual de boas-vindas" que um novo funcionário (instância) recebe no primeiro dia. Ele contém todas as instruções de setup: "Instale esses programas, configure esse serviço, crie essas pastas." O funcionário segue o manual uma vez e está pronto para trabalhar.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Ciclo de Vida do User Data</code><span class="cmd-tag">Diagrama</span></div>
+              <pre><code>
+┌──────────────────────────────────────────────────────────────┐
+│                    CICLO DA EC2 INSTANCE                       │
+│                                                              │
+│  terraform apply                                             │
+│       │                                                      │
+│       ▼                                                      │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐      │
+│  │ EC2 Created │───▶│ Boot Linux  │───▶│  cloud-init │      │
+│  │  (pending)  │    │  (running)  │    │ executa     │      │
+│  └─────────────┘    └─────────────┘    │ user_data   │      │
+│                                        └──────┬──────┘      │
+│                                               │              │
+│                                               ▼              │
+│                                        ┌─────────────┐      │
+│                                        │  Instância  │      │
+│                                        │   pronta!   │      │
+│                                        └─────────────┘      │
+│                                                              │
+│  IMPORTANTE:                                                 │
+│  • Executa como ROOT                                         │
+│  • Roda APENAS no primeiro boot (por padrão)                 │
+│  • Output vai para /var/log/cloud-init-output.log            │
+│  • Se o script falhar, a instância NÃO é recriada            │
+│  • Mudar user_data no Terraform = DESTROY + CREATE da EC2    │
+└──────────────────────────────────────────────────────────────┘
+              </code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 User Data Inline (Simples)</h3>
+          <p>Para scripts curtos, você pode incluir diretamente no recurso:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>User Data Inline — Instalando Nginx</code><span class="cmd-tag">Básico</span></div>
+              <pre><code>resource "aws_instance" "web" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.public[0].id
+
+  vpc_security_group_ids = [aws_security_group.web.id]
+
+  # User data inline (para scripts simples)
+  # O #!/bin/bash é OBRIGATÓRIO na primeira linha!
+  user_data = &lt;&lt;-EOF
+    #!/bin/bash
+    set -euxo pipefail  # Falha rápido, mostra comandos no log
+
+    # Atualizar pacotes do sistema
+    dnf update -y
+
+    # Instalar Nginx
+    dnf install -y nginx
+
+    # Criar página de health check
+    echo "&lt;h1&gt;Hello from $(hostname)&lt;/h1&gt;" > /usr/share/nginx/html/index.html
+
+    # Habilitar e iniciar Nginx
+    systemctl enable nginx
+    systemctl start nginx
+
+    # Sinalizar que o setup terminou (útil para debugging)
+    echo "User data completed at $(date)" >> /var/log/user-data-status.log
+  EOF
+
+  # Não recriar instância se user_data mudar (common pattern)
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+
+  tags = { Name = "web-nginx" }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 templatefile — Scripts Dinâmicos</h3>
+          <p>Para scripts complexos com variáveis, use a função <code>templatefile()</code>. Isso separa o template do código Terraform:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>main.tf — Chamando templatefile</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code>resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.private[0].id
+
+  vpc_security_group_ids = [
+    aws_security_group.app.id
+  ]
+
+  # templatefile() renderiza o script
+  # substituindo variáveis antes de enviar
+  user_data = templatefile(
+    "${path.module}/scripts/app-setup.sh",
+    {
+      # Variáveis disponíveis no template
+      environment   = var.environment
+      app_port      = var.app_port
+      db_host       = aws_db_instance.main.endpoint
+      s3_bucket     = aws_s3_bucket.assets.id
+      region        = data.aws_region.current.name
+      log_level     = var.environment == "prod" ? "warn" : "debug"
+    }
+  )
+
+  tags = {
+    Name = "${var.project}-app-server"
+  }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>scripts/app-setup.sh</code><span class="cmd-tag">Template</span></div>
+              <pre><code>#!/bin/bash
+set -euxo pipefail
+
+# ════════════════════════════════════
+# Setup da Aplicação
+# Ambiente: ${environment}
+# ════════════════════════════════════
+
+# Instalar dependências
+dnf install -y docker jq
+
+# Configurar variáveis de ambiente
+cat > /etc/environment &lt;&lt;'ENVFILE'
+APP_PORT=${app_port}
+DB_HOST=${db_host}
+S3_BUCKET=${s3_bucket}
+AWS_REGION=${region}
+LOG_LEVEL=${log_level}
+ENVFILE
+
+# Iniciar Docker
+systemctl enable docker
+systemctl start docker
+
+# Pull e executar container da app
+docker run -d \
+  --name app \
+  --restart always \
+  -p ${app_port}:${app_port} \
+  --env-file /etc/environment \
+  myapp:latest
+
+echo "Setup completo - ${environment}"</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 templatefile() vs heredoc inline:</strong>
+            <ul>
+              <li><strong>Inline (heredoc):</strong> Bom para scripts de 5-10 linhas. Fica no main.tf.</li>
+              <li><strong>templatefile():</strong> Bom para scripts complexos. Arquivo separado, syntax highlighting no editor, mais fácil de manter.</li>
+              <li><strong>Variáveis:</strong> No template, use <code>${"${var_name}"}</code> para substituição. Cuidado com <code>$</code> do bash — escape com <code>$$</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 Debugging User Data</h3>
+          <p>Quando o user_data não funciona como esperado, use estes métodos para investigar:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Debugando User Data — Logs e Verificação</code><span class="cmd-tag">Troubleshooting</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# ONDE ENCONTRAR LOGS DO USER DATA:
+# ═══════════════════════════════════════════════════════════════
+
+# 1. Log principal do cloud-init (STDOUT + STDERR do script)
+cat /var/log/cloud-init-output.log
+
+# 2. Log de ações do cloud-init (etapas do processo)
+cat /var/log/cloud-init.log
+
+# 3. Status do cloud-init (verificar se terminou com sucesso)
+cloud-init status
+# status: done  ← sucesso
+# status: error ← algo falhou
+
+# 4. Ver detalhes do erro
+cloud-init status --long
+
+# 5. O script original fica armazenado em:
+cat /var/lib/cloud/instance/scripts/part-001
+# ou
+cat /var/lib/cloud/instance/user-data.txt
+
+# ═══════════════════════════════════════════════════════════════
+# DICAS DE DEBUGGING:
+# ═══════════════════════════════════════════════════════════════
+
+# No início do script, SEMPRE adicione:
+# set -euxo pipefail
+#   -e = sair imediatamente se um comando falhar
+#   -u = tratar variáveis undefined como erro
+#   -x = imprimir cada comando antes de executar (MUITO útil no log!)
+#   -o pipefail = pipes retornam erro se qualquer parte falhar
+
+# Para re-executar o user_data (forçar):
+sudo cloud-init clean --logs
+sudo cloud-init init
+sudo cloud-init modules --mode=config
+sudo cloud-init modules --mode=final
+
+# Via console AWS (sem SSH):
+# Actions → Instance Settings → Get Instance Screenshot
+# Actions → Monitor and troubleshoot → Get System Log</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Armadilhas Comuns do User Data:</strong>
+            <ul>
+              <li><strong>Esquecer #!/bin/bash:</strong> Sem o shebang, o script não executa</li>
+              <li><strong>Limite de 16KB:</strong> User data comprimido com gzip pode ter até 64KB; sem compressão, 16KB</li>
+              <li><strong>Script falha silenciosamente:</strong> Sem <code>set -e</code>, erros são ignorados e a instância parece "ok" mas está mal configurada</li>
+              <li><strong>Dependência de rede:</strong> Se o script precisa baixar algo e a instância não tem rota para internet, vai falhar</li>
+              <li><strong>Mudar user_data = recrear instância:</strong> Qualquer mudança no user_data no Terraform causa DESTROY + CREATE. Use <code>ignore_changes</code> se necessário</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 7: ELASTIC IP
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Networking</span>
+          <h2>7. Elastic IP — IP Público Fixo</h2>
+          <p>Entenda quando usar Elastic IPs, como associá-los a instâncias e os custos envolvidos. Spoiler: na maioria dos casos modernos, você NÃO precisa de Elastic IP.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 O que é um Elastic IP?</h3>
+          <p>Um Elastic IP (EIP) é um endereço IPv4 público <strong>estático</strong> que você aloca na sua conta AWS. Diferente do IP público automático (que muda a cada stop/start da instância), o EIP permanece fixo até você liberá-lo.</p>
+
+          <div class="info-box highlight">
+            <strong>📞 Analogia — Número de Telefone Fixo:</strong>
+            <p>O IP público automático de uma EC2 é como um celular pré-pago — se você desligar e ligar de novo, ganha um número novo. O Elastic IP é como um número de telefone fixo empresarial — não importa quantas vezes você reinicia o equipamento, o número continua o mesmo. Clientes sempre conseguem ligar no mesmo número.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Comportamento de IPs na EC2</code><span class="cmd-tag">Comparação</span></div>
+              <pre><code>
+┌─────────────────────────────────────────────────────────────────┐
+│                IP PÚBLICO AUTOMÁTICO                              │
+│                                                                 │
+│  EC2 Start → IP: 54.210.33.44                                   │
+│  EC2 Stop  → IP: (liberado, perdido)                            │
+│  EC2 Start → IP: 18.205.77.12  ← NOVO IP! DNS precisa atualizar│
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                ELASTIC IP (Fixo)                                  │
+│                                                                 │
+│  EIP alocado → 52.90.100.200 (fixo na sua conta)               │
+│  EC2 Start → Associar EIP → 52.90.100.200                       │
+│  EC2 Stop  → EIP continua alocado (mas cobra $0.005/hora!)      │
+│  EC2 Start → Reassociar → 52.90.100.200 ← MESMO IP sempre      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+              </code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 Criando e Associando um Elastic IP</h3>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>aws_eip + aws_eip_association</code><span class="cmd-tag">Terraform</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Método 1: EIP com associação direta (mais simples)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_eip" "web" {
+  # domain = "vpc" substitui o antigo vpc = true (deprecated)
+  domain = "vpc"
+
+  # Associar diretamente à instância
+  instance = aws_instance.web.id
+
+  tags = {
+    Name        = "${var.project}-web-eip"
+    Environment = var.environment
+  }
+
+  # Importante: se a instância for recriada (create_before_destroy),
+  # o EIP precisa ser desassociado antes. Use depends_on se necessário.
+  depends_on = [aws_internet_gateway.main]
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Método 2: EIP + Association separada (mais flexível)
+# Útil quando o EIP precisa sobreviver à instância
+# ═══════════════════════════════════════════════════════════════
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  tags   = { Name = "nat-gateway-eip" }
+}
+
+resource "aws_eip_association" "web" {
+  instance_id   = aws_instance.web.id
+  allocation_id = aws_eip.web.id
+}
+
+# Output do IP público fixo
+output "web_public_ip" {
+  description = "IP público fixo do web server"
+  value       = aws_eip.web.public_ip
+}
+
+output "web_url" {
+  description = "URL do web server"
+  value       = "http://${aws_eip.web.public_ip}"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 Quando Usar (e Quando NÃO Usar) Elastic IP</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Cenário</th>
+                <th>Usar EIP?</th>
+                <th>Alternativa Melhor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Servidor com IP que nunca deve mudar</td><td>✅ Sim</td><td>—</td></tr>
+              <tr><td>NAT Gateway (precisa de IP fixo de saída)</td><td>✅ Sim</td><td>—</td></tr>
+              <tr><td>Failover rápido entre instâncias</td><td>✅ Sim</td><td>—</td></tr>
+              <tr><td>Website com domínio</td><td>❌ Não</td><td>ALB + Route 53 (alias record)</td></tr>
+              <tr><td>API pública</td><td>❌ Não</td><td>ALB/NLB + DNS</td></tr>
+              <tr><td>Ambiente de desenvolvimento</td><td>❌ Não</td><td>IP automático (descartável)</td></tr>
+              <tr><td>Auto Scaling Group</td><td>❌ Não</td><td>ALB distribui tráfego</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <strong>⚠️ Custo do Elastic IP (desde fev/2024):</strong>
+            <ul>
+              <li><strong>EIP associado a instância RUNNING:</strong> $0.005/hora (~$3.60/mês) — SIM, agora cobra!</li>
+              <li><strong>EIP NÃO associado (ocioso):</strong> $0.005/hora (~$3.60/mês)</li>
+              <li><strong>EIP adicional por instância:</strong> $0.005/hora por cada EIP extra</li>
+              <li><strong>Mudança de 2024:</strong> Antes, o primeiro EIP associado era grátis. Desde 1 de fevereiro de 2024, a AWS cobra por TODOS os IPv4 públicos, incluindo EIPs.</li>
+              <li><strong>Recomendação:</strong> Use EIP apenas quando realmente precisa de IP fixo. Para a maioria dos casos, use Load Balancer + DNS.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 8: LIFECYCLE RULES
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Controle de Ciclo</span>
+          <h2>8. Lifecycle Rules — Controle de Vida dos Recursos</h2>
+          <p>Lifecycle rules permitem customizar como o Terraform cria, atualiza e destrói recursos. São essenciais para evitar downtime, proteger dados e lidar com mudanças que forçam recriação.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 Visão Geral das Lifecycle Rules</h3>
+          <p>O bloco <code>lifecycle</code> pode ser adicionado a qualquer recurso para controlar seu comportamento:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Regra</th>
+                <th>O que faz</th>
+                <th>Quando usar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>create_before_destroy</code></td><td>Cria o novo ANTES de destruir o antigo</td><td>Zero-downtime updates (SGs, instâncias atrás de LB)</td></tr>
+              <tr><td><code>prevent_destroy</code></td><td>Impede <code>terraform destroy</code> de deletar o recurso</td><td>Databases, S3 buckets com dados críticos</td></tr>
+              <tr><td><code>ignore_changes</code></td><td>Ignora mudanças em atributos específicos</td><td>Atributos gerenciados externamente (ASG desired_count, tags manuais)</td></tr>
+              <tr><td><code>replace_triggered_by</code></td><td>Força recriação quando outro recurso muda</td><td>Recriar instância quando AMI é atualizada</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 create_before_destroy</h3>
+          <p>Por padrão, quando um recurso precisa ser recriado (alteração incompatível), o Terraform <strong>destrói primeiro, depois cria</strong>. Isso causa downtime. Com <code>create_before_destroy</code>, a ordem inverte:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>create_before_destroy — Zero Downtime</code><span class="cmd-tag">Essencial</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# SEM create_before_destroy (padrão):
+#   1. Destroy instância antiga → DOWNTIME!
+#   2. Create instância nova
+#   Período sem instância = segundos a minutos de downtime
+#
+# COM create_before_destroy:
+#   1. Create instância nova (em paralelo com a antiga)
+#   2. Nova instância fica healthy
+#   3. Destroy instância antiga
+#   Zero downtime (ambas coexistem brevemente)
+# ═══════════════════════════════════════════════════════════════
+
+resource "aws_security_group" "web" {
+  name_prefix = "web-sg-"  # Note: name_PREFIX (não name)
+  description = "Web server security group"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    # Cria o novo SG antes de destruir o antigo
+    # Necessário porque dois SGs não podem ter o MESMO name
+    # Por isso usamos name_prefix em vez de name!
+    create_before_destroy = true
+  }
+
+  tags = { Name = "web-sg" }
+}
+
+# Instância com create_before_destroy
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.small"
+  subnet_id     = aws_subnet.public[0].id
+
+  vpc_security_group_ids = [aws_security_group.web.id]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = { Name = "web-server" }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <strong>⚠️ Cuidado com name conflicts:</strong>
+            <p>Se usar <code>create_before_destroy = true</code> com Security Groups que têm <code>name</code> fixo, vai falhar porque dois SGs não podem ter o mesmo nome na mesma VPC. Solução: use <code>name_prefix</code> em vez de <code>name</code> — o Terraform gera sufixo aleatório para evitar conflito.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 prevent_destroy</h3>
+          <p>Proteção contra destruição acidental de recursos críticos:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>prevent_destroy — Proteção contra Acidente</code><span class="cmd-tag">Segurança</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# prevent_destroy = true:
+# Se alguém rodar "terraform destroy" ou fizer uma mudança que
+# force a recriação deste recurso, Terraform RECUSA e mostra erro.
+#
+# Error: Instance cannot be destroyed
+#   resource "aws_db_instance" "production" has lifecycle.prevent_destroy
+#   set, but the plan calls for this resource to be destroyed.
+# ═══════════════════════════════════════════════════════════════
+
+# Banco de dados de produção — NUNCA deve ser deletado acidentalmente
+resource "aws_db_instance" "production" {
+  identifier     = "producao-postgres"
+  engine         = "postgres"
+  engine_version = "15.4"
+  instance_class = "db.r6g.large"
+  
+  allocated_storage = 100
+  storage_encrypted = true
+
+  db_name  = "app_production"
+  username = "admin"
+  password = var.db_password
+
+  # Proteções adicionais (fora do Terraform)
+  deletion_protection = true   # Protege na API AWS também
+  skip_final_snapshot = false  # Cria snapshot antes de deletar
+
+  lifecycle {
+    prevent_destroy = true  # Terraform não pode destruir
+  }
+
+  tags = { Name = "production-database" }
+}
+
+# S3 bucket com dados importantes
+resource "aws_s3_bucket" "data_lake" {
+  bucket = "empresa-data-lake-producao"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = { Name = "data-lake" }
+}
+
+# NOTA: Para realmente destruir um recurso protegido:
+# 1. Remova prevent_destroy do código
+# 2. Rode terraform apply (aceita a remoção da proteção)
+# 3. Então rode terraform destroy
+# Isso é intencional — força um ato deliberado</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 ignore_changes</h3>
+          <p>Ignora mudanças em atributos específicos durante o plan/apply. Útil quando algo externo modifica o recurso e você não quer que o Terraform "conserte" de volta.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>ignore_changes — Cenários Comuns</code><span class="cmd-tag">Prático</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Cenário 1: Auto Scaling muda desired_capacity externamente
+# Sem ignore_changes, Terraform reverteria ao valor do código
+# ═══════════════════════════════════════════════════════════════
+resource "aws_autoscaling_group" "app" {
+  name                = "app-asg"
+  desired_capacity    = 2   # Valor inicial
+  min_size            = 1
+  max_size            = 10
+  vpc_zone_identifier = aws_subnet.private[*].id
+
+  lifecycle {
+    # ASG pode escalar para 5, 8, etc. Terraform não reverte para 2
+    ignore_changes = [desired_capacity]
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Cenário 2: Tags adicionadas manualmente ou por AWS Config
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "legacy" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.medium"
+  subnet_id     = aws_subnet.private[0].id
+
+  tags = {
+    Name      = "legacy-app"
+    ManagedBy = "terraform"
+  }
+
+  lifecycle {
+    # Equipe ops adiciona tags manuais — Terraform não remove
+    ignore_changes = [tags]
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Cenário 3: user_data atualizado mas não quer recriar instância
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "stateful" {
+  ami           = "ami-12345"
+  instance_type = "t3.large"
+  user_data     = file("setup.sh")
+
+  lifecycle {
+    # Mudou o script? Não recriar a instância (tem dados locais)
+    ignore_changes = [user_data, ami]
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# ignore_changes = all → Ignora TUDO (recurso nunca é atualizado)
+# Use com MUITA cautela — basicamente "desliga" gestão do recurso
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "unmanaged" {
+  ami           = "ami-12345"
+  instance_type = "t3.micro"
+
+  lifecycle {
+    ignore_changes = all  # Terraform só cria, nunca atualiza
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.5 replace_triggered_by</h3>
+          <p>Força a recriação de um recurso quando outro recurso ou atributo específico muda:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>replace_triggered_by — Recriação Condicional</code><span class="cmd-tag">Avançado</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Cenário: Recriar instância quando o script de configuração muda
+# Normalmente, mudar um arquivo local NÃO recriaria a instância
+# ═══════════════════════════════════════════════════════════════
+
+# Recurso auxiliar que rastreia o hash do script
+resource "terraform_data" "config_hash" {
+  input = filesha256("${path.module}/scripts/config.sh")
+}
+
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.small"
+  subnet_id     = aws_subnet.private[0].id
+  user_data     = file("${path.module}/scripts/config.sh")
+
+  lifecycle {
+    # Se o hash do script mudar, recria a instância
+    replace_triggered_by = [
+      terraform_data.config_hash
+    ]
+  }
+
+  tags = { Name = "app-server" }
+}
+
+# Outro caso: recriar containers quando a imagem muda
+resource "terraform_data" "docker_image_tag" {
+  input = var.docker_image_tag  # Ex: "v2.3.1"
+}
+
+resource "aws_ecs_service" "app" {
+  name            = "app-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 3
+
+  lifecycle {
+    replace_triggered_by = [
+      terraform_data.docker_image_tag
+    ]
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 9: PROVISIONERS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Último Recurso</span>
+          <h2>9. Provisioners (e Por Que Evitá-los)</h2>
+          <p>Provisioners executam scripts locais ou remotos durante a criação de recursos. Embora poderosos, a HashiCorp os considera um "último recurso". Entenda quando são necessários e as alternativas superiores.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 O que são Provisioners?</h3>
+          <p>Provisioners são blocos que executam ações <strong>imperativas</strong> (scripts, comandos) dentro de um fluxo declarativo. Eles quebram o paradigma do Terraform e por isso devem ser usados com cautela.</p>
+
+          <div class="info-box warning">
+            <strong>⚠️ A Posição Oficial da HashiCorp:</strong>
+            <p>"Provisioners are a Last Resort. [...] Most common situations can be covered with user_data, configuration management tools (Ansible, Chef, Puppet), or cloud-init." — <em>Terraform Documentation</em></p>
+            <p>Provisioners estão marcados como <strong>deprecated</strong> no roadmap do Terraform e podem ser removidos em versões futuras.</p>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Por que Provisioners são Problemáticos</code><span class="cmd-tag">Razões</span></div>
+              <pre><code>
+┌─────────────────────────────────────────────────────────────────┐
+│              PROBLEMAS DOS PROVISIONERS                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. NÃO estão no State                                          │
+│     → Terraform não sabe se o provisioner já rodou              │
+│     → Não é possível "reverter" um provisioner                  │
+│                                                                 │
+│  2. FALHA = recurso marcado como "tainted"                      │
+│     → Se o script falhar, Terraform destrói e recria o recurso  │
+│     → Pode causar perda de dados                                │
+│                                                                 │
+│  3. NÃO são declarativos                                        │
+│     → Rodar 2x pode causar problemas (não são idempotentes)     │
+│     → Terraform não pode "planificar" o resultado               │
+│                                                                 │
+│  4. Dependem de conectividade                                   │
+│     → remote-exec precisa SSH/WinRM funcionando                 │
+│     → Network issues = deploy quebrado                          │
+│                                                                 │
+│  5. Rodados APENAS na criação (por padrão)                      │
+│     → Se a instância existir, alterações no provisioner         │
+│       são IGNORADAS completamente                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+              </code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 Tipos de Provisioners</h3>
+          <p>Apesar das desvantagens, é importante conhecer os provisioners para entender código legado e casos extremos:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <div class="command-header"><code>local-exec</code><span class="cmd-tag">Máquina Local</span></div>
+              <pre><code># Executa comando na máquina onde
+# Terraform está rodando (seu PC ou CI)
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.public[0].id
+
+  # Roda LOCALMENTE após criar a instância
+  provisioner "local-exec" {
+    command = "echo ${self.public_ip} >> hosts.txt"
+  }
+
+  # Exemplo: chamar Ansible após criar
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook \
+        -i '${self.public_ip},' \
+        --private-key ~/.ssh/key.pem \
+        playbook.yml
+    EOT
+  }
+
+  tags = { Name = "web" }
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <div class="command-header"><code>remote-exec</code><span class="cmd-tag">Na Instância</span></div>
+              <pre><code># Executa comando DENTRO da instância
+# via SSH (Linux) ou WinRM (Windows)
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.micro"
+  key_name      = aws_key_pair.deployer.key_name
+  subnet_id     = aws_subnet.public[0].id
+
+  # Configuração de conexão SSH
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("~/.ssh/key.pem")
+    host        = self.public_ip
+  }
+
+  # Roda DENTRO da instância via SSH
+  provisioner "remote-exec" {
+    inline = [
+      "sudo dnf update -y",
+      "sudo dnf install -y nginx",
+      "sudo systemctl start nginx",
+    ]
+  }
+
+  tags = { Name = "app" }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>file provisioner + null_resource</code><span class="cmd-tag">Upload + Trigger</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# FILE PROVISIONER — Upload de arquivos para a instância
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.micro"
+  key_name      = aws_key_pair.deployer.key_name
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("~/.ssh/key.pem")
+    host        = self.public_ip
+  }
+
+  # Copiar arquivo de configuração para a instância
+  provisioner "file" {
+    source      = "configs/app.conf"         # Arquivo local
+    destination = "/tmp/app.conf"            # Destino na instância
+  }
+
+  # Copiar diretório inteiro
+  provisioner "file" {
+    source      = "scripts/"                 # Diretório local
+    destination = "/home/ec2-user/scripts"   # Destino na instância
+  }
+
+  # Depois de copiar, executar setup
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mv /tmp/app.conf /etc/app/app.conf",
+      "sudo systemctl restart app",
+    ]
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# NULL_RESOURCE — Executa provisioners sem criar recurso real
+# Útil para rodar scripts que não estão atrelados a um recurso
+# ═══════════════════════════════════════════════════════════════
+resource "null_resource" "post_deploy" {
+  # triggers: quando qualquer valor muda, re-executa os provisioners
+  triggers = {
+    instance_id = aws_instance.app.id
+    config_hash = filesha256("configs/app.conf")
+  }
+
+  provisioner "local-exec" {
+    command = "bash scripts/post-deploy.sh ${aws_instance.app.public_ip}"
+  }
+}
+
+# NOTA: terraform_data é o substituto moderno de null_resource
+resource "terraform_data" "post_deploy" {
+  triggers_replace = [aws_instance.app.id]
+  
+  provisioner "local-exec" {
+    command = "echo 'Deploy concluído para ${aws_instance.app.public_ip}'"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 Alternativas Recomendadas</h3>
+          <p>Para cada uso de provisioner, existe uma alternativa melhor:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Necessidade</th>
+                <th>Provisioner (Evite)</th>
+                <th>Alternativa (Use)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Instalar pacotes no boot</td><td>remote-exec com SSH</td><td><strong>user_data</strong> + cloud-init</td></tr>
+              <tr><td>Configurar aplicação</td><td>remote-exec + file</td><td><strong>Ansible</strong> (chamado via local-exec ou pipeline)</td></tr>
+              <tr><td>Copiar arquivos para instância</td><td>file provisioner</td><td><strong>S3</strong> + aws s3 cp no user_data</td></tr>
+              <tr><td>Executar em instância existente</td><td>remote-exec</td><td><strong>AWS SSM Run Command</strong></td></tr>
+              <tr><td>Rodar script pós-deploy</td><td>null_resource + local-exec</td><td><strong>CI/CD pipeline</strong> (GitHub Actions step)</td></tr>
+              <tr><td>Bootstrap complexo</td><td>Múltiplos remote-exec</td><td><strong>AMI customizada</strong> (Packer) + user_data leve</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <strong>💡 Regra de Ouro:</strong>
+            <p>Se você pode resolver com <code>user_data</code>, <strong>use user_data</strong>. Se precisa de configuração mais complexa, use <strong>AMI customizada com Packer</strong> ou <strong>Ansible</strong> executado pelo CI/CD. Provisioners devem ser o último recurso — quando literalmente não há outra opção.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 Quando Provisioners são Aceitáveis</h3>
+          <p>Existem poucos cenários onde provisioners são a opção pragmática:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div name="command-header"><code>Cenários Aceitáveis para local-exec</code><span class="cmd-tag">Exceções</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# 1. Registrar o IP em um inventário externo (após criação)
+# ═══════════════════════════════════════════════════════════════
+resource "aws_instance" "monitoring" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.small"
+  
+  provisioner "local-exec" {
+    command = "curl -X POST https://inventory.internal/register -d '{\"ip\": \"${self.private_ip}\"}'"
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# 2. Invalidar cache do CloudFront após deploy de site
+# ═══════════════════════════════════════════════════════════════
+resource "terraform_data" "invalidate_cache" {
+  triggers_replace = [aws_s3_object.site_files.etag]
+  
+  provisioner "local-exec" {
+    command = "aws cloudfront create-invalidation --distribution-id ${aws_cloudfront_distribution.site.id} --paths '/*'"
+  }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# 3. Gerar arquivo de configuração local após deploy
+# ═══════════════════════════════════════════════════════════════
+resource "terraform_data" "kubeconfig" {
+  triggers_replace = [aws_eks_cluster.main.endpoint]
+  
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name ${aws_eks_cluster.main.name} --region ${var.region}"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 10: OUTPUTS E REFERÊNCIAS CRUZADAS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Conectando Recursos</span>
+          <h2>10. Outputs e Referências Cruzadas</h2>
+          <p>Aprenda a conectar recursos entre si usando referências implícitas, entenda o grafo de dependências, quando usar depends_on explícito e como outputs expõem valores úteis.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.1 Referências Implícitas — O Poder do Grafo</h3>
+          <p>Quando você referencia um atributo de outro recurso (ex: <code>aws_vpc.main.id</code>), o Terraform automaticamente entende que existe uma <strong>dependência</strong>. Ele constrói um grafo e cria recursos na ordem correta.</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Cadeia de Dependências Implícitas</code><span class="cmd-tag">Automático</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Terraform infere AUTOMATICAMENTE a ordem de criação:
+# VPC → Subnet → Security Group → EC2 Instance → EIP
+#
+# Ele sabe disso porque cada recurso REFERENCIA o anterior!
+# ═══════════════════════════════════════════════════════════════
+
+# 1. VPC (não depende de nada — criada primeiro)
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  tags       = { Name = "main-vpc" }
+}
+
+# 2. Subnet (depende da VPC — criada segundo)
+resource "aws_subnet" "public" {
+  vpc_id            = aws_vpc.main.id  # ← Referência implícita à VPC
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+  tags              = { Name = "public-subnet" }
+}
+
+# 3. Security Group (depende da VPC — pode ser criado em paralelo com subnet)
+resource "aws_security_group" "web" {
+  vpc_id = aws_vpc.main.id  # ← Referência implícita à VPC
+  name   = "web-sg"
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 4. EC2 Instance (depende de Subnet + SG — criada terceiro)
+resource "aws_instance" "web" {
+  ami                    = data.aws_ami.amazon_linux_2023.id
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public.id             # ← Ref à Subnet
+  vpc_security_group_ids = [aws_security_group.web.id]      # ← Ref ao SG
+  key_name               = aws_key_pair.deployer.key_name   # ← Ref ao Key Pair
+  tags                   = { Name = "web-server" }
+}
+
+# 5. Elastic IP (depende da EC2 — criado por último)
+resource "aws_eip" "web" {
+  domain   = "vpc"
+  instance = aws_instance.web.id  # ← Referência implícita à EC2
+  tags     = { Name = "web-eip" }
+}
+
+# GRAFO RESULTANTE (terraform graph):
+#
+#         aws_vpc.main
+#         /          \
+#   aws_subnet     aws_security_group
+#   .public        .web
+#         \          /
+#       aws_instance.web
+#              |
+#         aws_eip.web</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.2 depends_on — Dependências Explícitas</h3>
+          <p>Em raros casos, não existe referência direta entre dois recursos mas mesmo assim um depende do outro. Use <code>depends_on</code> nesses casos:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>depends_on — Quando Terraform Não Consegue Inferir</code><span class="cmd-tag">Explícito</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# Cenário: A instância em subnet privada precisa da rota NAT
+# para acessar a internet (download de pacotes no user_data).
+# Mas NÃO há referência direta entre instância e rota/NAT.
+# Sem depends_on, Terraform poderia criar a instância ANTES
+# da rota estar pronta → user_data falha!
+# ═══════════════════════════════════════════════════════════════
+
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
+  tags          = { Name = "nat-gw" }
+}
+
+resource "aws_route" "private_nat" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main.id
+}
+
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.amazon_linux_2023.id
+  instance_type = "t3.small"
+  subnet_id     = aws_subnet.private[0].id
+
+  # User data precisa de internet (yum install)
+  user_data = file("scripts/setup.sh")
+
+  # Dependência EXPLÍCITA — garante que NAT route existe antes
+  # Sem isso, a instância poderia iniciar sem internet!
+  depends_on = [aws_route.private_nat]
+
+  tags = { Name = "app-server" }
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Outro caso: IAM policy que precisa existir antes do recurso usá-la
+# ═══════════════════════════════════════════════════════════════
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  role       = aws_iam_role.app.name
+  policy_arn = aws_iam_policy.s3_read.arn
+}
+
+resource "aws_instance" "worker" {
+  ami                  = data.aws_ami.amazon_linux_2023.id
+  instance_type        = "t3.micro"
+  iam_instance_profile = aws_iam_instance_profile.app.name
+
+  # Garante que a policy está attached antes de criar instância
+  # (eventual consistency da API IAM)
+  depends_on = [aws_iam_role_policy_attachment.s3_access]
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <strong>💡 Regra de Ouro para depends_on:</strong>
+            <ul>
+              <li><strong>Se existe referência direta (ex: <code>vpc_id = aws_vpc.main.id</code>):</strong> NÃO use depends_on — já é automático</li>
+              <li><strong>Se NÃO existe referência mas há dependência lógica:</strong> USE depends_on</li>
+              <li><strong>Uso excessivo de depends_on:</strong> É um "code smell" — geralmente indica que o código pode ser reestruturado para usar referências naturais</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.3 Outputs — Exportar Valores</h3>
+          <p>Outputs expõem valores dos seus recursos para uso externo (outros módulos, CI/CD, humanos, automações):</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>outputs.tf — Exemplos Completos</code><span class="cmd-tag">Produção</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# outputs.tf — Valores exportados do módulo/projeto
+# ═══════════════════════════════════════════════════════════════
+
+# IP público para SSH ou acesso direto
+output "web_server_public_ip" {
+  description = "IP público do servidor web (Elastic IP)"
+  value       = aws_eip.web.public_ip
+}
+
+# DNS name para configurar em Route 53
+output "web_server_dns" {
+  description = "DNS público da instância EC2"
+  value       = aws_instance.web.public_dns
+}
+
+# ID da instância (para SSM, AWS CLI, etc.)
+output "web_server_id" {
+  description = "ID da instância EC2 web"
+  value       = aws_instance.web.id
+}
+
+# Comando SSH pronto para uso
+output "ssh_command" {
+  description = "Comando SSH para conectar no servidor"
+  value       = "ssh -i ~/.ssh/terraform-key ec2-user@${aws_eip.web.public_ip}"
+}
+
+# Security Group ID (para outros recursos referenciarem)
+output "web_security_group_id" {
+  description = "ID do Security Group do web server"
+  value       = aws_security_group.web.id
+}
+
+# VPC ID (para compartilhar entre módulos)
+output "vpc_id" {
+  description = "ID da VPC principal"
+  value       = aws_vpc.main.id
+}
+
+# Subnet IDs (lista)
+output "private_subnet_ids" {
+  description = "IDs das subnets privadas"
+  value       = aws_subnet.private[*].id
+}
+
+# Output sensível (não exibido no console)
+output "db_endpoint" {
+  description = "Endpoint do banco de dados RDS"
+  value       = aws_db_instance.main.endpoint
+  sensitive   = true  # Oculta no output do terraform apply
+}
+
+# ═══════════════════════════════════════════════════════════════
+# Após terraform apply:
+# $ terraform output
+# web_server_public_ip = "52.90.100.200"
+# web_server_dns       = "ec2-52-90-100-200.compute-1.amazonaws.com"
+# ssh_command          = "ssh -i ~/.ssh/terraform-key ec2-user@52.90.100.200"
+#
+# $ terraform output -raw web_server_public_ip
+# 52.90.100.200
+#
+# $ terraform output -json
+# { "web_server_public_ip": { "value": "52.90.100.200" }, ... }
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.4 Referências Cruzadas entre Módulos</h3>
+          <p>Quando você divide infraestrutura em módulos, os outputs de um módulo alimentam as variáveis de outro:</p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <div class="command-header"><code>Módulo Network → Módulo Compute</code><span class="cmd-tag">Composição</span></div>
+              <pre><code># ═══════════════════════════════════════════════════════════════
+# main.tf — Chamando módulos e conectando outputs → variables
+# ═══════════════════════════════════════════════════════════════
+
+# Módulo de rede (cria VPC, subnets, SGs)
+module "network" {
+  source = "./modules/network"
+
+  vpc_cidr    = "10.0.0.0/16"
+  environment = var.environment
+}
+
+# Módulo de compute (cria EC2, usando outputs do network)
+module "compute" {
+  source = "./modules/compute"
+
+  # Outputs do módulo network → variáveis do módulo compute
+  vpc_id             = module.network.vpc_id              # ← Ref cruzada
+  subnet_ids         = module.network.private_subnet_ids  # ← Ref cruzada
+  security_group_ids = [module.network.app_sg_id]         # ← Ref cruzada
+
+  instance_type = "t3.small"
+  environment   = var.environment
+}
+
+# Output final composto
+output "application_url" {
+  value = "http://${module.compute.public_ip}"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# O Terraform entende automaticamente:
+# module.network DEVE ser criado ANTES de module.compute
+# porque compute referencia outputs do network
+# ═══════════════════════════════════════════════════════════════</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SEÇÃO 11: EXERCÍCIOS PRÁTICOS
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Prática</span>
+          <h2>11. Exercícios Práticos</h2>
+          <p>Coloque em prática tudo que aprendeu neste módulo. Cada exercício constrói sobre o anterior, formando uma infraestrutura EC2 completa e pronta para produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Data Sources e AMI Dinâmica</h3>
+          <p><strong>Objetivo:</strong> Criar um arquivo <code>data.tf</code> que consulta dinamicamente a AMI mais recente do Amazon Linux 2023, as AZs disponíveis, e as informações da conta atual. Use os atributos em locals para compor tags padronizadas.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>Data source para AMI Amazon Linux 2023 (x86_64, HVM, EBS)</li>
+            <li>Data source para availability zones disponíveis</li>
+            <li>Data source para caller identity e região</li>
+            <li>Locals com tags comuns (Environment, Region, AccountId, ManagedBy)</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>data.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# data.tf — Data Sources do projeto
+# ═══════════════════════════════════════════════════════════════
+
+# AMI mais recente do Amazon Linux 2023
+data "aws_ami" "amazon_linux_2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-kernel-6.1-x86_64"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
+# Availability Zones disponíveis
+data "aws_availability_zones" "available" {
+  state = "available"
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
+# Informações da conta e região
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+# ═══════════════════════════════════════════════════════════════
+# locals.tf — Tags e valores computados
+# ═══════════════════════════════════════════════════════════════
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+  region     = data.aws_region.current.name
+  azs        = data.aws_availability_zones.available.names
+  ami_id     = data.aws_ami.amazon_linux_2023.id
+
+  common_tags = {
+    Environment = var.environment
+    Region      = local.region
+    AccountId   = local.account_id
+    ManagedBy   = "terraform"
+    Project     = var.project
+  }
+}
+
+# Verificação via output
+output "ami_info" {
+  value = {
+    id   = data.aws_ami.amazon_linux_2023.id
+    name = data.aws_ami.amazon_linux_2023.name
+  }
+}
+
+output "available_azs" {
+  value = data.aws_availability_zones.available.names
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Security Groups em Cadeia</h3>
+          <p><strong>Objetivo:</strong> Criar três Security Groups em cadeia (ALB → App → DB) onde cada um só aceita tráfego do anterior. Use <code>aws_security_group_rule</code> separadas (não inline).</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>SG do ALB: aceita 80 e 443 de 0.0.0.0/0</li>
+            <li>SG da App: aceita porta 8080 APENAS do SG do ALB</li>
+            <li>SG do DB: aceita porta 5432 APENAS do SG da App</li>
+            <li>Todos com egress liberado para 0.0.0.0/0</li>
+            <li>Cada regra com description explicativa</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>security-groups.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# Security Groups em cadeia: ALB → App → DB
+# ═══════════════════════════════════════════════════════════════
+
+# ─── ALB Security Group ────────────────────────────────────────
+resource "aws_security_group" "alb" {
+  name_prefix = "${var.project}-alb-sg-"
+  description = "ALB - aceita HTTP/HTTPS da internet"
+  vpc_id      = aws_vpc.main.id
+  tags        = merge(local.common_tags, { Name = "${var.project}-alb-sg" })
+  lifecycle { create_before_destroy = true }
+}
+
+resource "aws_security_group_rule" "alb_http_in" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "HTTP from internet for redirect to HTTPS"
+  security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_security_group_rule" "alb_https_in" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "HTTPS from internet - main traffic entry"
+  security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_security_group_rule" "alb_all_out" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound to reach app targets"
+  security_group_id = aws_security_group.alb.id
+}
+
+# ─── App Security Group ───────────────────────────────────────
+resource "aws_security_group" "app" {
+  name_prefix = "${var.project}-app-sg-"
+  description = "App servers - aceita trafego APENAS do ALB"
+  vpc_id      = aws_vpc.main.id
+  tags        = merge(local.common_tags, { Name = "${var.project}-app-sg" })
+  lifecycle { create_before_destroy = true }
+}
+
+resource "aws_security_group_rule" "app_from_alb" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.alb.id
+  description              = "App port 8080 from ALB only"
+  security_group_id        = aws_security_group.app.id
+}
+
+resource "aws_security_group_rule" "app_all_out" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound for package downloads and DB access"
+  security_group_id = aws_security_group.app.id
+}
+
+# ─── Database Security Group ──────────────────────────────────
+resource "aws_security_group" "db" {
+  name_prefix = "${var.project}-db-sg-"
+  description = "Database - aceita conexoes APENAS dos app servers"
+  vpc_id      = aws_vpc.main.id
+  tags        = merge(local.common_tags, { Name = "${var.project}-db-sg" })
+  lifecycle { create_before_destroy = true }
+}
+
+resource "aws_security_group_rule" "db_from_app" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.app.id
+  description              = "PostgreSQL from app servers only"
+  security_group_id        = aws_security_group.db.id
+}
+
+resource "aws_security_group_rule" "db_egress_vpc" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = [aws_vpc.main.cidr_block]
+  description       = "Outbound only within VPC (no internet for DB)"
+  security_group_id = aws_security_group.db.id
+}</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — EC2 Completa com User Data</h3>
+          <p><strong>Objetivo:</strong> Criar uma instância EC2 em subnet pública com Nginx instalado via user_data usando templatefile. A instância deve ter EIP, key pair e Security Group adequados.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>Usar data source para AMI (do exercício 1)</li>
+            <li>Instance type t3.micro, volume gp3 de 20GB encriptado</li>
+            <li>Key pair registrado de arquivo local</li>
+            <li>Security Group permitindo HTTP (80), HTTPS (443) e SSH (do seu IP)</li>
+            <li>User data via templatefile instalando Nginx e criando página HTML customizada</li>
+            <li>Elastic IP associado</li>
+            <li>Outputs com IP, URL e comando SSH</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>main.tf + scripts/user_data.sh</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# main.tf — EC2 Instance completa com Nginx
+# ═══════════════════════════════════════════════════════════════
+
+# Key Pair
+resource "aws_key_pair" "web" {
+  key_name   = "${var.project}-web-key"
+  public_key = file("~/.ssh/terraform-key.pub")
+  tags       = merge(local.common_tags, { Name = "${var.project}-web-key" })
+}
+
+# Security Group
+resource "aws_security_group" "web" {
+  name_prefix = "${var.project}-web-"
+  description = "Web server - HTTP, HTTPS, SSH restrito"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "SSH from my IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip_cidr]  # Ex: "203.0.113.50/32"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle { create_before_destroy = true }
+  tags = merge(local.common_tags, { Name = "${var.project}-web-sg" })
+}
+
+# EC2 Instance
+resource "aws_instance" "web" {
+  ami           = local.ami_id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.public[0].id
+  key_name      = aws_key_pair.web.key_name
+
+  vpc_security_group_ids      = [aws_security_group.web.id]
+  associate_public_ip_address = true
+
+  root_block_device {
+    volume_type           = "gp3"
+    volume_size           = 20
+    encrypted             = true
+    delete_on_termination = true
+  }
+
+  user_data = templatefile("${path.module}/scripts/user_data.sh", {
+    project     = var.project
+    environment = var.environment
+  })
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.project}-web-server" })
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = [user_data]
+  }
+}
+
+# Elastic IP
+resource "aws_eip" "web" {
+  domain   = "vpc"
+  instance = aws_instance.web.id
+  tags     = merge(local.common_tags, { Name = "${var.project}-web-eip" })
+  depends_on = [aws_internet_gateway.main]
+}
+
+# Outputs
+output "web_url" {
+  value = "http://${aws_eip.web.public_ip}"
+}
+
+output "ssh_command" {
+  value = "ssh -i ~/.ssh/terraform-key ec2-user@${aws_eip.web.public_ip}"
+}
+
+# ═══════════════════════════════════════════════════════════════
+# scripts/user_data.sh (Template)
+# ═══════════════════════════════════════════════════════════════
+# #!/bin/bash
+# set -euxo pipefail
+#
+# # Atualizar sistema
+# dnf update -y
+#
+# # Instalar Nginx
+# dnf install -y nginx
+#
+# # Criar página customizada
+# cat > /usr/share/nginx/html/index.html &lt;&lt;'HTML'
+# &lt;!DOCTYPE html&gt;
+# &lt;html&gt;
+# &lt;head&gt;&lt;title&gt;${project} - ${environment}&lt;/title&gt;&lt;/head&gt;
+# &lt;body&gt;
+#   &lt;h1&gt;🚀 ${project} - ${environment}&lt;/h1&gt;
+#   &lt;p&gt;Servidor provisionado com Terraform&lt;/p&gt;
+#   &lt;p&gt;Hostname: $(hostname)&lt;/p&gt;
+#   &lt;p&gt;Data: $(date)&lt;/p&gt;
+# &lt;/body&gt;
+# &lt;/html&gt;
+# HTML
+#
+# # Iniciar Nginx
+# systemctl enable nginx
+# systemctl start nginx
+#
+# echo "Setup completed" >> /var/log/user-data-status.log</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — Lifecycle Rules e Proteção</h3>
+          <p><strong>Objetivo:</strong> Modificar a infraestrutura do exercício anterior para incluir lifecycle rules que protegem contra downtime e destruição acidental.</p>
+          <p><strong>Requisitos:</strong></p>
+          <ul>
+            <li>Security Group com <code>create_before_destroy</code> (use name_prefix)</li>
+            <li>EC2 Instance com <code>ignore_changes</code> em [user_data, ami]</li>
+            <li>Criar um "fake" RDS com <code>prevent_destroy = true</code></li>
+            <li>Usar <code>replace_triggered_by</code> para recriar a instância quando um terraform_data mudar</li>
+            <li>Adicionar output do comando de SSH e URL do servidor</li>
+          </ul>
+
+          <details>
+            <summary>▶ Ver solução</summary>
+            <div class="command-grid">
+              <div class="command-card wide">
+                <div class="command-header"><code>lifecycle-demo.tf</code><span class="cmd-tag">Solução</span></div>
+                <pre><code># ═══════════════════════════════════════════════════════════════
+# Demonstração completa de Lifecycle Rules
+# ═══════════════════════════════════════════════════════════════
+
+# Trigger para forçar recriação (simula mudança de config)
+resource "terraform_data" "app_config_version" {
+  input = var.app_config_version  # Mude para forçar redeploy
+}
+
+# Security Group com create_before_destroy
+resource "aws_security_group" "demo" {
+  name_prefix = "${var.project}-demo-"  # Prefixo permite coexistência
+  description = "Demo SG with lifecycle rules"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    # Cria novo SG antes de deletar o antigo → zero downtime
+    create_before_destroy = true
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.project}-demo-sg" })
+}
+
+# EC2 com ignore_changes e replace_triggered_by
+resource "aws_instance" "demo" {
+  ami           = local.ami_id
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.public[0].id
+  key_name      = aws_key_pair.web.key_name
+
+  vpc_security_group_ids = [aws_security_group.demo.id]
+  user_data              = file("${path.module}/scripts/user_data.sh")
+
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 20
+    encrypted   = true
+  }
+
+  lifecycle {
+    # Não recriar quando user_data ou AMI mudar acidentalmente
+    ignore_changes = [user_data, ami]
+
+    # MAS recriar quando explicitamente mudarmos a versão da config
+    replace_triggered_by = [terraform_data.app_config_version]
+
+    # Criar nova antes de destruir antiga
+    create_before_destroy = true
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.project}-demo-instance" })
+}
+
+# Simulação de recurso protegido (RDS)
+resource "aws_db_instance" "protected" {
+  identifier     = "${var.project}-protected-db"
+  engine         = "postgres"
+  engine_version = "15.4"
+  instance_class = "db.t3.micro"
+
+  allocated_storage = 20
+  storage_encrypted = true
+
+  db_name  = "app_db"
+  username = "admin"
+  password = var.db_password
+
+  skip_final_snapshot = true  # Para facilitar testes (em prod = false)
+  deletion_protection = true  # Proteção na API AWS
+
+  lifecycle {
+    # Terraform NÃO pode destruir este recurso
+    prevent_destroy = true
+  }
+
+  tags = merge(local.common_tags, { Name = "${var.project}-protected-db" })
+}
+
+# Outputs
+output "demo_instance_ip" {
+  value = aws_instance.demo.public_ip
+}
+
+output "demo_ssh" {
+  value = "ssh -i ~/.ssh/terraform-key ec2-user@${aws_instance.demo.public_ip}"
+}
+
+# Para testar replace_triggered_by:
+# terraform apply -var="app_config_version=v2"
+# → Instância será recriada!</code></pre>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CTA — PRÓXIMO MÓDULO
+         ═══════════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🏗️ Próximo passo</span>
+          <h2>Pronto para RDS e IAM?</h2>
+          <p>No Módulo 03 você aprenderá a criar bancos de dados RDS, gerenciar segredos com Secrets Manager e configurar IAM Roles e Policies com Terraform — essencial para qualquer aplicação de produção.</p>
+        </div>
+        <a href="modulo-03.html" class="button primary">Ir para Módulo 03 →</a>
       </div>
     </section>
   </main>
@@ -409,7 +3165,7 @@ terraform apply \
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
