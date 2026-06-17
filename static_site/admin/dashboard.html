@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudTrilhas Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #f1f5f9;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .auth-overlay {
+            position: fixed; inset: 0;
+            background: #0f172a;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .auth-box {
+            background: #1e293b;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 400px; width: 90%;
+        }
+        .auth-box h2 { margin-bottom: 1.5rem; color: #4f46e5; }
+        .auth-box input {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 1px solid #334155; border-radius: 0.5rem;
+            background: #0f172a; color: #f1f5f9;
+            font-size: 1rem; margin-bottom: 1rem;
+        }
+        .auth-box input:focus { outline: none; border-color: #4f46e5; }
+        .auth-box button {
+            width: 100%; padding: 0.75rem;
+            background: #4f46e5; color: white;
+            border: none; border-radius: 0.5rem;
+            font-size: 1rem; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .auth-box button:hover { background: #4338ca; }
+        .auth-error { color: #ef4444; margin-top: 0.75rem; display: none; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-meta {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .controls {
+            display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+        }
+        .period-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        .period-btn:hover { border-color: #4f46e5; color: #f1f5f9; }
+        .period-btn.active {
+            background: #4f46e5; border-color: #4f46e5; color: white;
+        }
+        .btn-refresh {
+            padding: 0.5rem 1.25rem;
+            background: #1e293b; border: 1px solid #334155;
+            color: #f1f5f9; border-radius: 0.5rem;
+            cursor: pointer; font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .btn-refresh:hover { border-color: #4f46e5; background: #263348; }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .summary-card {
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .summary-icon {
+            width: 48px; height: 48px;
+            border-radius: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .summary-icon.users { background: rgba(79,70,229,0.15); color: #818cf8; }
+        .summary-icon.trails { background: rgba(16,185,129,0.15); color: #34d399; }
+        .summary-icon.simulados { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .summary-icon.downloads { background: rgba(236,72,153,0.15); color: #f472b6; }
+        .summary-info h3 {
+            font-size: 1.75rem; font-weight: 700; line-height: 1.2;
+        }
+        .summary-info p {
+            color: #94a3b8; font-size: 0.85rem;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .charts-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .card h2 {
+            font-size: 1.1rem; margin-bottom: 1rem;
+            color: #e2e8f0; font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 350px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #334155;
+        }
+        th {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        td { color: #e2e8f0; }
+        tr:hover td { background: rgba(79,70,229,0.05); }
+        .scrollable-table {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .scrollable-table::-webkit-scrollbar { width: 6px; }
+        .scrollable-table::-webkit-scrollbar-track { background: #1e293b; }
+        .scrollable-table::-webkit-scrollbar-thumb {
+            background: #4f46e5; border-radius: 3px;
+        }
+        .loading-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15,23,42,0.85);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid #334155;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 1rem; color: #94a3b8; }
+        .error-state {
+            text-align: center; padding: 3rem;
+        }
+        .error-state h2 { color: #ef4444; margin-bottom: 1rem; }
+        .error-state p { color: #94a3b8; margin-bottom: 1.5rem; }
+        .error-state button {
+            padding: 0.75rem 1.5rem;
+            background: #4f46e5; color: white;
+            border: none; border-radius: 0.5rem;
+            cursor: pointer; font-size: 1rem;
+        }
+
+        .hidden { display: none !important; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-purple { background: rgba(79,70,229,0.2); color: #a5b4fc; }
+        .badge-green { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .charts-grid-2 { grid-template-columns: 1fr; }
+            .summary-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Overlay -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-box">
+            <h2>🔒 CloudTrilhas Analytics</h2>
+            <p style="color:#94a3b8;margin-bottom:1.5rem;">Insira a senha de acesso ao painel</p>
+            <input type="password" id="authPassword" placeholder="Senha de acesso" autocomplete="off">
+            <button onclick="authenticate()">Entrar</button>
+            <p class="auth-error" id="authError">Senha incorreta. Tente novamente.</p>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Carregando dados...</p>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="container hidden" id="dashboard">
+        <div class="header">
+            <div>
+                <h1>📊 CloudTrilhas Analytics</h1>
+                <p class="header-meta">Gerado em: <span id="timestamp">—</span></p>
+            </div>
+            <div class="controls">
+                <button class="period-btn active" data-days="7">7 dias</button>
+                <button class="period-btn" data-days="30">30 dias</button>
+                <button class="period-btn" data-days="90">90 dias</button>
+                <button class="btn-refresh" onclick="refreshData()">🔄 Atualizar</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="card summary-card">
+                <div class="summary-icon users">👥</div>
+                <div class="summary-info">
+                    <h3 id="totalUsers">0</h3>
+                    <p>Total de Usuários</p>
+                </div>
+            </div>
+            <div class="card summary-card">
+                <div class="summary-icon trails">🛤️</div>
+                <div class="summary-info">
+                    <h3 id="trailAccess">0</h3>
+                    <p>Acessos às Trilhas</p>
+                </div>
+            </div>
+            <div class="card summary-card">
+                <div class="summary-icon simulados">📝</div>
+                <div class="summary-info">
+                    <h3 id="totalSimulados">0</h3>
+                    <p>Simulados Realizados</p>
+                </div>
+            </div>
+            <div class="card summary-card">
+                <div class="summary-icon downloads">📥</div>
+                <div class="summary-info">
+                    <h3 id="totalDownloads">0</h3>
+                    <p>Downloads</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Chart -->
+        <div class="charts-grid">
+            <div class="card">
+                <h2>📈 Acessos Diários</h2>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row: Top Trails + Sources -->
+        <div class="charts-grid-2">
+            <div class="card">
+                <h2>🏆 Trilhas Mais Acessadas</h2>
+                <div class="chart-container">
+                    <canvas id="trailsChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>🌐 Origem dos Usuários</h2>
+                <div class="chart-container">
+                    <canvas id="sourcesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables Row: Institutions + Simulados -->
+        <div class="charts-grid-2">
+            <div class="card">
+                <h2>🏫 Instituições</h2>
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Instituição</th>
+                                <th>Acessos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="institutionsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <h2>📝 Simulados</h2>
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Página</th>
+                                <th>Acessos</th>
+                                <th>Resultados</th>
+                                <th>Média</th>
+                            </tr>
+                        </thead>
+                        <tbody id="simuladosTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Users -->
+        <div class="charts-grid">
+            <div class="card">
+                <h2>🕐 Usuários Recentes</h2>
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Página</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentUsersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state hidden" id="errorState">
+            <h2>⚠️ Erro ao carregar dados</h2>
+            <p id="errorMessage">Não foi possível conectar à API.</p>
+            <button onclick="refreshData()">Tentar Novamente</button>
+        </div>
+    </div>
+
+    <script>
+        // === Configuration ===
+        const API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/analytics';
+        const PASSWORD_HASH = 'c02b18eba561dbbd4573637ca5597bef0852da8185509bf61df2086614a272e5';
+
+        let timelineChart = null;
+        let trailsChart = null;
+        let sourcesChart = null;
+        let currentPeriod = 7;
+
+        // === Authentication ===
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function authenticate() {
+            const input = document.getElementById('authPassword').value;
+            const hash = await hashPassword(input);
+            if (hash === PASSWORD_HASH) {
+                sessionStorage.setItem('ct_auth', 'true');
+                document.getElementById('authOverlay').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadData();
+            } else {
+                document.getElementById('authError').style.display = 'block';
+                document.getElementById('authPassword').value = '';
+                document.getElementById('authPassword').focus();
+            }
+        }
+
+        // Enter key on password field
+        document.getElementById('authPassword').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') authenticate();
+        });
+
+        // Check session
+        if (sessionStorage.getItem('ct_auth') === 'true') {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadData();
+        }
+
+        // === Period Selector ===
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPeriod = parseInt(btn.dataset.days);
+                loadData();
+            });
+        });
+
+        // === Data Loading ===
+        async function loadData() {
+            const loading = document.getElementById('loadingOverlay');
+            const errorState = document.getElementById('errorState');
+            loading.classList.remove('hidden');
+            errorState.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_URL}?period=${currentPeriod}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                document.getElementById('errorMessage').textContent = 
+                    `Erro: ${error.message}`;
+                errorState.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        // === Render Dashboard ===
+        function renderDashboard(data) {
+            // Timestamp
+            document.getElementById('timestamp').textContent = 
+                data.generated_at ? new Date(data.generated_at).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
+
+            // Summary Cards
+            const s = data.summary || {};
+            document.getElementById('totalUsers').textContent = formatNumber(s.unique_users || 0);
+            document.getElementById('trailAccess').textContent = formatNumber(s.total_trail_access || 0);
+            document.getElementById('totalSimulados').textContent = formatNumber(s.total_simulado_access || 0);
+            document.getElementById('totalDownloads').textContent = formatNumber(s.total_downloads || 0);
+
+            // Timeline Chart (data.timeline is {date: count} dict)
+            const timeline = Object.entries(data.timeline || {}).map(([date, count]) => ({date, count}));
+            renderTimelineChart(timeline);
+
+            // Top Trails (data.trails is {page: count} dict)
+            const trails = Object.entries(data.trails || {}).slice(0, 10).map(([name, count]) => ({name, count}));
+            renderTrailsChart(trails);
+
+            // Sources (data.sources is {source: count} dict)
+            const sources = Object.entries(data.sources || {}).map(([source, count]) => ({source, count}));
+            renderSourcesChart(sources);
+
+            // Institutions (data.institutions is {name: count} dict)
+            const institutions = Object.entries(data.institutions || {}).map(([name, count]) => ({name, count}));
+            renderInstitutionsTable(institutions);
+
+            // Simulados (data.simulados is {page: {access, results, avg_score}} dict)
+            const simulados = Object.entries(data.simulados || {}).map(([page, d]) => ({
+                page, accesses: d.access, results: d.results, avgScore: d.avg_score
+            }));
+            renderSimuladosTable(simulados);
+
+            // Recent Users (data.recent_users is array)
+            renderRecentUsersTable(data.recent_users || []);
+        }
+
+        // === Chart Rendering ===
+        function renderTimelineChart(timeline) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            if (timelineChart) timelineChart.destroy();
+
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeline.map(t => formatDate(t.date)),
+                    datasets: [{
+                        label: 'Acessos',
+                        data: timeline.map(t => t.count),
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4f46e5',
+                        pointBorderColor: '#4f46e5',
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(51,65,85,0.5)' },
+                            ticks: { color: '#94a3b8', maxTicksLimit: 10 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(51,65,85,0.5)' },
+                            ticks: { color: '#94a3b8' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTrailsChart(trails) {
+            const ctx = document.getElementById('trailsChart').getContext('2d');
+            if (trailsChart) trailsChart.destroy();
+
+            const colors = [
+                '#4f46e5', '#7c3aed', '#2563eb', '#0891b2',
+                '#059669', '#d97706', '#dc2626', '#db2777',
+                '#4338ca', '#0d9488'
+            ];
+
+            trailsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: trails.map(t => truncateLabel(t.name, 25)),
+                    datasets: [{
+                        label: 'Acessos',
+                        data: trails.map(t => t.count),
+                        backgroundColor: colors.slice(0, trails.length),
+                        borderRadius: 4,
+                        barThickness: 24
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(51,65,85,0.5)' },
+                            ticks: { color: '#94a3b8' },
+                            beginAtZero: true
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#e2e8f0', font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderSourcesChart(sources) {
+            const ctx = document.getElementById('sourcesChart').getContext('2d');
+            if (sourcesChart) sourcesChart.destroy();
+
+            const colors = [
+                '#4f46e5', '#7c3aed', '#2563eb', '#0891b2',
+                '#059669', '#d97706', '#dc2626', '#db2777'
+            ];
+
+            sourcesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sources.map(s => s.source),
+                    datasets: [{
+                        data: sources.map(s => s.count),
+                        backgroundColor: colors.slice(0, sources.length),
+                        borderColor: '#1e293b',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#e2e8f0',
+                                padding: 12,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    }
+                }
+            });
+        }
+
+        // === Table Rendering ===
+        function renderInstitutionsTable(institutions) {
+            const tbody = document.getElementById('institutionsTable');
+            tbody.innerHTML = institutions.map((inst, i) => `
+                <tr>
+                    <td><span class="badge badge-purple">${i + 1}</span></td>
+                    <td>${escapeHtml(inst.name)}</td>
+                    <td>${formatNumber(inst.count)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Sem dados</td></tr>';
+        }
+
+        function renderSimuladosTable(simulados) {
+            const tbody = document.getElementById('simuladosTable');
+            tbody.innerHTML = simulados.map(s => `
+                <tr>
+                    <td>${escapeHtml(s.page || s.name)}</td>
+                    <td>${formatNumber(s.accesses || 0)}</td>
+                    <td>${formatNumber(s.results || 0)}</td>
+                    <td><span class="badge badge-green">${s.avgScore != null ? s.avgScore.toFixed(1) + '%' : '—'}</span></td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Sem dados</td></tr>';
+        }
+
+        function renderRecentUsersTable(users) {
+            const tbody = document.getElementById('recentUsersTable');
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${escapeHtml(u.name || 'Anônimo')}</td>
+                    <td>${maskEmail(u.email || '')}</td>
+                    <td>${escapeHtml(u.page || '—')}</td>
+                    <td>${formatDate(u.date)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Sem dados</td></tr>';
+        }
+
+        // === Utility Functions ===
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toLocaleString('pt-BR');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            return date.toLocaleDateString('pt-BR', { 
+                day: '2-digit', month: '2-digit', year: '2-digit' 
+            });
+        }
+
+        function maskEmail(email) {
+            if (!email || !email.includes('@')) return '***';
+            const [user, domain] = email.split('@');
+            const masked = user.charAt(0) + '***' + user.charAt(user.length - 1);
+            return masked + '@' + domain;
+        }
+
+        function truncateLabel(str, max) {
+            if (!str) return '';
+            return str.length > max ? str.substring(0, max) + '...' : str;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

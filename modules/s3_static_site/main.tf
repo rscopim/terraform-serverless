@@ -448,3 +448,11 @@ resource "aws_s3_object" "trail_gate_css" {
   content_type = "text/css"
   etag         = filemd5("${path.root}/../../static_site/trail-gate.css")
 }
+
+resource "aws_s3_object" "admin_dashboard" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "admin/dashboard.html"
+  source       = "${path.root}/../../static_site/admin/dashboard.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/admin/dashboard.html")
+}

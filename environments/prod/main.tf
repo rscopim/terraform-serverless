@@ -181,3 +181,19 @@ module "github_actions_oidc" {
   github_branch     = "main"
 }
 
+
+module "analytics" {
+  source = "../../modules/analytics"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  lambda_source_file = "${path.root}/../../lambda_src/analytics/app.py"
+  lambda_output_path = "${path.root}/analytics.zip"
+
+  dynamodb_table_name = module.dynamodb_leads.table_name
+  dynamodb_table_arn  = module.dynamodb_leads.table_arn
+  sns_topic_arn       = module.sns.topic_arn
+
+  api_gateway_id            = module.api_gateway.api_id
+  api_gateway_execution_arn = module.api_gateway.execution_arn
+}
