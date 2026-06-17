@@ -113,3 +113,10 @@ jobs:
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform apply -auto-approve tfplan
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id E16GA24I7417C2 \
+            --paths "/*"
+          echo "CloudFront invalidation created - changes will propagate in 2-5 minutes"
