@@ -20,6 +20,7 @@ from collections import defaultdict
 
 dynamodb = boto3.resource("dynamodb")
 sns = boto3.client("sns")
+ce = boto3.client("ce", region_name="us-east-1")  # Cost Explorer só funciona em us-east-1
 
 TABLE_NAME = os.environ.get("LEADS_TABLE_NAME", "leads")
 SNS_TOPIC_ARN = os.environ.get("SNS_TOPIC_ARN", "")
@@ -325,6 +326,62 @@ def build_report_text(metrics: dict) -> str:
     return "\n".join(lines)
 
 
+def get_aws_costs() -> dict:
+    """
+    Consulta Cost Explorer para custos do mês atual.
+    Retorna total, breakdown por serviço e custos diários.
+    """
+    try:
+        now = datetime.now(timezone.utc)
+        start_of_month = now.strftime("%Y-%m-01")
+        today = now.strftime("%Y-%m-%d")
+
+        # Se estamos no dia 1, não há dados ainda
+        if start_of_month == today:
+            return None
+
+        # Total por serviço
+        response = ce.get_cost_and_usage(
+            TimePeriod={"Start": start_of_month, "End": today},
+            Granularity="MONTHLY",
+            Metrics=["UnblendedCost"],
+            GroupBy=[{"Type": "DIMENSION", "Key": "SERVICE"}],
+        )
+
+        services = {}
+        total = 0.0
+        for group in response.get("ResultsByTime", [{}])[0].get("Groups", []):
+            svc_name = group["Keys"][0]
+            amount = float(group["Metrics"]["UnblendedCost"]["Amount"])
+            if amount > 0.001:
+                services[svc_name] = round(amount, 4)
+                total += amount
+
+        # Custos diários
+        daily_response = ce.get_cost_and_usage(
+            TimePeriod={"Start": start_of_month, "End": today},
+            Granularity="DAILY",
+            Metrics=["UnblendedCost"],
+        )
+
+        daily = {}
+        for day in daily_response.get("ResultsByTime", []):
+            date = day["TimePeriod"]["Start"]
+            amount = float(day["Total"]["UnblendedCost"]["Amount"])
+            daily[date] = round(amount, 4)
+
+        return {
+            "total": round(total, 2),
+            "services": services,
+            "daily": daily,
+            "period": f"{start_of_month} a {today}",
+        }
+
+    except Exception as e:
+        print(f"[AVISO] Erro ao consultar Cost Explorer: {e}")
+        return None
+
+
 # ============================================================================
 # Handlers Lambda
 # ============================================================================
@@ -352,6 +409,10 @@ def lambda_handler(event, context):
 
         # Agrega métricas
         metrics = aggregate_metrics(filtered_items, period)
+
+        # Busca custos AWS (apenas se período >= 7 dias)
+        if period >= 7:
+            metrics["costs"] = get_aws_costs()
 
         # Retorna resposta HTTP com CORS
         return {

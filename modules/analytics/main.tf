@@ -36,6 +36,11 @@ resource "aws_iam_role_policy" "analytics_policy" {
         Effect = "Allow"
         Action = ["sns:Publish"]
         Resource = var.sns_topic_arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ce:GetCostAndUsage"]
+        Resource = "*"
       }
     ]
   })

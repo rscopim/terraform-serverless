@@ -12,7 +12,8 @@
             background: #0f172a;
             color: #f1f5f9;
             min-height: 100vh;
-            line-height: 1.6;
+            line-height: 1.7;
+            font-size: 15px;
         }
         .auth-overlay {
             position: fixed; inset: 0;
@@ -132,7 +133,7 @@
             font-size: 1.75rem; font-weight: 700; line-height: 1.2;
         }
         .summary-info p {
-            color: #94a3b8; font-size: 0.85rem;
+            color: #94a3b8; font-size: 0.9rem;
         }
         .charts-grid {
             display: grid;
@@ -147,7 +148,7 @@
             margin-bottom: 2rem;
         }
         .card h2 {
-            font-size: 1.1rem; margin-bottom: 1rem;
+            font-size: 1.15rem; margin-bottom: 1.1rem;
             color: #e2e8f0; font-weight: 600;
         }
 
@@ -159,21 +160,21 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.875rem;
+            font-size: 0.925rem;
         }
         th, td {
             text-align: left;
-            padding: 0.75rem 1rem;
+            padding: 0.9rem 1.1rem;
             border-bottom: 1px solid #334155;
         }
         th {
             color: #94a3b8;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.84rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        td { color: #e2e8f0; }
+        td { color: #e2e8f0; line-height: 1.5; }
         tr:hover td { background: rgba(79,70,229,0.05); }
         .scrollable-table {
             max-height: 350px;
@@ -377,6 +378,40 @@
             </div>
         </div>
 
+        <!-- AWS Costs -->
+        <div class="charts-grid-2">
+            <div class="card">
+                <h2>💰 Custos AWS (Mês Atual)</h2>
+                <div id="costsSection">
+                    <div class="summary-card" style="margin-bottom:1rem">
+                        <div class="summary-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24">💲</div>
+                        <div class="summary-info">
+                            <h3 id="totalCost">—</h3>
+                            <p>Total do mês (USD)</p>
+                        </div>
+                    </div>
+                    <div class="scrollable-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Serviço</th>
+                                    <th>Custo (USD)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="costsTable"></tbody>
+                        </table>
+                    </div>
+                    <p style="color:#64748b;font-size:0.8rem;margin-top:0.75rem" id="costsMeta">Dados indisponíveis — aguardando deploy do módulo de custos</p>
+                </div>
+            </div>
+            <div class="card">
+                <h2>📊 Custos por Dia (Mês Atual)</h2>
+                <div class="chart-container">
+                    <canvas id="costsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Error State -->
         <div class="error-state hidden" id="errorState">
             <h2>⚠️ Erro ao carregar dados</h2>
@@ -523,6 +558,9 @@
 
             // Recent Users (data.recent_users is array)
             renderRecentUsersTable(data.recent_users || []);
+
+            // AWS Costs (if available)
+            renderCosts(data.costs || null);
         }
 
         // === Chart Rendering ===
@@ -733,6 +771,69 @@
         function truncateLabel(str, max) {
             if (!str) return '';
             return str.length > max ? str.substring(0, max) + '...' : str;
+        }
+
+        // === Costs Rendering ===
+        let costsChart = null;
+
+        function renderCosts(costs) {
+            const metaEl = document.getElementById('costsMeta');
+            const totalEl = document.getElementById('totalCost');
+            const tableEl = document.getElementById('costsTable');
+
+            if (!costs || !costs.total) {
+                totalEl.textContent = '—';
+                tableEl.innerHTML = '<tr><td colspan="2" style="text-align:center;color:#94a3b8;">Módulo de custos pendente de deploy</td></tr>';
+                metaEl.textContent = 'Dados indisponíveis — aguardando deploy do módulo de custos';
+                return;
+            }
+
+            totalEl.textContent = '$' + parseFloat(costs.total).toFixed(2);
+            metaEl.textContent = costs.period || 'Mês atual';
+
+            // Services table
+            const services = costs.services || {};
+            const sorted = Object.entries(services).sort((a, b) => b[1] - a[1]);
+            tableEl.innerHTML = sorted.map(([svc, amount]) => `
+                <tr>
+                    <td>${escapeHtml(svc)}</td>
+                    <td>$${parseFloat(amount).toFixed(2)}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="2" style="text-align:center;color:#94a3b8;">Sem custos</td></tr>';
+
+            // Daily costs chart
+            const daily = costs.daily || {};
+            const ctx = document.getElementById('costsChart').getContext('2d');
+            if (costsChart) costsChart.destroy();
+
+            const entries = Object.entries(daily).sort((a, b) => a[0].localeCompare(b[0]));
+            if (entries.length > 0) {
+                costsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: entries.map(([d]) => formatDate(d)),
+                        datasets: [{
+                            label: 'USD',
+                            data: entries.map(([, v]) => parseFloat(v)),
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4,
+                            barThickness: 16
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { backgroundColor: '#1e293b', titleColor: '#f1f5f9', bodyColor: '#94a3b8', borderColor: '#334155', borderWidth: 1 }
+                        },
+                        scales: {
+                            x: { grid: { color: 'rgba(51,65,85,0.5)' }, ticks: { color: '#94a3b8', maxTicksLimit: 10 } },
+                            y: { grid: { color: 'rgba(51,65,85,0.5)' }, ticks: { color: '#94a3b8', callback: v => '$' + v.toFixed(2) }, beginAtZero: true }
+                        }
+                    }
+                });
+            }
         }
 
         function escapeHtml(str) {
