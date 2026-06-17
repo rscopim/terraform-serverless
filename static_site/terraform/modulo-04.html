@@ -277,7 +277,7 @@ Versão 1               → Upload em 2024-05-20 │ ID: ghi789
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>❌ Padrão Antigo (Depreciado)</code><span class="cmd-tag">Evitar</span></div>
+              <div class="command-header"><code>❌ Padrão Antigo (Depreciado)</code><span class="cmd-tag">Evitar</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># NÃO USE — vai gerar warnings
 resource "aws_s3_bucket" "this" {
   bucket = "meu-bucket"
@@ -305,7 +305,7 @@ resource "aws_s3_bucket" "this" {
 }</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>✅ Padrão Novo (Recursos Separados)</code><span class="cmd-tag">Recomendado</span></div>
+              <div class="command-header"><code>✅ Padrão Novo (Recursos Separados)</code><span class="cmd-tag">Recomendado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># RECOMENDADO — cada config é um resource
 resource "aws_s3_bucket" "this" {
   bucket = "meu-bucket"
@@ -347,7 +347,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>s3.tf</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>s3.tf</code><span class="cmd-tag">Produção</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  S3 BUCKET — CONFIGURAÇÃO COMPLETA PARA PRODUÇÃO           ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -509,7 +509,7 @@ output "bucket_objects_arn" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>aws_s3_object</code><span class="cmd-tag">Upload</span></div>
+              <div class="command-header"><code>aws_s3_object</code><span class="cmd-tag">Upload</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Upload de arquivo individual
 resource "aws_s3_object" "index_html" {
   bucket       = aws_s3_bucket.app_assets.id
@@ -610,7 +610,7 @@ resource "aws_s3_object" "static_files" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>lifecycle.tf</code><span class="cmd-tag">Completo</span></div>
+              <div class="command-header"><code>lifecycle.tf</code><span class="cmd-tag">Completo</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  LIFECYCLE RULES — OTIMIZAÇÃO AUTOMÁTICA DE CUSTOS          ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -825,7 +825,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "app_assets" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>bucket_policy_cloudfront.tf</code><span class="cmd-tag">OAC</span></div>
+              <div class="command-header"><code>bucket_policy_cloudfront.tf</code><span class="cmd-tag">OAC</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  BUCKET POLICY — CLOUDFRONT OAC (Origin Access Control)     ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -873,7 +873,7 @@ resource "aws_cloudfront_origin_access_control" "s3_oac" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>bucket_policy_cross_account.tf</code><span class="cmd-tag">Multi-Account</span></div>
+              <div class="command-header"><code>bucket_policy_cross_account.tf</code><span class="cmd-tag">Multi-Account</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Cenário: Conta de Produção (111111111111) permite que
 # Conta de Analytics (222222222222) leia dados para relatórios
 
@@ -917,7 +917,7 @@ resource "aws_s3_bucket_policy" "cross_account_read" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>bucket_policy_enforce_tls.tf</code><span class="cmd-tag">Segurança</span></div>
+              <div class="command-header"><code>bucket_policy_enforce_tls.tf</code><span class="cmd-tag">Segurança</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Nega QUALQUER operação feita sem HTTPS (HTTP puro)
 resource "aws_s3_bucket_policy" "enforce_tls" {
   bucket = aws_s3_bucket.app_assets.id
@@ -1029,7 +1029,7 @@ resource "aws_s3_bucket_policy" "enforce_tls" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>backend.tf</code><span class="cmd-tag">Remote State</span></div>
+              <div class="command-header"><code>backend.tf</code><span class="cmd-tag">Remote State</span><a href="https://developer.hashicorp.com/terraform/language/settings/backends/s3" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  BACKEND S3 — REMOTE STATE COM LOCKING                      ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -1094,7 +1094,7 @@ terraform init \
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>bootstrap/main.tf</code><span class="cmd-tag">Bootstrap</span></div>
+              <div class="command-header"><code>bootstrap/main.tf</code><span class="cmd-tag">Bootstrap</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dynamodb_table" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  BOOTSTRAP — INFRAESTRUTURA PARA REMOTE STATE              ║
 # ║  Execute PRIMEIRO com state local, depois migre             ║
@@ -1243,7 +1243,7 @@ terraform force-unlock LOCK_ID
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Migração de Backend</code><span class="cmd-tag">Passo a Passo</span></div>
+              <div class="command-header"><code>Migração de Backend</code><span class="cmd-tag">Passo a Passo</span><a href="https://developer.hashicorp.com/terraform/language/settings/backends/s3" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># 1. Adicione o bloco backend ao código (como mostrado acima)
 
 # 2. Execute terraform init — ele detecta a mudança de backend:
@@ -1311,7 +1311,7 @@ $ terraform state list</code></pre>
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Cenários de state mv</code><span class="cmd-tag">Refatoração</span></div>
+              <div class="command-header"><code>Cenários de state mv</code><span class="cmd-tag">Refatoração</span><a href="https://developer.hashicorp.com/terraform/cli/commands/state/mv" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ══════════════════════════════════════════════════════════════════
 # CENÁRIO 1: Renomear recurso
 # ══════════════════════════════════════════════════════════════════
@@ -1358,7 +1358,7 @@ terraform state mv -state-out=../networking/terraform.tfstate \
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Import — Fluxo Completo</code><span class="cmd-tag">Adoção</span></div>
+              <div class="command-header"><code>Import — Fluxo Completo</code><span class="cmd-tag">Adoção</span><a href="https://developer.hashicorp.com/terraform/language/import" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ══════════════════════════════════════════════════════════════════
 # PASSO 1: Escreva o bloco resource (mesmo sem saber todos os args)
 # ══════════════════════════════════════════════════════════════════
@@ -1428,7 +1428,7 @@ terraform plan -generate-config-out=generated.tf</code></pre>
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Cross-Project References</code><span class="cmd-tag">Data Source</span></div>
+              <div class="command-header"><code>Cross-Project References</code><span class="cmd-tag">Data Source</span><a href="https://developer.hashicorp.com/terraform/language/state/remote-state-data" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ══════════════════════════════════════════════════════════════════
 # PROJETO A: networking/ — Cria VPC e exporta outputs
 # ══════════════════════════════════════════════════════════════════
@@ -1504,7 +1504,7 @@ resource "aws_db_instance" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Terraform Workspaces</code><span class="cmd-tag">Ambientes</span></div>
+              <div class="command-header"><code>Terraform Workspaces</code><span class="cmd-tag">Ambientes</span><a href="https://developer.hashicorp.com/terraform/language/state/workspaces" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Listar workspaces
 terraform workspace list
 # * default
@@ -1654,7 +1654,7 @@ resource "aws_instance" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Estrutura Padrão</code><span class="cmd-tag">Convenção</span></div>
+              <div class="command-header"><code>Estrutura Padrão</code><span class="cmd-tag">Convenção</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code>modules/vpc/
 ├── main.tf          # Recursos principais (VPC, subnets, gateways)
 ├── variables.tf     # Inputs do módulo (interface de entrada)
@@ -1741,7 +1741,7 @@ resource "aws_instance" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>modules/vpc/variables.tf</code><span class="cmd-tag">Inputs</span></div>
+              <div class="command-header"><code>modules/vpc/variables.tf</code><span class="cmd-tag">Inputs</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  VARIÁVEIS DO MÓDULO VPC — Interface de Entrada             ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -1826,7 +1826,7 @@ variable "tags" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>modules/vpc/main.tf</code><span class="cmd-tag">Core</span></div>
+              <div class="command-header"><code>modules/vpc/main.tf</code><span class="cmd-tag">Core</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  MÓDULO VPC — RECURSOS PRINCIPAIS                           ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -1983,7 +1983,7 @@ resource "aws_route_table_association" "private" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>modules/vpc/outputs.tf</code><span class="cmd-tag">Outputs</span></div>
+              <div class="command-header"><code>modules/vpc/outputs.tf</code><span class="cmd-tag">Outputs</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  OUTPUTS DO MÓDULO VPC — Interface de Saída                 ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -2042,7 +2042,7 @@ output "availability_zones" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>modules/vpc/versions.tf</code><span class="cmd-tag">Constraints</span></div>
+              <div class="command-header"><code>modules/vpc/versions.tf</code><span class="cmd-tag">Constraints</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code>terraform {
   # Versão mínima do Terraform para usar este módulo
   required_version = ">= 1.5.0"
@@ -2081,7 +2081,7 @@ output "availability_zones" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Usando o Módulo VPC</code><span class="cmd-tag">Chamada</span></div>
+              <div class="command-header"><code>Usando o Módulo VPC</code><span class="cmd-tag">Chamada</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  CHAMADA DO MÓDULO VPC — AMBIENTE DE PRODUÇÃO               ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -2158,7 +2158,7 @@ output "nat_ips" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Exemplos de Sources</code><span class="cmd-tag">Referência</span></div>
+              <div class="command-header"><code>Exemplos de Sources</code><span class="cmd-tag">Referência</span><a href="https://developer.hashicorp.com/terraform/language/modules/sources" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ══════════════════════════════════════════════════════════════════
 # LOCAL — Módulos no mesmo repo (desenvolvimento)
 # ══════════════════════════════════════════════════════════════════
@@ -2199,7 +2199,7 @@ module "vpc" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Version Constraints</code><span class="cmd-tag">Pinning</span></div>
+              <div class="command-header"><code>Version Constraints</code><span class="cmd-tag">Pinning</span><a href="https://registry.terraform.io/" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ══════════════════════════════════════════════════════════════════
 # CONSTRAINTS DE VERSÃO (mesmo formato de provider versions)
 # ══════════════════════════════════════════════════════════════════
@@ -2254,7 +2254,7 @@ module "vpc" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Múltiplas Chamadas</code><span class="cmd-tag">Reuso</span></div>
+              <div class="command-header"><code>Múltiplas Chamadas</code><span class="cmd-tag">Reuso</span><a href="https://developer.hashicorp.com/terraform/language/modules" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Mesmo módulo, ambientes diferentes
 module "vpc_prod" {
   source      = "../../modules/vpc"
@@ -2363,7 +2363,7 @@ output "bucket_arns" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Usando Módulo VPC do Registry</code><span class="cmd-tag">Exemplo Real</span></div>
+              <div class="command-header"><code>Usando Módulo VPC do Registry</code><span class="cmd-tag">Exemplo Real</span><a href="https://registry.terraform.io/" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Módulo oficial de VPC — milhões de downloads, battle-tested
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -2498,7 +2498,7 @@ module "vpc" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>oidc.tf — Infraestrutura para OIDC</code><span class="cmd-tag">Segurança</span></div>
+              <div class="command-header"><code>oidc.tf — Infraestrutura para OIDC</code><span class="cmd-tag">Segurança</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ╔══════════════════════════════════════════════════════════════╗
 # ║  GITHUB OIDC — AUTENTICAÇÃO SEM SECRETS                     ║
 # ╚══════════════════════════════════════════════════════════════╝

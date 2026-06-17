@@ -382,7 +382,7 @@ resource "aws_internet_gateway" "igw" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicialização</span></div>
+              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicialização</span><a href="https://developer.hashicorp.com/terraform/cli/commands/init" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Primeira coisa a rodar em qualquer projeto
 # Idempotente — pode rodar várias vezes
 
@@ -397,7 +397,7 @@ Initializing provider plugins...
 Terraform has been successfully initialized!</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Preview</span></div>
+              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Preview</span><a href="https://developer.hashicorp.com/terraform/cli/commands/plan" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Mostra EXATAMENTE o que será feito
 # NUNCA modifica nada — é seguro rodar
 
@@ -418,7 +418,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.</code></pre>
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Execução</span></div>
+              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Execução</span><a href="https://developer.hashicorp.com/terraform/cli/commands/apply" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Executa as mudanças planejadas
 # Pede confirmação interativa (ou use -auto-approve em CI/CD)
 
@@ -1043,7 +1043,7 @@ subnet_ids = var.environment == "production" ? var.private_subnets : [var.privat
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Funções de String</code><span class="cmd-tag">String</span></div>
+              <div class="command-header"><code>Funções de String</code><span class="cmd-tag">String</span><a href="https://developer.hashicorp.com/terraform/language/functions" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># upper / lower — converter caixa
 upper("hello")   # "HELLO"
 lower("WORLD")   # "world"
@@ -1073,7 +1073,7 @@ substr("terraform", 0, 5)
 # "terra"</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Funções de Coleção</code><span class="cmd-tag">List/Map</span></div>
+              <div class="command-header"><code>Funções de Coleção</code><span class="cmd-tag">List/Map</span><a href="https://developer.hashicorp.com/terraform/language/functions" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># length — tamanho
 length(["a", "b", "c"])  # 3
 
@@ -1108,7 +1108,7 @@ distinct(["a","a","b"])  # ["a","b"]</code></pre>
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Funções Numéricas e IP</code><span class="cmd-tag">Numeric</span></div>
+              <div class="command-header"><code>Funções Numéricas e IP</code><span class="cmd-tag">Numeric</span><a href="https://developer.hashicorp.com/terraform/language/functions" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># min / max
 min(5, 3, 9)   # 3
 max(5, 3, 9)   # 9
@@ -1131,7 +1131,7 @@ cidrsubnet("10.0.0.0/16", 8, 2)
 # netnum = qual subnet (0, 1, 2...)</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Funções de Encoding e Hash</code><span class="cmd-tag">Crypto</span></div>
+              <div class="command-header"><code>Funções de Encoding e Hash</code><span class="cmd-tag">Crypto</span><a href="https://developer.hashicorp.com/terraform/language/functions" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># base64encode / base64decode
 base64encode("hello")
 # "aGVsbG8="
@@ -1180,7 +1180,7 @@ sha256(file("app.zip"))</code></pre>
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>count, for_each, for expression</code><span class="cmd-tag">Loops</span></div>
+              <div class="command-header"><code>count, for_each, for expression</code><span class="cmd-tag">Loops</span><a href="https://developer.hashicorp.com/terraform/language/meta-arguments/for_each" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════
 # COUNT — criar N cópias de um recurso
 # ═══════════════════════════════════════════
@@ -1265,7 +1265,7 @@ upper_names = [for name in var.names : upper(name)]</code></pre>
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>providers.tf — Configuração Completa</code><span class="cmd-tag">Obrigatório</span></div>
+              <div class="command-header"><code>providers.tf — Configuração Completa</code><span class="cmd-tag">Obrigatório</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════
 # BLOCO TERRAFORM — Configuração do próprio Terraform
 # ═══════════════════════════════════════════
@@ -1394,7 +1394,7 @@ resource "aws_vpc" "main" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Multi-Region com Alias</code><span class="cmd-tag">Avançado</span></div>
+              <div class="command-header"><code>Multi-Region com Alias</code><span class="cmd-tag">Avançado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Provider padrão — us-east-1
 provider "aws" {
   region = "us-east-1"
@@ -1468,7 +1468,7 @@ resource "aws_acm_certificate" "cdn" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>variables.tf — Declarações Completas</code><span class="cmd-tag">Input</span></div>
+              <div class="command-header"><code>variables.tf — Declarações Completas</code><span class="cmd-tag">Input</span><a href="https://developer.hashicorp.com/terraform/language/values/variables" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════
 # VARIÁVEL SIMPLES — com tipo e default
 # ═══════════════════════════════════════════
@@ -1566,7 +1566,7 @@ variable "custom_ami" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform.tfvars</code><span class="cmd-tag">Arquivo</span></div>
+              <div class="command-header"><code>terraform.tfvars</code><span class="cmd-tag">Arquivo</span><a href="https://developer.hashicorp.com/terraform/language/values/variables" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># terraform.tfvars
 # Carregado AUTOMATICAMENTE se existir
 
@@ -1586,7 +1586,7 @@ subnet_config = {
 }</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Variáveis de Ambiente</code><span class="cmd-tag">TF_VAR_*</span></div>
+              <div class="command-header"><code>Variáveis de Ambiente</code><span class="cmd-tag">TF_VAR_*</span><a href="https://developer.hashicorp.com/terraform/language/values/variables" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Prefixo TF_VAR_ + nome da variável
 # Útil em CI/CD (GitHub Actions, etc.)
 
@@ -1628,7 +1628,7 @@ e você roda: terraform apply -var="vpc_cidr=192.168.0.0/16"
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Validações Complexas</code><span class="cmd-tag">Segurança</span></div>
+              <div class="command-header"><code>Validações Complexas</code><span class="cmd-tag">Segurança</span><a href="https://developer.hashicorp.com/terraform/language/values/variables" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Validar formato de CIDR
 variable "vpc_cidr" {
   type = string
@@ -1905,7 +1905,7 @@ FLUXO DE TRÁFEGO:
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>resource "aws_vpc"</code><span class="cmd-tag">VPC</span></div>
+              <div class="command-header"><code>resource "aws_vpc"</code><span class="cmd-tag">VPC</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # VPC — Rede Virtual Principal
 # ═══════════════════════════════════════════════════════════════
@@ -1956,7 +1956,7 @@ data "aws_availability_zones" "available" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Subnets Públicas (com for_each)</code><span class="cmd-tag">Public</span></div>
+              <div class="command-header"><code>Subnets Públicas (com for_each)</code><span class="cmd-tag">Public</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # LOCALS — Definir configuração das subnets
 # ═══════════════════════════════════════════════════════════════
@@ -1999,7 +1999,7 @@ resource "aws_subnet" "public" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Subnets Privadas (Aplicação + Database)</code><span class="cmd-tag">Private</span></div>
+              <div class="command-header"><code>Subnets Privadas (Aplicação + Database)</code><span class="cmd-tag">Private</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # SUBNETS PRIVADAS (Aplicação) — Uma por AZ
 # Estas hospedam: EC2 instances, ECS Tasks, Lambda (VPC)
@@ -2059,7 +2059,7 @@ resource "aws_subnet" "database" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>resource "aws_internet_gateway"</code><span class="cmd-tag">IGW</span></div>
+              <div class="command-header"><code>resource "aws_internet_gateway"</code><span class="cmd-tag">IGW</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # INTERNET GATEWAY — Porta para a Internet
 # ═══════════════════════════════════════════════════════════════
@@ -2085,7 +2085,7 @@ resource "aws_internet_gateway" "main" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Elastic IP + NAT Gateway</code><span class="cmd-tag">NAT</span></div>
+              <div class="command-header"><code>Elastic IP + NAT Gateway</code><span class="cmd-tag">NAT</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # ELASTIC IP — IP público fixo para o NAT Gateway
 # ═══════════════════════════════════════════════════════════════
@@ -2146,7 +2146,7 @@ resource "aws_nat_gateway" "main" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Route Table Pública</code><span class="cmd-tag">Rotas</span></div>
+              <div class="command-header"><code>Route Table Pública</code><span class="cmd-tag">Rotas</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # ROUTE TABLE PÚBLICA — Todo tráfego externo vai para IGW
 # ═══════════════════════════════════════════════════════════════
@@ -2184,7 +2184,7 @@ resource "aws_route_table_association" "public" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Route Table Privada (com NAT)</code><span class="cmd-tag">Private</span></div>
+              <div class="command-header"><code>Route Table Privada (com NAT)</code><span class="cmd-tag">Private</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # ROUTE TABLE PRIVADA — Tráfego externo vai para NAT Gateway
 # Em produção: 1 RT por AZ (cada uma aponta para NAT local)
@@ -2275,7 +2275,7 @@ resource "aws_route_table_association" "database" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>outputs.tf — Completo</code><span class="cmd-tag">Export</span></div>
+              <div class="command-header"><code>outputs.tf — Completo</code><span class="cmd-tag">Export</span><a href="https://developer.hashicorp.com/terraform/language/values/outputs" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # OUTPUTS DA VPC
 # ═══════════════════════════════════════════════════════════════
@@ -2435,7 +2435,7 @@ resource "aws_db_subnet_group" "main" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicialização</span></div>
+              <div class="command-header"><code>terraform init</code><span class="cmd-tag">Inicialização</span><a href="https://developer.hashicorp.com/terraform/cli/commands/init" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Inicializar projeto (OBRIGATÓRIO antes de tudo)
 terraform init
 
@@ -2457,7 +2457,7 @@ terraform init -backend=false
 # -lock=false      → Não travar state</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>terraform fmt</code><span class="cmd-tag">Formatação</span></div>
+              <div class="command-header"><code>terraform fmt</code><span class="cmd-tag">Formatação</span><a href="https://developer.hashicorp.com/terraform/cli/commands/fmt" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Formatar TODOS os arquivos .tf (in-place)
 terraform fmt
 
@@ -2482,7 +2482,7 @@ terraform fmt -check -recursive
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform validate</code><span class="cmd-tag">Validação</span></div>
+              <div class="command-header"><code>terraform validate</code><span class="cmd-tag">Validação</span><a href="https://developer.hashicorp.com/terraform/cli/commands/validate" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Validar sintaxe e consistência
 # (NÃO conecta na cloud — apenas verifica código)
 terraform validate
@@ -2503,7 +2503,7 @@ terraform validate -json
 # ✗ Se os valores são permitidos pela API</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Preview</span></div>
+              <div class="command-header"><code>terraform plan</code><span class="cmd-tag">Preview</span><a href="https://developer.hashicorp.com/terraform/cli/commands/plan" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Plano interativo (mostra no terminal)
 terraform plan
 
@@ -2536,7 +2536,7 @@ terraform plan \
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Execução</span></div>
+              <div class="command-header"><code>terraform apply</code><span class="cmd-tag">Execução</span><a href="https://developer.hashicorp.com/terraform/cli/commands/apply" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Apply interativo (pede confirmação)
 terraform apply
 
@@ -2563,7 +2563,7 @@ terraform plan -input=false -out=tfplan
 terraform apply -input=false tfplan</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>terraform destroy</code><span class="cmd-tag">Destruição</span></div>
+              <div class="command-header"><code>terraform destroy</code><span class="cmd-tag">Destruição</span><a href="https://developer.hashicorp.com/terraform/cli/commands/destroy" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Destruir TODOS os recursos (pede confirmação)
 terraform destroy
 
@@ -2598,7 +2598,7 @@ terraform plan -destroy
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform state list / show</code><span class="cmd-tag">Inspeção</span></div>
+              <div class="command-header"><code>terraform state list / show</code><span class="cmd-tag">Inspeção</span><a href="https://developer.hashicorp.com/terraform/cli/commands/state" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Listar TODOS os recursos no state
 terraform state list
 # aws_vpc.main
@@ -2623,7 +2623,7 @@ terraform state show aws_vpc.main
 terraform state list | grep subnet</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>terraform state mv / rm</code><span class="cmd-tag">Manipulação</span></div>
+              <div class="command-header"><code>terraform state mv / rm</code><span class="cmd-tag">Manipulação</span><a href="https://developer.hashicorp.com/terraform/cli/commands/state" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># RENOMEAR recurso no state
 # (quando você renomeia no código sem destruir)
 terraform state mv \
@@ -2655,7 +2655,7 @@ terraform state pull > backup.tfstate</code></pre>
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>terraform graph</code><span class="cmd-tag">Visualização</span></div>
+              <div class="command-header"><code>terraform graph</code><span class="cmd-tag">Visualização</span><a href="https://developer.hashicorp.com/terraform/cli/commands/graph" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Gerar grafo de dependências (formato DOT)
 terraform graph
 
@@ -2673,7 +2673,7 @@ terraform graph -type=plan
 # Cole o output DOT em: dreampuf.github.io/GraphvizOnline</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>terraform console / output</code><span class="cmd-tag">Debug</span></div>
+              <div class="command-header"><code>terraform console / output</code><span class="cmd-tag">Debug</span><a href="https://developer.hashicorp.com/terraform/cli/commands/console" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Console interativo (REPL)
 terraform console
 

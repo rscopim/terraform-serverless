@@ -127,7 +127,7 @@ data "aws_vpc" "existing" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>data "aws_ami" — AMI mais recente do Amazon Linux 2023</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>data "aws_ami" — AMI mais recente do Amazon Linux 2023</code><span class="cmd-tag">Produção</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Busca a AMI mais recente do Amazon Linux 2023
 # Isso garante que sempre teremos a última versão com patches
@@ -182,7 +182,7 @@ data "aws_ami" "amazon_linux_2023" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Ubuntu 22.04 LTS</code><span class="cmd-tag">Canonical</span></div>
+              <div class="command-header"><code>Ubuntu 22.04 LTS</code><span class="cmd-tag">Canonical</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># AMI oficial do Ubuntu 22.04 LTS
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -202,7 +202,7 @@ data "aws_ami" "ubuntu" {
 # Uso: data.aws_ami.ubuntu.id</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Windows Server 2022</code><span class="cmd-tag">Microsoft</span></div>
+              <div class="command-header"><code>Windows Server 2022</code><span class="cmd-tag">Microsoft</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># AMI oficial Windows Server 2022
 data "aws_ami" "windows" {
   most_recent = true
@@ -235,7 +235,7 @@ data "aws_ami" "windows" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>data "aws_availability_zones"</code><span class="cmd-tag">Dinâmico</span></div>
+              <div class="command-header"><code>data "aws_availability_zones"</code><span class="cmd-tag">Dinâmico</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Busca todas as AZs disponíveis na região configurada no provider
 # ═══════════════════════════════════════════════════════════════
@@ -281,7 +281,7 @@ resource "aws_subnet" "public" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>aws_caller_identity</code><span class="cmd-tag">Quem sou eu?</span></div>
+              <div class="command-header"><code>aws_caller_identity</code><span class="cmd-tag">Quem sou eu?</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Retorna informações sobre a conta
 # AWS autenticada atualmente
 data "aws_caller_identity" "current" {}
@@ -300,7 +300,7 @@ locals {
 }</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>aws_region</code><span class="cmd-tag">Onde estou?</span></div>
+              <div class="command-header"><code>aws_region</code><span class="cmd-tag">Onde estou?</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Retorna a região configurada
 # no provider AWS
 data "aws_region" "current" {}
@@ -342,7 +342,7 @@ locals {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Data Sources Essenciais</code><span class="cmd-tag">Referência</span></div>
+              <div class="command-header"><code>Data Sources Essenciais</code><span class="cmd-tag">Referência</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Buscar VPC existente por tag
 # ═══════════════════════════════════════════════════════════════
@@ -504,7 +504,7 @@ STATELESS (Network ACL):
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Security Group com Regras Inline</code><span class="cmd-tag">Básico</span></div>
+              <div class="command-header"><code>Security Group com Regras Inline</code><span class="cmd-tag">Básico</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Security Group para Web Server (HTTP + HTTPS + SSH restrito)
 # ═══════════════════════════════════════════════════════════════
@@ -574,7 +574,7 @@ resource "aws_security_group" "web" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Self-Referencing e Source Security Group</code><span class="cmd-tag">Avançado</span></div>
+              <div class="command-header"><code>Self-Referencing e Source Security Group</code><span class="cmd-tag">Avançado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # SG para cluster de aplicação — permite comunicação interna
 # ═══════════════════════════════════════════════════════════════
@@ -688,7 +688,7 @@ resource "aws_instance" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>aws_security_group_rule — Regras como Recursos Separados</code><span class="cmd-tag">Recomendado</span></div>
+              <div class="command-header"><code>aws_security_group_rule — Regras como Recursos Separados</code><span class="cmd-tag">Recomendado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # PADRÃO RECOMENDADO: SG vazio + regras separadas
 # Permite que módulos adicionem regras sem modificar o SG
@@ -789,7 +789,7 @@ resource "aws_security_group_rule" "web_all_egress" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Bastion Host</code><span class="cmd-tag">Jump Server</span></div>
+              <div class="command-header"><code>Bastion Host</code><span class="cmd-tag">Jump Server</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># SG para Bastion Host (ponto de entrada SSH)
 resource "aws_security_group" "bastion" {
   name        = "bastion-sg"
@@ -817,7 +817,7 @@ resource "aws_security_group" "bastion" {
 }</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Database (RDS)</code><span class="cmd-tag">Privado</span></div>
+              <div class="command-header"><code>Database (RDS)</code><span class="cmd-tag">Privado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># SG para RDS — aceita APENAS da aplicação
 resource "aws_security_group" "database" {
   name        = "database-sg"
@@ -1014,7 +1014,7 @@ cat ~/.ssh/terraform-key.pub
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Método 1: Arquivo Local</code><span class="cmd-tag">Recomendado</span></div>
+              <div class="command-header"><code>Método 1: Arquivo Local</code><span class="cmd-tag">Recomendado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Registra chave pública que já existe
 # no seu computador
 resource "aws_key_pair" "deployer" {
@@ -1037,7 +1037,7 @@ resource "aws_key_pair" "deployer" {
 #   ec2-user@<IP_PUBLICO></code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Método 2: Variável</code><span class="cmd-tag">CI/CD</span></div>
+              <div class="command-header"><code>Método 2: Variável</code><span class="cmd-tag">CI/CD</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Para CI/CD onde o arquivo não existe
 # no runner — passe como variável
 
@@ -1064,7 +1064,7 @@ resource "aws_key_pair" "deployer" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Método 3: tls_private_key (Desenvolvimento Apenas!)</code><span class="cmd-tag">⚠️ Dev Only</span></div>
+              <div class="command-header"><code>Método 3: tls_private_key (Desenvolvimento Apenas!)</code><span class="cmd-tag">⚠️ Dev Only</span><a href="https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # ⚠️  ATENÇÃO: Este método gera a chave PRIVADA no state file!
 #     Use APENAS para desenvolvimento/testes. Em produção, gere
@@ -1114,7 +1114,7 @@ output "ssh_command" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Session Manager — Sem SSH, Sem Key Pair</code><span class="cmd-tag">Moderno</span></div>
+              <div class="command-header"><code>Session Manager — Sem SSH, Sem Key Pair</code><span class="cmd-tag">Moderno</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Com Session Manager, você NÃO precisa:
 # ❌ Key Pair
 # ❌ Security Group com porta 22
@@ -1239,7 +1239,7 @@ resource "aws_instance" "secure" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>aws_instance — Instância Completa de Produção</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>aws_instance — Instância Completa de Produção</code><span class="cmd-tag">Produção</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # EC2 Instance — Web Server completo
 # ═══════════════════════════════════════════════════════════════
@@ -1464,7 +1464,7 @@ REGRA DE OURO:
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>User Data Inline — Instalando Nginx</code><span class="cmd-tag">Básico</span></div>
+              <div class="command-header"><code>User Data Inline — Instalando Nginx</code><span class="cmd-tag">Básico</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code>resource "aws_instance" "web" {
   ami           = data.aws_ami.amazon_linux_2023.id
   instance_type = "t3.micro"
@@ -1512,7 +1512,7 @@ REGRA DE OURO:
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>main.tf — Chamando templatefile</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>main.tf — Chamando templatefile</code><span class="cmd-tag">Terraform</span><a href="https://developer.hashicorp.com/terraform/language/functions/templatefile" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code>resource "aws_instance" "app" {
   ami           = data.aws_ami.amazon_linux_2023.id
   instance_type = var.instance_type
@@ -1707,7 +1707,7 @@ sudo cloud-init modules --mode=final
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>aws_eip + aws_eip_association</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>aws_eip + aws_eip_association</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Método 1: EIP com associação direta (mais simples)
 # ═══════════════════════════════════════════════════════════════
@@ -1830,7 +1830,7 @@ output "web_url" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>create_before_destroy — Zero Downtime</code><span class="cmd-tag">Essencial</span></div>
+              <div class="command-header"><code>create_before_destroy — Zero Downtime</code><span class="cmd-tag">Essencial</span><a href="https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # SEM create_before_destroy (padrão):
 #   1. Destroy instância antiga → DOWNTIME!
@@ -1902,7 +1902,7 @@ resource "aws_instance" "web" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>prevent_destroy — Proteção contra Acidente</code><span class="cmd-tag">Segurança</span></div>
+              <div class="command-header"><code>prevent_destroy — Proteção contra Acidente</code><span class="cmd-tag">Segurança</span><a href="https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # prevent_destroy = true:
 # Se alguém rodar "terraform destroy" ou fizer uma mudança que
@@ -1964,7 +1964,7 @@ resource "aws_s3_bucket" "data_lake" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>ignore_changes — Cenários Comuns</code><span class="cmd-tag">Prático</span></div>
+              <div class="command-header"><code>ignore_changes — Cenários Comuns</code><span class="cmd-tag">Prático</span><a href="https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Cenário 1: Auto Scaling muda desired_capacity externamente
 # Sem ignore_changes, Terraform reverteria ao valor do código
@@ -2037,7 +2037,7 @@ resource "aws_instance" "unmanaged" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>replace_triggered_by — Recriação Condicional</code><span class="cmd-tag">Avançado</span></div>
+              <div class="command-header"><code>replace_triggered_by — Recriação Condicional</code><span class="cmd-tag">Avançado</span><a href="https://developer.hashicorp.com/terraform/language/resources/terraform-data" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Cenário: Recriar instância quando o script de configuração muda
 # Normalmente, mudar um arquivo local NÃO recriaria a instância
@@ -2148,7 +2148,7 @@ resource "aws_ecs_service" "app" {
 
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>local-exec</code><span class="cmd-tag">Máquina Local</span></div>
+              <div class="command-header"><code>local-exec</code><span class="cmd-tag">Máquina Local</span><a href="https://developer.hashicorp.com/terraform/language/resources/provisioners/local-exec" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Executa comando na máquina onde
 # Terraform está rodando (seu PC ou CI)
 resource "aws_instance" "web" {
@@ -2175,7 +2175,7 @@ resource "aws_instance" "web" {
 }</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>remote-exec</code><span class="cmd-tag">Na Instância</span></div>
+              <div class="command-header"><code>remote-exec</code><span class="cmd-tag">Na Instância</span><a href="https://developer.hashicorp.com/terraform/language/resources/provisioners/remote-exec" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># Executa comando DENTRO da instância
 # via SSH (Linux) ou WinRM (Windows)
 resource "aws_instance" "app" {
@@ -2208,7 +2208,7 @@ resource "aws_instance" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>file provisioner + null_resource</code><span class="cmd-tag">Upload + Trigger</span></div>
+              <div class="command-header"><code>file provisioner + null_resource</code><span class="cmd-tag">Upload + Trigger</span><a href="https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # FILE PROVISIONER — Upload de arquivos para a instância
 # ═══════════════════════════════════════════════════════════════
@@ -2364,7 +2364,7 @@ resource "terraform_data" "kubeconfig" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Cadeia de Dependências Implícitas</code><span class="cmd-tag">Automático</span></div>
+              <div class="command-header"><code>Cadeia de Dependências Implícitas</code><span class="cmd-tag">Automático</span><a href="https://developer.hashicorp.com/terraform/language/meta-arguments/depends_on" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Terraform infere AUTOMATICAMENTE a ordem de criação:
 # VPC → Subnet → Security Group → EC2 Instance → EIP
@@ -2443,7 +2443,7 @@ resource "aws_eip" "web" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>depends_on — Quando Terraform Não Consegue Inferir</code><span class="cmd-tag">Explícito</span></div>
+              <div class="command-header"><code>depends_on — Quando Terraform Não Consegue Inferir</code><span class="cmd-tag">Explícito</span><a href="https://developer.hashicorp.com/terraform/language/meta-arguments/depends_on" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Cenário: A instância em subnet privada precisa da rota NAT
 # para acessar a internet (download de pacotes no user_data).
@@ -2515,7 +2515,7 @@ resource "aws_instance" "worker" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>outputs.tf — Exemplos Completos</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>outputs.tf — Exemplos Completos</code><span class="cmd-tag">Produção</span><a href="https://developer.hashicorp.com/terraform/language/values/outputs" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # outputs.tf — Valores exportados do módulo/projeto
 # ═══════════════════════════════════════════════════════════════
