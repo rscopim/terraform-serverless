@@ -86,3 +86,28 @@ kbd{display:inline-block;padding:2px 6px;border:1px solid var(--gray-300);border
   .progress-node small{display:none}
   .checklist-grid{grid-template-columns:1fr}
 }
+
+
+/* DOC LINKS — Links para documentação oficial nos code blocks */
+.doc-link {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary-500);
+  text-decoration: none;
+  margin-left: auto;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(79, 70, 229, 0.06);
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.doc-link:hover {
+  background: rgba(79, 70, 229, 0.12);
+  color: var(--primary-700);
+}
+.command-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

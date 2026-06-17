@@ -75,7 +75,7 @@
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Locals vs Variables — Quando usar cada um</code><span class="cmd-tag">Conceito</span></div>
+              <div class="command-header"><code>Locals vs Variables — Quando usar cada um</code><span class="cmd-tag">Conceito</span><a href="https://developer.hashicorp.com/terraform/language/values/locals" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # VARIABLES — Inputs do módulo (configuráveis pelo usuário)
 # Pertencem à INTERFACE PÚBLICA do módulo
@@ -129,7 +129,7 @@ locals {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>DRY com Locals — Antes vs Depois</code><span class="cmd-tag">Refatoração</span></div>
+              <div class="command-header"><code>DRY com Locals — Antes vs Depois</code><span class="cmd-tag">Refatoração</span><a href="https://developer.hashicorp.com/terraform/language/values/locals" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # ❌ ANTES (sem locals) — Repetição em todo lugar
 # Se o formato do nome mudar, precisa alterar em 15+ recursos!
@@ -188,7 +188,7 @@ resource "aws_instance" "web" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Locals Avançados — Computações Complexas</code><span class="cmd-tag">Avançado</span></div>
+              <div class="command-header"><code>Locals Avançados — Computações Complexas</code><span class="cmd-tag">Avançado</span><a href="https://developer.hashicorp.com/terraform/language/values/locals" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Locals com lógica complexa para um projeto real
 # ═══════════════════════════════════════════════════════════════
@@ -549,7 +549,7 @@ FLUXO DE AUTORIZAÇÃO:
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>aws_iam_role — Role para Lambda</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>aws_iam_role — Role para Lambda</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # IAM Role que pode ser assumida pelo serviço Lambda
 # ═══════════════════════════════════════════════════════════════
@@ -613,7 +613,7 @@ resource "aws_iam_role" "ec2_app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>aws_iam_policy — Policies Customizadas</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>aws_iam_policy — Policies Customizadas</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Policy customizada — Lambda pode ler S3 e escrever logs
 # ═══════════════════════════════════════════════════════════════
@@ -703,7 +703,7 @@ resource "aws_iam_policy" "ec2_secrets_access" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Attachment — Conectando as peças</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Attachment — Conectando as peças</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Attach policy customizada à role Lambda
 # ═══════════════════════════════════════════════════════════════
@@ -743,7 +743,7 @@ resource "aws_iam_role_policy_attachment" "ec2_secrets" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Instance Profile — Ponte entre EC2 e IAM Role</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Instance Profile — Ponte entre EC2 e IAM Role</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Instance Profile é o "adaptador" entre EC2 e IAM Role
 #
@@ -825,7 +825,7 @@ resource "aws_instance" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Lambda Role Completa — DynamoDB + S3 + Logs</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>Lambda Role Completa — DynamoDB + S3 + Logs</code><span class="cmd-tag">Produção</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Role completa para Lambda que processa uploads S3,
 # escreve em DynamoDB e envia para SQS
@@ -915,7 +915,7 @@ resource "aws_iam_role_policy_attachment" "lambda_processor" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>ECS — Task Execution Role + Task Role</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>ECS — Task Execution Role + Task Role</code><span class="cmd-tag">Produção</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # ECS Task Execution Role — para o ECS Agent (infraestrutura)
 # Permite: puxar imagens ECR, criar log streams, ler secrets
@@ -1019,7 +1019,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>GitHub Actions OIDC — Deploy sem Secrets</code><span class="cmd-tag">Segurança</span></div>
+              <div class="command-header"><code>GitHub Actions OIDC — Deploy sem Secrets</code><span class="cmd-tag">Segurança</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # FLUXO OIDC:
 #
@@ -1143,7 +1143,7 @@ resource "aws_iam_role_policy_attachment" "github_actions_deploy" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Cross-Account — Conta Dev acessando Prod</code><span class="cmd-tag">Multi-Account</span></div>
+              <div class="command-header"><code>Cross-Account — Conta Dev acessando Prod</code><span class="cmd-tag">Multi-Account</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # CENÁRIO: Conta de CI/CD (111111111111) precisa deploy na
 #          conta de Produção (999999999999)
@@ -1478,7 +1478,7 @@ resource "aws_iam_role_policy_attachment" "cross_account_deploy" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>DB Subnet Group — Subnets privadas</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>DB Subnet Group — Subnets privadas</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_subnet_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Subnet Group para RDS — SEMPRE em subnets PRIVADAS
 # RDS NUNCA deve ter IP público ou estar em subnet pública!
@@ -1517,7 +1517,7 @@ resource "aws_db_subnet_group" "main" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Parameter Group — Tuning do PostgreSQL</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Parameter Group — Tuning do PostgreSQL</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_parameter_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Parameter Group — Configurações do engine PostgreSQL
 # Equivalente a editar postgresql.conf, mas gerenciado pela AWS
@@ -1589,7 +1589,7 @@ resource "aws_db_parameter_group" "postgres" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>RDS PostgreSQL — Production-Ready</code><span class="cmd-tag">Produção</span></div>
+              <div class="command-header"><code>RDS PostgreSQL — Production-Ready</code><span class="cmd-tag">Produção</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # RDS PostgreSQL — Configuração completa para produção
 # ═══════════════════════════════════════════════════════════════
@@ -1691,7 +1691,7 @@ resource "aws_db_instance" "main" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Role para RDS Enhanced Monitoring</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Role para RDS Enhanced Monitoring</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # IAM Role para RDS Enhanced Monitoring
 # ═══════════════════════════════════════════════════════════════
@@ -1778,7 +1778,7 @@ resource "aws_iam_role_policy_attachment" "rds_monitoring" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Security Group RDS — Máxima Restrição</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Security Group RDS — Máxima Restrição</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Security Group para RDS — princípio de menor acesso
 # ═══════════════════════════════════════════════════════════════
@@ -1854,7 +1854,7 @@ resource "aws_security_group_rule" "db_from_bastion" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Route Table Privada — Sem Internet Gateway</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Route Table Privada — Sem Internet Gateway</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Route Table para subnets de banco de dados
 # NENHUMA rota para Internet Gateway ou NAT Gateway!
@@ -2076,7 +2076,7 @@ resource "aws_db_instance" "main" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Variable Sensitive — Mínimo Aceitável</code><span class="cmd-tag">Básico</span></div>
+              <div class="command-header"><code>Variable Sensitive — Mínimo Aceitável</code><span class="cmd-tag">Básico</span><a href="https://developer.hashicorp.com/terraform/language/values/variables" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # variables.tf — Definição com sensitive = true
 # ═══════════════════════════════════════════════════════════════
@@ -2137,7 +2137,7 @@ variable "api_key" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>SSM Parameter Store — Criar e Ler</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>SSM Parameter Store — Criar e Ler</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # CRIAR parâmetros no SSM Parameter Store
 # ═══════════════════════════════════════════════════════════════
@@ -2212,7 +2212,7 @@ data "aws_ssm_parameter" "external_api_key" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Secrets Manager — Criar e Popular</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Secrets Manager — Criar e Popular</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # PASSO 1: Criar o Secret (container)
 # ═══════════════════════════════════════════════════════════════
@@ -2289,7 +2289,7 @@ resource "aws_secretsmanager_secret_version" "api_keys" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Data Source — Lendo Secrets Existentes</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Data Source — Lendo Secrets Existentes</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Ler secret existente (criado manualmente ou por outro módulo)
 # ═══════════════════════════════════════════════════════════════
@@ -2360,7 +2360,7 @@ resource "aws_ecs_task_definition" "app" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Rotação Automática — Lambda + Secrets Manager</code><span class="cmd-tag">Avançado</span></div>
+              <div class="command-header"><code>Rotação Automática — Lambda + Secrets Manager</code><span class="cmd-tag">Avançado</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_rotation" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # Rotação automática de senha do RDS
 # A AWS fornece Lambdas prontas para RDS!
@@ -2445,7 +2445,7 @@ resource "aws_lambda_permission" "secrets_manager" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>KMS Key Dedicada para Secrets</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>KMS Key Dedicada para Secrets</code><span class="cmd-tag">Terraform</span><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # KMS Key para encriptar segredos da aplicação
 # ═══════════════════════════════════════════════════════════════
@@ -2518,7 +2518,7 @@ resource "aws_kms_alias" "secrets" {
 
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>Outputs Sensíveis — Definição e Acesso</code><span class="cmd-tag">Terraform</span></div>
+              <div class="command-header"><code>Outputs Sensíveis — Definição e Acesso</code><span class="cmd-tag">Terraform</span><a href="https://developer.hashicorp.com/terraform/language/values/outputs" target="_blank" rel="noopener" class="doc-link">📖 Docs</a></div>
               <pre><code># ═══════════════════════════════════════════════════════════════
 # outputs.tf — Outputs do módulo de banco de dados
 # ═══════════════════════════════════════════════════════════════
