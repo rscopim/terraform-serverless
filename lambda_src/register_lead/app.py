@@ -89,6 +89,47 @@ def lambda_handler(event, context):
         material = body.get("material", "")
         record_type = body.get("type", "lead")
 
+        # ===== TRACKING DE ACESSO A TRILHAS =====
+        if record_type == "trail-access":
+            lead_id = str(uuid.uuid4())
+            created_at = datetime.now(timezone.utc).isoformat()
+            page = body.get("page", "")
+            source = body.get("source", "")
+            institution = body.get("institution", "")
+
+            item = {
+                "lead_id": lead_id,
+                "type": "trail-access",
+                "name": name,
+                "email": email,
+                "source": source,
+                "institution": institution,
+                "page": page,
+                "created_at": created_at,
+            }
+
+            table.put_item(Item=item)
+
+            try:
+                cloudwatch.put_metric_data(
+                    Namespace="CloudTrilhas",
+                    MetricData=[
+                        {
+                            "MetricName": "TrailAccess",
+                            "Dimensions": [
+                                {"Name": "Page", "Value": page},
+                                {"Name": "Source", "Value": source},
+                            ],
+                            "Value": 1,
+                            "Unit": "Count",
+                        }
+                    ],
+                )
+            except Exception as e:
+                print(f"Erro CloudWatch metric trail-access: {e}")
+
+            return response(200, {"message": "Acesso registrado."})
+
         # ===== TRACKING DE SIMULADOS (sem validação de email) =====
         if record_type in ("simulado-access", "simulado-result"):
             lead_id = str(uuid.uuid4())
