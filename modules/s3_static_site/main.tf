@@ -8,6 +8,63 @@ resource "aws_s3_bucket" "this" {
   }
 }
 
+# Desabilitar versionamento — site estático não precisa de versões
+# (reduz custo de armazenamento drasticamente)
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  versioning_configuration {
+    status = "Suspended"
+  }
+}
+
+# Lifecycle: limpar versões antigas e uploads incompletos
+resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  # Deletar versões anteriores (non-current) após 1 dia
+  rule {
+    id     = "delete-old-versions"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 1
+    }
+  }
+
+  # Limpar delete markers órfãos
+  rule {
+    id     = "cleanup-delete-markers"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    expiration {
+      expired_object_delete_marker = true
+    }
+  }
+
+  # Abortar uploads multipart incompletos
+  rule {
+    id     = "abort-multipart"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "this" {
   bucket = aws_s3_bucket.this.id
 
