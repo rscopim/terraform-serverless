@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Redes Módulo 03: Endereçamento IP e Sub-redes</title>
+  <meta name="description" content="Guia completo sobre endereçamento IP, classes IPv4, endereços privados RFC 1918, máscaras de sub-rede, subnetting, CIDR e introdução ao IPv6." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,166 +18,2452 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../redes.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">← Anterior</a>
         <a href="modulo-04.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- HERO SECTION                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🌐 Redes — Módulo 03</span>
         <h1>Endereçamento IP e Sub-redes</h1>
-        <p>IPv4, IPv6, CIDR, cálculo de sub-redes e planejamento de endereçamento.</p>
+        <p>Neste módulo você dominará o sistema de endereçamento que permite a cada dispositivo ser localizado na rede. Aprenderá sobre IPv4, classes de endereço, endereços privados, máscaras de sub-rede, a técnica de subnetting, CIDR e os fundamentos do IPv6. Esses conhecimentos são essenciais para projetar, segmentar e administrar qualquer rede.</p>
       </div>
     </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PROGRESS TRACK                                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>OSI/TCP</small></a>
+        <a href="modulo-03.html" class="progress-node active"><span>03</span><small>IP &amp; Sub-redes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Diagnóstico</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Switches</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Roteamento</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Segurança</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Serviços</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: O QUE É UM ENDEREÇO IP?                             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h3>1. Endereçamento IPv4</h3>
-          <div class="info-box highlight">
-            <strong>IPv4:</strong> 32 bits divididos em 4 octetos. Formato: <code>192.168.1.100</code>. Total: ~4,3 bilhões de endereços.
-          </div>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Classes de IP (legado)</code><span class="cmd-tag">Conceito</span></div>
-              <pre><code>Classe A: 1.0.0.0   – 126.255.255.255   /8   (16M hosts)
-Classe B: 128.0.0.0 – 191.255.255.255   /16  (65K hosts)
-Classe C: 192.0.0.0 – 223.255.255.255   /24  (254 hosts)
-Classe D: 224.0.0.0 – 239.255.255.255   (Multicast)
-Classe E: 240.0.0.0 – 255.255.255.255   (Reservado)
-
-⚠️ Classful é legado — hoje usamos CIDR (Classless)</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>IPs Privados (RFC 1918)</code><span class="cmd-tag">Importante</span></div>
-              <p>Não roteáveis na internet. Usados em redes internas.</p>
-              <pre><code>10.0.0.0/8       — 10.0.0.0 a 10.255.255.255
-172.16.0.0/12    — 172.16.0.0 a 172.31.255.255
-192.168.0.0/16   — 192.168.0.0 a 192.168.255.255
-
-Outros reservados:
-127.0.0.0/8      — Loopback
-169.254.0.0/16   — Link-local (APIPA)
-0.0.0.0          — Default route</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>IPs Públicos</code><span class="cmd-tag">Internet</span></div>
-              <p>Roteáveis na internet. Atribuídos por ISPs/RIRs.</p>
-              <pre><code>Características:
-- Únicos globalmente
-- Atribuídos por IANA → RIRs → ISPs
-- Necessários para servidores públicos
-- Escassos (IPv4 esgotado)
-
-RIRs regionais:
-  ARIN    — América do Norte
-  LACNIC  — América Latina
-  RIPE    — Europa
-  APNIC   — Ásia-Pacífico
-  AFRINIC — África</code></pre>
-            </div>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>O que é um Endereço IP?</h2>
+          <p>Entenda o identificador numérico que permite localizar qualquer dispositivo conectado a uma rede, assim como um endereço postal localiza uma casa em uma cidade.</p>
         </div>
 
         <div class="topic-block">
-          <h3>2. Sub-redes (Subnetting) e CIDR</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>CIDR — Classless Inter-Domain Routing</code><span class="cmd-tag">Essencial</span></div>
-              <pre><code>Notação CIDR: IP/prefixo → 192.168.1.0/24
-
-Máscara de sub-rede:
-/8  = 255.0.0.0       → 16.777.214 hosts
-/16 = 255.255.0.0     → 65.534 hosts
-/24 = 255.255.255.0   → 254 hosts
-/25 = 255.255.255.128 → 126 hosts
-/26 = 255.255.255.192 → 62 hosts
-/27 = 255.255.255.224 → 30 hosts
-/28 = 255.255.255.240 → 14 hosts
-/30 = 255.255.255.252 → 2 hosts (ponto-a-ponto)
-/32 = 255.255.255.255 → 1 host (host route)
-
-Fórmula: Hosts = 2^(32 - prefixo) - 2</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>Exemplo de Subnetting</code><span class="cmd-tag">Prática</span></div>
-              <pre><code>Rede: 192.168.10.0/24 → dividir em 4 sub-redes
-
-Novo prefixo: /26 (emprestamos 2 bits → 2² = 4 sub-redes)
-
-Sub-rede 1: 192.168.10.0/26   (hosts: .1 a .62,   broadcast: .63)
-Sub-rede 2: 192.168.10.64/26  (hosts: .65 a .126, broadcast: .127)
-Sub-rede 3: 192.168.10.128/26 (hosts: .129 a .190, broadcast: .191)
-Sub-rede 4: 192.168.10.192/26 (hosts: .193 a .254, broadcast: .255)
-
-Cada sub-rede: 62 hosts utilizáveis</code></pre>
-            </div>
-          </div>
+          <h3>1.1 — Definição Formal</h3>
+          <p>
+            Um <strong>endereço IP</strong> (Internet Protocol address) é um identificador numérico único
+            atribuído a cada dispositivo (host) conectado a uma rede que utiliza o protocolo IP para
+            comunicação. Ele serve a dois propósitos fundamentais:
+          </p>
+          <ul>
+            <li><strong>Identificação do host:</strong> permite distinguir um dispositivo específico entre bilhões de outros na rede.</li>
+            <li><strong>Localização na rede:</strong> indica em qual rede lógica o dispositivo se encontra, permitindo o roteamento correto dos pacotes.</li>
+          </ul>
+          <p>
+            Sem endereços IP, seria impossível encaminhar dados de um computador em São Paulo até um
+            servidor no Japão. O endereço IP é a "identidade" do dispositivo no mundo das redes — é
+            através dele que roteadores sabem para onde enviar cada pacote.
+          </p>
         </div>
 
         <div class="topic-block">
-          <h3>3. IPv6 — Visão Geral</h3>
+          <h3>1.2 — Formato IPv4 (Notação Decimal Pontuada)</h3>
+          <p>
+            O IPv4 (Internet Protocol version 4) utiliza endereços de <strong>32 bits</strong>, representados
+            em <strong>notação decimal pontuada</strong> (dotted decimal notation). O endereço é dividido
+            em 4 grupos de 8 bits (octetos), separados por pontos:
+          </p>
+
           <div class="command-card wide">
-            <div class="command-header"><code>IPv6</code><span class="cmd-tag">Futuro</span></div>
-            <pre><code>Formato: 128 bits em 8 grupos hexadecimais
-Exemplo: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-Abreviado: 2001:db8:85a3::8a2e:370:7334
+            <h4>📐 Estrutura de um Endereço IPv4</h4>
+<pre><code>
+  Endereço IPv4:    192  .  168  .    1  .  100
+                     │        │       │       │
+  Octeto:           1º       2º      3º      4º
+  Bits:          8 bits   8 bits   8 bits   8 bits  = 32 bits total
+  Binário:     11000000.10101000.00000001.01100100
 
-Tipos de endereço:
-  ::1/128          — Loopback
-  fe80::/10        — Link-local (auto-configuração)
-  2000::/3         — Global Unicast (público)
-  fc00::/7         — Unique Local (privado)
-  ff00::/8         — Multicast
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  Faixa válida de cada octeto: 0 a 255 (2⁸ = 256 valores)       │
+  │  Total de endereços possíveis: 2³² = 4.294.967.296 (~4,3 bi)   │
+  └─────────────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
 
-Vantagens sobre IPv4:
-- Espaço praticamente ilimitado (3.4 × 10³⁸)
-- Sem necessidade de NAT
-- Auto-configuração (SLAAC)
-- IPSec nativo
-- Header simplificado</code></pre>
+          <p>Cada octeto pode assumir valores de <strong>0 a 255</strong>, pois com 8 bits temos 2⁸ = 256 combinações possíveis (de 00000000 a 11111111 em binário).</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Decimal</th>
+                <th>Binário</th>
+                <th>Cálculo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0</td>
+                <td>00000000</td>
+                <td>Todos os bits desligados</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>00000001</td>
+                <td>2⁰ = 1</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>00001010</td>
+                <td>2³ + 2¹ = 8 + 2 = 10</td>
+              </tr>
+              <tr>
+                <td>128</td>
+                <td>10000000</td>
+                <td>2⁷ = 128</td>
+              </tr>
+              <tr>
+                <td>192</td>
+                <td>11000000</td>
+                <td>2⁷ + 2⁶ = 128 + 64 = 192</td>
+              </tr>
+              <tr>
+                <td>255</td>
+                <td>11111111</td>
+                <td>2⁷+2⁶+2⁵+2⁴+2³+2²+2¹+2⁰ = 255</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 — Analogia: O Endereço Postal</h3>
+          <p>
+            A melhor analogia para entender endereços IP é o <strong>sistema de endereços postais</strong>:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Endereço Postal</th>
+                <th>Endereço IP</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CEP (ex: 01310-100)</td>
+                <td>Porção de rede (ex: 192.168.1.x)</td>
+                <td>Identifica a região/rede onde o destino está</td>
+              </tr>
+              <tr>
+                <td>Número da casa (ex: 1578)</td>
+                <td>Porção de host (ex: 192.168.1.100)</td>
+                <td>Identifica o dispositivo específico na rede</td>
+              </tr>
+              <tr>
+                <td>Cidade + Estado</td>
+                <td>Rede + Sub-rede</td>
+                <td>Hierarquia que permite roteamento eficiente</td>
+              </tr>
+              <tr>
+                <td>País</td>
+                <td>Bloco IP regional (LACNIC, ARIN, etc.)</td>
+                <td>Organização de alto nível geográfica</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que a analogia funciona?</h4>
+            <p>
+              Assim como o carteiro não precisa conhecer todas as casas do Brasil — ele olha o CEP para
+              descobrir a cidade, depois o bairro, depois a rua e enfim a casa — um roteador não precisa
+              conhecer todos os 4,3 bilhões de endereços IP. Ele olha a <strong>porção de rede</strong>
+              para encaminhar o pacote na direção certa, e o roteador seguinte cuida do próximo trecho.
+              Essa hierarquia é o que torna a Internet escalável.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 — Composição do Endereço: Porção de Rede e Porção de Host</h3>
+          <p>
+            Todo endereço IPv4 é logicamente dividido em duas partes:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔀 Divisão Rede / Host</h4>
+<pre><code>
+  Endereço IP:     192.168.1.100
+  Máscara:         255.255.255.0  (ou /24)
+  
+  ┌──────────────────────────────┬──────────────┐
+  │      PORÇÃO DE REDE          │ PORÇÃO HOST  │
+  │      (Network Portion)       │(Host Portion)│
+  ├──────────────────────────────┼──────────────┤
+  │        192.168.1             │     .100     │
+  │  (identifica A REDE)         │ (identifica  │
+  │                              │  O DEVICE)   │
+  └──────────────────────────────┴──────────────┘
+  
+  Analogia postal:
+  • Porção de rede = CEP (identifica o bairro/cidade)
+  • Porção de host = Número da casa (identifica a casa no bairro)
+</code></pre>
+          </div>
+
+          <p>
+            <strong>Todos os dispositivos na mesma rede</strong> compartilham a mesma porção de rede e diferem
+            apenas na porção de host. Dispositivos em redes diferentes têm porções de rede distintas e precisam
+            de um <strong>roteador</strong> (gateway) para se comunicar.
+          </p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 — Endereços IP Públicos vs Privados</h3>
+          <p>
+            Os endereços IP se dividem em duas grandes categorias de uso:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🌍 IP Público (Roteável na Internet)</h4>
+              <p><strong>Definição:</strong> Endereço globalmente único, visível e acessível pela Internet.</p>
+              <p><strong>Atribuição:</strong> Fornecido pelo ISP (provedor de Internet) ou registradores regionais (LACNIC, ARIN, RIPE, etc.)</p>
+              <p><strong>Custo:</strong> Recurso escasso e pago (IPv4 está esgotado desde 2019)</p>
+              <p><strong>Exemplo:</strong> 200.189.55.73, 8.8.8.8 (Google DNS)</p>
+              <p><strong>Uso:</strong> Servidores web, APIs públicas, qualquer recurso acessível da Internet</p>
+            </div>
+            <div class="command-card">
+              <h4>🏠 IP Privado (Não roteável na Internet)</h4>
+              <p><strong>Definição:</strong> Endereço usado apenas dentro de redes locais (LANs). Não é roteado na Internet.</p>
+              <p><strong>Atribuição:</strong> Livre — qualquer organização pode usar internamente</p>
+              <p><strong>Custo:</strong> Gratuito e ilimitado dentro da rede local</p>
+              <p><strong>Exemplo:</strong> 192.168.1.100, 10.0.0.5, 172.16.30.1</p>
+              <p><strong>Uso:</strong> Computadores de escritório, servidores internos, VPCs na nuvem</p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Conceito-chave</h4>
+            <p>
+              Endereços <strong>privados não podem ser usados na Internet</strong>. Se um computador com IP privado
+              (ex: 192.168.1.100) precisa acessar a Internet, ele passa por um dispositivo com IP público que faz
+              <strong>NAT (Network Address Translation)</strong> — traduz o endereço privado para o público na saída
+              e faz o caminho inverso na volta. Veremos NAT em detalhes na Seção 3.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.6 — Atribuição de Endereços IP</h3>
+          <p>
+            Existem duas formas de atribuir um endereço IP a um dispositivo:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>⚡ Dinâmico (DHCP)</h4>
+              <p>
+                O dispositivo recebe automaticamente um IP do servidor <strong>DHCP</strong>
+                (Dynamic Host Configuration Protocol) ao se conectar à rede. É o método padrão
+                para estações de trabalho, smartphones e dispositivos de usuário final.
+              </p>
+              <p><strong>Vantagens:</strong> Automático, sem configuração manual, reutiliza IPs</p>
+              <p><strong>Desvantagens:</strong> IP pode mudar a cada conexão (lease expira)</p>
+            </div>
+            <div class="command-card">
+              <h4>📌 Estático (Manual)</h4>
+              <p>
+                O administrador configura manualmente o IP no dispositivo. Usado em equipamentos
+                que precisam de um endereço fixo e previsível: servidores, impressoras de rede,
+                roteadores, switches gerenciáveis, câmeras IP.
+              </p>
+              <p><strong>Vantagens:</strong> IP sempre o mesmo, previsível para DNS e firewall</p>
+              <p><strong>Desvantagens:</strong> Trabalho manual, risco de conflito se mal gerenciado</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Na Prática Cloud (AWS)</h4>
+            <p>
+              Na AWS, instâncias EC2 recebem um <strong>IP privado</strong> automaticamente via DHCP interno
+              da VPC. Para acesso externo, você pode associar um <strong>Elastic IP</strong> (IP público estático)
+              ou usar um <strong>NAT Gateway</strong> para permitir saída à Internet sem expor a instância.
+              O conceito é idêntico ao mundo on-premises — muda apenas quem gerencia a infraestrutura.
+            </p>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: CLASSES DE ENDEREÇO IPv4                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Classes de Endereço IPv4</h2>
+          <p>O sistema classful original dividiu o espaço de endereçamento IPv4 em cinco classes (A a E). Embora ultrapassado na prática moderna, esse conhecimento é fundamental para entender a evolução do endereçamento e é cobrado em certificações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — O Sistema Classful (Classes A, B, C, D, E)</h3>
+          <p>
+            Nos primórdios da Internet (década de 1980), os endereços IPv4 foram organizados em
+            <strong>classes</strong> baseadas nos primeiros bits do endereço. Cada classe define
+            automaticamente qual parte é rede e qual parte é host:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Classe</th>
+                <th>1º Octeto</th>
+                <th>Bits Iniciais</th>
+                <th>Máscara Padrão</th>
+                <th>Nº de Redes</th>
+                <th>Hosts/Rede</th>
+                <th>Uso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>A</strong></td>
+                <td>1 – 126</td>
+                <td>0xxxxxxx</td>
+                <td>255.0.0.0 (/8)</td>
+                <td>126</td>
+                <td>16.777.214</td>
+                <td>Grandes organizações (IBM, Apple, DoD)</td>
+              </tr>
+              <tr>
+                <td><strong>B</strong></td>
+                <td>128 – 191</td>
+                <td>10xxxxxx</td>
+                <td>255.255.0.0 (/16)</td>
+                <td>16.384</td>
+                <td>65.534</td>
+                <td>Empresas médias e universidades</td>
+              </tr>
+              <tr>
+                <td><strong>C</strong></td>
+                <td>192 – 223</td>
+                <td>110xxxxx</td>
+                <td>255.255.255.0 (/24)</td>
+                <td>2.097.152</td>
+                <td>254</td>
+                <td>Pequenas empresas e redes locais</td>
+              </tr>
+              <tr>
+                <td><strong>D</strong></td>
+                <td>224 – 239</td>
+                <td>1110xxxx</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>Multicast (grupos de destino)</td>
+              </tr>
+              <tr>
+                <td><strong>E</strong></td>
+                <td>240 – 255</td>
+                <td>1111xxxx</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>Reservado (experimental/futuro)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📐 Visualização das Classes</h4>
+<pre><code>
+  Espaço total IPv4: 0.0.0.0 a 255.255.255.255
+  
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ Classe A │   Classe B    │  Classe C   │  D  │ E │
+  │ 0-126    │  128-191      │  192-223    │224  │240│
+  │ /8       │  /16          │  /24        │Multi│Res│
+  │ ~50% IPs │  ~25% IPs     │  ~12.5% IPs│cast │erv│
+  └─────────────────────────────────────────────────────────────────────────────┘
+       │              │               │
+       ▼              ▼               ▼
+  16M hosts/rede   65K hosts/rede   254 hosts/rede
+  
+  OBS: 127.x.x.x (entre A e B) é reservado para LOOPBACK
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Classe A em Detalhes</h3>
+          <p>
+            Endereços de Classe A dedicam <strong>1 octeto para rede</strong> e <strong>3 octetos para host</strong>,
+            resultando em poucas redes enormes:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🏢 Estrutura Classe A</h4>
+<pre><code>
+  Endereço:   10  .  45  .  128  .   7
+             ┌────┐┌────────────────────┐
+             │REDE││       HOST         │
+             │ /8 ││   24 bits          │
+             └────┘└────────────────────┘
+  
+  Máscara:   255  .   0  .   0   .   0
+  Binário:   11111111.00000000.00000000.00000000
+  
+  Faixa:     1.0.0.0   a   126.255.255.255
+  Redes:     126 redes (1.x.x.x até 126.x.x.x)
+  Hosts:     2²⁴ - 2 = 16.777.214 hosts por rede
+  
+  Exemplos de proprietários de redes /8:
+  • 9.0.0.0/8   → IBM
+  • 13.0.0.0/8  → Xerox
+  • 15.0.0.0/8  → HP
+  • 17.0.0.0/8  → Apple
+  • 56.0.0.0/8  → US Postal Service
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Classe B em Detalhes</h3>
+          <p>
+            Endereços de Classe B dedicam <strong>2 octetos para rede</strong> e <strong>2 octetos para host</strong>:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🏫 Estrutura Classe B</h4>
+<pre><code>
+  Endereço:   172  .  16  .   30  .  200
+             ┌──────────┐┌──────────────┐
+             │   REDE   ││    HOST      │
+             │   /16    ││   16 bits    │
+             └──────────┘└──────────────┘
+  
+  Máscara:   255  . 255  .   0   .   0
+  Binário:   11111111.11111111.00000000.00000000
+  
+  Faixa:     128.0.0.0  a  191.255.255.255
+  Redes:     16.384 redes
+  Hosts:     2¹⁶ - 2 = 65.534 hosts por rede
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — Classe C em Detalhes</h3>
+          <p>
+            Endereços de Classe C dedicam <strong>3 octetos para rede</strong> e <strong>1 octeto para host</strong>:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🏠 Estrutura Classe C</h4>
+<pre><code>
+  Endereço:   192  . 168  .   1   .  100
+             ┌─────────────────┐┌──────┐
+             │      REDE       ││ HOST │
+             │      /24        ││8 bits│
+             └─────────────────┘└──────┘
+  
+  Máscara:   255  . 255  . 255  .   0
+  Binário:   11111111.11111111.11111111.00000000
+  
+  Faixa:     192.0.0.0  a  223.255.255.255
+  Redes:     2.097.152 redes
+  Hosts:     2⁸ - 2 = 254 hosts por rede
+  
+  ⚠️ O "-2" existe porque:
+  • Primeiro endereço = endereço de REDE (não atribuível)
+  • Último endereço = endereço de BROADCAST (não atribuível)
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Por que subtraímos 2?</h4>
+            <p>
+              Em qualquer rede IP, dois endereços são <strong>reservados</strong> e não podem ser atribuídos a hosts:
+            </p>
+            <p>
+              <strong>1. Endereço de Rede</strong> (todos os bits de host = 0): identifica a rede como um todo.
+              Ex: 192.168.1.<strong>0</strong> — é o "nome" da rede, não um dispositivo.
+            </p>
+            <p>
+              <strong>2. Endereço de Broadcast</strong> (todos os bits de host = 1): usado para enviar dados
+              a TODOS os dispositivos da rede simultaneamente. Ex: 192.168.1.<strong>255</strong>.
+            </p>
+            <p>
+              Por isso a fórmula de hosts utilizáveis é: <strong>2ⁿ - 2</strong> (onde n = número de bits de host).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 — Endereços Especiais</h3>
+          <p>
+            Alguns endereços IPv4 têm funções especiais e reservadas:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Endereço</th>
+                <th>Nome</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>127.0.0.1</code></td>
+                <td>Loopback (localhost)</td>
+                <td>Referência ao próprio dispositivo. Tráfego nunca sai da máquina. Usado para testar a pilha TCP/IP local.</td>
+              </tr>
+              <tr>
+                <td><code>127.0.0.0/8</code></td>
+                <td>Rede Loopback inteira</td>
+                <td>Todo o bloco 127.x.x.x é reservado para loopback (16 milhões de endereços para um uso!).</td>
+              </tr>
+              <tr>
+                <td><code>0.0.0.0</code></td>
+                <td>Endereço indefinido / "todas as redes"</td>
+                <td>Em servidores: escutar em todas as interfaces. Em roteamento: rota padrão (default route).</td>
+              </tr>
+              <tr>
+                <td><code>255.255.255.255</code></td>
+                <td>Broadcast limitado</td>
+                <td>Broadcast para todos os dispositivos na rede local. Nunca ultrapassa o roteador.</td>
+              </tr>
+              <tr>
+                <td><code>169.254.x.x</code></td>
+                <td>APIPA (Link-Local IPv4)</td>
+                <td>Auto-atribuído quando DHCP falha. Comunicação apenas na LAN, sem gateway.</td>
+              </tr>
+              <tr>
+                <td><code>224.0.0.0/4</code></td>
+                <td>Multicast</td>
+                <td>Enviar para um grupo de hosts inscritos. Ex: 224.0.0.1 = todos os hosts, 224.0.0.2 = todos os roteadores.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Testando a pilha TCP/IP com Loopback</h4>
+            <p>
+              O comando <code>ping 127.0.0.1</code> (ou <code>ping localhost</code>) é o primeiro passo
+              para diagnosticar problemas de rede: se funcionar, a pilha TCP/IP do sistema operacional está
+              OK. Se falhar, o problema é na configuração local, não na rede. Exploraremos isso no Módulo 04.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.6 — Problema do Sistema Classful</h3>
+          <p>
+            O sistema de classes era extremamente <strong>desperdiçador</strong>:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>❌ Desperdício de Classe A</h4>
+              <p>
+                Uma empresa com 5.000 hosts recebia um /8 (16 milhões de endereços).
+                <strong>Resultado:</strong> 99,97% dos endereços eram desperdiçados!
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Classe C muito pequena</h4>
+              <p>
+                Uma empresa com 300 hosts não cabia em uma Classe C (254 hosts), então recebia
+                uma Classe B (65.534 hosts). <strong>Resultado:</strong> 99,5% desperdiçado.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Tabelas de roteamento enormes</h4>
+              <p>
+                Milhões de redes /24 individuais enchiam as tabelas de roteamento dos roteadores
+                de backbone, tornando o roteamento lento e consumindo memória.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>✅ Solução: CIDR (1993)</h4>
+              <p>
+                O CIDR (Classless Inter-Domain Routing) eliminou as classes fixas e permitiu
+                máscaras de qualquer tamanho (/1 a /32). Veremos em detalhes na Seção 6.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: ENDEREÇOS PRIVADOS (RFC 1918)                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Endereços Privados (RFC 1918)</h2>
+          <p>Conheça os blocos de endereços reservados para uso interno, por que eles existem e como o NAT permite que milhões de redes privadas compartilhem poucos endereços públicos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — Os Três Blocos Privados</h3>
+          <p>
+            A <strong>RFC 1918</strong> (1996) definiu três faixas de endereços IPv4 que <strong>nunca serão
+            roteados na Internet pública</strong>. Qualquer organização pode usá-los livremente dentro
+            de suas redes internas, sem necessidade de registro ou autorização:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Bloco</th>
+                <th>Faixa</th>
+                <th>Classe Equiv.</th>
+                <th>Nº de IPs</th>
+                <th>Uso Típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>10.0.0.0/8</code></td>
+                <td>10.0.0.0 a 10.255.255.255</td>
+                <td>1 rede Classe A</td>
+                <td>16.777.216</td>
+                <td>Grandes corporações, data centers, VPCs AWS</td>
+              </tr>
+              <tr>
+                <td><code>172.16.0.0/12</code></td>
+                <td>172.16.0.0 a 172.31.255.255</td>
+                <td>16 redes Classe B</td>
+                <td>1.048.576</td>
+                <td>Empresas médias, VPCs padrão AWS</td>
+              </tr>
+              <tr>
+                <td><code>192.168.0.0/16</code></td>
+                <td>192.168.0.0 a 192.168.255.255</td>
+                <td>256 redes Classe C</td>
+                <td>65.536</td>
+                <td>Redes domésticas, pequenos escritórios</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📐 Visualização dos Blocos Privados no Espaço IPv4</h4>
+<pre><code>
+  0         10        127  128     172.16  172.31  192.168    223   255
+  ├──────────┤          │   ├────────┤──────┤────────┤──────────┤     │
+  │          │          │   │        │PRIV B│        │  PRIV C  │     │
+  │  PRIV A  │          │   │        │ /12  │        │   /16    │     │
+  │   /8     │          │   │        │      │        │          │     │
+  │16M hosts │          │   │        │ 1M   │        │  65K     │     │
+  └──────────┘          │   │        └──────┘        └──────────┘     │
+                   Loopback │                                          │
+                            │        Classe B                     Multicast
+                            │                                     + Reserv.
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — Por que Endereços Privados Existem?</h3>
+          <p>
+            A motivação principal foi a <strong>escassez de endereços IPv4</strong>. Com apenas ~4,3 bilhões
+            de endereços e bilhões de dispositivos conectados, era matematicamente impossível dar um IP público
+            a cada um. A solução: reutilizar os mesmos endereços em redes internas separadas.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>♻️ Reutilização de Endereços</h4>
+              <p>
+                Milhões de redes domésticas usam 192.168.1.0/24 simultaneamente. Não há conflito porque
+                esses endereços nunca saem para a Internet — cada rede é um "universo" independente.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🔒 Segurança Natural</h4>
+              <p>
+                Dispositivos com IP privado são naturalmente inacessíveis da Internet (não roteáveis).
+                Um atacante externo não pode alcançar diretamente o IP 192.168.1.50 da sua rede local.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>💰 Economia de IPs Públicos</h4>
+              <p>
+                Um escritório com 500 computadores precisa de apenas 1 IP público (no roteador/gateway).
+                Todos os 500 dispositivos usam IPs privados internamente e compartilham o IP público via NAT.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🏗️ Flexibilidade de Design</h4>
+              <p>
+                O administrador tem total liberdade para projetar o esquema de endereçamento interno
+                sem depender de alocações externas. Pode criar quantas sub-redes quiser.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — NAT (Network Address Translation)</h3>
+          <p>
+            O <strong>NAT</strong> é o mecanismo que permite que dispositivos com endereços privados
+            acessem a Internet. Ele traduz endereços privados para públicos na saída e faz o reverso na volta:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔄 Como o NAT Funciona</h4>
+<pre><code>
+  REDE INTERNA (IPs Privados)          ROTEADOR/NAT          INTERNET (IPs Públicos)
+  ═══════════════════════════          ════════════          ══════════════════════════
+  
+  PC-1: 192.168.1.10 ────┐
+                          │         ┌──────────────┐
+  PC-2: 192.168.1.11 ────┼────────▶│  NAT Gateway │────────▶  200.189.55.73
+                          │         │              │           (IP Público único)
+  PC-3: 192.168.1.12 ────┘         │  Tradução:   │
+                                    │  .10:5001 ↔  │
+                                    │  .11:5002 ↔  │
+                                    │  .12:5003 ↔  │
+                                    └──────────────┘
+  
+  O NAT mantém uma TABELA DE TRADUÇÃO:
+  ┌────────────────────────┬───────────────────────────┐
+  │   IP Interno:Porta     │   IP Externo:Porta        │
+  ├────────────────────────┼───────────────────────────┤
+  │   192.168.1.10:50001   │   200.189.55.73:5001      │
+  │   192.168.1.11:50002   │   200.189.55.73:5002      │
+  │   192.168.1.12:50003   │   200.189.55.73:5003      │
+  └────────────────────────┴───────────────────────────┘
+</code></pre>
+          </div>
+
+          <p>Tipos de NAT:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>1️⃣ NAT Estático (1:1)</h4>
+              <p>
+                Um IP privado mapeado permanentemente para um IP público. Usado quando um servidor
+                interno precisa ser acessível da Internet (ex: servidor web).
+              </p>
+              <p><code>192.168.1.10 ↔ 200.189.55.74 (fixo)</code></p>
+            </div>
+            <div class="command-card">
+              <h4>2️⃣ NAT Dinâmico</h4>
+              <p>
+                Pool de IPs públicos distribuídos conforme demanda. Quando um host interno precisa
+                sair, recebe temporariamente um IP público do pool.
+              </p>
+              <p><code>Pool: 200.189.55.74-78 (5 IPs)</code></p>
+            </div>
+            <div class="command-card">
+              <h4>3️⃣ PAT / NAT Overload (N:1)</h4>
+              <p>
+                Múltiplos IPs privados compartilham UM ÚNICO IP público, diferenciados pela <strong>porta</strong>.
+                É o tipo mais comum — usado em roteadores domésticos e NAT Gateways AWS.
+              </p>
+              <p><code>N hosts → 1 IP público (diferenciado por porta)</code></p>
+            </div>
+            <div class="command-card">
+              <h4>☁️ NAT na AWS</h4>
+              <p>
+                A AWS oferece o <strong>NAT Gateway</strong> (gerenciado) e o <strong>NAT Instance</strong>
+                (EC2 fazendo NAT). Ambos permitem que instâncias em sub-redes privadas acessem a Internet
+                para atualizações sem serem expostas publicamente.
+              </p>
+              <p><code>Sub-rede privada → NAT GW → Internet GW</code></p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 NAT e o Problema das Conexões de Entrada</h4>
+            <p>
+              NAT funciona perfeitamente para conexões <strong>de saída</strong> (o host interno inicia a comunicação).
+              Para conexões <strong>de entrada</strong> (alguém de fora quer alcançar um servidor interno), é necessário
+              configurar <strong>Port Forwarding</strong> (DNAT) — redirecionar uma porta do IP público para um IP:porta interno.
+              Na AWS, isso é feito através de <strong>Security Groups</strong> e <strong>Elastic IPs</strong> em sub-redes públicas.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Blocos Privados na Prática Cloud</h3>
+          <p>
+            No mundo cloud, endereços privados são a base de toda a infraestrutura de rede:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Serviço Cloud</th>
+                <th>Bloco Padrão</th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AWS VPC (padrão)</td>
+                <td>172.31.0.0/16</td>
+                <td>VPC default criada automaticamente em cada região</td>
+              </tr>
+              <tr>
+                <td>AWS VPC (custom)</td>
+                <td>10.0.0.0/16 (recomendado)</td>
+                <td>Permite até 65.536 IPs; subdivida em /24 por sub-rede</td>
+              </tr>
+              <tr>
+                <td>Docker bridge</td>
+                <td>172.17.0.0/16</td>
+                <td>Rede bridge padrão dos containers Docker</td>
+              </tr>
+              <tr>
+                <td>Kubernetes (pods)</td>
+                <td>10.244.0.0/16 (Flannel)</td>
+                <td>CIDR de pods; cada nó recebe um /24</td>
+              </tr>
+              <tr>
+                <td>Kubernetes (services)</td>
+                <td>10.96.0.0/12</td>
+                <td>Cluster IP range para Services internos</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ Cuidado com Overlapping!</h4>
+            <p>
+              Ao conectar redes via VPN ou VPC Peering, os blocos CIDR <strong>não podem se sobrepor</strong>.
+              Se sua VPC AWS usa 10.0.0.0/16 e sua rede corporativa on-premises também usa 10.0.0.0/16,
+              o peering/VPN não funcionará. Planeje o esquema de endereçamento com antecedência!
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: MÁSCARA DE SUB-REDE                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Máscara de Sub-rede</h2>
+          <p>A máscara de sub-rede (subnet mask) é o mecanismo que define onde termina a porção de rede e começa a porção de host em um endereço IP. Sem ela, um dispositivo não sabe quem está na mesma rede e quem está em outra.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — O que a Máscara Faz</h3>
+          <p>
+            A máscara de sub-rede é um número de 32 bits que funciona como um <strong>"filtro"</strong>:
+            ela separa a porção de rede (bits 1) da porção de host (bits 0) no endereço IP.
+          </p>
+
+          <div class="command-card wide">
+            <h4>🎭 A Máscara como Filtro</h4>
+<pre><code>
+  Endereço IP:    192.168.1.100
+  Máscara:        255.255.255.0
+  
+  Em binário:
+  IP:       11000000.10101000.00000001.01100100
+  Máscara:  11111111.11111111.11111111.00000000
+            ├────────── REDE ──────────┤├─HOST─┤
+  
+  Operação AND bit a bit:
+  IP:       11000000.10101000.00000001.01100100
+  Máscara:  11111111.11111111.11111111.00000000
+            ─────────────────────────────────────
+  Resultado:11000000.10101000.00000001.00000000  = 192.168.1.0 (endereço de REDE)
+  
+  ┌─────────────────────────────────────────────────────────────┐
+  │  A máscara "mascara" a porção de host, revelando apenas     │
+  │  a porção de rede. Assim o dispositivo sabe sua rede!       │
+  └─────────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
+
+          <p>
+            Quando um computador quer enviar dados para outro IP, ele aplica a máscara nos dois endereços
+            (no seu e no destino). Se o resultado for igual, os dois estão na <strong>mesma rede</strong>
+            e a comunicação é direta (camada 2). Se for diferente, estão em <strong>redes diferentes</strong>
+            e o pacote deve ser enviado ao <strong>gateway padrão</strong> (roteador).
+          </p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — Representação Binária da Máscara</h3>
+          <p>
+            A máscara é sempre uma sequência contínua de bits 1 seguida por bits 0. <strong>Nunca</strong>
+            existem bits 1 intercalados com bits 0 (isso seria inválido):
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Máscara Decimal</th>
+                <th>Binário</th>
+                <th>Prefixo</th>
+                <th>Bits Rede</th>
+                <th>Bits Host</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>255.0.0.0</td>
+                <td>11111111.00000000.00000000.00000000</td>
+                <td>/8</td>
+                <td>8</td>
+                <td>24</td>
+              </tr>
+              <tr>
+                <td>255.255.0.0</td>
+                <td>11111111.11111111.00000000.00000000</td>
+                <td>/16</td>
+                <td>16</td>
+                <td>16</td>
+              </tr>
+              <tr>
+                <td>255.255.255.0</td>
+                <td>11111111.11111111.11111111.00000000</td>
+                <td>/24</td>
+                <td>24</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>255.255.255.128</td>
+                <td>11111111.11111111.11111111.10000000</td>
+                <td>/25</td>
+                <td>25</td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>255.255.255.192</td>
+                <td>11111111.11111111.11111111.11000000</td>
+                <td>/26</td>
+                <td>26</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>255.255.255.224</td>
+                <td>11111111.11111111.11111111.11100000</td>
+                <td>/27</td>
+                <td>27</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>255.255.255.240</td>
+                <td>11111111.11111111.11111111.11110000</td>
+                <td>/28</td>
+                <td>28</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>255.255.255.248</td>
+                <td>11111111.11111111.11111111.11111000</td>
+                <td>/29</td>
+                <td>29</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>255.255.255.252</td>
+                <td>11111111.11111111.11111111.11111100</td>
+                <td>/30</td>
+                <td>30</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>255.255.255.255</td>
+                <td>11111111.11111111.11111111.11111111</td>
+                <td>/32</td>
+                <td>32</td>
+                <td>0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Notação de Prefixo (CIDR)</h3>
+          <p>
+            Em vez de escrever a máscara completa (255.255.255.0), podemos usar a <strong>notação de prefixo</strong>
+            (também chamada notação CIDR), que indica apenas o número de bits 1 na máscara:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📝 Comparação de Notações</h4>
+<pre><code>
+  Notação completa:    192.168.1.0  máscara 255.255.255.0
+  Notação CIDR:        192.168.1.0/24
+                                    └── 24 bits de rede (= 24 bits "1" na máscara)
+  
+  Mais exemplos:
+  ┌──────────────────────────────┬────────────────┐
+  │  Notação CIDR                │  Equivalente   │
+  ├──────────────────────────────┼────────────────┤
+  │  10.0.0.0/8                  │  255.0.0.0     │
+  │  172.16.0.0/12               │  255.240.0.0   │
+  │  192.168.1.0/24              │  255.255.255.0 │
+  │  192.168.1.0/25              │  255.255.255.128│
+  │  192.168.1.64/26             │  255.255.255.192│
+  │  10.0.1.0/28                 │  255.255.255.240│
+  │  10.0.0.4/30                 │  255.255.255.252│
+  │  8.8.8.8/32                  │  255.255.255.255│
+  └──────────────────────────────┴────────────────┘
+  
+  /32 = endereço de um ÚNICO host (host route)
+  /31 = link ponto-a-ponto (RFC 3021, 2 IPs sem broadcast)
+  /30 = link ponto-a-ponto clássico (2 hosts utilizáveis)
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Regra Prática para Converter</h4>
+            <p>
+              Para converter rapidamente o último octeto da máscara: <strong>256 - valor do octeto = tamanho do bloco (step)</strong>.
+            </p>
+            <p>
+              Exemplo: máscara 255.255.255.192 → 256 - 192 = 64 → cada sub-rede tem 64 endereços (começando em 0, 64, 128, 192).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — Como a Máscara Determina a Comunicação</h3>
+          <p>
+            Veja na prática como um host decide se o destino está na mesma rede (comunicação direta via switch)
+            ou em outra rede (precisa do gateway/roteador):
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔍 Exemplo: Mesma Rede vs Rede Diferente</h4>
+<pre><code>
+  Host A:   192.168.1.10  /24   (máscara 255.255.255.0)
+  Host B:   192.168.1.200 /24
+  Host C:   192.168.2.10  /24
+  
+  ─── Host A quer falar com Host B ───
+  Host A AND máscara: 192.168.1.10 AND 255.255.255.0 = 192.168.1.0
+  Host B AND máscara: 192.168.1.200 AND 255.255.255.0 = 192.168.1.0
+  Resultado: IGUAIS → MESMA REDE → comunicação DIRETA (ARP + Switch)
+  
+  ─── Host A quer falar com Host C ───
+  Host A AND máscara: 192.168.1.10 AND 255.255.255.0 = 192.168.1.0
+  Host C AND máscara: 192.168.2.10 AND 255.255.255.0 = 192.168.2.0
+  Resultado: DIFERENTES → REDES DIFERENTES → envia ao GATEWAY (roteador)
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Erro Comum de Configuração</h4>
+            <p>
+              Se dois dispositivos na mesma LAN física tiverem <strong>máscaras diferentes</strong>
+              (ex: um com /24 e outro com /25), eles podem "não se enxergar" mesmo estando no mesmo
+              switch. Isso porque um deles calcula que o outro está em rede diferente e tenta enviar
+              ao gateway em vez de comunicar diretamente. Sempre use a mesma máscara em todos os hosts
+              de uma sub-rede!
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Endereço de Rede e Endereço de Broadcast</h3>
+          <p>
+            Dada uma combinação IP + máscara, podemos calcular dois endereços especiais:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Cálculo de Rede e Broadcast</h4>
+<pre><code>
+  Dado: 192.168.1.130/26 (máscara 255.255.255.192)
+  
+  Passo 1 — Tamanho do bloco: 256 - 192 = 64
+  Passo 2 — Em qual bloco o .130 cai? 0, 64, 128, 192 → cai no bloco 128
+  Passo 3 — Endereço de rede: 192.168.1.128 (início do bloco)
+  Passo 4 — Broadcast: 192.168.1.191 (fim do bloco = próximo bloco - 1 = 192 - 1)
+  Passo 5 — Primeiro host utilizável: 192.168.1.129
+  Passo 6 — Último host utilizável: 192.168.1.190
+  Passo 7 — Total de hosts: 2⁶ - 2 = 62
+  
+  Resumo:
+  ┌─────────────────────────────────────────────┐
+  │  Rede:       192.168.1.128/26              │
+  │  Broadcast:  192.168.1.191                  │
+  │  1º Host:    192.168.1.129                  │
+  │  Último:     192.168.1.190                  │
+  │  Total:      62 hosts utilizáveis           │
+  └─────────────────────────────────────────────┘
+</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: SUB-REDES (SUBNETTING)                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Sub-redes (Subnetting)</h2>
+          <p>Subnetting é a técnica de dividir uma rede grande em redes menores (sub-redes). É uma habilidade fundamental para qualquer profissional de redes e cloud — usada diariamente no design de VPCs, VLANs e segmentação de tráfego.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — Por que Fazer Subnetting?</h3>
+          <p>
+            Dividir uma rede em sub-redes menores traz múltiplos benefícios:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔒 Segurança e Isolamento</h4>
+              <p>
+                Departamentos ou funções diferentes ficam em sub-redes separadas. O tráfego entre elas
+                passa por um roteador/firewall onde políticas de segurança podem ser aplicadas.
+                Ex: servidores de banco de dados isolados dos desktops dos usuários.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>📡 Redução de Broadcast</h4>
+              <p>
+                Broadcasts (ARP, DHCP, etc.) ficam confinados dentro de cada sub-rede.
+                Em uma rede /24 com 254 hosts, cada broadcast atinge 254 dispositivos.
+                Dividindo em 4x /26, cada broadcast atinge apenas 62 dispositivos.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>📋 Organização Lógica</h4>
+              <p>
+                Facilita a administração, documentação e troubleshooting. "O problema está na sub-rede
+                de servidores (10.0.1.0/24)" é muito mais específico que "está na rede 10.0.0.0/16".
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>⚡ Performance</h4>
+              <p>
+                Menos hosts por domínio de broadcast = menos tráfego desnecessário = melhor performance
+                para todos. Especialmente importante em redes com muitos dispositivos.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>☁️ Requisito Cloud</h4>
+              <p>
+                Na AWS, cada VPC DEVE ser dividida em sub-redes (subnets) distribuídas em
+                Availability Zones. Sem subnetting, não é possível criar uma arquitetura
+                altamente disponível na nuvem.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>💰 Uso Eficiente de IPs</h4>
+              <p>
+                Em vez de desperdiçar um /24 inteiro (254 IPs) para um link ponto-a-ponto que
+                precisa de apenas 2 IPs, usa-se um /30 (2 IPs utilizáveis). Economia de 252 endereços!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — Método Passo a Passo para Subnetting</h3>
+          <p>
+            Siga este método sistemático para dividir qualquer rede em sub-redes:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📋 Algoritmo de Subnetting</h4>
+<pre><code>
+  ╔═══════════════════════════════════════════════════════════════════════╗
+  ║  MÉTODO DE SUBNETTING — 6 PASSOS                                     ║
+  ╠═══════════════════════════════════════════════════════════════════════╣
+  ║                                                                       ║
+  ║  1. DETERMINAR A NECESSIDADE                                          ║
+  ║     → Quantas sub-redes você precisa? OU                              ║
+  ║     → Quantos hosts por sub-rede você precisa?                        ║
+  ║                                                                       ║
+  ║  2. CALCULAR BITS EMPRESTADOS                                         ║
+  ║     → Para N sub-redes: bits = ⌈log₂(N)⌉  (arredonda para cima)      ║
+  ║     → Para H hosts: bits de host = ⌈log₂(H + 2)⌉                     ║
+  ║                                                                       ║
+  ║  3. NOVA MÁSCARA                                                      ║
+  ║     → Máscara original + bits emprestados = nova máscara              ║
+  ║     → Ex: /24 + 2 bits = /26                                         ║
+  ║                                                                       ║
+  ║  4. TAMANHO DO BLOCO (STEP/INCREMENTO)                                ║
+  ║     → 2^(bits de host restantes) = tamanho de cada sub-rede           ║
+  ║     → Ou: 256 - valor do último octeto da máscara                     ║
+  ║                                                                       ║
+  ║  5. LISTAR AS SUB-REDES                                               ║
+  ║     → Começando em 0 e incrementando pelo tamanho do bloco            ║
+  ║     → Sub-rede 0: .0, Sub-rede 1: .64, Sub-rede 2: .128, etc.        ║
+  ║                                                                       ║
+  ║  6. PARA CADA SUB-REDE, IDENTIFICAR:                                  ║
+  ║     → Endereço de rede (primeiro do bloco)                            ║
+  ║     → Primeiro host utilizável (rede + 1)                             ║
+  ║     → Último host utilizável (broadcast - 1)                          ║
+  ║     → Endereço de broadcast (último do bloco)                         ║
+  ║                                                                       ║
+  ╚═══════════════════════════════════════════════════════════════════════╝
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Exemplo Prático: Dividindo 192.168.1.0/24 em 4 Sub-redes</h3>
+          <p>
+            <strong>Cenário:</strong> Você tem a rede 192.168.1.0/24 e precisa de 4 sub-redes
+            (uma para cada departamento: TI, RH, Financeiro, Diretoria).
+          </p>
+
+          <div class="command-card wide">
+            <h4>🧮 Resolução Passo a Passo</h4>
+<pre><code>
+  Rede original: 192.168.1.0/24 (254 hosts)
+  Necessidade: 4 sub-redes
+  
+  PASSO 1: Quantos bits emprestar?
+  → 2² = 4 → precisamos de 2 bits emprestados da porção de host
+  
+  PASSO 2: Nova máscara
+  → /24 + 2 = /26 (255.255.255.192)
+  
+  PASSO 3: Tamanho do bloco
+  → 256 - 192 = 64 (cada sub-rede tem 64 endereços)
+  → Ou: 2⁶ = 64 (sobram 6 bits de host → 2⁶ = 64)
+  
+  PASSO 4: Hosts utilizáveis por sub-rede
+  → 2⁶ - 2 = 62 hosts por sub-rede
+  
+  PASSO 5: Listar as sub-redes (incremento de 64):
+  
+  ┌─────────────┬───────────────────┬─────────────────┬──────────────────┬───────────┐
+  │  Sub-rede   │  End. de Rede     │  1º Host        │  Último Host     │ Broadcast │
+  ├─────────────┼───────────────────┼─────────────────┼──────────────────┼───────────┤
+  │  TI         │  192.168.1.0/26   │  192.168.1.1    │  192.168.1.62    │ .63       │
+  │  RH         │  192.168.1.64/26  │  192.168.1.65   │  192.168.1.126   │ .127      │
+  │  Financeiro │  192.168.1.128/26 │  192.168.1.129  │  192.168.1.190   │ .191      │
+  │  Diretoria  │  192.168.1.192/26 │  192.168.1.193  │  192.168.1.254   │ .255      │
+  └─────────────┴───────────────────┴─────────────────┴──────────────────┴───────────┘
+  
+  ✅ 4 sub-redes criadas, cada uma com 62 hosts utilizáveis
+  ✅ Total aproveitado: 4 × 62 = 248 hosts (de 254 originais, perdemos 8 para rede/broadcast)
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 — Exemplo: Dividindo em 8 Sub-redes (/27)</h3>
+          <p>
+            <strong>Cenário:</strong> Você precisa de 8 sub-redes a partir de 10.0.1.0/24.
+          </p>
+
+          <div class="command-card wide">
+            <h4>🧮 Resolução /27</h4>
+<pre><code>
+  Rede original: 10.0.1.0/24
+  Necessidade: 8 sub-redes
+  
+  Bits emprestados: 2³ = 8 → 3 bits
+  Nova máscara: /24 + 3 = /27 (255.255.255.224)
+  Tamanho do bloco: 256 - 224 = 32
+  Hosts por sub-rede: 2⁵ - 2 = 30
+  
+  ┌───────┬──────────────────┬───────────────┬──────────────┬───────────┐
+  │  #    │  End. de Rede    │  1º Host      │  Último Host │ Broadcast │
+  ├───────┼──────────────────┼───────────────┼──────────────┼───────────┤
+  │  0    │  10.0.1.0/27     │  10.0.1.1     │  10.0.1.30   │ 10.0.1.31 │
+  │  1    │  10.0.1.32/27    │  10.0.1.33    │  10.0.1.62   │ 10.0.1.63 │
+  │  2    │  10.0.1.64/27    │  10.0.1.65    │  10.0.1.94   │ 10.0.1.95 │
+  │  3    │  10.0.1.96/27    │  10.0.1.97    │  10.0.1.126  │ 10.0.1.127│
+  │  4    │  10.0.1.128/27   │  10.0.1.129   │  10.0.1.158  │ 10.0.1.159│
+  │  5    │  10.0.1.160/27   │  10.0.1.161   │  10.0.1.190  │ 10.0.1.191│
+  │  6    │  10.0.1.192/27   │  10.0.1.193   │  10.0.1.222  │ 10.0.1.223│
+  │  7    │  10.0.1.224/27   │  10.0.1.225   │  10.0.1.254  │ 10.0.1.255│
+  └───────┴──────────────────┴───────────────┴──────────────┴───────────┘
+  
+  ✅ 8 sub-redes × 30 hosts = 240 hosts utilizáveis (de 254 originais)
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 — Exemplo: Sub-redes /28 (16 endereços por bloco)</h3>
+          <p>
+            <strong>Cenário:</strong> Você precisa de sub-redes pequenas com até 14 hosts cada,
+            a partir de 172.16.10.0/24.
+          </p>
+
+          <div class="command-card wide">
+            <h4>🧮 Resolução /28</h4>
+<pre><code>
+  Rede original: 172.16.10.0/24
+  Nova máscara: /28 (255.255.255.240)
+  Bits emprestados: 4 bits → 2⁴ = 16 sub-redes possíveis
+  Tamanho do bloco: 256 - 240 = 16
+  Hosts por sub-rede: 2⁴ - 2 = 14
+  
+  Primeiras 4 sub-redes:
+  ┌───────┬────────────────────┬─────────────────┬────────────────┬──────────────┐
+  │  #    │  End. de Rede      │  1º Host        │  Último Host   │  Broadcast   │
+  ├───────┼────────────────────┼─────────────────┼────────────────┼──────────────┤
+  │  0    │  172.16.10.0/28    │  172.16.10.1    │  172.16.10.14  │ 172.16.10.15 │
+  │  1    │  172.16.10.16/28   │  172.16.10.17   │  172.16.10.30  │ 172.16.10.31 │
+  │  2    │  172.16.10.32/28   │  172.16.10.33   │  172.16.10.46  │ 172.16.10.47 │
+  │  3    │  172.16.10.48/28   │  172.16.10.49   │  172.16.10.62  │ 172.16.10.63 │
+  └───────┴────────────────────┴─────────────────┴────────────────┴──────────────┘
+  ...continua até 172.16.10.240/28 (sub-rede 15)
+  
+  ✅ 16 sub-redes × 14 hosts = 224 hosts utilizáveis
+  
+  💡 Uso típico: VLANs de gerência, links WAN, DMZ pequenas
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.6 — Exemplo: Sub-redes /25 (128 endereços por bloco)</h3>
+          <p>
+            <strong>Cenário:</strong> Dividir 10.0.0.0/24 em apenas 2 sub-redes iguais.
+          </p>
+
+          <div class="command-card wide">
+            <h4>🧮 Resolução /25</h4>
+<pre><code>
+  Rede original: 10.0.0.0/24
+  Bits emprestados: 1 bit → 2¹ = 2 sub-redes
+  Nova máscara: /25 (255.255.255.128)
+  Tamanho do bloco: 256 - 128 = 128
+  Hosts por sub-rede: 2⁷ - 2 = 126
+  
+  ┌───────────────┬──────────────────┬──────────────┬──────────────┬─────────────┐
+  │  Sub-rede     │  End. de Rede    │  1º Host     │  Último Host │  Broadcast  │
+  ├───────────────┼──────────────────┼──────────────┼──────────────┼─────────────┤
+  │  Sub-rede 0   │  10.0.0.0/25     │  10.0.0.1    │  10.0.0.126  │ 10.0.0.127  │
+  │  Sub-rede 1   │  10.0.0.128/25   │  10.0.0.129  │  10.0.0.254  │ 10.0.0.255  │
+  └───────────────┴──────────────────┴──────────────┴──────────────┴─────────────┘
+  
+  💡 Uso típico na AWS: dividir uma /24 entre 2 Availability Zones
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.7 — Tabela de Referência Rápida</h3>
+          <p>
+            Memorize ou tenha sempre à mão esta tabela — ela é sua melhor amiga no dia a dia:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Prefixo</th>
+                <th>Máscara</th>
+                <th>Bloco</th>
+                <th>Sub-redes (de /24)</th>
+                <th>Hosts/Sub-rede</th>
+                <th>Uso Típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>/24</td>
+                <td>255.255.255.0</td>
+                <td>256</td>
+                <td>1</td>
+                <td>254</td>
+                <td>LAN padrão, sub-rede AWS</td>
+              </tr>
+              <tr>
+                <td>/25</td>
+                <td>255.255.255.128</td>
+                <td>128</td>
+                <td>2</td>
+                <td>126</td>
+                <td>Dividir /24 em 2 AZs</td>
+              </tr>
+              <tr>
+                <td>/26</td>
+                <td>255.255.255.192</td>
+                <td>64</td>
+                <td>4</td>
+                <td>62</td>
+                <td>Departamentos, VLANs</td>
+              </tr>
+              <tr>
+                <td>/27</td>
+                <td>255.255.255.224</td>
+                <td>32</td>
+                <td>8</td>
+                <td>30</td>
+                <td>Equipes, labs</td>
+              </tr>
+              <tr>
+                <td>/28</td>
+                <td>255.255.255.240</td>
+                <td>16</td>
+                <td>16</td>
+                <td>14</td>
+                <td>DMZ, gerência, IoT</td>
+              </tr>
+              <tr>
+                <td>/29</td>
+                <td>255.255.255.248</td>
+                <td>8</td>
+                <td>32</td>
+                <td>6</td>
+                <td>Pequenos grupos, firewalls</td>
+              </tr>
+              <tr>
+                <td>/30</td>
+                <td>255.255.255.252</td>
+                <td>4</td>
+                <td>64</td>
+                <td>2</td>
+                <td>Links ponto-a-ponto (WAN)</td>
+              </tr>
+              <tr>
+                <td>/31</td>
+                <td>255.255.255.254</td>
+                <td>2</td>
+                <td>128</td>
+                <td>2*</td>
+                <td>P2P (RFC 3021, sem broadcast)</td>
+              </tr>
+              <tr>
+                <td>/32</td>
+                <td>255.255.255.255</td>
+                <td>1</td>
+                <td>256</td>
+                <td>1</td>
+                <td>Host route (loopback, ACL)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: CIDR                                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>CIDR (Classless Inter-Domain Routing)</h2>
+          <p>O CIDR substituiu o sistema classful rígido, permitindo alocações flexíveis de endereços e agregação de rotas. É o sistema usado na Internet moderna, em cloud computing e em toda configuração de rede atual.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — Por que o CIDR Substituiu as Classes?</h3>
+          <p>
+            Nos anos 90, a Internet crescia exponencialmente e dois problemas ameaçavam sua sobrevivência:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔥 Esgotamento de Endereços</h4>
+              <p>
+                Classes fixas causavam desperdício massivo. Uma empresa com 1.000 hosts recebia
+                uma Classe B (65.534 IPs) — 98,5% desperdiçado. Os endereços estavam acabando rapidamente.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>💥 Explosão de Tabelas de Roteamento</h4>
+              <p>
+                Cada rede Classe C precisava de uma entrada separada na tabela de roteamento dos roteadores
+                de backbone. Com milhões de redes /24, os roteadores não tinham memória suficiente.
+              </p>
+            </div>
+          </div>
+
+          <p>
+            O <strong>CIDR</strong> (RFC 1517-1520, 1993) resolveu ambos os problemas ao eliminar as
+            classes fixas e permitir:
+          </p>
+          <ul>
+            <li><strong>Alocação flexível:</strong> máscaras de qualquer tamanho (/1 a /32), não apenas /8, /16, /24</li>
+            <li><strong>Agregação de rotas (supernetting):</strong> múltiplas redes pequenas resumidas em uma única rota</li>
+            <li><strong>VLSM:</strong> sub-redes de tamanhos diferentes dentro da mesma rede</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — Notação CIDR</h3>
+          <p>
+            A notação CIDR usa o formato <code>endereço/prefixo</code>, onde o prefixo indica
+            quantos bits são a parte de rede:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📝 Exemplos de CIDR no Mundo Real</h4>
+<pre><code>
+  ┌─────────────────────────┬──────────────────────────────────────────────────┐
+  │  CIDR                   │  Significado                                     │
+  ├─────────────────────────┼──────────────────────────────────────────────────┤
+  │  0.0.0.0/0              │  TODA a Internet (rota default)                  │
+  │  10.0.0.0/8             │  Bloco privado classe A (16M IPs)                │
+  │  10.0.0.0/16            │  Sub-bloco de 65.536 IPs dentro do 10.x.x.x     │
+  │  10.0.1.0/24            │  Sub-rede típica (254 hosts)                     │
+  │  10.0.1.128/25          │  Metade de uma /24 (126 hosts)                   │
+  │  203.0.113.0/22         │  4 blocos /24 agregados (1.022 hosts)            │
+  │  8.8.8.8/32             │  UM ÚNICO host (Google DNS)                      │
+  └─────────────────────────┴──────────────────────────────────────────────────┘
+  
+  Regra geral:
+  • Prefixo MENOR (/8) = rede MAIOR (mais hosts)
+  • Prefixo MAIOR (/28) = rede MENOR (menos hosts)
+  • Cada bit a mais no prefixo DIVIDE a rede pela metade
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Agregação de Rotas (Supernetting / Summarization)</h3>
+          <p>
+            O CIDR permite <strong>agregar</strong> múltiplas redes menores em uma única rota maior,
+            reduzindo drasticamente o tamanho das tabelas de roteamento:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔗 Exemplo de Agregação</h4>
+<pre><code>
+  SEM AGREGAÇÃO (4 rotas na tabela):
+  ┌────────────────────────────────────────┐
+  │  192.168.0.0/24   →  Roteador A       │
+  │  192.168.1.0/24   →  Roteador A       │
+  │  192.168.2.0/24   →  Roteador A       │
+  │  192.168.3.0/24   →  Roteador A       │
+  └────────────────────────────────────────┘
+  
+  COM AGREGAÇÃO (1 rota na tabela):
+  ┌────────────────────────────────────────┐
+  │  192.168.0.0/22   →  Roteador A       │
+  └────────────────────────────────────────┘
+  
+  Por que /22?
+  • 4 redes /24 = 2² → precisamos de 2 bits a menos no prefixo
+  • /24 - 2 = /22
+  • /22 cobre: 192.168.0.0 a 192.168.3.255 (1.024 IPs)
+  
+  Verificação em binário:
+  192.168.0.0   = 11000000.10101000.000000|00.00000000
+  192.168.1.0   = 11000000.10101000.000000|01.00000000
+  192.168.2.0   = 11000000.10101000.000000|10.00000000
+  192.168.3.0   = 11000000.10101000.000000|11.00000000
+                                    ^^^^^^
+                            22 bits iguais → /22
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Impacto Real da Agregação</h4>
+            <p>
+              Sem CIDR, a tabela de roteamento global da Internet teria <strong>milhões de entradas</strong>
+              individuais. Com CIDR e agregação, os ISPs resumem milhares de redes de clientes em poucas
+              rotas agregadas. Em 2024, a tabela BGP global tem ~930.000 rotas — sem agregação, teria
+              muito mais do que isso.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — VLSM (Variable Length Subnet Masking)</h3>
+          <p>
+            O VLSM é uma extensão natural do CIDR que permite usar <strong>máscaras de tamanhos diferentes</strong>
+            dentro da mesma rede. No sistema classful, todas as sub-redes precisavam ter a mesma máscara.
+            Com VLSM, cada sub-rede pode ter o tamanho ideal para suas necessidades:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 Exemplo VLSM: Rede 10.1.0.0/24</h4>
+<pre><code>
+  Requisitos:
+  • Departamento A: 100 hosts  → precisa de /25 (126 hosts)
+  • Departamento B: 50 hosts   → precisa de /26 (62 hosts)
+  • Departamento C: 25 hosts   → precisa de /27 (30 hosts)
+  • Link WAN 1: 2 hosts        → precisa de /30 (2 hosts)
+  • Link WAN 2: 2 hosts        → precisa de /30 (2 hosts)
+  
+  Alocação VLSM (sempre aloque do MAIOR para o MENOR):
+  
+  ┌──────────────────┬────────────────────┬────────────┬─────────────────────┐
+  │  Departamento    │  Sub-rede          │  Hosts     │  Faixa              │
+  ├──────────────────┼────────────────────┼────────────┼─────────────────────┤
+  │  Depto A         │  10.1.0.0/25       │  126       │  10.1.0.1 - .126    │
+  │  Depto B         │  10.1.0.128/26     │  62        │  10.1.0.129 - .190  │
+  │  Depto C         │  10.1.0.192/27     │  30        │  10.1.0.193 - .222  │
+  │  WAN Link 1      │  10.1.0.224/30     │  2         │  10.1.0.225 - .226  │
+  │  WAN Link 2      │  10.1.0.228/30     │  2         │  10.1.0.229 - .230  │
+  └──────────────────┴────────────────────┴────────────┴─────────────────────┘
+  
+  ✅ Total utilizado: 126 + 62 + 30 + 2 + 2 = 222 hosts
+  ✅ IPs restantes (10.1.0.232 - 10.1.0.255): livres para expansão futura
+  ✅ SEM VLSM (tudo /26): caberia apenas 4 × 62 = 248, mas desperdiçaria
+     sub-redes inteiras nos links WAN
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 VLSM na AWS</h4>
+            <p>
+              Na AWS, quando você cria sub-redes dentro de uma VPC, está usando VLSM naturalmente.
+              Você pode ter uma sub-rede /24 para servidores web, uma /26 para bancos de dados e
+              uma /28 para a sub-rede do NAT Gateway — tudo dentro da mesma VPC /16. Cada sub-rede
+              tem o tamanho exato necessário.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.5 — CIDR no Dia a Dia: Exemplos Práticos</h3>
+          <p>
+            Você encontrará notação CIDR constantemente em:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>☁️ AWS Security Groups</h4>
+<pre><code>
+# Permitir SSH apenas do escritório
+Inbound Rule:
+  Type: SSH (22)
+  Source: 200.189.55.0/28
+  
+# Permitir HTTP de qualquer lugar
+Inbound Rule:
+  Type: HTTP (80)
+  Source: 0.0.0.0/0
+</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>🔥 Firewall / iptables</h4>
+<pre><code>
+# Bloquear sub-rede suspeita
+iptables -A INPUT \
+  -s 45.33.32.0/24 \
+  -j DROP
+
+# Permitir rede interna
+iptables -A INPUT \
+  -s 10.0.0.0/8 \
+  -j ACCEPT
+</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>🏗️ Terraform (VPC)</h4>
+<pre><code>
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "web" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+}
+
+resource "aws_subnet" "db" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+}
+</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>📋 Tabelas de Rota</h4>
+<pre><code>
+# ip route (Linux)
+default via 10.0.0.1
+10.0.0.0/16 dev eth0
+172.16.0.0/12 via 10.0.0.254
+192.168.0.0/16 via 10.0.0.253
+
+# 0.0.0.0/0 = default route
+# (todos os destinos não listados)
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: IPv6 — INTRODUÇÃO                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>IPv6 — Introdução</h2>
+          <p>O IPv6 é o sucessor do IPv4, projetado para resolver definitivamente o problema de esgotamento de endereços e simplificar várias aspectos do protocolo. Com 128 bits, oferece um espaço de endereçamento praticamente infinito.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — Por que IPv6?</h3>
+          <p>
+            O IPv4 está <strong>esgotado</strong>. Todos os blocos /8 disponíveis já foram distribuídos
+            pelos registradores regionais (RIRs). Novos endereços IPv4 só são obtidos por:
+          </p>
+          <ul>
+            <li>Compra/transferência de blocos existentes (mercado secundário — caro!)</li>
+            <li>Devolução de blocos subutilizados (raro)</li>
+            <li>Uso cada vez mais agressivo de NAT (CGN/CGNAT)</li>
+          </ul>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📊 IPv4 vs IPv6 — Números</h4>
+              <p><strong>IPv4:</strong> 2³² = ~4,3 bilhões de endereços</p>
+              <p><strong>IPv6:</strong> 2¹²⁸ = ~340 undecilhões de endereços</p>
+              <p>(340.282.366.920.938.463.463.374.607.431.768.211.456)</p>
+              <p>Isso é aproximadamente 6,7 × 10²³ endereços por metro quadrado da superfície terrestre!</p>
+            </div>
+            <div class="command-card">
+              <h4>✅ Benefícios do IPv6</h4>
+              <p>• Espaço de endereçamento virtualmente infinito</p>
+              <p>• Cabeçalho simplificado (mais eficiente para roteadores)</p>
+              <p>• Auto-configuração (SLAAC — não precisa de DHCP)</p>
+              <p>• IPsec integrado nativamente</p>
+              <p>• Sem necessidade de NAT (cada dispositivo tem IP público)</p>
+              <p>• Multicast melhorado (sem broadcast)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Formato do Endereço IPv6</h3>
+          <p>
+            Um endereço IPv6 tem <strong>128 bits</strong>, representados em <strong>8 grupos de 4
+            dígitos hexadecimais</strong> (16 bits cada), separados por dois-pontos:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 Estrutura IPv6</h4>
+<pre><code>
+  Formato completo (sem abreviações):
+  2001:0db8:85a3:0000:0000:8a2e:0370:7334
+  ├──┤├──┤├──┤├──┤├──┤├──┤├──┤├──┤
+   16   16   16   16   16   16   16   16  = 128 bits
+   bits bits bits bits bits bits bits bits
+  
+  Cada dígito hexadecimal = 4 bits
+  Cada grupo = 4 dígitos hex = 16 bits
+  8 grupos × 16 bits = 128 bits total
+  
+  Comparação visual:
+  ┌─────────────────────────────────────────────────────────┐
+  │  IPv4:  192.168.1.1           (32 bits, decimal)        │
+  │  IPv6:  2001:0db8:85a3:0000:0000:8a2e:0370:7334        │
+  │         (128 bits, hexadecimal)                         │
+  └─────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Regras de Abreviação IPv6</h3>
+          <p>
+            Endereços IPv6 são longos, então existem duas regras de abreviação:
+          </p>
+
+          <div class="command-card wide">
+            <h4>✂️ Regra 1: Omitir Zeros à Esquerda</h4>
+<pre><code>
+  Completo:     2001:0db8:0085:0000:0000:8a2e:0370:7334
+  Abreviado:    2001:db8:85:0:0:8a2e:370:7334
+  
+  • 0db8 → db8  (remove 0 à esquerda)
+  • 0085 → 85   (remove 00 à esquerda)
+  • 0000 → 0    (remove 000 à esquerda, mantém pelo menos um dígito)
+  • 0370 → 370  (remove 0 à esquerda)
+</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>✂️ Regra 2: Substituir Grupos Consecutivos de Zeros por "::"</h4>
+<pre><code>
+  Após Regra 1: 2001:db8:85:0:0:8a2e:370:7334
+  Após Regra 2: 2001:db8:85::8a2e:370:7334
+                           ^^
+                           substitui ":0:0:" por "::"
+  
+  ⚠️ IMPORTANTE: o "::" só pode ser usado UMA VEZ por endereço!
+  (senão seria ambíguo quantos grupos de zeros foram omitidos)
+  
+  Mais exemplos:
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │  Completo                         │  Abreviado                        │
+  ├────────────────────────────────────────────────────────────────────────┤
+  │  2001:0db8:0000:0000:0000:0000:0000:0001  │  2001:db8::1            │
+  │  fe80:0000:0000:0000:0210:a4ff:fee3:9566  │  fe80::210:a4ff:fee3:9566│
+  │  0000:0000:0000:0000:0000:0000:0000:0001  │  ::1 (loopback!)        │
+  │  0000:0000:0000:0000:0000:0000:0000:0000  │  :: (endereço indefinido)│
+  │  ff02:0000:0000:0000:0000:0000:0000:0001  │  ff02::1 (all nodes)    │
+  └────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Armadilha do "::"</h4>
+            <p>
+              O "::" só pode aparecer <strong>uma vez</strong> no endereço. Se aparecesse duas vezes,
+              seria impossível saber quantos grupos de zeros cada "::" representa.
+              Exemplo inválido: <code>2001::db8::1</code> — ERRADO! Ambíguo.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Tipos de Endereço IPv6</h3>
+          <p>
+            Os principais tipos de endereço IPv6 que você encontrará:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Prefixo</th>
+                <th>Exemplo</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Global Unicast (GUA)</strong></td>
+                <td>2000::/3</td>
+                <td>2001:db8:1::100</td>
+                <td>Equivalente ao IP público IPv4. Roteável globalmente na Internet.</td>
+              </tr>
+              <tr>
+                <td><strong>Link-Local</strong></td>
+                <td>fe80::/10</td>
+                <td>fe80::1</td>
+                <td>Auto-configurado em toda interface. Comunicação apenas no link local (não roteável).</td>
+              </tr>
+              <tr>
+                <td><strong>Unique Local (ULA)</strong></td>
+                <td>fc00::/7 (fd00::/8)</td>
+                <td>fd00:1234::1</td>
+                <td>Equivalente aos IPs privados RFC 1918. Uso interno, não roteável na Internet.</td>
+              </tr>
+              <tr>
+                <td><strong>Loopback</strong></td>
+                <td>::1/128</td>
+                <td>::1</td>
+                <td>Equivalente ao 127.0.0.1 do IPv4.</td>
+              </tr>
+              <tr>
+                <td><strong>Multicast</strong></td>
+                <td>ff00::/8</td>
+                <td>ff02::1</td>
+                <td>Enviar para um grupo. ff02::1 = all nodes, ff02::2 = all routers.</td>
+              </tr>
+              <tr>
+                <td><strong>Endereço Indefinido</strong></td>
+                <td>::/128</td>
+                <td>::</td>
+                <td>Equivalente ao 0.0.0.0 do IPv4. Usado antes de receber endereço.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Link-Local (fe80::)</h3>
+          <p>
+            Toda interface de rede com IPv6 habilitado recebe automaticamente um endereço
+            <strong>link-local</strong> (fe80::/10). Não precisa de DHCP nem configuração manual:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔗 Endereço Link-Local</h4>
+<pre><code>
+  Formato: fe80::[Interface ID]/10
+  
+  O Interface ID geralmente é derivado do MAC address (EUI-64):
+  
+  MAC Address:    00:1A:2B:3C:4D:5E
+  
+  Processo EUI-64:
+  1. Inserir FF:FE no meio:   00:1A:2B:FF:FE:3C:4D:5E
+  2. Inverter bit U/L (7º):   02:1A:2B:FF:FE:3C:4D:5E
+  3. Converter para IPv6:     fe80::021a:2bff:fe3c:4d5e
+  
+  Uso do Link-Local:
+  • Descoberta de vizinhos (Neighbor Discovery Protocol - NDP)
+  • Obter endereço global via SLAAC ou DHCPv6
+  • Comunicação na LAN sem configuração
+  • Next-hop em tabelas de roteamento IPv6
+  
+  ⚠️ Link-local NUNCA é roteado para fora do link (segmento de rede local)
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.6 — Global Unicast Address (GUA)</h3>
+          <p>
+            O GUA é o equivalente IPv6 de um endereço IP público. É globalmente roteável e
+            estruturado hierarquicamente:
+          </p>
+
+          <div class="command-card wide">
+            <h4>🌍 Estrutura do GUA</h4>
+<pre><code>
+  |<──────── 48 bits ────────>|<─ 16 ─>|<────────── 64 bits ──────────>|
+  ┌──────────────────────────┬─────────┬───────────────────────────────┐
+  │   Global Routing Prefix  │Subnet ID│        Interface ID           │
+  │   (ISP + Site)           │         │   (identifica o host)         │
+  └──────────────────────────┴─────────┴───────────────────────────────┘
+  
+  Exemplo: 2001:0db8:acad:0001:0000:0000:0000:0100/64
+           ├─── Routing Prefix ──┤├Sub─┤├──── Interface ID ─────────┤
+  
+  • Global Routing Prefix (48 bits): atribuído pelo ISP/RIR
+  • Subnet ID (16 bits): permite 65.536 sub-redes dentro do site
+  • Interface ID (64 bits): identifica o host na sub-rede
+  
+  Com /64 por sub-rede: 2⁶⁴ = 18.4 quintilhões de hosts por sub-rede!
+  (mais que todos os grãos de areia da Terra)
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 IPv6 na AWS</h4>
+            <p>
+              A AWS suporta <strong>dual-stack</strong> (IPv4 + IPv6 simultaneamente) em VPCs.
+              Ao habilitar IPv6, a AWS aloca um /56 para a VPC e você pode criar sub-redes /64.
+              Instâncias podem ter tanto um IPv4 privado quanto um IPv6 GUA público.
+              O IPv6 na AWS é <strong>gratuito</strong> (sem custo adicional pelo endereçamento).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.7 — IPv6 vs IPv4 — Resumo Comparativo</h3>
+          <p>
+            As principais diferenças entre os dois protocolos:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>IPv4</th>
+                <th>IPv6</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tamanho do endereço</td>
+                <td>32 bits</td>
+                <td>128 bits</td>
+              </tr>
+              <tr>
+                <td>Notação</td>
+                <td>Decimal pontuada (192.168.1.1)</td>
+                <td>Hexadecimal com : (2001:db8::1)</td>
+              </tr>
+              <tr>
+                <td>Total de endereços</td>
+                <td>~4,3 bilhões</td>
+                <td>~340 undecilhões</td>
+              </tr>
+              <tr>
+                <td>Configuração</td>
+                <td>DHCP ou manual</td>
+                <td>SLAAC, DHCPv6 ou manual</td>
+              </tr>
+              <tr>
+                <td>NAT</td>
+                <td>Amplamente necessário</td>
+                <td>Desnecessário (todo host tem GUA)</td>
+              </tr>
+              <tr>
+                <td>Broadcast</td>
+                <td>Sim (255.255.255.255)</td>
+                <td>Não (substituído por multicast)</td>
+              </tr>
+              <tr>
+                <td>Segurança</td>
+                <td>IPsec opcional</td>
+                <td>IPsec integrado (mandatório na spec)</td>
+              </tr>
+              <tr>
+                <td>Cabeçalho</td>
+                <td>Variável (20-60 bytes)</td>
+                <td>Fixo (40 bytes) + extension headers</td>
+              </tr>
+              <tr>
+                <td>Fragmentação</td>
+                <td>Roteadores e hosts</td>
+                <td>Apenas no host de origem</td>
+              </tr>
+              <tr>
+                <td>ARP</td>
+                <td>Sim</td>
+                <td>Substituído por NDP (Neighbor Discovery)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: EXERCÍCIOS PRÁTICOS                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Pratique subnetting com estes 4 exercícios progressivos. Tente resolver sozinho antes de abrir a solução! A prática é o único caminho para dominar subnetting — não existe atalho.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Identificar Rede, Broadcast e Hosts</h3>
+          <p>
+            <strong>Problema:</strong> Dado o endereço <code>172.16.35.123/20</code>, determine:
+          </p>
+          <ol>
+            <li>Endereço de rede</li>
+            <li>Endereço de broadcast</li>
+            <li>Primeiro host utilizável</li>
+            <li>Último host utilizável</li>
+            <li>Total de hosts utilizáveis</li>
+          </ol>
+
+          <details>
+            <summary><strong>🔍 Clique para ver a solução passo a passo</strong></summary>
+            <div class="command-card wide">
+              <h4>📝 Resolução do Exercício 1</h4>
+<pre><code>
+  Dado: 172.16.35.123/20
+  
+  PASSO 1: Identificar a máscara
+  /20 = 20 bits de rede, 12 bits de host
+  Máscara: 255.255.240.0
+  (240 = 11110000 → os 4 primeiros bits do 3º octeto são rede)
+  
+  PASSO 2: Tamanho do bloco no 3º octeto
+  256 - 240 = 16
+  Os blocos no 3º octeto são: 0, 16, 32, 48, 64...
+  
+  PASSO 3: Em qual bloco cai o 35?
+  32 ≤ 35 < 48 → cai no bloco 32
+  
+  PASSO 4: Calcular os endereços
+  
+  • Endereço de Rede:       172.16.32.0/20
+    (3º octeto = início do bloco = 32, 4º octeto = 0)
+  
+  • Endereço de Broadcast:  172.16.47.255
+    (próximo bloco - 1 = 48 - 1 = 47 no 3º octeto, 255 no 4º)
+  
+  • Primeiro Host:          172.16.32.1
+  
+  • Último Host:            172.16.47.254
+  
+  • Total de Hosts:         2¹² - 2 = 4.094 hosts
+  
+  VERIFICAÇÃO:
+  Rede em binário:      172.16.  0010|0000.00000000 = 172.16.32.0
+  IP em binário:        172.16.  0010|0011.01111011 = 172.16.35.123
+  Broadcast binário:    172.16.  0010|1111.11111111 = 172.16.47.255
+                              ────┘    └─────────────────────────────
+                        20 bits rede    12 bits host
+</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Criar Sub-redes para Departamentos</h3>
+          <p>
+            <strong>Problema:</strong> Sua empresa recebeu a rede <code>192.168.10.0/24</code> e precisa
+            criar sub-redes para:
+          </p>
+          <ul>
+            <li>Departamento de Vendas: 50 hosts</li>
+            <li>Departamento de TI: 25 hosts</li>
+            <li>Departamento de RH: 10 hosts</li>
+            <li>Link WAN para filial: 2 hosts</li>
+          </ul>
+          <p>Use VLSM para otimizar o uso de endereços. Liste endereço de rede, faixa de hosts e broadcast para cada sub-rede.</p>
+
+          <details>
+            <summary><strong>🔍 Clique para ver a solução passo a passo</strong></summary>
+            <div class="command-card wide">
+              <h4>📝 Resolução do Exercício 2 (VLSM)</h4>
+<pre><code>
+  Rede base: 192.168.10.0/24 (254 hosts disponíveis)
+  
+  PASSO 1: Ordenar do MAIOR para o MENOR requisito
+  1. Vendas: 50 hosts → precisa de /26 (62 hosts, 2⁶-2)
+  2. TI: 25 hosts     → precisa de /27 (30 hosts, 2⁵-2)
+  3. RH: 10 hosts     → precisa de /28 (14 hosts, 2⁴-2)
+  4. WAN: 2 hosts     → precisa de /30 (2 hosts, 2²-2)
+  
+  PASSO 2: Alocar sequencialmente (sempre do maior bloco primeiro)
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  SUB-REDE 1: VENDAS (/26 = 64 endereços)                               │
+  │  Rede:       192.168.10.0/26                                            │
+  │  1º Host:    192.168.10.1                                               │
+  │  Último:     192.168.10.62                                              │
+  │  Broadcast:  192.168.10.63                                              │
+  │  Gateway:    192.168.10.1 (convenção: primeiro IP)                      │
+  │  Capacidade: 62 hosts (50 necessários ✅)                               │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  Próximo bloco disponível: 192.168.10.64
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  SUB-REDE 2: TI (/27 = 32 endereços)                                   │
+  │  Rede:       192.168.10.64/27                                           │
+  │  1º Host:    192.168.10.65                                              │
+  │  Último:     192.168.10.94                                              │
+  │  Broadcast:  192.168.10.95                                              │
+  │  Gateway:    192.168.10.65                                              │
+  │  Capacidade: 30 hosts (25 necessários ✅)                               │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  Próximo bloco disponível: 192.168.10.96
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  SUB-REDE 3: RH (/28 = 16 endereços)                                   │
+  │  Rede:       192.168.10.96/28                                           │
+  │  1º Host:    192.168.10.97                                              │
+  │  Último:     192.168.10.110                                             │
+  │  Broadcast:  192.168.10.111                                             │
+  │  Gateway:    192.168.10.97                                              │
+  │  Capacidade: 14 hosts (10 necessários ✅)                               │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  Próximo bloco disponível: 192.168.10.112
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  SUB-REDE 4: LINK WAN (/30 = 4 endereços)                              │
+  │  Rede:       192.168.10.112/30                                          │
+  │  1º Host:    192.168.10.113 (interface local do roteador)               │
+  │  Último:     192.168.10.114 (interface remota do roteador)              │
+  │  Broadcast:  192.168.10.115                                             │
+  │  Capacidade: 2 hosts (2 necessários ✅)                                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  RESUMO DE USO:
+  • Utilizado: 64 + 32 + 16 + 4 = 116 endereços
+  • Livre: 192.168.10.116 a 192.168.10.255 (140 endereços para expansão!)
+  • Eficiência: muito superior ao uso de /24 para cada departamento
+</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — Subnetting em Contexto Cloud (AWS VPC)</h3>
+          <p>
+            <strong>Problema:</strong> Você está projetando uma VPC na AWS com o CIDR <code>10.0.0.0/16</code>.
+            Precisa criar as seguintes sub-redes distribuídas em 2 Availability Zones:
+          </p>
+          <ul>
+            <li>AZ-1: Sub-rede pública (web servers) — até 250 hosts</li>
+            <li>AZ-1: Sub-rede privada (app servers) — até 250 hosts</li>
+            <li>AZ-1: Sub-rede de banco de dados — até 50 hosts</li>
+            <li>AZ-2: Sub-rede pública (web servers) — até 250 hosts</li>
+            <li>AZ-2: Sub-rede privada (app servers) — até 250 hosts</li>
+            <li>AZ-2: Sub-rede de banco de dados — até 50 hosts</li>
+          </ul>
+          <p>Projete o esquema de endereçamento. Lembre-se que a AWS reserva 5 IPs por sub-rede.</p>
+
+          <details>
+            <summary><strong>🔍 Clique para ver a solução passo a passo</strong></summary>
+            <div class="command-card wide">
+              <h4>📝 Resolução do Exercício 3</h4>
+<pre><code>
+  VPC CIDR: 10.0.0.0/16 (65.536 IPs disponíveis)
+  
+  ⚠️ AWS reserva 5 IPs por sub-rede:
+  • .0 = endereço de rede
+  • .1 = gateway (AWS)
+  • .2 = DNS (AWS)
+  • .3 = reservado para uso futuro (AWS)
+  • .255 = broadcast (em /24)
+  → Hosts REAIS em /24: 256 - 5 = 251 (não 254!)
+  
+  PASSO 1: Escolher máscara adequada
+  • Web/App (250 hosts): /24 → 256 IPs - 5 AWS = 251 utilizáveis ✅
+  • Database (50 hosts): /26 → 64 IPs - 5 AWS = 59 utilizáveis ✅
+    (ou /24 para simplificar e ter espaço de crescimento)
+  
+  PASSO 2: Organizar por AZ com esquema lógico
+  
+  Estratégia: usar 3º octeto para organizar
+  • AZ-1: octetos 1, 2, 3
+  • AZ-2: octetos 11, 12, 13
+  (deixa espaço entre AZs para crescimento)
+  
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │  AVAILABILITY ZONE 1 (us-east-1a)                                        │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │  Pública (web):    10.0.1.0/24  │  IPs: 10.0.1.4 - 10.0.1.254 (251)   │
+  │  Privada (app):    10.0.2.0/24  │  IPs: 10.0.2.4 - 10.0.2.254 (251)   │
+  │  Database:         10.0.3.0/24  │  IPs: 10.0.3.4 - 10.0.3.254 (251)   │
+  └──────────────────────────────────────────────────────────────────────────┘
+  
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │  AVAILABILITY ZONE 2 (us-east-1b)                                        │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │  Pública (web):    10.0.11.0/24 │  IPs: 10.0.11.4 - 10.0.11.254 (251) │
+  │  Privada (app):    10.0.12.0/24 │  IPs: 10.0.12.4 - 10.0.12.254 (251) │
+  │  Database:         10.0.13.0/24 │  IPs: 10.0.13.4 - 10.0.13.254 (251) │
+  └──────────────────────────────────────────────────────────────────────────┘
+  
+  TERRAFORM EQUIVALENTE:
+  
+  locals {
+    vpc_cidr = "10.0.0.0/16"
+    subnets = {
+      public_az1  = "10.0.1.0/24"
+      private_az1 = "10.0.2.0/24"
+      db_az1      = "10.0.3.0/24"
+      public_az2  = "10.0.11.0/24"
+      private_az2 = "10.0.12.0/24"
+      db_az2      = "10.0.13.0/24"
+    }
+  }
+  
+  Total utilizado: 6 × 256 = 1.536 IPs (de 65.536 disponíveis)
+  Restam 63.000+ IPs para expansão (AZ-3, novos serviços, etc.)
+</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — Agregação de Rotas (Supernetting)</h3>
+          <p>
+            <strong>Problema:</strong> Sua empresa possui as seguintes redes atrás do mesmo roteador de borda:
+          </p>
+          <ul>
+            <li>192.168.16.0/24</li>
+            <li>192.168.17.0/24</li>
+            <li>192.168.18.0/24</li>
+            <li>192.168.19.0/24</li>
+            <li>192.168.20.0/24</li>
+            <li>192.168.21.0/24</li>
+            <li>192.168.22.0/24</li>
+            <li>192.168.23.0/24</li>
+          </ul>
+          <p>Encontre uma única rota agregada (supernet) que cubra todas essas redes sem incluir redes adicionais desnecessárias.</p>
+
+          <details>
+            <summary><strong>🔍 Clique para ver a solução passo a passo</strong></summary>
+            <div class="command-card wide">
+              <h4>📝 Resolução do Exercício 4</h4>
+<pre><code>
+  Redes para agregar: 192.168.16.0 a 192.168.23.0 (8 redes /24)
+  
+  PASSO 1: Converter o 3º octeto para binário
+  
+  16 = 0001|0000
+  17 = 0001|0001
+  18 = 0001|0010
+  19 = 0001|0011
+  20 = 0001|0100
+  21 = 0001|0101
+  22 = 0001|0110
+  23 = 0001|0111
+       ─────┘└──┘
+       Iguais  Diferentes
+       (5 bits)(3 bits)
+  
+  PASSO 2: Encontrar os bits em comum
+  Os 5 primeiros bits do 3º octeto são iguais (00010)
+  Os 3 últimos bits variam (000 a 111 = 0 a 7)
+  
+  PASSO 3: Calcular o novo prefixo
+  • Bits fixos: 8 + 8 + 5 = 21 bits de rede
+  • Novo prefixo: /21
+  
+  PASSO 4: Verificar o endereço base
+  • 3º octeto com bits variáveis zerados: 00010|000 = 16
+  • Endereço base: 192.168.16.0
+  
+  RESULTADO:
+  ┌─────────────────────────────────────────────────────────────┐
+  │  Rota agregada: 192.168.16.0/21                             │
+  │                                                             │
+  │  Cobre: 192.168.16.0 a 192.168.23.255 (2.048 IPs)          │
+  │  = exatamente as 8 redes /24 desejadas                      │
+  │                                                             │
+  │  Verificação: 2²¹ padrão contém 8 × /24                    │
+  │  /24 - /21 = 3 bits → 2³ = 8 redes ✅                       │
+  └─────────────────────────────────────────────────────────────┘
+  
+  ANTES (8 rotas):                 DEPOIS (1 rota):
+  192.168.16.0/24 → Router A       192.168.16.0/21 → Router A
+  192.168.17.0/24 → Router A       
+  192.168.18.0/24 → Router A       Economia: 87.5% menos rotas!
+  192.168.19.0/24 → Router A       
+  192.168.20.0/24 → Router A       
+  192.168.21.0/24 → Router A       
+  192.168.22.0/24 → Router A       
+  192.168.23.0/24 → Router A       
+  
+  ⚠️ ATENÇÃO: a agregação só funciona perfeitamente porque:
+  1. As 8 redes são contíguas (16-23, sem buracos)
+  2. Começam em um limite de /21 (16 é múltiplo de 8)
+  3. São exatamente 2ⁿ redes (8 = 2³)
+  
+  Se fossem 192.168.16.0 a 192.168.20.0 (5 redes), NÃO seria
+  possível agregar em uma única rota sem incluir as redes 21-23.
+</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>🎯 Dicas para Praticar Subnetting</h3>
+          <p>
+            Dominar subnetting exige prática repetitiva. Aqui estão estratégias que funcionam:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>⏱️ Pratique Velocidade</h4>
+              <p>
+                No início, use papel e caneta. Com o tempo, tente resolver mentalmente.
+                O objetivo para certificações é resolver em menos de 1 minuto por questão.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>📊 Memorize as Potências de 2</h4>
+              <p>
+                2¹=2, 2²=4, 2³=8, 2⁴=16, 2⁵=32, 2⁶=64, 2⁷=128, 2⁸=256.
+                Saiba de cor: 256, 128, 64, 32, 16, 8, 4, 2 — são os tamanhos de bloco.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🔢 Memorize os Valores de Máscara</h4>
+              <p>
+                Os valores possíveis no último octeto variável da máscara são:
+                0, 128, 192, 224, 240, 248, 252, 254, 255.
+                Correspondem a /24, /25, /26, /27, /28, /29, /30, /31, /32.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🌐 Use no Dia a Dia</h4>
+              <p>
+                Sempre que configurar uma VPC, Security Group ou firewall, faça o cálculo
+                mental do CIDR. Pergunte-se: "quantos hosts cabem?", "qual é o broadcast?".
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CTA — PRÓXIMO MÓDULO                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🌐 Próximo passo</span>
+          <h2>Pronto para Comandos de Diagnóstico?</h2>
+          <p>No Módulo 04 você aprenderá as ferramentas essenciais para diagnosticar problemas de rede: ping, traceroute, nslookup, dig, netstat, ss, tcpdump e Wireshark. Com o conhecimento de IP e sub-redes deste módulo, você estará preparado para interpretar os resultados desses comandos com profundidade.</p>
+        </div>
+        <a href="modulo-04.html" class="button primary">Ir para Módulo 04 →</a>
       </div>
     </section>
   </main>
 
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="footer-brand">
+        <img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" />
+        <p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p>
+      </div>
+      <div class="footer-column">
+        <h2>Cloud</h2>
+        <a href="../aws.html">AWS</a>
+        <a href="../cloud-practitioner.html">Cloud Practitioner</a>
+        <a href="../ai-practitioner.html">AI Practitioner</a>
+        <a href="../developer.html">Developer</a>
+        <a href="../solutions-architect.html">Solutions Architect</a>
+      </div>
+      <div class="footer-column">
+        <h2>DevOps</h2>
+        <a href="../linux.html">Linux</a>
+        <a href="../docker.html">Docker &amp; K8s</a>
+        <a href="../terraform.html">Terraform</a>
+        <a href="../python.html">Python</a>
+        <a href="../redes.html">Redes</a>
+        <a href="../github.html">GitHub</a>
+      </div>
+      <div class="footer-column">
+        <h2>Projeto</h2>
+        <a href="../about.html">Sobre</a>
+        <a href="../contact.html">Contato</a>
+        <a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p>
+    </div>
   </footer>
+
   <script src="../trail-gate.js"></script>
   <script src="../config.js"></script>
   <script src="../app.js"></script>

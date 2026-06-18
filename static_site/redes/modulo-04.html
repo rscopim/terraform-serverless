@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Redes Módulo 04: Comandos de Diagnóstico</title>
+  <title>CloudTrilhas — Redes Módulo 04: Comandos de Diagnóstico de Rede</title>
+  <meta name="description" content="Guia completo sobre comandos de diagnóstico de rede: ping, traceroute, nslookup, dig, netstat, ss, ifconfig, ip, nmap, tcpdump e Wireshark." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,187 +18,2392 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../redes.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-03.html" class="nav-link">← Anterior</a>
         <a href="modulo-05.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- HERO SECTION                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🌐 Redes — Módulo 04</span>
-        <h1>Comandos de Diagnóstico</h1>
-        <p>Ferramentas essenciais para troubleshooting e análise de conectividade em redes.</p>
+        <h1>Comandos de Diagnóstico de Rede</h1>
+        <p>Neste módulo você dominará as ferramentas essenciais para diagnosticar, monitorar e solucionar problemas de rede. Do básico ping até a captura avançada de pacotes com tcpdump e Wireshark, cada comando é uma arma no arsenal do profissional de infraestrutura.</p>
       </div>
     </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PROGRESS TRACK                                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>OSI/TCP</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>IP &amp; Sub-redes</small></a>
+        <a href="modulo-04.html" class="progress-node active"><span>04</span><small>Diagnóstico</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Switches</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Roteamento</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Segurança</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Serviços</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: PING                                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>ping — Testando Conectividade</h2>
+          <p>O comando mais fundamental de diagnóstico de rede. Verifica se um host está alcançável e mede o tempo de resposta usando o protocolo ICMP.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Conectividade e Resolução</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>ping</code><span class="cmd-tag">ICMP</span></div>
-              <p>Testa conectividade usando pacotes ICMP Echo Request/Reply.</p>
-              <pre><code>ping 8.8.8.8              # teste básico
-ping -c 4 google.com      # 4 pacotes (Linux)
-ping -t google.com         # contínuo (Windows)
-ping -s 1472 -M do host   # testa MTU
+          <h3>1.1 — O que é o ping?</h3>
+          <p>
+            O <strong>ping</strong> é uma ferramenta de diagnóstico que utiliza o protocolo
+            <strong>ICMP (Internet Control Message Protocol)</strong> para verificar a conectividade
+            entre dois hosts na rede. Ele funciona enviando pacotes <em>ICMP Echo Request</em> para
+            o destino e aguardando pacotes <em>ICMP Echo Reply</em> como resposta.
+          </p>
+          <p>
+            O nome "ping" vem da analogia com o sonar de submarinos — um pulso é enviado e espera-se
+            o eco de volta. Se o eco retorna, o alvo está lá. Se não retorna, algo está bloqueando
+            a comunicação.
+          </p>
+          <p>
+            O ping opera na <strong>Camada 3 (Rede)</strong> do modelo OSI, o que significa que ele
+            testa a conectividade IP sem se preocupar com portas ou serviços específicos. Um ping
+            bem-sucedido garante que existe rota IP entre origem e destino, mas <strong>não garante</strong>
+            que um serviço específico (como HTTP na porta 80) esteja funcionando.
+          </p>
 
-Interpretação:
-- Reply: conectividade OK
-- Request timed out: host/firewall bloqueando
-- Destination unreachable: rota inexistente
-- TTL expired: muitos saltos</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>traceroute / tracert</code><span class="cmd-tag">Rota</span></div>
-              <p>Mostra o caminho (saltos) até o destino.</p>
-              <pre><code>traceroute google.com       # Linux (UDP)
-tracert google.com          # Windows (ICMP)
-traceroute -I google.com    # Linux com ICMP
-mtr google.com              # traceroute + ping
-
-Cada linha = um roteador no caminho
-* * * = roteador não responde (filtrado)
-Latência alta = possível gargalo</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>nslookup / dig</code><span class="cmd-tag">DNS</span></div>
-              <p>Consulta registros DNS.</p>
-              <pre><code>nslookup google.com
-nslookup -type=MX gmail.com
-nslookup google.com 8.8.8.8  # DNS específico
-
-dig google.com +short
-dig google.com A              # registro A
-dig google.com MX             # registro MX
-dig google.com NS             # nameservers
-dig @8.8.8.8 google.com      # consulta DNS específico
-dig google.com +trace         # resolução completa</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>host / whois</code><span class="cmd-tag">DNS</span></div>
-              <p>Consultas rápidas de DNS e registro de domínio.</p>
-              <pre><code>host google.com
-host -t AAAA google.com    # IPv6
-host 8.8.8.8               # reverso
-
-whois google.com           # info do domínio
-whois 200.160.2.3          # info do IP</code></pre>
-            </div>
+          <div class="info-box highlight">
+            <h4>💡 ICMP — O Protocolo por trás do ping</h4>
+            <p>
+              ICMP (RFC 792) é um protocolo auxiliar do IP usado para enviar mensagens de controle e erro.
+              Além do ping (Echo Request/Reply), o ICMP é responsável por mensagens como "Destination
+              Unreachable", "Time Exceeded" (usado pelo traceroute) e "Redirect". O ICMP não usa portas
+              TCP/UDP — ele opera diretamente sobre o IP.
+            </p>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Conexões e Portas</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>netstat / ss</code><span class="cmd-tag">Essencial</span></div>
-              <p>Exibe conexões de rede, portas em escuta e estatísticas.</p>
-              <pre><code># ss (moderno, substitui netstat)
-ss -tuln                    # portas TCP/UDP em escuta
-ss -tunap                   # com PID e nome do processo
-ss -s                       # estatísticas resumidas
-ss state established        # conexões ativas
-ss -tuln | grep :443        # quem escuta na 443
+          <h3>1.2 — Sintaxe Básica</h3>
+          <div class="command-card wide">
+            <h4>📋 Sintaxe do ping</h4>
+<pre><code># Sintaxe geral
+ping [opções] &lt;destino&gt;
 
-# netstat (legado, ainda útil)
-netstat -tuln               # portas em escuta
-netstat -an                 # todas as conexões
-netstat -rn                 # tabela de rotas
-netstat -i                  # estatísticas de interface</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>nmap</code><span class="cmd-tag">Scanner</span></div>
-              <p>Scanner de portas e descoberta de rede.</p>
-              <pre><code>nmap 192.168.1.1            # scan básico
-nmap -sV 192.168.1.1        # versão dos serviços
-nmap -O 192.168.1.1         # detecção de OS
-nmap -p 80,443 192.168.1.0/24  # portas específicas
-nmap -sn 192.168.1.0/24     # ping sweep (hosts ativos)
-nmap -A 192.168.1.1         # scan agressivo</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>tcpdump</code><span class="cmd-tag">Captura</span></div>
-              <p>Captura e analisa pacotes em tempo real.</p>
-              <pre><code>sudo tcpdump -i eth0              # todo tráfego
-sudo tcpdump -i eth0 port 80      # apenas porta 80
-sudo tcpdump -i eth0 host 10.0.0.1  # host específico
-sudo tcpdump -i eth0 -c 100       # 100 pacotes
-sudo tcpdump -i eth0 -w captura.pcap  # salva arquivo
-sudo tcpdump -r captura.pcap      # lê arquivo
-
-# Filtros combinados
-sudo tcpdump -i eth0 'tcp port 443 and host 10.0.0.5'</code></pre>
-            </div>
+# Exemplos básicos
+ping google.com              # Ping por hostname (resolve DNS primeiro)
+ping 8.8.8.8                 # Ping por IP (sem resolução DNS)
+ping 192.168.1.1             # Ping no gateway local
+ping localhost               # Ping em si mesmo (127.0.0.1)
+ping ::1                     # Ping IPv6 loopback</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Configuração de Interface</h3>
+          <h3>1.3 — Interpretando a Saída do ping</h3>
+          <div class="command-card wide">
+            <h4>📋 Saída típica do ping (Linux)</h4>
+<pre><code>$ ping -c 5 google.com
+PING google.com (142.250.79.46) 56(84) bytes of data.
+64 bytes from gru14s29-in-f14.1e100.net (142.250.79.46): icmp_seq=1 ttl=117 time=8.42 ms
+64 bytes from gru14s29-in-f14.1e100.net (142.250.79.46): icmp_seq=2 ttl=117 time=7.89 ms
+64 bytes from gru14s29-in-f14.1e100.net (142.250.79.46): icmp_seq=3 ttl=117 time=8.15 ms
+64 bytes from gru14s29-in-f14.1e100.net (142.250.79.46): icmp_seq=4 ttl=117 time=9.01 ms
+64 bytes from gru14s29-in-f14.1e100.net (142.250.79.46): icmp_seq=5 ttl=117 time=8.33 ms
+
+--- google.com ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+rtt min/avg/max/mdev = 7.890/8.360/9.010/0.361 ms</code></pre>
+          </div>
+
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>ip (iproute2)</code><span class="cmd-tag">Linux</span></div>
-              <pre><code># Interfaces
-ip addr show                      # listar interfaces e IPs
-ip link show                      # status das interfaces
-ip link set eth0 up               # ativar interface
-ip link set eth0 down             # desativar interface
-
-# Endereços
-ip addr add 192.168.1.10/24 dev eth0    # adicionar IP
-ip addr del 192.168.1.10/24 dev eth0    # remover IP
-
-# Rotas
-ip route show                     # tabela de rotas
-ip route add 10.0.0.0/8 via 192.168.1.1  # adicionar rota
-ip route add default via 192.168.1.1      # default gateway
-ip route del 10.0.0.0/8 via 192.168.1.1  # remover rota
-
-# ARP / Vizinhos
-ip neigh show                     # tabela ARP</code></pre>
+            <div class="command-card">
+              <h4>📊 Campos da Resposta</h4>
+              <p><strong>64 bytes:</strong> Tamanho do pacote de resposta (56 bytes payload + 8 bytes cabeçalho ICMP)</p>
+              <p><strong>from:</strong> Hostname e IP do respondente (confirmação de quem respondeu)</p>
+              <p><strong>icmp_seq:</strong> Número de sequência do pacote (permite detectar pacotes fora de ordem ou perdidos)</p>
+              <p><strong>ttl (Time To Live):</strong> Número de saltos restantes antes do pacote ser descartado</p>
+              <p><strong>time:</strong> RTT (Round Trip Time) — tempo de ida e volta em milissegundos</p>
             </div>
+            <div class="command-card">
+              <h4>📊 Estatísticas Finais</h4>
+              <p><strong>packets transmitted:</strong> Quantos pacotes foram enviados</p>
+              <p><strong>received:</strong> Quantos retornaram (diferença = perda)</p>
+              <p><strong>packet loss:</strong> Percentual de perda (0% = perfeito)</p>
+              <p><strong>time:</strong> Tempo total da operação</p>
+              <p><strong>rtt min/avg/max/mdev:</strong> Estatísticas de latência — mínimo, média, máximo e desvio padrão</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🔍 Interpretando o TTL</h4>
+<pre><code># TTL indica quantos roteadores o pacote pode atravessar antes de ser descartado
+# O TTL inicial depende do SO do destino:
+
+TTL 64  → Geralmente Linux/Unix (128 - roteadores atravessados ≈ 64)
+TTL 128 → Geralmente Windows
+TTL 255 → Geralmente equipamentos de rede (Cisco, etc.)
+
+# Exemplo: Se recebemos TTL=117 de um host Windows (TTL inicial=128):
+# 128 - 117 = 11 roteadores entre nós e o destino
+
+# Exemplo: Se recebemos TTL=52 de um host Linux (TTL inicial=64):
+# 64 - 52 = 12 roteadores entre nós e o destino</code></pre>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>1.4 — Flags Comuns do ping</h3>
+          <div class="command-card wide">
+            <h4>📋 Flags mais utilizadas</h4>
+<pre><code># -c (count) — Define número de pacotes a enviar (Linux/Mac)
+ping -c 4 google.com          # Envia exatamente 4 pacotes e para
+
+# -t (Windows) — Ping contínuo até Ctrl+C
+ping -t google.com             # Windows: ping infinito
+
+# -n (Windows) — Define número de pacotes
+ping -n 10 google.com          # Windows: envia 10 pacotes
+
+# -i (interval) — Intervalo entre pacotes em segundos (Linux)
+ping -i 0.2 google.com         # Envia a cada 200ms (requer root para &lt;0.2)
+ping -i 5 google.com           # Envia a cada 5 segundos (monitoramento)
+
+# -s (size) — Tamanho do payload ICMP em bytes
+ping -s 1472 google.com        # Testa MTU (1472 + 28 bytes cabeçalho = 1500 MTU)
+ping -s 65507 google.com       # Payload máximo (antigo "ping of death")
+
+# -W / -w (timeout) — Tempo máximo de espera por resposta
+ping -W 2 192.168.1.100        # Linux: espera max 2 segundos por resposta
+ping -w 5 192.168.1.100        # Linux: tempo total máximo de execução
+
+# -f (flood) — Envia pacotes na velocidade máxima (requer root)
+sudo ping -f -c 1000 192.168.1.1  # Stress test local (CUIDADO!)
+
+# -I (interface) — Especifica interface de saída
+ping -I eth0 8.8.8.8           # Força saída pela interface eth0
+
+# -4 / -6 — Força IPv4 ou IPv6
+ping -4 google.com             # Força resolução/ping IPv4
+ping -6 google.com             # Força resolução/ping IPv6
+
+# -D — Mostra timestamp em cada linha (Linux)
+ping -D google.com             # Útil para correlacionar com logs
+
+# -q — Modo quiet (só mostra estatísticas finais)
+ping -q -c 100 google.com     # Útil em scripts</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 — Troubleshooting com ping</h3>
+          <p>
+            O ping é a primeira ferramenta a ser utilizada quando há suspeita de problemas de conectividade.
+            A técnica recomendada é testar de dentro para fora (do mais próximo ao mais distante):
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔧 Metodologia de Diagnóstico com ping</h4>
+<pre><code># PASSO 1: Testar a interface local (loopback)
+ping -c 2 127.0.0.1
+# Se falhar: Stack TCP/IP do SO está com problema
+
+# PASSO 2: Testar o gateway padrão (roteador local)
+ping -c 2 192.168.1.1
+# Se falhar: Problema na rede local (cabo, Wi-Fi, switch)
+
+# PASSO 3: Testar um IP externo conhecido
+ping -c 2 8.8.8.8
+# Se falhar: Problema no link de Internet ou roteamento
+
+# PASSO 4: Testar resolução DNS
+ping -c 2 google.com
+# Se IP funciona mas hostname falha: Problema de DNS
+
+# PASSO 5: Testar o destino final específico
+ping -c 5 meu-servidor.empresa.com
+# Se falhar: Problema específico com o destino</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>⚠️ Cenários Comuns de Falha</h4>
+<pre><code># Cenário 1: Destination Host Unreachable
+$ ping 192.168.1.200
+From 192.168.1.1 icmp_seq=1 Destination Host Unreachable
+# Significado: O roteador não encontrou o host na rede local (ARP falhou)
+# Causa provável: Host desligado ou IP errado na mesma subnet
+
+# Cenário 2: Request Timed Out (sem resposta)
+$ ping 10.0.5.100
+--- 10.0.5.100 ping statistics ---
+5 packets transmitted, 0 received, 100% packet loss
+# Significado: Pacotes enviados mas nenhuma resposta recebida
+# Causas: Firewall bloqueando ICMP, host fora do ar, rota inexistente
+
+# Cenário 3: Packet loss intermitente
+$ ping -c 20 servidor.empresa.com
+20 packets transmitted, 16 received, 20% packet loss
+# Significado: Conexão instável — alguns pacotes se perdem
+# Causas: Link congestionado, cabo danificado, interferência Wi-Fi
+
+# Cenário 4: Latência alta/variável
+64 bytes from server: icmp_seq=1 ttl=64 time=1.2 ms
+64 bytes from server: icmp_seq=2 ttl=64 time=245.8 ms
+64 bytes from server: icmp_seq=3 ttl=64 time=2.1 ms
+64 bytes from server: icmp_seq=4 ttl=64 time=189.3 ms
+# Significado: Jitter alto — latência variando muito
+# Causas: Congestionamento, QoS inadequado, link saturado
+
+# Cenário 5: TTL Exceeded
+$ ping 172.16.0.50
+From 10.0.0.1 icmp_seq=1 Time to live exceeded
+# Significado: Loop de roteamento — pacote ficou circulando
+# Causa: Configuração errada de rotas (routing loop)</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Limitações do ping</h4>
+            <p>
+              Muitos firewalls e servidores bloqueiam ICMP por política de segurança. Um ping que falha
+              <strong>não significa necessariamente</strong> que o host está fora do ar — pode significar
+              apenas que ICMP está bloqueado. Exemplo clássico: o Windows Firewall por padrão bloqueia
+              ping de entrada. Servidores corporativos frequentemente desabilitam resposta a ICMP.
+              Sempre combine ping com outras ferramentas (telnet, curl, nmap) para confirmar.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: TRACEROUTE / TRACERT                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>traceroute / tracert — Mapeando o Caminho</h2>
+          <p>Descubra exatamente por quais roteadores seus pacotes passam até chegar ao destino, identificando gargalos e pontos de falha no caminho.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — Como o traceroute Funciona</h3>
+          <p>
+            O <strong>traceroute</strong> (Linux/Mac) ou <strong>tracert</strong> (Windows) é uma ferramenta
+            que revela o caminho completo que um pacote percorre da origem até o destino, mostrando cada
+            roteador (hop) intermediário e o tempo de resposta em cada salto.
+          </p>
+          <p>
+            O funcionamento é engenhoso: ele explora o campo <strong>TTL (Time To Live)</strong> do cabeçalho IP.
+            Cada roteador que processa um pacote decrementa o TTL em 1. Quando o TTL chega a 0, o roteador
+            descarta o pacote e envia uma mensagem <strong>ICMP Time Exceeded</strong> de volta à origem,
+            revelando sua identidade (IP).
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔧 Mecanismo do traceroute — Passo a Passo</h4>
+<pre><code># O traceroute envia pacotes com TTL incrementalmente crescente:
+
+Pacote 1: TTL=1
+  → Chega ao 1° roteador → TTL decrementado para 0
+  → Roteador 1 descarta e envia "ICMP Time Exceeded" → Revelado!
+
+Pacote 2: TTL=2
+  → Passa pelo 1° roteador (TTL=1) → Chega ao 2° roteador → TTL=0
+  → Roteador 2 descarta e envia "ICMP Time Exceeded" → Revelado!
+
+Pacote 3: TTL=3
+  → Passa pelo 1° (TTL=2) → 2° (TTL=1) → Chega ao 3° → TTL=0
+  → Roteador 3 descarta e envia "ICMP Time Exceeded" → Revelado!
+
+  ... continua até o destino final responder ...
+
+Pacote N: TTL=N (suficiente para alcançar o destino)
+  → Destino recebe o pacote e responde normalmente
+  → Traceroute completo!
+
+# Diagrama:
+Origem ──[TTL=1]──▶ R1 ──✗ (Time Exceeded → revela R1)
+Origem ──[TTL=2]──▶ R1 ──▶ R2 ──✗ (Time Exceeded → revela R2)
+Origem ──[TTL=3]──▶ R1 ──▶ R2 ──▶ R3 ──✗ (Time Exceeded → revela R3)
+Origem ──[TTL=4]──▶ R1 ──▶ R2 ──▶ R3 ──▶ Destino ✓ (ICMP Echo Reply)</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Diferenças entre Implementações</h4>
+            <p>
+              <strong>Linux traceroute:</strong> Por padrão usa pacotes UDP em portas altas (33434+).
+              Pode ser configurado para usar ICMP (-I) ou TCP (-T).<br>
+              <strong>Windows tracert:</strong> Usa ICMP Echo Request (como o ping).<br>
+              <strong>Implicação:</strong> Se um firewall bloqueia UDP mas permite ICMP, o traceroute
+              do Linux pode falhar enquanto o tracert do Windows funciona. Use <code>traceroute -I</code>
+              no Linux para comportamento similar ao Windows.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Lendo a Saída do traceroute</h3>
+          <div class="command-card wide">
+            <h4>📋 Saída típica do traceroute (Linux)</h4>
+<pre><code>$ traceroute google.com
+traceroute to google.com (142.250.79.46), 30 hops max, 60 byte packets
+ 1  gateway (192.168.1.1)  1.234 ms  0.987 ms  1.102 ms
+ 2  10.0.0.1 (10.0.0.1)  5.432 ms  5.218 ms  5.567 ms
+ 3  bd-gw-01.spo.operadora.net (200.100.50.1)  8.901 ms  8.765 ms  9.012 ms
+ 4  core-gw-01.spo.operadora.net (200.100.51.2)  10.234 ms  10.456 ms  10.123 ms
+ 5  peer-gw-google.spo.operadora.net (200.100.52.5)  9.876 ms  9.654 ms  10.012 ms
+ 6  108.170.245.161 (108.170.245.161)  10.567 ms  10.234 ms  10.890 ms
+ 7  142.251.49.133 (142.251.49.133)  9.345 ms  9.123 ms  9.567 ms
+ 8  gru14s29-in-f14.1e100.net (142.250.79.46)  8.901 ms  8.678 ms  8.456 ms</code></pre>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📊 Interpretando Cada Coluna</h4>
+              <p><strong>Coluna 1 (número):</strong> Número do hop (salto) — distância em roteadores da origem</p>
+              <p><strong>Coluna 2 (hostname/IP):</strong> Identidade do roteador naquele hop</p>
+              <p><strong>Colunas 3-5 (tempo):</strong> Latência de 3 probes enviados para aquele hop (em ms)</p>
+              <p><strong>* (asterisco):</strong> O probe não recebeu resposta (timeout)</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 O que Observar</h4>
+              <p><strong>Salto grande de latência:</strong> Indica gargalo ou link lento entre dois hops</p>
+              <p><strong>Latência consistente alta:</strong> Se continua alta em todos os hops seguintes, o gargalo é naquele ponto</p>
+              <p><strong>Variação entre probes:</strong> Indica congestionamento ou roteamento assimétrico</p>
+              <p><strong>Mudança de hostname:</strong> Indica transição entre redes/operadoras</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🔍 Cenários Especiais na Saída</h4>
+<pre><code># Cenário 1: Asteriscos (*) — Hop não responde
+ 4  core-router.isp.net (200.100.51.2)  10.234 ms  10.456 ms  10.123 ms
+ 5  * * *
+ 6  edge-router.google.com (108.170.245.161)  11.567 ms  11.234 ms  11.890 ms
+# Significado: O roteador no hop 5 não responde a ICMP mas encaminha tráfego
+#              normalmente. Isso é COMUM e geralmente NÃO indica problema.
+
+# Cenário 2: Todos asteriscos até o fim
+ 7  * * *
+ 8  * * *
+ 9  * * *
+ ...
+30  * * *
+# Significado: Firewall bloqueando completamente após hop 6
+#              OU destino inalcançável
+
+# Cenário 3: Aumento repentino de latência
+ 3  router-sp.isp.net (200.10.1.1)    10 ms   9 ms   11 ms
+ 4  router-ny.isp.net (200.10.2.1)   150 ms  148 ms  152 ms   ← SALTO!
+ 5  router-lon.isp.net (200.10.3.1)  155 ms  153 ms  157 ms
+# Significado: Link entre hop 3 (SP) e hop 4 (NY) é intercontinental
+#              Latência alta é ESPERADA (velocidade da luz no cabo submarino)
+
+# Cenário 4: Loop de roteamento detectado
+ 5  router-a.net (10.0.1.1)  15 ms  14 ms  16 ms
+ 6  router-b.net (10.0.2.1)  18 ms  17 ms  19 ms
+ 7  router-a.net (10.0.1.1)  21 ms  20 ms  22 ms   ← VOLTOU!
+ 8  router-b.net (10.0.2.1)  24 ms  23 ms  25 ms   ← LOOP!
+# Significado: Problema grave de roteamento — pacotes circulando</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Flags e Variações do traceroute</h3>
+          <div class="command-card wide">
+            <h4>📋 Opções comuns do traceroute</h4>
+<pre><code># Linux — traceroute
+traceroute google.com              # Padrão: UDP probes
+traceroute -I google.com           # Usar ICMP (como tracert do Windows)
+traceroute -T google.com           # Usar TCP SYN (atravessa mais firewalls)
+traceroute -T -p 443 google.com   # TCP na porta 443 (HTTPS)
+traceroute -n google.com           # Não resolver DNS (mais rápido)
+traceroute -m 20 google.com       # Máximo de 20 hops (padrão: 30)
+traceroute -w 3 google.com        # Timeout de 3 segundos por probe
+traceroute -q 1 google.com        # Apenas 1 probe por hop (mais rápido)
+
+# Windows — tracert
+tracert google.com                 # Padrão: ICMP
+tracert -d google.com              # Não resolver DNS
+tracert -h 20 google.com          # Máximo de 20 hops
+tracert -w 2000 google.com        # Timeout de 2000ms por probe
+
+# mtr — Ferramenta moderna que combina ping + traceroute
+mtr google.com                     # Interface interativa em tempo real
+mtr -r -c 100 google.com         # Relatório após 100 ciclos
+mtr --tcp -P 443 google.com      # Usar TCP porta 443
+mtr -n google.com                  # Sem resolução DNS</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🔧 mtr — O Melhor dos Dois Mundos</h4>
+<pre><code>$ mtr -r -c 10 google.com
+Start: 2024-01-15T14:30:00-0300
+HOST: minha-maquina              Loss%   Snt   Last   Avg  Best  Wrst StDev
+  1.|-- gateway                   0.0%    10    1.2   1.1   0.8   1.5   0.2
+  2.|-- 10.0.0.1                  0.0%    10    5.4   5.3   4.9   5.8   0.3
+  3.|-- core-sp.isp.net           0.0%    10    9.1   9.0   8.5   9.8   0.4
+  4.|-- peer-google.isp.net       0.0%    10   10.2  10.1   9.6  10.8   0.3
+  5.|-- 108.170.245.161          10.0%    10   10.5  11.2   9.8  15.3   1.8
+  6.|-- 142.251.49.133            0.0%    10    9.8   9.7   9.2  10.4   0.4
+  7.|-- gru14s29-in-f14.1e100    0.0%    10    8.9   8.8   8.3   9.5   0.3
+
+# Colunas do mtr:
+# Loss% — Percentual de perda naquele hop (10% no hop 5 = problema!)
+# Snt   — Pacotes enviados
+# Last  — Latência do último pacote
+# Avg   — Latência média
+# Best  — Menor latência observada
+# Wrst  — Maior latência observada
+# StDev — Desvio padrão (variação/jitter)</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Cuidado ao Interpretar Perda em Hops Intermediários</h4>
+            <p>
+              Muitos roteadores dão <strong>baixa prioridade</strong> para responder ICMP Time Exceeded
+              (rate limiting). Isso pode mostrar "perda" em um hop intermediário que na verdade está
+              funcionando perfeitamente. A regra de ouro: <strong>se a perda não continua nos hops
+              seguintes, provavelmente é rate limiting e não perda real</strong>. Só considere um
+              problema real se a perda persistir em todos os hops subsequentes.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — Encontrando Gargalos</h3>
+          <p>
+            O traceroute é essencial para identificar <strong>onde</strong> um problema de rede está
+            ocorrendo. Aqui estão as técnicas para encontrar gargalos:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🎯 Sinais de Gargalo</h4>
+              <p><strong>1.</strong> Salto de latência que persiste — aumento de 10ms para 150ms que continua alto em todos os hops seguintes</p>
+              <p><strong>2.</strong> Perda de pacotes que persiste — se hop 5 tem 20% de perda E hops 6-8 também, o problema é no hop 5</p>
+              <p><strong>3.</strong> Jitter alto (StDev grande) — indica congestionamento/saturação naquele link</p>
+              <p><strong>4.</strong> Timeouts completos a partir de um ponto — indica bloqueio ou falha</p>
+            </div>
+            <div class="command-card">
+              <h4>🎯 Falsos Positivos</h4>
+              <p><strong>1.</strong> Perda em um hop que não se repete depois — rate limiting, ignorar</p>
+              <p><strong>2.</strong> Latência alta em um hop mas baixa no seguinte — roteador lento para responder ICMP, não é gargalo real</p>
+              <p><strong>3.</strong> Asteriscos isolados — roteador configurado para não responder, tráfego passa normalmente</p>
+              <p><strong>4.</strong> Salto geográfico (SP→NY) — latência é física, não é "problema"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: NSLOOKUP / DIG                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>nslookup / dig — Consultas DNS</h2>
+          <p>Ferramentas para consultar o Sistema de Nomes de Domínio (DNS), resolver hostnames para IPs e diagnosticar problemas de resolução de nomes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — O que são nslookup e dig?</h3>
+          <p>
+            O <strong>DNS (Domain Name System)</strong> é o "catálogo telefônico" da Internet — traduz
+            nomes legíveis (como google.com) para endereços IP (como 142.250.79.46). Quando a resolução
+            DNS falha, nenhum serviço baseado em nome funciona, mesmo que a rede IP esteja perfeita.
+          </p>
+          <p>
+            <strong>nslookup</strong> (Name Server Lookup) é uma ferramenta disponível em todos os SOs
+            (Windows, Linux, Mac). É mais simples e interativa, ideal para consultas rápidas.
+          </p>
+          <p>
+            <strong>dig</strong> (Domain Information Groper) é a ferramenta preferida por profissionais
+            em ambientes Linux/Unix. Oferece saída mais detalhada e completa, com informações sobre
+            autoridade, tempo de resposta, e flags do protocolo DNS.
+          </p>
+
+          <div class="info-box highlight">
+            <h4>💡 nslookup vs dig — Qual Usar?</h4>
+            <p>
+              <strong>nslookup:</strong> Use para consultas rápidas e simples, especialmente em Windows.
+              Está sendo gradualmente substituído pelo dig em ambientes profissionais.<br>
+              <strong>dig:</strong> Use para diagnósticos detalhados, scripts de automação e quando precisa
+              de informações completas sobre a resposta DNS (flags, seções authority/additional, TTL dos registros).
+              É a ferramenta padrão para administradores DNS.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — nslookup — Consultas Básicas</h3>
+          <div class="command-card wide">
+            <h4>📋 Usando o nslookup</h4>
+<pre><code># Consulta simples (registro A — hostname → IPv4)
+$ nslookup google.com
+Server:     192.168.1.1
+Address:    192.168.1.1#53
+
+Non-authoritative answer:
+Name:   google.com
+Address: 142.250.79.46
+
+# Consulta em servidor DNS específico
+$ nslookup google.com 8.8.8.8
+Server:     8.8.8.8
+Address:    8.8.8.8#53
+
+Non-authoritative answer:
+Name:   google.com
+Address: 142.250.79.46
+
+# Consulta de registro MX (servidores de e-mail)
+$ nslookup -type=MX gmail.com
+Server:     192.168.1.1
+Address:    192.168.1.1#53
+
+Non-authoritative answer:
+gmail.com   mail exchanger = 5 gmail-smtp-in.l.google.com.
+gmail.com   mail exchanger = 10 alt1.gmail-smtp-in.l.google.com.
+gmail.com   mail exchanger = 20 alt2.gmail-smtp-in.l.google.com.
+gmail.com   mail exchanger = 30 alt3.gmail-smtp-in.l.google.com.
+gmail.com   mail exchanger = 40 alt4.gmail-smtp-in.l.google.com.
+
+# Consulta de registro NS (servidores autoritativos)
+$ nslookup -type=NS amazon.com
+Server:     192.168.1.1
+Address:    192.168.1.1#53
+
+Non-authoritative answer:
+amazon.com  nameserver = pdns1.ultradns.net.
+amazon.com  nameserver = pdns6.ultradns.co.uk.
+amazon.com  nameserver = ns1.p31.dynect.net.
+amazon.com  nameserver = ns3.p31.dynect.net.
+
+# Consulta reversa (IP → hostname — registro PTR)
+$ nslookup 8.8.8.8
+Server:     192.168.1.1
+Address:    192.168.1.1#53
+
+Non-authoritative answer:
+8.8.8.8.in-addr.arpa    name = dns.google.
+
+# Consulta de registro CNAME (alias)
+$ nslookup -type=CNAME www.github.com
+www.github.com  canonical name = github.com.</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — dig — Consultas Avançadas</h3>
+          <div class="command-card wide">
+            <h4>📋 Consultas com dig</h4>
+<pre><code># Consulta básica (registro A)
+$ dig google.com
+
+; &lt;&lt;&gt;&gt; DiG 9.18.18 &lt;&lt;&gt;&gt; google.com
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 45321
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;google.com.                    IN      A
+
+;; ANSWER SECTION:
+google.com.             241     IN      A       142.250.79.46
+
+;; Query time: 8 msec
+;; SERVER: 192.168.1.1#53(192.168.1.1) (UDP)
+;; WHEN: Mon Jan 15 14:30:00 -03 2024
+;; MSG SIZE  rcvd: 55
+
+# dig +short — Saída resumida (ótimo para scripts)
+$ dig +short google.com
+142.250.79.46
+
+$ dig +short MX gmail.com
+5 gmail-smtp-in.l.google.com.
+10 alt1.gmail-smtp-in.l.google.com.
+20 alt2.gmail-smtp-in.l.google.com.
+
+# Consultar servidor DNS específico
+$ dig @8.8.8.8 google.com
+$ dig @1.1.1.1 google.com       # Cloudflare DNS
+$ dig @208.67.222.222 google.com # OpenDNS
+
+# Consultar diferentes tipos de registros
+$ dig google.com A         # IPv4 (padrão)
+$ dig google.com AAAA      # IPv6
+$ dig google.com MX        # Mail Exchange
+$ dig google.com NS        # Name Servers
+$ dig google.com TXT       # Text records (SPF, DKIM, etc.)
+$ dig google.com SOA       # Start of Authority
+$ dig google.com CNAME     # Canonical Name (alias)
+$ dig google.com ANY       # Todos os registros (nem sempre funciona)
+
+# Consulta reversa (PTR)
+$ dig -x 8.8.8.8
+;; ANSWER SECTION:
+8.8.8.8.in-addr.arpa.  7103    IN      PTR     dns.google.
+
+# Trace — Mostra toda a cadeia de resolução DNS
+$ dig +trace google.com
+; &lt;&lt;&gt;&gt; DiG 9.18.18 &lt;&lt;&gt;&gt; +trace google.com
+.                       86400   IN      NS      a.root-servers.net.
+google.com.             172800  IN      NS      ns1.google.com.
+google.com.             300     IN      A       142.250.79.46
+
+# +noall +answer — Apenas a seção de resposta
+$ dig +noall +answer google.com
+google.com.             300     IN      A       142.250.79.46
+
+# Verificar propagação DNS (consultar múltiplos servidores)
+$ dig +short @8.8.8.8 meusite.com.br
+$ dig +short @1.1.1.1 meusite.com.br
+$ dig +short @208.67.222.222 meusite.com.br</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Tipos de Registros DNS</h3>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Registro</th>
+                <th>Significado</th>
+                <th>Exemplo</th>
+                <th>Uso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>A</strong></td>
+                <td>Address (IPv4)</td>
+                <td>google.com → 142.250.79.46</td>
+                <td>Mapeamento principal hostname→IP</td>
+              </tr>
+              <tr>
+                <td><strong>AAAA</strong></td>
+                <td>Address (IPv6)</td>
+                <td>google.com → 2800:3f0:4001:829::200e</td>
+                <td>Mapeamento hostname→IPv6</td>
+              </tr>
+              <tr>
+                <td><strong>CNAME</strong></td>
+                <td>Canonical Name (alias)</td>
+                <td>www.example.com → example.com</td>
+                <td>Apontar subdomínio para outro domínio</td>
+              </tr>
+              <tr>
+                <td><strong>MX</strong></td>
+                <td>Mail Exchange</td>
+                <td>gmail.com → gmail-smtp-in.l.google.com (prioridade 5)</td>
+                <td>Servidores de e-mail do domínio</td>
+              </tr>
+              <tr>
+                <td><strong>NS</strong></td>
+                <td>Name Server</td>
+                <td>google.com → ns1.google.com</td>
+                <td>Servidores DNS autoritativos</td>
+              </tr>
+              <tr>
+                <td><strong>PTR</strong></td>
+                <td>Pointer (reverso)</td>
+                <td>8.8.8.8 → dns.google</td>
+                <td>IP→hostname (DNS reverso)</td>
+              </tr>
+              <tr>
+                <td><strong>TXT</strong></td>
+                <td>Text Record</td>
+                <td>SPF, DKIM, verificação de domínio</td>
+                <td>Validação e metadados do domínio</td>
+              </tr>
+              <tr>
+                <td><strong>SOA</strong></td>
+                <td>Start of Authority</td>
+                <td>Serial, refresh, retry, expire</td>
+                <td>Informações de administração da zona</td>
+              </tr>
+              <tr>
+                <td><strong>SRV</strong></td>
+                <td>Service Locator</td>
+                <td>_sip._tcp.example.com → sipserver.example.com:5060</td>
+                <td>Descoberta de serviços (ex: AD, SIP)</td>
+              </tr>
+              <tr>
+                <td><strong>CAA</strong></td>
+                <td>Certification Authority Authorization</td>
+                <td>example.com → letsencrypt.org</td>
+                <td>Controla quais CAs podem emitir certificados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 — Troubleshooting DNS</h3>
+          <div class="command-card wide">
+            <h4>🔧 Diagnóstico de Problemas DNS</h4>
+<pre><code># Problema: "Site não abre" — Primeiro verificar se é DNS
+$ ping meusite.com.br
+ping: meusite.com.br: Name or service not known
+# ↑ DNS não resolveu! Vamos investigar:
+
+# 1. Verificar se o DNS configurado está respondendo
+$ dig @192.168.1.1 google.com +short
+142.250.79.46
+# ✓ DNS local funciona para outros domínios
+
+# 2. Consultar o domínio problemático
+$ dig meusite.com.br
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN
+# ↑ NXDOMAIN = domínio não existe (expirou? erro de digitação?)
+
+# 3. Testar com DNS público (eliminar problema no DNS local)
+$ dig @8.8.8.8 meusite.com.br
+# Se funciona no 8.8.8.8 mas não no local: problema no DNS local/cache
+
+# 4. Verificar propagação (domínio recém-criado/alterado)
+$ dig +short @8.8.8.8 novo-site.com.br
+$ dig +short @1.1.1.1 novo-site.com.br
+# Se resultados diferentes: propagação DNS ainda em andamento (até 48h)
+
+# 5. Verificar TTL restante de um registro
+$ dig google.com | grep -A1 "ANSWER SECTION"
+google.com.             241     IN      A       142.250.79.46
+#                       ↑ TTL=241 segundos até o cache expirar
+
+# 6. Flush do cache DNS local
+# Windows:
+ipconfig /flushdns
+
+# Linux (systemd-resolved):
+sudo systemd-resolve --flush-caches
+
+# macOS:
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ "Non-authoritative answer" — O que significa?</h4>
+            <p>
+              Quando você vê "Non-authoritative answer" no nslookup (ou sem flag <code>aa</code> no dig),
+              significa que a resposta veio de um <strong>cache DNS</strong> e não diretamente do servidor
+              autoritativo do domínio. Isso é <strong>normal e esperado</strong> — o sistema DNS depende
+              de cache para funcionar em escala. Uma resposta "authoritative" viria diretamente do NS
+              do domínio (ex: ns1.google.com para google.com).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: NETSTAT / SS                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>netstat / ss — Conexões e Portas</h2>
+          <p>Ferramentas para listar conexões de rede ativas, portas em escuta e identificar quais processos estão usando cada porta. Essenciais para segurança e troubleshooting de serviços.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — netstat vs ss</h3>
+          <p>
+            O <strong>netstat</strong> (Network Statistics) é a ferramenta clássica presente em todos os
+            sistemas operacionais há décadas. Mostra conexões de rede, tabelas de roteamento, estatísticas
+            de interface e muito mais.
+          </p>
+          <p>
+            O <strong>ss</strong> (Socket Statistics) é o substituto moderno do netstat em sistemas Linux.
+            É significativamente mais rápido (especialmente em servidores com milhares de conexões) e
+            fornece informações mais detalhadas sobre o estado dos sockets. Em distribuições Linux modernas,
+            o ss é preferido — o netstat faz parte do pacote <code>net-tools</code> que está sendo
+            descontinuado.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📊 netstat — Vantagens</h4>
+              <p>• Disponível em todos os SOs (Windows, Linux, Mac)</p>
+              <p>• Interface familiar e bem documentada</p>
+              <p>• Flags similares entre plataformas</p>
+              <p>• Mostra rotas e estatísticas de interface</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 ss — Vantagens</h4>
+              <p>• Muito mais rápido (usa netlink ao invés de /proc)</p>
+              <p>• Mostra mais informações (timers, memória, etc.)</p>
+              <p>• Filtros avançados embutidos</p>
+              <p>• Ativamente mantido (netstat está depreciado)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — Estados de Conexão TCP</h3>
+          <p>
+            Para interpretar a saída do netstat/ss, é essencial entender os <strong>estados TCP</strong>:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📋 Estados TCP e seus Significados</h4>
+<pre><code># Estados TCP principais que você verá no netstat/ss:
+
+LISTEN        → Porta aberta aguardando conexões (servidor pronto)
+ESTABLISHED   → Conexão ativa e transmitindo dados
+SYN_SENT      → Cliente enviou SYN, aguardando SYN-ACK (tentando conectar)
+SYN_RECV      → Servidor recebeu SYN, enviou SYN-ACK, aguardando ACK final
+TIME_WAIT     → Conexão fechada, aguardando pacotes retardatários (normal!)
+CLOSE_WAIT    → Lado remoto fechou, aguardando aplicação local fechar
+FIN_WAIT1     → Aplicação local iniciou fechamento, enviou FIN
+FIN_WAIT2     → Recebeu ACK do FIN, aguardando FIN do remoto
+CLOSING       → Ambos os lados enviaram FIN simultaneamente
+LAST_ACK      → Aguardando ACK final antes de liberar o socket
+
+# Diagrama simplificado do ciclo de vida TCP:
+#
+# Cliente                          Servidor
+#    │                                │
+#    │──── SYN ────────────────▶│     │  (SYN_SENT)
+#    │                          │     │  (SYN_RECV)
+#    │◀─── SYN-ACK ────────────│     │
+#    │                                │
+#    │──── ACK ────────────────▶│     │  (ESTABLISHED)
+#    │                                │
+#    │◀════ Dados ════════════▶│     │  (ESTABLISHED)
+#    │                                │
+#    │──── FIN ────────────────▶│     │  (FIN_WAIT1 → FIN_WAIT2)
+#    │◀─── ACK ────────────────│     │  (CLOSE_WAIT)
+#    │◀─── FIN ────────────────│     │  (LAST_ACK)
+#    │──── ACK ────────────────▶│     │  (TIME_WAIT → CLOSED)
+#    │                                │  (CLOSED)</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 TIME_WAIT — Não é um Problema!</h4>
+            <p>
+              Ver muitas conexões em TIME_WAIT é <strong>normal</strong> em servidores web ocupados.
+              O TIME_WAIT dura 2×MSL (Maximum Segment Lifetime, geralmente 60 segundos) e serve para
+              garantir que pacotes retardatários não confundam novas conexões. Só é problema se esgotar
+              as portas efêmeras disponíveis (65535 - portas reservadas ≈ 28000 portas disponíveis).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Comandos netstat Essenciais</h3>
+          <div class="command-card wide">
+            <h4>📋 netstat — Receitas Práticas</h4>
+<pre><code># ═══════════════════════════════════════════════════
+# LINUX
+# ═══════════════════════════════════════════════════
+
+# Listar todas as portas em LISTEN (serviços ativos)
+$ netstat -tlnp
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1234/sshd
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      5678/nginx
+tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      9012/postgres
+tcp6       0      0 :::443                  :::*                    LISTEN      5678/nginx
+
+# Flags explicadas:
+# -t = TCP apenas
+# -l = Somente LISTEN (portas abertas)
+# -n = Numérico (não resolver DNS — mais rápido)
+# -p = Mostrar PID/nome do processo (requer root)
+
+# Listar conexões ESTABLISHED (ativas)
+$ netstat -tnp | grep ESTABLISHED
+tcp   0   0 192.168.1.10:22    200.100.50.1:54321   ESTABLISHED  1234/sshd
+tcp   0   0 192.168.1.10:80    10.0.0.5:49876       ESTABLISHED  5678/nginx
+
+# Listar todas as conexões (todos os estados)
+$ netstat -anp
+
+# Incluir UDP (-u)
+$ netstat -tulnp
+tcp   0   0 0.0.0.0:22      0.0.0.0:*    LISTEN    1234/sshd
+tcp   0   0 0.0.0.0:80      0.0.0.0:*    LISTEN    5678/nginx
+udp   0   0 0.0.0.0:53      0.0.0.0:*              3456/named
+udp   0   0 0.0.0.0:68      0.0.0.0:*              789/dhclient
+
+# Contar conexões por estado
+$ netstat -ant | awk '{print $6}' | sort | uniq -c | sort -rn
+    156 ESTABLISHED
+     89 TIME_WAIT
+     12 LISTEN
+      3 CLOSE_WAIT
+      2 SYN_RECV
+
+# Encontrar qual processo usa a porta 8080
+$ netstat -tlnp | grep :8080
+tcp  0  0 0.0.0.0:8080  0.0.0.0:*  LISTEN  4567/java
+
+# ═══════════════════════════════════════════════════
+# WINDOWS
+# ═══════════════════════════════════════════════════
+
+# Listar todas as portas em escuta com PID
+netstat -ano | findstr LISTENING
+
+# Encontrar qual processo usa a porta 80
+netstat -ano | findstr :80
+# Depois: tasklist | findstr "PID_NUMBER"
+
+# Conexões estabelecidas
+netstat -ano | findstr ESTABLISHED
+
+# Estatísticas de protocolo
+netstat -s</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — ss — O Substituto Moderno</h3>
+          <div class="command-card wide">
+            <h4>📋 ss — Socket Statistics</h4>
+<pre><code># Equivalente ao netstat -tlnp (portas em LISTEN com processos)
+$ ss -tulnp
+Netid  State   Recv-Q  Send-Q   Local Address:Port    Peer Address:Port  Process
+tcp    LISTEN  0       128      0.0.0.0:22             0.0.0.0:*          users:(("sshd",pid=1234,fd=3))
+tcp    LISTEN  0       511      0.0.0.0:80             0.0.0.0:*          users:(("nginx",pid=5678,fd=6))
+tcp    LISTEN  0       244      127.0.0.1:5432         0.0.0.0:*          users:(("postgres",pid=9012,fd=5))
+udp    UNCONN  0       0        0.0.0.0:68             0.0.0.0:*          users:(("dhclient",pid=789,fd=6))
+
+# Flags do ss:
+# -t = TCP
+# -u = UDP
+# -l = Listening (portas abertas)
+# -n = Numérico (sem resolução DNS)
+# -p = Processos (requer root)
+# -a = All (todos os estados)
+# -e = Extended info (UID, inode, etc.)
+# -i = Internal TCP info (congestion window, RTT, etc.)
+
+# Listar TODAS as conexões TCP com info extendida
+$ ss -tanpe
+
+# Filtrar por estado
+$ ss -t state established
+$ ss -t state time-wait
+$ ss -t state listening
+
+# Filtrar por porta
+$ ss -tlnp sport = :80          # Source port 80
+$ ss -tnp dport = :443          # Destination port 443
+
+# Filtrar por IP
+$ ss -tnp dst 10.0.0.5          # Conexões para 10.0.0.5
+$ ss -tnp src 192.168.1.10      # Conexões de 192.168.1.10
+
+# Contar conexões por estado (mais rápido que netstat)
+$ ss -s
+Total: 387
+TCP:   264 (estab 156, closed 45, orphaned 2, timewait 45)
+
+Transport Total     IP        IPv6
+RAW       1         0         1
+UDP       8         5         3
+TCP       219       186       33
+INET      228       191       37
+FRAG      0         0         0
+
+# Informações detalhadas de um socket (congestion, RTT)
+$ ss -ti dst 8.8.8.8
+State  Recv-Q  Send-Q  Local Address:Port  Peer Address:Port
+ESTAB  0       0       192.168.1.10:54321  8.8.8.8:443
+     cubic wscale:7,7 rto:208 rtt:4.5/2.1 ato:40 mss:1448 pmtu:1500
+     rcvmss:1448 advmss:1448 cwnd:10 bytes_sent:1234 bytes_acked:1234
+     bytes_received:5678 segs_out:15 segs_in:12 data_segs_out:8
+     send 25.7Mbps lastsnd:120 lastrcv:80 lastack:80
+     pacing_rate 51.4Mbps delivery_rate 12.8Mbps
+
+# Encontrar conexões em CLOSE_WAIT (possível leak de conexão)
+$ ss -tnp state close-wait
+# CLOSE_WAIT acumulando = aplicação não está fechando sockets corretamente!</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Segurança: Quem Está Ouvindo?</h4>
+            <p>
+              Uma das verificações de segurança mais importantes é listar portas em LISTEN.
+              Se você encontrar portas abertas que não reconhece, pode ser um serviço
+              desnecessário (aumenta superfície de ataque) ou pior, um backdoor. Sempre
+              verifique: <code>ss -tulnp</code> → identifique cada porta → desative serviços desnecessários.
+              Preste atenção especial a serviços escutando em <code>0.0.0.0</code> (todas as interfaces)
+              vs <code>127.0.0.1</code> (apenas local).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Cenários Práticos</h3>
+          <div class="command-card wide">
+            <h4>🔧 Cenário: "Porta 8080 já está em uso!"</h4>
+<pre><code># Sua aplicação Java não inicia: "Address already in use: bind"
+# Quem está usando a porta 8080?
+
+# Linux:
+$ ss -tlnp | grep :8080
+tcp  LISTEN  0  100  *:8080  *:*  users:(("java",pid=12345,fd=89))
+# → Processo Java com PID 12345 está usando. Verificar:
+$ ps aux | grep 12345
+user  12345  2.5  4.0  2048000 320000 ?  Sl  10:00  1:23 java -jar old-app.jar
+
+# Matar o processo antigo (se necessário):
+$ kill 12345        # Graceful
+$ kill -9 12345     # Forçado (último recurso)
+
+# Windows:
+netstat -ano | findstr :8080
+  TCP  0.0.0.0:8080  0.0.0.0:0  LISTENING  12345
+tasklist | findstr "12345"
+java.exe  12345  Console  1  512,000 K
+taskkill /PID 12345 /F</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🔧 Cenário: Monitorar Conexões de um Serviço Web</h4>
+<pre><code># Quantas conexões simultâneas o nginx está atendendo?
+$ ss -tnp | grep nginx | wc -l
+342
+
+# Distribuição por estado:
+$ ss -tnp | grep nginx | awk '{print $1}' | sort | uniq -c | sort -rn
+    285 ESTAB
+     42 TIME-WAIT
+     12 CLOSE-WAIT
+      3 SYN-RECV
+
+# Top IPs conectados (possível ataque se um IP domina):
+$ ss -tnp dst :80 | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -rn | head
+    156 200.100.50.1    ← Possível abuso!
+     23 10.0.0.5
+     18 172.16.0.10
+     12 192.168.1.50
+
+# Monitoramento em tempo real (watch):
+$ watch -n 1 'ss -s'</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: IFCONFIG / IP ADDR                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>ifconfig / ip addr — Configuração de Interfaces</h2>
+          <p>Visualize e gerencie interfaces de rede, endereços IP, endereços MAC, MTU e estado das interfaces. O ip é o comando moderno que substituiu o ifconfig.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — ifconfig vs ip — A Transição</h3>
+          <p>
+            O <strong>ifconfig</strong> (interface configuration) é o comando clássico Unix/Linux para
+            configurar interfaces de rede. Assim como o netstat, faz parte do pacote <code>net-tools</code>
+            que está sendo descontinuado em distribuições Linux modernas.
+          </p>
+          <p>
+            O <strong>ip</strong> (do pacote <code>iproute2</code>) é o substituto moderno, mais poderoso
+            e consistente. Ele agrupa funcionalidades que antes estavam espalhadas em vários comandos
+            (ifconfig, route, arp, netstat) em um único utilitário.
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tarefa</th>
+                <th>ifconfig (legado)</th>
+                <th>ip (moderno)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ver interfaces</td>
+                <td><code>ifconfig</code></td>
+                <td><code>ip addr show</code> ou <code>ip a</code></td>
+              </tr>
+              <tr>
+                <td>Ver interface específica</td>
+                <td><code>ifconfig eth0</code></td>
+                <td><code>ip addr show dev eth0</code></td>
+              </tr>
+              <tr>
+                <td>Atribuir IP</td>
+                <td><code>ifconfig eth0 192.168.1.10/24</code></td>
+                <td><code>ip addr add 192.168.1.10/24 dev eth0</code></td>
+              </tr>
+              <tr>
+                <td>Remover IP</td>
+                <td><code>ifconfig eth0 0.0.0.0</code></td>
+                <td><code>ip addr del 192.168.1.10/24 dev eth0</code></td>
+              </tr>
+              <tr>
+                <td>Ativar interface</td>
+                <td><code>ifconfig eth0 up</code></td>
+                <td><code>ip link set eth0 up</code></td>
+              </tr>
+              <tr>
+                <td>Desativar interface</td>
+                <td><code>ifconfig eth0 down</code></td>
+                <td><code>ip link set eth0 down</code></td>
+              </tr>
+              <tr>
+                <td>Ver tabela de rotas</td>
+                <td><code>route -n</code></td>
+                <td><code>ip route show</code> ou <code>ip r</code></td>
+              </tr>
+              <tr>
+                <td>Adicionar rota</td>
+                <td><code>route add -net 10.0.0.0/8 gw 192.168.1.1</code></td>
+                <td><code>ip route add 10.0.0.0/8 via 192.168.1.1</code></td>
+              </tr>
+              <tr>
+                <td>Ver tabela ARP</td>
+                <td><code>arp -a</code></td>
+                <td><code>ip neigh show</code> ou <code>ip n</code></td>
+              </tr>
+              <tr>
+                <td>Alterar MTU</td>
+                <td><code>ifconfig eth0 mtu 9000</code></td>
+                <td><code>ip link set eth0 mtu 9000</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — Visualizando Interfaces com ifconfig</h3>
+          <div class="command-card wide">
+            <h4>📋 Saída do ifconfig</h4>
+<pre><code>$ ifconfig
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::a00:27ff:fe4e:66a1  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 08:00:27:4e:66:a1  txqueuelen 1000  (Ethernet)
+        RX packets 125432  bytes 98765432 (94.1 MiB)
+        RX errors 0  dropped 12  overruns 0  frame 0
+        TX packets 87654  bytes 12345678 (11.7 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 5432  bytes 654321 (639.0 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5432  bytes 654321 (639.0 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4099&lt;UP,BROADCAST,MULTICAST&gt;  mtu 1500
+        inet 192.168.1.20  netmask 255.255.255.0  broadcast 192.168.1.255
+        ether ac:12:03:4b:5c:6d  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        TX packets 0  bytes 0 (0.0 B)</code></pre>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📊 Campos Importantes</h4>
+              <p><strong>flags:</strong> Estado da interface (UP=ativa, RUNNING=link detectado, BROADCAST=suporta broadcast)</p>
+              <p><strong>mtu:</strong> Maximum Transmission Unit — tamanho máximo do frame (1500 bytes para Ethernet padrão)</p>
+              <p><strong>inet:</strong> Endereço IPv4 atribuído à interface</p>
+              <p><strong>netmask:</strong> Máscara de sub-rede (define o tamanho da rede local)</p>
+              <p><strong>broadcast:</strong> Endereço de broadcast da sub-rede</p>
+              <p><strong>ether:</strong> Endereço MAC (hardware) da interface — único por fabricante</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 Contadores de Tráfego</h4>
+              <p><strong>RX packets/bytes:</strong> Total recebido (Receive)</p>
+              <p><strong>TX packets/bytes:</strong> Total transmitido (Transmit)</p>
+              <p><strong>errors:</strong> Pacotes com erro (CRC, tamanho, etc.)</p>
+              <p><strong>dropped:</strong> Pacotes descartados (buffer cheio, regras de firewall)</p>
+              <p><strong>overruns:</strong> Buffer de hardware transbordou (placa não conseguiu processar)</p>
+              <p><strong>collisions:</strong> Colisões detectadas (relevante em half-duplex/hubs antigos)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Visualizando com ip addr / ip link</h3>
+          <div class="command-card wide">
+            <h4>📋 Saída do ip addr show</h4>
+<pre><code>$ ip addr show
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:4e:66:a1 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.10/24 brd 192.168.1.255 scope global dynamic eth0
+       valid_lft 86400sec preferred_lft 86400sec
+    inet6 fe80::a00:27ff:fe4e:66a1/64 scope link
+       valid_lft forever preferred_lft forever
+
+3: wlan0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether ac:12:03:4b:5c:6d brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.20/24 brd 192.168.1.255 scope global dynamic wlan0
+       valid_lft 43200sec preferred_lft 43200sec
+
+4: docker0: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu 1500 qdisc noqueue state DOWN group default
+    link/ether 02:42:ac:11:00:01 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 ip link — Foco na Camada 2 (Estado e MAC)</h4>
+<pre><code>$ ip link show
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP mode DEFAULT
+    link/ether 08:00:27:4e:66:a1 brd ff:ff:ff:ff:ff:ff
+3: wlan0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP mode DORMANT
+    link/ether ac:12:03:4b:5c:6d brd ff:ff:ff:ff:ff:ff
+
+# state UP     → Interface ativa com link detectado
+# state DOWN   → Interface desativada administrativamente
+# state UNKNOWN → Loopback ou virtual (normal)
+# NO-CARRIER   → Interface ativa mas sem cabo/conexão (sem link físico)
+
+# Ativar/Desativar interface:
+$ sudo ip link set eth0 down    # Desativa
+$ sudo ip link set eth0 up      # Ativa
+
+# Alterar MTU (ex: Jumbo Frames para rede 10G):
+$ sudo ip link set eth0 mtu 9000</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 — ip route — Tabela de Roteamento</h3>
+          <div class="command-card wide">
+            <h4>📋 Visualizando e Gerenciando Rotas</h4>
+<pre><code># Ver tabela de rotas
+$ ip route show
+default via 192.168.1.1 dev eth0 proto dhcp metric 100
+10.0.0.0/8 via 192.168.1.254 dev eth0 proto static
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric 100
+
+# Interpretando:
+# default via 192.168.1.1  → Gateway padrão (para onde vai tudo que não tem rota específica)
+# 10.0.0.0/8 via 192.168.1.254 → Rede 10.x.x.x acessível via 192.168.1.254
+# 192.168.1.0/24 dev eth0  → Rede local diretamente conectada na eth0
+
+# Descobrir por onde um pacote sairia:
+$ ip route get 8.8.8.8
+8.8.8.8 via 192.168.1.1 dev eth0 src 192.168.1.10 uid 1000
+    cache
+
+$ ip route get 10.0.5.100
+10.0.5.100 via 192.168.1.254 dev eth0 src 192.168.1.10 uid 1000
+    cache
+
+# Adicionar rota estática:
+$ sudo ip route add 10.10.0.0/16 via 192.168.1.254 dev eth0
+
+# Remover rota:
+$ sudo ip route del 10.10.0.0/16
+
+# Adicionar gateway padrão:
+$ sudo ip route add default via 192.168.1.1 dev eth0
+
+# Ver rotas com métricas e protocolo:
+$ ip route show table all</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 — Windows: ipconfig</h3>
+          <div class="command-card wide">
+            <h4>📋 ipconfig — Equivalente Windows</h4>
+<pre><code># Exibir configuração resumida
+C:\&gt; ipconfig
+
+Windows IP Configuration
+
+Ethernet adapter Ethernet:
+   Connection-specific DNS Suffix  . : empresa.local
+   IPv4 Address. . . . . . . . . . . : 192.168.1.50
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.1.1
+
+Wireless LAN adapter Wi-Fi:
+   Media State . . . . . . . . . . . : Media disconnected
+
+# Exibir configuração completa (com MAC, DHCP, DNS)
+C:\&gt; ipconfig /all
+
+Ethernet adapter Ethernet:
+   Description . . . . . . . . . . . : Intel(R) I211 Gigabit
+   Physical Address. . . . . . . . . : 08-00-27-4E-66-A1
+   DHCP Enabled. . . . . . . . . . . : Yes
+   IPv4 Address. . . . . . . . . . . : 192.168.1.50
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.1.1
+   DHCP Server . . . . . . . . . . . : 192.168.1.1
+   DNS Servers . . . . . . . . . . . : 192.168.1.1
+                                        8.8.8.8
+   Lease Obtained. . . . . . . . . . : Monday, January 15, 2024 10:00:00
+   Lease Expires . . . . . . . . . . : Tuesday, January 16, 2024 10:00:00
+
+# Renovar IP via DHCP
+C:\&gt; ipconfig /release      # Libera IP atual
+C:\&gt; ipconfig /renew        # Solicita novo IP ao DHCP
+
+# Limpar cache DNS
+C:\&gt; ipconfig /flushdns
+Successfully flushed the DNS Resolver Cache.
+
+# Exibir cache DNS
+C:\&gt; ipconfig /displaydns</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Dica Profissional: ip -br (brief) — Saída Resumida</h4>
+            <p>
+              O comando <code>ip -br addr</code> (brief) fornece uma visão resumida e limpa de todas
+              as interfaces, perfeita para scripts e visualização rápida:
+            </p>
+<pre><code>$ ip -br addr
+lo       UNKNOWN  127.0.0.1/8 ::1/128
+eth0     UP       192.168.1.10/24 fe80::a00:27ff:fe4e:66a1/64
+wlan0    UP       192.168.1.20/24
+docker0  DOWN     172.17.0.1/16
+
+$ ip -br link
+lo       UNKNOWN  00:00:00:00:00:00 &lt;LOOPBACK,UP,LOWER_UP&gt;
+eth0     UP       08:00:27:4e:66:a1 &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt;
+wlan0    UP       ac:12:03:4b:5c:6d &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt;
+docker0  DOWN     02:42:ac:11:00:01 &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt;</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: NMAP                                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>nmap — Scanner de Rede</h2>
+          <p>A ferramenta definitiva para descoberta de hosts, varredura de portas e auditoria de segurança. Poderosa e versátil, é indispensável para profissionais de segurança e administradores de rede.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — O que é o nmap?</h3>
+          <p>
+            O <strong>nmap</strong> (Network Mapper) é um scanner de rede open-source criado por Gordon
+            "Fyodor" Lyon. É a ferramenta mais popular do mundo para:
+          </p>
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🎯 Capacidades do nmap</h4>
+              <p>• <strong>Descoberta de hosts:</strong> Quais máquinas estão online na rede</p>
+              <p>• <strong>Varredura de portas:</strong> Quais serviços estão rodando em cada host</p>
+              <p>• <strong>Detecção de versão:</strong> Qual software e versão em cada porta</p>
+              <p>• <strong>Detecção de SO:</strong> Identifica o sistema operacional remoto</p>
+              <p>• <strong>Scripts NSE:</strong> Automação de testes de segurança específicos</p>
+            </div>
+            <div class="command-card">
+              <h4>⚖️ Aspectos Legais e Éticos</h4>
+              <p>• <strong>Redes próprias:</strong> Totalmente legal e recomendado</p>
+              <p>• <strong>Com autorização:</strong> Legal (pentest contratado com escopo definido)</p>
+              <p>• <strong>Sem autorização:</strong> ILEGAL em muitas jurisdições (invasão de privacidade)</p>
+              <p>• <strong>Em produção:</strong> Cuidado — scans agressivos podem derrubar serviços frágeis</p>
+              <p>• <strong>Regra de ouro:</strong> Só escaneie o que você tem permissão para escanear</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — Descoberta de Hosts</h3>
+          <div class="command-card wide">
+            <h4>📋 Encontrando Hosts Ativos na Rede</h4>
+<pre><code># Ping scan — Descobre quais hosts estão online (sem varrer portas)
+$ nmap -sn 192.168.1.0/24
+Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for gateway (192.168.1.1)
+Host is up (0.0015s latency).
+MAC Address: AA:BB:CC:DD:EE:01 (TP-Link)
+
+Nmap scan report for desktop-pc (192.168.1.10)
+Host is up (0.00045s latency).
+MAC Address: 08:00:27:4E:66:A1 (Oracle VirtualBox)
+
+Nmap scan report for server (192.168.1.50)
+Host is up (0.00032s latency).
+MAC Address: DE:AD:BE:EF:CA:FE (Dell)
+
+Nmap scan report for printer (192.168.1.100)
+Host is up (0.0089s latency).
+MAC Address: 00:1B:44:11:3A:B7 (HP)
+
+Nmap done: 256 IP addresses (4 hosts up) scanned in 2.34 seconds
+
+# Variações de descoberta:
+$ nmap -sn 192.168.1.0/24      # Ping scan (ARP em rede local)
+$ nmap -sn 10.0.0.1-100        # Range específico
+$ nmap -sn 192.168.1.1,50,100  # IPs específicos
+$ nmap -Pn 192.168.1.50        # Pular descoberta (assumir online)
+$ nmap -sn -PS443 10.0.0.0/24  # Descoberta via TCP SYN na porta 443
+
+# Lista de alvos a partir de arquivo:
+$ nmap -sn -iL alvos.txt       # Um IP/range por linha no arquivo</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Varredura de Portas</h3>
+          <div class="command-card wide">
+            <h4>📋 Tipos de Scan e Exemplos</h4>
+<pre><code># ═══════════════════════════════════════════════════
+# SCANS BÁSICOS
+# ═══════════════════════════════════════════════════
+
+# Scan padrão (top 1000 portas TCP)
+$ nmap 192.168.1.50
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+443/tcp  open  https
+3306/tcp open  mysql
+
+# Scan de todas as 65535 portas TCP
+$ nmap -p- 192.168.1.50
+
+# Scan de portas específicas
+$ nmap -p 22,80,443,8080 192.168.1.50
+
+# Scan de range de portas
+$ nmap -p 1-1024 192.168.1.50
+
+# Scan de portas UDP (mais lento — UDP não confirma recebimento)
+$ nmap -sU 192.168.1.50
+
+# Scan TCP + UDP combinado
+$ nmap -sS -sU -p T:22,80,443,U:53,161 192.168.1.50
+
+# ═══════════════════════════════════════════════════
+# TÉCNICAS DE SCAN (-s)
+# ═══════════════════════════════════════════════════
+
+# -sS (SYN Scan — "Half-open") — O mais comum e discreto
+$ sudo nmap -sS 192.168.1.50
+# Envia SYN, recebe SYN-ACK (porta aberta) ou RST (fechada)
+# Não completa o handshake → mais difícil de detectar em logs
+# Requer root/admin (raw sockets)
+
+# -sT (TCP Connect) — Completa o handshake
+$ nmap -sT 192.168.1.50
+# Mais lento e mais visível, mas não requer root
+# Aparece nos logs do servidor como conexão completa
+
+# -sV (Version Detection) — Identifica serviço e versão
+$ nmap -sV 192.168.1.50
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh      OpenSSH 8.9p1 Ubuntu 3ubuntu0.4
+80/tcp   open  http     nginx 1.24.0
+443/tcp  open  ssl/http nginx 1.24.0
+3306/tcp open  mysql    MySQL 8.0.35
+
+# -O (OS Detection) — Identifica sistema operacional
+$ sudo nmap -O 192.168.1.50
+Running: Linux 5.X
+OS details: Linux 5.15 - 5.19
+Network Distance: 1 hop
+
+# Scan agressivo (OS + Version + Scripts + Traceroute)
+$ sudo nmap -A 192.168.1.50
+
+# ═══════════════════════════════════════════════════
+# ESTADOS DE PORTA NO NMAP
+# ═══════════════════════════════════════════════════
+# open     → Porta aceitando conexões (serviço ativo)
+# closed   → Porta acessível mas sem serviço (responde RST)
+# filtered → Firewall bloqueando (sem resposta ou ICMP unreachable)
+# open|filtered → Não foi possível determinar (comum em UDP scan)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — Scans Comuns no Dia a Dia</h3>
+          <div class="command-card wide">
+            <h4>🔧 Receitas Práticas com nmap</h4>
+<pre><code># Auditoria rápida de um servidor (o que está exposto?)
+$ sudo nmap -sS -sV -O --top-ports 100 192.168.1.50
+
+# Verificar se uma porta específica está aberta (rápido)
+$ nmap -p 443 --open 192.168.1.50
+PORT    STATE SERVICE
+443/tcp open  https
+
+# Encontrar todos os servidores web na rede
+$ nmap -sS -p 80,443,8080,8443 --open 192.168.1.0/24
+
+# Encontrar todos os servidores SSH na rede
+$ nmap -sS -p 22 --open 10.0.0.0/24
+
+# Scan silencioso (evasão básica de IDS)
+$ sudo nmap -sS -T2 --randomize-hosts 192.168.1.0/24
+# -T2 = velocidade "polite" (mais lento, menos detectável)
+# Escala: -T0 (paranoid) → -T5 (insane)
+
+# Salvar resultado em arquivo
+$ nmap -sV -oN resultado.txt 192.168.1.50      # Formato normal
+$ nmap -sV -oX resultado.xml 192.168.1.50      # Formato XML
+$ nmap -sV -oA resultado 192.168.1.50          # Todos os formatos
+
+# Scan de vulnerabilidades com scripts NSE
+$ nmap --script vuln 192.168.1.50
+$ nmap --script ssl-heartbleed -p 443 192.168.1.50
+$ nmap --script http-title -p 80,443 192.168.1.0/24</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Implicações de Segurança do nmap</h4>
+            <p>
+              O nmap é uma faca de dois gumes: é essencial para administradores verificarem a segurança
+              de suas redes, mas também é a primeira ferramenta que um atacante usaria para reconhecimento.
+              <strong>Implicações:</strong> (1) Sistemas IDS/IPS podem alertar ou bloquear scans;
+              (2) Muitos provedores cloud (AWS, Azure) exigem autorização prévia para realizar scans;
+              (3) Portas abertas desnecessárias devem ser fechadas imediatamente após descoberta;
+              (4) Atualize serviços cuja versão apresente vulnerabilidades conhecidas (CVEs).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: TCPDUMP / WIRESHARK                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>tcpdump / Wireshark — Captura de Pacotes</h2>
+          <p>As ferramentas definitivas para análise profunda de tráfego de rede. Quando todos os outros comandos não bastam, a captura de pacotes revela exatamente o que está acontecendo no fio.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — tcpdump vs Wireshark — Quando Usar Cada Um</h3>
+          <p>
+            A <strong>captura de pacotes</strong> (packet capture/sniffing) é o nível mais profundo
+            de diagnóstico de rede. Permite ver cada byte que trafega na interface, incluindo cabeçalhos
+            de protocolos, payloads e timing preciso.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🖥️ tcpdump</h4>
+              <p><strong>Tipo:</strong> Linha de comando (CLI)</p>
+              <p><strong>Onde:</strong> Linux/Mac (nativamente), Windows (via WinDump/Npcap)</p>
+              <p><strong>Quando usar:</strong></p>
+              <p>• Servidores sem interface gráfica (SSH)</p>
+              <p>• Captura rápida em produção</p>
+              <p>• Scripts automatizados</p>
+              <p>• Capturar e salvar para análise posterior</p>
+              <p>• Ambientes de container/Kubernetes</p>
+            </div>
+            <div class="command-card">
+              <h4>🦈 Wireshark</h4>
+              <p><strong>Tipo:</strong> Interface gráfica (GUI)</p>
+              <p><strong>Onde:</strong> Windows, Linux, Mac</p>
+              <p><strong>Quando usar:</strong></p>
+              <p>• Análise detalhada de protocolos</p>
+              <p>• Visualização de conversações (follow stream)</p>
+              <p>• Decodificação complexa (TLS, HTTP/2, gRPC)</p>
+              <p>• Ensino e aprendizado de protocolos</p>
+              <p>• Análise forense de tráfego</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Fluxo de Trabalho Profissional</h4>
+            <p>
+              O workflow mais comum em produção: (1) Capturar com <strong>tcpdump</strong> no servidor
+              remoto via SSH, salvando em arquivo .pcap; (2) Transferir o arquivo para sua estação de
+              trabalho; (3) Analisar com <strong>Wireshark</strong> usando toda a riqueza da interface
+              gráfica. Isso combina o melhor dos dois mundos — captura leve em produção e análise
+              detalhada no desktop.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — tcpdump — Captura via Linha de Comando</h3>
+          <div class="command-card wide">
+            <h4>📋 Sintaxe e Exemplos do tcpdump</h4>
+<pre><code># Sintaxe geral:
+# tcpdump [opções] [expressão de filtro]
+
+# ═══════════════════════════════════════════════════
+# CAPTURAS BÁSICAS
+# ═══════════════════════════════════════════════════
+
+# Capturar todo o tráfego na interface padrão
+$ sudo tcpdump
+# Ctrl+C para parar
+
+# Capturar em interface específica
+$ sudo tcpdump -i eth0
+$ sudo tcpdump -i any          # Todas as interfaces
+
+# Limitar número de pacotes capturados
+$ sudo tcpdump -c 100          # Captura 100 pacotes e para
+
+# Não resolver DNS (mais rápido, IPs puros)
+$ sudo tcpdump -n
+
+# Mostrar conteúdo do pacote em hex e ASCII
+$ sudo tcpdump -X
+
+# Verbose (mais detalhes nos cabeçalhos)
+$ sudo tcpdump -v              # Verbose
+$ sudo tcpdump -vv             # Muito verbose
+$ sudo tcpdump -vvv            # Máximo detalhe
+
+# ═══════════════════════════════════════════════════
+# FILTROS POR HOST
+# ═══════════════════════════════════════════════════
+
+# Tráfego de/para um host específico
+$ sudo tcpdump host 192.168.1.50
+
+# Apenas tráfego ORIGINADO do host
+$ sudo tcpdump src host 192.168.1.50
+
+# Apenas tráfego DESTINADO ao host
+$ sudo tcpdump dst host 192.168.1.50
+
+# Tráfego entre dois hosts específicos
+$ sudo tcpdump host 192.168.1.10 and host 192.168.1.50
+
+# ═══════════════════════════════════════════════════
+# FILTROS POR PORTA
+# ═══════════════════════════════════════════════════
+
+# Tráfego na porta 80 (HTTP)
+$ sudo tcpdump port 80
+
+# Tráfego na porta 443 (HTTPS)
+$ sudo tcpdump port 443
+
+# Múltiplas portas
+$ sudo tcpdump port 80 or port 443
+
+# Range de portas
+$ sudo tcpdump portrange 8000-9000
+
+# Porta de destino específica
+$ sudo tcpdump dst port 3306       # Conexões ao MySQL
+
+# ═══════════════════════════════════════════════════
+# FILTROS POR PROTOCOLO
+# ═══════════════════════════════════════════════════
+
+# Apenas tráfego TCP
+$ sudo tcpdump tcp
+
+# Apenas tráfego UDP
+$ sudo tcpdump udp
+
+# Apenas tráfego ICMP (ping)
+$ sudo tcpdump icmp
+
+# Apenas tráfego ARP
+$ sudo tcpdump arp
+
+# Apenas pacotes DNS (porta 53)
+$ sudo tcpdump port 53
+
+# ═══════════════════════════════════════════════════
+# FILTROS COMBINADOS
+# ═══════════════════════════════════════════════════
+
+# TCP na porta 80 de/para um host
+$ sudo tcpdump tcp and port 80 and host 10.0.0.5
+
+# Todo tráfego EXCETO SSH (para não capturar sua própria sessão)
+$ sudo tcpdump not port 22
+
+# Tráfego HTTP excluindo um host específico
+$ sudo tcpdump tcp port 80 and not host 192.168.1.1
+
+# Apenas pacotes SYN (início de conexão TCP)
+$ sudo tcpdump 'tcp[tcpflags] &amp; (tcp-syn) != 0'
+
+# Apenas pacotes SYN sem ACK (novas conexões)
+$ sudo tcpdump 'tcp[tcpflags] == tcp-syn'
+
+# Pacotes RST (conexões rejeitadas/resetadas)
+$ sudo tcpdump 'tcp[tcpflags] &amp; (tcp-rst) != 0'</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Salvando e Lendo Capturas</h3>
+          <div class="command-card wide">
+            <h4>📋 Trabalhando com Arquivos .pcap</h4>
+<pre><code># Salvar captura em arquivo .pcap (para análise posterior no Wireshark)
+$ sudo tcpdump -i eth0 -w captura.pcap
+
+# Salvar com limite de tamanho (rotação de arquivo)
+$ sudo tcpdump -i eth0 -w captura.pcap -C 100
+# -C 100 = cria novo arquivo a cada 100MB (captura.pcap, captura.pcap1, etc.)
+
+# Salvar com limite de tempo
+$ sudo tcpdump -i eth0 -w captura.pcap -G 3600 -W 24
+# -G 3600 = novo arquivo a cada hora
+# -W 24 = máximo 24 arquivos (24 horas de captura)
+
+# Ler arquivo .pcap salvo
+$ tcpdump -r captura.pcap
+
+# Ler com filtro (analisar apenas parte da captura)
+$ tcpdump -r captura.pcap port 443
+$ tcpdump -r captura.pcap host 10.0.0.5
+
+# Ler mostrando timestamps legíveis
+$ tcpdump -r captura.pcap -tttt
+
+# Captura em produção (receita recomendada):
+$ sudo tcpdump -i eth0 -n -s 0 -w /tmp/debug-$(date +%Y%m%d-%H%M%S).pcap \
+    port 443 and host 10.0.0.5 -c 10000
+# -n = sem DNS
+# -s 0 = capturar pacote completo (não truncar)
+# -c 10000 = parar após 10000 pacotes
+# Depois: scp /tmp/debug-*.pcap usuario@desktop:/tmp/</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Lendo Pacotes Capturados</h3>
+          <div class="command-card wide">
+            <h4>📋 Interpretando a Saída do tcpdump</h4>
+<pre><code># Exemplo de captura de um handshake TCP (3-way handshake):
+$ sudo tcpdump -n -c 3 tcp and port 80 and host 192.168.1.50
+14:30:01.123456 IP 192.168.1.10.54321 &gt; 192.168.1.50.80: Flags [S], seq 1000, win 65535, length 0
+14:30:01.123789 IP 192.168.1.50.80 &gt; 192.168.1.10.54321: Flags [S.], seq 2000, ack 1001, win 65535, length 0
+14:30:01.124012 IP 192.168.1.10.54321 &gt; 192.168.1.50.80: Flags [.], ack 2001, win 65535, length 0
+
+# Decodificando:
+# Timestamp     | IP origem.porta > IP destino.porta | Flags TCP | Detalhes
+#
+# Flags TCP no tcpdump:
+# [S]   = SYN (início de conexão)
+# [S.]  = SYN-ACK (confirmação do servidor)
+# [.]   = ACK (confirmação)
+# [P.]  = PSH-ACK (dados sendo enviados)
+# [F.]  = FIN-ACK (fechamento de conexão)
+# [R]   = RST (reset — conexão rejeitada/abortada)
+# [R.]  = RST-ACK
+
+# Exemplo de requisição HTTP capturada:
+14:30:01.200000 IP 192.168.1.10.54321 &gt; 192.168.1.50.80: Flags [P.], seq 1:78, ack 1, length 77
+    GET /index.html HTTP/1.1
+    Host: 192.168.1.50
+    User-Agent: curl/8.1.2
+
+14:30:01.205000 IP 192.168.1.50.80 &gt; 192.168.1.10.54321: Flags [P.], seq 1:512, ack 78, length 511
+    HTTP/1.1 200 OK
+    Content-Type: text/html
+    Content-Length: 1234
+
+# Exemplo de consulta DNS capturada:
+14:30:02.000000 IP 192.168.1.10.45678 &gt; 8.8.8.8.53: 12345+ A? google.com. (28)
+14:30:02.008000 IP 8.8.8.8.53 &gt; 192.168.1.10.45678: 12345 1/0/0 A 142.250.79.46 (44)
+# Query ID 12345, perguntando registro A de google.com
+# Resposta: 1 answer, 0 authority, 0 additional → A = 142.250.79.46</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Wireshark — Análise Visual</h3>
+          <p>
+            O <strong>Wireshark</strong> é o analisador de protocolos mais utilizado no mundo. Sua
+            interface gráfica permite explorar pacotes camada por camada, seguir conversações TCP
+            completas, e decodificar centenas de protocolos automaticamente.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📋 Filtros de Display do Wireshark (os mais úteis)</h4>
+<pre><code># ═══════════════════════════════════════════════════
+# FILTROS DE DISPLAY (barra de filtro verde no Wireshark)
+# Nota: Sintaxe diferente do tcpdump!
+# ═══════════════════════════════════════════════════
+
+# Por IP
+ip.addr == 192.168.1.50            # Tráfego de/para este IP
+ip.src == 192.168.1.10             # Origem específica
+ip.dst == 10.0.0.5                 # Destino específico
+
+# Por porta
+tcp.port == 80                     # TCP porta 80 (origem ou destino)
+tcp.dstport == 443                 # Destino porta 443
+udp.port == 53                     # UDP porta 53 (DNS)
+
+# Por protocolo
+http                               # Tráfego HTTP
+dns                                # Consultas/respostas DNS
+tls                                # Tráfego TLS/SSL
+tcp                                # Todo TCP
+arp                                # Requisições/respostas ARP
+icmp                               # Ping e mensagens ICMP
+
+# Filtros HTTP específicos
+http.request.method == "GET"       # Apenas GETs
+http.request.method == "POST"      # Apenas POSTs
+http.response.code == 404          # Respostas 404
+http.response.code &gt;= 500         # Erros de servidor
+http.host contains "google"        # Host contendo "google"
+
+# Filtros TCP específicos
+tcp.flags.syn == 1                 # Pacotes SYN
+tcp.flags.rst == 1                 # Pacotes RST (problemas!)
+tcp.flags.fin == 1                 # Pacotes FIN
+tcp.analysis.retransmission        # Retransmissões (perda de pacote!)
+tcp.analysis.zero_window           # Window zerada (receptor congestionado)
+tcp.analysis.duplicate_ack         # ACKs duplicados
+
+# Filtros DNS específicos
+dns.qry.name == "google.com"       # Query para google.com
+dns.flags.rcode != 0               # Respostas com erro
+
+# Combinações com operadores lógicos
+ip.addr == 192.168.1.50 and tcp.port == 80
+http and ip.src == 10.0.0.5
+dns or icmp
+not arp and not stp                # Excluir ruído de rede
+
+# Filtros por conteúdo (payload)
+frame contains "password"          # Pacotes contendo "password"
+tcp contains "HTTP/1.1 500"        # Respostas 500</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🔧 Funcionalidades Essenciais do Wireshark</h4>
+<pre><code># ═══════════════════════════════════════════════════
+# FOLLOW STREAM (Seguir Conversação)
+# ═══════════════════════════════════════════════════
+# Clique direito em pacote → Follow → TCP Stream
+# Mostra toda a conversação HTTP/SMTP/etc. de forma legível
+# Cores: Vermelho = cliente → servidor, Azul = servidor → cliente
+
+# Exemplo de Follow TCP Stream em HTTP:
+# ─── CLIENTE (vermelho) ───
+# GET /api/users HTTP/1.1
+# Host: api.empresa.com
+# Authorization: Bearer eyJhbG...
+#
+# ─── SERVIDOR (azul) ───
+# HTTP/1.1 200 OK
+# Content-Type: application/json
+# {"users": [{"id": 1, "name": "João"}]}
+
+# ═══════════════════════════════════════════════════
+# STATISTICS (Estatísticas)
+# ═══════════════════════════════════════════════════
+# Statistics → Conversations → TCP tab
+# Mostra todas as conexões TCP com bytes trafegados, duração, etc.
+
+# Statistics → Protocol Hierarchy
+# Mostra distribuição de protocolos (% HTTP, DNS, TLS, etc.)
+
+# Statistics → I/O Graphs
+# Gráfico temporal de tráfego — identifica picos e padrões
+
+# ═══════════════════════════════════════════════════
+# EXPERT INFO (Análise Automática de Problemas)
+# ═══════════════════════════════════════════════════
+# Analyze → Expert Information
+# Wireshark automaticamente detecta:
+# ⚠️ Retransmissões TCP (perda de pacotes)
+# ⚠️ Zero Window (receptor congestionado)
+# ⚠️ RST inesperados (conexões abortadas)
+# ⚠️ Out-of-order packets
+# ⚠️ Duplicate ACKs</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Captura de Pacotes e Privacidade</h4>
+            <p>
+              A captura de pacotes pode expor informações sensíveis: credenciais em protocolos não
+              criptografados (HTTP, FTP, Telnet, SMTP sem TLS), tokens de API, cookies de sessão,
+              dados pessoais. <strong>Regras importantes:</strong> (1) Capture apenas o necessário para
+              o diagnóstico; (2) Delete capturas após a análise; (3) Nunca capture em redes que você
+              não administra sem autorização; (4) Em redes com HTTPS, o payload é criptografado (você
+              verá apenas os cabeçalhos TCP/TLS); (5) Informe a equipe quando realizar capturas em produção.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: EXERCÍCIOS PRÁTICOS                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Aplique todos os comandos aprendidos neste módulo para diagnosticar e resolver problemas reais de rede. Cada exercício simula um cenário que você encontrará no dia a dia como profissional de infraestrutura.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Servidor Web Inacessível</h3>
+          <div class="command-card wide">
+            <h4>📋 Cenário</h4>
+<pre><code># SITUAÇÃO:
+# Você é administrador de rede e recebe um chamado:
+# "O site interno da empresa (intranet.empresa.local) não está abrindo!"
+#
+# Informações disponíveis:
+# - Servidor web: 10.0.1.50 (porta 80 e 443)
+# - DNS interno: 10.0.1.10
+# - Gateway da sua rede: 192.168.1.1
+# - Seu IP: 192.168.1.100
+#
+# TAREFA: Use os comandos de diagnóstico para identificar o problema.
+# Siga a metodologia "de dentro para fora".</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>✅ Solução — Passo a Passo</h4>
+<pre><code># PASSO 1: Verificar conectividade básica (stack TCP/IP local)
+$ ping -c 2 127.0.0.1
+PING 127.0.0.1: 2 packets transmitted, 2 received, 0% packet loss
+# ✓ Stack local OK
+
+# PASSO 2: Verificar gateway
+$ ping -c 2 192.168.1.1
+PING 192.168.1.1: 2 packets transmitted, 2 received, 0% packet loss
+# ✓ Rede local OK, gateway acessível
+
+# PASSO 3: Verificar se o servidor responde por IP
+$ ping -c 4 10.0.1.50
+PING 10.0.1.50: 4 packets transmitted, 4 received, 0% packet loss
+# ✓ Servidor está online e acessível por IP
+
+# PASSO 4: Verificar resolução DNS
+$ nslookup intranet.empresa.local 10.0.1.10
+Server:     10.0.1.10
+Address:    10.0.1.10#53
+
+** server can't find intranet.empresa.local: NXDOMAIN
+# ✗ DNS NÃO RESOLVE o nome! Esse é o problema!
+
+# PASSO 5: Confirmar que o serviço web está rodando
+$ nmap -p 80,443 10.0.1.50
+PORT    STATE SERVICE
+80/tcp  open  http
+443/tcp open  https
+# ✓ Serviço web está rodando
+
+# DIAGNÓSTICO FINAL:
+# O servidor web está online e funcionando (porta 80/443 aberta).
+# O problema é DNS — o registro "intranet.empresa.local" não existe
+# no servidor DNS 10.0.1.10.
+#
+# SOLUÇÃO: Criar/corrigir o registro A no servidor DNS:
+# intranet.empresa.local → 10.0.1.50
+#
+# WORKAROUND IMEDIATO: Usuário pode acessar por IP: http://10.0.1.50</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Latência Alta em Aplicação</h3>
+          <div class="command-card wide">
+            <h4>📋 Cenário</h4>
+<pre><code># SITUAÇÃO:
+# Usuários reclamam que o sistema ERP (erp.empresa.com) está
+# "muito lento" desde ontem. O servidor está em um data center
+# externo (IP: 203.0.113.50).
+#
+# Informações:
+# - ERP Server: 203.0.113.50 (porta 8443)
+# - Localização: Data center em São Paulo
+# - Sua rede: Escritório no Rio de Janeiro
+# - Problema começou: ontem às 14h
+#
+# TAREFA: Identifique onde está o gargalo.</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>✅ Solução — Passo a Passo</h4>
+<pre><code># PASSO 1: Medir latência atual para o servidor
+$ ping -c 10 203.0.113.50
+--- 203.0.113.50 ping statistics ---
+10 packets transmitted, 10 received, 0% packet loss
+rtt min/avg/max/mdev = 45.2/48.7/89.3/12.1 ms
+# Latência média 48ms com pico de 89ms e desvio alto (12ms)
+# Para SP-RJ, esperado seria ~15-25ms. Algo está errado.
+
+# PASSO 2: Traceroute para encontrar o gargalo
+$ mtr -r -c 20 203.0.113.50
+HOST                         Loss%   Snt   Last   Avg  Best  Wrst StDev
+1.|-- gateway (192.168.1.1)   0.0%    20    1.2   1.1   0.8   1.5   0.2
+2.|-- isp-router-rj.net       0.0%    20    5.4   5.2   4.8   5.9   0.3
+3.|-- core-rj.isp.net         0.0%    20    8.1   7.9   7.2   8.8   0.4
+4.|-- backbone-sp.isp.net    15.0%    20   45.3  52.8  12.1  98.7  28.5  ← GARGALO!
+5.|-- dc-edge.datacenter.net  15.0%    20   48.2  55.1  15.3  99.2  27.8
+6.|-- 203.0.113.50            15.0%    20   49.1  56.3  16.8 101.5  28.1
+
+# ANÁLISE:
+# - Hops 1-3: Latência normal e estável (rede local e ISP local OK)
+# - Hop 4: SALTO de latência (7ms → 52ms avg) + 15% perda + jitter alto!
+# - Hops 5-6: Mantêm a degradação (perda e latência persistem)
+#
+# O gargalo está no link entre o hop 3 (core-rj.isp.net) e
+# hop 4 (backbone-sp.isp.net) — o link WAN do ISP entre RJ e SP.
+
+# PASSO 3: Verificar se o serviço em si está respondendo
+$ nmap -p 8443 203.0.113.50
+PORT     STATE SERVICE
+8443/tcp open  https-alt
+# ✓ Serviço está respondendo
+
+# PASSO 4: Testar tempo de resposta da aplicação
+$ curl -o /dev/null -s -w "DNS: %{time_namelookup}s\nConexão: %{time_connect}s\nTLS: %{time_appconnect}s\nTotal: %{time_total}s\n" https://erp.empresa.com:8443/health
+DNS: 0.012s
+Conexão: 0.056s
+TLS: 0.145s
+Total: 0.892s
+# Conexão em 56ms (confirma latência alta), resposta total de 892ms
+
+# DIAGNÓSTICO FINAL:
+# O problema está no link WAN do ISP entre Rio e São Paulo.
+# - 15% de perda de pacotes causa retransmissões TCP
+# - Latência 3x acima do esperado
+# - Jitter alto (StDev 28ms) causa experiência inconsistente
+#
+# AÇÕES:
+# 1. Abrir chamado no ISP informando degradação no link RJ-SP
+# 2. Verificar se há rota alternativa disponível
+# 3. Monitorar com: watch -n 5 'ping -c 3 203.0.113.50'</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — Porta Misteriosa Aberta</h3>
+          <div class="command-card wide">
+            <h4>📋 Cenário</h4>
+<pre><code># SITUAÇÃO:
+# Durante uma auditoria de segurança de rotina, você precisa verificar
+# quais portas estão abertas no servidor de produção (192.168.1.50)
+# e identificar um serviço suspeito rodando em uma porta não-padrão.
+#
+# O servidor deveria ter APENAS:
+# - SSH (22)
+# - HTTP (80)
+# - HTTPS (443)
+# - PostgreSQL (5432) — apenas local (127.0.0.1)
+#
+# TAREFA: Identifique portas abertas indevidas e o processo responsável.</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>✅ Solução — Passo a Passo</h4>
+<pre><code># PASSO 1: Scan completo do servidor (da sua máquina)
+$ sudo nmap -sS -sV -p- 192.168.1.50
+PORT      STATE SERVICE    VERSION
+22/tcp    open  ssh        OpenSSH 8.9p1 Ubuntu 3ubuntu0.4
+80/tcp    open  http       nginx 1.24.0
+443/tcp   open  ssl/http   nginx 1.24.0
+4444/tcp  open  krb524?                    ← SUSPEITO!
+5432/tcp  open  postgresql PostgreSQL 15.4
+
+# PROBLEMAS DETECTADOS:
+# 1. Porta 4444 aberta — NÃO está na lista de serviços autorizados!
+# 2. PostgreSQL (5432) acessível externamente — deveria ser só 127.0.0.1!
+
+# PASSO 2: No servidor — identificar o processo na porta 4444
+$ ss -tlnp | grep :4444
+tcp  LISTEN  0  5  0.0.0.0:4444  0.0.0.0:*  users:(("nc",pid=31337,fd=4))
+# → netcat (nc) rodando como listener na porta 4444!
+# PID 31337 — número de "elite" frequentemente associado a backdoors
+
+# PASSO 3: Investigar o processo suspeito
+$ ps aux | grep 31337
+nobody  31337  0.0  0.1  2000  500 ?  S  Jan10  0:00  nc -lvp 4444 -e /bin/bash
+# CRÍTICO! É um netcat com shell reverso — BACKDOOR CONFIRMADO!
+# -l = listen, -v = verbose, -p 4444 = porta, -e /bin/bash = executa shell
+
+# PASSO 4: Verificar PostgreSQL escutando em interface errada
+$ ss -tlnp | grep :5432
+tcp  LISTEN  0  128  0.0.0.0:5432  0.0.0.0:*  users:(("postgres",pid=1234,fd=6))
+# Escutando em 0.0.0.0 (todas interfaces) — deveria ser 127.0.0.1!
+
+# AÇÕES IMEDIATAS:
+# 1. Matar o backdoor:
+$ sudo kill -9 31337
+
+# 2. Bloquear porta 4444 no firewall:
+$ sudo iptables -A INPUT -p tcp --dport 4444 -j DROP
+
+# 3. Corrigir PostgreSQL (/etc/postgresql/15/main/postgresql.conf):
+#    listen_addresses = 'localhost'    # Era '*'
+$ sudo systemctl restart postgresql
+
+# 4. Investigar como o backdoor foi instalado:
+$ last                            # Últimos logins
+$ cat /var/log/auth.log | grep "Accepted"  # Logins SSH
+$ find / -newer /etc/passwd -name "*.sh"   # Scripts recentes
+
+# 5. Notificar equipe de segurança para incident response completo</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — Problema de Comunicação entre Containers</h3>
+          <div class="command-card wide">
+            <h4>📋 Cenário</h4>
+<pre><code># SITUAÇÃO:
+# Você tem uma aplicação em Docker Compose com 3 containers:
+# - frontend (nginx) na porta 3000
+# - backend (Node.js API) na porta 8080
+# - database (PostgreSQL) na porta 5432
+#
+# O frontend consegue acessar o backend, mas o backend NÃO consegue
+# conectar ao database. Erro: "Connection refused to db:5432"
+#
+# Docker network: app-network (bridge)
+# Nomes dos containers: app-frontend, app-backend, app-database
+#
+# TAREFA: Diagnostique o problema de comunicação entre containers.</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>✅ Solução — Passo a Passo</h4>
+<pre><code># PASSO 1: Verificar se todos os containers estão rodando
+$ docker ps
+CONTAINER ID  IMAGE    COMMAND               STATUS          PORTS         NAMES
+a1b2c3d4e5f6  nginx    "nginx -g..."         Up 5 minutes    0.0.0.0:3000→80  app-frontend
+f6e5d4c3b2a1  node     "node server.js"      Up 5 minutes    8080/tcp      app-backend
+1a2b3c4d5e6f  postgres "docker-entrypoint…"  Up 2 minutes    5432/tcp      app-database
+
+# ✓ Todos rodando
+
+# PASSO 2: Verificar se os containers estão na mesma rede
+$ docker network inspect app-network | grep -A 3 "Containers"
+# Verificar se app-database está listado na rede
+
+# PASSO 3: Testar DNS interno do Docker (de dentro do backend)
+$ docker exec app-backend nslookup app-database
+Server:    127.0.0.11
+Address:   127.0.0.11#53
+
+Name:   app-database
+Address: 172.18.0.4
+# ✓ DNS resolve corretamente
+
+# PASSO 4: Testar conectividade IP (ping)
+$ docker exec app-backend ping -c 3 app-database
+PING app-database (172.18.0.4): 3 packets transmitted, 3 received, 0% loss
+# ✓ Conectividade IP OK
+
+# PASSO 5: Testar se a porta 5432 está acessível
+$ docker exec app-backend sh -c 'nc -zv app-database 5432'
+app-database (172.18.0.4:5432): Connection refused
+# ✗ A porta está RECUSANDO conexão!
+
+# PASSO 6: Verificar se PostgreSQL está escutando dentro do container
+$ docker exec app-database ss -tlnp | grep 5432
+tcp  LISTEN  0  128  127.0.0.1:5432  0.0.0.0:*  users:(("postgres",pid=1,fd=3))
+# ← ENCONTRADO! PostgreSQL escutando apenas em 127.0.0.1 (localhost)!
+# Precisa escutar em 0.0.0.0 para aceitar conexões de outros containers
+
+# DIAGNÓSTICO FINAL:
+# O PostgreSQL está configurado para aceitar conexões apenas de localhost
+# (127.0.0.1), mas o backend está em outro container (outro IP: 172.18.0.x).
+# 
+# SOLUÇÃO: No docker-compose.yml ou postgresql.conf:
+#
+# Opção A — docker-compose.yml (variável de ambiente):
+#   environment:
+#     - POSTGRES_HOST_AUTH_METHOD=md5
+#   command: ["postgres", "-c", "listen_addresses=*"]
+#
+# Opção B — postgresql.conf dentro do container:
+#   listen_addresses = '*'
+#
+# E em pg_hba.conf, adicionar:
+#   host  all  all  172.18.0.0/16  md5
+#
+# Após alteração:
+$ docker restart app-database
+
+# VERIFICAÇÃO:
+$ docker exec app-backend sh -c 'nc -zv app-database 5432'
+app-database (172.18.0.4:5432): Connection succeeded!
+# ✓ Problema resolvido!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Resumo dos Comandos — Referência Rápida</h3>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Problema</th>
+                <th>Primeiro Comando</th>
+                <th>Segundo Comando</th>
+                <th>Terceiro Comando</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Host inacessível</td>
+                <td><code>ping &lt;host&gt;</code></td>
+                <td><code>traceroute &lt;host&gt;</code></td>
+                <td><code>nmap -p &lt;port&gt; &lt;host&gt;</code></td>
+              </tr>
+              <tr>
+                <td>DNS não resolve</td>
+                <td><code>nslookup &lt;domain&gt;</code></td>
+                <td><code>dig @8.8.8.8 &lt;domain&gt;</code></td>
+                <td><code>dig +trace &lt;domain&gt;</code></td>
+              </tr>
+              <tr>
+                <td>Serviço não responde</td>
+                <td><code>ss -tlnp | grep &lt;port&gt;</code></td>
+                <td><code>nmap -sV -p &lt;port&gt; &lt;host&gt;</code></td>
+                <td><code>tcpdump port &lt;port&gt;</code></td>
+              </tr>
+              <tr>
+                <td>Latência alta</td>
+                <td><code>ping -c 20 &lt;host&gt;</code></td>
+                <td><code>mtr &lt;host&gt;</code></td>
+                <td><code>traceroute -I &lt;host&gt;</code></td>
+              </tr>
+              <tr>
+                <td>Quem usa a porta X?</td>
+                <td><code>ss -tlnp sport = :X</code></td>
+                <td><code>lsof -i :X</code></td>
+                <td><code>fuser X/tcp</code></td>
+              </tr>
+              <tr>
+                <td>Meu IP/Gateway</td>
+                <td><code>ip addr show</code></td>
+                <td><code>ip route show</code></td>
+                <td><code>ip neigh show</code></td>
+              </tr>
+              <tr>
+                <td>Auditoria de segurança</td>
+                <td><code>nmap -sS -sV &lt;host&gt;</code></td>
+                <td><code>ss -tulnp</code></td>
+                <td><code>nmap --script vuln &lt;host&gt;</code></td>
+              </tr>
+              <tr>
+                <td>Análise profunda</td>
+                <td><code>tcpdump -w cap.pcap</code></td>
+                <td>Wireshark (abrir .pcap)</td>
+                <td>Follow TCP Stream</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CTA — PRÓXIMO MÓDULO                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🌐 Próximo passo</span>
+          <h2>Pronto para Switches e VLANs?</h2>
+          <p>No Módulo 05 você aprenderá como switches operam na Camada 2, a diferença entre switches gerenciáveis e não-gerenciáveis, como configurar VLANs para segmentar tráfego, protocolos como STP (Spanning Tree) e técnicas de port security. Conhecimentos essenciais para redes corporativas.</p>
+        </div>
+        <a href="modulo-05.html" class="button primary">Ir para Módulo 05 →</a>
       </div>
     </section>
   </main>
 
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="footer-brand">
+        <img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" />
+        <p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p>
+      </div>
+      <div class="footer-column">
+        <h2>Cloud</h2>
+        <a href="../aws.html">AWS</a>
+        <a href="../cloud-practitioner.html">Cloud Practitioner</a>
+        <a href="../ai-practitioner.html">AI Practitioner</a>
+        <a href="../developer.html">Developer</a>
+        <a href="../solutions-architect.html">Solutions Architect</a>
+      </div>
+      <div class="footer-column">
+        <h2>DevOps</h2>
+        <a href="../linux.html">Linux</a>
+        <a href="../docker.html">Docker &amp; K8s</a>
+        <a href="../terraform.html">Terraform</a>
+        <a href="../python.html">Python</a>
+        <a href="../redes.html">Redes</a>
+        <a href="../github.html">GitHub</a>
+      </div>
+      <div class="footer-column">
+        <h2>Projeto</h2>
+        <a href="../about.html">Sobre</a>
+        <a href="../contact.html">Contato</a>
+        <a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p>
+    </div>
   </footer>
+
   <script src="../trail-gate.js"></script>
   <script src="../config.js"></script>
   <script src="../app.js"></script>
