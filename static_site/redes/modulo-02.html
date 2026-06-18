@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Redes Módulo 02: Modelo OSI e TCP/IP</title>
+  <meta name="description" content="Guia completo sobre os modelos OSI e TCP/IP: camadas, protocolos, encapsulamento, PDUs e comparação detalhada entre os dois modelos de referência." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,149 +18,2068 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../redes.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-01.html" class="nav-link">← Anterior</a>
         <a href="modulo-03.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- HERO SECTION                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🌐 Redes — Módulo 02</span>
         <h1>Modelo OSI e TCP/IP</h1>
-        <p>Os modelos de referência que definem como a comunicação em rede é organizada em camadas.</p>
+        <p>Neste módulo você dominará os dois principais modelos de referência em redes: o Modelo OSI (7 camadas) e o Modelo TCP/IP (4 camadas). Entender como os dados são organizados em camadas é a chave para diagnosticar problemas, configurar equipamentos e projetar redes robustas.</p>
       </div>
     </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PROGRESS TRACK                                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node active"><span>02</span><small>OSI/TCP</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>IP &amp; Sub-redes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Diagnóstico</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Switches</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Roteamento</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Segurança</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Serviços</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: POR QUE MODELOS EM CAMADAS?                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h3>1. Modelo OSI — 7 Camadas</h3>
-          <div class="info-box highlight">
-            <strong>Mnemônico:</strong> "<strong>A</strong>ll <strong>P</strong>eople <strong>S</strong>eem <strong>T</strong>o <strong>N</strong>eed <strong>D</strong>ata <strong>P</strong>rocessing" (de cima para baixo)
-          </div>
-          <div class="command-card wide" style="margin-top:16px">
-            <div class="command-header"><code>Camadas OSI</code><span class="cmd-tag">Modelo</span></div>
-            <pre><code>Camada 7 — Aplicação     | HTTP, HTTPS, FTP, DNS, SMTP, SSH
-Camada 6 — Apresentação  | SSL/TLS, JPEG, ASCII, criptografia
-Camada 5 — Sessão        | NetBIOS, RPC, controle de sessão
-Camada 4 — Transporte    | TCP (confiável), UDP (rápido)
-Camada 3 — Rede          | IP, ICMP, ARP, roteamento
-Camada 2 — Enlace        | Ethernet, MAC, switches, frames
-Camada 1 — Física        | Cabos, sinais elétricos, conectores
-
-PDU por camada:
-  Camada 4: Segmento (TCP) / Datagrama (UDP)
-  Camada 3: Pacote
-  Camada 2: Frame
-  Camada 1: Bits</code></pre>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Por que Modelos em Camadas?</h2>
+          <p>Antes de mergulhar nas camadas do OSI e TCP/IP, entenda por que dividir a comunicação em camadas é tão poderoso e por que essa abordagem revolucionou as redes de computadores.</p>
         </div>
 
         <div class="topic-block">
-          <h3>2. Modelo TCP/IP — 4 Camadas</h3>
+          <h3>1.1 — O Problema Sem Camadas</h3>
+          <p>
+            Imagine construir um sistema de comunicação sem nenhuma organização em camadas. Você teria
+            que resolver <strong>todos</strong> os problemas de uma vez: como converter dados em sinais
+            elétricos, como detectar erros, como encontrar rotas, como garantir entrega, como formatar
+            dados para aplicações — tudo em um único bloco monolítico de código.
+          </p>
+          <p>
+            Nos primórdios das redes (anos 1960-70), cada fabricante criava sua própria solução
+            proprietária e monolítica. Redes IBM (SNA) não conversavam com redes DEC (DECnet), que não
+            conversavam com redes Honeywell. Era como se cada país tivesse seu próprio sistema postal
+            com regras completamente diferentes e incompatíveis.
+          </p>
+          <p>
+            A solução? <strong>Dividir para conquistar</strong> — separar o problema complexo da
+            comunicação em rede em camadas menores, bem definidas e independentes. Cada camada resolve
+            um aspecto específico do problema e oferece serviços à camada superior.
+          </p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 — Analogia: Linha de Montagem Industrial</h3>
+          <p>
+            A melhor analogia para modelos em camadas é uma <strong>linha de montagem</strong> de uma
+            fábrica de automóveis. Em vez de um único operário montar o carro inteiro (impossível de
+            escalar), a produção é dividida em etapas especializadas:
+          </p>
+
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>TCP/IP vs OSI</code><span class="cmd-tag">Comparação</span></div>
-              <pre><code>TCP/IP              OSI Equivalente         Protocolos
-─────────────────────────────────────────────────────────
-Aplicação           7 + 6 + 5               HTTP, DNS, FTP, SSH
-Transporte          4                       TCP, UDP
-Internet            3                       IP, ICMP, ARP
-Acesso à Rede      2 + 1                   Ethernet, Wi-Fi</code></pre>
+            <div class="command-card">
+              <h4>🏭 Linha de Montagem (Analogia)</h4>
+              <p><strong>Estação 1:</strong> Monta o chassi (estrutura base)</p>
+              <p><strong>Estação 2:</strong> Instala o motor (potência)</p>
+              <p><strong>Estação 3:</strong> Coloca a carroceria (proteção)</p>
+              <p><strong>Estação 4:</strong> Faz a pintura (acabamento)</p>
+              <p><strong>Estação 5:</strong> Instala o interior (conforto)</p>
+              <p><strong>Estação 6:</strong> Controle de qualidade (verificação)</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>TCP vs UDP</code><span class="cmd-tag">Transporte</span></div>
-              <p>Dois protocolos de transporte com características distintas.</p>
-              <pre><code>TCP (Transmission Control Protocol):
-- Orientado a conexão (3-way handshake)
-- Confiável (ACK, retransmissão)
-- Controle de fluxo e congestionamento
-- Uso: HTTP, SSH, FTP, SMTP
+              <h4>🌐 Modelo em Camadas (Rede)</h4>
+              <p><strong>Camada 1:</strong> Transmite bits (sinais físicos)</p>
+              <p><strong>Camada 2:</strong> Organiza frames (acesso ao meio)</p>
+              <p><strong>Camada 3:</strong> Roteia pacotes (endereçamento lógico)</p>
+              <p><strong>Camada 4:</strong> Garante entrega (transporte confiável)</p>
+              <p><strong>Camada 5-6:</strong> Gerencia sessão e formato</p>
+              <p><strong>Camada 7:</strong> Interface com usuário (aplicação)</p>
+            </div>
+          </div>
 
-UDP (User Datagram Protocol):
-- Sem conexão (connectionless)
-- Sem garantia de entrega
-- Menor overhead, mais rápido
-- Uso: DNS, DHCP, VoIP, streaming</code></pre>
+          <p>
+            Assim como na fábrica, cada estação (camada) é <strong>especialista</strong> no que faz,
+            não precisa saber como as outras estações funcionam internamente, e pode ser
+            <strong>atualizada independentemente</strong> sem parar toda a linha.
+          </p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 — Conceitos Fundamentais da Arquitetura em Camadas</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🧩 Abstração</h4>
+              <p>
+                Cada camada esconde sua complexidade interna e expõe apenas uma <strong>interface simples</strong>
+                para a camada acima. Quando você acessa um site, não precisa saber se está usando fibra óptica ou
+                Wi-Fi — a camada de aplicação (HTTP) funciona igual em ambos os casos. A camada física é "abstraída".
+              </p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>3-Way Handshake</code><span class="cmd-tag">TCP</span></div>
-              <p>Estabelecimento de conexão TCP.</p>
-              <pre><code>Cliente → Servidor: SYN (seq=100)
-Servidor → Cliente: SYN-ACK (seq=300, ack=101)
-Cliente → Servidor: ACK (seq=101, ack=301)
-
-Encerramento (4-way):
-Cliente → FIN
-Servidor → ACK
-Servidor → FIN
-Cliente → ACK</code></pre>
+              <h4>📦 Modularidade</h4>
+              <p>
+                Assim como blocos LEGO, cada camada é um módulo independente. Você pode trocar a camada física
+                (substituir cabo por Wi-Fi) sem alterar absolutamente nada nas camadas superiores. A aplicação
+                nem percebe a mudança. Isso permite <strong>evolução tecnológica</strong> sem redesenhar tudo.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🔌 Interoperabilidade</h4>
+              <p>
+                Com interfaces padronizadas entre camadas, equipamentos de <strong>fabricantes diferentes</strong>
+                podem trabalhar juntos. Um switch Cisco conversa com um servidor Dell que roda Linux e envia dados
+                para um iPhone — todos usando os mesmos padrões de camada.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🛠️ Facilidade de Troubleshooting</h4>
+              <p>
+                Se a rede para de funcionar, você pode testar <strong>camada por camada</strong> de baixo para
+                cima: "O cabo está conectado? (L1) O MAC está OK? (L2) O IP responde a ping? (L3) A porta TCP
+                está aberta? (L4) O HTTP retorna 200? (L7)". Isso isola o problema rapidamente.
+              </p>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Portas e Protocolos Importantes</h3>
+          <h3>1.4 — Benefícios Práticos da Abordagem em Camadas</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Benefício</th>
+                <th>Descrição</th>
+                <th>Exemplo Prático</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Desenvolvimento Paralelo</td>
+                <td>Times diferentes trabalham em camadas diferentes simultaneamente</td>
+                <td>Equipe de hardware desenvolve novo chip Wi-Fi 7 enquanto equipe de software mantém o TCP igual</td>
+              </tr>
+              <tr>
+                <td>Substituição de Componentes</td>
+                <td>Trocar tecnologia de uma camada sem afetar as demais</td>
+                <td>Migrar de IPv4 para IPv6 sem alterar Ethernet (L2) ou HTTP (L7)</td>
+              </tr>
+              <tr>
+                <td>Padronização</td>
+                <td>Cada camada tem padrões definidos por organismos internacionais</td>
+                <td>IEEE define Ethernet (L1/L2), IETF define TCP/IP (L3/L4), W3C define HTTP (L7)</td>
+              </tr>
+              <tr>
+                <td>Escalabilidade</td>
+                <td>Adicionar funcionalidades em uma camada sem reescrever tudo</td>
+                <td>Adicionar TLS (criptografia) entre L4 e L7 sem modificar TCP ou HTTP</td>
+              </tr>
+              <tr>
+                <td>Diagnóstico Estruturado</td>
+                <td>Isolar problemas verificando cada camada sequencialmente</td>
+                <td>"Ping funciona (L3 OK), mas HTTP dá timeout (problema em L4 ou L7)"</td>
+              </tr>
+              <tr>
+                <td>Reuso</td>
+                <td>Serviços de uma camada são reutilizados por múltiplas aplicações acima</td>
+                <td>TCP é usado tanto por HTTP quanto por SMTP, FTP, SSH — não precisa reinventar transporte</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Na Prática — Cloud e DevOps</h4>
+            <p>
+              No mundo cloud, a abstração em camadas é levada ao extremo: quando você usa um
+              <strong>AWS Application Load Balancer</strong>, está operando na Camada 7 — a AWS cuida
+              de todas as camadas abaixo (hardware, rede, transporte) para você. Da mesma forma,
+              containers Docker abstraem o SO e a infraestrutura abaixo. Entender as camadas ajuda a
+              escolher o serviço cloud certo para cada necessidade.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 — Princípios de Comunicação Entre Camadas</h3>
+          <p>
+            As camadas se comunicam seguindo regras claras:
+          </p>
+
           <div class="command-card wide">
-            <div class="command-header"><code>Portas Conhecidas</code><span class="cmd-tag">Referência</span></div>
-            <div class="options-table">
-              <table>
-                <thead><tr><th>Porta</th><th>Protocolo</th><th>Serviço</th></tr></thead>
-                <tbody>
-                  <tr><td><code>20/21</code></td><td>TCP</td><td>FTP (dados/controle)</td></tr>
-                  <tr><td><code>22</code></td><td>TCP</td><td>SSH</td></tr>
-                  <tr><td><code>23</code></td><td>TCP</td><td>Telnet (inseguro)</td></tr>
-                  <tr><td><code>25</code></td><td>TCP</td><td>SMTP (e-mail)</td></tr>
-                  <tr><td><code>53</code></td><td>TCP/UDP</td><td>DNS</td></tr>
-                  <tr><td><code>67/68</code></td><td>UDP</td><td>DHCP</td></tr>
-                  <tr><td><code>80</code></td><td>TCP</td><td>HTTP</td></tr>
-                  <tr><td><code>443</code></td><td>TCP</td><td>HTTPS</td></tr>
-                  <tr><td><code>161/162</code></td><td>UDP</td><td>SNMP</td></tr>
-                  <tr><td><code>3389</code></td><td>TCP</td><td>RDP</td></tr>
-                </tbody>
-              </table>
-            </div>
+            <h4>📐 Interfaces e Serviços</h4>
+<pre><code>
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                      CAMADA N+1                                  │
+  │                   (Usuária do serviço)                           │
+  └────────────────────────────┬────────────────────────────────────┘
+                               │ SAP (Service Access Point)
+                               │ Interface bem definida
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                      CAMADA N                                    │
+  │                 (Provedora do serviço)                           │
+  │                                                                 │
+  │  Regras:                                                        │
+  │  • Cada camada só se comunica com a camada imediatamente        │
+  │    acima e abaixo (adjacentes)                                  │
+  │  • Comunicação entre camadas NÃO adjacentes é proibida          │
+  │  • A camada N oferece SERVIÇOS à camada N+1                     │
+  │  • A camada N usa SERVIÇOS da camada N-1                        │
+  │  • Camadas pares (mesmo nível) se comunicam via PROTOCOLOS      │
+  └────────────────────────────┬────────────────────────────────────┘
+                               │
+                               ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                      CAMADA N-1                                  │
+  │                 (Provê serviço para N)                           │
+  └─────────────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Conceito Importante: Comunicação Lógica vs Física</h4>
+            <p>
+              Duas máquinas conversando via HTTP parecem estar trocando dados diretamente na Camada 7.
+              Mas <strong>fisicamente</strong>, os dados descem todas as camadas no emissor (7→1), viajam
+              pelo meio físico, e sobem todas as camadas no receptor (1→7). A comunicação direta entre
+              camadas pares é apenas <strong>lógica</strong> (conceitual) — os dados sempre passam pelas
+              camadas intermediárias. Esse processo se chama <strong>encapsulamento</strong>.
+            </p>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: MODELO OSI (7 CAMADAS)                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Modelo OSI — 7 Camadas</h2>
+          <p>O modelo Open Systems Interconnection (OSI) foi criado pela ISO em 1984 como referência teórica universal. Possui 7 camadas, cada uma com responsabilidades bem definidas. Vamos explorar cada uma em profundidade.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — Visão Geral do Modelo OSI</h3>
+          <p>
+            O modelo OSI (Open Systems Interconnection) foi desenvolvido pela
+            <strong>ISO (International Organization for Standardization)</strong> entre 1977 e 1984.
+            Seu objetivo era criar um <strong>modelo de referência universal</strong> que permitisse
+            a qualquer fabricante desenvolver equipamentos e softwares de rede que pudessem interoperar.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 As 7 Camadas do Modelo OSI</h4>
+<pre><code>
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │  Nº  │     CAMADA         │   PDU      │  EXEMPLO DE PROTOCOLO/TECNOLOGIA  │
+  ├──────┼────────────────────┼────────────┼───────────────────────────────────┤
+  │  7   │  Aplicação         │  Dados     │  HTTP, HTTPS, FTP, SMTP, DNS      │
+  │  6   │  Apresentação      │  Dados     │  SSL/TLS, JPEG, MPEG, ASCII       │
+  │  5   │  Sessão            │  Dados     │  NetBIOS, RPC, PPTP               │
+  │  4   │  Transporte        │  Segmento  │  TCP, UDP, SCTP                   │
+  │  3   │  Rede              │  Pacote    │  IP, ICMP, IPSec, OSPF, BGP       │
+  │  2   │  Enlace (Data Link)│  Frame     │  Ethernet, Wi-Fi, PPP, ARP        │
+  │  1   │  Física            │  Bit       │  Cabos, Hubs, sinais elétricos    │
+  └─────────────────────────────────────────────────────────────────────────────┘
+  
+  Mnemônico para memorizar (de baixo para cima):
+  "Fui Em Roma Transportar Sete Pessoas Alegres"
+   F=Física  E=Enlace  R=Rede  T=Transporte  S=Sessão  P=Apresentação  A=Aplicação
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Camada 1: Física (Physical Layer)</h3>
+          <p>
+            A camada mais baixa do modelo OSI lida com a <strong>transmissão bruta de bits</strong> sobre
+            um meio físico. Ela não se preocupa com o significado dos dados — apenas com a conversão entre
+            bits (0s e 1s) e sinais (elétricos, ópticos ou eletromagnéticos).
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>⚡ Função Principal</h4>
+              <p>Transmitir bits individuais de um nó ao próximo nó através de um meio de transmissão físico.</p>
+              <p><strong>PDU:</strong> Bit (stream de bits)</p>
+              <p><strong>Endereçamento:</strong> Nenhum (apenas sinais)</p>
+              <p><strong>Dispositivos:</strong> Hubs, repetidores, cabos, conectores, transceivers</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Definição de voltagens e temporização dos sinais</p>
+              <p>• Tipo de conector e pinagem (RJ-45, LC, SC)</p>
+              <p>• Taxa de transmissão (bit rate): 10 Mbps, 1 Gbps, etc.</p>
+              <p>• Modo de transmissão: simplex, half-duplex, full-duplex</p>
+              <p>• Topologia física: bus, estrela, anel</p>
+              <p>• Codificação de linha (Manchester, 4B/5B, 8B/10B)</p>
+            </div>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Meio Físico</th>
+                <th>Tipo de Sinal</th>
+                <th>Velocidade Típica</th>
+                <th>Distância Máxima</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Par Trançado Cat5e</td>
+                <td>Elétrico</td>
+                <td>1 Gbps</td>
+                <td>100 metros</td>
+              </tr>
+              <tr>
+                <td>Par Trançado Cat6a</td>
+                <td>Elétrico</td>
+                <td>10 Gbps</td>
+                <td>100 metros</td>
+              </tr>
+              <tr>
+                <td>Fibra Multimodo (OM3)</td>
+                <td>Óptico (luz)</td>
+                <td>10 Gbps</td>
+                <td>300 metros</td>
+              </tr>
+              <tr>
+                <td>Fibra Monomodo (OS2)</td>
+                <td>Óptico (laser)</td>
+                <td>100 Gbps</td>
+                <td>80+ km</td>
+              </tr>
+              <tr>
+                <td>Wi-Fi 6 (802.11ax)</td>
+                <td>Eletromagnético</td>
+                <td>9.6 Gbps (teórico)</td>
+                <td>~70 metros indoor</td>
+              </tr>
+              <tr>
+                <td>Coaxial (RG-6)</td>
+                <td>Elétrico</td>
+                <td>10 Gbps (DOCSIS 4.0)</td>
+                <td>500 metros</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Diagnóstico na Camada 1</h4>
+            <p>
+              Problemas de Camada 1 são os mais comuns e os primeiros a verificar: cabo desconectado,
+              cabo danificado, porta do switch com LED apagado, interferência eletromagnética, conector
+              mal crimpado. A famosa frase de troubleshooting: <em>"Você verificou se o cabo está conectado?"</em>
+              é literalmente um diagnóstico de Camada 1.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Camada 2: Enlace de Dados (Data Link Layer)</h3>
+          <p>
+            A Camada 2 é responsável pela comunicação <strong>nó a nó</strong> — ou seja, entre dois
+            dispositivos diretamente conectados no mesmo segmento de rede. Ela organiza os bits da
+            Camada 1 em unidades lógicas chamadas <strong>frames</strong> e adiciona endereçamento físico (MAC).
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔗 Função Principal</h4>
+              <p>Transferência confiável de frames entre dois nós adjacentes na mesma rede local.</p>
+              <p><strong>PDU:</strong> Frame (quadro)</p>
+              <p><strong>Endereçamento:</strong> MAC Address (48 bits, ex: AA:BB:CC:DD:EE:FF)</p>
+              <p><strong>Dispositivos:</strong> Switches, bridges, placas de rede (NIC)</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Enquadramento (framing): delimitar onde começa e termina cada frame</p>
+              <p>• Endereçamento físico: MAC de origem e destino</p>
+              <p>• Controle de acesso ao meio (MAC): quem pode transmitir e quando</p>
+              <p>• Detecção de erros: CRC (Cyclic Redundancy Check) no trailer</p>
+              <p>• Controle de fluxo: evitar que receptor lento seja sobrecarregado</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📐 Estrutura de um Frame Ethernet (IEEE 802.3)</h4>
+<pre><code>
+  ┌──────────┬──────────┬──────────┬───────────┬──────────┬────────────────┬──────────┐
+  │ Preâmbulo│   SFD    │ MAC Dest │ MAC Origem│  Tipo/   │    PAYLOAD     │   FCS    │
+  │  7 bytes │  1 byte  │  6 bytes │  6 bytes  │Tamanho   │ 46-1500 bytes  │  4 bytes │
+  │          │          │          │           │ 2 bytes  │                │  (CRC)   │
+  └──────────┴──────────┴──────────┴───────────┴──────────┴────────────────┴──────────┘
+  
+  • Preâmbulo: sincronização de clock (10101010... repetido)
+  • SFD (Start Frame Delimiter): marca o início real do frame (10101011)
+  • MAC Destino: endereço físico do destinatário
+  • MAC Origem: endereço físico do remetente
+  • Tipo/Tamanho: identifica o protocolo superior (0x0800 = IPv4, 0x86DD = IPv6)
+  • Payload: dados da camada superior (pacote IP encapsulado)
+  • FCS (Frame Check Sequence): CRC-32 para detecção de erros
+</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📐 Sub-camadas da Camada 2</h4>
+<pre><code>
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │                    CAMADA 2: ENLACE DE DADOS                        │
+  ├─────────────────────────────────────────────────────────────────────┤
+  │                                                                     │
+  │  ┌───────────────────────────────────────────────────────────────┐  │
+  │  │  LLC (Logical Link Control) — IEEE 802.2                      │  │
+  │  │  • Multiplexação de protocolos superiores                     │  │
+  │  │  • Controle de fluxo (opcional)                               │  │
+  │  │  • Controle de erros (opcional)                               │  │
+  │  └───────────────────────────────────────────────────────────────┘  │
+  │                                                                     │
+  │  ┌───────────────────────────────────────────────────────────────┐  │
+  │  │  MAC (Media Access Control) — IEEE 802.3 / 802.11             │  │
+  │  │  • Endereçamento MAC (48 bits)                                │  │
+  │  │  • Controle de acesso ao meio (CSMA/CD, CSMA/CA)             │  │
+  │  │  • Enquadramento (framing)                                    │  │
+  │  │  • Detecção de erros (FCS/CRC)                                │  │
+  │  └───────────────────────────────────────────────────────────────┘  │
+  │                                                                     │
+  └─────────────────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ MAC Address vs IP Address</h4>
+            <p>
+              O <strong>MAC address</strong> (Camada 2) é gravado no hardware da placa de rede pelo fabricante
+              e identifica o dispositivo <strong>localmente</strong>. O <strong>IP address</strong> (Camada 3)
+              é configurado por software e identifica o dispositivo <strong>logicamente</strong> na rede.
+              O MAC funciona apenas no segmento local — quando um pacote cruza um roteador, os MACs de
+              origem e destino mudam (são trocados pelo roteador), mas os IPs permanecem os mesmos.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — Camada 3: Rede (Network Layer)</h3>
+          <p>
+            A Camada 3 é responsável pelo <strong>endereçamento lógico</strong> e pelo
+            <strong>roteamento</strong> — ou seja, encontrar o melhor caminho para um pacote viajar
+            da origem ao destino, mesmo passando por múltiplas redes intermediárias.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🗺️ Função Principal</h4>
+              <p>Roteamento de pacotes da origem ao destino final através de múltiplas redes.</p>
+              <p><strong>PDU:</strong> Pacote (Packet)</p>
+              <p><strong>Endereçamento:</strong> IP Address (IPv4: 32 bits / IPv6: 128 bits)</p>
+              <p><strong>Dispositivos:</strong> Roteadores (routers), switches L3</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Endereçamento lógico: atribuir IPs únicos aos dispositivos</p>
+              <p>• Roteamento: determinar o melhor caminho (OSPF, BGP, RIP)</p>
+              <p>• Fragmentação: dividir pacotes grandes se necessário</p>
+              <p>• Controle de congestionamento</p>
+              <p>• Tradução de endereços (NAT)</p>
+              <p>• QoS (Quality of Service): priorização de tráfego</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📐 Estrutura do Cabeçalho IPv4</h4>
+<pre><code>
+  0                   1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
+  │Version│  IHL  │    DSCP   │ECN│         Total Length          │
+  ├───────┼───────┼───────────┼───┼───────────────────────────────┤
+  │         Identification        │Flags│    Fragment Offset      │
+  ├───────────────────────────────┼─────┼─────────────────────────┤
+  │  Time to Live │   Protocol    │       Header Checksum         │
+  ├───────────────┼───────────────┼─────────────────────────────────┤
+  │                    Source IP Address (32 bits)                   │
+  ├─────────────────────────────────────────────────────────────────┤
+  │                 Destination IP Address (32 bits)                 │
+  ├─────────────────────────────────────────────────────────────────┤
+  │                    Options (se IHL > 5)                          │
+  └─────────────────────────────────────────────────────────────────┘
+  
+  Campos mais importantes:
+  • TTL (Time to Live): decrementado em cada roteador, previne loops infinitos
+  • Protocol: identifica L4 (6=TCP, 17=UDP, 1=ICMP)
+  • Source/Destination IP: endereços lógicos de origem e destino
+</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo de Roteamento</th>
+                <th>Tipo</th>
+                <th>Uso Típico</th>
+                <th>Métrica</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>RIP (Routing Information Protocol)</td>
+                <td>Distance Vector</td>
+                <td>Redes pequenas, legado</td>
+                <td>Hop count (máx 15)</td>
+              </tr>
+              <tr>
+                <td>OSPF (Open Shortest Path First)</td>
+                <td>Link State</td>
+                <td>Redes corporativas médias/grandes</td>
+                <td>Custo (baseado em bandwidth)</td>
+              </tr>
+              <tr>
+                <td>BGP (Border Gateway Protocol)</td>
+                <td>Path Vector</td>
+                <td>Internet (entre ISPs/ASes)</td>
+                <td>Políticas + path attributes</td>
+              </tr>
+              <tr>
+                <td>EIGRP (Enhanced IGRP)</td>
+                <td>Hybrid (Cisco)</td>
+                <td>Redes Cisco enterprise</td>
+                <td>Bandwidth + delay + confiabilidade</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Camada 3 na Cloud (AWS)</h4>
+            <p>
+              Na AWS, a <strong>VPC (Virtual Private Cloud)</strong> é essencialmente uma rede de Camada 3.
+              Você define CIDR blocks (faixas de IP), cria sub-redes, configura route tables e internet
+              gateways — tudo conceitos de Camada 3. Security Groups filtram por IP e porta (L3/L4).
+              Entender roteamento é fundamental para arquitetar VPCs corretamente.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 — Camada 4: Transporte (Transport Layer)</h3>
+          <p>
+            A Camada 4 é responsável pela comunicação <strong>fim a fim</strong> (end-to-end) entre
+            processos em hosts diferentes. Enquanto a Camada 3 roteia pacotes entre máquinas, a Camada 4
+            entrega dados ao <strong>processo correto</strong> dentro da máquina (usando portas).
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🚚 Função Principal</h4>
+              <p>Entrega confiável (ou não) de dados entre processos em hosts distintos.</p>
+              <p><strong>PDU:</strong> Segmento (TCP) ou Datagrama (UDP)</p>
+              <p><strong>Endereçamento:</strong> Portas (0-65535)</p>
+              <p><strong>Protocolos:</strong> TCP, UDP, SCTP, QUIC</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Segmentação e remontagem de dados</p>
+              <p>• Multiplexação por portas (múltiplas apps no mesmo host)</p>
+              <p>• Controle de fluxo (sliding window)</p>
+              <p>• Controle de congestionamento (TCP)</p>
+              <p>• Entrega ordenada e sem duplicatas (TCP)</p>
+              <p>• Detecção de erros (checksum)</p>
+            </div>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>TCP (Transmission Control Protocol)</th>
+                <th>UDP (User Datagram Protocol)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Conexão</td>
+                <td>Orientado a conexão (3-way handshake)</td>
+                <td>Sem conexão (connectionless)</td>
+              </tr>
+              <tr>
+                <td>Confiabilidade</td>
+                <td>Garantida (ACKs, retransmissão)</td>
+                <td>Não garantida (best-effort)</td>
+              </tr>
+              <tr>
+                <td>Ordenação</td>
+                <td>Dados entregues em ordem (sequence numbers)</td>
+                <td>Sem garantia de ordem</td>
+              </tr>
+              <tr>
+                <td>Velocidade</td>
+                <td>Mais lento (overhead de controle)</td>
+                <td>Mais rápido (mínimo overhead)</td>
+              </tr>
+              <tr>
+                <td>Controle de Fluxo</td>
+                <td>Sim (sliding window)</td>
+                <td>Não</td>
+              </tr>
+              <tr>
+                <td>Overhead do Header</td>
+                <td>20-60 bytes</td>
+                <td>8 bytes</td>
+              </tr>
+              <tr>
+                <td>Uso Típico</td>
+                <td>HTTP, HTTPS, FTP, SMTP, SSH</td>
+                <td>DNS, DHCP, VoIP, streaming, gaming</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📐 TCP Three-Way Handshake</h4>
+<pre><code>
+  CLIENTE                                                  SERVIDOR
+  ═══════                                                  ════════
+     │                                                        │
+     │──────────── SYN (seq=100) ────────────────────────────▶│
+     │             "Quero conectar"                            │
+     │                                                        │
+     │◀─────────── SYN-ACK (seq=300, ack=101) ───────────────│
+     │             "OK, aceito. E você confirma?"              │
+     │                                                        │
+     │──────────── ACK (seq=101, ack=301) ───────────────────▶│
+     │             "Confirmado. Conexão estabelecida!"         │
+     │                                                        │
+     │◀═══════════ DADOS PODEM FLUIR ════════════════════════▶│
+     │                                                        │
+  
+  Portas Well-Known (0-1023):
+  • 80  = HTTP       • 443 = HTTPS     • 22  = SSH
+  • 25  = SMTP       • 53  = DNS       • 21  = FTP
+  • 110 = POP3       • 143 = IMAP      • 3389 = RDP
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 TCP vs UDP — Quando Usar Cada Um?</h4>
+            <p>
+              Use <strong>TCP</strong> quando precisa que todos os dados cheguem corretamente e em ordem
+              (web, email, transferência de arquivos). Use <strong>UDP</strong> quando velocidade importa
+              mais que perfeição — em streaming de vídeo, se um frame se perde, é melhor seguir em frente
+              do que parar e retransmitir (isso causaria "travamento"). DNS também usa UDP porque as
+              consultas são pequenas e rápidas — se não responder, basta perguntar de novo.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.6 — Camada 5: Sessão (Session Layer)</h3>
+          <p>
+            A Camada 5 gerencia <strong>sessões de comunicação</strong> entre aplicações. Uma sessão é
+            um diálogo ordenado entre dois processos — ela controla quem fala quando, permite checkpoints
+            para retomar transferências e garante que conexões sejam abertas e fechadas de forma organizada.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🤝 Função Principal</h4>
+              <p>Estabelecer, gerenciar e encerrar sessões entre aplicações.</p>
+              <p><strong>PDU:</strong> Dados (Data)</p>
+              <p><strong>Protocolos:</strong> NetBIOS, RPC, PPTP, L2TP, SIP</p>
+              <p><strong>Conceito-chave:</strong> Controle de diálogo</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Abertura e fechamento de sessões</p>
+              <p>• Sincronização (checkpoints para recuperação)</p>
+              <p>• Controle de diálogo: full-duplex, half-duplex, simplex</p>
+              <p>• Gerenciamento de tokens (quem pode transmitir)</p>
+              <p>• Recuperação de sessão em caso de falha</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Exemplo Prático de Sessão</h4>
+            <p>
+              Quando você faz upload de um arquivo grande (ex: 2 GB) e a conexão cai no meio, um protocolo
+              com suporte a sessão pode <strong>retomar de onde parou</strong> em vez de começar do zero.
+              Isso é possível graças aos <em>checkpoints</em> (pontos de sincronização) que a Camada 5
+              insere periodicamente. Sem sessão, todo o progresso seria perdido.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.7 — Camada 6: Apresentação (Presentation Layer)</h3>
+          <p>
+            A Camada 6 cuida da <strong>sintaxe e semântica</strong> das informações trocadas. Ela garante
+            que dados produzidos por uma aplicação em um sistema possam ser lidos por uma aplicação em outro
+            sistema, independentemente da representação interna.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🎨 Função Principal</h4>
+              <p>Tradução, criptografia e compressão de dados para a camada de aplicação.</p>
+              <p><strong>PDU:</strong> Dados (Data)</p>
+              <p><strong>Protocolos/Padrões:</strong> SSL/TLS, JPEG, MPEG, GIF, ASCII, Unicode, XML, JSON</p>
+              <p><strong>Conceito-chave:</strong> Formatação e tradução</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Tradução de formatos (ASCII ↔ EBCDIC, UTF-8 ↔ UTF-16)</p>
+              <p>• Criptografia/Descriptografia (SSL/TLS)</p>
+              <p>• Compressão/Descompressão (reduzir tamanho dos dados)</p>
+              <p>• Serialização (converter objetos em bytes)</p>
+              <p>• Codificação de mídia (JPEG, MP3, H.264)</p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Camadas 5 e 6 na Prática</h4>
+            <p>
+              No mundo real, as funções das Camadas 5 e 6 geralmente são <strong>absorvidas pela Camada 7</strong>
+              (aplicação) ou por bibliotecas do sistema. Por exemplo, TLS (criptografia) tecnicamente seria
+              Camada 6, mas na prática é implementado como uma biblioteca entre TCP (L4) e HTTP (L7).
+              É por isso que o modelo TCP/IP não possui essas camadas separadas — ele unifica tudo em "Aplicação".
+              Ainda assim, o OSI é útil como <strong>modelo de referência conceitual</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.8 — Camada 7: Aplicação (Application Layer)</h3>
+          <p>
+            A Camada 7 é a camada mais próxima do usuário final. Ela fornece a <strong>interface
+            entre a rede e as aplicações</strong> que o usuário utiliza. Não é a aplicação em si
+            (o navegador, por exemplo), mas sim os protocolos que a aplicação usa para se comunicar.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📱 Função Principal</h4>
+              <p>Fornecer serviços de rede diretamente aos processos de aplicação do usuário.</p>
+              <p><strong>PDU:</strong> Dados/Mensagem (Data/Message)</p>
+              <p><strong>Protocolos:</strong> HTTP, HTTPS, FTP, SMTP, POP3, IMAP, DNS, DHCP, SSH, Telnet, SNMP</p>
+              <p><strong>Conceito-chave:</strong> Interface com o usuário</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Responsabilidades</h4>
+              <p>• Identificação de parceiros de comunicação</p>
+              <p>• Determinação de disponibilidade de recursos</p>
+              <p>• Sincronização de comunicação</p>
+              <p>• Autenticação e autorização</p>
+              <p>• Transferência de informações (arquivos, e-mails, páginas web)</p>
+              <p>• Resolução de nomes (DNS)</p>
+            </div>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Porta</th>
+                <th>Transporte</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>HTTP</td>
+                <td>80</td>
+                <td>TCP</td>
+                <td>Transferência de páginas web (sem criptografia)</td>
+              </tr>
+              <tr>
+                <td>HTTPS</td>
+                <td>443</td>
+                <td>TCP</td>
+                <td>HTTP com criptografia TLS (seguro)</td>
+              </tr>
+              <tr>
+                <td>FTP</td>
+                <td>20/21</td>
+                <td>TCP</td>
+                <td>Transferência de arquivos (dados/controle)</td>
+              </tr>
+              <tr>
+                <td>SSH</td>
+                <td>22</td>
+                <td>TCP</td>
+                <td>Acesso remoto seguro (substituto do Telnet)</td>
+              </tr>
+              <tr>
+                <td>SMTP</td>
+                <td>25/587</td>
+                <td>TCP</td>
+                <td>Envio de e-mails</td>
+              </tr>
+              <tr>
+                <td>DNS</td>
+                <td>53</td>
+                <td>UDP/TCP</td>
+                <td>Resolução de nomes para IP</td>
+              </tr>
+              <tr>
+                <td>DHCP</td>
+                <td>67/68</td>
+                <td>UDP</td>
+                <td>Atribuição automática de IPs</td>
+              </tr>
+              <tr>
+                <td>SNMP</td>
+                <td>161/162</td>
+                <td>UDP</td>
+                <td>Gerenciamento e monitoramento de rede</td>
+              </tr>
+              <tr>
+                <td>Telnet</td>
+                <td>23</td>
+                <td>TCP</td>
+                <td>Acesso remoto (inseguro, legado)</td>
+              </tr>
+              <tr>
+                <td>RDP</td>
+                <td>3389</td>
+                <td>TCP/UDP</td>
+                <td>Acesso remoto gráfico (Windows)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Camada 7 e Load Balancers</h4>
+            <p>
+              Na AWS, o <strong>Application Load Balancer (ALB)</strong> opera na Camada 7 — ele pode
+              tomar decisões de roteamento baseadas no conteúdo HTTP (URL path, headers, cookies).
+              Já o <strong>Network Load Balancer (NLB)</strong> opera na Camada 4 — ele só vê IP e porta.
+              Essa distinção é direta do modelo OSI e determina qual load balancer usar em cada cenário.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: MODELO TCP/IP (4 CAMADAS)                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Modelo TCP/IP — 4 Camadas</h2>
+          <p>O modelo TCP/IP é o modelo prático que realmente roda a Internet. Desenvolvido pelo DoD (Departamento de Defesa dos EUA) nos anos 1970, é mais simples que o OSI e reflete como os protocolos são implementados na prática.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — Origem e Filosofia do TCP/IP</h3>
+          <p>
+            O modelo TCP/IP nasceu antes do modelo OSI — foi desenvolvido por <strong>Vinton Cerf</strong>
+            e <strong>Bob Kahn</strong> na DARPA (Defense Advanced Research Projects Agency) entre 1973-1983.
+            Enquanto o OSI é um modelo <strong>teórico</strong> criado por comitê, o TCP/IP foi desenvolvido
+            <strong>na prática</strong>, resolvendo problemas reais da ARPANET.
+          </p>
+          <p>
+            A filosofia do TCP/IP segue princípios pragmáticos:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🎯 Princípios do TCP/IP</h4>
+              <p><strong>End-to-End:</strong> Inteligência nas pontas, rede simples no meio</p>
+              <p><strong>Robustez:</strong> "Seja liberal no que aceita, conservador no que envia" (Postel's Law)</p>
+              <p><strong>Simplicidade:</strong> Menos camadas, implementação mais direta</p>
+              <p><strong>Interoperabilidade:</strong> Funcionar em qualquer hardware/SO</p>
+              <p><strong>Escalabilidade:</strong> Projetado para crescer (e cresceu para bilhões de hosts)</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 TCP/IP vs OSI — Números</h4>
+              <p><strong>Camadas:</strong> 4 (vs 7 do OSI)</p>
+              <p><strong>Documentação:</strong> RFCs (Request for Comments)</p>
+              <p><strong>Organismo:</strong> IETF (Internet Engineering Task Force)</p>
+              <p><strong>Adoção:</strong> 100% da Internet mundial</p>
+              <p><strong>Implementações:</strong> Linux, Windows, macOS, iOS, Android</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — As 4 Camadas do Modelo TCP/IP</h3>
+
+          <div class="command-card wide">
+            <h4>📐 Estrutura do Modelo TCP/IP</h4>
+<pre><code>
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │  Nº  │     CAMADA              │   PDU        │  PROTOCOLOS                 │
+  ├──────┼─────────────────────────┼──────────────┼─────────────────────────────┤
+  │  4   │  Aplicação              │  Mensagem    │  HTTP, FTP, DNS, SMTP, SSH  │
+  │      │  (Application)          │              │  DHCP, SNMP, TLS            │
+  ├──────┼─────────────────────────┼──────────────┼─────────────────────────────┤
+  │  3   │  Transporte             │  Segmento/   │  TCP, UDP, SCTP, QUIC       │
+  │      │  (Transport)            │  Datagrama   │                             │
+  ├──────┼─────────────────────────┼──────────────┼─────────────────────────────┤
+  │  2   │  Internet               │  Pacote/     │  IPv4, IPv6, ICMP, ICMPv6   │
+  │      │  (Internet)             │  Datagrama   │  ARP, IGMP, IPSec           │
+  ├──────┼─────────────────────────┼──────────────┼─────────────────────────────┤
+  │  1   │  Acesso à Rede          │  Frame/Bits  │  Ethernet, Wi-Fi, PPP       │
+  │      │  (Network Access/Link)  │              │  DSL, DOCSIS, Frame Relay   │
+  └─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — Camada 1: Acesso à Rede (Network Access / Link Layer)</h3>
+          <p>
+            Esta camada combina as funções das Camadas 1 (Física) e 2 (Enlace) do modelo OSI. Ela é
+            responsável por colocar os pacotes IP "no fio" — converter pacotes em frames e frames em
+            sinais que viajam pelo meio físico.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔌 Função</h4>
+              <p>Transmitir dados no segmento local de rede, do host ao primeiro roteador (ou entre hosts no mesmo segmento).</p>
+              <p><strong>Protocolos:</strong> Ethernet (802.3), Wi-Fi (802.11), PPP, ARP</p>
+              <p><strong>Endereçamento:</strong> MAC address (hardware)</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 O que resolve</h4>
+              <p>• Como bits viram sinais (codificação)</p>
+              <p>• Como delimitar frames (enquadramento)</p>
+              <p>• Como identificar vizinhos (MAC/ARP)</p>
+              <p>• Como lidar com colisões (CSMA/CD, CSMA/CA)</p>
+              <p>• Como detectar erros no segmento local (CRC)</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que o TCP/IP "simplifica" esta camada?</h4>
+            <p>
+              O modelo TCP/IP foi projetado para funcionar sobre <strong>qualquer</strong> tecnologia de
+              rede local — Ethernet, Token Ring, FDDI, ATM, Wi-Fi, celular. Por isso, ele não detalha
+              a camada de acesso à rede: "não importa <em>como</em> o pacote chega ao próximo hop, desde
+              que chegue". Essa flexibilidade é o que permite que IP rode tanto sobre fibra óptica
+              submarina quanto sobre satélite ou Bluetooth.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Camada 2: Internet (Internet Layer)</h3>
+          <p>
+            Equivalente à Camada 3 do OSI. É o coração do modelo TCP/IP — o protocolo
+            <strong>IP (Internet Protocol)</strong> opera aqui e é responsável por rotear pacotes
+            da origem ao destino final, independentemente de quantas redes intermediárias existam.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🌐 Função</h4>
+              <p>Endereçamento lógico e roteamento de pacotes entre redes distintas.</p>
+              <p><strong>Protocolo Principal:</strong> IP (v4 e v6)</p>
+              <p><strong>Protocolos Auxiliares:</strong> ICMP (diagnóstico), ARP (resolução MAC), IGMP (multicast)</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Características do IP</h4>
+              <p>• <strong>Connectionless:</strong> Cada pacote é independente</p>
+              <p>• <strong>Best-effort:</strong> Não garante entrega (L4 cuida disso)</p>
+              <p>• <strong>Roteável:</strong> Pacotes podem cruzar múltiplas redes</p>
+              <p>• <strong>Fragmentável:</strong> Pacotes grandes podem ser divididos</p>
+              <p>• <strong>Endereçamento hierárquico:</strong> Permite agregação de rotas</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 — Camada 3: Transporte (Transport Layer)</h3>
+          <p>
+            Idêntica à Camada 4 do OSI. Fornece comunicação fim a fim entre processos, com os mesmos
+            dois protocolos principais: <strong>TCP</strong> (confiável) e <strong>UDP</strong> (rápido).
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🚚 TCP no Modelo TCP/IP</h4>
+              <p><strong>Orientado a conexão:</strong> 3-way handshake antes de enviar dados</p>
+              <p><strong>Confiável:</strong> Retransmissão automática de segmentos perdidos</p>
+              <p><strong>Ordenado:</strong> Números de sequência garantem ordem correta</p>
+              <p><strong>Controle de fluxo:</strong> Window size adapta velocidade</p>
+              <p><strong>Controle de congestionamento:</strong> Slow start, congestion avoidance</p>
+            </div>
+            <div class="command-card">
+              <h4>⚡ UDP no Modelo TCP/IP</h4>
+              <p><strong>Sem conexão:</strong> Envia sem handshake (fire and forget)</p>
+              <p><strong>Não confiável:</strong> Sem ACKs nem retransmissão</p>
+              <p><strong>Não ordenado:</strong> Datagramas podem chegar fora de ordem</p>
+              <p><strong>Leve:</strong> Header de apenas 8 bytes</p>
+              <p><strong>Rápido:</strong> Ideal para real-time (VoIP, games, streaming)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.6 — Camada 4: Aplicação (Application Layer)</h3>
+          <p>
+            No modelo TCP/IP, a camada de Aplicação unifica as Camadas 5, 6 e 7 do OSI em uma única
+            camada. Aqui residem todos os protocolos que interagem diretamente com o software do usuário.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📱 Protocolos de Aplicação TCP/IP</h4>
+              <p><strong>Web:</strong> HTTP/1.1, HTTP/2, HTTP/3, HTTPS (TLS)</p>
+              <p><strong>E-mail:</strong> SMTP (envio), POP3/IMAP (recebimento)</p>
+              <p><strong>Transferência:</strong> FTP, SFTP, SCP, TFTP</p>
+              <p><strong>Resolução:</strong> DNS (nomes → IPs)</p>
+              <p><strong>Configuração:</strong> DHCP (IPs automáticos), NTP (tempo)</p>
+              <p><strong>Acesso remoto:</strong> SSH, Telnet, RDP</p>
+              <p><strong>Gerenciamento:</strong> SNMP, Syslog, NETCONF</p>
+            </div>
+            <div class="command-card">
+              <h4>🔐 TLS/SSL na Aplicação TCP/IP</h4>
+              <p>
+                No modelo OSI, criptografia seria Camada 6 (Apresentação). No TCP/IP, TLS é tratado
+                como parte da camada de Aplicação — mais especificamente, ele se situa <strong>entre</strong>
+                a aplicação (HTTP) e o transporte (TCP), criando um "sub-layer" de segurança.
+              </p>
+              <p><strong>Stack completa HTTPS:</strong></p>
+              <p>HTTP → TLS → TCP → IP → Ethernet</p>
+              <p>Isso resulta no que chamamos de <strong>HTTPS = HTTP over TLS over TCP</strong>.</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 HTTP/3 e QUIC — A Evolução</h4>
+            <p>
+              O protocolo <strong>HTTP/3</strong> (2022) revolucionou ao abandonar TCP em favor de
+              <strong>QUIC</strong> (baseado em UDP). QUIC implementa confiabilidade e criptografia
+              diretamente, eliminando o overhead do TCP handshake + TLS handshake. O resultado?
+              Conexões são estabelecidas com <strong>0-RTT</strong> (zero round trips), 
+              drasticamente mais rápido que TCP+TLS (que requer 3+ round trips). Isso mostra como
+              o modelo em camadas permite inovação radical mantendo compatibilidade.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: OSI vs TCP/IP — COMPARAÇÃO                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>OSI vs TCP/IP — Comparação Completa</h2>
+          <p>Entenda as diferenças, semelhanças e quando usar cada modelo como referência. Ambos coexistem e se complementam no dia a dia de profissionais de redes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — Mapeamento de Camadas</h3>
+
+          <div class="command-card wide">
+            <h4>📐 OSI vs TCP/IP — Mapeamento Visual</h4>
+<pre><code>
+  ┌─────────────────────────┐          ┌─────────────────────────┐
+  │    MODELO OSI (7)       │          │   MODELO TCP/IP (4)     │
+  ├─────────────────────────┤          ├─────────────────────────┤
+  │                         │          │                         │
+  │  7. Aplicação           │ ─────┐   │                         │
+  │                         │      │   │                         │
+  │  6. Apresentação        │ ─────┼──▶│  4. Aplicação           │
+  │                         │      │   │                         │
+  │  5. Sessão              │ ─────┘   │                         │
+  │                         │          │                         │
+  ├─────────────────────────┤          ├─────────────────────────┤
+  │                         │          │                         │
+  │  4. Transporte          │ ────────▶│  3. Transporte          │
+  │                         │          │                         │
+  ├─────────────────────────┤          ├─────────────────────────┤
+  │                         │          │                         │
+  │  3. Rede                │ ────────▶│  2. Internet            │
+  │                         │          │                         │
+  ├─────────────────────────┤          ├─────────────────────────┤
+  │                         │          │                         │
+  │  2. Enlace de Dados     │ ─────┐   │                         │
+  │                         │      ├──▶│  1. Acesso à Rede       │
+  │  1. Física              │ ─────┘   │                         │
+  │                         │          │                         │
+  └─────────────────────────┘          └─────────────────────────┘
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — Tabela Comparativa Detalhada</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Modelo OSI</th>
+                <th>Modelo TCP/IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Número de Camadas</td>
+                <td>7 camadas</td>
+                <td>4 camadas</td>
+              </tr>
+              <tr>
+                <td>Desenvolvido por</td>
+                <td>ISO (International Organization for Standardization)</td>
+                <td>DoD / DARPA (Departamento de Defesa dos EUA)</td>
+              </tr>
+              <tr>
+                <td>Ano</td>
+                <td>1984</td>
+                <td>1974-1983</td>
+              </tr>
+              <tr>
+                <td>Abordagem</td>
+                <td>Modelo de referência teórico (top-down)</td>
+                <td>Modelo prático baseado em protocolos existentes (bottom-up)</td>
+              </tr>
+              <tr>
+                <td>Adoção</td>
+                <td>Referência para ensino e certificações</td>
+                <td>Implementação real da Internet global</td>
+              </tr>
+              <tr>
+                <td>Sessão e Apresentação</td>
+                <td>Camadas separadas (5 e 6)</td>
+                <td>Incorporadas à camada de Aplicação</td>
+              </tr>
+              <tr>
+                <td>Camada de Rede</td>
+                <td>Suporta orientado e não orientado a conexão</td>
+                <td>Apenas não orientado a conexão (IP é connectionless)</td>
+              </tr>
+              <tr>
+                <td>Camada de Transporte</td>
+                <td>Apenas orientado a conexão</td>
+                <td>Suporta ambos: TCP (conexão) e UDP (sem conexão)</td>
+              </tr>
+              <tr>
+                <td>Documentação</td>
+                <td>Padrões ISO formais (pagos)</td>
+                <td>RFCs abertas e gratuitas (IETF)</td>
+              </tr>
+              <tr>
+                <td>Protocolos</td>
+                <td>Modelo genérico, não define protocolos específicos</td>
+                <td>Definido pelos protocolos (TCP, IP, HTTP, etc.)</td>
+              </tr>
+              <tr>
+                <td>Vantagem Principal</td>
+                <td>Excelente para ensino, troubleshooting e comunicação</td>
+                <td>Funciona na prática, implementação real</td>
+              </tr>
+              <tr>
+                <td>Desvantagem</td>
+                <td>Nunca implementado como stack completo</td>
+                <td>Camada de Aplicação "genérica demais" (mistura tudo)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Quando Usar Cada Modelo?</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📚 Use o OSI quando...</h4>
+              <p>• Estudar para certificações (CCNA, CompTIA Network+)</p>
+              <p>• Fazer troubleshooting estruturado (testar camada por camada)</p>
+              <p>• Comunicar sobre redes com outros profissionais</p>
+              <p>• Ensinar conceitos de redes para iniciantes</p>
+              <p>• Documentar arquiteturas de rede em alto nível</p>
+              <p>• Classificar onde um problema ocorre (L1? L2? L3?)</p>
+            </div>
+            <div class="command-card">
+              <h4>🌐 Use o TCP/IP quando...</h4>
+              <p>• Implementar ou programar aplicações de rede</p>
+              <p>• Configurar equipamentos reais (roteadores, firewalls)</p>
+              <p>• Trabalhar com cloud (AWS VPC, Azure VNet)</p>
+              <p>• Analisar capturas de pacotes (Wireshark)</p>
+              <p>• Desenvolver ou debugar código de rede</p>
+              <p>• Entender como a Internet realmente funciona</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Na Prática: Os Dois Coexistem</h4>
+            <p>
+              Profissionais de rede usam ambos os modelos simultaneamente. Quando alguém diz
+              "problema de Camada 3" ou "ataque de Camada 7", está usando terminologia OSI. Quando
+              configura um servidor web com "HTTP sobre TCP sobre IP sobre Ethernet", está pensando
+              em TCP/IP. Os dois modelos se complementam: <strong>OSI para comunicar e diagnosticar,
+              TCP/IP para implementar e configurar</strong>.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: ENCAPSULAMENTO E DESENCAPSULAMENTO                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Encapsulamento e Desencapsulamento</h2>
+          <p>Entenda como os dados são "embalados" camada por camada ao descer o modelo (envio) e "desembalados" ao subir (recepção). Este processo é fundamental para entender como redes funcionam na prática.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — O que é Encapsulamento?</h3>
+          <p>
+            <strong>Encapsulamento</strong> é o processo pelo qual cada camada adiciona seu próprio
+            <strong>cabeçalho (header)</strong> — e às vezes um <strong>trailer</strong> — aos dados
+            recebidos da camada superior. É como colocar uma carta dentro de um envelope, depois
+            esse envelope dentro de outro envelope, e assim por diante.
+          </p>
+          <p>
+            Cada cabeçalho adicionado contém informações de controle específicas daquela camada:
+            endereços, números de sequência, checksums, flags, etc. Quando o dado chega ao destino,
+            cada camada remove seu respectivo cabeçalho (desencapsulamento) e passa o conteúdo
+            para a camada acima.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 Encapsulamento — Dados Descendo as Camadas (Envio)</h4>
+<pre><code>
+  APLICAÇÃO (L7)        ┌───────────────────────────────────────────┐
+  Gera os dados         │              DADOS DO USUÁRIO              │
+                        └───────────────────────────────────────────┘
+                                           │
+                                           ▼ Adiciona header L4
+  TRANSPORTE (L4)       ┌──────┬───────────────────────────────────────────┐
+  Cria segmento         │ TCP  │              DADOS DO USUÁRIO              │
+                        │Header│                                            │
+                        └──────┴───────────────────────────────────────────┘
+                                           │
+                                           ▼ Adiciona header L3
+  REDE (L3)             ┌──────┬──────┬───────────────────────────────────────────┐
+  Cria pacote           │  IP  │ TCP  │              DADOS DO USUÁRIO              │
+                        │Header│Header│                                            │
+                        └──────┴──────┴───────────────────────────────────────────┘
+                                           │
+                                           ▼ Adiciona header L2 + trailer
+  ENLACE (L2)    ┌──────┬──────┬──────┬───────────────────────────────────────────┬─────┐
+  Cria frame     │ ETH  │  IP  │ TCP  │              DADOS DO USUÁRIO              │ FCS │
+                 │Header│Header│Header│                                            │Trail│
+                 └──────┴──────┴──────┴───────────────────────────────────────────┴─────┘
+                                           │
+                                           ▼ Converte em sinais
+  FÍSICA (L1)    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  Transmite bits           Stream de bits (sinais elétricos/ópticos/rádio)
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — Desencapsulamento (Processo Inverso)</h3>
+          <p>
+            No destino, o processo é <strong>invertido</strong>. Cada camada lê e remove seu cabeçalho
+            correspondente, extrai as informações de controle relevantes, e passa o restante para a
+            camada acima — até que os dados originais cheguem limpos à aplicação.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 Desencapsulamento — Dados Subindo as Camadas (Recepção)</h4>
+<pre><code>
+  FÍSICA (L1)    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+  Recebe bits              Sinais → reconstrói bits
+                                           │
+                                           ▼ Remove header/trailer L2
+  ENLACE (L2)    ┌──────┬──────┬──────┬───────────────────────────────────────────┬─────┐
+  Lê frame       │ ETH ✓│  IP  │ TCP  │              DADOS DO USUÁRIO              │FCS✓ │
+                 └──────┴──────┴──────┴───────────────────────────────────────────┴─────┘
+                 Verifica CRC, remove ETH header/trailer, passa para cima
+                                           │
+                                           ▼ Remove header L3
+  REDE (L3)             ┌──────┬──────┬───────────────────────────────────────────┐
+  Lê pacote             │ IP ✓ │ TCP  │              DADOS DO USUÁRIO              │
+                        └──────┴──────┴───────────────────────────────────────────┘
+                        Verifica IP destino, remove IP header, passa para cima
+                                           │
+                                           ▼ Remove header L4
+  TRANSPORTE (L4)       ┌──────┬───────────────────────────────────────────┐
+  Lê segmento           │TCP ✓ │              DADOS DO USUÁRIO              │
+                        └──────┴───────────────────────────────────────────┘
+                        Verifica porta destino, checksum, reordena, passa para cima
+                                           │
+                                           ▼ Dados limpos
+  APLICAÇÃO (L7)        ┌───────────────────────────────────────────┐
+  Recebe dados          │              DADOS DO USUÁRIO              │
+                        └───────────────────────────────────────────┘
+                        Aplicação recebe exatamente o que foi enviado!
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Exemplo Completo: Acessando um Site</h3>
+          <p>
+            Vamos seguir o encapsulamento completo quando você digita <code>https://cloudtrilhas.com</code>
+            no navegador:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>⬇️ No Seu Computador (Encapsulamento)</h4>
+              <p><strong>L7 (Aplicação):</strong> Navegador gera requisição HTTP GET /</p>
+              <p><strong>L6 (Apresentação):</strong> TLS criptografa a requisição</p>
+              <p><strong>L5 (Sessão):</strong> Sessão TLS gerenciada</p>
+              <p><strong>L4 (Transporte):</strong> TCP adiciona porta origem (ex: 52481) e destino (443)</p>
+              <p><strong>L3 (Rede):</strong> IP adiciona IP origem (192.168.1.100) e destino (104.21.x.x)</p>
+              <p><strong>L2 (Enlace):</strong> Ethernet adiciona MAC origem (sua NIC) e destino (gateway)</p>
+              <p><strong>L1 (Física):</strong> Placa Wi-Fi converte frame em ondas de rádio</p>
+            </div>
+            <div class="command-card">
+              <h4>⬆️ No Servidor Web (Desencapsulamento)</h4>
+              <p><strong>L1 (Física):</strong> NIC recebe sinais, reconstrói bits</p>
+              <p><strong>L2 (Enlace):</strong> Verifica MAC, valida CRC, extrai pacote IP</p>
+              <p><strong>L3 (Rede):</strong> Confirma IP destino é dele, extrai segmento TCP</p>
+              <p><strong>L4 (Transporte):</strong> Porta 443 → encaminha para processo HTTPS</p>
+              <p><strong>L5 (Sessão):</strong> Sessão TLS identificada</p>
+              <p><strong>L6 (Apresentação):</strong> TLS descriptografa os dados</p>
+              <p><strong>L7 (Aplicação):</strong> Web server recebe "GET /" e retorna HTML</p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ O que Acontece no Meio? (Roteadores)</h4>
+            <p>
+              Cada roteador no caminho faz <strong>desencapsulamento parcial</strong>: ele remove o
+              header de Camada 2, lê o header de Camada 3 (IP destino) para decidir a rota, e
+              <strong>re-encapsula</strong> com um novo header de Camada 2 (novos MACs) para o próximo
+              hop. Os headers de Camada 3+ permanecem intactos. É por isso que dizemos que roteadores
+              operam na Camada 3 — eles só precisam "ler" até essa camada.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: PDUs (PROTOCOL DATA UNITS)                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>PDUs — Protocol Data Units</h2>
+          <p>Cada camada do modelo OSI dá um nome específico à unidade de dados que manipula. Conhecer esses nomes é essencial para comunicação profissional e para interpretar documentação técnica.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — O que é uma PDU?</h3>
+          <p>
+            <strong>PDU (Protocol Data Unit)</strong> é o nome genérico para a unidade de dados em cada
+            camada. Quando dados descem pelo modelo, cada camada adiciona seu cabeçalho e renomeia a
+            unidade. É como uma carta que vai ganhando embalagens: primeiro vira um pacote, depois uma
+            encomenda, depois um contêiner.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 PDUs em Cada Camada</h4>
+<pre><code>
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │  CAMADA          │  PDU NAME     │  COMPOSIÇÃO                           │
+  ├──────────────────┼───────────────┼───────────────────────────────────────┤
+  │                  │               │                                       │
+  │  7. Aplicação    │  DATA         │  Dados puros da aplicação             │
+  │  6. Apresentação │  (Dados)      │  (formatados/criptografados)          │
+  │  5. Sessão       │               │                                       │
+  │                  │               │                                       │
+  ├──────────────────┼───────────────┼───────────────────────────────────────┤
+  │                  │               │                                       │
+  │  4. Transporte   │  SEGMENT      │  TCP Header + Data                    │
+  │                  │  (Segmento)   │  ou UDP Header + Data (= Datagrama)   │
+  │                  │               │                                       │
+  ├──────────────────┼───────────────┼───────────────────────────────────────┤
+  │                  │               │                                       │
+  │  3. Rede         │  PACKET       │  IP Header + Segment                  │
+  │                  │  (Pacote)     │                                       │
+  │                  │               │                                       │
+  ├──────────────────┼───────────────┼───────────────────────────────────────┤
+  │                  │               │                                       │
+  │  2. Enlace       │  FRAME        │  ETH Header + Packet + FCS Trailer    │
+  │                  │  (Quadro)     │                                       │
+  │                  │               │                                       │
+  ├──────────────────┼───────────────┼───────────────────────────────────────┤
+  │                  │               │                                       │
+  │  1. Física       │  BIT          │  Stream de 0s e 1s (sinais)           │
+  │                  │  (Bit)        │                                       │
+  │                  │               │                                       │
+  └──────────────────┴───────────────┴───────────────────────────────────────┘
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — Detalhando Cada PDU</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Camada</th>
+                <th>PDU</th>
+                <th>Header Adicionado</th>
+                <th>Tamanho Típico do Header</th>
+                <th>Info Principal no Header</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>7/6/5 — Aplicação</td>
+                <td>Data (Dados)</td>
+                <td>Protocolo da aplicação (ex: HTTP)</td>
+                <td>Variável</td>
+                <td>Método, URL, Content-Type, etc.</td>
+              </tr>
+              <tr>
+                <td>4 — Transporte</td>
+                <td>Segment (Segmento)</td>
+                <td>TCP Header</td>
+                <td>20-60 bytes</td>
+                <td>Portas (origem/destino), Seq, ACK, Flags</td>
+              </tr>
+              <tr>
+                <td>4 — Transporte</td>
+                <td>Datagram (Datagrama)</td>
+                <td>UDP Header</td>
+                <td>8 bytes</td>
+                <td>Portas (origem/destino), Tamanho, Checksum</td>
+              </tr>
+              <tr>
+                <td>3 — Rede</td>
+                <td>Packet (Pacote)</td>
+                <td>IP Header</td>
+                <td>20-60 bytes</td>
+                <td>IP origem, IP destino, TTL, Protocol</td>
+              </tr>
+              <tr>
+                <td>2 — Enlace</td>
+                <td>Frame (Quadro)</td>
+                <td>Ethernet Header + FCS</td>
+                <td>14 bytes + 4 bytes trailer</td>
+                <td>MAC origem, MAC destino, EtherType</td>
+              </tr>
+              <tr>
+                <td>1 — Física</td>
+                <td>Bit</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Preâmbulo + SFD (sincronização)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Overhead de Encapsulamento</h3>
+          <p>
+            Cada camada adiciona bytes de controle (overhead). Para dados úteis (payload) viajarem pela
+            rede, eles precisam carregar todos esses cabeçalhos consigo. Vamos calcular:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📊 Cálculo de Overhead Típico</h4>
+              <p><strong>Ethernet Header:</strong> 14 bytes</p>
+              <p><strong>IP Header:</strong> 20 bytes</p>
+              <p><strong>TCP Header:</strong> 20 bytes</p>
+              <p><strong>FCS (CRC):</strong> 4 bytes</p>
+              <p><strong>Total de overhead:</strong> 58 bytes</p>
+              <p><strong>MTU Ethernet:</strong> 1500 bytes (payload máximo)</p>
+              <p><strong>MSS TCP:</strong> 1460 bytes (1500 - 20 IP - 20 TCP)</p>
+            </div>
+            <div class="command-card">
+              <h4>📈 Eficiência</h4>
+              <p><strong>Com payload máximo (1460 bytes):</strong></p>
+              <p>Eficiência = 1460/1518 = <strong>96.2%</strong></p>
+              <p><strong>Com payload pequeno (100 bytes):</strong></p>
+              <p>Eficiência = 100/158 = <strong>63.3%</strong></p>
+              <p><strong>Conclusão:</strong> Pacotes pequenos têm muito overhead relativo. É por isso que o TCP usa o algoritmo de Nagle para agrupar dados pequenos!</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 MTU e Fragmentação</h4>
+            <p>
+              <strong>MTU (Maximum Transmission Unit)</strong> é o tamanho máximo de um pacote que pode
+              ser transmitido sem fragmentação. Na Ethernet padrão, o MTU é <strong>1500 bytes</strong>.
+              Se um pacote for maior que o MTU do link, ele precisa ser fragmentado (dividido em pedaços
+              menores). Fragmentação reduz a performance e deve ser evitada — por isso, o TCP descobre
+              o menor MTU do caminho (Path MTU Discovery) e ajusta o tamanho dos segmentos.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: PROTOCOLOS POR CAMADA                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Protocolos por Camada — Guia Detalhado</h2>
+          <p>Um mapeamento completo dos protocolos mais importantes organizados por camada. Esta é sua referência rápida para entender onde cada protocolo atua e qual sua função na pilha de rede.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — Protocolos da Camada de Aplicação (L7)</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Porta(s)</th>
+                <th>Transporte</th>
+                <th>Função</th>
+                <th>Detalhes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>HTTP</strong></td>
+                <td>80</td>
+                <td>TCP</td>
+                <td>Transferência de hipertexto</td>
+                <td>Base da Web. Request/Response stateless. Métodos: GET, POST, PUT, DELETE, PATCH</td>
+              </tr>
+              <tr>
+                <td><strong>HTTPS</strong></td>
+                <td>443</td>
+                <td>TCP</td>
+                <td>HTTP seguro (criptografado)</td>
+                <td>HTTP + TLS. Garante confidencialidade, integridade e autenticação via certificados</td>
+              </tr>
+              <tr>
+                <td><strong>DNS</strong></td>
+                <td>53</td>
+                <td>UDP/TCP</td>
+                <td>Resolução de nomes</td>
+                <td>Traduz nomes (google.com) em IPs. Hierárquico: Root → TLD → Authoritative. UDP para consultas, TCP para transferências de zona</td>
+              </tr>
+              <tr>
+                <td><strong>DHCP</strong></td>
+                <td>67/68</td>
+                <td>UDP</td>
+                <td>Configuração automática de IP</td>
+                <td>Processo DORA: Discover → Offer → Request → Acknowledge. Atribui IP, máscara, gateway, DNS</td>
+              </tr>
+              <tr>
+                <td><strong>FTP</strong></td>
+                <td>20/21</td>
+                <td>TCP</td>
+                <td>Transferência de arquivos</td>
+                <td>Porta 21 = controle, Porta 20 = dados. Modos ativo e passivo. Inseguro (texto plano)</td>
+              </tr>
+              <tr>
+                <td><strong>SMTP</strong></td>
+                <td>25/587</td>
+                <td>TCP</td>
+                <td>Envio de e-mails</td>
+                <td>Simple Mail Transfer Protocol. Porta 25 = servidor→servidor, 587 = cliente→servidor (com auth)</td>
+              </tr>
+              <tr>
+                <td><strong>POP3</strong></td>
+                <td>110/995</td>
+                <td>TCP</td>
+                <td>Recebimento de e-mails (download)</td>
+                <td>Baixa e-mails para o cliente local. 995 = com SSL. Simples mas limitado</td>
+              </tr>
+              <tr>
+                <td><strong>IMAP</strong></td>
+                <td>143/993</td>
+                <td>TCP</td>
+                <td>Recebimento de e-mails (sincronizado)</td>
+                <td>Mantém e-mails no servidor. Sincroniza entre múltiplos dispositivos. 993 = com SSL</td>
+              </tr>
+              <tr>
+                <td><strong>SSH</strong></td>
+                <td>22</td>
+                <td>TCP</td>
+                <td>Acesso remoto seguro</td>
+                <td>Shell criptografado. Substitui Telnet. Suporta autenticação por chave pública. Também usado para SCP/SFTP</td>
+              </tr>
+              <tr>
+                <td><strong>SNMP</strong></td>
+                <td>161/162</td>
+                <td>UDP</td>
+                <td>Gerenciamento de rede</td>
+                <td>Monitora switches, roteadores, servidores. Usa OIDs para consultar métricas. v3 com segurança</td>
+              </tr>
+              <tr>
+                <td><strong>NTP</strong></td>
+                <td>123</td>
+                <td>UDP</td>
+                <td>Sincronização de relógio</td>
+                <td>Mantém horários sincronizados na rede. Precisão de milissegundos. Hierarquia de stratum</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Protocolos da Camada de Transporte (L4)</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Tipo</th>
+                <th>Características</th>
+                <th>Uso Principal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>TCP</strong></td>
+                <td>Orientado a conexão</td>
+                <td>Confiável, ordenado, controle de fluxo/congestionamento, 3-way handshake</td>
+                <td>Web (HTTP/HTTPS), e-mail, transferência de arquivos, SSH</td>
+              </tr>
+              <tr>
+                <td><strong>UDP</strong></td>
+                <td>Sem conexão</td>
+                <td>Não confiável, rápido, sem overhead, fire-and-forget</td>
+                <td>DNS, DHCP, VoIP, streaming, gaming online, NTP</td>
+              </tr>
+              <tr>
+                <td><strong>SCTP</strong></td>
+                <td>Orientado a conexão</td>
+                <td>Multi-homing, multi-streaming, combina vantagens de TCP e UDP</td>
+                <td>Sinalização telefônica (SS7 sobre IP), WebRTC</td>
+              </tr>
+              <tr>
+                <td><strong>QUIC</strong></td>
+                <td>Sobre UDP</td>
+                <td>Multiplexação sem head-of-line blocking, 0-RTT, criptografia integrada</td>
+                <td>HTTP/3, Google services, YouTube, Chrome</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📐 Comparativo Visual: TCP vs UDP Headers</h4>
+<pre><code>
+  TCP HEADER (20-60 bytes):
+  ┌────────────────────┬────────────────────┐
+  │   Source Port      │  Destination Port  │  ← Portas (qual processo)
+  ├────────────────────┴────────────────────┤
+  │          Sequence Number                │  ← Ordem dos dados
+  ├─────────────────────────────────────────┤
+  │       Acknowledgment Number             │  ← Confirmação de recebimento
+  ├────┬───────┬────────┬───────────────────┤
+  │Offs│Reserv │ Flags  │   Window Size     │  ← Controle de fluxo
+  ├────┴───────┴────────┼───────────────────┤
+  │     Checksum        │  Urgent Pointer   │  ← Integridade
+  ├─────────────────────┴───────────────────┤
+  │         Options (variável)              │
+  └─────────────────────────────────────────┘
+
+  UDP HEADER (8 bytes apenas!):
+  ┌────────────────────┬────────────────────┐
+  │   Source Port      │  Destination Port  │  ← Portas
+  ├────────────────────┼────────────────────┤
+  │      Length        │     Checksum       │  ← Tamanho + integridade básica
+  └────────────────────┴────────────────────┘
+  
+  UDP é 2.5x a 7.5x MENOR em overhead que TCP!
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Protocolos da Camada de Rede (L3)</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Função</th>
+                <th>Detalhes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>IPv4</strong></td>
+                <td>Endereçamento e roteamento (32 bits)</td>
+                <td>Formato: 192.168.1.1. Suporta ~4.3 bilhões de endereços. Amplamente utilizado com NAT</td>
+              </tr>
+              <tr>
+                <td><strong>IPv6</strong></td>
+                <td>Endereçamento e roteamento (128 bits)</td>
+                <td>Formato: 2001:db8::1. Suporta 3.4×10³⁸ endereços. Sem necessidade de NAT. Header simplificado</td>
+              </tr>
+              <tr>
+                <td><strong>ICMP</strong></td>
+                <td>Mensagens de controle e erro</td>
+                <td>Usado por ping (Echo Request/Reply) e traceroute. Reporta erros: host unreachable, TTL exceeded</td>
+              </tr>
+              <tr>
+                <td><strong>ICMPv6</strong></td>
+                <td>ICMP para IPv6</td>
+                <td>Inclui Neighbor Discovery (substitui ARP), Path MTU Discovery, Router Solicitation/Advertisement</td>
+              </tr>
+              <tr>
+                <td><strong>IPSec</strong></td>
+                <td>Segurança na camada de rede</td>
+                <td>Criptografia e autenticação de pacotes IP. Base de VPNs site-to-site. Modos: Transport e Tunnel</td>
+              </tr>
+              <tr>
+                <td><strong>OSPF</strong></td>
+                <td>Roteamento dinâmico (intra-AS)</td>
+                <td>Link-state, convergência rápida, suporta VLSM e CIDR. Usa áreas para escalabilidade</td>
+              </tr>
+              <tr>
+                <td><strong>BGP</strong></td>
+                <td>Roteamento dinâmico (inter-AS)</td>
+                <td>Protocolo da Internet. Conecta ISPs e grandes redes (AS). Path-vector, baseado em políticas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Protocolos da Camada de Enlace (L2)</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo/Tecnologia</th>
+                <th>Padrão</th>
+                <th>Função</th>
+                <th>Detalhes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Ethernet</strong></td>
+                <td>IEEE 802.3</td>
+                <td>LAN cabeada</td>
+                <td>Padrão dominante em redes locais. 10 Mbps → 400 Gbps. CSMA/CD (legado). Full-duplex com switches</td>
+              </tr>
+              <tr>
+                <td><strong>Wi-Fi</strong></td>
+                <td>IEEE 802.11 (a/b/g/n/ac/ax)</td>
+                <td>LAN sem fio</td>
+                <td>CSMA/CA para evitar colisões. Frequências: 2.4 GHz, 5 GHz, 6 GHz. Criptografia: WPA3</td>
+              </tr>
+              <tr>
+                <td><strong>ARP</strong></td>
+                <td>RFC 826</td>
+                <td>Resolução IP → MAC</td>
+                <td>Broadcast "Quem tem IP X?". Resposta unicast com MAC. Tabela ARP em cache. Vulnerável a ARP Spoofing</td>
+              </tr>
+              <tr>
+                <td><strong>PPP</strong></td>
+                <td>RFC 1661</td>
+                <td>Links ponto-a-ponto</td>
+                <td>Usado em conexões DSL (PPPoE), links WAN seriais. Autenticação (PAP/CHAP), compressão</td>
+              </tr>
+              <tr>
+                <td><strong>STP</strong></td>
+                <td>IEEE 802.1D</td>
+                <td>Prevenção de loops</td>
+                <td>Spanning Tree Protocol. Desabilita links redundantes para evitar broadcast storms. RSTP (802.1w) é mais rápido</td>
+              </tr>
+              <tr>
+                <td><strong>VLAN</strong></td>
+                <td>IEEE 802.1Q</td>
+                <td>Segmentação lógica</td>
+                <td>Divide switch em múltiplas redes lógicas. Tag de 4 bytes no frame. Até 4094 VLANs. Trunk entre switches</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Mapa Mental: Todos os Protocolos por Camada</h3>
+
+          <div class="command-card wide">
+            <h4>📐 Resumo Visual Completo</h4>
+<pre><code>
+  ╔══════════════════════════════════════════════════════════════════════════════╗
+  ║  CAMADA 7 — APLICAÇÃO                                                      ║
+  ║  HTTP │ HTTPS │ FTP │ SMTP │ POP3 │ IMAP │ DNS │ DHCP │ SSH │ SNMP │ NTP  ║
+  ╠══════════════════════════════════════════════════════════════════════════════╣
+  ║  CAMADA 6 — APRESENTAÇÃO                                                   ║
+  ║  TLS/SSL │ JPEG │ PNG │ MPEG │ ASCII │ Unicode │ XML │ JSON │ Base64       ║
+  ╠══════════════════════════════════════════════════════════════════════════════╣
+  ║  CAMADA 5 — SESSÃO                                                         ║
+  ║  NetBIOS │ RPC │ PPTP │ L2TP │ SIP │ SOCKS │ SMB                          ║
+  ╠══════════════════════════════════════════════════════════════════════════════╣
+  ║  CAMADA 4 — TRANSPORTE                                                     ║
+  ║  TCP │ UDP │ SCTP │ QUIC │ DCCP                                            ║
+  ╠══════════════════════════════════════════════════════════════════════════════╣
+  ║  CAMADA 3 — REDE                                                           ║
+  ║  IPv4 │ IPv6 │ ICMP │ ICMPv6 │ IPSec │ OSPF │ BGP │ RIP │ EIGRP │ IGMP   ║
+  ╠══════════════════════════════════════════════════════════════════════════════╣
+  ║  CAMADA 2 — ENLACE                                                         ║
+  ║  Ethernet │ Wi-Fi │ ARP │ PPP │ STP │ VLAN (802.1Q) │ LLDP │ LACP        ║
+  ╠══════════════════════════════════════════════════════════════════════════════╣
+  ║  CAMADA 1 — FÍSICA                                                         ║
+  ║  UTP │ STP │ Fibra │ Coaxial │ Wi-Fi (rádio) │ Bluetooth │ DSL │ SONET    ║
+  ╚══════════════════════════════════════════════════════════════════════════════╝
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Dica para Certificações (CCNA / Network+)</h4>
+            <p>
+              Em provas, é comum questões perguntarem "em qual camada opera o protocolo X?" ou
+              "qual é a PDU da camada Y?". Memorize: <strong>HTTP=L7, TCP/UDP=L4, IP/ICMP=L3,
+              Ethernet/ARP=L2, Cabos/Sinais=L1</strong>. Para PDUs: <strong>Data→Segment→Packet→Frame→Bit</strong>
+              (mnemônico: "Dados Seguem Por Fibras Boas" ou em inglês "Do Some People Fear Birthdays?").
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: EXERCÍCIOS PRÁTICOS                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Teste seu conhecimento sobre os modelos OSI e TCP/IP com estes exercícios. Tente resolver antes de ver a resposta — a prática é fundamental para fixar os conceitos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Identificação de Camadas</h3>
+          <p>
+            Para cada cenário abaixo, identifique em qual camada do modelo OSI o problema ou ação está ocorrendo.
+            Justifique sua resposta.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📋 Cenários</h4>
+              <p><strong>A)</strong> O LED da porta do switch está apagado após conectar o cabo.</p>
+              <p><strong>B)</strong> O comando <code>ping 8.8.8.8</code> retorna "Destination Host Unreachable".</p>
+              <p><strong>C)</strong> O navegador exibe "ERR_SSL_PROTOCOL_ERROR" ao acessar um site HTTPS.</p>
+              <p><strong>D)</strong> Um download via FTP para no meio e não retoma — ao reconectar, recomeça do zero.</p>
+              <p><strong>E)</strong> Dois computadores no mesmo switch não se comunicam, mas o cabo está OK e os LEDs acendem.</p>
+              <p><strong>F)</strong> O comando <code>curl http://api.exemplo.com/users</code> retorna HTTP 503 Service Unavailable.</p>
+            </div>
+          </div>
+
+          <details>
+            <summary><strong>🔍 Ver Resposta do Exercício 1</strong></summary>
+            <div class="info-box highlight">
+              <h4>Respostas:</h4>
+              <p><strong>A) Camada 1 (Física)</strong> — LED apagado indica problema físico: cabo danificado, mal crimpado, conector quebrado, ou porta do switch com defeito. Sem sinal elétrico/óptico = problema L1.</p>
+              <p><strong>B) Camada 3 (Rede)</strong> — "Destination Host Unreachable" é uma mensagem ICMP indicando que o roteador não encontrou rota para o destino. Problema de roteamento/endereçamento IP = L3.</p>
+              <p><strong>C) Camada 6 (Apresentação) / Camada 5-7 no TCP/IP</strong> — SSL/TLS é um protocolo de apresentação (criptografia). Erro de protocolo SSL indica incompatibilidade de versão ou certificado inválido.</p>
+              <p><strong>D) Camada 5 (Sessão)</strong> — A sessão não manteve checkpoints/pontos de sincronização. Sem gerenciamento de sessão adequado, não há como retomar de onde parou.</p>
+              <p><strong>E) Camada 2 (Enlace)</strong> — LEDs OK (L1 funcionando). Possíveis causas L2: VLANs diferentes, endereços MAC duplicados, port security bloqueando, ou STP colocando porta em blocking.</p>
+              <p><strong>F) Camada 7 (Aplicação)</strong> — HTTP 503 é uma resposta do servidor web (aplicação). O servidor está up mas indisponível (manutenção, overload). Todas as camadas inferiores funcionam (a resposta chegou!).</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Encapsulamento Passo a Passo</h3>
+          <p>
+            Você está em um computador com IP <code>192.168.1.50</code> e MAC <code>AA:BB:CC:11:22:33</code>.
+            Seu gateway é <code>192.168.1.1</code> com MAC <code>DD:EE:FF:44:55:66</code>.
+            Você quer acessar <code>http://93.184.216.34</code> (servidor web externo).
+          </p>
+          <p><strong>Descreva o encapsulamento completo do pacote, preenchendo os campos de cada cabeçalho.</strong></p>
+
+          <details>
+            <summary><strong>🔍 Ver Resposta do Exercício 2</strong></summary>
+            <div class="info-box highlight">
+              <h4>Encapsulamento Completo:</h4>
+              <p><strong>Camada 7 (Aplicação):</strong></p>
+              <p>Dados = "GET / HTTP/1.1\r\nHost: 93.184.216.34\r\n\r\n"</p>
+              <p><strong>Camada 4 (Transporte — TCP):</strong></p>
+              <p>• Porta Origem: 49152 (efêmera, aleatória entre 49152-65535)</p>
+              <p>• Porta Destino: 80 (HTTP)</p>
+              <p>• Seq: número de sequência inicial (ISN do handshake)</p>
+              <p>• Flags: PSH, ACK (push data, acknowledge)</p>
+              <p><strong>Camada 3 (Rede — IPv4):</strong></p>
+              <p>• IP Origem: 192.168.1.50</p>
+              <p>• IP Destino: 93.184.216.34</p>
+              <p>• TTL: 128 (Windows default) ou 64 (Linux default)</p>
+              <p>• Protocol: 6 (TCP)</p>
+              <p><strong>Camada 2 (Enlace — Ethernet):</strong></p>
+              <p>• MAC Origem: AA:BB:CC:11:22:33 (seu computador)</p>
+              <p>• MAC Destino: DD:EE:FF:44:55:66 (gateway! NÃO o servidor final)</p>
+              <p>• EtherType: 0x0800 (IPv4)</p>
+              <p>• FCS: CRC-32 calculado sobre todo o frame</p>
+              <p><strong>Ponto crucial:</strong> O MAC destino é do GATEWAY (roteador), não do servidor final! O roteador vai trocar os MACs a cada hop, mas os IPs permanecem os mesmos até o destino.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — TCP vs UDP: Escolha o Protocolo</h3>
+          <p>
+            Para cada aplicação abaixo, indique se deve usar <strong>TCP</strong> ou <strong>UDP</strong>
+            e justifique com base nas características de cada protocolo.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📋 Aplicações</h4>
+              <p><strong>A)</strong> Sistema de videoconferência em tempo real (Zoom/Meet)</p>
+              <p><strong>B)</strong> Transferência bancária online (internet banking)</p>
+              <p><strong>C)</strong> Jogo multiplayer online (FPS com 64 jogadores)</p>
+              <p><strong>D)</strong> Download de atualização de sistema operacional (4 GB)</p>
+              <p><strong>E)</strong> Sensor IoT enviando temperatura a cada 5 segundos</p>
+              <p><strong>F)</strong> Consulta DNS para resolver "cloudtrilhas.com"</p>
+            </div>
+          </div>
+
+          <details>
+            <summary><strong>🔍 Ver Resposta do Exercício 3</strong></summary>
+            <div class="info-box highlight">
+              <h4>Respostas:</h4>
+              <p><strong>A) UDP</strong> — Videoconferência prioriza tempo real. Se um frame de vídeo se perde, é melhor mostrar o próximo do que pausar para retransmitir (causaria lag). Latência baixa > perfeição.</p>
+              <p><strong>B) TCP</strong> — Transação financeira exige 100% de confiabilidade. Cada byte deve chegar correto e em ordem. Perder ou corromper dados em uma transferência bancária seria catastrófico.</p>
+              <p><strong>C) UDP</strong> — Games FPS precisam de latência mínima. Posição de jogadores muda 60x/segundo — um pacote perdido é irrelevante pois o próximo já traz a posição atualizada.</p>
+              <p><strong>D) TCP</strong> — Download de arquivo grande precisa ser 100% íntegro. Um bit errado pode corromper todo o instalador. TCP garante entrega completa, ordenada e sem erros.</p>
+              <p><strong>E) UDP</strong> — Sensor IoT envia leituras frequentes. Se uma leitura se perde, a próxima chega em 5s. O overhead do TCP (handshake + ACKs) seria desnecessário para dados tão pequenos e frequentes.</p>
+              <p><strong>F) UDP</strong> — Consultas DNS são pequenas (< 512 bytes) e rápidas. Se não responder, o cliente simplesmente pergunta de novo. TCP seria overhead desnecessário para uma pergunta/resposta tão simples.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — Mapeamento OSI ↔ TCP/IP e Troubleshooting</h3>
+          <p>
+            Você é administrador de rede e recebe o seguinte chamado:
+            <em>"Usuários do escritório não conseguem acessar o site interno http://intranet.empresa.local,
+            mas conseguem acessar sites externos como google.com normalmente."</em>
+          </p>
+          <p><strong>Faça um diagnóstico estruturado usando as camadas do modelo OSI (de baixo para cima) e identifique as possíveis causas em cada camada.</strong></p>
+
+          <details>
+            <summary><strong>🔍 Ver Resposta do Exercício 4</strong></summary>
+            <div class="info-box highlight">
+              <h4>Diagnóstico Estruturado:</h4>
+              <p><strong>Camada 1 (Física):</strong> DESCARTADA — Se acessam Google, a conectividade física está OK. Cabos, switches e links funcionam.</p>
+              <p><strong>Camada 2 (Enlace):</strong> DESCARTADA — Se há comunicação com a Internet, frames estão sendo enviados/recebidos corretamente no segmento local.</p>
+              <p><strong>Camada 3 (Rede):</strong> POSSÍVEL — O servidor da intranet pode estar em uma sub-rede diferente com rota faltando. Verificar: <code>ping [IP-do-servidor-intranet]</code>. Se ping funcionar com IP direto, descarte L3.</p>
+              <p><strong>Camada 4 (Transporte):</strong> POSSÍVEL — A porta 80 do servidor pode estar fechada (serviço parado). Verificar: <code>telnet intranet.empresa.local 80</code> ou <code>Test-NetConnection</code>.</p>
+              <p><strong>Camada 5 (Sessão):</strong> MENOS PROVÁVEL — Problemas de sessão são raros em HTTP simples.</p>
+              <p><strong>Camada 6 (Apresentação):</strong> MENOS PROVÁVEL — Não é HTTPS, então não há TLS envolvido.</p>
+              <p><strong>Camada 7 (Aplicação):</strong> MUITO PROVÁVEL — O nome "intranet.empresa.local" pode não estar resolvendo em DNS! Sites externos usam DNS público (8.8.8.8) que funciona, mas o DNS interno (que resolve .local) pode estar fora do ar. Verificar: <code>nslookup intranet.empresa.local</code>.</p>
+              <p><strong>Diagnóstico mais provável:</strong> Problema de DNS interno (Camada 7/Aplicação). O servidor DNS corporativo que resolve nomes internos (.local) está offline ou mal configurado, mas o DNS para nomes públicos funciona via DNS externo.</p>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CTA — PRÓXIMO MÓDULO                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-03.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🌐 Próximo passo</span>
+          <h2>Pronto para Endereçamento IP e Sub-redes?</h2>
+          <p>No Módulo 03 você dominará endereçamento IPv4 e IPv6, cálculo de sub-redes (subnetting), CIDR, VLSM e aprenderá a projetar esquemas de endereçamento eficientes para redes corporativas e cloud.</p>
+        </div>
+        <a href="modulo-03.html" class="button primary">Ir para Módulo 03 →</a>
       </div>
     </section>
   </main>
 
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="footer-brand">
+        <img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" />
+        <p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p>
+      </div>
+      <div class="footer-column">
+        <h2>Cloud</h2>
+        <a href="../aws.html">AWS</a>
+        <a href="../cloud-practitioner.html">Cloud Practitioner</a>
+        <a href="../ai-practitioner.html">AI Practitioner</a>
+        <a href="../developer.html">Developer</a>
+        <a href="../solutions-architect.html">Solutions Architect</a>
+      </div>
+      <div class="footer-column">
+        <h2>DevOps</h2>
+        <a href="../linux.html">Linux</a>
+        <a href="../docker.html">Docker &amp; K8s</a>
+        <a href="../terraform.html">Terraform</a>
+        <a href="../python.html">Python</a>
+        <a href="../redes.html">Redes</a>
+        <a href="../github.html">GitHub</a>
+      </div>
+      <div class="footer-column">
+        <h2>Projeto</h2>
+        <a href="../about.html">Sobre</a>
+        <a href="../contact.html">Contato</a>
+        <a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p>
+    </div>
   </footer>
+
   <script src="../trail-gate.js"></script>
   <script src="../config.js"></script>
   <script src="../app.js"></script>

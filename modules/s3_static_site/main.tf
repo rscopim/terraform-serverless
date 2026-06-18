@@ -513,3 +513,11 @@ resource "aws_s3_object" "admin_dashboard" {
   content_type = "text/html"
   etag         = filemd5("${path.root}/../../static_site/admin/dashboard.html")
 }
+
+resource "aws_s3_object" "error_404" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "404.html"
+  source       = "${path.root}/../../static_site/404.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/404.html")
+}

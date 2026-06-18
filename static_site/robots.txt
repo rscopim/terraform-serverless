@@ -1,13 +1,30 @@
 User-agent: *
-Allow: /
-Disallow: /kubernetes/docker/
-Disallow: /kubernetes/cloudformation/
-Disallow: /terraform/redes/
-Disallow: /terraform/cloudformation/
-Disallow: /docker/cloudformation/
-Disallow: /cloudformation/kubernetes/
+Allow: /index.html
+Allow: /linux.html
+Allow: /terraform.html
+Allow: /docker.html
+Allow: /python.html
+Allow: /redes.html
+Allow: /aws.html
+Allow: /about.html
+Allow: /contact.html
+Allow: /cloud-practitioner.html
+Allow: /ai-practitioner.html
+Allow: /developer.html
+Allow: /solutions-architect.html
+Disallow: /linux/
+Disallow: /terraform/
+Disallow: /docker/
+Disallow: /python/
+Disallow: /redes/
+Disallow: /aws/
+Disallow: /admin/
+Disallow: /kubernetes/
+Disallow: /cloudformation/
+Disallow: /github/
 
-# Block deep crawling of concatenated paths (bot protection)
-Disallow: /*/*/*/*/*/
+# Block all concatenated/invalid paths
+Disallow: /*/*/
+Disallow: /*/*/*/
 
 Sitemap: https://www.cloudtrilhas.com.br/sitemap.xml

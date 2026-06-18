@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Redes Módulo 01: Fundamentos de Redes</title>
+  <meta name="description" content="Guia completo sobre fundamentos de redes: tipos, topologias, meios de transmissão, dispositivos e modelos de comunicação." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -20,118 +21,681 @@
         <a href="../redes.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- HERO SECTION                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🌐 Redes — Módulo 01</span>
         <h1>Fundamentos de Redes</h1>
-        <p>Conceitos essenciais de comunicação de dados, tipos de redes, topologias e meios de transmissão.</p>
+        <p>Neste módulo você aprenderá os conceitos essenciais de redes de computadores: o que são, como funcionam, quais dispositivos fazem tudo acontecer e como os dados viajam de um ponto a outro. Uma base sólida para toda a jornada em infraestrutura e cloud.</p>
       </div>
     </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PROGRESS TRACK                                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node active"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>OSI/TCP</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>IP &amp; Sub-redes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Diagnóstico</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Switches</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Roteamento</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Segurança</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Serviços</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: O QUE É UMA REDE?                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>O que é uma Rede de Computadores?</h2>
+          <p>Entenda o conceito fundamental que conecta bilhões de dispositivos ao redor do mundo e permite a comunicação digital moderna.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Conceitos Básicos</h3>
-          <div class="info-box highlight">
-            <strong>O que é uma rede?</strong> Um conjunto de dispositivos interconectados que compartilham recursos e trocam dados usando protocolos padronizados.
-          </div>
+          <h3>1.1 — Definição Formal</h3>
+          <p>
+            Uma <strong>rede de computadores</strong> é um conjunto de dois ou mais dispositivos eletrônicos
+            (computadores, servidores, smartphones, impressoras, câmeras, sensores IoT, etc.) interconectados
+            por meio de um canal de comunicação, com o objetivo de <strong>compartilhar recursos</strong> e
+            <strong>trocar informações</strong>.
+          </p>
+          <p>
+            Em termos técnicos, uma rede permite que dados sejam transmitidos de um ponto de origem (source)
+            para um ponto de destino (destination) através de um meio físico ou lógico, seguindo protocolos
+            (regras) previamente definidos que garantem a integridade, a ordem e a confiabilidade da comunicação.
+          </p>
+          <p>
+            O conceito parece simples, mas dentro dessa definição existem camadas de complexidade: como o dado
+            é dividido em pacotes, como os pacotes encontram o caminho certo, como erros são detectados e
+            corrigidos, como múltiplos dispositivos compartilham o mesmo meio sem conflitos. Tudo isso é o que
+            estudaremos ao longo desta trilha de Redes.
+          </p>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 — Por que Redes Existem?</h3>
+          <p>
+            Antes das redes, cada computador era uma ilha isolada. Se você precisasse de um arquivo que estava
+            em outro computador, a única opção era copiar para um disquete, caminhar até a outra máquina e
+            transferir manualmente — o chamado <em>"sneakernet"</em> (rede de tênis).
+          </p>
+          <p>As redes surgiram para resolver problemas fundamentais:</p>
+
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Tipos de Rede</code><span class="cmd-tag">Conceito</span></div>
-              <p>Classificação por abrangência geográfica.</p>
-              <pre><code>LAN  — Local Area Network    (escritório, casa)
-MAN  — Metropolitan Area     (cidade, campus)
-WAN  — Wide Area Network     (países, continentes)
-WLAN — Wireless LAN          (Wi-Fi)
-PAN  — Personal Area Network (Bluetooth, NFC)</code></pre>
+            <div class="command-card">
+              <h4>📂 Compartilhamento de Recursos</h4>
+              <p>
+                Impressoras, scanners, armazenamento em disco e conexão à Internet podem ser compartilhados
+                entre dezenas ou centenas de usuários simultaneamente, reduzindo custos e aumentando a eficiência.
+              </p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Topologias</code><span class="cmd-tag">Conceito</span></div>
-              <p>Forma como os dispositivos são conectados.</p>
-              <pre><code>Estrela  — Hub/Switch central (mais comum)
-Barramento — Cabo compartilhado (legado)
-Anel     — Token Ring (legado)
-Malha    — Full/Partial mesh (alta disponibilidade)
-Árvore   — Hierárquica (redes corporativas)</code></pre>
+              <h4>💬 Comunicação</h4>
+              <p>
+                E-mail, mensagens instantâneas, videoconferência, VoIP — todas as formas modernas de comunicação
+                digital dependem de redes. Sem elas, não haveria WhatsApp, Zoom, Slack ou Teams.
+              </p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Meios de Transmissão</code><span class="cmd-tag">Físico</span></div>
-              <p>Cabos e conexões físicas.</p>
-              <pre><code>Par trançado (UTP/STP):
-  Cat5e — 1 Gbps, 100m
-  Cat6  — 10 Gbps, 55m
-  Cat6a — 10 Gbps, 100m
-
-Fibra óptica:
-  Monomodo — longa distância (km)
-  Multimodo — curta distância (campus)
-
-Wireless: 802.11ac (Wi-Fi 5), 802.11ax (Wi-Fi 6)</code></pre>
+              <h4>🗄️ Centralização de Dados</h4>
+              <p>
+                Bancos de dados centralizados permitem que múltiplos usuários acessem as mesmas informações
+                em tempo real, garantindo consistência e facilitando backups.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🔄 Redundância e Disponibilidade</h4>
+              <p>
+                Com redes, é possível criar sistemas redundantes onde, se um servidor falha, outro assume
+                automaticamente — conceito fundamental para alta disponibilidade (High Availability).
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>💰 Redução de Custos</h4>
+              <p>
+                Uma única impressora de alta qualidade conectada à rede atende um escritório inteiro. Um
+                servidor de arquivos centralizado elimina a necessidade de discos grandes em cada estação.
+              </p>
+            </div>
+            <div class="command-card">
+              <h4>🌍 Acesso Remoto</h4>
+              <p>
+                Colaboradores podem acessar sistemas corporativos de qualquer lugar do mundo via VPN, RDP
+                ou soluções em nuvem, habilitando o trabalho remoto moderno.
+              </p>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Dispositivos de Rede</h3>
+          <h3>1.3 — Analogia: O Sistema Postal</h3>
+          <p>
+            Para entender redes de computadores de forma intuitiva, vamos compará-las ao sistema postal
+            que todos conhecemos. Esta analogia é surpreendentemente precisa:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Sistema Postal</th>
+                <th>Rede de Computadores</th>
+                <th>Explicação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Carta</td>
+                <td>Pacote de dados (packet)</td>
+                <td>A unidade de informação que viaja pela rede</td>
+              </tr>
+              <tr>
+                <td>Envelope (endereço)</td>
+                <td>Cabeçalho (header) do pacote</td>
+                <td>Contém IP de origem, IP de destino, porta, etc.</td>
+              </tr>
+              <tr>
+                <td>Conteúdo da carta</td>
+                <td>Payload (carga útil)</td>
+                <td>Os dados reais sendo transmitidos</td>
+              </tr>
+              <tr>
+                <td>CEP</td>
+                <td>Endereço IP</td>
+                <td>Identificador numérico único do destino</td>
+              </tr>
+              <tr>
+                <td>Nome do destinatário</td>
+                <td>Porta (port number)</td>
+                <td>Identifica qual aplicação deve receber o dado</td>
+              </tr>
+              <tr>
+                <td>Carteiro</td>
+                <td>Roteador (router)</td>
+                <td>Encaminha o pacote para o destino correto</td>
+              </tr>
+              <tr>
+                <td>Agência dos Correios</td>
+                <td>Switch / Hub</td>
+                <td>Ponto de distribuição local dos pacotes</td>
+              </tr>
+              <tr>
+                <td>Rodovias entre cidades</td>
+                <td>Links WAN / fibra óptica</td>
+                <td>Conexões de longa distância entre redes</td>
+              </tr>
+              <tr>
+                <td>Aviso de Recebimento (AR)</td>
+                <td>ACK (acknowledgment)</td>
+                <td>Confirmação de que o pacote chegou ao destino</td>
+              </tr>
+              <tr>
+                <td>Carta devolvida ao remetente</td>
+                <td>ICMP Destination Unreachable</td>
+                <td>Quando o destino não é encontrado</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Dica Memorável</h4>
+            <p>
+              Assim como você não precisa saber todas as rotas que o carteiro percorre para enviar uma carta,
+              o usuário final não precisa conhecer o caminho exato que seus dados percorrem na Internet.
+              Essa abstração é o que torna as redes tão poderosas — e é exatamente o que os protocolos
+              de rede resolvem nos bastidores.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 — O Modelo Básico de Comunicação</h3>
+          <p>
+            Toda comunicação em rede (e na verdade qualquer comunicação) envolve três componentes
+            fundamentais. Este modelo foi formalizado por Claude Shannon em 1948 e continua sendo
+            a base de toda teoria de comunicações:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card wide">
+              <h4>📡 Modelo Emissor → Meio → Receptor</h4>
+<pre><code>
+┌──────────────┐         ┌──────────────────┐         ┌──────────────┐
+│              │         │                  │         │              │
+│   EMISSOR    │────────▶│  MEIO/CANAL DE   │────────▶│   RECEPTOR   │
+│  (Sender)    │         │  TRANSMISSÃO     │         │  (Receiver)  │
+│              │         │  (Medium)        │         │              │
+└──────────────┘         └──────────────────┘         └──────────────┘
+       │                         │                           │
+       ▼                         ▼                           ▼
+  Gera a mensagem        Transporta o sinal         Recebe e interpreta
+  Codifica em sinais     Sujeito a ruído/perda      Decodifica o sinal
+  Ex: Seu computador     Ex: Cabo, fibra, ar        Ex: Servidor web
+</code></pre>
+            </div>
+          </div>
+
+          <p>Detalhando cada componente:</p>
+
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Switch</code><span class="cmd-tag">Camada 2</span></div>
-              <p>Encaminha frames baseado em endereços MAC. Opera na camada de enlace.</p>
-              <pre><code>Funcionalidades:
-- Tabela MAC (CAM table)
-- VLANs
-- Spanning Tree (STP)
-- Port Security
-- PoE (Power over Ethernet)</code></pre>
+              <h4>1️⃣ Emissor (Sender / Source)</h4>
+              <p>
+                O dispositivo ou processo que origina a comunicação. Ele <strong>codifica</strong> a
+                informação em um formato adequado para transmissão. Exemplo: seu notebook enviando uma
+                requisição HTTP ao acessar um site. O navegador gera a mensagem, o sistema operacional
+                a encapsula em pacotes TCP/IP, e a placa de rede converte em sinais elétricos ou ondas de rádio.
+              </p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Roteador</code><span class="cmd-tag">Camada 3</span></div>
-              <p>Encaminha pacotes entre redes diferentes usando endereços IP.</p>
-              <pre><code>Funcionalidades:
-- Tabela de rotas
-- NAT/PAT
-- ACLs (Access Control Lists)
-- DHCP Server
-- VPN Gateway
-- QoS (Quality of Service)</code></pre>
+              <h4>2️⃣ Meio de Transmissão (Medium / Channel)</h4>
+              <p>
+                O canal físico ou lógico por onde o sinal viaja. Pode ser um cabo de cobre (sinais elétricos),
+                fibra óptica (luz), ou o ar (ondas eletromagnéticas no Wi-Fi). Cada meio tem características
+                próprias de velocidade, distância máxima e susceptibilidade a interferências (ruído).
+              </p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Firewall</code><span class="cmd-tag">Segurança</span></div>
-              <p>Filtra tráfego entre redes com base em regras.</p>
-              <pre><code>Tipos:
-- Stateless (filtro de pacotes simples)
-- Stateful (rastreia conexões)
-- NGFW (Next-Gen: DPI, IPS, App Control)
-- WAF (Web Application Firewall)</code></pre>
+              <h4>3️⃣ Receptor (Receiver / Destination)</h4>
+              <p>
+                O dispositivo ou processo que recebe e <strong>decodifica</strong> a informação. Ele interpreta
+                os sinais recebidos, reconstrói a mensagem original e a entrega à aplicação de destino.
+                Exemplo: o servidor web que recebe sua requisição, processa e retorna a página HTML.
+              </p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Cuidado: Ruído e Interferência</h4>
+            <p>
+              Nenhum canal de comunicação é perfeito. Sempre existe <strong>ruído</strong> — interferência
+              eletromagnética em cabos de cobre, dispersão em fibra óptica, interferência de outros
+              dispositivos Wi-Fi no mesmo canal. É por isso que os protocolos de rede incluem mecanismos
+              de detecção e correção de erros (checksums, CRC, retransmissão). Veremos isso em detalhes
+              no Módulo 02 ao estudar as camadas do modelo OSI.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 — Breve História das Redes</h3>
+          <p>
+            Entender a evolução das redes ajuda a compreender por que as coisas funcionam como funcionam hoje:
+          </p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Década</th>
+                <th>Marco</th>
+                <th>Impacto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1960s</td>
+                <td>ARPANET (4 nós)</td>
+                <td>Primeira rede de comutação de pacotes; provou que computadores podiam se comunicar remotamente</td>
+              </tr>
+              <tr>
+                <td>1970s</td>
+                <td>Ethernet (Xerox PARC) e TCP/IP (Vinton Cerf)</td>
+                <td>Padrões fundamentais que usamos até hoje foram criados nessa época</td>
+              </tr>
+              <tr>
+                <td>1980s</td>
+                <td>DNS, modelo OSI, redes locais se popularizam</td>
+                <td>Empresas começam a conectar seus computadores internamente</td>
+              </tr>
+              <tr>
+                <td>1990s</td>
+                <td>World Wide Web (Tim Berners-Lee), ISPs comerciais</td>
+                <td>A Internet se torna acessível ao público geral</td>
+              </tr>
+              <tr>
+                <td>2000s</td>
+                <td>Wi-Fi, banda larga, computação em nuvem</td>
+                <td>Conexões sem fio e serviços online transformam o dia a dia</td>
+              </tr>
+              <tr>
+                <td>2010s</td>
+                <td>4G/LTE, SDN, IoT, microserviços</td>
+                <td>Redes definidas por software e bilhões de dispositivos conectados</td>
+              </tr>
+              <tr>
+                <td>2020s</td>
+                <td>5G, Wi-Fi 6/6E, Edge Computing, Zero Trust</td>
+                <td>Latência ultra-baixa, velocidades multi-gigabit e segurança redesenhada</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: TIPOS DE REDES                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Tipos de Redes</h2>
+          <p>As redes são classificadas principalmente pela sua abrangência geográfica. Conheça os cinco tipos fundamentais e saiba quando cada um se aplica.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — Visão Geral da Classificação por Abrangência</h3>
+          <p>
+            A classificação mais comum de redes é baseada na <strong>área geográfica</strong> que cobrem.
+            Cada tipo possui características distintas de velocidade, custo, tecnologias utilizadas e
+            complexidade de gerenciamento.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📐 Escala Comparativa</h4>
+<pre><code>
+  ┌─────┐   ┌─────────┐   ┌──────────────┐   ┌─────────────────────┐   ┌────────────────────────────┐
+  │ PAN │   │   LAN   │   │     MAN      │   │        WAN          │   │        INTERNET            │
+  │~1m  │   │ ~1km    │   │  ~50km       │   │  ~milhares km       │   │     Global                 │
+  │     │   │         │   │              │   │                     │   │                            │
+  │ 🧑  │   │ 🏢      │   │  🏙️          │   │  🌎                 │   │  🌐                        │
+  └─────┘   └─────────┘   └──────────────┘   └─────────────────────┘   └────────────────────────────┘
+  Pessoal    Local         Metropolitana      Ampla (Wide Area)         Rede das redes
+</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — PAN (Personal Area Network)</h3>
+          <p>
+            Uma <strong>PAN</strong> é a menor classificação de rede, cobrindo tipicamente uma área de
+            <strong>1 a 10 metros</strong> ao redor de uma pessoa. Conecta dispositivos pessoais entre si.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📱 Características da PAN</h4>
+              <p><strong>Alcance:</strong> 1 a 10 metros</p>
+              <p><strong>Velocidade:</strong> 1 Mbps a 3 Mbps (Bluetooth clássico) até 2 Gbps (USB)</p>
+              <p><strong>Custo:</strong> Muito baixo (integrado aos dispositivos)</p>
+              <p><strong>Tecnologias:</strong> Bluetooth, USB, NFC, Infrared (IrDA), Zigbee</p>
+              <p><strong>Gerenciamento:</strong> Automático/mínimo (pareamento)</p>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Access Point</code><span class="cmd-tag">Wireless</span></div>
-              <p>Fornece conectividade Wi-Fi aos dispositivos.</p>
-              <pre><code>Conceitos:
-- SSID (nome da rede)
-- Canais (2.4 GHz / 5 GHz / 6 GHz)
-- WPA3 (segurança)
-- Roaming (transição entre APs)
-- Controller-based vs Autonomous</code></pre>
+              <h4>🔗 Exemplos de PAN</h4>
+              <p>• Smartphone conectado a fone Bluetooth</p>
+              <p>• Smartwatch sincronizando com celular</p>
+              <p>• Teclado/mouse sem fio no computador</p>
+              <p>• Pagamento por aproximação (NFC)</p>
+              <p>• Tethering (compartilhar Internet do celular)</p>
+              <p>• Dispositivos wearables (pulseiras fitness)</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 PAN no Contexto Cloud/DevOps</h4>
+            <p>
+              Embora PANs pareçam distantes do mundo cloud, sensores IoT industriais frequentemente
+              usam protocolos PAN (Zigbee, Z-Wave, BLE) para coletar dados localmente antes de enviá-los
+              para a nuvem via um gateway. Entender PANs ajuda a projetar arquiteturas IoT completas.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — LAN (Local Area Network)</h3>
+          <p>
+            A <strong>LAN</strong> é provavelmente o tipo de rede mais comum no dia a dia profissional.
+            Cobre uma área limitada como um escritório, andar de prédio, campus universitário ou residência.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🏢 Características da LAN</h4>
+              <p><strong>Alcance:</strong> Até ~1 km (tipicamente um prédio ou campus)</p>
+              <p><strong>Velocidade:</strong> 100 Mbps a 10 Gbps (Ethernet), até 9.6 Gbps (Wi-Fi 6E)</p>
+              <p><strong>Custo:</strong> Moderado (switches, cabos, access points)</p>
+              <p><strong>Tecnologias:</strong> Ethernet (IEEE 802.3), Wi-Fi (IEEE 802.11)</p>
+              <p><strong>Gerenciamento:</strong> Administrador local, relativamente simples</p>
+              <p><strong>Propriedade:</strong> Privada (empresa ou indivíduo é dono da rede)</p>
+            </div>
+            <div class="command-card">
+              <h4>🔗 Exemplos de LAN</h4>
+              <p>• Rede do escritório com 50 computadores</p>
+              <p>• Rede doméstica (roteador + dispositivos)</p>
+              <p>• Laboratório de informática de uma escola</p>
+              <p>• Rede de uma loja conectando caixas e estoque</p>
+              <p>• Data center local de uma empresa</p>
+              <p>• Rede de um andar inteiro de prédio comercial</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🏗️ Anatomia de uma LAN Típica de Escritório</h4>
+<pre><code>
+                              ┌─────────────┐
+                              │  INTERNET   │
+                              └──────┬──────┘
+                                     │
+                              ┌──────┴──────┐
+                              │   ROUTER    │  ← Gateway da rede (conecta LAN à WAN)
+                              │ 192.168.1.1 │
+                              └──────┬──────┘
+                                     │
+                              ┌──────┴──────┐
+                              │  FIREWALL   │  ← Filtra tráfego malicioso
+                              └──────┬──────┘
+                                     │
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+             ┌──────┴──────┐  ┌──────┴──────┐  ┌──────┴──────┐
+             │  SWITCH 1   │  │  SWITCH 2   │  │ ACCESS POINT│
+             │  (Andar 1)  │  │  (Andar 2)  │  │   (Wi-Fi)   │
+             └──┬───┬───┬──┘  └──┬───┬───┬──┘  └──┬───┬───┬──┘
+                │   │   │        │   │   │        │   │   │
+               💻  💻  🖨️      💻  💻  💻      📱  💻  📱
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 VLAN — LAN Virtual</h4>
+            <p>
+              Em ambientes corporativos, uma única LAN física é frequentemente dividida em
+              <strong>VLANs</strong> (Virtual LANs) usando switches gerenciáveis. Isso permite
+              segmentar o tráfego (ex: VLAN de RH separada da VLAN de TI) sem precisar de
+              cabos físicos separados. Estudaremos VLANs em profundidade no Módulo 05 (Switches).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — MAN (Metropolitan Area Network)</h3>
+          <p>
+            Uma <strong>MAN</strong> cobre uma área geográfica maior que uma LAN, tipicamente uma
+            <strong>cidade ou região metropolitana</strong> (até ~50 km). Interconecta múltiplas LANs.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🏙️ Características da MAN</h4>
+              <p><strong>Alcance:</strong> 5 a 50 km (uma cidade ou metrópole)</p>
+              <p><strong>Velocidade:</strong> 100 Mbps a 10 Gbps</p>
+              <p><strong>Custo:</strong> Alto (infraestrutura metropolitana)</p>
+              <p><strong>Tecnologias:</strong> Fibra óptica (metro ethernet), WiMAX, MPLS</p>
+              <p><strong>Gerenciamento:</strong> ISP ou consórcio de empresas</p>
+              <p><strong>Propriedade:</strong> ISP, governo ou consórcio privado</p>
+            </div>
+            <div class="command-card">
+              <h4>🔗 Exemplos de MAN</h4>
+              <p>• Rede de TV a cabo cobrindo uma cidade</p>
+              <p>• Interconexão de filiais de um banco na mesma cidade</p>
+              <p>• Rede de câmeras de segurança pública</p>
+              <p>• Backbone metropolitano de um ISP</p>
+              <p>• Rede acadêmica conectando universidades na região</p>
+              <p>• Sistema de transporte público integrado (bilhetagem)</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Metro Ethernet</h4>
+            <p>
+              A tecnologia mais comum em MANs modernas é a <strong>Metro Ethernet</strong>, que utiliza
+              o mesmo padrão Ethernet das LANs, mas operando sobre fibra óptica em distâncias metropolitanas.
+              Isso simplifica a integração entre a rede local e a rede metropolitana, pois usa a mesma
+              tecnologia de camada 2.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 — WAN (Wide Area Network)</h3>
+          <p>
+            Uma <strong>WAN</strong> cobre grandes distâncias geográficas — de centenas a milhares de
+            quilômetros. Conecta LANs e MANs entre cidades, estados, países e até continentes.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🌎 Características da WAN</h4>
+              <p><strong>Alcance:</strong> Centenas a milhares de km (entre cidades/países)</p>
+              <p><strong>Velocidade:</strong> 1 Mbps a 100+ Gbps (depende do serviço contratado)</p>
+              <p><strong>Custo:</strong> Muito alto (links dedicados, satélites)</p>
+              <p><strong>Tecnologias:</strong> MPLS, Frame Relay (legado), SD-WAN, fibra submarina, satélite</p>
+              <p><strong>Gerenciamento:</strong> ISPs e operadoras de telecomunicações</p>
+              <p><strong>Latência:</strong> Maior que LAN (10-300ms dependendo da distância)</p>
+            </div>
+            <div class="command-card">
+              <h4>🔗 Exemplos de WAN</h4>
+              <p>• Link MPLS conectando escritório em SP ao escritório em NY</p>
+              <p>• Rede privada entre data centers em diferentes continentes</p>
+              <p>• Conexão via satélite para áreas remotas</p>
+              <p>• VPN site-to-site entre filiais de uma empresa</p>
+              <p>• AWS Direct Connect (link dedicado ao cloud)</p>
+              <p>• Redes de operadoras de telecomunicações (backbone)</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🌊 Cabos Submarinos — A Espinha Dorsal da Internet</h4>
+<pre><code>
+  AMÉRICA DO SUL                    OCEANO ATLÂNTICO                    EUROPA/AFRICA
+  ━━━━━━━━━━━━━━                    ════════════════                    ━━━━━━━━━━━━━
+  
+       São Paulo ──────────────── EllaLink (2021) ──────────────── Lisboa/Portugal
+       ↓                           6.000 km                              ↓
+       Fortaleza ──────────────── SACS (2018) ────────────────── Luanda/Angola
+       ↓                           6.200 km                              
+       Santos ────────────────── BRUSA (2018) ──────────────── Virginia Beach/EUA
+                                   10.700 km
+  
+  💡 Mais de 95% do tráfego intercontinental da Internet viaja por cabos
+     submarinos de fibra óptica no fundo do oceano!
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ WAN vs Internet</h4>
+            <p>
+              Cuidado para não confundir: uma WAN é uma rede de longa distância <strong>privada</strong>
+              (pertence a uma organização ou operadora). A Internet é uma WAN pública e aberta.
+              Empresas podem ter WANs privadas (links MPLS dedicados) que não passam pela Internet pública,
+              oferecendo maior segurança e garantia de performance (SLA).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.6 — Internet (A Rede das Redes)</h3>
+          <p>
+            A <strong>Internet</strong> não é um tipo de rede em si, mas sim uma <strong>interconexão
+            global de redes</strong> (inter-net = entre redes). É composta por milhões de LANs, MANs e
+            WANs interconectadas usando o protocolo TCP/IP como linguagem universal.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🌐 Características da Internet</h4>
+              <p><strong>Alcance:</strong> Global (todos os continentes, inclusive Antártica)</p>
+              <p><strong>Velocidade:</strong> Variável (56 Kbps em áreas remotas a 400+ Gbps em backbones)</p>
+              <p><strong>Custo:</strong> Variável (ISPs cobram pelo acesso)</p>
+              <p><strong>Protocolo Base:</strong> TCP/IP (obrigatório para participar)</p>
+              <p><strong>Governança:</strong> Descentralizada (ICANN, IETF, registros regionais)</p>
+              <p><strong>Dispositivos conectados:</strong> ~30 bilhões (2024)</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 Internet em Números (2024)</h4>
+              <p>• <strong>5.4 bilhões</strong> de usuários ativos</p>
+              <p>• <strong>~550</strong> cabos submarinos ativos</p>
+              <p>• <strong>~70.000</strong> Sistemas Autônomos (AS)</p>
+              <p>• <strong>~400 Tbps</strong> de capacidade total dos backbones</p>
+              <p>• <strong>~1.2 bilhão</strong> de sites ativos</p>
+              <p>• <strong>~4.9 zettabytes</strong> de tráfego anual</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.7 — Tabela Comparativa Completa</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Alcance</th>
+                <th>Velocidade Típica</th>
+                <th>Tecnologias</th>
+                <th>Exemplo</th>
+                <th>Propriedade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>PAN</strong></td>
+                <td>1–10 m</td>
+                <td>1–3 Mbps</td>
+                <td>Bluetooth, USB, NFC</td>
+                <td>Fone + smartphone</td>
+                <td>Pessoal</td>
+              </tr>
+              <tr>
+                <td><strong>LAN</strong></td>
+                <td>Até 1 km</td>
+                <td>100 Mbps–10 Gbps</td>
+                <td>Ethernet, Wi-Fi</td>
+                <td>Rede do escritório</td>
+                <td>Privada (organização)</td>
+              </tr>
+              <tr>
+                <td><strong>MAN</strong></td>
+                <td>5–50 km</td>
+                <td>100 Mbps–10 Gbps</td>
+                <td>Metro Ethernet, WiMAX</td>
+                <td>Rede de TV a cabo</td>
+                <td>ISP ou consórcio</td>
+              </tr>
+              <tr>
+                <td><strong>WAN</strong></td>
+                <td>100–10.000+ km</td>
+                <td>1 Mbps–100 Gbps</td>
+                <td>MPLS, SD-WAN, satélite</td>
+                <td>Link SP ↔ Nova York</td>
+                <td>Operadora/empresa</td>
+              </tr>
+              <tr>
+                <td><strong>Internet</strong></td>
+                <td>Global</td>
+                <td>Variável</td>
+                <td>TCP/IP sobre tudo</td>
+                <td>A própria Internet</td>
+                <td>Descentralizada</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.8 — Outros Tipos de Redes (Complementar)</h3>
+          <p>Além dos cinco tipos principais, existem classificações especializadas:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🏠 WLAN (Wireless LAN)</h4>
+              <p>LAN sem fio. Usa padrões IEEE 802.11 (Wi-Fi). Mesma abrangência de uma LAN, mas sem cabos. Muito comum em escritórios e residências.</p>
+            </div>
+            <div class="command-card">
+              <h4>🗄️ SAN (Storage Area Network)</h4>
+              <p>Rede dedicada exclusivamente para armazenamento. Conecta servidores a arrays de discos usando Fibre Channel ou iSCSI. Comum em data centers.</p>
+            </div>
+            <div class="command-card">
+              <h4>☁️ VPN (Virtual Private Network)</h4>
+              <p>Não é um tipo físico, mas uma rede lógica que cria um "túnel" criptografado sobre a Internet pública, simulando uma rede privada.</p>
+            </div>
+            <div class="command-card">
+              <h4>🏭 CAN (Campus Area Network)</h4>
+              <p>Interconecta múltiplas LANs dentro de um campus (universidade, complexo empresarial). Maior que uma LAN, menor que uma MAN.</p>
             </div>
           </div>
         </div>
@@ -139,24 +703,2719 @@ Wireless: 802.11ac (Wi-Fi 5), 802.11ax (Wi-Fi 6)</code></pre>
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: TOPOLOGIAS DE REDE                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Topologias de Rede</h2>
+          <p>A topologia define como os dispositivos são organizados e conectados fisicamente (ou logicamente) em uma rede. Pense nela como a "planta baixa" da sua rede.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — O que é Topologia?</h3>
+          <p>
+            <strong>Topologia de rede</strong> refere-se ao layout — físico ou lógico — de como os nós
+            (dispositivos) e links (conexões) são arranjados. Existem dois tipos:
+          </p>
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔌 Topologia Física</h4>
+              <p>Como os cabos e dispositivos estão realmente dispostos no espaço físico. É o que você vê ao olhar o rack de rede ou seguir os cabos.</p>
+            </div>
+            <div class="command-card">
+              <h4>🧠 Topologia Lógica</h4>
+              <p>Como os dados realmente fluem pela rede, independente da disposição física. Exemplo: uma rede fisicamente em estrela pode operar logicamente como um barramento (Ethernet compartilhada).</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Analogia: Layout de Cidade</h4>
+            <p>
+              Pense nas topologias como layouts de cidades: uma topologia em <strong>barramento</strong> é como uma rua única
+              com casas dos dois lados (todos compartilham a mesma via); uma topologia em <strong>estrela</strong> é como
+              uma praça central com ruas saindo em todas as direções; uma topologia em <strong>anel</strong> é como uma
+              rotatória onde o tráfego flui em círculo; e uma topologia em <strong>malha</strong> é como uma cidade
+              com múltiplas vias alternativas entre qualquer dois pontos.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — Topologia em Barramento (Bus)</h3>
+          <p>
+            Na topologia em <strong>barramento</strong>, todos os dispositivos são conectados a um único
+            cabo central (o "backbone" ou barramento). Os dados são transmitidos em ambas as direções
+            e todos os dispositivos recebem o sinal, mas apenas o destinatário o processa.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Diagrama — Topologia em Barramento</h4>
+<pre><code>
+         Terminador                                              Terminador
+            ┃                                                       ┃
+  ══════════╋═══════════╋═══════════╋═══════════╋═══════════╋═══════╋══════
+            ┃           ┃           ┃           ┃           ┃
+          ┌─┴─┐       ┌─┴─┐       ┌─┴─┐       ┌─┴─┐       ┌─┴─┐
+          │PC1│       │PC2│       │PC3│       │PC4│       │PC5│
+          └───┘       └───┘       └───┘       └───┘       └───┘
+
+  ══════════ = Cabo coaxial (barramento único compartilhado)
+  ┃          = Conexão T (T-connector) ao barramento
+  Terminador = Resistor de 50Ω nas extremidades (evita reflexão de sinal)
+</code></pre>
+          </div>
+
+          <p><strong>Como funciona:</strong></p>
+          <p>
+            Quando o PC1 quer enviar dados ao PC4, ele coloca o sinal no barramento. O sinal viaja em
+            ambas as direções. PC2, PC3 e PC5 recebem o sinal mas o ignoram (não é para eles). PC4
+            reconhece que o endereço de destino é o dele e processa os dados. Apenas um dispositivo
+            pode transmitir por vez — se dois transmitirem simultaneamente, ocorre uma <strong>colisão</strong>.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens</h4>
+              <p>• Simples de implementar e barata</p>
+              <p>• Pouco cabo necessário (um único backbone)</p>
+              <p>• Fácil adicionar novos dispositivos</p>
+              <p>• Funciona bem para redes muito pequenas</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens</h4>
+              <p>• Se o cabo central rompe, TODA a rede cai</p>
+              <p>• Colisões aumentam com mais dispositivos</p>
+              <p>• Difícil identificar falhas (troubleshooting)</p>
+              <p>• Performance degrada com crescimento</p>
+              <p>• Segurança fraca (todos "ouvem" tudo)</p>
+              <p>• <strong>OBSOLETA</strong> — não usada em redes modernas</p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Nota Histórica</h4>
+            <p>
+              A topologia em barramento foi popular nos anos 1980–90 com o padrão <strong>10BASE2</strong>
+              (Thin Ethernet, cabo coaxial fino) e <strong>10BASE5</strong> (Thick Ethernet). Hoje é
+              considerada obsoleta para redes físicas, mas o conceito sobrevive logicamente em tecnologias
+              como <strong>Ethernet half-duplex</strong> e <strong>barramentos CAN</strong> (usados em
+              automóveis).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — Topologia em Estrela (Star)</h3>
+          <p>
+            Na topologia em <strong>estrela</strong>, todos os dispositivos são conectados a um
+            <strong>dispositivo central</strong> (hub ou switch). Toda comunicação passa pelo centro.
+            É a topologia mais utilizada em redes modernas.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Diagrama — Topologia em Estrela</h4>
+<pre><code>
+                          ┌───┐
+                          │PC1│
+                          └─┬─┘
+                            │
+               ┌───┐    ┌──┴───┐    ┌───┐
+               │PC2├────┤      ├────┤PC3│
+               └───┘    │SWITCH│    └───┘
+               ┌───┐    │      │    ┌───┐
+               │PC4├────┤(Hub) ├────┤PC5│
+               └───┘    └──┬───┘    └───┘
+                            │
+                          ┌─┴─┐
+                          │PC6│
+                          └───┘
+
+  Todos os cabos convergem para o dispositivo central (switch/hub).
+  Se PC1 quer falar com PC5, o dado vai: PC1 → Switch → PC5
+</code></pre>
+          </div>
+
+          <p><strong>Como funciona:</strong></p>
+          <p>
+            Cada dispositivo tem seu próprio cabo dedicado até o switch central. Quando PC1 quer enviar
+            dados para PC5, ele envia ao switch. O switch (diferente do hub) lê o endereço MAC de destino
+            e encaminha o frame apenas para a porta onde PC5 está conectado. Isso elimina colisões e
+            melhora drasticamente a performance e a segurança.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens</h4>
+              <p>• Falha em um cabo afeta apenas aquele dispositivo</p>
+              <p>• Fácil adicionar/remover dispositivos</p>
+              <p>• Fácil identificar e isolar problemas</p>
+              <p>• Boa performance (com switch: sem colisões)</p>
+              <p>• Centralização facilita monitoramento</p>
+              <p>• Escalável até centenas de portas (stacking)</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens</h4>
+              <p>• Se o dispositivo central falha, TODA rede cai</p>
+              <p>• Mais cabo necessário (um cabo por dispositivo)</p>
+              <p>• Custo do switch central (especialmente gerenciável)</p>
+              <p>• Limitada pelo número de portas do switch</p>
+              <p>• Ponto único de falha (single point of failure)</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Estrela Estendida (Extended Star)</h4>
+            <p>
+              Na prática, redes corporativas usam <strong>estrela estendida</strong>: múltiplos switches
+              de acesso (um por andar/sala) conectados a um switch de distribuição central, que por sua
+              vez conecta ao switch core. Essa hierarquia de três camadas (Access → Distribution → Core)
+              é o padrão Cisco para design de redes corporativas.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Topologia em Anel (Ring)</h3>
+          <p>
+            Na topologia em <strong>anel</strong>, cada dispositivo é conectado exatamente a
+            <strong>dois vizinhos</strong>, formando um circuito fechado. Os dados circulam em uma
+            direção (ou ambas, no anel duplo) até chegarem ao destinatário.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Diagrama — Topologia em Anel</h4>
+<pre><code>
+                    ┌───┐
+                ┌───┤PC1├───┐
+                │   └───┘   │
+              ┌─┴─┐       ┌─┴─┐
+              │PC5│       │PC2│
+              └─┬─┘       └─┬─┘
+                │           │
+              ┌─┴─┐       ┌─┴─┐
+              │PC4│       │PC3│
+              └─┬─┘       └─┬─┘
+                │   ┌───┐   │
+                └───┤PC6├───┘
+                    └───┘
+
+  Direção do fluxo: PC1 → PC2 → PC3 → PC6 → PC4 → PC5 → PC1 (circular)
+  Cada dispositivo recebe, verifica se é para ele, e passa adiante se não for.
+</code></pre>
+          </div>
+
+          <p><strong>Como funciona:</strong></p>
+          <p>
+            Um <strong>token</strong> (ficha) circula pelo anel. Apenas o dispositivo que possui o token
+            pode transmitir. Quando PC1 quer enviar para PC3, ele espera receber o token, anexa seus
+            dados e envia. O frame passa por PC2 (que verifica e repassa) até chegar a PC3. PC3 copia
+            os dados e marca como "recebido". O frame continua circulando de volta ao PC1, que confirma
+            a entrega e libera o token.
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens</h4>
+              <p>• Sem colisões (acesso controlado por token)</p>
+              <p>• Performance previsível sob alta carga</p>
+              <p>• Cada dispositivo tem acesso igual ao meio</p>
+              <p>• Não precisa de dispositivo central</p>
+              <p>• Funciona bem para tráfego constante e previsível</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens</h4>
+              <p>• Se um dispositivo ou link falha, o anel inteiro cai</p>
+              <p>• Adicionar/remover dispositivos interrompe a rede</p>
+              <p>• Troubleshooting difícil (precisa percorrer o anel)</p>
+              <p>• Latência aumenta com mais dispositivos no anel</p>
+              <p>• Complexidade de manutenção</p>
+              <p>• Largamente <strong>substituída</strong> por estrela</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Anel Duplo (Dual Ring) — FDDI e Resilient Packet Ring</h4>
+            <p>
+              Para resolver o problema de falha no anel, tecnologias como <strong>FDDI</strong> (Fiber
+              Distributed Data Interface) usam <strong>dois anéis</strong> girando em direções opostas.
+              Se o anel primário falha em um ponto, o anel secundário assume, fazendo um "wrap around"
+              (envolvimento) para manter a comunicação. O conceito persiste em redes metropolitanas
+              (SDH/SONET).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 — Topologia em Malha (Mesh)</h3>
+          <p>
+            Na topologia em <strong>malha</strong>, cada dispositivo é conectado <strong>diretamente</strong>
+            a todos os outros (malha completa) ou a vários outros (malha parcial). Oferece máxima
+            redundância e tolerância a falhas.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Diagrama — Topologia em Malha Completa (Full Mesh)</h4>
+<pre><code>
+                       ┌───┐
+                  ┌────┤ A ├────┐
+                  │    └─┬─┘    │
+                  │      │      │
+                  │      │      │
+                ┌─┴─┐    │    ┌─┴─┐
+                │ B ├────┼────┤ C │
+                └─┬─┘    │    └─┬─┘
+                  │      │      │
+                  │      │      │
+                  │    ┌─┴─┐    │
+                  └────┤ D ├────┘
+                       └───┘
+
+  Full Mesh com 4 nós: cada nó conectado a todos os outros
+  Total de links = n(n-1)/2 = 4(3)/2 = 6 links
+
+  Se o link A↔D falha, A ainda alcança D via A→B→D ou A→C→D
+</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📊 Diagrama — Topologia em Malha Parcial (Partial Mesh)</h4>
+<pre><code>
+                       ┌───┐
+                  ┌────┤ A ├────┐
+                  │    └───┘    │
+                  │             │
+                ┌─┴─┐        ┌─┴─┐
+                │ B ├────────┤ C │
+                └─┬─┘        └─┬─┘
+                  │             │
+                  │   ┌───┐    │
+                  └───┤ D ├────┘
+                      └───┘
+
+  Partial Mesh: nem todos os nós conectados entre si
+  Menos links que full mesh, mas ainda oferece redundância
+  Mais custo-efetivo para redes maiores
+</code></pre>
+          </div>
+
+          <p><strong>Fórmula de links (Full Mesh):</strong></p>
+          <p>
+            Para N dispositivos em malha completa, o número de links necessários é:
+            <strong>Links = N × (N - 1) / 2</strong>
+          </p>
+          <p>Exemplos: 4 nós = 6 links | 5 nós = 10 links | 10 nós = 45 links | 20 nós = 190 links</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens</h4>
+              <p>• Máxima redundância e tolerância a falhas</p>
+              <p>• Múltiplos caminhos entre qualquer dois pontos</p>
+              <p>• Falha de um link não isola nenhum dispositivo</p>
+              <p>• Tráfego pode ser balanceado entre caminhos</p>
+              <p>• Ideal para redes críticas (backbone, WAN)</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens</h4>
+              <p>• Custo muito alto (muitos links/portas)</p>
+              <p>• Complexidade cresce exponencialmente</p>
+              <p>• Difícil de gerenciar em grande escala</p>
+              <p>• Full mesh impraticável para muitos nós</p>
+              <p>• Cada dispositivo precisa de muitas interfaces</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Mesh na Prática — Onde é Usado</h4>
+            <p>
+              <strong>Full mesh</strong> é usado entre roteadores de backbone de grandes ISPs e em
+              interconexões de data centers (DC-to-DC). <strong>Partial mesh</strong> é o padrão para
+              WANs corporativas (MPLS). <strong>Wireless mesh</strong> (ex: Google WiFi, Ubiquiti AmpliFi)
+              usa o conceito em redes domésticas para eliminar pontos cegos de cobertura.
+              Na AWS, o conceito aparece no <strong>Transit Gateway</strong> com peering full-mesh entre VPCs.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.6 — Topologia Híbrida (Hybrid)</h3>
+          <p>
+            A <strong>topologia híbrida</strong> combina duas ou mais topologias básicas para atender
+            necessidades específicas. É o que encontramos na esmagadora maioria das redes reais.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Diagrama — Topologia Híbrida (Estrela + Malha)</h4>
+<pre><code>
+                    ┌─────────────────────────────────────────────┐
+                    │              CORE (Malha Parcial)           │
+                    │                                             │
+                    │    ┌────────┐         ┌────────┐           │
+                    │    │ROUTER 1├─────────┤ROUTER 2│           │
+                    │    └───┬────┘         └────┬───┘           │
+                    │        │     ╲       ╱     │               │
+                    │        │      ╲     ╱      │               │
+                    │    ┌───┴────┐  ╲   ╱  ┌────┴───┐          │
+                    │    │ROUTER 3├───╳───┤ROUTER 4│           │
+                    │    └───┬────┘  ╱   ╲  └────┬───┘          │
+                    └────────┼─────╱─────╲───────┼──────────────┘
+                             │               │
+                    ┌────────┼───┐   ┌───────┼────────┐
+                    │  ANDAR 1   │   │     ANDAR 2    │
+                    │  (Estrela) │   │    (Estrela)   │
+                    │            │   │                │
+                    │  ┌──────┐  │   │   ┌──────┐    │
+                    │  │SWITCH│  │   │   │SWITCH│    │
+                    │  └─┬┬┬──┘  │   │   └─┬┬┬──┘   │
+                    │   💻💻💻   │   │    💻💻💻    │
+                    └────────────┘   └────────────────┘
+
+  Core: Malha parcial entre roteadores (redundância)
+  Acesso: Estrela em cada andar (simplicidade)
+  Resultado: Topologia híbrida otimizada
+</code></pre>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens</h4>
+              <p>• Flexível — combina o melhor de cada topologia</p>
+              <p>• Escalável — cresce de forma modular</p>
+              <p>• Redundância onde necessário (core em malha)</p>
+              <p>• Simplicidade onde possível (acesso em estrela)</p>
+              <p>• Reflete necessidades reais do negócio</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens</h4>
+              <p>• Maior complexidade de design e gerenciamento</p>
+              <p>• Custo pode ser elevado</p>
+              <p>• Requer planejamento cuidadoso</p>
+              <p>• Troubleshooting mais complexo</p>
+              <p>• Documentação precisa ser muito detalhada</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.7 — Tabela Comparativa de Topologias</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Topologia</th>
+                <th>Tolerância a Falhas</th>
+                <th>Escalabilidade</th>
+                <th>Custo</th>
+                <th>Uso Atual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Barramento</strong></td>
+                <td>❌ Muito baixa</td>
+                <td>❌ Baixa</td>
+                <td>💰 Muito baixo</td>
+                <td>Obsoleta (apenas legado)</td>
+              </tr>
+              <tr>
+                <td><strong>Estrela</strong></td>
+                <td>⚠️ Média (depende do centro)</td>
+                <td>✅ Alta</td>
+                <td>💰💰 Moderado</td>
+                <td>Padrão para LANs (switches)</td>
+              </tr>
+              <tr>
+                <td><strong>Anel</strong></td>
+                <td>❌ Baixa (anel simples)</td>
+                <td>⚠️ Média</td>
+                <td>💰💰 Moderado</td>
+                <td>SDH/SONET, redes metro</td>
+              </tr>
+              <tr>
+                <td><strong>Malha</strong></td>
+                <td>✅ Muito alta</td>
+                <td>⚠️ Limitada (full mesh)</td>
+                <td>💰💰💰 Alto</td>
+                <td>Backbone, WAN, DC core</td>
+              </tr>
+              <tr>
+                <td><strong>Híbrida</strong></td>
+                <td>✅ Alta (configurável)</td>
+                <td>✅ Alta</td>
+                <td>💰💰 Variável</td>
+                <td>Todas as redes reais</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: MEIOS DE TRANSMISSÃO                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Meios de Transmissão</h2>
+          <p>O meio de transmissão é o "caminho" físico por onde os sinais viajam. A escolha do meio impacta diretamente velocidade, distância, custo e confiabilidade da rede.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — Classificação dos Meios</h3>
+          <p>Os meios de transmissão se dividem em duas grandes categorias:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔌 Meios Guiados (Guided Media)</h4>
+              <p>O sinal viaja confinado em um condutor físico:</p>
+              <p>• <strong>Cabo de par trançado</strong> (cobre) — sinais elétricos</p>
+              <p>• <strong>Cabo coaxial</strong> (cobre) — sinais elétricos</p>
+              <p>• <strong>Fibra óptica</strong> (vidro/plástico) — pulsos de luz</p>
+            </div>
+            <div class="command-card">
+              <h4>📡 Meios Não-Guiados (Unguided Media)</h4>
+              <p>O sinal se propaga livremente pelo espaço:</p>
+              <p>• <strong>Ondas de rádio</strong> — Wi-Fi, Bluetooth, celular</p>
+              <p>• <strong>Micro-ondas</strong> — links ponto-a-ponto</p>
+              <p>• <strong>Infravermelho</strong> — controles remotos, IrDA</p>
+              <p>• <strong>Satélite</strong> — comunicação global</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — Cabo de Par Trançado (Twisted Pair)</h3>
+          <p>
+            O cabo de <strong>par trançado</strong> é o meio mais utilizado em redes locais. Consiste em
+            pares de fios de cobre isolados e trançados entre si. O trançamento reduz a interferência
+            eletromagnética (EMI) — técnica conhecida como <strong>cancelamento de ruído</strong>.
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔍 Anatomia de um Cabo UTP Cat6</h4>
+<pre><code>
+  Seção transversal:
+  ┌─────────────────────────────────┐
+  │         Capa externa            │  ← PVC ou LSZH (Low Smoke Zero Halogen)
+  │  ┌───────────────────────────┐  │
+  │  │    ╱╲    ╱╲    ╱╲        │  │  ← Par 1 (azul/branco-azul)
+  │  │   ╱  ╲  ╱  ╲  ╱  ╲      │  │
+  │  │  ╱╲    ╱╲    ╱╲         │  │  ← Par 2 (laranja/branco-laranja)
+  │  │ ╱  ╲  ╱  ╲  ╱  ╲       │  │
+  │  │    ╱╲    ╱╲    ╱╲        │  │  ← Par 3 (verde/branco-verde)
+  │  │   ╱  ╲  ╱  ╲  ╱  ╲      │  │
+  │  │  ╱╲    ╱╲    ╱╲         │  │  ← Par 4 (marrom/branco-marrom)
+  │  │ ╱  ╲  ╱  ╲  ╱  ╲       │  │
+  │  │       Separador central   │  │  ← Spline (Cat6/6a - separa os pares)
+  │  └───────────────────────────┘  │
+  └─────────────────────────────────┘
+
+  Conector: RJ-45 (8P8C) — 8 posições, 8 contatos
+  Padrão de cores: T568A ou T568B
+</code></pre>
+          </div>
+
+          <p><strong>Tipos de blindagem:</strong></p>
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>UTP (Unshielded Twisted Pair)</h4>
+              <p>Sem blindagem. O mais comum e barato. Adequado para escritórios com baixa interferência eletromagnética. Padrão para a maioria das instalações.</p>
+            </div>
+            <div class="command-card">
+              <h4>STP (Shielded Twisted Pair)</h4>
+              <p>Cada par tem blindagem individual de folha metálica. Usado em ambientes com alta EMI (fábricas, próximo a motores elétricos). Mais caro e rígido.</p>
+            </div>
+            <div class="command-card">
+              <h4>FTP (Foiled Twisted Pair)</h4>
+              <p>Uma folha metálica envolve todos os pares (sem blindagem individual). Compromisso entre proteção e custo. Popular na Europa.</p>
+            </div>
+            <div class="command-card">
+              <h4>S/FTP (Shielded + Foiled)</h4>
+              <p>Combina blindagem geral (malha) + folha individual por par. Máxima proteção contra EMI. Usado em Cat6a e Cat7 para garantir 10 Gbps a 100m.</p>
+            </div>
+          </div>
+
+          <h4>Categorias de Cabo UTP/STP</h4>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Velocidade Máx.</th>
+                <th>Frequência</th>
+                <th>Distância Máx.</th>
+                <th>Uso Recomendado</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cat3</td>
+                <td>10 Mbps</td>
+                <td>16 MHz</td>
+                <td>100 m</td>
+                <td>Telefonia (legado)</td>
+                <td>❌ Obsoleto</td>
+              </tr>
+              <tr>
+                <td>Cat5</td>
+                <td>100 Mbps</td>
+                <td>100 MHz</td>
+                <td>100 m</td>
+                <td>Fast Ethernet (legado)</td>
+                <td>❌ Obsoleto</td>
+              </tr>
+              <tr>
+                <td><strong>Cat5e</strong></td>
+                <td>1 Gbps</td>
+                <td>100 MHz</td>
+                <td>100 m</td>
+                <td>Gigabit Ethernet</td>
+                <td>⚠️ Mínimo aceitável</td>
+              </tr>
+              <tr>
+                <td><strong>Cat6</strong></td>
+                <td>1 Gbps (10 Gbps até 55m)</td>
+                <td>250 MHz</td>
+                <td>100 m (55m para 10G)</td>
+                <td>Gigabit / 10 Gigabit curto</td>
+                <td>✅ Recomendado</td>
+              </tr>
+              <tr>
+                <td><strong>Cat6a</strong></td>
+                <td>10 Gbps</td>
+                <td>500 MHz</td>
+                <td>100 m</td>
+                <td>10 Gigabit Ethernet</td>
+                <td>✅ Ideal para novos projetos</td>
+              </tr>
+              <tr>
+                <td>Cat7</td>
+                <td>10 Gbps</td>
+                <td>600 MHz</td>
+                <td>100 m</td>
+                <td>Data centers, ambientes EMI</td>
+                <td>✅ Premium (conector GG45)</td>
+              </tr>
+              <tr>
+                <td>Cat8</td>
+                <td>25/40 Gbps</td>
+                <td>2000 MHz</td>
+                <td>30 m</td>
+                <td>Dentro de racks de data center</td>
+                <td>✅ Específico para DC</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Recomendação Prática</h4>
+            <p>
+              Para novas instalações em 2024+, escolha no mínimo <strong>Cat6</strong> (custo-benefício)
+              ou <strong>Cat6a</strong> (pronto para 10G). O investimento adicional de ~30% em Cat6a
+              garante que sua infraestrutura física suportará as demandas dos próximos 10-15 anos sem
+              recabeamento. Cabos duram décadas; equipamentos são substituídos a cada 5-7 anos.
+            </p>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Regra dos 100 Metros</h4>
+            <p>
+              Todos os cabos de par trançado Ethernet têm limitação de <strong>100 metros</strong> no
+              total do segmento (incluindo patch cords nas pontas). Na prática, o padrão TIA/EIA-568
+              divide assim: <strong>90 metros</strong> de cabeamento horizontal fixo (parede) + 
+              <strong>5 metros</strong> de patch cord em cada extremidade. Além de 100m, o sinal se
+              degrada além do aceitável e ocorrem erros. Para distâncias maiores, use fibra óptica.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Fibra Óptica</h3>
+          <p>
+            A <strong>fibra óptica</strong> transmite dados como <strong>pulsos de luz</strong> através de
+            um filamento de vidro (ou plástico) extremamente fino. É o meio mais rápido, com maior alcance
+            e imune a interferência eletromagnética.
+          </p>
+
+          <div class="command-card wide">
+            <h4>🔍 Estrutura de um Cabo de Fibra Óptica</h4>
+<pre><code>
+  Seção transversal:
+  ┌──────────────────────────────────────────┐
+  │           Capa externa (jacket)           │  ← Proteção mecânica
+  │  ┌────────────────────────────────────┐  │
+  │  │     Membro de resistência          │  │  ← Kevlar (resistência à tração)
+  │  │  ┌──────────────────────────────┐  │  │
+  │  │  │     Buffer (revestimento)    │  │  │  ← Proteção individual da fibra
+  │  │  │  ┌────────────────────────┐  │  │  │
+  │  │  │  │    Cladding (casca)    │  │  │  │  ← Índice refração menor (reflexão)
+  │  │  │  │  ┌──────────────────┐  │  │  │  │
+  │  │  │  │  │    NÚCLEO (Core) │  │  │  │  │  ← Por onde a luz viaja!
+  │  │  │  │  │   (vidro puro)   │  │  │  │  │     Single-mode: 9 μm
+  │  │  │  │  └──────────────────┘  │  │  │  │     Multi-mode: 50/62.5 μm
+  │  │  │  └────────────────────────┘  │  │  │
+  │  │  └──────────────────────────────┘  │  │
+  │  └────────────────────────────────────┘  │
+  └──────────────────────────────────────────┘
+
+  Princípio: REFLEXÃO TOTAL INTERNA
+  A luz entra no núcleo e ricocheteamos nas paredes do cladding,
+  viajando em zigue-zague até o outro extremo sem perda significativa.
+</code></pre>
+          </div>
+
+          <h4>Tipos de Fibra Óptica:</h4>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔵 Single-Mode (Monomodo) — SMF</h4>
+              <p><strong>Núcleo:</strong> 9 μm (muito fino)</p>
+              <p><strong>Distância:</strong> Até 80+ km sem repetidor</p>
+              <p><strong>Velocidade:</strong> 100 Gbps+ (com multiplexação DWDM: Tbps)</p>
+              <p><strong>Laser:</strong> Laser de comprimento de onda específico (1310nm / 1550nm)</p>
+              <p><strong>Custo:</strong> Transceivers mais caros</p>
+              <p><strong>Cor do cabo:</strong> Amarelo (padrão)</p>
+              <p><strong>Uso:</strong> Links WAN, metro, backbone, longa distância</p>
+            </div>
+            <div class="command-card">
+              <h4>🟠 Multi-Mode (Multimodo) — MMF</h4>
+              <p><strong>Núcleo:</strong> 50 μm (OM3/OM4) ou 62.5 μm (OM1/OM2)</p>
+              <p><strong>Distância:</strong> 300m (10G) a 550m (10G com OM4)</p>
+              <p><strong>Velocidade:</strong> Até 100 Gbps (distâncias curtas)</p>
+              <p><strong>Laser:</strong> LED ou VCSEL (850nm)</p>
+              <p><strong>Custo:</strong> Transceivers mais baratos</p>
+              <p><strong>Cor do cabo:</strong> Laranja (OM1/OM2) ou Aqua (OM3/OM4)</p>
+              <p><strong>Uso:</strong> Dentro de data centers, entre andares, backbone de prédio</p>
+            </div>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Classificação</th>
+                <th>Núcleo</th>
+                <th>Distância a 10 Gbps</th>
+                <th>Distância a 40/100 Gbps</th>
+                <th>Cor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>OM1</td>
+                <td>62.5 μm</td>
+                <td>33 m</td>
+                <td>Não suportado</td>
+                <td>Laranja</td>
+              </tr>
+              <tr>
+                <td>OM2</td>
+                <td>50 μm</td>
+                <td>82 m</td>
+                <td>Não suportado</td>
+                <td>Laranja</td>
+              </tr>
+              <tr>
+                <td><strong>OM3</strong></td>
+                <td>50 μm</td>
+                <td>300 m</td>
+                <td>100 m</td>
+                <td>Aqua</td>
+              </tr>
+              <tr>
+                <td><strong>OM4</strong></td>
+                <td>50 μm</td>
+                <td>550 m</td>
+                <td>150 m</td>
+                <td>Aqua</td>
+              </tr>
+              <tr>
+                <td><strong>OM5</strong></td>
+                <td>50 μm</td>
+                <td>550 m</td>
+                <td>400 m (SWDM)</td>
+                <td>Verde-limão</td>
+              </tr>
+              <tr>
+                <td><strong>OS2</strong> (single)</td>
+                <td>9 μm</td>
+                <td>10+ km</td>
+                <td>10+ km</td>
+                <td>Amarelo</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Conectores Comuns de Fibra</h4>
+            <p>
+              <strong>LC</strong> (Lucent Connector): Pequeno, o mais usado em data centers modernos. 
+              <strong>SC</strong> (Subscriber Connector): Encaixe push-pull, comum em telecomunicações.
+              <strong>ST</strong> (Straight Tip): Rosqueado, mais antigo. 
+              <strong>MPO/MTP</strong>: Multi-fibra (12/24 fibras), usado em conexões 40G/100G+ em DCs.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — Meios Sem Fio (Wireless)</h3>
+          <p>
+            A comunicação sem fio utiliza <strong>ondas eletromagnéticas</strong> que se propagam pelo ar.
+            O padrão mais importante para redes locais é o <strong>IEEE 802.11</strong> (Wi-Fi).
+          </p>
+
+          <h4>Evolução dos Padrões Wi-Fi:</h4>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Padrão IEEE</th>
+                <th>Nome Comercial</th>
+                <th>Ano</th>
+                <th>Frequência</th>
+                <th>Velocidade Máx.</th>
+                <th>Alcance Típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>802.11a</td>
+                <td>Wi-Fi 2</td>
+                <td>1999</td>
+                <td>5 GHz</td>
+                <td>54 Mbps</td>
+                <td>~35 m (indoor)</td>
+              </tr>
+              <tr>
+                <td>802.11b</td>
+                <td>Wi-Fi 1</td>
+                <td>1999</td>
+                <td>2.4 GHz</td>
+                <td>11 Mbps</td>
+                <td>~70 m (indoor)</td>
+              </tr>
+              <tr>
+                <td>802.11g</td>
+                <td>Wi-Fi 3</td>
+                <td>2003</td>
+                <td>2.4 GHz</td>
+                <td>54 Mbps</td>
+                <td>~70 m (indoor)</td>
+              </tr>
+              <tr>
+                <td>802.11n</td>
+                <td><strong>Wi-Fi 4</strong></td>
+                <td>2009</td>
+                <td>2.4 / 5 GHz</td>
+                <td>600 Mbps</td>
+                <td>~70 m (indoor)</td>
+              </tr>
+              <tr>
+                <td>802.11ac</td>
+                <td><strong>Wi-Fi 5</strong></td>
+                <td>2013</td>
+                <td>5 GHz</td>
+                <td>6.9 Gbps</td>
+                <td>~35 m (indoor)</td>
+              </tr>
+              <tr>
+                <td>802.11ax</td>
+                <td><strong>Wi-Fi 6/6E</strong></td>
+                <td>2020/2021</td>
+                <td>2.4 / 5 / 6 GHz</td>
+                <td>9.6 Gbps</td>
+                <td>~30 m (indoor)</td>
+              </tr>
+              <tr>
+                <td>802.11be</td>
+                <td><strong>Wi-Fi 7</strong></td>
+                <td>2024</td>
+                <td>2.4 / 5 / 6 GHz</td>
+                <td>46 Gbps</td>
+                <td>~30 m (indoor)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📻 Frequência 2.4 GHz</h4>
+              <p><strong>Prós:</strong> Maior alcance, melhor penetração em paredes</p>
+              <p><strong>Contras:</strong> Apenas 3 canais não sobrepostos, muito congestionado (micro-ondas, Bluetooth, vizinhos)</p>
+              <p><strong>Canais:</strong> 1, 6, 11 (recomendados para evitar sobreposição)</p>
+              <p><strong>Largura de banda:</strong> 20 MHz (40 MHz possível mas não recomendado)</p>
+            </div>
+            <div class="command-card">
+              <h4>📻 Frequência 5 GHz</h4>
+              <p><strong>Prós:</strong> Mais canais disponíveis (~25), menos interferência, maior velocidade</p>
+              <p><strong>Contras:</strong> Menor alcance, pior penetração em obstáculos</p>
+              <p><strong>Canais:</strong> 36-165 (variável por país, alguns requerem DFS)</p>
+              <p><strong>Largura de banda:</strong> 20/40/80/160 MHz</p>
+            </div>
+            <div class="command-card">
+              <h4>📻 Frequência 6 GHz (Wi-Fi 6E)</h4>
+              <p><strong>Prós:</strong> Espectro limpo (sem legado), até 7 canais de 160 MHz</p>
+              <p><strong>Contras:</strong> Alcance ainda menor, exige hardware novo, regulamentação em evolução</p>
+              <p><strong>Canais:</strong> 1-233 (UNII-5 a UNII-8)</p>
+              <p><strong>Largura de banda:</strong> 20/40/80/160/320 MHz (Wi-Fi 7)</p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Velocidade Teórica vs Real</h4>
+            <p>
+              As velocidades listadas são <strong>máximas teóricas</strong> em condições ideais (sem
+              interferência, cliente único, proximidade ao AP). Na prática, espere <strong>40-60%</strong>
+              da velocidade anunciada. Um AP Wi-Fi 6 que promete 2.4 Gbps entregará ~1-1.5 Gbps em
+              condições reais com um cliente próximo, e significativamente menos com vários clientes
+              simultâneos ou distância/obstáculos.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Tabela Comparativa dos Meios de Transmissão</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>Par Trançado (Cat6a)</th>
+                <th>Fibra Multimodo (OM4)</th>
+                <th>Fibra Monomodo (OS2)</th>
+                <th>Wi-Fi 6 (802.11ax)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Velocidade Máx.</strong></td>
+                <td>10 Gbps</td>
+                <td>100 Gbps</td>
+                <td>400+ Gbps (DWDM)</td>
+                <td>9.6 Gbps (teórico)</td>
+              </tr>
+              <tr>
+                <td><strong>Distância Máx.</strong></td>
+                <td>100 m</td>
+                <td>550 m (10G)</td>
+                <td>80+ km</td>
+                <td>~30 m (indoor útil)</td>
+              </tr>
+              <tr>
+                <td><strong>Imunidade EMI</strong></td>
+                <td>Baixa-Média</td>
+                <td>Total</td>
+                <td>Total</td>
+                <td>Nenhuma (susceptível)</td>
+              </tr>
+              <tr>
+                <td><strong>Custo do Cabo</strong></td>
+                <td>Baixo (~R$3/m)</td>
+                <td>Médio (~R$8/m)</td>
+                <td>Médio (~R$6/m)</td>
+                <td>N/A (sem fio)</td>
+              </tr>
+              <tr>
+                <td><strong>Custo do Transceiver</strong></td>
+                <td>Integrado (RJ-45)</td>
+                <td>Médio (SFP+ ~R$200)</td>
+                <td>Alto (SFP+ ~R$500)</td>
+                <td>Integrado no AP</td>
+              </tr>
+              <tr>
+                <td><strong>Instalação</strong></td>
+                <td>Fácil (crimpagem)</td>
+                <td>Técnica (fusão/conectorização)</td>
+                <td>Especializada (fusão)</td>
+                <td>Simples (configuração)</td>
+              </tr>
+              <tr>
+                <td><strong>Segurança Física</strong></td>
+                <td>Média (pode ser "grampeado")</td>
+                <td>Alta (difícil interceptar)</td>
+                <td>Alta (difícil interceptar)</td>
+                <td>Baixa (sinal no ar)</td>
+              </tr>
+              <tr>
+                <td><strong>Aplicação Típica</strong></td>
+                <td>LAN (desktop → switch)</td>
+                <td>Backbone de prédio/DC</td>
+                <td>WAN, metro, longa distância</td>
+                <td>Acesso sem fio (mobilidade)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Quando Usar Cada Meio?</h4>
+            <p>
+              <strong>Par trançado:</strong> Do desktop/laptop até o switch mais próximo (horizontal cabling). 
+              <strong>Fibra multimodo:</strong> Backbone entre switches no mesmo prédio ou data center. 
+              <strong>Fibra monomodo:</strong> Links entre prédios, cidades ou data centers distantes. 
+              <strong>Wi-Fi:</strong> Onde mobilidade é necessária (laptops, celulares, IoT).
+              Na prática, uma rede bem projetada usa <strong>todos eles</strong> em diferentes pontos.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: DISPOSITIVOS DE REDE                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Dispositivos de Rede</h2>
+          <p>Conheça os principais equipamentos que compõem uma rede, suas funções específicas e em qual camada do modelo OSI eles operam.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — Hub (Concentrador)</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📦 O que é?</h4>
+              <p>
+                O <strong>hub</strong> é o dispositivo de rede mais simples e mais antigo. Ele atua como
+                um repetidor multiporta: quando recebe um sinal em uma porta, <strong>replica esse sinal
+                para TODAS as outras portas</strong>, sem qualquer inteligência.
+              </p>
+              <p><strong>Camada OSI:</strong> Camada 1 (Física)</p>
+              <p><strong>Status:</strong> ❌ OBSOLETO — completamente substituído pelo switch</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Funcionamento</h4>
+              <p>• Recebe sinais elétricos em uma porta</p>
+              <p>• Regenera (amplifica) o sinal</p>
+              <p>• Retransmite para TODAS as outras portas</p>
+              <p>• Não entende endereços MAC ou IP</p>
+              <p>• Todos os dispositivos compartilham a mesma largura de banda</p>
+              <p>• Cria um único domínio de colisão</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📊 Hub vs Switch — Comportamento Visual</h4>
+<pre><code>
+  HUB (Camada 1 — "burro"):
+  ┌───────────────────────────────────────────┐
+  │   PC-A envia frame para PC-D              │
+  │                                           │
+  │   PC-A ──▶ HUB ──▶ PC-B  (recebe, ignora)│
+  │                ──▶ PC-C  (recebe, ignora) │
+  │                ──▶ PC-D  ✅ (destinatário) │
+  │                ──▶ PC-E  (recebe, ignora) │
+  │                                           │
+  │   Resultado: TODOS recebem o frame!       │
+  │   (desperdício de banda + inseguro)       │
+  └───────────────────────────────────────────┘
+
+  SWITCH (Camada 2 — "inteligente"):
+  ┌───────────────────────────────────────────┐
+  │   PC-A envia frame para PC-D              │
+  │                                           │
+  │   PC-A ──▶ SWITCH ──▶ PC-D ✅ (apenas ele)│
+  │                                           │
+  │   PC-B, PC-C, PC-E não recebem nada!     │
+  │   (eficiente + seguro)                    │
+  └───────────────────────────────────────────┘
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Por que Hubs são Ruins?</h4>
+            <p>
+              Hubs criam um único <strong>domínio de colisão</strong> — se dois PCs transmitem ao mesmo
+              tempo, os sinais colidem e ambos precisam retransmitir (protocolo CSMA/CD). Com 10+
+              dispositivos, colisões se tornam tão frequentes que a rede fica praticamente inutilizável.
+              Além disso, como todos "ouvem" tudo, é trivial interceptar dados com um sniffer.
+              <strong>Nunca use hubs em produção.</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — Switch (Comutador)</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📦 O que é?</h4>
+              <p>
+                O <strong>switch</strong> é o dispositivo central das redes locais modernas. Ele opera na
+                <strong>Camada 2 (Enlace)</strong> do modelo OSI, entende endereços <strong>MAC</strong> e
+                encaminha frames apenas para a porta correta, eliminando colisões.
+              </p>
+              <p><strong>Camada OSI:</strong> Camada 2 (Enlace) — alguns operam na Camada 3 (L3 switches)</p>
+              <p><strong>Status:</strong> ✅ ESSENCIAL — presente em toda rede moderna</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Funcionamento</h4>
+              <p>• Mantém uma <strong>tabela MAC</strong> (CAM table): MAC ↔ Porta</p>
+              <p>• Aprende MACs analisando os frames recebidos</p>
+              <p>• Encaminha frames apenas para a porta de destino</p>
+              <p>• Cada porta é um domínio de colisão separado</p>
+              <p>• Suporta full-duplex (transmitir e receber simultaneamente)</p>
+              <p>• Pode fazer VLANs, QoS, Port Security (gerenciável)</p>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🏷️ Switch Não-Gerenciável (Unmanaged)</h4>
+              <p>Plug-and-play, sem configuração. Ideal para redes domésticas ou pequenos escritórios. Não suporta VLANs, monitoramento ou controle avançado. Barato.</p>
+            </div>
+            <div class="command-card">
+              <h4>🏷️ Switch Gerenciável (Managed)</h4>
+              <p>Configurável via CLI (SSH/Telnet), web ou SNMP. Suporta VLANs, STP, LACP, QoS, port mirroring, ACLs. Essencial para redes corporativas. Interface de gerenciamento IP.</p>
+            </div>
+            <div class="command-card">
+              <h4>🏷️ Switch Layer 3 (L3)</h4>
+              <p>Combina funções de switch + roteador. Faz roteamento inter-VLAN por hardware (ASICs), muito mais rápido que roteadores tradicionais. Usado como switch de distribuição/core.</p>
+            </div>
+            <div class="command-card">
+              <h4>🏷️ Switch PoE (Power over Ethernet)</h4>
+              <p>Fornece energia elétrica pelo mesmo cabo de rede (até 90W em PoE++). Alimenta APs Wi-Fi, câmeras IP, telefones VoIP sem tomada de energia separada.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Roteador (Router)</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📦 O que é?</h4>
+              <p>
+                O <strong>roteador</strong> opera na <strong>Camada 3 (Rede)</strong> e é responsável por
+                <strong>encaminhar pacotes entre redes diferentes</strong>. Ele toma decisões de roteamento
+                baseado em endereços IP e tabelas de roteamento.
+              </p>
+              <p><strong>Camada OSI:</strong> Camada 3 (Rede)</p>
+              <p><strong>Função principal:</strong> Conectar redes diferentes (LAN ↔ WAN, subnet ↔ subnet)</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Funcionamento</h4>
+              <p>• Analisa o <strong>IP de destino</strong> de cada pacote</p>
+              <p>• Consulta a <strong>tabela de roteamento</strong></p>
+              <p>• Determina a melhor interface/next-hop para encaminhar</p>
+              <p>• Realiza <strong>NAT</strong> (tradução de endereço) na borda da rede</p>
+              <p>• Separa domínios de broadcast</p>
+              <p>• Implementa ACLs (filtros básicos de segurança)</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📊 Switch vs Roteador — Diferença Fundamental</h4>
+<pre><code>
+  SWITCH (Camada 2):                         ROUTER (Camada 3):
+  ─────────────────                          ──────────────────
+  • Opera com endereços MAC                  • Opera com endereços IP
+  • Encaminha frames dentro da MESMA rede    • Encaminha pacotes entre redes DIFERENTES
+  • Mantém tabela MAC (CAM)                  • Mantém tabela de roteamento
+  • Não entende sub-redes                    • Entende e roteia entre sub-redes
+  • Muito rápido (hardware/ASIC)             • Mais lento (processamento de rotas)
+  • Ex: PC1→PC2 no mesmo escritório          • Ex: LAN do escritório → Internet
+
+  Em resumo:
+  ┌────────┐                    ┌────────┐                    ┌────────┐
+  │ Rede A │ ←── SWITCH ───→   │ Rede A │ ←── ROUTER ───→   │ Rede B │
+  │(mesma) │    (dentro)        │192.168.│    (entre)         │10.0.0. │
+  └────────┘                    └────────┘                    └────────┘
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Roteador Doméstico = Tudo-em-Um</h4>
+            <p>
+              O "roteador Wi-Fi" que você tem em casa na verdade é um dispositivo combo que inclui:
+              roteador (NAT, roteamento), switch (4 portas LAN), access point Wi-Fi, servidor DHCP,
+              firewall básico e às vezes modem. Em redes corporativas, cada função é um equipamento
+              dedicado para melhor performance e gerenciamento.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 — Access Point (Ponto de Acesso Wireless)</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📦 O que é?</h4>
+              <p>
+                O <strong>Access Point (AP)</strong> é um dispositivo que cria uma rede sem fio (Wi-Fi)
+                e faz a ponte entre dispositivos wireless e a rede cabeada (LAN). Ele converte sinais
+                elétricos (Ethernet) em ondas de rádio e vice-versa.
+              </p>
+              <p><strong>Camada OSI:</strong> Camada 2 (Enlace) — funciona como uma bridge wireless</p>
+              <p><strong>Função:</strong> Conectar dispositivos sem fio à rede cabeada</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Tipos de AP</h4>
+              <p><strong>Standalone (Fat AP):</strong> Configuração individual, independente. Bom para redes pequenas (1-5 APs).</p>
+              <p><strong>Gerenciado por Controller (Thin AP):</strong> Configurado centralmente por um WLC (Wireless LAN Controller). Essencial para redes com 10+ APs. Roaming seamless.</p>
+              <p><strong>Cloud-Managed:</strong> Gerenciado pela nuvem (ex: Ubiquiti UniFi, Meraki). Sem controller local, gerenciamento via dashboard web.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 — Firewall</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📦 O que é?</h4>
+              <p>
+                O <strong>firewall</strong> é um dispositivo (ou software) que monitora e controla o
+                tráfego de rede baseado em <strong>regras de segurança</strong> predefinidas. Ele decide
+                quais pacotes podem passar (allow) e quais devem ser bloqueados (deny/drop).
+              </p>
+              <p><strong>Camada OSI:</strong> Camada 3–7 (depende do tipo)</p>
+              <p><strong>Função:</strong> Segurança — controlar e filtrar tráfego de rede</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Tipos de Firewall</h4>
+              <p><strong>Packet Filter:</strong> Filtra por IP/porta (Camada 3-4). Simples, rápido, pouca inspeção.</p>
+              <p><strong>Stateful:</strong> Rastreia estado das conexões. Sabe que uma resposta faz parte de uma sessão já autorizada.</p>
+              <p><strong>NGFW (Next-Gen):</strong> Inspeção profunda (DPI), IDS/IPS, filtro de aplicação (Camada 7), anti-malware integrado.</p>
+              <p><strong>WAF (Web Application Firewall):</strong> Protege especificamente aplicações web contra SQLi, XSS, etc.</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Firewall na Cloud (AWS)</h4>
+            <p>
+              Na AWS, o conceito de firewall aparece como <strong>Security Groups</strong> (firewall
+              stateful por instância), <strong>Network ACLs</strong> (firewall stateless por subnet) e
+              <strong>AWS WAF</strong> (proteção de aplicações web no CloudFront/ALB). No mundo
+              on-premise, marcas como Fortinet, Palo Alto, Checkpoint e pfSense dominam o mercado.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.6 — Load Balancer (Balanceador de Carga)</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📦 O que é?</h4>
+              <p>
+                O <strong>Load Balancer</strong> distribui o tráfego de entrada entre múltiplos servidores
+                backend, garantindo que nenhum servidor fique sobrecarregado. Fundamental para alta
+                disponibilidade e escalabilidade.
+              </p>
+              <p><strong>Camada OSI:</strong> Camada 4 (L4 — TCP/UDP) ou Camada 7 (L7 — HTTP/HTTPS)</p>
+              <p><strong>Função:</strong> Distribuir carga, health check, failover automático</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Algoritmos de Balanceamento</h4>
+              <p><strong>Round Robin:</strong> Distribui sequencialmente (1, 2, 3, 1, 2, 3...)</p>
+              <p><strong>Least Connections:</strong> Envia para o servidor com menos conexões ativas</p>
+              <p><strong>IP Hash:</strong> Mesmo cliente sempre vai para o mesmo servidor (session persistence)</p>
+              <p><strong>Weighted:</strong> Servidores mais potentes recebem mais tráfego</p>
+              <p><strong>Health-based:</strong> Remove automaticamente servidores com falha</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Load Balancer na AWS</h4>
+            <p>
+              Na AWS, existem três tipos: <strong>ALB</strong> (Application Load Balancer — Camada 7, HTTP/HTTPS),
+              <strong>NLB</strong> (Network Load Balancer — Camada 4, TCP/UDP, ultra-baixa latência) e
+              <strong>CLB</strong> (Classic, legado). O ALB é o mais usado para aplicações web, suportando
+              roteamento baseado em path, host, headers e query strings.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.7 — Tabela Resumo dos Dispositivos de Rede</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Dispositivo</th>
+                <th>Camada OSI</th>
+                <th>Endereço que Usa</th>
+                <th>Função Principal</th>
+                <th>Domínio que Segmenta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Hub</strong></td>
+                <td>Camada 1 (Física)</td>
+                <td>Nenhum</td>
+                <td>Repetir sinal para todas as portas</td>
+                <td>Nenhum (amplia colisão)</td>
+              </tr>
+              <tr>
+                <td><strong>Switch L2</strong></td>
+                <td>Camada 2 (Enlace)</td>
+                <td>MAC Address</td>
+                <td>Encaminhar frames para porta correta</td>
+                <td>Segmenta domínio de colisão</td>
+              </tr>
+              <tr>
+                <td><strong>Switch L3</strong></td>
+                <td>Camada 2 + 3</td>
+                <td>MAC + IP</td>
+                <td>Switching + roteamento inter-VLAN</td>
+                <td>Colisão + Broadcast</td>
+              </tr>
+              <tr>
+                <td><strong>Router</strong></td>
+                <td>Camada 3 (Rede)</td>
+                <td>IP Address</td>
+                <td>Rotear pacotes entre redes diferentes</td>
+                <td>Segmenta domínio de broadcast</td>
+              </tr>
+              <tr>
+                <td><strong>Access Point</strong></td>
+                <td>Camada 2 (Enlace)</td>
+                <td>MAC Address</td>
+                <td>Bridge wireless ↔ wired</td>
+                <td>Nenhum (extensão da LAN)</td>
+              </tr>
+              <tr>
+                <td><strong>Firewall</strong></td>
+                <td>Camada 3–7</td>
+                <td>IP, porta, aplicação</td>
+                <td>Filtrar/controlar tráfego</td>
+                <td>Segurança (zonas de confiança)</td>
+              </tr>
+              <tr>
+                <td><strong>Load Balancer</strong></td>
+                <td>Camada 4 ou 7</td>
+                <td>IP + porta / URL</td>
+                <td>Distribuir carga entre servidores</td>
+                <td>N/A (distribuição)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.8 — Outros Dispositivos Importantes</h3>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📡 Modem</h4>
+              <p><strong>Camada 1-2</strong> — Converte sinais digitais ↔ analógicos. Conecta sua rede ao ISP (ADSL, cable, fibra GPON). MOdulador + DEModulador = MODEM.</p>
+            </div>
+            <div class="command-card">
+              <h4>🔁 Repeater / Extensor</h4>
+              <p><strong>Camada 1</strong> — Regenera e amplifica o sinal para estender o alcance. Usado quando o cabo excede a distância máxima ou para ampliar cobertura Wi-Fi.</p>
+            </div>
+            <div class="command-card">
+              <h4>🌉 Bridge (Ponte)</h4>
+              <p><strong>Camada 2</strong> — Conecta dois segmentos de rede distintos em um só. Filtra tráfego por MAC. Predecessor do switch (switch = bridge multiporta).</p>
+            </div>
+            <div class="command-card">
+              <h4>🖥️ Proxy Server</h4>
+              <p><strong>Camada 7</strong> — Intermediário entre clientes e servidores. Cache de conteúdo, filtro de URLs, anonimização. Ex: Squid, nginx reverse proxy.</p>
+            </div>
+            <div class="command-card">
+              <h4>🔑 VPN Gateway</h4>
+              <p><strong>Camada 3-4</strong> — Estabelece túneis criptografados entre redes remotas (site-to-site) ou para usuários remotos (client-to-site). IPsec, WireGuard, OpenVPN.</p>
+            </div>
+            <div class="command-card">
+              <h4>📋 IDS/IPS</h4>
+              <p><strong>Camada 3-7</strong> — IDS detecta intrusões e alerta. IPS detecta E bloqueia automaticamente. Analisa padrões de tráfego buscando ameaças conhecidas.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: MODELOS DE COMUNICAÇÃO                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Modelos de Comunicação</h2>
+          <p>Entenda as diferentes formas como dispositivos se comunicam em rede: quem inicia, quem responde, e como os dados fluem entre os participantes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — Cliente-Servidor (Client-Server)</h3>
+          <p>
+            O modelo <strong>cliente-servidor</strong> é a arquitetura mais utilizada em redes modernas.
+            Um dispositivo (cliente) <strong>solicita</strong> um serviço ou recurso, e outro dispositivo
+            (servidor) <strong>fornece</strong> esse serviço ou recurso.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Modelo Cliente-Servidor</h4>
+<pre><code>
+  ┌──────────┐    Requisição (Request)     ┌──────────────┐
+  │          │ ──────────────────────────▶  │              │
+  │  CLIENT  │                              │   SERVIDOR   │
+  │(navegador│                              │  (web server)│
+  │  app,etc)│ ◀──────────────────────────  │              │
+  └──────────┘    Resposta (Response)       └──────────────┘
+
+  Exemplos do dia a dia:
+  ┌──────────┐         ┌───────────────────┐
+  │ Seu PC   │ ──────▶ │ Google (busca)    │
+  │ (Chrome) │ ◀────── │ Retorna resultados│
+  └──────────┘         └───────────────────┘
+
+  ┌──────────┐         ┌───────────────────┐
+  │ Seu App  │ ──────▶ │ API REST          │
+  │ (mobile) │ ◀────── │ Retorna JSON      │
+  └──────────┘         └───────────────────┘
+
+  ┌──────────┐         ┌───────────────────┐
+  │ Outlook  │ ──────▶ │ Exchange Server   │
+  │ (e-mail) │ ◀────── │ Entrega e-mails   │
+  └──────────┘         └───────────────────┘
+</code></pre>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens do Cliente-Servidor</h4>
+              <p>• Centralização de dados e serviços</p>
+              <p>• Fácil gerenciar segurança e backups</p>
+              <p>• Escalável (adicionar mais servidores)</p>
+              <p>• Clientes podem ser simples (thin clients)</p>
+              <p>• Controle de acesso granular</p>
+              <p>• Auditoria e logging centralizado</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens do Cliente-Servidor</h4>
+              <p>• Servidor é ponto único de falha (sem HA)</p>
+              <p>• Custo do servidor (hardware dedicado)</p>
+              <p>• Congestionamento se muitos clientes simultâneos</p>
+              <p>• Dependência do servidor (se cai, ninguém trabalha)</p>
+              <p>• Requer administrador dedicado</p>
+              <p>• Latência entre cliente e servidor distante</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — Peer-to-Peer (P2P)</h3>
+          <p>
+            No modelo <strong>peer-to-peer</strong>, não há distinção fixa entre cliente e servidor.
+            Cada dispositivo (peer) pode atuar <strong>simultaneamente como cliente E servidor</strong>,
+            compartilhando recursos diretamente com outros peers.
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Modelo Peer-to-Peer</h4>
+<pre><code>
+  ┌──────┐         ┌──────┐         ┌──────┐
+  │Peer A│◀───────▶│Peer B│◀───────▶│Peer C│
+  └──┬───┘         └──┬───┘         └──┬───┘
+     │                 │                 │
+     └─────────────────┼─────────────────┘
+                       │
+                    ┌──┴───┐
+                    │Peer D│
+                    └──────┘
+
+  Cada peer pode:
+  • Solicitar arquivos de qualquer outro peer (agir como cliente)
+  • Fornecer arquivos para qualquer outro peer (agir como servidor)
+  • Fazer ambos simultaneamente!
+
+  Exemplos: BitTorrent, Bitcoin/Blockchain, Napster (histórico)
+</code></pre>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>✅ Vantagens do P2P</h4>
+              <p>• Sem ponto único de falha</p>
+              <p>• Quanto mais peers, mais recursos disponíveis</p>
+              <p>• Baixo custo (sem servidor central)</p>
+              <p>• Resiliente (rede sobrevive a falhas)</p>
+              <p>• Escalabilidade natural</p>
+            </div>
+            <div class="command-card">
+              <h4>❌ Desvantagens do P2P</h4>
+              <p>• Difícil garantir segurança e confiança</p>
+              <p>• Conteúdo distribuído dificulta controle</p>
+              <p>• Performance imprevisível</p>
+              <p>• Difícil administrar/auditar</p>
+              <p>• Peers offline = recursos indisponíveis</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 P2P no Contexto Cloud</h4>
+            <p>
+              Embora a cloud seja fundamentalmente cliente-servidor, conceitos P2P aparecem em
+              <strong>blockchain</strong> (redes descentralizadas), <strong>gossip protocols</strong>
+              (usado pelo AWS DynamoDB e Cassandra para replicação), e <strong>WebRTC</strong>
+              (comunicação direta entre navegadores para vídeo/voz sem servidor intermediário).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Unicast, Broadcast e Multicast</h3>
+          <p>
+            A forma como um pacote é endereçado determina quantos dispositivos o receberão.
+            Existem três modos de endereçamento fundamentais:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Modos de Endereçamento Visual</h4>
+<pre><code>
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  UNICAST (1 para 1)                                                ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║                                                                    ║
+  ║  [Emissor] ────────────────────────────────▶ [Receptor único]      ║
+  ║                                                                    ║
+  ║  • Um remetente envia para UM destinatário específico              ║
+  ║  • Endereço de destino é um IP/MAC específico                      ║
+  ║  • Exemplo: acessar um site, enviar e-mail, SSH                    ║
+  ║  • ~90% do tráfego de Internet é unicast                           ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  BROADCAST (1 para TODOS)                                          ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║                        ┌─▶ [Receptor 1]                            ║
+  ║                        ├─▶ [Receptor 2]                            ║
+  ║  [Emissor] ────────────├─▶ [Receptor 3]                            ║
+  ║                        ├─▶ [Receptor 4]                            ║
+  ║                        └─▶ [TODOS na rede]                         ║
+  ║                                                                    ║
+  ║  • Um remetente envia para TODOS os dispositivos na rede/subnet    ║
+  ║  • Endereço: 255.255.255.255 (limited) ou x.x.x.255 (directed)    ║
+  ║  • Exemplo: ARP request, DHCP Discover                             ║
+  ║  • ⚠️ Não cruza roteadores (limitado ao domínio de broadcast)      ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  MULTICAST (1 para GRUPO)                                          ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║                        ┌─▶ [Membro do grupo ✓]                     ║
+  ║                        ├─▶ [NÃO membro ✗]                          ║
+  ║  [Emissor] ────────────├─▶ [Membro do grupo ✓]                     ║
+  ║                        ├─▶ [NÃO membro ✗]                          ║
+  ║                        └─▶ [Membro do grupo ✓]                     ║
+  ║                                                                    ║
+  ║  • Um remetente envia para um GRUPO de destinatários interessados  ║
+  ║  • Endereço: Faixa 224.0.0.0 – 239.255.255.255                    ║
+  ║  • Exemplo: IPTV, streaming de vídeo, atualizações OSPF           ║
+  ║  • Eficiente: pacote transmitido uma vez, replicado na rede        ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>Unicast</th>
+                <th>Broadcast</th>
+                <th>Multicast</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Destinatários</strong></td>
+                <td>1 (específico)</td>
+                <td>Todos na subnet</td>
+                <td>Grupo inscrito</td>
+              </tr>
+              <tr>
+                <td><strong>Endereço Destino</strong></td>
+                <td>IP específico</td>
+                <td>255.255.255.255</td>
+                <td>224.0.0.0/4</td>
+              </tr>
+              <tr>
+                <td><strong>Cruza Router?</strong></td>
+                <td>✅ Sim</td>
+                <td>❌ Não</td>
+                <td>⚠️ Com PIM configurado</td>
+              </tr>
+              <tr>
+                <td><strong>Uso de Banda</strong></td>
+                <td>Proporcional a destinatários</td>
+                <td>Alto (inunda a rede)</td>
+                <td>Eficiente (1 cópia por segmento)</td>
+              </tr>
+              <tr>
+                <td><strong>Exemplos</strong></td>
+                <td>HTTP, SSH, SMTP</td>
+                <td>ARP, DHCP Discover</td>
+                <td>IPTV, OSPF, mDNS</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — Modos de Transmissão: Simplex, Half-Duplex e Full-Duplex</h3>
+          <p>
+            O modo de transmissão define a <strong>direção</strong> em que os dados podem fluir
+            entre dois dispositivos:
+          </p>
+
+          <div class="command-card wide">
+            <h4>📊 Modos de Transmissão</h4>
+<pre><code>
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  SIMPLEX (unidirecional)                                 ║
+  ╠═══════════════════════════════════════════════════════════╣
+  ║                                                          ║
+  ║  [Dispositivo A] ═══════════════════▶ [Dispositivo B]    ║
+  ║                    (apenas ida)                          ║
+  ║                                                          ║
+  ║  Exemplos:                                               ║
+  ║  • Teclado → Computador                                  ║
+  ║  • Estação de rádio → Seu rádio                          ║
+  ║  • Sensor IoT → Gateway (em alguns casos)                ║
+  ║  • Monitor de TV → Seus olhos 😄                         ║
+  ╚═══════════════════════════════════════════════════════════╝
+
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  HALF-DUPLEX (bidirecional alternado)                    ║
+  ╠═══════════════════════════════════════════════════════════╣
+  ║                                                          ║
+  ║  [Dispositivo A] ═══════▶ [Dispositivo B]  (momento 1)   ║
+  ║  [Dispositivo A] ◀═══════ [Dispositivo B]  (momento 2)   ║
+  ║                                                          ║
+  ║  • Ambos podem enviar e receber, MAS NÃO ao mesmo tempo ║
+  ║  • Como um walkie-talkie: "câmbio, desligo"              ║
+  ║                                                          ║
+  ║  Exemplos:                                               ║
+  ║  • Walkie-talkie (rádio PTT)                             ║
+  ║  • Hub Ethernet (CSMA/CD)                                ║
+  ║  • Wi-Fi (CSMA/CA — só um transmite por vez no canal)    ║
+  ╚═══════════════════════════════════════════════════════════╝
+
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  FULL-DUPLEX (bidirecional simultâneo)                   ║
+  ╠═══════════════════════════════════════════════════════════╣
+  ║                                                          ║
+  ║  [Dispositivo A] ════════▶ [Dispositivo B]               ║
+  ║  [Dispositivo A] ◀════════ [Dispositivo B]               ║
+  ║                   (ao mesmo tempo!)                      ║
+  ║                                                          ║
+  ║  • Ambos enviam e recebem SIMULTANEAMENTE                ║
+  ║  • Como uma conversa telefônica (ambos falam e ouvem)    ║
+  ║                                                          ║
+  ║  Exemplos:                                               ║
+  ║  • Switch Ethernet (cada porta é full-duplex)            ║
+  ║  • Telefone                                              ║
+  ║  • Fibra óptica (fibra de TX + fibra de RX)              ║
+  ║  • Conexão switch-to-switch (uplink)                     ║
+  ╚═══════════════════════════════════════════════════════════╝
+</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Modo</th>
+                <th>Direção</th>
+                <th>Simultâneo?</th>
+                <th>Analogia</th>
+                <th>Exemplo em Redes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Simplex</strong></td>
+                <td>A → B (só ida)</td>
+                <td>N/A</td>
+                <td>Rádio FM</td>
+                <td>Sensores unidirecionais</td>
+              </tr>
+              <tr>
+                <td><strong>Half-Duplex</strong></td>
+                <td>A ↔ B (alternado)</td>
+                <td>❌ Não</td>
+                <td>Walkie-talkie</td>
+                <td>Wi-Fi, hubs antigos</td>
+              </tr>
+              <tr>
+                <td><strong>Full-Duplex</strong></td>
+                <td>A ↔ B (simultâneo)</td>
+                <td>✅ Sim</td>
+                <td>Telefone</td>
+                <td>Switch Ethernet, fibra</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Impacto na Performance</h4>
+            <p>
+              Um link de 1 Gbps em <strong>full-duplex</strong> oferece efetivamente 2 Gbps de capacidade
+              total (1 Gbps em cada direção simultaneamente). O mesmo link em half-duplex oferece apenas
+              1 Gbps compartilhado. Por isso, sempre configure switches modernos em <strong>full-duplex</strong>
+              (auto-negociação geralmente faz isso automaticamente). Se você ver "duplex mismatch" nos logs
+              do switch, investigue — é uma das causas mais comuns de problemas de performance em LANs.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.5 — Comparação: Cliente-Servidor vs P2P</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Critério</th>
+                <th>Cliente-Servidor</th>
+                <th>Peer-to-Peer (P2P)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Controle</strong></td>
+                <td>Centralizado no servidor</td>
+                <td>Descentralizado entre peers</td>
+              </tr>
+              <tr>
+                <td><strong>Segurança</strong></td>
+                <td>Mais fácil de implementar</td>
+                <td>Mais difícil (cada peer é uma superfície de ataque)</td>
+              </tr>
+              <tr>
+                <td><strong>Custo</strong></td>
+                <td>Servidor dedicado necessário</td>
+                <td>Sem servidor central (baixo custo)</td>
+              </tr>
+              <tr>
+                <td><strong>Escalabilidade</strong></td>
+                <td>Limitada pelo servidor (precisa escalar)</td>
+                <td>Naturalmente escalável (mais peers = mais recursos)</td>
+              </tr>
+              <tr>
+                <td><strong>Disponibilidade</strong></td>
+                <td>Depende do servidor (SPOF sem HA)</td>
+                <td>Alta (rede sobrevive a falhas individuais)</td>
+              </tr>
+              <tr>
+                <td><strong>Gerenciamento</strong></td>
+                <td>Centralizado (mais fácil)</td>
+                <td>Descentralizado (mais complexo)</td>
+              </tr>
+              <tr>
+                <td><strong>Uso típico</strong></td>
+                <td>Web, e-mail, bancos de dados, APIs</td>
+                <td>Torrent, blockchain, videoconferência P2P</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: UNIDADES DE MEDIDA                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Unidades de Medida em Redes</h2>
+          <p>Entenda as unidades utilizadas para medir velocidade, capacidade, desempenho e qualidade de uma rede. Confundir bits e bytes é um erro clássico — vamos eliminar essa dúvida de vez.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — Bits vs Bytes: A Diferença Fundamental</h3>
+          <p>
+            Esta é possivelmente a confusão mais comum em redes e computação. A distinção é simples
+            mas crítica:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>0️⃣1️⃣ Bit (b minúsculo)</h4>
+              <p>A menor unidade de informação digital. Pode ser 0 ou 1.</p>
+              <p><strong>Símbolo:</strong> b (minúsculo)</p>
+              <p><strong>Usado para:</strong> Velocidade de rede (Mbps, Gbps)</p>
+              <p><strong>Por quê:</strong> Redes transmitem dados bit a bit pelo meio físico</p>
+              <p><strong>Exemplo:</strong> "Internet de 100 Mbps" = 100 Mega<em>bits</em> por segundo</p>
+            </div>
+            <div class="command-card">
+              <h4>📦 Byte (B maiúsculo)</h4>
+              <p>Conjunto de 8 bits. Unidade básica de armazenamento.</p>
+              <p><strong>Símbolo:</strong> B (maiúsculo)</p>
+              <p><strong>Usado para:</strong> Tamanho de arquivos (MB, GB, TB)</p>
+              <p><strong>Por quê:</strong> 1 caractere ASCII = 1 byte = 8 bits</p>
+              <p><strong>Exemplo:</strong> "Arquivo de 100 MB" = 100 Mega<em>bytes</em></p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>🔢 Conversão: 1 Byte = 8 bits</h4>
+<pre><code>
+  CONVERSÃO PRÁTICA:
+  ═══════════════════
+
+  Velocidade da rede (bits)  →  Velocidade em bytes (divide por 8)
+
+  Internet de 100 Mbps ÷ 8 = 12.5 MB/s de download teórico
+  Internet de 200 Mbps ÷ 8 = 25 MB/s de download teórico
+  Internet de 1 Gbps   ÷ 8 = 125 MB/s de download teórico
+
+  ═══════════════════════════════════════════════════════════
+  💡 DICA RÁPIDA: Para converter Mbps → MB/s, divida por 8
+     (ou multiplique por 0.125 se preferir)
+  ═══════════════════════════════════════════════════════════
+
+  EXEMPLO REAL:
+  Você contratou Internet de 100 Mbps.
+  Faz download de um arquivo de 800 MB.
+  
+  Tempo teórico = 800 MB ÷ 12.5 MB/s = 64 segundos (~1 minuto)
+  Tempo real    ≈ 80-90 segundos (overhead de protocolo, congestionamento)
+</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Por que ISPs usam bits e não bytes?</h4>
+            <p>
+              Os provedores de Internet anunciam velocidade em <strong>bits por segundo (Mbps)</strong>
+              porque o número parece maior. "100 Mbps" soa muito melhor que "12.5 MB/s" — marketing!
+              Mas também há razão técnica: sinais na rede viajam bit a bit. Porém, os gerenciadores
+              de download e sistemas operacionais mostram velocidade em <strong>bytes por segundo (MB/s)</strong>
+              porque é mais útil para comparar com tamanho de arquivos. Preste atenção no b ou B!
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Prefixos e Escalas</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Prefixo</th>
+                <th>Símbolo</th>
+                <th>Valor (decimal/SI)</th>
+                <th>Exemplo em Rede</th>
+                <th>Exemplo em Armazenamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Kilo</td>
+                <td>K</td>
+                <td>10³ = 1.000</td>
+                <td>56 Kbps (modem dial-up)</td>
+                <td>1 KB = 1.000 bytes</td>
+              </tr>
+              <tr>
+                <td>Mega</td>
+                <td>M</td>
+                <td>10⁶ = 1.000.000</td>
+                <td>100 Mbps (Fast Ethernet)</td>
+                <td>1 MB = 1.000.000 bytes</td>
+              </tr>
+              <tr>
+                <td>Giga</td>
+                <td>G</td>
+                <td>10⁹ = 1.000.000.000</td>
+                <td>1 Gbps (Gigabit Ethernet)</td>
+                <td>1 GB = 1.000.000.000 bytes</td>
+              </tr>
+              <tr>
+                <td>Tera</td>
+                <td>T</td>
+                <td>10¹² = 1.000.000.000.000</td>
+                <td>1 Tbps (backbone Internet)</td>
+                <td>1 TB = 1 trilhão de bytes</td>
+              </tr>
+              <tr>
+                <td>Peta</td>
+                <td>P</td>
+                <td>10¹⁵</td>
+                <td>Capacidade total de backbones</td>
+                <td>1 PB = 1.000 TB</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 SI (decimal) vs IEC (binário)</h4>
+            <p>
+              Em redes, sempre usamos prefixos <strong>decimais (SI)</strong>: 1 Gbps = exatamente
+              1.000.000.000 bits/s. Em armazenamento de computadores, historicamente se usava base 2:
+              1 "GB" no Windows = 1.073.741.824 bytes (2³⁰). Para evitar confusão, o padrão IEC criou
+              prefixos binários: KiB, MiB, GiB (1 GiB = 2³⁰ bytes). Na prática, para redes, use
+              sempre base 10 — 1 Gbps = 10⁹ bps, sem exceção.
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Latência (ms)</h3>
+          <p>
+            <strong>Latência</strong> é o tempo que um pacote leva para ir de um ponto A até um ponto B
+            na rede. Medida em <strong>milissegundos (ms)</strong>. É diferente de velocidade/largura de banda!
+          </p>
+
+          <div class="command-card wide">
+            <h4>🎯 Analogia: Latência vs Largura de Banda</h4>
+<pre><code>
+  Imagine um cano de água:
+
+  LARGURA DE BANDA = diâmetro do cano (quanto cabe por vez)
+  ════════════════
+  Cano fino  ══╗═══╗══  → pouca água por segundo (ex: 10 Mbps)
+  Cano grosso ═══════╗══  → muita água por segundo (ex: 1 Gbps)
+
+  LATÊNCIA = comprimento do cano (tempo até chegar)
+  ════════
+  Cano curto  [A]═══[B]  → chega rápido (ex: 1 ms - LAN)
+  Cano longo  [A]══════════════════════[B]  → demora mais (ex: 150 ms - intercontinental)
+
+  CONCLUSÃO:
+  • Você pode ter alta largura de banda com alta latência
+    (link de satélite: 100 Mbps mas 600ms de latência)
+  • Ou baixa largura de banda com baixa latência
+    (link de fibra local: 10 Mbps mas 1ms de latência)
+  • O ideal é: alta largura de banda + baixa latência 🎯
+</code></pre>
+          </div>
+
+          <h4>Fatores que influenciam a latência:</h4>
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📍 Distância Física</h4>
+              <p>A luz na fibra viaja a ~200.000 km/s. São Paulo → Nova York (~8.000 km) ≈ 40ms só de propagação (ida), ~80ms round-trip mínimo teórico. Na prática, ~150-180ms RTT.</p>
+            </div>
+            <div class="command-card">
+              <h4>🔄 Saltos (Hops)</h4>
+              <p>Cada roteador no caminho adiciona ~0.5-5ms de processamento. Um pacote típico na Internet passa por 10-20 roteadores (hops) entre origem e destino.</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 Congestionamento</h4>
+              <p>Quando um link está sobrecarregado, pacotes ficam em fila (buffer) esperando sua vez. Isso adiciona latência variável (jitter). Pior em horários de pico.</p>
+            </div>
+            <div class="command-card">
+              <h4>⚙️ Processamento</h4>
+              <p>Firewalls, NAT, inspeção profunda (DPI), criptografia — cada camada de processamento adiciona microssegundos a milissegundos de atraso.</p>
+            </div>
+          </div>
+
+          <h4>Referência de valores de latência:</h4>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Cenário</th>
+                <th>Latência Típica (RTT)</th>
+                <th>Qualidade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mesma LAN (switch)</td>
+                <td>&lt; 1 ms</td>
+                <td>🟢 Excelente</td>
+              </tr>
+              <tr>
+                <td>Mesma cidade (fibra)</td>
+                <td>1–10 ms</td>
+                <td>🟢 Excelente</td>
+              </tr>
+              <tr>
+                <td>Mesmo país (BR)</td>
+                <td>10–50 ms</td>
+                <td>🟢 Boa</td>
+              </tr>
+              <tr>
+                <td>Intercontinental (BR → EU)</td>
+                <td>150–250 ms</td>
+                <td>🟡 Aceitável</td>
+              </tr>
+              <tr>
+                <td>Satélite geoestacionário</td>
+                <td>500–700 ms</td>
+                <td>🔴 Alta</td>
+              </tr>
+              <tr>
+                <td>Requerimento para VoIP</td>
+                <td>&lt; 150 ms</td>
+                <td>Limite para boa qualidade de voz</td>
+              </tr>
+              <tr>
+                <td>Requerimento para gaming</td>
+                <td>&lt; 50 ms</td>
+                <td>Limite para jogos competitivos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Throughput vs Bandwidth (Vazão vs Largura de Banda)</h3>
+          <p>
+            Esses dois termos são frequentemente confundidos, mas representam conceitos diferentes:
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📐 Bandwidth (Largura de Banda)</h4>
+              <p>A capacidade <strong>máxima teórica</strong> do link. É como o limite de velocidade de uma rodovia.</p>
+              <p><strong>Definição:</strong> Taxa máxima de transmissão do meio/link</p>
+              <p><strong>Exemplo:</strong> "Link de 1 Gbps" — o máximo que o link suporta</p>
+              <p><strong>Analogia:</strong> Largura da rodovia (quantas faixas tem)</p>
+              <p><strong>Determinado por:</strong> Hardware (cabo, transceiver, interface)</p>
+            </div>
+            <div class="command-card">
+              <h4>📊 Throughput (Vazão)</h4>
+              <p>A quantidade <strong>real</strong> de dados úteis transferidos por segundo. É a velocidade real que o carro anda na rodovia.</p>
+              <p><strong>Definição:</strong> Taxa efetiva de transferência de dados úteis</p>
+              <p><strong>Exemplo:</strong> "Transferindo a 750 Mbps" — o que realmente acontece</p>
+              <p><strong>Analogia:</strong> Velocidade real dos carros (com trânsito, semáforos)</p>
+              <p><strong>Afetado por:</strong> Congestionamento, protocolo overhead, erros, distância</p>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📊 Por que Throughput &lt; Bandwidth?</h4>
+<pre><code>
+  Link de 1 Gbps (bandwidth):
+
+  ┌─────────────────────────────────────────────────────────┐
+  │ Capacidade total: 1000 Mbps                             │
+  ├─────────────────────────────────────────────────────────┤
+  │                                                         │
+  │  ████████████████████████████████████░░░░░░░░░░░░░░░░░ │
+  │  ←── Throughput real: ~750 Mbps ──→  ←── Overhead ──→  │
+  │                                                         │
+  ├─────────────────────────────────────────────────────────┤
+  │ O que "consome" a diferença:                            │
+  │                                                         │
+  │  • Headers de protocolo (TCP/IP/Ethernet): ~3-5%        │
+  │  • Retransmissões (pacotes perdidos): variável          │
+  │  • Congestionamento (buffers cheios): variável          │
+  │  • Half-duplex / colisões (se aplicável)                │
+  │  • Latência (limita TCP window): significativo em WAN   │
+  │  • Processamento intermediário (firewall, NAT)          │
+  └─────────────────────────────────────────────────────────┘
+
+  Eficiência típica:
+  • LAN (switch local): 90-95% (throughput ≈ 900-950 Mbps em link 1G)
+  • WAN (Internet): 60-80% (depende de distância e congestionamento)
+  • Wi-Fi: 40-60% (overhead de 802.11 é significativo)
+</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Conceito Extra: Goodput</h4>
+            <p>
+              Existe ainda o conceito de <strong>Goodput</strong>: a taxa de dados úteis da <em>aplicação</em>
+              (excluindo headers de TODOS os protocolos, retransmissões, e overhead). É o que realmente
+              importa para o usuário final. Um throughput de 100 Mbps pode resultar em goodput de apenas
+              85-90 Mbps após descontar todos os headers (Ethernet + IP + TCP + TLS).
+            </p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Jitter (Variação da Latência)</h3>
+          <p>
+            <strong>Jitter</strong> é a variação na latência ao longo do tempo. Se a latência média é
+            20ms mas oscila entre 10ms e 80ms, o jitter é alto. Isso é especialmente problemático para
+            aplicações em tempo real (VoIP, videoconferência, jogos online).
+          </p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📊 Exemplo de Jitter</h4>
+              <p><strong>Baixo jitter (bom):</strong> 20ms, 21ms, 19ms, 20ms, 22ms</p>
+              <p>→ Variação de apenas 3ms. Voz e vídeo claros.</p>
+              <p><strong>Alto jitter (ruim):</strong> 20ms, 5ms, 80ms, 15ms, 120ms</p>
+              <p>→ Variação de 115ms! Voz robotizada, vídeo com cortes.</p>
+            </div>
+            <div class="command-card">
+              <h4>🎯 Limites Aceitáveis</h4>
+              <p><strong>VoIP:</strong> Jitter &lt; 30ms (aceitável), &lt; 10ms (ideal)</p>
+              <p><strong>Videoconferência:</strong> Jitter &lt; 50ms</p>
+              <p><strong>Gaming:</strong> Jitter &lt; 20ms</p>
+              <p><strong>Navegação web:</strong> Jitter não é perceptível</p>
+              <p><strong>Download:</strong> Jitter não afeta (TCP compensa)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.6 — Tabela Resumo de Unidades</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Medida</th>
+                <th>Unidade</th>
+                <th>O que Mede</th>
+                <th>Ferramenta de Medição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Bandwidth</strong></td>
+                <td>bps, Kbps, Mbps, Gbps</td>
+                <td>Capacidade máxima do link</td>
+                <td>Especificação do equipamento</td>
+              </tr>
+              <tr>
+                <td><strong>Throughput</strong></td>
+                <td>bps, Mbps, Gbps</td>
+                <td>Velocidade real de transferência</td>
+                <td>iperf3, speedtest, nuttcp</td>
+              </tr>
+              <tr>
+                <td><strong>Latência</strong></td>
+                <td>ms (milissegundos)</td>
+                <td>Tempo de ida-e-volta (RTT)</td>
+                <td>ping, traceroute, mtr</td>
+              </tr>
+              <tr>
+                <td><strong>Jitter</strong></td>
+                <td>ms</td>
+                <td>Variação da latência</td>
+                <td>ping -c 100, iperf3 -u</td>
+              </tr>
+              <tr>
+                <td><strong>Packet Loss</strong></td>
+                <td>% (porcentagem)</td>
+                <td>Pacotes que não chegaram</td>
+                <td>ping, mtr, iperf3</td>
+              </tr>
+              <tr>
+                <td><strong>Tamanho de arquivo</strong></td>
+                <td>B, KB, MB, GB, TB</td>
+                <td>Quantidade de dados armazenados</td>
+                <td>ls -lh, du, explorer</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: EXERCÍCIOS PRÁTICOS                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Teste seus conhecimentos sobre os fundamentos apresentados neste módulo. Tente resolver cada exercício antes de revelar a solução!</p>
+        </div>
+
+        <!-- EXERCÍCIO 1 -->
+        <div class="topic-block">
+          <h3>📝 Exercício 1 — Identificação de Tipos de Rede</h3>
+          <p>Classifique cada cenário abaixo no tipo correto de rede (PAN, LAN, MAN, WAN ou Internet):</p>
+
+          <div class="command-card wide">
+<pre><code>
+  Cenários para classificar:
+
+  a) Você conecta seu smartphone ao fone de ouvido Bluetooth para ouvir música
+     enquanto caminha.
+
+  b) A empresa "TechCorp" possui escritórios em São Paulo e Nova York
+     conectados por um link MPLS dedicado de 100 Mbps.
+
+  c) Seu escritório tem 30 computadores conectados a switches e
+     um servidor local de arquivos.
+
+  d) A prefeitura instalou câmeras de segurança em 200 cruzamentos da cidade,
+     todas conectadas a um centro de monitoramento via fibra óptica metropolitana.
+
+  e) Você acessa o site da Netflix pelo seu navegador, e o conteúdo vem de
+     um servidor CDN localizado em São Paulo.
+
+  f) Uma universidade possui 5 prédios conectados por fibra óptica dentro
+     de seu campus de 2 km².
+</code></pre>
+          </div>
+
+          <details>
+            <summary>🔍 Clique para ver a solução do Exercício 1</summary>
+            <div class="info-box highlight">
+              <h4>Resolução:</h4>
+              <p><strong>a) PAN (Personal Area Network)</strong></p>
+              <p>
+                Smartphone + fone Bluetooth = rede pessoal. Alcance de poucos metros, conectando
+                dispositivos pessoais do mesmo usuário via Bluetooth (IEEE 802.15.1).
+              </p>
+              <p><strong>b) WAN (Wide Area Network)</strong></p>
+              <p>
+                São Paulo ↔ Nova York = conexão intercontinental (~8.000 km). Link MPLS dedicado é
+                uma WAN privada operada por uma operadora de telecomunicações. Não é "Internet" porque
+                é um link dedicado/privado.
+              </p>
+              <p><strong>c) LAN (Local Area Network)</strong></p>
+              <p>
+                30 PCs + switches + servidor em um escritório = rede local clássica. Abrangência de um
+                prédio, tecnologia Ethernet, propriedade privada da empresa.
+              </p>
+              <p><strong>d) MAN (Metropolitan Area Network)</strong></p>
+              <p>
+                200 cruzamentos de uma cidade conectados por fibra = rede metropolitana. Cobre a
+                extensão de uma cidade inteira (~5-50 km), gerenciada por uma entidade (prefeitura).
+              </p>
+              <p><strong>e) Internet</strong></p>
+              <p>
+                Acesso a Netflix via navegador = uso da Internet pública. Mesmo que o servidor CDN
+                esteja na mesma cidade, a comunicação usa a infraestrutura pública da Internet
+                (protocolos TCP/IP abertos, roteamento por múltiplos ASs).
+              </p>
+              <p><strong>f) CAN/LAN (Campus Area Network)</strong></p>
+              <p>
+                Universidade com 5 prédios em 2 km² = CAN (Campus Area Network). Alguns classificam como
+                LAN estendida. É maior que uma LAN de um prédio mas menor que uma MAN. A chave é que
+                toda a infraestrutura pertence à mesma organização e está em uma área contígua.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- EXERCÍCIO 2 -->
+        <div class="topic-block">
+          <h3>📝 Exercício 2 — Cálculos de Velocidade e Tempo de Download</h3>
+          <p>Resolva os problemas abaixo, mostrando os cálculos:</p>
+
+          <div class="command-card wide">
+<pre><code>
+  Problemas:
+
+  a) Você tem uma conexão de Internet de 200 Mbps. Quanto tempo levará para
+     baixar um arquivo de 5 GB? (considere 100% de eficiência, sem overhead)
+
+  b) Uma empresa precisa transferir 2 TB de dados entre dois data centers
+     conectados por um link de 10 Gbps. Qual o tempo mínimo teórico?
+
+  c) Seu provedor oferece dois planos:
+     - Plano A: 300 Mbps, latência de 15ms, R$99/mês
+     - Plano B: 500 Mbps, latência de 80ms, R$149/mês
+     Qual plano é melhor para:
+     (i)   Trabalho remoto com videoconferência?
+     (ii)  Download de arquivos grandes?
+     (iii) Gaming online competitivo?
+
+  d) Em uma rede Wi-Fi 5 (802.11ac) com velocidade nominal de 1.3 Gbps,
+     qual throughput real você pode esperar? Justifique.
+</code></pre>
+          </div>
+
+          <details>
+            <summary>🔍 Clique para ver a solução do Exercício 2</summary>
+            <div class="info-box highlight">
+              <h4>Resolução:</h4>
+
+              <p><strong>a) Download de 5 GB em link de 200 Mbps:</strong></p>
+              <p>
+                Passo 1: Converter 5 GB para bits<br />
+                5 GB = 5 × 1.000.000.000 bytes = 5.000.000.000 bytes<br />
+                5.000.000.000 × 8 = 40.000.000.000 bits = 40 Gbits<br /><br />
+                Passo 2: Calcular tempo<br />
+                Tempo = Tamanho ÷ Velocidade<br />
+                Tempo = 40.000.000.000 bits ÷ 200.000.000 bits/s<br />
+                Tempo = 200 segundos = <strong>3 minutos e 20 segundos</strong><br /><br />
+                Forma simplificada: 5 GB ÷ (200 Mbps ÷ 8) = 5.000 MB ÷ 25 MB/s = 200 s
+              </p>
+
+              <p><strong>b) Transferência de 2 TB em link de 10 Gbps:</strong></p>
+              <p>
+                2 TB = 2.000 GB = 2.000.000 MB<br />
+                Velocidade em bytes: 10 Gbps ÷ 8 = 1.25 GB/s = 1.250 MB/s<br />
+                Tempo = 2.000.000 MB ÷ 1.250 MB/s = 1.600 segundos<br />
+                <strong>≈ 26 minutos e 40 segundos</strong> (teórico, sem overhead)<br /><br />
+                Na prática, com overhead TCP (~5%) e possível congestionamento, espere ~30-35 minutos.
+              </p>
+
+              <p><strong>c) Comparação de planos:</strong></p>
+              <p>
+                <strong>(i) Videoconferência → Plano A (300 Mbps, 15ms)</strong><br />
+                Videoconferência (Zoom, Teams) usa ~5-15 Mbps. Ambos os planos têm bandwidth
+                suficiente. O diferencial é a <strong>latência</strong>: 15ms vs 80ms. Latência
+                baixa é crucial para comunicação em tempo real (voz e vídeo). Plano A ganha.<br /><br />
+
+                <strong>(ii) Downloads grandes → Plano B (500 Mbps, 80ms)</strong><br />
+                Para downloads, o que importa é <strong>throughput máximo</strong>. A latência afeta
+                pouco (TCP se adapta com window scaling). 500 Mbps > 300 Mbps, então o arquivo chega
+                ~40% mais rápido. Plano B ganha.<br /><br />
+
+                <strong>(iii) Gaming → Plano A (300 Mbps, 15ms)</strong><br />
+                Games online usam pouquíssima banda (~1-5 Mbps) mas são extremamente sensíveis à
+                latência. 15ms é excelente para gaming; 80ms é aceitável mas muito inferior em jogos
+                competitivos (FPS, MOBA). Plano A ganha por larga margem.
+              </p>
+
+              <p><strong>d) Throughput real em Wi-Fi 5 (1.3 Gbps nominal):</strong></p>
+              <p>
+                Throughput real esperado: <strong>~500-700 Mbps</strong> (40-55% da velocidade nominal).<br /><br />
+                Justificativa:<br />
+                • Wi-Fi é half-duplex (CSMA/CA) — overhead de acesso ao meio: -20%<br />
+                • Frame headers 802.11 são maiores que Ethernet: -5%<br />
+                • Retransmissões (interferência): -5-15%<br />
+                • 1.3 Gbps requer condições ideais (4 streams MIMO, canal 80MHz, sem vizinhos)<br />
+                • Na prática com 1-2 paredes e outros dispositivos: 400-600 Mbps é realista<br />
+                • Regra geral: espere 40-60% da velocidade anunciada em Wi-Fi
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- EXERCÍCIO 3 -->
+        <div class="topic-block">
+          <h3>📝 Exercício 3 — Escolha de Topologia e Equipamentos</h3>
+          <p>Analise o cenário e proponha a solução adequada:</p>
+
+          <div class="command-card wide">
+<pre><code>
+  Cenário:
+  Uma empresa de médio porte está montando um novo escritório com:
+  - 3 andares
+  - 25 estações de trabalho por andar (75 total)
+  - 1 sala de servidores no térreo (5 servidores)
+  - Necessidade de Wi-Fi em todos os andares
+  - Dois links de Internet (redundância)
+  - Câmeras IP em todos os andares (alimentadas por PoE)
+  - Orçamento: moderado
+
+  Perguntas:
+  a) Qual topologia você recomendaria? Justifique.
+  b) Liste os dispositivos de rede necessários com quantidades.
+  c) Que tipo de cabo usaria para o cabeamento horizontal (desktop → switch)?
+  d) Que tipo de cabo usaria para o backbone entre andares?
+  e) Quantas portas no mínimo cada switch de acesso precisa ter?
+</code></pre>
+          </div>
+
+          <details>
+            <summary>🔍 Clique para ver a solução do Exercício 3</summary>
+            <div class="info-box highlight">
+              <h4>Resolução:</h4>
+
+              <p><strong>a) Topologia recomendada: Estrela Estendida (Hierarchical Star) / Híbrida</strong></p>
+              <p>
+                Justificativa: A topologia em estrela estendida com hierarquia de 2 camadas (acesso +
+                core/distribuição) é ideal porque:<br />
+                • Cada andar tem seu switch de acesso (estrela local) — isolamento de falhas<br />
+                • Os switches de acesso conectam a um switch core na sala de servidores — centralização<br />
+                • Redundância entre switches core e routers — malha parcial no core<br />
+                • Padrão da indústria para este porte, fácil expansão e troubleshooting
+              </p>
+
+              <p><strong>b) Dispositivos necessários:</strong></p>
+              <p>
+                • <strong>3× Switch de acesso PoE (48 portas cada)</strong> — um por andar, para desktops + câmeras<br />
+                • <strong>1× Switch core L3 (24-48 portas)</strong> — na sala de servidores, roteamento inter-VLAN<br />
+                • <strong>2× Roteador ou Firewall</strong> — um para cada link de Internet (redundância com VRRP/HSRP)<br />
+                • <strong>3-6× Access Point Wi-Fi</strong> — 1-2 por andar (depende da área e cobertura necessária)<br />
+                • <strong>1× Firewall NGFW</strong> — segurança na borda da rede<br />
+                • <strong>1× Patch panel por andar</strong> — organização do cabeamento horizontal<br />
+                • <strong>1× Rack por andar</strong> (ou 1 rack central + mini-racks nos andares)<br />
+                • <strong>1× UPS/nobreak</strong> — para a sala de servidores
+              </p>
+
+              <p><strong>c) Cabeamento horizontal (desktop → switch): Cat6</strong></p>
+              <p>
+                Cat6 oferece o melhor custo-benefício em 2024: suporta 1 Gbps com folga a 100m e
+                10 Gbps até 55m. Preparado para futuro próximo sem custo excessivo. Cat6a seria
+                ideal (10G a 100m) mas o custo adicional pode não se justificar para desktops que
+                tipicamente usam 1 Gbps.
+              </p>
+
+              <p><strong>d) Backbone entre andares: Fibra Óptica Multimodo (OM3 ou OM4)</strong></p>
+              <p>
+                Fibra entre andares porque: imune a EMI dos dutos de elevador/energia, suporta
+                10-40 Gbps facilmente, distâncias de 100-300m (mais que suficiente para um prédio
+                de 3 andares). OM3 ou OM4 com conectores LC e transceivers SFP+ 10G.
+              </p>
+
+              <p><strong>e) Portas mínimas por switch de acesso:</strong></p>
+              <p>
+                25 desktops + ~4-6 câmeras IP + 2 APs Wi-Fi + 1-2 impressoras = ~33-35 dispositivos.<br />
+                Recomendação: <strong>48 portas PoE</strong> por switch.<br />
+                Justificativa: 35 usadas + 13 livres (27% de crescimento). A regra de ouro é manter
+                pelo menos 20-30% de portas livres para crescimento futuro. Switches de 48 portas
+                também custam menos por porta que dois switches de 24.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <!-- EXERCÍCIO 4 -->
+        <div class="topic-block">
+          <h3>📝 Exercício 4 — Análise de Cenário e Troubleshooting Conceitual</h3>
+          <p>Analise as situações abaixo e identifique o dispositivo ou conceito envolvido:</p>
+
+          <div class="command-card wide">
+<pre><code>
+  Situações:
+
+  a) O computador do João está no departamento de RH (VLAN 10) e precisa
+     acessar o servidor de arquivos que está na VLAN 20 (TI).
+     Qual dispositivo é necessário para permitir essa comunicação?
+     Por quê?
+
+  b) A empresa possui 3 servidores web que atendem o site corporativo.
+     Quando um cliente acessa www.empresa.com, a requisição precisa ser
+     direcionada para um dos 3 servidores de forma equilibrada.
+     Qual dispositivo faz isso? Em qual camada OSI opera?
+
+  c) Um técnico conectou um hub de 8 portas na rede do escritório.
+     Imediatamente, vários usuários começaram a reclamar de lentidão.
+     Por que isso aconteceu? O que deveria ter sido usado no lugar?
+
+  d) O administrador de rede percebeu que quando o PC do andar 2 faz
+     uma requisição ARP (broadcast), os PCs do andar 1 e 3 também recebem.
+     Isso é normal? Como resolver se for um problema?
+
+  e) A conexão de Internet da empresa caiu, mas os computadores
+     ainda conseguem acessar o servidor de arquivos local e a impressora.
+     Explique por que isso acontece em termos de dispositivos de rede.
+</code></pre>
+          </div>
+
+          <details>
+            <summary>🔍 Clique para ver a solução do Exercício 4</summary>
+            <div class="info-box highlight">
+              <h4>Resolução:</h4>
+
+              <p><strong>a) Dispositivo necessário: Roteador (ou Switch Layer 3)</strong></p>
+              <p>
+                VLANs criam domínios de broadcast separados — como se fossem redes diferentes.
+                Para que dispositivos em VLANs diferentes se comuniquem, é necessário
+                <strong>roteamento inter-VLAN</strong>, que opera na Camada 3. Pode ser feito por:<br />
+                • Um roteador com sub-interfaces (router-on-a-stick) — funcional mas gargalo<br />
+                • Um switch Layer 3 com SVIs (Switch Virtual Interfaces) — mais performático<br />
+                O switch L3 lê o IP de destino, consulta a tabela de roteamento e encaminha o pacote
+                entre as VLANs via hardware (ASICs), muito mais rápido que um roteador tradicional.
+              </p>
+
+              <p><strong>b) Dispositivo: Load Balancer (Balanceador de Carga)</strong></p>
+              <p>
+                Opera na <strong>Camada 4 (TCP)</strong> ou <strong>Camada 7 (HTTP/HTTPS)</strong>
+                dependendo da configuração.<br />
+                Para um site web (www.empresa.com), o mais comum é um load balancer L7 que:<br />
+                • Recebe todas as requisições HTTP/HTTPS na porta 80/443<br />
+                • Distribui entre os 3 servidores (round-robin, least-connections, etc.)<br />
+                • Faz health checks para remover servidores com falha<br />
+                • Pode fazer SSL termination (descriptografia centralizada)<br />
+                Na AWS, seria um ALB (Application Load Balancer).
+              </p>
+
+              <p><strong>c) Por que o hub causou lentidão:</strong></p>
+              <p>
+                O hub criou um <strong>domínio de colisão compartilhado</strong> entre todas as 8 portas.
+                Problemas:<br />
+                • Todos os 8 dispositivos agora compartilham a mesma banda (100 Mbps ÷ 8 = ~12.5 Mbps cada)<br />
+                • Colisões frequentes — quando 2+ transmitem simultaneamente, ambos precisam esperar e retransmitir<br />
+                • O hub também "polui" a rede existente com broadcasts para todas as portas<br />
+                • Switched segments upstream agora recebem todo o tráfego das 8 portas do hub<br /><br />
+                <strong>Solução:</strong> Substituir o hub por um <strong>switch</strong>. O switch dá
+                bandwidth dedicada por porta, elimina colisões (full-duplex) e encaminha frames apenas
+                para a porta de destino.
+              </p>
+
+              <p><strong>d) Broadcast ARP chegando a todos os andares — Normal? Depende!</strong></p>
+              <p>
+                Se todos os andares estão na <strong>mesma VLAN</strong>, isso é comportamento normal
+                (e esperado) — broadcasts se propagam por toda a VLAN/domínio de broadcast.<br /><br />
+                Se é um <strong>problema</strong> (performance, segurança), a solução é:<br />
+                • Criar VLANs separadas por andar (ex: VLAN 10 = andar 1, VLAN 20 = andar 2, VLAN 30 = andar 3)<br />
+                • Configurar roteamento inter-VLAN no switch L3 para permitir comunicação quando necessário<br />
+                • Isso contém broadcasts dentro de cada andar, reduzindo tráfego desnecessário<br />
+                Roteadores e switches L3 <strong>não propagam broadcasts</strong> entre VLANs — eles
+                segmentam o domínio de broadcast.
+              </p>
+
+              <p><strong>e) Internet caiu mas rede local funciona:</strong></p>
+              <p>
+                A rede local (LAN) é independente da Internet. Os dispositivos internos (PCs, servidor
+                de arquivos, impressora) estão todos conectados através dos <strong>switches locais</strong>,
+                que operam na Camada 2 usando endereços MAC.<br /><br />
+                A Internet é acessada através do <strong>roteador/gateway</strong> (e possivelmente modem).
+                Se o link de Internet cai (problema no ISP, modem, ou roteador WAN), apenas o tráfego
+                que precisa sair da rede local é afetado.<br /><br />
+                Fluxo local: PC → Switch → Servidor (não passa pelo roteador)<br />
+                Fluxo Internet: PC → Switch → Roteador → Modem → ISP → Internet (roteador é necessário)<br /><br />
+                Isso demonstra a separação entre Camada 2 (local) e Camada 3 (inter-redes).
+              </p>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RESUMO DO MÓDULO                                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Resumo</span>
+          <h2>Resumo do Módulo 01</h2>
+          <p>Principais conceitos que você aprendeu neste módulo:</p>
+        </div>
+
+        <div class="topic-block">
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🌐 Conceito de Rede</h4>
+              <p>Rede = dispositivos interconectados para compartilhar recursos e informações. Modelo: Emissor → Meio → Receptor.</p>
+            </div>
+            <div class="command-card">
+              <h4>📐 Tipos de Rede</h4>
+              <p>PAN (pessoal, ~10m), LAN (local, ~1km), MAN (metropolitana, ~50km), WAN (ampla, milhares de km), Internet (global).</p>
+            </div>
+            <div class="command-card">
+              <h4>🔗 Topologias</h4>
+              <p>Barramento (obsoleta), Estrela (padrão), Anel (legado), Malha (core/backbone), Híbrida (mundo real).</p>
+            </div>
+            <div class="command-card">
+              <h4>🔌 Meios de Transmissão</h4>
+              <p>Par trançado (Cat5e/6/6a, 100m), Fibra multimodo (DC, 550m), Fibra monomodo (WAN, 80+km), Wi-Fi (mobilidade).</p>
+            </div>
+            <div class="command-card">
+              <h4>📦 Dispositivos</h4>
+              <p>Hub (L1, obsoleto), Switch (L2, padrão), Router (L3, inter-redes), AP (Wi-Fi), Firewall (segurança), Load Balancer (distribuição).</p>
+            </div>
+            <div class="command-card">
+              <h4>💬 Modelos de Comunicação</h4>
+              <p>Client-Server vs P2P. Unicast/Broadcast/Multicast. Simplex/Half-duplex/Full-duplex.</p>
+            </div>
+            <div class="command-card">
+              <h4>📏 Unidades de Medida</h4>
+              <p>Bit (b) vs Byte (B), 1B = 8b. Bandwidth (capacidade máx.) vs Throughput (real). Latência (ms) e Jitter.</p>
+            </div>
+            <div class="command-card">
+              <h4>🎯 Conceitos-Chave</h4>
+              <p>Domínio de colisão (switch separa), Domínio de broadcast (router separa), Full-duplex (switch), Half-duplex (Wi-Fi/hub).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Glossário Rápido</h3>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Termo</th>
+                <th>Definição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pacote</strong></td>
+                <td>Unidade de dados na Camada 3 (rede) — contém IP de origem e destino</td>
+              </tr>
+              <tr>
+                <td><strong>Frame</strong></td>
+                <td>Unidade de dados na Camada 2 (enlace) — contém MAC de origem e destino</td>
+              </tr>
+              <tr>
+                <td><strong>MAC Address</strong></td>
+                <td>Endereço físico único da placa de rede (48 bits, ex: AA:BB:CC:DD:EE:FF)</td>
+              </tr>
+              <tr>
+                <td><strong>IP Address</strong></td>
+                <td>Endereço lógico do dispositivo na rede (IPv4: 192.168.1.100)</td>
+              </tr>
+              <tr>
+                <td><strong>Protocolo</strong></td>
+                <td>Conjunto de regras que define como a comunicação deve ocorrer</td>
+              </tr>
+              <tr>
+                <td><strong>Bandwidth</strong></td>
+                <td>Capacidade máxima de transmissão do link (ex: 1 Gbps)</td>
+              </tr>
+              <tr>
+                <td><strong>Throughput</strong></td>
+                <td>Velocidade real de transferência de dados (sempre ≤ bandwidth)</td>
+              </tr>
+              <tr>
+                <td><strong>Latência (RTT)</strong></td>
+                <td>Tempo de ida e volta de um pacote (Round-Trip Time), em milissegundos</td>
+              </tr>
+              <tr>
+                <td><strong>VLAN</strong></td>
+                <td>Rede local virtual — segmenta uma LAN física em múltiplas redes lógicas</td>
+              </tr>
+              <tr>
+                <td><strong>NAT</strong></td>
+                <td>Network Address Translation — converte IPs privados em públicos (e vice-versa)</td>
+              </tr>
+              <tr>
+                <td><strong>DHCP</strong></td>
+                <td>Protocolo que atribui IPs automaticamente aos dispositivos na rede</td>
+              </tr>
+              <tr>
+                <td><strong>DNS</strong></td>
+                <td>Traduz nomes de domínio (google.com) em endereços IP (142.250.79.14)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CHECKLIST DE APRENDIZADO                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">✅ Checklist</span>
+          <h2>Verifique seu Aprendizado</h2>
+          <p>Antes de avançar para o Módulo 02, certifique-se de que consegue responder estas perguntas:</p>
+        </div>
+
+        <div class="topic-block">
+          <div class="command-card wide">
+<pre><code>
+  □ O que é uma rede de computadores e qual seu objetivo principal?
+  □ Qual a diferença entre LAN, MAN e WAN?
+  □ Quais são as 5 topologias básicas de rede?
+  □ Por que a topologia em estrela é a mais usada hoje?
+  □ Qual a diferença entre cabo UTP Cat5e, Cat6 e Cat6a?
+  □ Quando usar fibra monomodo vs multimodo?
+  □ Qual a limitação de distância do cabo de par trançado?
+  □ O que faz um switch diferente de um hub?
+  □ Qual a função de um roteador?
+  □ Em qual camada OSI opera cada dispositivo de rede?
+  □ Qual a diferença entre unicast, broadcast e multicast?
+  □ O que é full-duplex e por que é melhor que half-duplex?
+  □ Como converter Mbps para MB/s?
+  □ Qual a diferença entre bandwidth e throughput?
+  □ O que é latência e o que é jitter?
+  □ Qual a diferença entre o modelo cliente-servidor e P2P?
+
+  Se alguma pergunta ficou sem resposta clara, revise a seção correspondente
+  antes de prosseguir. Uma base sólida aqui facilita todo o resto da trilha!
+</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PREPARAÇÃO PARA O PRÓXIMO MÓDULO                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">👀 Preview</span>
+          <h2>O que Vem no Módulo 02?</h2>
+          <p>Uma prévia do que você aprenderá no próximo módulo: Modelo OSI e TCP/IP.</p>
+        </div>
+
+        <div class="topic-block">
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📚 Modelo OSI (7 Camadas)</h4>
+              <p>Entenda como as 7 camadas do modelo OSI organizam a comunicação em rede: Física, Enlace, Rede, Transporte, Sessão, Apresentação e Aplicação.</p>
+            </div>
+            <div class="command-card">
+              <h4>🔧 Modelo TCP/IP (4 Camadas)</h4>
+              <p>O modelo prático usado na Internet real: Acesso à Rede, Internet, Transporte e Aplicação. Como ele se relaciona com o OSI.</p>
+            </div>
+            <div class="command-card">
+              <h4>📦 Encapsulamento</h4>
+              <p>Como os dados são empacotados camada por camada (headers + payload) ao descer o modelo, e desempacotados ao subir no destino.</p>
+            </div>
+            <div class="command-card">
+              <h4>🔌 PDUs (Protocol Data Units)</h4>
+              <p>Os nomes corretos para dados em cada camada: Bits → Frames → Pacotes → Segmentos → Dados.</p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que o Modelo OSI é importante?</h4>
+            <p>
+              O Modelo OSI é a <strong>linguagem universal</strong> para discutir redes. Quando um
+              engenheiro diz "o problema está na Camada 3", todos entendem que é um problema de
+              roteamento/IP. Quando diz "Camada 2", é um problema de switching/MAC. Essa taxonomia
+              é fundamental para troubleshooting eficiente e comunicação entre profissionais.
+              Além disso, é tema obrigatório em certificações como CCNA, CompTIA Network+ e AWS
+              Advanced Networking.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CTA — PRÓXIMO MÓDULO                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="../redes.html" class="button secondary">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+      <div class="container learning-box">
+        <div>
+          <span class="eyebrow">🌐 Próximo passo</span>
+          <h2>Pronto para o Modelo OSI e TCP/IP?</h2>
+          <p>No Módulo 02 você aprenderá as camadas do modelo OSI e TCP/IP — a base de toda comunicação em rede. Entender essas camadas é essencial para diagnosticar problemas, configurar equipamentos e projetar redes.</p>
+        </div>
+        <a href="modulo-02.html" class="button primary">Ir para Módulo 02 →</a>
       </div>
     </section>
   </main>
 
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FOOTER                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="footer-brand">
+        <img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" />
+        <p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p>
+      </div>
+      <div class="footer-column">
+        <h2>Cloud</h2>
+        <a href="../aws.html">AWS</a>
+        <a href="../cloud-practitioner.html">Cloud Practitioner</a>
+        <a href="../ai-practitioner.html">AI Practitioner</a>
+        <a href="../developer.html">Developer</a>
+        <a href="../solutions-architect.html">Solutions Architect</a>
+      </div>
+      <div class="footer-column">
+        <h2>DevOps</h2>
+        <a href="../linux.html">Linux</a>
+        <a href="../docker.html">Docker &amp; K8s</a>
+        <a href="../terraform.html">Terraform</a>
+        <a href="../python.html">Python</a>
+        <a href="../redes.html">Redes</a>
+        <a href="../github.html">GitHub</a>
+      </div>
+      <div class="footer-column">
+        <h2>Projeto</h2>
+        <a href="../about.html">Sobre</a>
+        <a href="../contact.html">Contato</a>
+        <a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p>
+    </div>
   </footer>
+
   <script src="../trail-gate.js"></script>
   <script src="../config.js"></script>
   <script src="../app.js"></script>

@@ -31,6 +31,10 @@ resource "aws_cloudfront_distribution" "this" {
 
     compress = true
 
+    min_ttl     = 0
+    default_ttl = 86400
+    max_ttl     = 604800
+
     forwarded_values {
       query_string = false
 
@@ -43,15 +47,15 @@ resource "aws_cloudfront_distribution" "this" {
   custom_error_response {
     error_code            = 404
     response_code         = 404
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 300
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 86400
   }
 
   custom_error_response {
     error_code            = 403
     response_code         = 403
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 300
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 86400
   }
 
   restrictions {
@@ -61,15 +65,10 @@ resource "aws_cloudfront_distribution" "this" {
       locations = [
         "BR", # Brasil
         "AR", # Argentina
-        "BO", # Bolívia
         "CL", # Chile
         "CO", # Colômbia
         "EC", # Equador
         "PY", # Paraguai
-        "PE", # Peru
-        "UY", # Uruguai
-        "VE", # Venezuela
-        "PT", # Portugal
         "CA"  # Canadá
       ]
     }

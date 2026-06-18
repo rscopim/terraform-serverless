@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Redes Módulo 06: Roteamento</title>
+  <meta name="description" content="Guia completo sobre roteamento: rotas estáticas, protocolos de roteamento dinâmico (RIP, OSPF, EIGRP, BGP), tabela de roteamento, métricas e redistribuição." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,23 +18,20 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../redes.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-05.html" class="nav-link">← Anterior</a>
         <a href="modulo-07.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,116 +40,3415 @@
       <div class="container training-hero-content">
         <span class="pill">🌐 Redes — Módulo 06</span>
         <h1>Roteamento</h1>
-        <p>Roteamento estático, dinâmico (OSPF, BGP), e conceitos de encaminhamento de pacotes.</p>
+        <p>Domine os fundamentos e protocolos de roteamento que sustentam a comunicação entre redes. Desde rotas estáticas até protocolos dinâmicos como OSPF, EIGRP e BGP — aprenda a projetar, configurar e solucionar problemas em topologias de rede corporativas e ambientes cloud.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>OSI/TCP</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>IP &amp; Sub-redes</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Diagnóstico</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Switches</small></a>
+        <a href="modulo-06.html" class="progress-node active"><span>06</span><small>Roteamento</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Segurança</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Serviços</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1 — FUNDAMENTOS DE ROTEAMENTO
+         ═══════════════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Fundamentos de Roteamento</h2>
+          <p>Compreenda o conceito essencial de roteamento, a arquitetura interna de um roteador, o processo de encaminhamento de pacotes e os elementos fundamentais que compõem a tabela de roteamento.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Roteamento Estático</h3>
+          <h3>1.1 — O que é Roteamento e por que ele é Necessário</h3>
+          <p>Roteamento é o processo de selecionar o melhor caminho para encaminhar pacotes de dados entre redes distintas. Enquanto switches operam na Camada 2 (enlace) movendo quadros dentro de uma mesma rede local, roteadores operam na Camada 3 (rede) e são responsáveis por interconectar redes diferentes, tomando decisões baseadas em endereços IP de destino.</p>
+          <p>Sem roteamento, cada rede seria uma "ilha" isolada. Um computador na rede 192.168.1.0/24 não conseguiria se comunicar com outro na rede 10.0.0.0/8 — mesmo estando fisicamente próximos. O roteador é o dispositivo que "traduz" essa comunicação, examinando o endereço IP de destino de cada pacote e decidindo por qual interface deve enviá-lo.</p>
+
+          <div class="info-box highlight">
+            <h4>💡 Analogia Prática</h4>
+            <p>Pense no roteador como um correio central: ele recebe cartas (pacotes) de diversas origens, examina o endereço de destino (IP de destino), consulta seu mapa de rotas (tabela de roteamento) e encaminha cada carta pelo melhor caminho disponível até seu destino final.</p>
+          </div>
+
+          <p><strong>Principais funções de um roteador:</strong></p>
+          <ul>
+            <li><strong>Determinação do melhor caminho:</strong> Analisa múltiplas rotas possíveis e seleciona a mais eficiente com base em métricas</li>
+            <li><strong>Encaminhamento de pacotes (forwarding):</strong> Move pacotes da interface de entrada para a interface de saída apropriada</li>
+            <li><strong>Segmentação de domínios de broadcast:</strong> Cada interface do roteador está em um domínio de broadcast diferente</li>
+            <li><strong>Conectividade inter-redes:</strong> Permite comunicação entre redes com endereçamentos diferentes</li>
+            <li><strong>Filtragem de tráfego:</strong> Pode aplicar ACLs para controlar o fluxo de dados</li>
+            <li><strong>Tradução de endereços (NAT):</strong> Converte endereços privados em públicos para acesso à Internet</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 — Arquitetura Interna de um Roteador</h3>
+          <p>Para entender como um roteador processa pacotes, é fundamental conhecer seus componentes internos. Um roteador Cisco típico possui os seguintes elementos:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Tipo de Memória</th>
+                <th>Função</th>
+                <th>Conteúdo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CPU</strong></td>
+                <td>Processador</td>
+                <td>Executa instruções do sistema operacional (IOS)</td>
+                <td>Processamento de rotas, gerenciamento de protocolos</td>
+              </tr>
+              <tr>
+                <td><strong>RAM</strong></td>
+                <td>Volátil</td>
+                <td>Armazena dados temporários durante operação</td>
+                <td>Tabela de roteamento, cache ARP, buffers de pacotes, running-config</td>
+              </tr>
+              <tr>
+                <td><strong>Flash</strong></td>
+                <td>Não-volátil</td>
+                <td>Armazena o sistema operacional</td>
+                <td>Imagem do IOS, arquivos de backup</td>
+              </tr>
+              <tr>
+                <td><strong>NVRAM</strong></td>
+                <td>Não-volátil</td>
+                <td>Armazena configuração de inicialização</td>
+                <td>startup-config (persiste após reboot)</td>
+              </tr>
+              <tr>
+                <td><strong>ROM</strong></td>
+                <td>Somente leitura</td>
+                <td>Bootstrap e diagnóstico</td>
+                <td>POST, bootstrap, ROMMON (modo de recuperação)</td>
+              </tr>
+              <tr>
+                <td><strong>Interfaces</strong></td>
+                <td>Hardware</td>
+                <td>Conexão física com as redes</td>
+                <td>GigabitEthernet, Serial, Loopback, etc.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ Importante sobre RAM vs NVRAM</h4>
+            <p>A <strong>running-config</strong> (configuração ativa) fica na RAM e é perdida se o roteador reiniciar sem salvar. A <strong>startup-config</strong> fica na NVRAM e é carregada automaticamente no boot. Sempre use <code>copy running-config startup-config</code> (ou <code>write memory</code>) para salvar alterações permanentemente.</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Verificando Componentes do Roteador</h4>
+            <pre><code>! Ver informações gerais do hardware e software
+Router# show version
+
+! Verificar utilização de memória RAM
+Router# show memory statistics
+
+! Verificar espaço na Flash
+Router# show flash:
+
+! Verificar configuração em execução
+Router# show running-config
+
+! Verificar configuração de inicialização
+Router# show startup-config
+
+! Verificar status das interfaces
+Router# show ip interface brief</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 — Processo de Encaminhamento de Pacotes (Passo a Passo)</h3>
+          <p>Quando um pacote chega a um roteador, ele passa por um processo meticuloso antes de ser encaminhado. Entender esse processo é crucial para troubleshooting:</p>
+
+          <ol>
+            <li><strong>Recepção do quadro na interface de entrada:</strong> O roteador recebe um quadro Ethernet (Layer 2) em uma de suas interfaces. Ele verifica o endereço MAC de destino — se for o MAC da própria interface, aceita o quadro.</li>
+            <li><strong>Desencapsulamento (Layer 2 → Layer 3):</strong> O roteador remove o cabeçalho Ethernet (Layer 2) para acessar o pacote IP interno. O FCS é verificado para detectar erros.</li>
+            <li><strong>Exame do endereço IP de destino:</strong> O roteador extrai o endereço IP de destino do cabeçalho IPv4/IPv6.</li>
+            <li><strong>Consulta à tabela de roteamento:</strong> O roteador busca na tabela de roteamento a rota que melhor corresponde ao IP de destino (longest prefix match).</li>
+            <li><strong>Determinação do next-hop:</strong> Com base na rota encontrada, o roteador identifica o próximo salto (next-hop IP) ou a interface de saída.</li>
+            <li><strong>Decremento do TTL:</strong> O campo Time-to-Live é decrementado em 1. Se chegar a 0, o pacote é descartado e uma mensagem ICMP "Time Exceeded" é enviada ao remetente.</li>
+            <li><strong>Re-encapsulamento (Layer 3 → Layer 2):</strong> O roteador cria um novo cabeçalho Ethernet com o MAC de origem (sua interface de saída) e o MAC de destino (next-hop, obtido via ARP).</li>
+            <li><strong>Transmissão pela interface de saída:</strong> O novo quadro é enviado pela interface de saída em direção ao próximo salto.</li>
+          </ol>
+
+          <div class="info-box highlight">
+            <h4>💡 O MAC muda, o IP permanece</h4>
+            <p>A cada salto (hop) pelo roteador, o cabeçalho Layer 2 (MAC de origem e destino) muda, mas o cabeçalho Layer 3 (IP de origem e destino) permanece o mesmo durante todo o trajeto (exceto quando há NAT). Esta é uma distinção fundamental entre switching (L2) e routing (L3).</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 — Estrutura e Componentes da Tabela de Roteamento</h3>
+          <p>A tabela de roteamento é a "base de dados" central que o roteador consulta para tomar decisões de encaminhamento. Cada entrada na tabela contém as seguintes informações:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Campo</th>
+                <th>Descrição</th>
+                <th>Exemplo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Código da Fonte</strong></td>
+                <td>Indica como a rota foi aprendida (C, L, S, O, D, R, B)</td>
+                <td>O (OSPF), S (Static)</td>
+              </tr>
+              <tr>
+                <td><strong>Rede de Destino</strong></td>
+                <td>Prefixo de rede + máscara (CIDR)</td>
+                <td>10.0.0.0/24</td>
+              </tr>
+              <tr>
+                <td><strong>Distância Administrativa</strong></td>
+                <td>Confiabilidade da fonte (menor = mais confiável)</td>
+                <td>[110/20]</td>
+              </tr>
+              <tr>
+                <td><strong>Métrica</strong></td>
+                <td>Custo do caminho dentro do protocolo</td>
+                <td>[110/20] ← 20 é a métrica</td>
+              </tr>
+              <tr>
+                <td><strong>Next-Hop</strong></td>
+                <td>IP do próximo roteador no caminho</td>
+                <td>via 192.168.1.1</td>
+              </tr>
+              <tr>
+                <td><strong>Interface de Saída</strong></td>
+                <td>Interface local para enviar o pacote</td>
+                <td>GigabitEthernet0/1</td>
+              </tr>
+              <tr>
+                <td><strong>Timestamp</strong></td>
+                <td>Tempo desde a última atualização da rota</td>
+                <td>00:05:32</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 — Tipos de Rotas: Conectadas, Estáticas e Dinâmicas</h3>
+          <p>As rotas na tabela de roteamento podem ser classificadas em três categorias principais:</p>
+
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Rotas Estáticas</code><span class="cmd-tag">Config</span></div>
-              <pre><code># Conceito: administrador define manualmente as rotas
-# Uso: redes pequenas, rotas específicas, backup
+            <div class="command-card">
+              <h4>🔗 Rotas Conectadas (C)</h4>
+              <p>Adicionadas automaticamente quando uma interface é configurada com IP e ativada (no shutdown). Representam redes diretamente ligadas ao roteador.</p>
+              <pre><code>C   192.168.1.0/24 is directly connected, GigabitEthernet0/0
+L   192.168.1.1/32 is directly connected, GigabitEthernet0/0</code></pre>
+              <p><strong>Nota:</strong> A rota "L" (Local) com /32 representa o IP exato da interface — usada para tráfego destinado ao próprio roteador.</p>
+            </div>
+            <div class="command-card">
+              <h4>📝 Rotas Estáticas (S)</h4>
+              <p>Configuradas manualmente pelo administrador. Úteis em redes pequenas ou para rotas específicas de backup.</p>
+              <pre><code>S   10.0.0.0/8 [1/0] via 192.168.1.254
+S*  0.0.0.0/0 [1/0] via 203.0.113.1</code></pre>
+              <p><strong>Nota:</strong> O asterisco (*) indica que esta é a rota padrão (default route / gateway of last resort).</p>
+            </div>
+          </div>
 
-# Cisco IOS
-Router(config)# ip route 10.0.0.0 255.255.255.0 192.168.1.1
-Router(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1    # default route
-
-# Linux
-ip route add 10.0.0.0/24 via 192.168.1.1
-ip route add default via 203.0.113.1
-
-# Verificação
-Router# show ip route
-Router# show ip route static
-
-Vantagens: simples, sem overhead, previsível
-Desvantagens: não escala, sem failover automático</code></pre>
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔄 Rotas Dinâmicas</h4>
+              <p>Aprendidas automaticamente via protocolos de roteamento (OSPF, EIGRP, BGP, RIP). O roteador troca informações com vizinhos para construir a tabela.</p>
+              <pre><code>O   172.16.0.0/16 [110/20] via 10.0.0.2, 00:15:32, GigabitEthernet0/1
+D   192.168.100.0/24 [90/2570240] via 10.0.0.3, 00:08:15, Serial0/0/0
+B   8.8.8.0/24 [20/0] via 203.0.113.5, 01:30:00</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>📊 Comparação Rápida</h4>
+              <table class="styled-table">
+                <thead><tr><th>Aspecto</th><th>Estática</th><th>Dinâmica</th></tr></thead>
+                <tbody>
+                  <tr><td>Configuração</td><td>Manual</td><td>Automática</td></tr>
+                  <tr><td>Escalabilidade</td><td>Baixa</td><td>Alta</td></tr>
+                  <tr><td>Uso de CPU/RAM</td><td>Mínimo</td><td>Moderado/Alto</td></tr>
+                  <tr><td>Convergência</td><td>Não converge</td><td>Automática</td></tr>
+                  <tr><td>Segurança</td><td>Mais segura</td><td>Troca informações</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. OSPF (Open Shortest Path First)</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>OSPF</code><span class="cmd-tag">IGP</span></div>
-              <pre><code># Protocolo Link-State, usa algoritmo Dijkstra (SPF)
-# Métrica: custo (baseado em bandwidth)
-# AD (Administrative Distance): 110
+          <h3>1.6 — Distância Administrativa (AD)</h3>
+          <p>Quando um roteador aprende uma rota para o mesmo destino através de múltiplas fontes (ex: uma rota estática e uma rota OSPF para 10.0.0.0/24), ele precisa decidir qual é mais confiável. A <strong>Distância Administrativa (AD)</strong> é o critério de desempate — quanto menor o valor, mais confiável a fonte.</p>
 
-# Conceitos:
-# - Áreas (Area 0 = backbone, obrigatória)
-# - LSA (Link-State Advertisements)
-# - DR/BDR (Designated Router em redes multi-acesso)
-# - Hello packets (10s em broadcast, 40s dead)
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Fonte da Rota</th>
+                <th>AD Padrão</th>
+                <th>Código</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Conectada (directly connected)</td><td>0</td><td>C</td></tr>
+              <tr><td>Estática</td><td>1</td><td>S</td></tr>
+              <tr><td>eBGP (External BGP)</td><td>20</td><td>B</td></tr>
+              <tr><td>EIGRP (interno)</td><td>90</td><td>D</td></tr>
+              <tr><td>OSPF</td><td>110</td><td>O</td></tr>
+              <tr><td>IS-IS</td><td>115</td><td>i</td></tr>
+              <tr><td>RIP</td><td>120</td><td>R</td></tr>
+              <tr><td>EIGRP (externo)</td><td>170</td><td>D EX</td></tr>
+              <tr><td>iBGP (Internal BGP)</td><td>200</td><td>B</td></tr>
+              <tr><td>Desconhecida / Não confiável</td><td>255</td><td>—</td></tr>
+            </tbody>
+          </table>
 
-# Configuração básica
-Router(config)# router ospf 1
-Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
-Router(config-router)# network 10.0.0.0 0.0.0.255 area 1
-Router(config-router)# passive-interface gi0/0
-
-# Verificação
-Router# show ip ospf neighbor
-Router# show ip ospf interface brief
-Router# show ip route ospf</code></pre>
-            </div>
+          <div class="info-box highlight">
+            <h4>💡 Regra de Ouro da AD</h4>
+            <p><strong>AD = 255 significa "nunca use esta rota".</strong> Nenhuma rota com AD 255 será instalada na tabela de roteamento. Isso é usado intencionalmente em floating static routes para criar rotas de backup que só entram em ação quando a rota principal cai.</p>
           </div>
+
+          <p><strong>Processo de seleção de rotas (hierarquia):</strong></p>
+          <ol>
+            <li><strong>Longest Prefix Match:</strong> A rota mais específica sempre vence (ex: /28 vence /24 que vence /16)</li>
+            <li><strong>Distância Administrativa:</strong> Se os prefixos são iguais, a menor AD vence</li>
+            <li><strong>Métrica:</strong> Se AD e prefixo são iguais (mesmo protocolo), a menor métrica vence</li>
+          </ol>
         </div>
 
         <div class="topic-block">
-          <h3>3. BGP (Border Gateway Protocol)</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>BGP</code><span class="cmd-tag">EGP</span></div>
-              <pre><code># Protocolo Path-Vector, usado entre Sistemas Autônomos (AS)
-# "O protocolo da Internet" — conecta ISPs e grandes redes
-# AD: eBGP = 20, iBGP = 200
+          <h3>1.7 — Longest Prefix Match (Correspondência de Prefixo Mais Longo)</h3>
+          <p>Este é o princípio MAIS IMPORTANTE do roteamento IP. Quando existem múltiplas rotas que correspondem ao destino, o roteador sempre escolhe a rota com a máscara mais longa (mais específica).</p>
 
-# Conceitos:
-# - AS (Autonomous System): rede sob administração única
-# - eBGP: entre ASes diferentes
-# - iBGP: dentro do mesmo AS
-# - Prefixos e AS-PATH
-# - Políticas de roteamento (route-maps, prefix-lists)
+          <div class="command-card wide">
+            <h4>📋 Exemplo de Longest Prefix Match</h4>
+            <pre><code>! Tabela de roteamento do Router R1:
+S   0.0.0.0/0 [1/0] via 203.0.113.1          ← Default route (/0)
+O   10.0.0.0/8 [110/20] via 192.168.1.2       ← Rota para /8
+O   10.1.0.0/16 [110/30] via 192.168.1.3      ← Rota para /16
+S   10.1.1.0/24 [1/0] via 192.168.1.4         ← Rota para /24
+O   10.1.1.128/25 [110/40] via 192.168.1.5    ← Rota para /25
 
-# Configuração básica
-Router(config)# router bgp 65001
-Router(config-router)# neighbor 203.0.113.1 remote-as 65002
-Router(config-router)# network 192.168.0.0 mask 255.255.0.0
-Router(config-router)# address-family ipv4 unicast
+! Pacote destinado a 10.1.1.200:
+! Corresponde a: 0.0.0.0/0 ✓, 10.0.0.0/8 ✓, 10.1.0.0/16 ✓, 10.1.1.0/24 ✓, 10.1.1.128/25 ✓
+! Vencedor: 10.1.1.128/25 (máscara /25 é a MAIS LONGA que corresponde)
+! → Pacote encaminhado via 192.168.1.5
 
-# Verificação
-Router# show ip bgp summary
-Router# show ip bgp
-Router# show ip bgp neighbors</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>Comparação de Protocolos</code><span class="cmd-tag">Referência</span></div>
-              <div class="options-table">
-                <table>
-                  <thead><tr><th>Protocolo</th><th>Tipo</th><th>Algoritmo</th><th>Métrica</th><th>Uso</th></tr></thead>
-                  <tbody>
-                    <tr><td><code>RIP</code></td><td>Distance-Vector</td><td>Bellman-Ford</td><td>Hop count (max 15)</td><td>Redes pequenas</td></tr>
-                    <tr><td><code>OSPF</code></td><td>Link-State</td><td>Dijkstra (SPF)</td><td>Custo (bandwidth)</td><td>Redes corporativas</td></tr>
-                    <tr><td><code>EIGRP</code></td><td>Hybrid</td><td>DUAL</td><td>Bandwidth + delay</td><td>Cisco (proprietário)</td></tr>
-                    <tr><td><code>BGP</code></td><td>Path-Vector</td><td>Best path</td><td>AS-PATH + atributos</td><td>Internet / ISPs</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+! Pacote destinado a 10.1.1.50:
+! Corresponde a: 0.0.0.0/0 ✓, 10.0.0.0/8 ✓, 10.1.0.0/16 ✓, 10.1.1.0/24 ✓
+! NÃO corresponde a 10.1.1.128/25 (50 < 128, fora da faixa)
+! Vencedor: 10.1.1.0/24 (máscara /24 é a mais longa)
+! → Pacote encaminhado via 192.168.1.4</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ AD só desempata rotas com MESMO prefixo</h4>
+            <p>Muitos estudantes cometem o erro de pensar que AD vence o longest prefix match. <strong>ERRADO!</strong> O longest prefix match SEMPRE é avaliado primeiro. Uma rota OSPF /24 (AD 110) vence uma rota estática /16 (AD 1) se o destino corresponder a ambas. A AD só é usada quando duas rotas possuem exatamente o mesmo prefixo de rede e máscara.</p>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2 — TABELA DE ROTEAMENTO: ANATOMIA COMPLETA
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Tabela de Roteamento — Anatomia Completa</h2>
+          <p>Aprenda a ler, interpretar e analisar cada campo da saída do comando <code>show ip route</code>. Domine a identificação de fontes de rotas, métricas, next-hops e compreenda conceitos como gateway of last resort e null routes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — Lendo e Interpretando o show ip route</h3>
+          <p>O comando <code>show ip route</code> é o mais importante para análise de roteamento. Vamos dissecar cada parte da saída:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Saída Completa do show ip route (Exemplo Real)</h4>
+            <pre><code>Router# show ip route
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is 203.0.113.1 to network 0.0.0.0
+
+S*    0.0.0.0/0 [1/0] via 203.0.113.1
+      10.0.0.0/8 is variably subnetted, 4 subnets, 3 masks
+C        10.0.0.0/30 is directly connected, Serial0/0/0
+L        10.0.0.1/32 is directly connected, Serial0/0/0
+O        10.0.1.0/24 [110/20] via 10.0.0.2, 00:45:12, Serial0/0/0
+O IA     10.0.2.0/24 [110/30] via 10.0.0.2, 00:30:05, Serial0/0/0
+      172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks
+D        172.16.1.0/24 [90/2170112] via 192.168.1.2, 01:15:30, GigabitEthernet0/0
+D        172.16.2.0/24 [90/2170112] via 192.168.1.2, 01:15:30, GigabitEthernet0/0
+      192.168.1.0/24 is variably subnetted, 2 subnets, 2 masks
+C        192.168.1.0/24 is directly connected, GigabitEthernet0/0
+L        192.168.1.1/32 is directly connected, GigabitEthernet0/0
+B     200.200.200.0/24 [20/0] via 203.0.113.5, 02:00:00</code></pre>
+          </div>
+
+          <p><strong>Decompondo cada elemento de uma entrada:</strong></p>
+          <div class="command-card wide">
+            <h4>📋 Anatomia de uma Entrada na Tabela</h4>
+            <pre><code>O IA     10.0.2.0/24 [110/30] via 10.0.0.2, 00:30:05, Serial0/0/0
+│ │      │           │    │       │           │         │
+│ │      │           │    │       │           │         └─ Interface de saída
+│ │      │           │    │       │           └─ Tempo desde última atualização
+│ │      │           │    │       └─ Endereço IP do next-hop
+│ │      │           │    └─ Métrica (custo OSPF = 30)
+│ │      │           └─ Distância Administrativa (OSPF = 110)
+│ │      └─ Rede de destino com prefixo CIDR
+│ └─ Subtipo (IA = Inter-Area OSPF)
+└─ Código da fonte (O = OSPF)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Códigos de Fonte das Rotas</h3>
+          <p>Cada rota na tabela é precedida por um código que indica sua origem. Conhecer esses códigos é essencial para diagnóstico rápido:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Significado</th>
+                <th>Descrição Detalhada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>C</strong></td><td>Connected</td><td>Rede diretamente conectada a uma interface ativa do roteador</td></tr>
+              <tr><td><strong>L</strong></td><td>Local</td><td>Endereço IP exato (/32) atribuído à interface do roteador</td></tr>
+              <tr><td><strong>S</strong></td><td>Static</td><td>Rota configurada manualmente pelo administrador</td></tr>
+              <tr><td><strong>S*</strong></td><td>Static Default</td><td>Rota estática padrão (candidata a gateway of last resort)</td></tr>
+              <tr><td><strong>R</strong></td><td>RIP</td><td>Rota aprendida via protocolo RIP</td></tr>
+              <tr><td><strong>O</strong></td><td>OSPF</td><td>Rota OSPF intra-área (dentro da mesma área)</td></tr>
+              <tr><td><strong>O IA</strong></td><td>OSPF Inter-Area</td><td>Rota OSPF entre áreas diferentes (via ABR)</td></tr>
+              <tr><td><strong>O E1</strong></td><td>OSPF External Type 1</td><td>Rota externa redistribuída no OSPF (métrica acumulativa)</td></tr>
+              <tr><td><strong>O E2</strong></td><td>OSPF External Type 2</td><td>Rota externa redistribuída no OSPF (métrica fixa — padrão)</td></tr>
+              <tr><td><strong>D</strong></td><td>EIGRP</td><td>Rota aprendida via EIGRP (interno)</td></tr>
+              <tr><td><strong>D EX</strong></td><td>EIGRP External</td><td>Rota redistribuída no EIGRP (origem externa)</td></tr>
+              <tr><td><strong>B</strong></td><td>BGP</td><td>Rota aprendida via Border Gateway Protocol</td></tr>
+              <tr><td><strong>i</strong></td><td>IS-IS</td><td>Rota aprendida via protocolo IS-IS</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Gateway of Last Resort (Rota Padrão)</h3>
+          <p>O <strong>Gateway of Last Resort</strong> é a rota que o roteador utiliza quando nenhuma outra rota mais específica corresponde ao destino. É equivalente à "rota padrão" ou "default route" (0.0.0.0/0).</p>
+
+          <div class="command-card wide">
+            <h4>📋 Cenários do Gateway of Last Resort</h4>
+            <pre><code>! Quando existe uma rota padrão:
+Gateway of last resort is 203.0.113.1 to network 0.0.0.0
+S*    0.0.0.0/0 [1/0] via 203.0.113.1
+
+! Quando NÃO existe rota padrão:
+Gateway of last resort is not set
+
+! Consequência: pacotes para destinos desconhecidos serão DESCARTADOS
+! O roteador envia ICMP "Destination Unreachable" ao remetente</code></pre>
+          </div>
+
+          <p><strong>Quando usar rota padrão:</strong></p>
+          <ul>
+            <li>Roteadores de borda (edge routers) que se conectam à Internet — todo tráfego "desconhecido" vai para o ISP</li>
+            <li>Roteadores stub (com apenas um caminho de saída) — simplesmente encaminha tudo para o único vizinho</li>
+            <li>Redes hierárquicas onde roteadores de acesso enviam tráfego para roteadores de distribuição</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — Null Route (Rota para Buraco Negro)</h3>
+          <p>Uma <strong>Null Route</strong> é uma rota que aponta para a interface virtual <code>Null0</code>. Pacotes encaminhados para Null0 são silenciosamente descartados (sem ICMP de retorno). É usada para:</p>
+
+          <ul>
+            <li><strong>Prevenção de loops de roteamento:</strong> Quando você faz sumarização, a rota sumarizada aponta para Null0 para evitar que sub-rotas mais específicas causem loops</li>
+            <li><strong>Blackhole filtering:</strong> Descartar tráfego de/para endereços conhecidos como maliciosos</li>
+            <li><strong>Triggered black hole (RTBH):</strong> Técnica de mitigação de DDoS onde tráfego atacante é roteado para Null0</li>
+          </ul>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando Null Routes</h4>
+            <pre><code>! Rota estática para Null0 — descarta silenciosamente tráfego para 198.51.100.0/24
+Router(config)# ip route 198.51.100.0 255.255.255.0 Null0
+
+! Verificando na tabela:
+Router# show ip route static
+S     198.51.100.0/24 is directly connected, Null0
+
+! Uso em sumarização EIGRP (automático):
+! Quando você configura sumarização manual no EIGRP, ele cria automaticamente
+! uma rota Null0 para a rede sumarizada para prevenir loops
+Router(config-if)# ip summary-address eigrp 100 10.0.0.0 255.255.0.0</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 — Roteamento Classful vs Classless</h3>
+          <p>Historicamente, os protocolos de roteamento eram divididos em <strong>classful</strong> (não enviam informação de máscara) e <strong>classless</strong> (enviam máscara junto com a rota):</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Classful</th>
+                <th>Classless</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Envio de máscara</td><td>Não envia subnet mask nas atualizações</td><td>Envia subnet mask (VLSM suportado)</td></tr>
+              <tr><td>Suporte a VLSM</td><td>Não</td><td>Sim</td></tr>
+              <tr><td>Suporte a CIDR</td><td>Não</td><td>Sim</td></tr>
+              <tr><td>Sumarização</td><td>Automática nos limites de classe</td><td>Manual ou automática configurável</td></tr>
+              <tr><td>Protocolos</td><td>RIPv1, IGRP (obsoletos)</td><td>RIPv2, OSPF, EIGRP, BGP, IS-IS</td></tr>
+              <tr><td>Roteamento moderno</td><td>Não usado</td><td>Padrão atual</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ Classful é Obsoleto</h4>
+            <p>Na prática moderna, <strong>todo roteamento é classless</strong>. Os protocolos classful (RIPv1, IGRP) não são mais usados em produção. O comando <code>ip classless</code> (habilitado por padrão no IOS moderno) permite que o roteador use a rota padrão para destinos não encontrados em sub-redes de redes classful presentes na tabela. Sempre mantenha este comportamento padrão.</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Variably Subnetted na Saída do show ip route</h4>
+            <pre><code>! A linha "variably subnetted" indica uso de VLSM:
+      10.0.0.0/8 is variably subnetted, 4 subnets, 3 masks
+C        10.0.0.0/30 is directly connected, Serial0/0/0      ← /30 (point-to-point)
+L        10.0.0.1/32 is directly connected, Serial0/0/0      ← /32 (local)
+O        10.0.1.0/24 [110/20] via 10.0.0.2, Serial0/0/0     ← /24 (LAN)
+O        10.0.0.0/16 [110/40] via 10.0.0.2, Serial0/0/0     ← /16 (sumarização)
+
+! "4 subnets, 3 masks" = 4 entradas usando 3 máscaras diferentes (/30, /32, /24, /16)
+! Isso só é possível com roteamento classless (VLSM)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3 — ROTAS ESTÁTICAS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Rotas Estáticas</h2>
+          <p>Domine a configuração de rotas estáticas em todas as suas variações: next-hop IP, exit interface, floating static, default route, fully specified e rotas IPv6. Aprenda quando usar cada tipo e pratique com cenários de laboratório completos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — Quando Usar Rotas Estáticas</h3>
+          <p>Rotas estáticas são configuradas manualmente e não mudam a menos que o administrador as altere. São ideais nos seguintes cenários:</p>
+
+          <ul>
+            <li><strong>Redes stub:</strong> Redes com um único ponto de saída (não há necessidade de protocolo dinâmico)</li>
+            <li><strong>Redes pequenas:</strong> Com poucos roteadores onde a manutenção manual é viável</li>
+            <li><strong>Rota padrão:</strong> Para direcionar tráfego desconhecido ao ISP ou core da rede</li>
+            <li><strong>Rotas de backup (floating static):</strong> Rotas que só são ativadas quando a rota principal (dinâmica) falha</li>
+            <li><strong>Segurança:</strong> Quando não se deseja trocar informações de roteamento com dispositivos vizinhos</li>
+            <li><strong>Tráfego específico:</strong> Forçar certo tráfego por um caminho predefinido (policy-based)</li>
+            <li><strong>Links dedicados ponto-a-ponto:</strong> Onde não há alternativa de caminho</li>
+          </ul>
+
+          <div class="info-box warning">
+            <h4>⚠️ Desvantagens das Rotas Estáticas</h4>
+            <p><strong>Não se adaptam a falhas automaticamente.</strong> Se um link cair, a rota estática permanece na tabela (a menos que a interface local caia) e pacotes continuam sendo enviados para um "buraco negro". Em redes grandes, manter rotas estáticas manualmente é impraticável e propenso a erros. Use roteamento dinâmico para redes com redundância e múltiplos caminhos.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — Configuração com Next-Hop IP vs Exit Interface</h3>
+          <p>Existem três formas de configurar uma rota estática, cada uma com comportamentos distintos:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Três Formas de Rota Estática</h4>
+            <pre><code>! ─────────────────────────────────────────────────────────────────
+! FORMA 1: Next-Hop IP (RECOMENDADA para redes multi-acesso)
+! ─────────────────────────────────────────────────────────────────
+Router(config)# ip route 10.0.0.0 255.255.255.0 192.168.1.2
+! O roteador faz lookup recursivo: primeiro encontra a rota para 192.168.1.2
+! Depois resolve o MAC de 192.168.1.2 via ARP (se necessário)
+! Vantagem: funciona corretamente em redes Ethernet multi-acesso
+
+! ─────────────────────────────────────────────────────────────────
+! FORMA 2: Exit Interface (adequada APENAS para links ponto-a-ponto)
+! ─────────────────────────────────────────────────────────────────
+Router(config)# ip route 10.0.0.0 255.255.255.0 Serial0/0/0
+! O roteador envia o pacote diretamente pela interface indicada
+! Em links seriais (ponto-a-ponto) funciona perfeitamente
+! Em Ethernet: causa proxy-ARP para CADA destino (INEFICIENTE!)
+
+! ─────────────────────────────────────────────────────────────────
+! FORMA 3: Fully Specified (Next-Hop + Exit Interface)
+! ─────────────────────────────────────────────────────────────────
+Router(config)# ip route 10.0.0.0 255.255.255.0 GigabitEthernet0/0 192.168.1.2
+! Combina ambas: especifica a interface de saída E o next-hop
+! Elimina lookup recursivo e evita problemas de proxy-ARP
+! MELHOR OPÇÃO quando há ambiguidade ou múltiplas interfaces para o next-hop</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Lookup Recursivo</th>
+                <th>Proxy-ARP</th>
+                <th>Uso Ideal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Next-Hop IP</td><td>Sim (resolve interface)</td><td>Não</td><td>Redes Ethernet (multi-acesso)</td></tr>
+              <tr><td>Exit Interface</td><td>Não</td><td>Sim (em Ethernet)</td><td>Links Serial ponto-a-ponto</td></tr>
+              <tr><td>Fully Specified</td><td>Não</td><td>Não</td><td>Qualquer cenário (mais eficiente)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — Floating Static Routes (Rotas Estáticas Flutuantes)</h3>
+          <p>Uma <strong>floating static route</strong> é uma rota estática configurada com uma Distância Administrativa maior que a da rota principal. Ela permanece "invisível" na tabela de roteamento enquanto a rota principal está ativa, mas assume automaticamente quando a rota principal desaparece.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando Floating Static Route</h4>
+            <pre><code>! Cenário: Link principal via OSPF (AD=110), backup via link secundário
+! ─────────────────────────────────────────────────────────────────
+
+! A rota OSPF aprendida dinamicamente (AD=110):
+! O   10.0.0.0/24 [110/20] via 192.168.1.2, GigabitEthernet0/0
+
+! Rota estática de backup com AD=130 (maior que OSPF=110):
+Router(config)# ip route 10.0.0.0 255.255.255.0 172.16.1.2 130
+!                                                            ^^^
+!                                              AD personalizada = 130
+
+! Resultado quando OSPF está ativo:
+! show ip route mostra APENAS a rota OSPF (AD 110 < 130)
+! O   10.0.0.0/24 [110/20] via 192.168.1.2
+
+! Resultado quando o link OSPF cai:
+! Rota OSPF é removida → floating static assume automaticamente:
+! S   10.0.0.0/24 [130/0] via 172.16.1.2
+
+! Quando o link OSPF volta:
+! OSPF reconverge → rota OSPF é reinstalada → floating static sai da tabela</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Boas Práticas para Floating Static</h4>
+            <p>Configure a AD da floating static para ser LIGEIRAMENTE maior que o protocolo principal: para backup de OSPF (110), use AD 115-130. Para backup de EIGRP (90), use AD 95-100. Valores muito altos (ex: 250) funcionam, mas dificultam o entendimento da hierarquia.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Default Static Route (0.0.0.0/0)</h3>
+          <p>A rota padrão (default route) é usada quando nenhuma rota mais específica é encontrada na tabela. É essencial para roteadores de borda e redes stub:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando Default Route</h4>
+            <pre><code>! Default route com next-hop IP (mais comum):
+Router(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1
+
+! Default route com exit interface (links ponto-a-ponto):
+Router(config)# ip route 0.0.0.0 0.0.0.0 Serial0/0/0
+
+! Default route fully specified:
+Router(config)# ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/0 203.0.113.1
+
+! Verificação:
+Router# show ip route
+Gateway of last resort is 203.0.113.1 to network 0.0.0.0
+S*    0.0.0.0/0 [1/0] via 203.0.113.1
+
+! IPv6 default route:
+Router(config)# ipv6 route ::/0 2001:db8:cafe::1</code></pre>
+          </div>
+
+          <p><strong>Propagando a default route para outros roteadores:</strong></p>
+          <div class="command-card wide">
+            <h4>📋 Anunciando Default Route via Protocolos Dinâmicos</h4>
+            <pre><code>! Via OSPF — o roteador que tem a default route a anuncia para os vizinhos:
+Router(config-router)# default-information originate
+! Anuncia 0.0.0.0/0 via OSPF (aparece como O*E2 nos vizinhos)
+
+! Via OSPF (sempre, mesmo sem default route local):
+Router(config-router)# default-information originate always
+
+! Via EIGRP — redistribuir a rota estática:
+Router(config-router)# redistribute static
+
+! Via RIP:
+Router(config-router)# default-information originate</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 — Rotas Estáticas IPv6</h3>
+          <p>A configuração de rotas estáticas IPv6 segue a mesma lógica do IPv4, mas com sintaxe adaptada ao formato de endereços de 128 bits:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Rotas Estáticas IPv6</h4>
+            <pre><code>! Habilitar roteamento IPv6 (necessário no Cisco IOS):
+Router(config)# ipv6 unicast-routing
+
+! Rota estática IPv6 com next-hop global:
+Router(config)# ipv6 route 2001:db8:acad::/48 2001:db8:feed::1
+
+! Rota estática IPv6 com link-local next-hop (requer exit interface):
+Router(config)# ipv6 route 2001:db8:acad::/48 GigabitEthernet0/0 FE80::1
+! Nota: link-local EXIGE a interface porque não é globalmente único
+
+! Rota estática IPv6 com exit interface (ponto-a-ponto):
+Router(config)# ipv6 route 2001:db8:acad::/48 Serial0/0/0
+
+! Default route IPv6:
+Router(config)# ipv6 route ::/0 2001:db8:feed::1
+
+! Floating static IPv6 (AD=130):
+Router(config)# ipv6 route 2001:db8:acad::/48 2001:db8:backup::1 130
+
+! Verificação:
+Router# show ipv6 route
+Router# show ipv6 route static</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Link-Local como Next-Hop</h4>
+            <p>Em IPv6, é comum usar endereços link-local (FE80::/10) como next-hop, pois eles são automaticamente atribuídos e sempre disponíveis. Porém, como um endereço link-local pode existir em múltiplas interfaces, você DEVE especificar a interface de saída junto com o endereço link-local.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.6 — Recursive vs Directly Attached Static Routes</h3>
+          <p>Entender a diferença entre rotas recursivas e diretamente conectadas é importante para otimização e troubleshooting:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔁 Rota Recursiva</h4>
+              <p>O next-hop não está diretamente conectado — o roteador precisa fazer um segundo lookup para descobrir como alcançar o next-hop.</p>
+              <pre><code>! R1 tem rota para 10.0.0.0/24 via 172.16.1.1
+! Mas 172.16.1.1 não está diretamente conectado
+! R1 precisa resolver: "como chego em 172.16.1.1?"
+! Segundo lookup encontra: via 192.168.1.2
+
+ip route 10.0.0.0 255.255.255.0 172.16.1.1
+! → Lookup 1: destino 10.0.0.0/24 → next-hop 172.16.1.1
+! → Lookup 2: como alcançar 172.16.1.1? → via 192.168.1.2, Gi0/0</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>🔗 Rota Diretamente Conectada</h4>
+              <p>O next-hop está em uma rede diretamente conectada ao roteador — resolução é imediata sem recursão.</p>
+              <pre><code>! R1 tem rota para 10.0.0.0/24 via 192.168.1.2
+! E 192.168.1.2 está na rede da interface Gi0/0
+! Resolução direta sem recursão
+
+ip route 10.0.0.0 255.255.255.0 192.168.1.2
+! → Lookup único: next-hop 192.168.1.2
+! → 192.168.1.2 está em rede conectada (Gi0/0)
+! → ARP para 192.168.1.2, encaminha pela Gi0/0</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Cuidado com Recursão Excessiva</h4>
+            <p>Rotas recursivas adicionam latência (múltiplos lookups) e podem causar problemas se a rota intermediária mudar ou desaparecer. No Cisco IOS, o limite padrão de recursão é de 1 nível. Se o next-hop recursivo não puder ser resolvido em uma única consulta adicional, a rota é considerada inválida.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.7 — Laboratório Completo: Cenário de Rotas Estáticas</h3>
+          <p>Vamos configurar um cenário completo com três roteadores usando rotas estáticas, incluindo default route e floating static:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Topologia do Laboratório</h4>
+            <pre><code>! ┌──────────┐     Serial 10.0.0.0/30      ┌──────────┐     Serial 10.0.0.4/30      ┌──────────┐
+! │   R1     │─────────────────────────────│   R2     │─────────────────────────────│   R3     │
+! │ Gi0/0    │ .1                      .2  │ Gi0/0    │ .5                      .6  │ Gi0/0    │
+! └────┬─────┘                             └────┬─────┘                             └────┬─────┘
+!      │                                        │                                        │
+!      │ 192.168.1.0/24                         │ 192.168.2.0/24                         │ 192.168.3.0/24
+!      │ (LAN A)                                │ (LAN B)                                │ (LAN C)
+!   [PCs...]                                 [PCs...]                                 [PCs...]
+
+! ═══════════════════════════════════════════════════════════════
+! CONFIGURAÇÃO R1
+! ═══════════════════════════════════════════════════════════════
+R1(config)# interface GigabitEthernet0/0
+R1(config-if)# ip address 192.168.1.1 255.255.255.0
+R1(config-if)# no shutdown
+
+R1(config)# interface Serial0/0/0
+R1(config-if)# ip address 10.0.0.1 255.255.255.252
+R1(config-if)# no shutdown
+
+! Rota para LAN B (via R2):
+R1(config)# ip route 192.168.2.0 255.255.255.0 10.0.0.2
+
+! Rota para LAN C (via R2 → R3):
+R1(config)# ip route 192.168.3.0 255.255.255.0 10.0.0.2
+
+! Rota para o link entre R2 e R3:
+R1(config)# ip route 10.0.0.4 255.255.255.252 10.0.0.2
+
+! ═══════════════════════════════════════════════════════════════
+! CONFIGURAÇÃO R2
+! ═══════════════════════════════════════════════════════════════
+R2(config)# interface GigabitEthernet0/0
+R2(config-if)# ip address 192.168.2.1 255.255.255.0
+R2(config-if)# no shutdown
+
+R2(config)# interface Serial0/0/0
+R2(config-if)# ip address 10.0.0.2 255.255.255.252
+R2(config-if)# no shutdown
+
+R2(config)# interface Serial0/0/1
+R2(config-if)# ip address 10.0.0.5 255.255.255.252
+R2(config-if)# no shutdown
+
+! Rota para LAN A (via R1):
+R2(config)# ip route 192.168.1.0 255.255.255.0 10.0.0.1
+
+! Rota para LAN C (via R3):
+R2(config)# ip route 192.168.3.0 255.255.255.0 10.0.0.6
+
+! ═══════════════════════════════════════════════════════════════
+! CONFIGURAÇÃO R3
+! ═══════════════════════════════════════════════════════════════
+R3(config)# interface GigabitEthernet0/0
+R3(config-if)# ip address 192.168.3.1 255.255.255.0
+R3(config-if)# no shutdown
+
+R3(config)# interface Serial0/0/0
+R3(config-if)# ip address 10.0.0.6 255.255.255.252
+R3(config-if)# no shutdown
+
+! Rota para LAN A e LAN B (sumarizada via R2):
+R3(config)# ip route 192.168.1.0 255.255.255.0 10.0.0.5
+R3(config)# ip route 192.168.2.0 255.255.255.0 10.0.0.5
+
+! Rota para o link entre R1 e R2:
+R3(config)# ip route 10.0.0.0 255.255.255.252 10.0.0.5
+
+! ═══════════════════════════════════════════════════════════════
+! VERIFICAÇÃO
+! ═══════════════════════════════════════════════════════════════
+R1# ping 192.168.3.1    ← Deve funcionar (R1 → R2 → R3)
+R3# ping 192.168.1.1    ← Deve funcionar (R3 → R2 → R1)
+R1# traceroute 192.168.3.1
+! 1  10.0.0.2    (R2)
+! 2  10.0.0.6    (R3)
+! 3  192.168.3.1 (destino)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4 — ROTEAMENTO DINÂMICO: CONCEITOS GERAIS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Roteamento Dinâmico — Conceitos Gerais</h2>
+          <p>Compreenda os fundamentos dos protocolos de roteamento dinâmico: classificações, algoritmos, métricas, convergência e como eles permitem que redes complexas se auto-organizem e se recuperem automaticamente de falhas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — Por que Usar Roteamento Dinâmico</h3>
+          <p>Em redes com mais de 3-4 roteadores, a manutenção de rotas estáticas se torna impraticável. Protocolos de roteamento dinâmico resolvem esse problema ao automatizar o processo de descoberta e manutenção de rotas:</p>
+
+          <ul>
+            <li><strong>Escalabilidade:</strong> Centenas de roteadores trocam informações automaticamente — sem intervenção manual para cada nova rede</li>
+            <li><strong>Convergência automática:</strong> Quando um link cai, os roteadores detectam a falha e recalculam rotas alternativas em segundos</li>
+            <li><strong>Redundância:</strong> Múltiplos caminhos são conhecidos e podem ser usados como backup ou para balanceamento de carga</li>
+            <li><strong>Redução de erros humanos:</strong> Elimina configuração manual repetitiva e propensa a erros</li>
+            <li><strong>Adaptabilidade:</strong> Novas redes são automaticamente anunciadas e aprendidas por todos os roteadores</li>
+            <li><strong>Load balancing:</strong> Alguns protocolos distribuem tráfego por múltiplos caminhos de custo igual (ECMP)</li>
+          </ul>
+
+          <div class="info-box highlight">
+            <h4>💡 Trade-off: Dinâmico vs Estático</h4>
+            <p>Roteamento dinâmico consome CPU, RAM e largura de banda (para troca de atualizações). Em redes muito simples, o overhead pode não se justificar. A regra prática: use estático para redes stub e cenários simples; use dinâmico quando há redundância, múltiplos caminhos, ou mais de 5 roteadores.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — IGP vs EGP</h3>
+          <p>Protocolos de roteamento são classificados em dois grandes grupos com base no escopo de operação:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🏢 IGP (Interior Gateway Protocol)</h4>
+              <p>Operam <strong>dentro</strong> de um único Sistema Autônomo (AS). Usados para roteamento interno de organizações.</p>
+              <ul>
+                <li><strong>RIP</strong> (v1 e v2)</li>
+                <li><strong>OSPF</strong> (Open Shortest Path First)</li>
+                <li><strong>EIGRP</strong> (Enhanced IGRP)</li>
+                <li><strong>IS-IS</strong> (Intermediate System to IS)</li>
+              </ul>
+              <p><em>Foco: melhor caminho interno, convergência rápida, métricas de desempenho.</em></p>
+            </div>
+            <div class="command-card">
+              <h4>🌍 EGP (Exterior Gateway Protocol)</h4>
+              <p>Operam <strong>entre</strong> Sistemas Autônomos diferentes. Usados para roteamento na Internet.</p>
+              <ul>
+                <li><strong>BGP</strong> (Border Gateway Protocol) — o único EGP moderno</li>
+                <li>EGP (protocolo original, obsoleto)</li>
+              </ul>
+              <p><em>Foco: políticas de roteamento, controle de tráfego entre organizações, estabilidade.</em></p>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 O que é um Sistema Autônomo (AS)?</h4>
+            <p>Um AS é uma rede ou conjunto de redes sob uma mesma administração e política de roteamento. Cada AS recebe um número único (ASN) — de 16 bits (1-65535) ou 32 bits (65536-4294967295). Exemplos: Google AS 15169, Amazon AS 16509, Cloudflare AS 13335. ISPs e grandes empresas possuem ASNs próprios.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Classificação por Algoritmo</h3>
+          <p>Os protocolos de roteamento utilizam diferentes algoritmos para calcular o melhor caminho:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Algoritmo</th>
+                <th>Funcionamento</th>
+                <th>Protocolos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Distance Vector</strong></td>
+                <td>Bellman-Ford</td>
+                <td>Cada roteador conhece apenas seus vizinhos diretos e envia sua tabela completa periodicamente. Decisão baseada em "direção + distância".</td>
+                <td>RIP, IGRP (obsoleto)</td>
+              </tr>
+              <tr>
+                <td><strong>Link-State</strong></td>
+                <td>Dijkstra (SPF)</td>
+                <td>Cada roteador possui um mapa completo da topologia e calcula independentemente o melhor caminho para cada destino.</td>
+                <td>OSPF, IS-IS</td>
+              </tr>
+              <tr>
+                <td><strong>Advanced Distance Vector (Híbrido)</strong></td>
+                <td>DUAL</td>
+                <td>Combina características de ambos: mantém tabela de topologia mas usa algoritmo baseado em distância com convergência rápida.</td>
+                <td>EIGRP</td>
+              </tr>
+              <tr>
+                <td><strong>Path Vector</strong></td>
+                <td>Best Path Selection</td>
+                <td>Troca caminhos completos (lista de ASs) e aplica políticas complexas para seleção. Não otimiza por métrica de desempenho.</td>
+                <td>BGP</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — Métricas dos Protocolos de Roteamento</h3>
+          <p>A <strong>métrica</strong> é o valor numérico que cada protocolo usa para determinar qual é o melhor caminho quando existem múltiplas rotas para o mesmo destino (dentro do mesmo protocolo):</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Métrica Principal</th>
+                <th>Descrição</th>
+                <th>Exemplo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>RIP</strong></td><td>Hop Count</td><td>Número de roteadores entre origem e destino</td><td>3 hops = métrica 3 (máx. 15)</td></tr>
+              <tr><td><strong>OSPF</strong></td><td>Cost (Custo)</td><td>Baseado em largura de banda: ref_BW / interface_BW</td><td>100Mbps ref ÷ 10Mbps = custo 10</td></tr>
+              <tr><td><strong>EIGRP</strong></td><td>Composta</td><td>Bandwidth + Delay (padrão). Pode incluir Load e Reliability</td><td>Fórmula: 256 × (10⁷/BW_min + Delay_sum)</td></tr>
+              <tr><td><strong>IS-IS</strong></td><td>Cost</td><td>Custo atribuído a cada interface (default: 10 para todas)</td><td>Soma dos custos no caminho</td></tr>
+              <tr><td><strong>BGP</strong></td><td>Path Attributes</td><td>Não usa métrica simples — usa algoritmo com 13+ critérios</td><td>AS-Path length, Local Pref, MED</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ Métrica só compara rotas DO MESMO protocolo</h4>
+            <p>Você NÃO pode comparar a métrica 20 do OSPF com a métrica 2170112 do EIGRP — são escalas completamente diferentes. Para comparar rotas de protocolos diferentes, usa-se a Distância Administrativa (AD). Primeiro: longest prefix match. Segundo: AD (entre protocolos). Terceiro: métrica (dentro do mesmo protocolo).</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Convergência</h3>
+          <p><strong>Convergência</strong> é o estado em que todos os roteadores de uma rede possuem informações consistentes e atualizadas em suas tabelas de roteamento. O tempo de convergência é o período entre a ocorrência de uma mudança na topologia (link caiu, nova rede adicionada) e o momento em que todos os roteadores se adaptaram à mudança.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Tempo de Convergência Típico</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>RIP</strong></td><td>30s a vários minutos</td><td>Atualizações periódicas a cada 30s; timers de holddown</td></tr>
+              <tr><td><strong>OSPF</strong></td><td>Subsegundos a poucos segundos</td><td>Detecção rápida via Hello; SPF recalcula instantaneamente</td></tr>
+              <tr><td><strong>EIGRP</strong></td><td>Subsegundos a poucos segundos</td><td>Feasible Successor permite switchover imediato sem recálculo</td></tr>
+              <tr><td><strong>BGP</strong></td><td>Segundos a minutos</td><td>Conservador por design; usa timers longos para estabilidade</td></tr>
+            </tbody>
+          </table>
+
+          <p><strong>Fatores que afetam a convergência:</strong></p>
+          <ul>
+            <li><strong>Mecanismo de detecção de falha:</strong> Hello timers, BFD (Bidirectional Forwarding Detection)</li>
+            <li><strong>Propagação da informação:</strong> Triggered updates vs periodic updates</li>
+            <li><strong>Tempo de cálculo:</strong> SPF simples (OSPF) vs múltiplos atributos (BGP)</li>
+            <li><strong>Complexidade da topologia:</strong> Mais roteadores = mais tempo para convergir</li>
+            <li><strong>Presença de rotas de backup:</strong> EIGRP Feasible Successor elimina tempo de recálculo</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.6 — Sumarização de Rotas (CIDR)</h3>
+          <p><strong>Sumarização</strong> (ou agregação de rotas) combina múltiplas rotas específicas em uma única rota mais geral. Isso reduz o tamanho da tabela de roteamento e diminui o overhead de processamento.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplo de Sumarização</h4>
+            <pre><code>! Sem sumarização (4 rotas individuais):
+O   192.168.0.0/24 [110/20] via 10.0.0.2
+O   192.168.1.0/24 [110/20] via 10.0.0.2
+O   192.168.2.0/24 [110/20] via 10.0.0.2
+O   192.168.3.0/24 [110/20] via 10.0.0.2
+
+! Com sumarização (1 rota sumarizada):
+O   192.168.0.0/22 [110/20] via 10.0.0.2
+
+! Como calcular a sumarização:
+! 192.168.0.0  = 11000000.10101000.000000|00.00000000
+! 192.168.1.0  = 11000000.10101000.000000|01.00000000
+! 192.168.2.0  = 11000000.10101000.000000|10.00000000
+! 192.168.3.0  = 11000000.10101000.000000|11.00000000
+!                                  ^^^^^^
+!                           22 bits em comum → /22
+! Resultado: 192.168.0.0/22 cobre todas as 4 redes</code></pre>
+          </div>
+
+          <p><strong>Benefícios da sumarização:</strong></p>
+          <ul>
+            <li>Tabelas de roteamento menores (menos entradas = lookups mais rápidos)</li>
+            <li>Menos uso de memória nos roteadores</li>
+            <li>Atualizações menores (menos informação para propagar)</li>
+            <li>Maior estabilidade (instabilidade em sub-redes individuais não afeta roteadores distantes)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5 — RIPv2 (Routing Information Protocol)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>RIPv2 (Routing Information Protocol)</h2>
+          <p>Conheça o protocolo de roteamento mais simples e antigo ainda presente em certificações. Entenda o algoritmo Bellman-Ford, as limitações do hop count, mecanismos anti-loop e por que o RIP é inadequado para redes modernas de grande porte.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — Como o RIP Funciona (Algoritmo Bellman-Ford)</h3>
+          <p>O RIP é um protocolo <strong>Distance Vector</strong> que usa o algoritmo de Bellman-Ford para calcular o melhor caminho. Cada roteador RIP conhece apenas seus vizinhos diretos e toma decisões com base em "direção" (interface de saída) e "distância" (hop count).</p>
+
+          <p><strong>Funcionamento básico:</strong></p>
+          <ol>
+            <li>Cada roteador RIP envia sua tabela de roteamento COMPLETA para todos os vizinhos a cada 30 segundos (update timer)</li>
+            <li>Os vizinhos recebem a tabela, incrementam a métrica (hop count) em +1 para cada rota recebida</li>
+            <li>Se a nova rota tem métrica melhor (menor) que a existente, substitui na tabela</li>
+            <li>O processo se repete até que todos os roteadores tenham informações convergentes</li>
+          </ol>
+
+          <div class="info-box highlight">
+            <h4>💡 "Routing by Rumor" (Roteamento por Rumor)</h4>
+            <p>Protocolos Distance Vector são chamados de "routing by rumor" porque cada roteador confia nas informações que seus vizinhos fornecem, sem verificação independente da topologia real. É como pedir direções: cada pessoa diz "siga por ali, faltam X quarteirões" — mas ninguém tem um mapa completo. Isso contrasta com Link-State (OSPF), onde cada roteador tem o mapa completo.</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplo de Propagação RIP</h4>
+            <pre><code>! Topologia: R1 ─── R2 ─── R3 ─── R4
+! Rede 192.168.4.0/24 está conectada em R4
+
+! Após inicialização e convergência:
+! R4 anuncia: 192.168.4.0/24, métrica 0 (diretamente conectada para R4, mas envia como 1)
+! R3 recebe: 192.168.4.0/24, métrica 1 (1 hop via R4)
+! R2 recebe de R3: 192.168.4.0/24, métrica 2 (2 hops via R3)
+! R1 recebe de R2: 192.168.4.0/24, métrica 3 (3 hops via R2)
+
+! Tabela de R1:
+R   192.168.4.0/24 [120/3] via 10.0.12.2, 00:00:15, Serial0/0/0
+!                       ^                     ^
+!                  3 hops               Tempo desde última atualização</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — RIPv1 vs RIPv2: Diferenças Cruciais</h3>
+          
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>RIPv1</th>
+                <th>RIPv2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Tipo de atualização</td><td>Broadcast (255.255.255.255)</td><td>Multicast (224.0.0.9)</td></tr>
+              <tr><td>Suporte a VLSM</td><td>Não (classful)</td><td>Sim (classless)</td></tr>
+              <tr><td>Suporte a CIDR</td><td>Não</td><td>Sim</td></tr>
+              <tr><td>Envia subnet mask</td><td>Não</td><td>Sim</td></tr>
+              <tr><td>Autenticação</td><td>Não</td><td>Sim (plaintext e MD5)</td></tr>
+              <tr><td>Next-hop field</td><td>Não</td><td>Sim (pode indicar next-hop diferente)</td></tr>
+              <tr><td>Route tags</td><td>Não</td><td>Sim (para identificar rotas redistribuídas)</td></tr>
+              <tr><td>Status atual</td><td>Obsoleto</td><td>Usado apenas em labs/educação</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ RIPv1 é Perigoso em Redes com VLSM</h4>
+            <p>Como RIPv1 não envia a máscara de sub-rede, ele assume a classe do endereço (Classe A, B ou C). Se você tem a rede 172.16.1.0/24 e anuncia via RIPv1, roteadores em outras redes classful interpretarão como 172.16.0.0/16 — causando roteamento incorreto e potenciais loops.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Métrica: Hop Count (Máximo 15)</h3>
+          <p>O RIP usa exclusivamente o <strong>hop count</strong> (número de roteadores no caminho) como métrica. Isso significa que ele NÃO considera largura de banda, delay, ou qualidade do link:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Limitação da Métrica do RIP</h4>
+            <pre><code>! Cenário: dois caminhos de R1 para a rede 10.0.0.0/24
+!
+! Caminho A: R1 → R2 → R3 (2 hops, links de 100 Mbps)
+! Caminho B: R1 → R4 → R5 → R6 → R3 (4 hops, links de 10 Gbps)
+!
+! RIP escolhe: Caminho A (2 hops < 4 hops)
+! OSPF escolheria: Caminho B (menor custo baseado em bandwidth)
+!
+! RIP ignora completamente a qualidade do link!
+
+! Hop count máximo = 15
+! Hop count = 16 significa "UNREACHABLE" (inalcançável)
+! Consequência: RIP NÃO funciona em redes com mais de 15 roteadores no caminho
+! Esta é a limitação mais crítica do RIP para redes corporativas</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 — Configuração Completa do RIPv2</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando RIPv2 (Cisco IOS)</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! Configuração básica do RIPv2
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router rip
+Router(config-router)# version 2
+Router(config-router)# no auto-summary
+! ↑ CRÍTICO: desabilita sumarização automática classful
+
+! Anunciar redes diretamente conectadas:
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 10.0.0.0
+! Nota: o comando "network" em RIP usa endereço CLASSFUL
+! "network 10.0.0.0" ativa RIP em TODAS as interfaces na rede 10.x.x.x
+
+! Impedir envio de updates em interfaces LAN (passive interface):
+Router(config-router)# passive-interface GigabitEthernet0/0
+! ↑ A interface ainda anuncia sua rede, mas NÃO envia/recebe updates RIP
+
+! Redistribuir rota padrão para vizinhos RIP:
+Router(config-router)# default-information originate
+
+! ═══════════════════════════════════════════════════════════════
+! Verificação
+! ═══════════════════════════════════════════════════════════════
+Router# show ip protocols
+! Mostra protocolos ativos, redes anunciadas, timers, vizinhos
+
+Router# show ip route rip
+! Mostra apenas rotas aprendidas via RIP
+
+Router# show ip rip database
+! Mostra a base de dados RIP com todas as rotas conhecidas
+
+Router# debug ip rip
+! Mostra atualizações RIP em tempo real (CUIDADO em produção!)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 — Timers do RIP</h3>
+          <p>O RIP utiliza quatro timers que controlam seu comportamento e convergência:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Timer</th>
+                <th>Padrão</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Update Timer</strong></td><td>30 segundos</td><td>Intervalo entre envios periódicos da tabela completa para vizinhos</td></tr>
+              <tr><td><strong>Invalid Timer</strong></td><td>180 segundos</td><td>Se uma rota não é atualizada em 180s, é marcada como inválida (metric=16)</td></tr>
+              <tr><td><strong>Holddown Timer</strong></td><td>180 segundos</td><td>Após uma rota ser invalidada, ignora atualizações com métrica PIOR por este período</td></tr>
+              <tr><td><strong>Flush Timer</strong></td><td>240 segundos</td><td>Remove completamente a rota da tabela de roteamento</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📋 Modificando Timers do RIP</h4>
+            <pre><code>! Alterar timers (update, invalid, holddown, flush):
+Router(config-router)# timers basic 20 120 120 160
+!                                    ^   ^    ^    ^
+!                              update invalid hold flush
+
+! Verificar timers atuais:
+Router# show ip protocols
+  Routing Protocol is "rip"
+    Sending updates every 20 seconds, next due in 12 seconds
+    Invalid after 120 seconds, hold down 120, flushed after 160</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.6 — Mecanismos Anti-Loop do RIP</h3>
+          <p>Por ser Distance Vector, o RIP é suscetível a loops de roteamento (count to infinity). Para mitigar, ele implementa vários mecanismos:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🚫 Split Horizon</h4>
+              <p>Regra: <strong>nunca anuncie uma rota de volta pela interface onde ela foi aprendida.</strong></p>
+              <p>Se R2 aprendeu a rota para 10.0.0.0/24 via a interface Serial0/0 (de R1), ele NUNCA anunciará essa rota de volta para R1 pela mesma interface.</p>
+              <pre><code>! Verificar se está ativo:
+Router# show ip interface Serial0/0/0
+  Split horizon is enabled</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>☠️ Route Poisoning</h4>
+              <p>Quando uma rede se torna inalcançável, o roteador imediatamente anuncia a rota com <strong>métrica 16 (infinity)</strong> para todos os vizinhos, em vez de simplesmente parar de anunciar.</p>
+              <p>Isso garante que vizinhos saibam imediatamente que a rota morreu, em vez de esperar o timer expirar.</p>
+            </div>
+          </div>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>⚡ Triggered Updates</h4>
+              <p>Quando ocorre uma mudança na topologia, o roteador envia uma <strong>atualização imediata</strong> (sem esperar os 30 segundos do update timer), acelerando a convergência.</p>
+              <p>Apenas as rotas que mudaram são incluídas no triggered update — não a tabela inteira.</p>
+            </div>
+            <div class="command-card">
+              <h4>⏸️ Holddown Timer</h4>
+              <p>Após receber informação de que uma rota está inválida (métrica 16), o roteador <strong>ignora novas informações com métrica pior</strong> pelo período de holddown.</p>
+              <p>Isso evita que informações desatualizadas (stale) de outros roteadores reinstaurem uma rota que deveria estar morta.</p>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Count to Infinity</h4>
+            <p>Sem esses mecanismos, quando uma rede cai, roteadores podem ficar incrementando a métrica indefinidamente (1→2→3→...→∞), criando um loop. O RIP limita o "infinito" a 16 — quando a métrica atinge 16, a rota é considerada inalcançável. Mesmo com todos os mecanismos, a convergência do RIP pode levar minutos em cenários complexos.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.7 — Quando NÃO Usar RIP</h3>
+          <ul>
+            <li><strong>Redes com mais de 15 hops de diâmetro:</strong> Limitação fatal do hop count</li>
+            <li><strong>Redes com links de velocidades variadas:</strong> RIP não diferencia entre links de 10 Mbps e 10 Gbps</li>
+            <li><strong>Ambientes que exigem convergência rápida:</strong> 30 segundos entre updates é inaceitável</li>
+            <li><strong>Redes grandes (100+ roteadores):</strong> O envio periódico da tabela completa consome largura de banda</li>
+            <li><strong>Ambientes de produção modernos:</strong> OSPF ou EIGRP são superiores em todos os aspectos</li>
+          </ul>
+          <p><strong>RIP é usado hoje apenas para:</strong> estudos para certificações, labs de aprendizagem, e dispositivos legados que não suportam OSPF/EIGRP.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6 — OSPF (Open Shortest Path First)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>OSPF — Open Shortest Path First</h2>
+          <p>Domine o protocolo Link-State mais utilizado em redes corporativas. Compreenda o algoritmo SPF de Dijkstra, design hierárquico com áreas, processo de adjacência entre vizinhos, eleição DR/BDR, tipos de LSA e configuração completa single-area e multi-area.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — Fundamentos do Protocolo Link-State</h3>
+          <p>Diferente do RIP (Distance Vector), o OSPF é um protocolo <strong>Link-State</strong> — cada roteador constrói um mapa completo da topologia da rede e calcula independentemente o melhor caminho para cada destino.</p>
+
+          <p><strong>Princípios fundamentais do Link-State:</strong></p>
+          <ol>
+            <li><strong>Descoberta de vizinhos:</strong> Cada roteador identifica quem são seus vizinhos diretos via pacotes Hello</li>
+            <li><strong>Troca de LSAs:</strong> Cada roteador gera Link-State Advertisements (LSAs) descrevendo suas conexões e os inunda (flood) para toda a área</li>
+            <li><strong>Banco de dados sincronizado:</strong> Todos os roteadores na mesma área possuem o mesmo LSDB (Link-State Database)</li>
+            <li><strong>Cálculo SPF independente:</strong> Cada roteador roda o algoritmo de Dijkstra no LSDB para calcular a árvore de menor custo</li>
+            <li><strong>Tabela de roteamento:</strong> Os resultados do SPF populam a tabela de roteamento</li>
+          </ol>
+
+          <div class="info-box highlight">
+            <h4>💡 Analogia: Link-State vs Distance Vector</h4>
+            <p><strong>Distance Vector (RIP):</strong> É como perguntar direções a cada esquina — "por onde vou?" → "siga 3 quadras ao norte". Você confia no que cada pessoa diz, sem ter o mapa completo.<br>
+            <strong>Link-State (OSPF):</strong> É como cada roteador receber uma cópia do mapa da cidade inteira e usar GPS para calcular a melhor rota independentemente. Todos têm a mesma informação e chegam às mesmas conclusões.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — Algoritmo SPF de Dijkstra</h3>
+          <p>O <strong>algoritmo Shortest Path First (SPF)</strong> de Dijkstra é o coração do OSPF. Ele calcula o caminho de menor custo de um roteador (raiz) para todos os outros destinos na rede:</p>
+
+          <ol>
+            <li>O roteador coloca a si mesmo como raiz da árvore SPF</li>
+            <li>Examina todos os links diretos e seus custos</li>
+            <li>Seleciona o vizinho com menor custo acumulado</li>
+            <li>A partir desse vizinho, examina seus links e calcula custos acumulados</li>
+            <li>Repete o processo até que todos os nós tenham sido processados</li>
+            <li>Resultado: árvore de menor custo (SPF Tree) com o melhor caminho para cada destino</li>
+          </ol>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplo Visual do Cálculo SPF</h4>
+            <pre><code>! Topologia com custos OSPF:
+!
+!          custo 10         custo 5
+!    R1 ────────────── R2 ──────────── R4
+!    │                  │               │
+!    │ custo 3          │ custo 7       │ custo 2
+!    │                  │               │
+!    R3 ────────────── R5 ──────────── R6
+!          custo 4         custo 1
+!
+! Calculando a partir de R1 (SPF Tree):
+!
+! R1 → R2: custo 10 (direto)
+! R1 → R3: custo 3 (direto) ← MENOR, processa R3 primeiro
+! R1 → R3 → R5: custo 3+4 = 7
+! R1 → R2: custo 10 vs R1 → R3 → R5 → R2? (3+4+7=14) → R1→R2 direto é melhor (10)
+! R1 → R3 → R5 → R6: custo 3+4+1 = 8
+! R1 → R2 → R4: custo 10+5 = 15 vs R1 → R3 → R5 → R6 → R4: 3+4+1+2 = 10 ← MELHOR!
+!
+! Resultado final (SPF Tree de R1):
+! R1 → R3: custo 3 (via direta)
+! R1 → R3 → R5: custo 7
+! R1 → R3 → R5 → R6: custo 8
+! R1 → R2: custo 10 (via direta)
+! R1 → R3 → R5 → R6 → R4: custo 10</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Design Hierárquico: Áreas OSPF</h3>
+          <p>Para escalar em redes grandes, o OSPF utiliza um design hierárquico baseado em <strong>áreas</strong>. Cada área mantém seu próprio LSDB e cálculo SPF, reduzindo a carga computacional em cada roteador:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Estrutura de Áreas OSPF</h4>
+            <pre><code>!                    ┌─────────────────────────────────────────┐
+!                    │           ÁREA 0 (BACKBONE)              │
+!                    │                                         │
+!                    │    R1 ──── R2 ──── R3 ──── R4          │
+!                    │    │              │         │           │
+!                    └────┼──────────────┼─────────┼───────────┘
+!                         │              │         │
+!              ┌──────────┼──┐    ┌──────┼──┐    ┌┼──────────┐
+!              │  ÁREA 1  │  │    │ ÁREA 2│  │    │ ÁREA 3   │
+!              │          │  │    │       │  │    │          │
+!              │  R5──R6  │  │    │ R7─R8 │  │    │ R9──R10  │
+!              │          │  │    │       │  │    │          │
+!              └──────────┘  │    └───────┘  │    └──────────┘
+!                            │               │
+!                     ABR (Area Border Router)
+!
+! REGRAS DO OSPF MULTI-ÁREA:
+! 1. TODA área deve se conectar à Área 0 (backbone)
+! 2. Área 0 é obrigatória — sem ela, OSPF multi-área não funciona
+! 3. ABRs (Area Border Routers) conectam áreas não-backbone à backbone
+! 4. Tráfego inter-área SEMPRE passa pela Área 0</code></pre>
+          </div>
+
+          <p><strong>Tipos de roteadores OSPF:</strong></p>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Característica</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Internal Router</strong></td><td>Todas as interfaces na mesma área</td><td>Mantém LSDB apenas de sua área</td></tr>
+              <tr><td><strong>Backbone Router</strong></td><td>Pelo menos uma interface na Área 0</td><td>Participa do backbone</td></tr>
+              <tr><td><strong>ABR (Area Border Router)</strong></td><td>Interfaces em múltiplas áreas (incluindo Área 0)</td><td>Sumariza e propaga rotas entre áreas</td></tr>
+              <tr><td><strong>ASBR (AS Boundary Router)</strong></td><td>Conecta OSPF a outro domínio de roteamento</td><td>Redistribui rotas externas para dentro do OSPF</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — Processo de Adjacência OSPF (Formação de Vizinhança)</h3>
+          <p>Antes de trocar informações de roteamento, roteadores OSPF precisam estabelecer uma <strong>adjacência</strong>. O processo passa por vários estados:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Estado</th>
+                <th>Descrição</th>
+                <th>O que acontece</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Down</strong></td><td>Nenhum Hello recebido</td><td>Estado inicial — nenhuma comunicação com o vizinho</td></tr>
+              <tr><td><strong>Init</strong></td><td>Hello recebido, mas sem bidirecionalidade</td><td>Recebeu Hello do vizinho, mas o próprio Router ID não consta no Hello recebido</td></tr>
+              <tr><td><strong>2-Way</strong></td><td>Comunicação bidirecional confirmada</td><td>Ambos os roteadores se veem nos Hellos um do outro. Decisão de DR/BDR ocorre aqui</td></tr>
+              <tr><td><strong>ExStart</strong></td><td>Negociação de Master/Slave</td><td>Roteadores decidem quem inicia a troca de DBD (maior Router ID = Master)</td></tr>
+              <tr><td><strong>Exchange</strong></td><td>Troca de DBD (Database Description)</td><td>Enviam resumos (headers) de seus LSAs para identificar diferenças</td></tr>
+              <tr><td><strong>Loading</strong></td><td>Solicitação de LSAs faltantes</td><td>Enviam LSR (Link-State Request) para LSAs que não possuem; recebem LSU (Updates)</td></tr>
+              <tr><td><strong>Full</strong></td><td>Adjacência completa — LSDBs sincronizados</td><td>Banco de dados idênticos — roteadores estão completamente convergidos</td></tr>
+            </tbody>
+          </table>
+
+          <p><strong>Pacotes OSPF usados na adjacência:</strong></p>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Pacote</th>
+                <th>Tipo</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Hello</strong></td><td>Tipo 1</td><td>Descoberta e manutenção de vizinhança. Enviado periodicamente (10s em broadcast, 30s em NBMA)</td></tr>
+              <tr><td><strong>DBD</strong></td><td>Tipo 2</td><td>Database Description — resumo dos LSAs que o roteador possui</td></tr>
+              <tr><td><strong>LSR</strong></td><td>Tipo 3</td><td>Link-State Request — solicita LSAs específicos que estão faltando</td></tr>
+              <tr><td><strong>LSU</strong></td><td>Tipo 4</td><td>Link-State Update — contém os LSAs completos solicitados</td></tr>
+              <tr><td><strong>LSAck</strong></td><td>Tipo 5</td><td>Link-State Acknowledgment — confirma recebimento de LSUs</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Requisitos para Adjacência OSPF</h4>
+            <p>Para que dois roteadores OSPF formem adjacência, os seguintes parâmetros DEVEM ser iguais em ambos:</p>
+            <ul>
+              <li><strong>Área ID:</strong> Ambas as interfaces devem estar na mesma área</li>
+              <li><strong>Hello/Dead intervals:</strong> Devem ser idênticos (padrão: Hello=10s, Dead=40s)</li>
+              <li><strong>Tipo de rede:</strong> Ambos devem concordar (broadcast, point-to-point, NBMA)</li>
+              <li><strong>Subnet:</strong> Interfaces devem estar na mesma sub-rede</li>
+              <li><strong>Autenticação:</strong> Se configurada, deve ser idêntica em ambos</li>
+              <li><strong>Stub area flag:</strong> Ambos devem concordar se a área é stub ou não</li>
+              <li><strong>MTU:</strong> Deve ser igual (ou ignorar com <code>ip ospf mtu-ignore</code>)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.5 — Eleição DR/BDR em Redes Multi-Acesso</h3>
+          <p>Em redes multi-acesso (Ethernet), se cada roteador formasse adjacência completa com todos os outros, o número de adjacências cresceria exponencialmente (n×(n-1)/2). Para otimizar, o OSPF elege um <strong>DR (Designated Router)</strong> e um <strong>BDR (Backup Designated Router)</strong>:</p>
+
+          <ul>
+            <li><strong>DR:</strong> Todos os roteadores formam adjacência Full APENAS com o DR. O DR coleta e distribui LSAs para o segmento</li>
+            <li><strong>BDR:</strong> Backup do DR — assume se o DR falhar. Também mantém adjacência Full com todos</li>
+            <li><strong>DROther:</strong> Roteadores que não são DR nem BDR. Formam adjacência Full apenas com DR e BDR; entre si ficam em estado 2-Way</li>
+          </ul>
+
+          <p><strong>Processo de eleição:</strong></p>
+          <ol>
+            <li>Comparar a <strong>OSPF Priority</strong> das interfaces (0-255, padrão=1)</li>
+            <li>Maior priority = DR. Segundo maior = BDR</li>
+            <li>Priority = 0 significa "NÃO participo da eleição" (nunca será DR/BDR)</li>
+            <li>Em caso de empate na priority, o maior <strong>Router ID</strong> vence</li>
+            <li><strong>A eleição NÃO é preemptiva!</strong> Se um roteador com priority maior entrar na rede depois, NÃO toma o papel de DR até que o atual caia</li>
+          </ol>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando e Verificando DR/BDR</h4>
+            <pre><code>! Definir priority (interface específica):
+Router(config-if)# ip ospf priority 255
+! ↑ Garante que este roteador seja eleito DR
+
+Router(config-if)# ip ospf priority 0
+! ↑ Este roteador NUNCA será DR ou BDR
+
+! Definir Router ID manualmente (recomendado):
+Router(config-router)# router-id 1.1.1.1
+
+! Verificar eleição:
+Router# show ip ospf neighbor
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+2.2.2.2          1   FULL/DR         00:00:35    192.168.1.2     Gi0/0
+3.3.3.3          1   FULL/BDR        00:00:37    192.168.1.3     Gi0/0
+4.4.4.4          1   2WAY/DROTHER    00:00:39    192.168.1.4     Gi0/0
+
+! Endereços multicast OSPF:
+! 224.0.0.5 = AllSPFRouters (todos os roteadores OSPF)
+! 224.0.0.6 = AllDRouters (apenas DR e BDR)
+! DROthers enviam para 224.0.0.6; DR replica para 224.0.0.5</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.6 — Métrica OSPF: Custo (Cost)</h3>
+          <p>A métrica do OSPF é o <strong>custo</strong>, calculado com base na largura de banda da interface. A fórmula padrão é:</p>
+
+          <div class="info-box highlight">
+            <h4>📐 Fórmula do Custo OSPF</h4>
+            <p><strong>Custo = Reference Bandwidth ÷ Interface Bandwidth</strong></p>
+            <p>Padrão Cisco: Reference Bandwidth = 100 Mbps (10⁸ bps)</p>
+            <p>O custo total de um caminho é a SOMA dos custos de todas as interfaces de saída no caminho.</p>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Interface</th>
+                <th>Bandwidth</th>
+                <th>Custo (ref=100Mbps)</th>
+                <th>Custo (ref=10Gbps)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Serial (T1)</td><td>1.544 Mbps</td><td>64</td><td>6477</td></tr>
+              <tr><td>FastEthernet</td><td>100 Mbps</td><td>1</td><td>100</td></tr>
+              <tr><td>GigabitEthernet</td><td>1 Gbps</td><td>1 (mesmo que FastE!)</td><td>10</td></tr>
+              <tr><td>10 GigabitEthernet</td><td>10 Gbps</td><td>1 (mesmo!)</td><td>1</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ Problema: Reference Bandwidth Padrão de 100 Mbps</h4>
+            <p>Com a reference bandwidth padrão de 100 Mbps, interfaces FastEthernet, GigabitEthernet e 10G têm TODAS custo 1 — o OSPF não consegue diferenciar entre elas! A solução é aumentar a reference bandwidth para refletir a realidade da sua rede. <strong>Configure o mesmo valor em TODOS os roteadores OSPF.</strong></p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando e Verificando Custo OSPF</h4>
+            <pre><code>! Alterar reference bandwidth (FAÇA EM TODOS OS ROTEADORES):
+Router(config-router)# auto-cost reference-bandwidth 10000
+! ↑ 10000 Mbps = 10 Gbps → Agora GigE=10, FastE=100, 10G=1
+
+! Definir custo manualmente em uma interface:
+Router(config-if)# ip ospf cost 50
+
+! Verificar custo da interface:
+Router# show ip ospf interface GigabitEthernet0/0
+  GigabitEthernet0/0 is up, line protocol is up
+    Internet Address 192.168.1.1/24, Area 0
+    Process ID 1, Router ID 1.1.1.1, Network Type BROADCAST, Cost: 10
+    Transmit Delay is 1 sec, State DR, Priority 1
+    Designated Router (ID) 1.1.1.1, Interface address 192.168.1.1
+    Hello 10, Dead 40, Retransmit 5
+
+! Verificar custo das rotas:
+Router# show ip route ospf
+O     10.0.1.0/24 [110/20] via 192.168.1.2, 00:45:00, GigabitEthernet0/0
+!                       ^^
+!                  custo total = 20 (soma dos custos das interfaces no caminho)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.7 — Configuração Single-Area OSPF (Detalhada)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração Completa de OSPF Single-Area</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! ETAPA 1: Configuração básica do processo OSPF
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router ospf 1
+!                          ^
+!              Process ID (local, não precisa ser igual entre roteadores)
+
+! Router ID (RECOMENDADO definir manualmente):
+Router(config-router)# router-id 1.1.1.1
+
+! Reference bandwidth ajustada:
+Router(config-router)# auto-cost reference-bandwidth 10000
+
+! ═══════════════════════════════════════════════════════════════
+! ETAPA 2: Anunciar redes (método clássico com wildcard mask)
+! ═══════════════════════════════════════════════════════════════
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)# network 10.0.0.0 0.0.0.3 area 0
+!                               ^^^^^^^^ ^^^^^^^^
+!                            rede destino  wildcard mask (inversa da subnet mask)
+!
+! Wildcard mask: bits 0 = deve corresponder exatamente
+!                bits 1 = pode ser qualquer valor
+! /24 (255.255.255.0) → wildcard 0.0.0.255
+! /30 (255.255.255.252) → wildcard 0.0.0.3
+! /32 (255.255.255.255) → wildcard 0.0.0.0
+
+! ═══════════════════════════════════════════════════════════════
+! MÉTODO ALTERNATIVO: Ativar OSPF diretamente na interface
+! ═══════════════════════════════════════════════════════════════
+Router(config)# interface GigabitEthernet0/0
+Router(config-if)# ip ospf 1 area 0
+!                          ^ ^
+!                    process area
+
+Router(config)# interface Serial0/0/0
+Router(config-if)# ip ospf 1 area 0
+
+! ═══════════════════════════════════════════════════════════════
+! ETAPA 3: Passive interfaces (interfaces que NÃO enviam Hello)
+! ═══════════════════════════════════════════════════════════════
+Router(config-router)# passive-interface GigabitEthernet0/1
+! ↑ Interface LAN — não precisa descobrir vizinhos OSPF
+! A rede AINDA é anunciada, mas nenhum Hello é enviado
+
+! Alternativa: todas passivas, exceto as de trânsito:
+Router(config-router)# passive-interface default
+Router(config-router)# no passive-interface Serial0/0/0
+Router(config-router)# no passive-interface GigabitEthernet0/0
+
+! ═══════════════════════════════════════════════════════════════
+! ETAPA 4: Default route (se este roteador é gateway para Internet)
+! ═══════════════════════════════════════════════════════════════
+Router(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1
+Router(config)# router ospf 1
+Router(config-router)# default-information originate
+
+! ═══════════════════════════════════════════════════════════════
+! ETAPA 5: Otimizações
+! ═══════════════════════════════════════════════════════════════
+! Alterar Hello/Dead intervals (interface específica):
+Router(config-if)# ip ospf hello-interval 5
+Router(config-if)# ip ospf dead-interval 20
+
+! Autenticação MD5:
+Router(config-if)# ip ospf authentication message-digest
+Router(config-if)# ip ospf message-digest-key 1 md5 SENHA_SECRETA</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.8 — Multi-Area OSPF: Visão Geral</h3>
+          <p>Em redes maiores (50+ roteadores), single-area OSPF pode ter problemas de escalabilidade. Multi-area OSPF resolve isso dividindo a rede em áreas menores:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração de ABR (Area Border Router)</h4>
+            <pre><code>! ABR com interfaces na Área 0 e Área 1:
+Router(config)# router ospf 1
+Router(config-router)# router-id 2.2.2.2
+
+! Interface na Área 0 (backbone):
+Router(config)# interface GigabitEthernet0/0
+Router(config-if)# ip ospf 1 area 0
+
+! Interface na Área 1:
+Router(config)# interface GigabitEthernet0/1
+Router(config-if)# ip ospf 1 area 1
+
+! Sumarização inter-área no ABR:
+Router(config-router)# area 1 range 10.1.0.0 255.255.0.0
+! ↑ Sumariza todas as redes 10.1.x.x/24 da Área 1 em uma única 10.1.0.0/16
+! Reduz o tamanho da tabela de roteamento nas outras áreas
+
+! Verificação:
+Router# show ip ospf border-routers
+Router# show ip ospf database summary</code></pre>
+          </div>
+
+          <p><strong>Tipos de áreas especiais:</strong></p>
+          <ul>
+            <li><strong>Stub Area:</strong> Não recebe rotas externas (LSA tipo 5). Usa default route para sair da área</li>
+            <li><strong>Totally Stubby Area:</strong> Não recebe rotas externas NEM inter-área. Recebe apenas default route</li>
+            <li><strong>NSSA (Not-So-Stubby Area):</strong> Stub que permite redistribuição local (via LSA tipo 7)</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.9 — Tipos de LSA (Link-State Advertisements)</h3>
+          <p>Os LSAs são os "blocos de informação" que compõem o LSDB. Cada tipo carrega informações específicas:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Nome</th>
+                <th>Gerado por</th>
+                <th>Escopo</th>
+                <th>Função</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>Router LSA</td><td>Todos os roteadores</td><td>Intra-área</td><td>Descreve links e custos do roteador que o gerou</td></tr>
+              <tr><td><strong>2</strong></td><td>Network LSA</td><td>DR (Designated Router)</td><td>Intra-área</td><td>Descreve roteadores conectados a uma rede multi-acesso</td></tr>
+              <tr><td><strong>3</strong></td><td>Summary LSA</td><td>ABR</td><td>Inter-área</td><td>Anuncia redes de uma área para outras áreas</td></tr>
+              <tr><td><strong>4</strong></td><td>ASBR Summary LSA</td><td>ABR</td><td>Inter-área</td><td>Indica como alcançar um ASBR em outra área</td></tr>
+              <tr><td><strong>5</strong></td><td>External LSA</td><td>ASBR</td><td>Todo o domínio</td><td>Rotas redistribuídas de outros protocolos/domínios</td></tr>
+              <tr><td><strong>7</strong></td><td>NSSA External LSA</td><td>ASBR em NSSA</td><td>Dentro da NSSA</td><td>Similar ao tipo 5, mas confinado à NSSA (convertido em tipo 5 pelo ABR)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.10 — Comandos de Verificação OSPF</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Comandos Essenciais de Verificação OSPF</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! VERIFICAÇÃO DE VIZINHANÇA
+! ═══════════════════════════════════════════════════════════════
+Router# show ip ospf neighbor
+! Mostra vizinhos OSPF, estado (Full/2Way), prioridade, DR/BDR
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+2.2.2.2          1   FULL/DR         00:00:33    192.168.1.2     GigabitEthernet0/0
+3.3.3.3          1   FULL/BDR        00:00:35    192.168.1.3     GigabitEthernet0/0
+
+! ═══════════════════════════════════════════════════════════════
+! VERIFICAÇÃO DE INTERFACES
+! ═══════════════════════════════════════════════════════════════
+Router# show ip ospf interface brief
+Interface    PID   Area            IP Address/Mask    Cost  State Nbrs F/C
+Gi0/0        1     0               192.168.1.1/24     10    DR    2/2
+Se0/0/0      1     0               10.0.0.1/30        6477  P2P   1/1
+
+Router# show ip ospf interface GigabitEthernet0/0
+! Detalhes completos: tipo de rede, custo, DR/BDR, timers, adjacências
+
+! ═══════════════════════════════════════════════════════════════
+! VERIFICAÇÃO DO BANCO DE DADOS (LSDB)
+! ═══════════════════════════════════════════════════════════════
+Router# show ip ospf database
+! Lista TODOS os LSAs organizados por tipo
+
+            OSPF Router with ID (1.1.1.1) (Process ID 1)
+                Router Link States (Area 0)
+Link ID         ADV Router      Age         Seq#       Checksum Link count
+1.1.1.1         1.1.1.1         342         0x80000005 0x00A5B3 3
+2.2.2.2         2.2.2.2         298         0x80000004 0x009BC2 2
+
+                Net Link States (Area 0)
+Link ID         ADV Router      Age         Seq#       Checksum
+192.168.1.2     2.2.2.2         298         0x80000002 0x00C4A1
+
+! ═══════════════════════════════════════════════════════════════
+! VERIFICAÇÃO DE ROTAS OSPF
+! ═══════════════════════════════════════════════════════════════
+Router# show ip route ospf
+! Mostra apenas rotas aprendidas via OSPF
+
+O     10.0.1.0/24 [110/20] via 192.168.1.2, 01:30:00, GigabitEthernet0/0
+O IA  10.0.2.0/24 [110/30] via 192.168.1.2, 01:25:00, GigabitEthernet0/0
+O E2  0.0.0.0/0 [110/1] via 192.168.1.2, 00:45:00, GigabitEthernet0/0
+
+! ═══════════════════════════════════════════════════════════════
+! VERIFICAÇÃO DO PROCESSO OSPF
+! ═══════════════════════════════════════════════════════════════
+Router# show ip ospf
+! Mostra: Router ID, áreas, SPF statistics, timers, reference bandwidth
+
+Router# show ip protocols
+! Visão geral: redes anunciadas, passive interfaces, redistribuição
+
+! ═══════════════════════════════════════════════════════════════
+! TROUBLESHOOTING
+! ═══════════════════════════════════════════════════════════════
+Router# debug ip ospf adj
+! Mostra processo de adjacência em tempo real
+
+Router# debug ip ospf events
+! Mostra eventos OSPF (mudanças de estado, recálculo SPF)
+
+Router# clear ip ospf process
+! CUIDADO: reinicia o processo OSPF (perda temporária de rotas!)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7 — EIGRP (Enhanced Interior Gateway Routing Protocol)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>EIGRP — Enhanced Interior Gateway Routing Protocol</h2>
+          <p>Explore o protocolo proprietário da Cisco (agora aberto via RFC 7868) que combina a simplicidade de Distance Vector com convergência ultra-rápida via algoritmo DUAL. Entenda Successors, Feasible Successors, a métrica composta e a configuração Named Mode.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — Características do EIGRP</h3>
+          <p>O EIGRP é frequentemente classificado como um protocolo <strong>"Advanced Distance Vector"</strong> ou <strong>"Híbrido"</strong>, pois combina características de ambos os paradigmas:</p>
+
+          <ul>
+            <li><strong>Convergência rápida:</strong> O algoritmo DUAL permite failover quase instantâneo quando existe Feasible Successor</li>
+            <li><strong>Uso eficiente de bandwidth:</strong> Envia updates parciais (apenas mudanças) e multicast bounded</li>
+            <li><strong>Suporte a VLSM e CIDR:</strong> Protocolo completamente classless</li>
+            <li><strong>Balanceamento de carga desigual:</strong> Unique feature — pode distribuir tráfego por caminhos com métricas diferentes (variance)</li>
+            <li><strong>Multi-protocolo:</strong> Suporta IPv4, IPv6, IPX e AppleTalk (legacy)</li>
+            <li><strong>Independência de transport:</strong> Usa protocolo IP número 88 (não TCP/UDP)</li>
+            <li><strong>Reliable Transport Protocol (RTP):</strong> Garantia de entrega para updates críticos</li>
+            <li><strong>Multicast 224.0.0.10:</strong> Endereço de grupo para roteadores EIGRP</li>
+          </ul>
+
+          <div class="info-box highlight">
+            <h4>💡 EIGRP: Proprietário ou Aberto?</h4>
+            <p>O EIGRP foi proprietário Cisco por décadas, mas em 2013 foi parcialmente aberto via RFC 7868. Na prática, ainda é predominantemente usado em ambientes Cisco. Outros fabricantes raramente o implementam, então em redes multi-vendor, OSPF continua sendo a escolha padrão para IGP.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Algoritmo DUAL (Diffusing Update Algorithm)</h3>
+          <p>O DUAL é o que torna o EIGRP excepcionalmente rápido em convergência. Ele mantém uma <strong>tabela de topologia</strong> com rotas alternativas pré-calculadas:</p>
+
+          <p><strong>Conceitos-chave do DUAL:</strong></p>
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Conceito</th>
+                <th>Definição</th>
+                <th>Analogia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Feasible Distance (FD)</strong></td>
+                <td>Menor métrica total conhecida para alcançar um destino</td>
+                <td>O "recorde" de distância mínima até o destino</td>
+              </tr>
+              <tr>
+                <td><strong>Reported Distance (RD)</strong></td>
+                <td>Métrica anunciada pelo vizinho para alcançar o destino (do ponto de vista dele)</td>
+                <td>O que o vizinho diz que é a distância dele até o destino</td>
+              </tr>
+              <tr>
+                <td><strong>Successor</strong></td>
+                <td>Vizinho com a melhor métrica (menor FD) — rota principal instalada na tabela de roteamento</td>
+                <td>A rota principal (GPS primário)</td>
+              </tr>
+              <tr>
+                <td><strong>Feasible Successor (FS)</strong></td>
+                <td>Vizinho alternativo que satisfaz a Feasibility Condition — rota de backup pré-qualificada</td>
+                <td>A rota de backup já validada (GPS alternativo pronto para uso)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Feasibility Condition (Condição de Viabilidade)</h3>
+          <p>A <strong>Feasibility Condition</strong> é a regra que determina se um vizinho alternativo pode ser considerado Feasible Successor (backup confiável sem loops):</p>
+
+          <div class="info-box highlight">
+            <h4>📐 Regra da Feasibility Condition</h4>
+            <p><strong>RD do vizinho alternativo &lt; FD do Successor atual</strong></p>
+            <p>Se a Reported Distance (RD) de um vizinho alternativo for MENOR que a Feasible Distance (FD) do Successor atual, esse vizinho é garantido livre de loops e pode ser Feasible Successor.</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplo Prático de Successor e Feasible Successor</h4>
+            <pre><code>! Rede destino: 10.0.0.0/24
+! R1 tem 3 vizinhos que conhecem rotas para 10.0.0.0/24:
+!
+! Vizinho R2: RD=20, custo R1→R2=10, FD via R2 = 20+10 = 30
+! Vizinho R3: RD=25, custo R1→R3=15, FD via R3 = 25+15 = 40
+! Vizinho R4: RD=35, custo R1→R4=5,  FD via R4 = 35+5  = 40
+!
+! Successor: R2 (menor FD = 30) → instalado na tabela de roteamento
+! FD atual = 30
+!
+! Feasibility Condition para FS:
+! R3: RD(25) < FD(30)? SIM → R3 é Feasible Successor ✓
+! R4: RD(35) < FD(30)? NÃO → R4 NÃO é Feasible Successor ✗
+!
+! Se R2 (Successor) cair:
+! R1 promove R3 (Feasible Successor) INSTANTANEAMENTE — sem recálculo!
+! → Convergência em milissegundos!
+!
+! Se não houvesse FS, R1 entraria em estado ACTIVE e enviaria queries
+! aos vizinhos (processo mais lento — segundos)
+
+! Verificar topology table:
+Router# show ip eigrp topology
+P 10.0.0.0/24, 1 successors, FD is 30
+        via 10.1.12.2 (30/20), Serial0/0/0        ← Successor
+        via 10.1.13.3 (40/25), GigabitEthernet0/0  ← Feasible Successor
+!                      ^   ^
+!                     FD  RD</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Métrica Composta do EIGRP</h3>
+          <p>O EIGRP usa uma métrica composta baseada em múltiplos parâmetros do link (por padrão, apenas bandwidth e delay):</p>
+
+          <div class="info-box highlight">
+            <h4>📐 Fórmula da Métrica EIGRP (Padrão: K1=1, K2=0, K3=1, K4=0, K5=0)</h4>
+            <p><strong>Métrica = 256 × [(10⁷ ÷ BW_mínima) + (soma_delays ÷ 10)]</strong></p>
+            <p>Onde:<br>
+            • BW_mínima = menor bandwidth (em Kbps) no caminho inteiro<br>
+            • soma_delays = soma de todos os delays (em μs) das interfaces no caminho<br>
+            • O fator 256 é multiplicador de escala</p>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Parâmetro K</th>
+                <th>Componente</th>
+                <th>Padrão</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>K1</strong></td><td>Bandwidth</td><td>1 (ativo)</td><td>Menor bandwidth no caminho</td></tr>
+              <tr><td><strong>K2</strong></td><td>Load</td><td>0 (inativo)</td><td>Carga atual da interface (instável, evitar)</td></tr>
+              <tr><td><strong>K3</strong></td><td>Delay</td><td>1 (ativo)</td><td>Soma dos delays acumulados</td></tr>
+              <tr><td><strong>K4</strong></td><td>Reliability</td><td>0 (inativo)</td><td>Confiabilidade do link</td></tr>
+              <tr><td><strong>K5</strong></td><td>MTU</td><td>0 (inativo)</td><td>Maximum Transmission Unit</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box warning">
+            <h4>⚠️ K values DEVEM ser iguais entre vizinhos</h4>
+            <p>Se os valores K forem diferentes entre dois vizinhos EIGRP, a adjacência NÃO será formada. Isso é um requisito obrigatório. Na prática, quase nunca se alteram os valores K padrão (K1=K3=1, resto=0).</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Configuração do EIGRP (Classic e Named Mode)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração EIGRP Classic Mode</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! EIGRP Classic (modo tradicional)
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router eigrp 100
+!                             ^^^
+!              AS Number (DEVE ser igual em todos os roteadores do domínio!)
+
+! Anunciar redes (usa wildcard mask como OSPF):
+Router(config-router)# network 192.168.1.0 0.0.0.255
+Router(config-router)# network 10.0.0.0 0.0.0.3
+
+! Desabilitar auto-summary (CRÍTICO para VLSM):
+Router(config-router)# no auto-summary
+
+! Passive interface:
+Router(config-router)# passive-interface GigabitEthernet0/1
+
+! Definir Router ID:
+Router(config-router)# eigrp router-id 1.1.1.1
+
+! Balanceamento de carga desigual (variance):
+Router(config-router)# variance 2
+! ↑ Permite caminhos com FD até 2x a FD do Successor
+! Ex: FD do Successor = 30 → aceita caminhos com FD até 60</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração EIGRP Named Mode (Recomendado — IOS 15.0+)</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! EIGRP Named Mode (moderno, hierárquico)
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router eigrp EMPRESA
+!                             ^^^^^^^
+!              Nome do processo (pode ser qualquer string)
+
+Router(config-router)# address-family ipv4 unicast autonomous-system 100
+Router(config-router-af)# network 192.168.1.0 0.0.0.255
+Router(config-router-af)# network 10.0.0.0 0.0.0.3
+Router(config-router-af)# eigrp router-id 1.1.1.1
+
+! Topology base (sub-modo para ajustes de roteamento):
+Router(config-router-af)# topology base
+Router(config-router-af-topology)# variance 2
+Router(config-router-af-topology)# redistribute static
+
+! Interface-specific settings:
+Router(config-router-af)# af-interface GigabitEthernet0/0
+Router(config-router-af-if)# passive-interface
+Router(config-router-af-if)# exit
+
+Router(config-router-af)# af-interface Serial0/0/0
+Router(config-router-af-if)# hello-interval 5
+Router(config-router-af-if)# hold-time 15
+Router(config-router-af-if)# authentication mode md5
+Router(config-router-af-if)# authentication key-chain EIGRP_KEY
+
+! IPv6 (no mesmo processo Named Mode):
+Router(config-router)# address-family ipv6 unicast autonomous-system 100
+Router(config-router-af)# eigrp router-id 1.1.1.1</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.6 — Verificação e Troubleshooting EIGRP</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Comandos de Verificação EIGRP</h4>
+            <pre><code>! Verificar vizinhos EIGRP:
+Router# show ip eigrp neighbors
+H   Address                 Interface              Hold Uptime   SRTT   RTO  Q  Seq
+                                                   (sec)         (ms)       Cnt Num
+0   192.168.1.2             Gi0/0                    12 01:30:00   10   100  0  45
+1   10.0.0.2                Se0/0/0                  14 02:00:00   25   200  0  38
+
+! Verificar tabela de topologia:
+Router# show ip eigrp topology
+! P = Passive (estável), A = Active (em recálculo)
+P 10.0.1.0/24, 1 successors, FD is 2170112
+        via 192.168.1.2 (2170112/28160), GigabitEthernet0/0
+        via 10.0.0.2 (2681856/2169856), Serial0/0/0
+
+! Verificar rotas EIGRP na tabela de roteamento:
+Router# show ip route eigrp
+D     10.0.1.0/24 [90/2170112] via 192.168.1.2, 01:30:00, GigabitEthernet0/0
+
+! Verificar interfaces e métricas:
+Router# show ip eigrp interfaces
+Router# show ip eigrp interfaces detail
+
+! Verificar protocolos:
+Router# show ip protocols
+! Mostra: AS number, K values, redes anunciadas, redistribuição, variance</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.7 — EIGRP vs OSPF: Comparação Detalhada</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>EIGRP</th>
+                <th>OSPF</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Tipo de algoritmo</td><td>Advanced Distance Vector (DUAL)</td><td>Link-State (Dijkstra SPF)</td></tr>
+              <tr><td>AD padrão</td><td>90 (interno), 170 (externo)</td><td>110</td></tr>
+              <tr><td>Convergência</td><td>Muito rápida (FS pronto)</td><td>Rápida (recalcula SPF)</td></tr>
+              <tr><td>Métrica</td><td>Composta (BW + Delay)</td><td>Custo (Reference BW / Interface BW)</td></tr>
+              <tr><td>Hierarquia</td><td>Flat (sem áreas obrigatórias)</td><td>Áreas obrigatórias (Área 0)</td></tr>
+              <tr><td>Multi-vendor</td><td>Limitado (predominantemente Cisco)</td><td>Padrão aberto (RFC 2328)</td></tr>
+              <tr><td>Balanceamento desigual</td><td>Sim (variance)</td><td>Não (apenas ECMP)</td></tr>
+              <tr><td>Uso de memória</td><td>Moderado (topology table)</td><td>Alto (LSDB completo)</td></tr>
+              <tr><td>Complexidade</td><td>Menor (configuração mais simples)</td><td>Maior (design de áreas)</td></tr>
+              <tr><td>Protocolo de transporte</td><td>IP Protocol 88 (RTP)</td><td>IP Protocol 89</td></tr>
+              <tr><td>Multicast</td><td>224.0.0.10</td><td>224.0.0.5 e 224.0.0.6</td></tr>
+              <tr><td>Recomendação</td><td>Redes 100% Cisco de porte médio</td><td>Redes multi-vendor ou grandes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8 — BGP (Border Gateway Protocol)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>BGP — Border Gateway Protocol</h2>
+          <p>Conheça o protocolo que mantém a Internet funcionando. Entenda Sistemas Autônomos, iBGP vs eBGP, atributos de caminho, algoritmo de seleção de melhor rota e como o BGP é utilizado em ambientes cloud com AWS Direct Connect e VPN.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 — O que é BGP e Quando Usá-lo</h3>
+          <p>O <strong>BGP (Border Gateway Protocol)</strong> é o único protocolo EGP (Exterior Gateway Protocol) em uso na Internet moderna. Ele é responsável por rotear tráfego entre Sistemas Autônomos (AS) — ou seja, entre diferentes organizações, ISPs e provedores de conteúdo.</p>
+
+          <p><strong>Quando usar BGP:</strong></p>
+          <ul>
+            <li><strong>Conexão com ISPs:</strong> Quando sua organização se conecta a um ou mais provedores de Internet</li>
+            <li><strong>Multi-homing:</strong> Conexão com múltiplos ISPs para redundância e load balancing</li>
+            <li><strong>Trânsito de tráfego:</strong> Se você é um ISP ou provê trânsito entre ASs</li>
+            <li><strong>Internet Exchange Points (IXPs):</strong> Peering direto com outras organizações</li>
+            <li><strong>Cloud connectivity:</strong> AWS Direct Connect, Azure ExpressRoute, Google Cloud Interconnect</li>
+            <li><strong>Redes de grande escala:</strong> Data centers com milhares de rotas e políticas complexas</li>
+          </ul>
+
+          <div class="info-box warning">
+            <h4>⚠️ BGP NÃO é para Roteamento Interno</h4>
+            <p>Um erro comum de estudantes é pensar que BGP substitui OSPF/EIGRP dentro de uma rede corporativa. <strong>ERRADO!</strong> BGP é para interconexão ENTRE organizações. Internamente, use OSPF ou EIGRP. BGP não otimiza caminhos por desempenho — ele usa políticas. Uma exceção são grandes data centers que usam iBGP internamente (design de spine-leaf), mas isso é um caso especializado.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 — iBGP vs eBGP</h3>
+          <p>O BGP opera em dois modos dependendo da relação entre os peers (vizinhos):</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🌍 eBGP (External BGP)</h4>
+              <p>Sessão entre roteadores em <strong>ASs diferentes</strong>.</p>
+              <ul>
+                <li>AD padrão: <strong>20</strong> (mais confiável que IGPs)</li>
+                <li>TTL padrão: 1 (peers devem ser diretamente conectados)</li>
+                <li>Next-hop: muda para o IP do peer eBGP</li>
+                <li>AS-Path: AS do vizinho é adicionado</li>
+                <li>Uso: interconexão com ISPs, peering</li>
+              </ul>
+            </div>
+            <div class="command-card">
+              <h4>🏢 iBGP (Internal BGP)</h4>
+              <p>Sessão entre roteadores no <strong>mesmo AS</strong>.</p>
+              <ul>
+                <li>AD padrão: <strong>200</strong> (menos confiável que IGPs)</li>
+                <li>TTL padrão: 255 (peers podem não ser diretos)</li>
+                <li>Next-hop: NÃO muda por padrão (precisa de next-hop-self)</li>
+                <li>AS-Path: NÃO modifica (loop prevention diferente)</li>
+                <li>Uso: propagar rotas externas internamente</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Split Horizon no iBGP</h4>
+            <p>O iBGP tem uma regra anti-loop importante: <strong>rotas aprendidas de um peer iBGP NÃO são anunciadas para outros peers iBGP.</strong> Isso exige que todo roteador iBGP faça peering com TODOS os outros (full mesh) — ou use Route Reflectors / Confederations para escalar.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 — Sistemas Autônomos (AS Numbers)</h3>
+          <p>Cada organização que participa do roteamento BGP na Internet recebe um <strong>ASN (Autonomous System Number)</strong> único:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>ASN 16-bit</th>
+                <th>ASN 32-bit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Faixa</td><td>1 — 65535</td><td>65536 — 4294967295</td></tr>
+              <tr><td>Privados</td><td>64512 — 65534</td><td>4200000000 — 4294967294</td></tr>
+              <tr><td>Notação 32-bit</td><td>—</td><td>X.Y (ex: 1.15 = 65551)</td></tr>
+              <tr><td>Alocação</td><td>IANA → RIRs (LACNIC, ARIN, etc.)</td><td>Mesmo processo</td></tr>
+            </tbody>
+          </table>
+
+          <p><strong>Exemplos de ASNs reais:</strong></p>
+          <ul>
+            <li>Google: AS 15169</li>
+            <li>Amazon/AWS: AS 16509</li>
+            <li>Cloudflare: AS 13335</li>
+            <li>Microsoft/Azure: AS 8075</li>
+            <li>Netflix: AS 2906</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 — Path Attributes (Atributos de Caminho)</h3>
+          <p>Diferente de IGPs que usam uma métrica numérica simples, o BGP usa <strong>Path Attributes</strong> — um conjunto de atributos associados a cada rota que influenciam a seleção do melhor caminho:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Atributo</th>
+                <th>Categoria</th>
+                <th>Descrição</th>
+                <th>Manipulação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Weight</strong></td>
+                <td>Cisco-specific (local)</td>
+                <td>Preferência local do roteador. Maior = preferido. NÃO propagado</td>
+                <td>Forçar escolha de ISP específico localmente</td>
+              </tr>
+              <tr>
+                <td><strong>Local Preference</strong></td>
+                <td>Well-known Discretionary</td>
+                <td>Preferência dentro do AS. Maior = preferido. Propagado via iBGP</td>
+                <td>Definir ISP preferido para todo o AS</td>
+              </tr>
+              <tr>
+                <td><strong>AS-Path</strong></td>
+                <td>Well-known Mandatory</td>
+                <td>Lista de ASs que a rota atravessa. Menor = preferido. Loop prevention</td>
+                <td>AS-Path prepending (adicionar ASs para tornar caminho menos atrativo)</td>
+              </tr>
+              <tr>
+                <td><strong>Origin</strong></td>
+                <td>Well-known Mandatory</td>
+                <td>Como a rota foi originada: i (IGP) > e (EGP) > ? (incomplete)</td>
+                <td>Raramente manipulado</td>
+              </tr>
+              <tr>
+                <td><strong>MED (Multi-Exit Discriminator)</strong></td>
+                <td>Optional Non-Transitive</td>
+                <td>Sugestão ao vizinho sobre qual link usar para entrar no AS. Menor = preferido</td>
+                <td>Influenciar como tráfego ENTRA no seu AS</td>
+              </tr>
+              <tr>
+                <td><strong>Next-Hop</strong></td>
+                <td>Well-known Mandatory</td>
+                <td>IP do próximo salto para alcançar o destino</td>
+                <td>next-hop-self (iBGP), next-hop unchanged</td>
+              </tr>
+              <tr>
+                <td><strong>Community</strong></td>
+                <td>Optional Transitive</td>
+                <td>Tags para agrupar rotas e aplicar políticas em lote</td>
+                <td>Sinalizar ações ao ISP (no-export, no-advertise, etc.)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.5 — Algoritmo de Seleção do Melhor Caminho BGP</h3>
+          <p>Quando o BGP recebe múltiplos caminhos para o mesmo prefixo, ele aplica o seguinte algoritmo de seleção (em ordem de prioridade):</p>
+
+          <ol>
+            <li><strong>Maior Weight</strong> (Cisco-specific, local ao roteador)</li>
+            <li><strong>Maior Local Preference</strong> (propagado dentro do AS)</li>
+            <li><strong>Rota originada localmente</strong> (network ou redistribute)</li>
+            <li><strong>Menor AS-Path length</strong> (menos ASs no caminho)</li>
+            <li><strong>Menor Origin type</strong> (i > e > ?)</li>
+            <li><strong>Menor MED</strong> (comparado apenas entre rotas do mesmo AS vizinho)</li>
+            <li><strong>eBGP preferido sobre iBGP</strong></li>
+            <li><strong>Menor IGP metric para next-hop</strong></li>
+            <li><strong>Rota mais antiga</strong> (eBGP — estabilidade)</li>
+            <li><strong>Menor Router ID do peer</strong></li>
+            <li><strong>Menor neighbor IP address</strong></li>
+          </ol>
+
+          <div class="info-box highlight">
+            <h4>💡 Mnemônico para Best Path: "We Love Oranges AS Oranges Mean Pure Refreshment"</h4>
+            <p><strong>W</strong>eight → <strong>L</strong>ocal Preference → <strong>O</strong>riginate locally → <strong>AS</strong>-Path → <strong>O</strong>rigin → <strong>M</strong>ED → <strong>P</strong>ath type (eBGP>iBGP) → <strong>R</strong>outer ID. Na prática, a maioria das decisões é resolvida nos 4 primeiros critérios.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.6 — Configuração Básica de eBGP</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração eBGP — Peering com ISP</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! Cenário: Empresa (AS 65001) conectando ao ISP (AS 65000)
+! Link: 203.0.113.0/30
+! Empresa: 203.0.113.2 (nosso roteador)
+! ISP: 203.0.113.1 (roteador do ISP)
+! Rede interna da empresa: 198.51.100.0/24
+! ═══════════════════════════════════════════════════════════════
+
+! Configuração no roteador da empresa:
+Router(config)# router bgp 65001
+!                          ^^^^^
+!              Nosso AS number
+
+! Router ID (recomendado):
+Router(config-router)# bgp router-id 1.1.1.1
+
+! Definir vizinho eBGP (ISP):
+Router(config-router)# neighbor 203.0.113.1 remote-as 65000
+!                               ^^^^^^^^^^^           ^^^^^
+!                            IP do peer ISP         AS do ISP
+
+! Anunciar nossa rede para o ISP:
+Router(config-router)# network 198.51.100.0 mask 255.255.255.0
+! NOTA: A rede DEVE existir na tabela de roteamento (rota exata) para ser anunciada!
+
+! Opcional: next-hop-self para peers iBGP internos:
+Router(config-router)# neighbor 10.0.0.2 remote-as 65001
+Router(config-router)# neighbor 10.0.0.2 next-hop-self
+
+! ═══════════════════════════════════════════════════════════════
+! Verificação
+! ═══════════════════════════════════════════════════════════════
+Router# show ip bgp summary
+! Estado: Established = sessão UP, Active/Idle = problema
+
+Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+203.0.113.1     4 65000    1520    1480        5    0    0 01:30:00        3
+
+Router# show ip bgp
+! Mostra todas as rotas BGP com atributos
+
+Router# show ip bgp neighbors 203.0.113.1
+! Detalhes da sessão com o peer específico
+
+Router# show ip route bgp
+! Rotas BGP instaladas na tabela de roteamento</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.7 — BGP em Ambientes Cloud</h3>
+          <p>O BGP é amplamente utilizado em conectividade cloud para troca dinâmica de rotas entre sua rede on-premises e os provedores de nuvem:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>☁️ AWS Direct Connect + BGP</h4>
+              <ul>
+                <li>Direct Connect usa BGP para trocar rotas entre seu data center e VPCs na AWS</li>
+                <li>Você anuncia seus prefixos on-premises via BGP para a AWS</li>
+                <li>A AWS anuncia os CIDRs das suas VPCs de volta</li>
+                <li>AS privado comum: 64512-65534</li>
+                <li>AWS usa AS 7224 (público) ou AS privado (64512)</li>
+                <li>Suporta BGP communities para controle de propagação</li>
+              </ul>
+            </div>
+            <div class="command-card">
+              <h4>☁️ Azure ExpressRoute + BGP</h4>
+              <ul>
+                <li>ExpressRoute usa BGP para anúncio dinâmico de rotas</li>
+                <li>Microsoft peering: acesso a serviços Microsoft (O365, etc.)</li>
+                <li>Private peering: acesso a VNets do Azure</li>
+                <li>AS da Microsoft: 12076</li>
+                <li>Suporta BGP communities para identificar região Azure</li>
+                <li>Route filters controlam quais prefixos são aceitos</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 BGP em VPN Site-to-Site (AWS)</h4>
+            <p>Ao criar uma VPN Site-to-Site na AWS com roteamento dinâmico, a AWS estabelece sessões BGP com seu Customer Gateway. A AWS usa AS 64512 (padrão) e você configura seu AS. As rotas da VPC são automaticamente anunciadas e rotas do seu site são propagadas para a VPC route table (com route propagation habilitado).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9 — REDISTRIBUIÇÃO DE ROTAS E ROUTE MAPS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 9</span>
+          <h2>Redistribuição de Rotas e Route Maps</h2>
+          <p>Aprenda a integrar diferentes domínios de roteamento através da redistribuição de rotas. Domine route maps para filtragem e manipulação granular de rotas, prefix lists para controle preciso de prefixos e as melhores práticas para evitar loops e instabilidade.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 — Quando a Redistribuição é Necessária</h3>
+          <p>A <strong>redistribuição de rotas</strong> é o processo de injetar rotas de um protocolo de roteamento em outro. Ela é necessária quando sua rede usa múltiplos protocolos de roteamento simultaneamente:</p>
+
+          <ul>
+            <li><strong>Fusões e aquisições:</strong> Empresa A usa OSPF, empresa B usa EIGRP — após a fusão, ambos precisam se comunicar</li>
+            <li><strong>Migração gradual:</strong> Transição de RIP para OSPF, onde ambos coexistem temporariamente</li>
+            <li><strong>Requisitos de design:</strong> Diferentes departamentos usando diferentes protocolos por razões técnicas</li>
+            <li><strong>Conectividade com rotas estáticas:</strong> Injetar rotas estáticas em OSPF para que toda a rede conheça</li>
+            <li><strong>Integração com BGP:</strong> Redistribuir rotas internas (OSPF) para BGP e vice-versa</li>
+            <li><strong>Ambientes multi-vendor:</strong> Dispositivos que não suportam o mesmo protocolo</li>
+          </ul>
+
+          <div class="info-box warning">
+            <h4>⚠️ Redistribuição é uma Operação de RISCO</h4>
+            <p>Redistribuição mal configurada pode causar: <strong>loops de roteamento</strong>, <strong>rotas subótimas</strong>, <strong>instabilidade na rede</strong> e <strong>black holes</strong>. Sempre use route maps ou prefix lists para filtrar e controlar exatamente quais rotas são redistribuídas. Nunca faça redistribuição "aberta" (sem filtros) em produção!</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 — Redistribuição entre Protocolos</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplos de Redistribuição</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! REDISTRIBUIÇÃO: Rotas Estáticas → OSPF
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router ospf 1
+Router(config-router)# redistribute static subnets
+! "subnets" é OBRIGATÓRIO no OSPF para redistribuir redes com sub-redes
+! Sem "subnets", apenas redes classful são redistribuídas
+
+! Com métrica e tipo específicos:
+Router(config-router)# redistribute static metric 100 metric-type 1 subnets
+!                                            ^^^            ^
+!                               custo OSPF atribuído    E1 (acumulativo) vs E2 (fixo)
+
+! ═══════════════════════════════════════════════════════════════
+! REDISTRIBUIÇÃO: EIGRP → OSPF
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router ospf 1
+Router(config-router)# redistribute eigrp 100 metric 50 metric-type 1 subnets
+
+! ═══════════════════════════════════════════════════════════════
+! REDISTRIBUIÇÃO: OSPF → EIGRP
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router eigrp 100
+Router(config-router)# redistribute ospf 1 metric 10000 100 255 1 1500
+!                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+!                                    bandwidth delay reliability load MTU
+! EIGRP EXIGE seed metric ao redistribuir (caso contrário, métrica = infinity)
+
+! ═══════════════════════════════════════════════════════════════
+! REDISTRIBUIÇÃO: Conectadas → OSPF
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router ospf 1
+Router(config-router)# redistribute connected subnets
+
+! ═══════════════════════════════════════════════════════════════
+! REDISTRIBUIÇÃO: OSPF → BGP
+! ═══════════════════════════════════════════════════════════════
+Router(config)# router bgp 65001
+Router(config-router)# redistribute ospf 1 match internal external 1 external 2</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 — Route Maps: Filtragem e Manipulação</h3>
+          <p><strong>Route maps</strong> são a ferramenta mais poderosa para controlar redistribuição. Funcionam como "if-then-else" para rotas — combinam condições (match) com ações (set):</p>
+
+          <div class="command-card wide">
+            <h4>📋 Estrutura e Uso de Route Maps</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! CRIANDO UM ROUTE MAP
+! ═══════════════════════════════════════════════════════════════
+! Estrutura: route-map NOME {permit|deny} SEQUÊNCIA
+!
+! permit = se match, aplica a rota (com modificações do set)
+! deny = se match, bloqueia a rota
+! Sequências são avaliadas em ordem (menor primeiro)
+! Se nenhuma sequência faz match, a rota é NEGADA (implicit deny)
+
+! Exemplo: Redistribuir OSPF→EIGRP apenas rotas 10.x.x.x com métrica específica:
+
+! Passo 1: Criar ACL ou prefix-list para match:
+Router(config)# ip prefix-list REDES_10 permit 10.0.0.0/8 le 24
+! Permite prefixos 10.x.x.x com máscara de /8 até /24
+
+! Passo 2: Criar route-map:
+Router(config)# route-map OSPF_PARA_EIGRP permit 10
+Router(config-route-map)# match ip address prefix-list REDES_10
+Router(config-route-map)# set metric 10000 100 255 1 1500
+Router(config-route-map)# set tag 100
+
+! Sequência 20: bloquear tudo que não combinou (explícito para clareza):
+Router(config)# route-map OSPF_PARA_EIGRP deny 20
+! ↑ Sem match = combina com tudo restante → deny
+
+! Passo 3: Aplicar na redistribuição:
+Router(config)# router eigrp 100
+Router(config-router)# redistribute ospf 1 route-map OSPF_PARA_EIGRP
+
+! ═══════════════════════════════════════════════════════════════
+! COMANDOS MATCH COMUNS
+! ═══════════════════════════════════════════════════════════════
+! match ip address <ACL ou prefix-list>    → Filtra por prefixo de destino
+! match ip address prefix-list <nome>      → Filtra por prefixo (mais preciso)
+! match metric <valor>                     → Filtra por métrica do protocolo origem
+! match tag <valor>                        → Filtra por tag (útil para evitar loops)
+! match route-type <internal|external>     → Filtra por tipo de rota OSPF
+! match interface <interface>              → Filtra por interface de saída
+
+! ═══════════════════════════════════════════════════════════════
+! COMANDOS SET COMUNS
+! ═══════════════════════════════════════════════════════════════
+! set metric <valor>                       → Define métrica no protocolo destino
+! set metric-type type-1                   → Define tipo OSPF (E1 vs E2)
+! set tag <valor>                          → Adiciona tag para controle de loops
+! set local-preference <valor>             → Manipula BGP local-pref
+! set as-path prepend <ASNs>              → Adiciona ASs ao AS-Path (BGP)
+! set community <valor>                    → Define BGP community</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 — Prefix Lists</h3>
+          <p><strong>Prefix lists</strong> são a forma mais eficiente e precisa de filtrar rotas por prefixo IP. Superiores às ACLs para esse propósito:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configurando Prefix Lists</h4>
+            <pre><code>! Sintaxe: ip prefix-list NOME {permit|deny} REDE/MÁSCARA [ge MIN] [le MAX]
+!
+! ge (greater or equal) = máscara mínima aceita
+! le (less or equal) = máscara máxima aceita
+
+! Permitir exatamente 192.168.1.0/24:
+ip prefix-list EXATA permit 192.168.1.0/24
+
+! Permitir qualquer sub-rede de 10.0.0.0/8 com máscara entre /16 e /24:
+ip prefix-list FAIXA permit 10.0.0.0/8 ge 16 le 24
+! Aceita: 10.1.0.0/16, 10.1.1.0/24, 10.255.0.0/16
+! Rejeita: 10.0.0.0/8 (máscara < 16), 10.1.1.0/25 (máscara > 24)
+
+! Permitir default route apenas:
+ip prefix-list DEFAULT permit 0.0.0.0/0
+
+! Permitir TODAS as rotas (wildcard):
+ip prefix-list TODAS permit 0.0.0.0/0 le 32
+
+! Negar redes RFC1918 e permitir o resto:
+ip prefix-list NO_RFC1918 deny 10.0.0.0/8 le 32
+ip prefix-list NO_RFC1918 deny 172.16.0.0/12 le 32
+ip prefix-list NO_RFC1918 deny 192.168.0.0/16 le 32
+ip prefix-list NO_RFC1918 permit 0.0.0.0/0 le 32
+
+! Verificação:
+Router# show ip prefix-list
+Router# show ip prefix-list detail
+Router# show ip prefix-list NOME</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.5 — Riscos e Melhores Práticas de Redistribuição</h3>
+
+          <div class="info-box warning">
+            <h4>⚠️ Problemas Comuns na Redistribuição</h4>
+            <ul>
+              <li><strong>Loops de redistribuição:</strong> Rota vai de OSPF→EIGRP, depois volta EIGRP→OSPF com AD melhor, causando loop. Solução: use tags para identificar rotas redistribuídas e filtrá-las</li>
+              <li><strong>Suboptimal routing:</strong> Uma rota redistribuída pode ter AD menor que a rota original no outro protocolo, causando caminhos subótimos</li>
+              <li><strong>Métrica seed incorreta:</strong> No EIGRP, se não especificar seed metric, rotas redistribuídas ficam com métrica infinita e não são usadas</li>
+              <li><strong>Falta do keyword "subnets":</strong> No OSPF, sem "subnets", apenas redes classful são redistribuídas — sub-redes são ignoradas silenciosamente</li>
+            </ul>
+          </div>
+
+          <p><strong>Melhores práticas:</strong></p>
+          <ul>
+            <li>Sempre use route maps com prefix lists para controlar redistribuição</li>
+            <li>Use tags para marcar rotas redistribuídas e evitar "redistribuição reversa"</li>
+            <li>Documente todos os pontos de redistribuição no diagrama de rede</li>
+            <li>Minimize os pontos de redistribuição (idealmente apenas 2 para redundância)</li>
+            <li>Teste em ambiente de lab antes de implementar em produção</li>
+            <li>Monitore a tabela de roteamento após cada mudança</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 10 — NAT (Network Address Translation)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 10</span>
+          <h2>NAT — Network Address Translation</h2>
+          <p>Compreenda como o NAT permite que redes privadas acessem a Internet, os diferentes tipos (estático, dinâmico, PAT/overload), a terminologia inside/outside e como configurar e troubleshootar NAT em ambientes corporativos e cloud.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.1 — Por que o NAT Existe (Exaustão do IPv4)</h3>
+          <p>O IPv4 possui apenas ~4,3 bilhões de endereços (2³²). Com bilhões de dispositivos conectados, os endereços públicos esgotaram-se. O <strong>NAT (Network Address Translation)</strong> foi a solução paliativa que permitiu a Internet continuar crescendo:</p>
+
+          <ul>
+            <li><strong>Endereços privados (RFC 1918)</strong> são usados internamente: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16</li>
+            <li>Esses endereços NÃO são roteáveis na Internet</li>
+            <li>O NAT traduz endereços privados em um (ou poucos) endereço público na saída para Internet</li>
+            <li>Milhares de dispositivos podem compartilhar um único IP público via PAT</li>
+          </ul>
+
+          <p><strong>Benefícios adicionais do NAT:</strong></p>
+          <ul>
+            <li><strong>Conservação de IPs públicos:</strong> Uma organização com 1000 hosts pode usar apenas 1-5 IPs públicos</li>
+            <li><strong>Segurança por obscuridade:</strong> Dispositivos internos não são diretamente acessíveis da Internet</li>
+            <li><strong>Flexibilidade de endereçamento:</strong> Mudança de ISP não exige reendereçar toda a rede interna</li>
+            <li><strong>Resolução de conflitos:</strong> Quando duas redes com o mesmo endereçamento precisam se comunicar</li>
+          </ul>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.2 — Terminologia NAT: Inside/Outside, Local/Global</h3>
+          <p>O NAT usa uma terminologia específica que causa confusão. Vamos esclarecer:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Termo</th>
+                <th>Definição</th>
+                <th>Exemplo Típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Inside Local</strong></td>
+                <td>IP do host interno ANTES da tradução (IP privado original)</td>
+                <td>192.168.1.100</td>
+              </tr>
+              <tr>
+                <td><strong>Inside Global</strong></td>
+                <td>IP do host interno APÓS a tradução (IP público visto pela Internet)</td>
+                <td>203.0.113.50</td>
+              </tr>
+              <tr>
+                <td><strong>Outside Local</strong></td>
+                <td>IP do host externo como visto pela rede interna</td>
+                <td>8.8.8.8 (geralmente não traduzido)</td>
+              </tr>
+              <tr>
+                <td><strong>Outside Global</strong></td>
+                <td>IP real do host externo na Internet</td>
+                <td>8.8.8.8</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Simplificando a Terminologia</h4>
+            <p><strong>Inside</strong> = sua rede (privada). <strong>Outside</strong> = Internet (pública).<br>
+            <strong>Local</strong> = endereço como visto ANTES da tradução.<br>
+            <strong>Global</strong> = endereço como visto APÓS a tradução.<br>
+            Na maioria dos cenários, você só se preocupa com <strong>Inside Local</strong> (IP privado do host) e <strong>Inside Global</strong> (IP público traduzido).</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Definindo Interfaces Inside e Outside</h4>
+            <pre><code>! A interface voltada para a rede INTERNA:
+Router(config)# interface GigabitEthernet0/0
+Router(config-if)# ip nat inside
+
+! A interface voltada para a INTERNET (ISP):
+Router(config)# interface GigabitEthernet0/1
+Router(config-if)# ip nat outside
+
+! REGRA: O NAT acontece na "fronteira" entre inside e outside
+! Pacotes entrando pela interface "inside" com destino "outside" são traduzidos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.3 — NAT Estático (Static NAT)</h3>
+          <p>O <strong>NAT estático</strong> cria um mapeamento permanente 1:1 entre um IP interno e um IP público. Usado quando um servidor interno precisa ser acessível da Internet (web server, mail server, etc.):</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração de NAT Estático</h4>
+            <pre><code>! Cenário: Servidor web interno 192.168.1.100 precisa ser acessível
+! externamente como 203.0.113.50
+
+! Mapeamento estático:
+Router(config)# ip nat inside source static 192.168.1.100 203.0.113.50
+!                                            ^^^^^^^^^^^^^ ^^^^^^^^^^^^
+!                                         Inside Local    Inside Global
+
+! Interfaces:
+Router(config)# interface GigabitEthernet0/0
+Router(config-if)# ip address 192.168.1.1 255.255.255.0
+Router(config-if)# ip nat inside
+
+Router(config)# interface GigabitEthernet0/1
+Router(config-if)# ip address 203.0.113.1 255.255.255.0
+Router(config-if)# ip nat outside
+
+! Verificação:
+Router# show ip nat translations
+Pro Inside global      Inside local       Outside local      Outside global
+--- 203.0.113.50       192.168.1.100      ---                ---
+
+! NAT estático com porta específica (Port Forwarding):
+Router(config)# ip nat inside source static tcp 192.168.1.100 80 203.0.113.1 8080
+! Traduz: tráfego TCP porta 8080 no IP público → porta 80 no servidor interno</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.4 — NAT Dinâmico (Dynamic NAT)</h3>
+          <p>O <strong>NAT dinâmico</strong> traduz endereços internos para um pool de endereços públicos. O mapeamento é temporário e atribuído sob demanda:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração de NAT Dinâmico</h4>
+            <pre><code>! Pool de endereços públicos disponíveis:
+Router(config)# ip nat pool EMPRESA 203.0.113.10 203.0.113.20 netmask 255.255.255.0
+!                            ^^^^^^^ ^^^^^^^^^^^^^ ^^^^^^^^^^^^^
+!                         Nome pool   IP inicial    IP final (11 IPs disponíveis)
+
+! ACL definindo quais hosts internos podem ser traduzidos:
+Router(config)# access-list 10 permit 192.168.1.0 0.0.0.255
+
+! Vincular ACL ao pool:
+Router(config)# ip nat inside source list 10 pool EMPRESA
+
+! Resultado: hosts 192.168.1.x receberão IPs de 203.0.113.10 a .20 (máx 11 simultâneos)
+! Se todos os IPs do pool estiverem em uso → novos hosts são BLOQUEADOS (sem NAT)
+
+! Verificação:
+Router# show ip nat translations
+Router# show ip nat statistics
+  Total active translations: 5 (1 static, 4 dynamic; 4 extended)
+  Peak translations: 8, occurred 00:15:32 ago
+  Outside interfaces: GigabitEthernet0/1
+  Inside interfaces: GigabitEthernet0/0
+  Hits: 1543  Misses: 12
+  Pool EMPRESA: netmask 255.255.255.0
+    start 203.0.113.10 end 203.0.113.20
+    type generic, total addresses 11, allocated 4 (36%), misses 0</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.5 — PAT (Port Address Translation / NAT Overload)</h3>
+          <p>O <strong>PAT</strong> (também chamado NAT Overload) é o tipo mais comum de NAT. Permite que MILHARES de hosts internos compartilhem um ÚNICO IP público, diferenciando conexões por número de porta:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Configuração de PAT (Overload)</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! MÉTODO 1: PAT usando IP da interface externa (mais comum)
+! ═══════════════════════════════════════════════════════════════
+! ACL definindo hosts internos:
+Router(config)# access-list 10 permit 192.168.1.0 0.0.0.255
+Router(config)# access-list 10 permit 192.168.2.0 0.0.0.255
+
+! PAT com overload no IP da interface:
+Router(config)# ip nat inside source list 10 interface GigabitEthernet0/1 overload
+!                                                      ^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^
+!                                           Interface com IP público     KEYWORD CRITICAL!
+
+! ═══════════════════════════════════════════════════════════════
+! MÉTODO 2: PAT usando um pool (múltiplos IPs públicos)
+! ═══════════════════════════════════════════════════════════════
+Router(config)# ip nat pool PAT_POOL 203.0.113.10 203.0.113.12 netmask 255.255.255.0
+Router(config)# ip nat inside source list 10 pool PAT_POOL overload
+! 3 IPs × ~65000 portas cada = ~195.000 conexões simultâneas possíveis
+
+! ═══════════════════════════════════════════════════════════════
+! COMO FUNCIONA O PAT:
+! ═══════════════════════════════════════════════════════════════
+! Host A (192.168.1.10:50001) → Internet = 203.0.113.1:50001
+! Host B (192.168.1.20:50001) → Internet = 203.0.113.1:50002 (porta mudou!)
+! Host C (192.168.1.30:60000) → Internet = 203.0.113.1:60000
+!
+! O roteador mantém tabela de mapeamento:
+! Inside Local          Inside Global         Outside
+! 192.168.1.10:50001    203.0.113.1:50001     8.8.8.8:53
+! 192.168.1.20:50001    203.0.113.1:50002     8.8.8.8:53
+! 192.168.1.30:60000    203.0.113.1:60000     142.250.80.4:443
+
+! Verificação:
+Router# show ip nat translations
+Pro Inside global      Inside local       Outside local      Outside global
+tcp 203.0.113.1:50001  192.168.1.10:50001 8.8.8.8:53         8.8.8.8:53
+tcp 203.0.113.1:50002  192.168.1.20:50001 8.8.8.8:53         8.8.8.8:53
+tcp 203.0.113.1:60000  192.168.1.30:60000 142.250.80.4:443   142.250.80.4:443</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que PAT é o Mais Usado?</h4>
+            <p>PAT é usado em praticamente TODOS os roteadores domésticos e corporativos. Com um único IP público, você pode ter até ~65.000 conexões TCP e ~65.000 UDP simultâneas (na prática, mais, pois a combinação é IP+porta+protocolo+destino). Seu roteador Wi-Fi em casa usa PAT!</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.6 — Troubleshooting NAT</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Comandos de Verificação e Debug NAT</h4>
+            <pre><code>! Ver todas as traduções ativas:
+Router# show ip nat translations
+! Mostra: protocolo, inside global/local, outside global/local
+
+! Ver estatísticas do NAT:
+Router# show ip nat statistics
+! Mostra: hits, misses, pool usage, interfaces inside/outside
+
+! Limpar traduções (útil para troubleshooting):
+Router# clear ip nat translation *
+! CUIDADO: desconecta todas as sessões ativas!
+
+! Limpar tradução específica:
+Router# clear ip nat translation inside 192.168.1.10 203.0.113.50
+
+! Debug NAT (ver traduções em tempo real):
+Router# debug ip nat
+! Saída exemplo:
+! NAT*: s=192.168.1.10->203.0.113.1, d=8.8.8.8 [45123]
+! NAT*: s=8.8.8.8, d=203.0.113.1->192.168.1.10 [45123]
+
+! Verificar se interfaces estão marcadas corretamente:
+Router# show ip nat statistics
+  Outside interfaces: GigabitEthernet0/1
+  Inside interfaces: GigabitEthernet0/0
+
+! PROBLEMAS COMUNS:
+! 1. "ip nat inside" ou "ip nat outside" esquecido na interface
+! 2. ACL não corresponde aos hosts corretos (wildcard errada)
+! 3. Falta do keyword "overload" no PAT
+! 4. Pool esgotado (NAT dinâmico sem overload)
+! 5. Rota de retorno ausente (tráfego externo não sabe voltar)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.7 — NAT em Ambientes Cloud</h3>
+          <p>Os conceitos de NAT se aplicam diretamente em ambientes cloud, com serviços gerenciados:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>☁️ AWS — NAT Gateway</h4>
+              <ul>
+                <li><strong>NAT Gateway:</strong> Serviço gerenciado que permite instâncias em sub-redes privadas acessar a Internet</li>
+                <li>Funciona como PAT — traduz IPs privados para Elastic IP público</li>
+                <li>Suporta até 55.000 conexões simultâneas por destino</li>
+                <li>Altamente disponível dentro de uma AZ</li>
+                <li>Não permite tráfego de entrada (inbound) — para isso use ALB/NLB</li>
+                <li><strong>Elastic IP:</strong> Equivalente ao NAT estático (IP público fixo para instância)</li>
+              </ul>
+            </div>
+            <div class="command-card">
+              <h4>☁️ Azure — NAT Gateway</h4>
+              <ul>
+                <li><strong>Azure NAT Gateway:</strong> Serviço gerenciado para outbound connectivity</li>
+                <li>Associado a sub-redes específicas da VNet</li>
+                <li>Usa Public IP ou Public IP Prefix</li>
+                <li>Suporta até 64.000 conexões SNAT por IP</li>
+                <li>Idle timeout configurável (4-120 minutos)</li>
+                <li>Substitui SNAT implícito do Load Balancer</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.8 — IPv6 e o Futuro sem NAT</h3>
+          <p>Com o IPv6 (2¹²⁸ endereços = 340 undecilhões), o NAT torna-se <strong>desnecessário</strong> para conservação de endereços. Cada dispositivo pode ter um IP público globalmente único:</p>
+
+          <ul>
+            <li><strong>IPv6 elimina a necessidade de NAT para conservação de endereços</strong></li>
+            <li>End-to-end connectivity é restaurada (princípio original da Internet)</li>
+            <li>Firewalls continuam necessários para segurança (NAT ≠ firewall)</li>
+            <li><strong>NPTv6 (Network Prefix Translation):</strong> Existe para IPv6, mas traduz apenas prefixos (não portas) — usado para multihoming e renumbering, não para "esconder" hosts</li>
+            <li>NAT64: Tradução entre IPv6 e IPv4 durante período de transição</li>
+            <li>Na prática, muitas redes IPv6 ainda usam ULA (Unique Local Addresses) + NAT66 por inércia, embora não seja recomendado</li>
+          </ul>
+
+          <div class="info-box highlight">
+            <h4>💡 IPv6 em Cloud</h4>
+            <p>AWS e Azure oferecem suporte nativo a IPv6 em VPCs/VNets. Com IPv6, instâncias podem ter endereços globais públicos diretamente — sem necessidade de NAT Gateway para comunicação outbound. O Egress-only Internet Gateway (AWS) filtra tráfego inbound enquanto permite outbound — funcionalidade de firewall stateful, não NAT.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 11 — ROTEAMENTO EM AMBIENTES CLOUD (AWS/AZURE)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 11</span>
+          <h2>Roteamento em Ambientes Cloud (AWS/Azure)</h2>
+          <p>Entenda como os conceitos de roteamento tradicionais se aplicam em ambientes de nuvem. Explore VPC Route Tables, Internet Gateways, NAT Gateways, Transit Gateways e as analogias entre roteamento físico e virtual.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.1 — VPC/VNet Route Tables</h3>
+          <p>Em ambientes cloud, as route tables funcionam de forma similar às tabelas de roteamento tradicionais, mas com algumas diferenças importantes:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>☁️ AWS VPC Route Table</h4>
+              <pre><code>Destination       Target           Status
+10.0.0.0/16       local            active
+0.0.0.0/0         igw-abc123       active
+172.16.0.0/16     pcx-def456       active
+192.168.0.0/16    tgw-ghi789       active
+10.1.0.0/16       vpn-gw-xyz       propagated</code></pre>
+              <ul>
+                <li><strong>local:</strong> Rota automática para comunicação dentro da VPC (como rota conectada)</li>
+                <li><strong>igw-:</strong> Internet Gateway (saída para Internet)</li>
+                <li><strong>nat-:</strong> NAT Gateway (sub-redes privadas)</li>
+                <li><strong>pcx-:</strong> VPC Peering Connection</li>
+                <li><strong>tgw-:</strong> Transit Gateway</li>
+                <li><strong>vgw-:</strong> Virtual Private Gateway (VPN/DX)</li>
+              </ul>
+            </div>
+            <div class="command-card">
+              <h4>☁️ Azure VNet Route Table (Effective Routes)</h4>
+              <pre><code>Source    Prefix          Next Hop Type        Next Hop
+Default   10.0.0.0/16     VNet                 —
+Default   0.0.0.0/0       Internet             —
+User      172.16.0.0/16   VNet Peering         —
+User      192.168.0.0/16  Virtual Appliance    10.0.1.4
+VPN GW    10.1.0.0/16     Virtual Network GW   —</code></pre>
+              <ul>
+                <li><strong>Default routes:</strong> Criadas automaticamente pelo Azure</li>
+                <li><strong>User routes:</strong> UDR (User-Defined Routes) criadas manualmente</li>
+                <li><strong>VPN GW / ExpressRoute:</strong> Propagadas dinamicamente via BGP</li>
+                <li><strong>Virtual Appliance:</strong> Encaminha para um NVA (Network Virtual Appliance)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Diferenças Chave: Cloud vs Físico</h4>
+            <p><strong>Longest prefix match:</strong> Funciona igualmente na cloud — rotas mais específicas vencem.<br>
+            <strong>Sem protocolos dinâmicos internos:</strong> Dentro de uma VPC/VNet, não há OSPF/EIGRP — o roteamento é gerenciado pelo provedor.<br>
+            <strong>Route propagation:</strong> Em vez de protocolos dinâmicos, rotas são "propagadas" automaticamente de VPN/Direct Connect gateways.<br>
+            <strong>Cada subnet tem sua route table:</strong> Equivalente a cada interface do roteador ter configurações diferentes.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.2 — Internet Gateway e NAT Gateway</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Função</th>
+                <th>Analogia Física</th>
+                <th>Direção</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Internet Gateway (IGW)</strong></td>
+                <td>Permite comunicação bidirecional com a Internet para instâncias com IP público</td>
+                <td>Interface WAN do roteador de borda conectada ao ISP</td>
+                <td>Inbound + Outbound</td>
+              </tr>
+              <tr>
+                <td><strong>NAT Gateway</strong></td>
+                <td>Permite apenas saída (outbound) para Internet a partir de sub-redes privadas</td>
+                <td>Roteador com PAT configurado (overload) em interface inside</td>
+                <td>Outbound apenas</td>
+              </tr>
+              <tr>
+                <td><strong>Egress-Only IGW (IPv6)</strong></td>
+                <td>Permite saída IPv6 sem permitir entrada não solicitada</td>
+                <td>Firewall stateful na interface WAN (permite respostas, bloqueia iniciação externa)</td>
+                <td>Outbound + respostas</td>
+              </tr>
+              <tr>
+                <td><strong>Virtual Private Gateway (VGW)</strong></td>
+                <td>Terminação de VPN Site-to-Site e Direct Connect do lado AWS</td>
+                <td>Roteador com interfaces VPN/MPLS conectando sites remotos</td>
+                <td>Bidirecional (privada)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplo: Route Tables para Sub-redes Públicas e Privadas (AWS)</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! ROUTE TABLE: Sub-rede PÚBLICA (instâncias com IP público)
+! ═══════════════════════════════════════════════════════════════
+! Destination       Target           Analogia
+! 10.0.0.0/16       local            → Rota conectada (rede interna da VPC)
+! 0.0.0.0/0         igw-abc123       → Default route para Internet via IGW
+
+! ═══════════════════════════════════════════════════════════════
+! ROUTE TABLE: Sub-rede PRIVADA (sem IP público)
+! ═══════════════════════════════════════════════════════════════
+! Destination       Target           Analogia
+! 10.0.0.0/16       local            → Rota conectada
+! 0.0.0.0/0         nat-xyz789       → Default route via NAT Gateway (apenas saída)
+! 172.16.0.0/16     tgw-abc456       → Rota para rede on-premises via Transit Gateway
+
+! ═══════════════════════════════════════════════════════════════
+! ROUTE TABLE: Sub-rede ISOLADA (sem acesso à Internet)
+! ═══════════════════════════════════════════════════════════════
+! Destination       Target           Analogia
+! 10.0.0.0/16       local            → Apenas comunicação interna na VPC
+! (sem default route = sem saída para Internet)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.3 — Route Propagation</h3>
+          <p>Em vez de usar protocolos dinâmicos como OSPF dentro da VPC, a AWS usa o conceito de <strong>Route Propagation</strong> para injetar rotas automaticamente na route table:</p>
+
+          <ul>
+            <li><strong>Virtual Private Gateway (VGW):</strong> Quando route propagation está habilitado, rotas aprendidas via BGP (do on-premises) aparecem automaticamente na route table da sub-rede</li>
+            <li><strong>Transit Gateway:</strong> Rotas são propagadas entre VPCs e conexões VPN/Direct Connect via TGW route tables</li>
+            <li><strong>Sem propagation:</strong> Todas as rotas para destinos fora da VPC devem ser criadas manualmente (como rotas estáticas)</li>
+          </ul>
+
+          <div class="info-box highlight">
+            <h4>💡 Analogia com Roteamento Físico</h4>
+            <p><strong>Route propagation habilitado</strong> = Redistribuição de BGP na tabela de roteamento (como <code>redistribute bgp</code> no roteador).<br>
+            <strong>Route propagation desabilitado</strong> = Apenas rotas estáticas (manual) — você controla exatamente o que entra na tabela.<br>
+            <strong>Rotas estáticas na cloud</strong> sempre têm prioridade sobre rotas propagadas (longest prefix match ainda se aplica).</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.4 — Transit Gateway e VNet Peering</h3>
+          <p>Para conectar múltiplas VPCs/VNets entre si e com redes on-premises, os provedores cloud oferecem hubs de roteamento centralizados:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>🔀 AWS Transit Gateway</h4>
+              <ul>
+                <li>Hub centralizado que conecta múltiplas VPCs, VPNs e Direct Connects</li>
+                <li>Equivale a um roteador central (core router) em design hub-and-spoke</li>
+                <li>Possui suas próprias route tables (TGW route tables)</li>
+                <li>Suporta peering entre TGWs em regiões diferentes</li>
+                <li>Elimina a complexidade de VPC peering full-mesh</li>
+                <li>Suporta multicast (diferente de VPC peering)</li>
+              </ul>
+            </div>
+            <div class="command-card">
+              <h4>🔀 Azure Virtual WAN / VNet Peering</h4>
+              <ul>
+                <li><strong>VNet Peering:</strong> Conexão direta entre duas VNets (não transitiva por padrão)</li>
+                <li><strong>Virtual WAN:</strong> Hub gerenciado equivalente ao Transit Gateway</li>
+                <li><strong>Hub VNet:</strong> VNet centralizada com Azure Firewall/NVA para modelo hub-spoke</li>
+                <li>Route tables em subnets permitem forçar tráfego pelo hub (UDR com next-hop NVA)</li>
+                <li>ExpressRoute e VPN Gateway no hub propagam rotas via BGP</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>11.5 — BGP com Direct Connect / ExpressRoute</h3>
+          <p>A integração entre redes on-premises e cloud utiliza BGP como protocolo de roteamento dinâmico:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplo: BGP com AWS Direct Connect</h4>
+            <pre><code>! ═══════════════════════════════════════════════════════════════
+! Configuração no roteador on-premises (Customer Router)
+! Peering BGP com AWS via Direct Connect
+! ═══════════════════════════════════════════════════════════════
+
+! Interface para o Direct Connect:
+Router(config)# interface GigabitEthernet0/2
+Router(config-if)# description AWS Direct Connect - VLAN 100
+Router(config-if)# no shutdown
+
+! Sub-interface para VLAN do Virtual Interface:
+Router(config)# interface GigabitEthernet0/2.100
+Router(config-subif)# encapsulation dot1Q 100
+Router(config-subif)# ip address 169.254.100.2 255.255.255.252
+! AWS side: 169.254.100.1/30
+
+! BGP peering com AWS:
+Router(config)# router bgp 65001
+Router(config-router)# neighbor 169.254.100.1 remote-as 7224
+!                                              ^^^^^^^^^^^^
+!                                         ASN da AWS (público) ou 64512 (privado)
+
+! Anunciar redes on-premises para AWS:
+Router(config-router)# network 10.0.0.0 mask 255.255.0.0
+Router(config-router)# network 172.16.0.0 mask 255.255.0.0
+
+! Receber rotas da VPC (CIDR da VPC será anunciado pela AWS):
+! AWS automaticamente anuncia: 10.100.0.0/16 (CIDR da VPC)
+
+! Verificação:
+Router# show ip bgp summary
+Router# show ip bgp neighbors 169.254.100.1 received-routes
+Router# show ip bgp neighbors 169.254.100.1 advertised-routes</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 12 — EXERCÍCIOS PRÁTICOS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 12</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Teste seus conhecimentos sobre roteamento com exercícios que cobrem rotas estáticas, OSPF, seleção de rotas, NAT e troubleshooting. Cada exercício possui resposta detalhada — tente resolver antes de consultar!</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Seleção de Rotas (Longest Prefix Match + AD)</h3>
+          <p>Dado a seguinte tabela de roteamento, para qual next-hop será encaminhado um pacote destinado ao IP <strong>10.1.1.200</strong>?</p>
+          <div class="command-card wide">
+            <h4>📋 Tabela de Roteamento</h4>
+            <pre><code>S     0.0.0.0/0 [1/0] via 203.0.113.1
+O     10.0.0.0/8 [110/20] via 192.168.1.2
+D     10.1.0.0/16 [90/2170112] via 192.168.1.3
+S     10.1.1.0/24 [1/0] via 192.168.1.4
+O     10.1.1.128/25 [110/40] via 192.168.1.5</code></pre>
+          </div>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Resposta: via 192.168.1.5 (rota OSPF 10.1.1.128/25)</strong></p>
+              <p><strong>Explicação passo a passo:</strong></p>
+              <ol>
+                <li>O destino é 10.1.1.200. Primeiro, verificamos quais rotas correspondem (longest prefix match):</li>
+                <li>0.0.0.0/0 → Corresponde a TUDO ✓</li>
+                <li>10.0.0.0/8 → 10.x.x.x corresponde ✓</li>
+                <li>10.1.0.0/16 → 10.1.x.x corresponde ✓</li>
+                <li>10.1.1.0/24 → 10.1.1.x corresponde ✓</li>
+                <li>10.1.1.128/25 → Faixa 10.1.1.128-255. O destino 10.1.1.200 está nessa faixa ✓</li>
+                <li>A rota com prefixo MAIS LONGO é /25 (10.1.1.128/25)</li>
+                <li>Mesmo tendo AD=110 (OSPF) vs AD=1 (estática /24), o <strong>longest prefix match SEMPRE vence!</strong></li>
+                <li>Pacote encaminhado via 192.168.1.5</li>
+              </ol>
+              <p><strong>Erro comum:</strong> Escolher a rota estática /24 por ter AD menor. Lembre-se: longest prefix match é avaliado ANTES da AD!</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Configuração de Rotas Estáticas</h3>
+          <p>Dada a topologia abaixo, escreva TODAS as rotas estáticas necessárias em R1 para que ele alcance todas as redes:</p>
+          <div class="command-card wide">
+            <h4>📋 Topologia</h4>
+            <pre><code>! R1 (Gi0/0: 192.168.1.1/24) ──── Serial (10.0.0.1/30) ──── R2 (10.0.0.2/30)
+!                                                               │
+!                                                    Gi0/0: 172.16.1.1/24 (LAN B)
+!                                                               │
+!                                                    Serial: 10.0.0.5/30
+!                                                               │
+!                                                    R3 (10.0.0.6/30)
+!                                                    Gi0/0: 172.16.2.1/24 (LAN C)
+!
+! R1 LAN A: 192.168.1.0/24 (conectada)
+! Objetivo: R1 deve alcançar LAN B (172.16.1.0/24), LAN C (172.16.2.0/24)
+!           e o link entre R2 e R3 (10.0.0.4/30)</code></pre>
+          </div>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Configuração de R1:</strong></p>
+              <pre><code>! Rota para LAN B (172.16.1.0/24) — próximo salto é R2:
+R1(config)# ip route 172.16.1.0 255.255.255.0 10.0.0.2
+
+! Rota para LAN C (172.16.2.0/24) — via R2 (que roteará para R3):
+R1(config)# ip route 172.16.2.0 255.255.255.0 10.0.0.2
+
+! Rota para o link R2-R3 (10.0.0.4/30):
+R1(config)# ip route 10.0.0.4 255.255.255.252 10.0.0.2
+
+! ALTERNATIVA com sumarização (se possível):
+! 172.16.1.0/24 e 172.16.2.0/24 podem ser sumarizados em:
+R1(config)# ip route 172.16.0.0 255.255.254.0 10.0.0.2
+! (172.16.0.0/23 cobre 172.16.0.0-172.16.1.255 — cuidado, não cobre .2.0!)
+! Melhor usar rotas individuais neste caso</code></pre>
+              <p><strong>Nota:</strong> Não se esqueça que R2 e R3 também precisam de rotas de retorno para 192.168.1.0/24 (via 10.0.0.1)!</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — OSPF: Identificando Problemas de Adjacência</h3>
+          <p>Dois roteadores OSPF não formam adjacência (ficam em estado INIT). As configurações são:</p>
+          <div class="command-card wide">
+            <h4>📋 Configuração dos Roteadores</h4>
+            <pre><code>! ROUTER A:
+interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+ ip ospf 1 area 0
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40
+
+! ROUTER B:
+interface GigabitEthernet0/0
+ ip address 192.168.1.2 255.255.255.0
+ ip ospf 1 area 1
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40</code></pre>
+          </div>
+          <p>Identifique o problema e a solução.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Problema: Áreas OSPF diferentes!</strong></p>
+              <p>Router A está na <strong>area 0</strong> e Router B está na <strong>area 1</strong>. Para formar adjacência OSPF, ambas as interfaces DEVEM estar na mesma área.</p>
+              <p><strong>Solução:</strong> Alterar um dos roteadores para usar a mesma área:</p>
+              <pre><code>! No Router B, corrigir para area 0:
+Router_B(config)# interface GigabitEthernet0/0
+Router_B(config-if)# ip ospf 1 area 0</code></pre>
+              <p><strong>Outros parâmetros verificados (estão OK):</strong></p>
+              <ul>
+                <li>Hello interval: 10 = 10 ✓</li>
+                <li>Dead interval: 40 = 40 ✓</li>
+                <li>Sub-rede: ambos em 192.168.1.0/24 ✓</li>
+                <li>Autenticação: nenhuma em ambos ✓</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — OSPF: Calculando o Custo</h3>
+          <p>Com reference bandwidth de 10 Gbps (10000 Mbps), calcule o custo total OSPF do caminho:</p>
+          <p><strong>R1 (GigabitEthernet) → R2 (FastEthernet) → R3 (10 GigabitEthernet) → R4</strong></p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Fórmula: Custo = Reference BW ÷ Interface BW</strong></p>
+              <p><strong>Reference BW = 10000 Mbps</strong></p>
+              <ul>
+                <li>R1 saída GigabitEthernet (1000 Mbps): 10000 ÷ 1000 = <strong>10</strong></li>
+                <li>R2 saída FastEthernet (100 Mbps): 10000 ÷ 100 = <strong>100</strong></li>
+                <li>R3 saída 10GigabitEthernet (10000 Mbps): 10000 ÷ 10000 = <strong>1</strong></li>
+              </ul>
+              <p><strong>Custo total = 10 + 100 + 1 = 111</strong></p>
+              <p><strong>Nota:</strong> O custo é calculado nas interfaces de SAÍDA do caminho. Se houvesse um caminho alternativo R1→R5→R4 usando apenas GigabitEthernet (custo = 10+10=20), o OSPF escolheria esse caminho por ter custo menor (20 < 111).</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 5 — EIGRP: Feasible Successor</h3>
+          <p>Analise a topology table do EIGRP abaixo para a rede 10.0.0.0/24. Identifique o Successor e se existe um Feasible Successor:</p>
+          <div class="command-card wide">
+            <h4>📋 Topology Table</h4>
+            <pre><code>Router# show ip eigrp topology 10.0.0.0/24
+P 10.0.0.0/24, 1 successors, FD is 28160
+        via 192.168.1.2 (28160/28160), GigabitEthernet0/0
+        via 192.168.2.2 (30720/28160), Serial0/0/0
+        via 192.168.3.2 (33280/30720), GigabitEthernet0/1</code></pre>
+          </div>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Análise:</strong></p>
+              <p>Formato: via next-hop (<strong>FD</strong>/<strong>RD</strong>), interface</p>
+              <ul>
+                <li>Via 192.168.1.2: FD=28160, RD=28160</li>
+                <li>Via 192.168.2.2: FD=30720, RD=28160</li>
+                <li>Via 192.168.3.2: FD=33280, RD=30720</li>
+              </ul>
+              <p><strong>Successor:</strong> 192.168.1.2 (menor FD = 28160) → Instalado na tabela de roteamento</p>
+              <p><strong>FD do Successor = 28160</strong></p>
+              <p><strong>Feasibility Condition: RD do candidato &lt; FD do Successor (28160)</strong></p>
+              <ul>
+                <li>192.168.2.2: RD=28160 &lt; FD=28160? <strong>NÃO</strong> (não é estritamente menor, é igual!) → <strong>NÃO é FS</strong></li>
+                <li>192.168.3.2: RD=30720 &lt; FD=28160? <strong>NÃO</strong> (30720 > 28160) → <strong>NÃO é FS</strong></li>
+              </ul>
+              <p><strong>Resultado: Não há Feasible Successor!</strong></p>
+              <p>Se o Successor (192.168.1.2) cair, o roteador entrará em estado <strong>ACTIVE</strong> e enviará queries aos vizinhos para encontrar um novo caminho — convergência mais lenta do que se houvesse um FS pronto.</p>
+              <p><strong>Nota importante:</strong> A Feasibility Condition exige que RD seja <strong>estritamente menor</strong> (&lt;) que a FD, não menor ou igual (≤).</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 6 — NAT: Identificando Tipos</h3>
+          <p>Para cada cenário abaixo, identifique o tipo de NAT mais adequado (Estático, Dinâmico ou PAT):</p>
+          <ol>
+            <li>Uma empresa com 500 funcionários precisa acessar a Internet usando apenas 1 IP público</li>
+            <li>Um servidor web interno (192.168.1.100) precisa ser acessível pela Internet como 203.0.113.50</li>
+            <li>Uma empresa tem 20 IPs públicos e quer distribuí-los entre 50 hosts que acessam Internet simultaneamente</li>
+            <li>Um servidor DNS interno precisa ser acessível externamente na porta 53, mas usando o IP da interface WAN do roteador</li>
+          </ol>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <ol>
+                <li><strong>PAT (NAT Overload):</strong> 500 hosts compartilhando 1 IP público — cada conexão é diferenciada por porta. Configuração: <code>ip nat inside source list ACL interface Gi0/1 overload</code></li>
+                <li><strong>NAT Estático:</strong> Mapeamento fixo 1:1 (192.168.1.100 ↔ 203.0.113.50). O servidor precisa ser sempre acessível no mesmo IP público. Configuração: <code>ip nat inside source static 192.168.1.100 203.0.113.50</code></li>
+                <li><strong>PAT com Pool:</strong> 50 hosts > 20 IPs disponíveis, então NAT dinâmico puro não seria suficiente. Use PAT com pool de 20 IPs (overload). Configuração: <code>ip nat inside source list ACL pool POOL overload</code></li>
+                <li><strong>NAT Estático com Porta (Port Forwarding):</strong> Mapear porta específica do IP da interface WAN para o servidor interno. Configuração: <code>ip nat inside source static tcp 192.168.1.53 53 interface Gi0/1 53</code></li>
+              </ol>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 7 — Distância Administrativa</h3>
+          <p>Um roteador recebe as seguintes rotas para o destino 172.16.5.0/24. Qual será instalada na tabela de roteamento?</p>
+          <ul>
+            <li>Rota OSPF: 172.16.5.0/24 via 10.0.0.2 (métrica 50)</li>
+            <li>Rota EIGRP: 172.16.5.0/24 via 10.0.0.3 (métrica 2170112)</li>
+            <li>Rota RIP: 172.16.5.0/24 via 10.0.0.4 (métrica 3)</li>
+            <li>Rota Estática: 172.16.5.0/24 via 10.0.0.5</li>
+          </ul>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Resposta: Rota Estática via 10.0.0.5</strong></p>
+              <p>Todas as rotas são para o MESMO prefixo (172.16.5.0/24), então o longest prefix match não diferencia. O critério de desempate é a <strong>Distância Administrativa</strong>:</p>
+              <ul>
+                <li>Rota Estática: AD = <strong>1</strong> ← VENCEDORA (menor AD)</li>
+                <li>EIGRP: AD = 90</li>
+                <li>OSPF: AD = 110</li>
+                <li>RIP: AD = 120</li>
+              </ul>
+              <p><strong>Nota:</strong> As métricas (50, 2170112, 3) são IRRELEVANTES aqui porque são de protocolos diferentes. Métrica só é comparada entre rotas do MESMO protocolo. Entre protocolos diferentes, AD é o critério.</p>
+              <p>Se a rota estática for removida, a próxima a ser instalada seria a EIGRP (AD=90).</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 8 — BGP Best Path Selection</h3>
+          <p>Um roteador BGP recebe 3 caminhos para o prefixo 8.8.8.0/24. Qual será selecionado como melhor caminho?</p>
+          <div class="command-card wide">
+            <h4>📋 Caminhos BGP Recebidos</h4>
+            <pre><code>   Network          Next Hop       Metric  LocPrf  Weight  Path
+*  8.8.8.0/24       10.0.0.1              0    200       0    65000 65010 15169 i
+*  8.8.8.0/24       10.0.0.2              0    150       0    65001 15169 i
+*  8.8.8.0/24       10.0.0.3              0    200      100   65002 65003 65004 15169 i</code></pre>
+          </div>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Resposta: Caminho via 10.0.0.3</strong></p>
+              <p>Aplicando o algoritmo BGP Best Path Selection em ordem:</p>
+              <ol>
+                <li><strong>Weight (maior vence):</strong>
+                  <ul>
+                    <li>10.0.0.1: Weight=0</li>
+                    <li>10.0.0.2: Weight=0</li>
+                    <li>10.0.0.3: Weight=<strong>100</strong> ← MAIOR! <strong>VENCEDOR!</strong></li>
+                  </ul>
+                </li>
+              </ol>
+              <p>O algoritmo para NO PRIMEIRO critério que diferencia os caminhos. Como Weight de 10.0.0.3 (100) é maior que os outros (0), ele vence imediatamente. Os critérios seguintes (Local Pref, AS-Path, etc.) NÃO são avaliados.</p>
+              <p><strong>Se Weight fosse igual (todos 0):</strong></p>
+              <ol start="2">
+                <li>Local Preference: 10.0.0.1 (200) e 10.0.0.3 (200) empatariam; 10.0.0.2 (150) perderia</li>
+                <li>AS-Path: 10.0.0.1 tem 3 ASs (65000 65010 15169); 10.0.0.3 tem 4 ASs (65002 65003 65004 15169); 10.0.0.1 venceria por AS-Path menor</li>
+              </ol>
+              <p><strong>Nota:</strong> Weight é Cisco-specific e LOCAL ao roteador (não propagado). É a primeira coisa avaliada e pode "forçar" a escolha de um caminho independente dos outros atributos.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 9 — Troubleshooting: Pacote não Chega ao Destino</h3>
+          <p>Um administrador configurou as seguintes rotas estáticas, mas o host 192.168.1.100 não consegue alcançar 172.16.1.100. Identifique o problema:</p>
+          <div class="command-card wide">
+            <h4>📋 Configuração</h4>
+            <pre><code>! R1 (LAN A: 192.168.1.0/24, Serial: 10.0.0.1/30):
+ip route 172.16.1.0 255.255.255.0 10.0.0.2
+
+! R2 (LAN B: 172.16.1.0/24, Serial: 10.0.0.2/30):
+! (Nenhuma rota estática configurada além das conectadas)
+
+! Teste: Host 192.168.1.100 faz ping para 172.16.1.100
+! Resultado: Request timed out</code></pre>
+          </div>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Problema: Falta de rota de RETORNO em R2!</strong></p>
+              <p><strong>Análise do fluxo:</strong></p>
+              <ol>
+                <li>Host 192.168.1.100 envia pacote (origem: 192.168.1.100, destino: 172.16.1.100)</li>
+                <li>R1 recebe, consulta tabela: rota para 172.16.1.0/24 via 10.0.0.2 → encaminha ✓</li>
+                <li>R2 recebe, destino 172.16.1.100 está em rede conectada → entrega ao host ✓</li>
+                <li>Host 172.16.1.100 responde (origem: 172.16.1.100, destino: <strong>192.168.1.100</strong>)</li>
+                <li>R2 recebe a resposta, consulta tabela: <strong>NÃO TEM ROTA para 192.168.1.0/24!</strong> ✗</li>
+                <li>R2 descarta o pacote de resposta → Timeout!</li>
+              </ol>
+              <p><strong>Solução:</strong> Adicionar rota de retorno em R2:</p>
+              <pre><code>R2(config)# ip route 192.168.1.0 255.255.255.0 10.0.0.1</code></pre>
+              <p><strong>Lição:</strong> Roteamento é BIDIRECIONAL. Cada roteador no caminho precisa saber rotear tanto o tráfego de IDA quanto o de VOLTA!</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 10 — Cloud Routing: AWS VPC</h3>
+          <p>Você tem a seguinte configuração de VPC na AWS:</p>
+          <ul>
+            <li>VPC CIDR: 10.0.0.0/16</li>
+            <li>Sub-rede pública: 10.0.1.0/24 (com Internet Gateway)</li>
+            <li>Sub-rede privada: 10.0.2.0/24 (com NAT Gateway na sub-rede pública)</li>
+            <li>VPN para rede on-premises: 172.16.0.0/16</li>
+          </ul>
+          <p>Monte as route tables para ambas as sub-redes.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <p><strong>Route Table da Sub-rede PÚBLICA:</strong></p>
+              <table class="styled-table">
+                <thead><tr><th>Destination</th><th>Target</th><th>Motivo</th></tr></thead>
+                <tbody>
+                  <tr><td>10.0.0.0/16</td><td>local</td><td>Comunicação interna na VPC (automática)</td></tr>
+                  <tr><td>0.0.0.0/0</td><td>igw-xxxxxx</td><td>Tráfego para Internet via Internet Gateway</td></tr>
+                  <tr><td>172.16.0.0/16</td><td>vgw-xxxxxx</td><td>Tráfego para on-premises via VPN Gateway (pode ser propagada)</td></tr>
+                </tbody>
+              </table>
+              <p><strong>Route Table da Sub-rede PRIVADA:</strong></p>
+              <table class="styled-table">
+                <thead><tr><th>Destination</th><th>Target</th><th>Motivo</th></tr></thead>
+                <tbody>
+                  <tr><td>10.0.0.0/16</td><td>local</td><td>Comunicação interna na VPC (automática)</td></tr>
+                  <tr><td>0.0.0.0/0</td><td>nat-xxxxxx</td><td>Saída Internet via NAT Gateway (apenas outbound)</td></tr>
+                  <tr><td>172.16.0.0/16</td><td>vgw-xxxxxx</td><td>Tráfego para on-premises via VPN Gateway</td></tr>
+                </tbody>
+              </table>
+              <p><strong>Diferença chave:</strong> A sub-rede pública usa IGW (bidirecional) e a privada usa NAT Gateway (apenas outbound). Ambas acessam on-premises via VPN Gateway.</p>
+              <p><strong>Longest prefix match se aplica:</strong> Tráfego para 172.16.1.100 corresponde a 172.16.0.0/16 (mais específico que 0.0.0.0/0), então vai pelo VPN Gateway, não pela Internet.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO FINAL — RESUMO E NAVEGAÇÃO
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Resumo</span>
+          <h2>Recapitulação do Módulo 06</h2>
+          <p>Revisão consolidada dos principais conceitos abordados neste módulo sobre Roteamento.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Conceitos-Chave para Revisão Rápida</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Tópico</th>
+                <th>Conceito Principal</th>
+                <th>O que Lembrar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Longest Prefix Match</td><td>Rota mais específica vence</td><td>/28 vence /24 que vence /16, INDEPENDENTE de AD</td></tr>
+              <tr><td>Distância Administrativa</td><td>Desempata rotas com mesmo prefixo</td><td>Menor AD = mais confiável. Connected=0, Static=1, EIGRP=90, OSPF=110, RIP=120</td></tr>
+              <tr><td>Rotas Estáticas</td><td>Configuração manual, não se adapta</td><td>Floating static (AD alta) para backup. Fully specified para eficiência</td></tr>
+              <tr><td>RIP</td><td>Distance Vector, hop count (max 15)</td><td>Obsoleto. Não diferencia bandwidth. Convergência lenta (30s updates)</td></tr>
+              <tr><td>OSPF</td><td>Link-State, SPF Dijkstra, áreas</td><td>Custo = Ref_BW/Int_BW. Ajuste reference-bandwidth! DR/BDR em multi-acesso</td></tr>
+              <tr><td>EIGRP</td><td>Advanced DV, DUAL, FS</td><td>Convergência ultra-rápida com Feasible Successor. Métrica: BW + Delay</td></tr>
+              <tr><td>BGP</td><td>Path Vector, EGP, políticas</td><td>Entre ASs. eBGP AD=20, iBGP AD=200. Best path: Weight→LocPref→AS-Path</td></tr>
+              <tr><td>Redistribuição</td><td>Integra protocolos diferentes</td><td>SEMPRE use route-maps! Seed metric obrigatória no EIGRP. "subnets" no OSPF</td></tr>
+              <tr><td>NAT</td><td>Tradução de endereços (privado→público)</td><td>PAT (overload) é o mais comum. Estático para servidores. Inside/Outside nas interfaces</td></tr>
+              <tr><td>Cloud Routing</td><td>Route tables, gateways, propagation</td><td>Longest prefix match funciona igual. BGP com Direct Connect/ExpressRoute</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>🎯 Hierarquia de Seleção de Rotas (Memorize!)</h4>
+            <p><strong>1º) Longest Prefix Match</strong> (rota mais específica) → <strong>2º) Distância Administrativa</strong> (menor = mais confiável) → <strong>3º) Métrica</strong> (menor = melhor caminho dentro do mesmo protocolo)</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Próximos Passos</h3>
+          <ul>
+            <li>🔬 <strong>Pratique em simuladores:</strong> Use Cisco Packet Tracer ou GNS3 para configurar cenários de OSPF, EIGRP e rotas estáticas</li>
+            <li>☁️ <strong>Lab na cloud:</strong> Crie uma VPC na AWS com sub-redes públicas e privadas, configure route tables e NAT Gateway</li>
+            <li>📚 <strong>Aprofunde em BGP:</strong> Estude route reflectors, confederations e communities para cenários avançados</li>
+            <li>🔒 <strong>Próximo módulo (Segurança):</strong> Aprenda a proteger o plano de controle dos roteadores com ACLs, autenticação de protocolos e hardening</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <section class="learning-section">
       <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
         <a href="modulo-05.html" class="button secondary">← Módulo Anterior</a>
@@ -164,7 +3461,7 @@ Router# show ip bgp neighbors</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
