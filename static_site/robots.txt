@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /kubernetes/docker/
+Disallow: /kubernetes/cloudformation/
+Disallow: /terraform/redes/
+Disallow: /terraform/cloudformation/
+Disallow: /docker/cloudformation/
+Disallow: /cloudformation/kubernetes/
+
+# Block deep crawling of concatenated paths (bot protection)
+Disallow: /*/*/*/*/*/
 
 Sitemap: https://www.cloudtrilhas.com.br/sitemap.xml
