@@ -67,7 +67,8 @@ resource "aws_cloudfront_distribution" "this" {
         "PE", # Peru
         "UY", # Uruguai
         "VE", # Venezuela
-        "PT"  # Portugal
+        "PT", # Portugal
+        "CA"  # Canadá
       ]
     }
   }
