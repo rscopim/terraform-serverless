@@ -267,6 +267,7 @@ O projeto é documentado por fases evolutivas (24 fases):
 
 - AWS Solutions Architect Associate
 - AWS Cloud Practitioner
+- AWS AI Practitioner
 - Instrutor AWS re/Start
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ricardosiminesscopim/)
