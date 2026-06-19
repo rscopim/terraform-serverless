@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Python Módulo 04: Estruturas de Dados</title>
+  <meta name="description" content="Guia completo sobre estruturas de dados em Python: listas, tuplas, dicionários e sets. Aprenda a manipular coleções, otimizar performance e aplicar em cenários DevOps/Cloud." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,8 +20,9 @@
       <div class="nav-actions">
         <a href="modulo-03.html" class="nav-link">← Anterior</a>
         <a href="modulo-05.html" class="nav-link">Próximo →</a>
+        <a href="../python.html" class="nav-link">← Voltar ao Curso</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
@@ -38,137 +40,3296 @@
   </header>
 
   <main>
+    <!-- Hero Section -->
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐍 Python — Módulo 04</span>
-        <h1>Estruturas de Dados: Listas, Dicts, Tuplas e Sets</h1>
-        <p>Domine as estruturas de dados nativas do Python para manipular coleções de forma eficiente.</p>
+        <h1>Estruturas de Dados: Listas, Tuplas, Dicionários e Sets</h1>
+        <p>Domine as coleções nativas do Python — a base para manipular dados em qualquer aplicação DevOps, automação cloud e análise de infraestrutura.</p>
       </div>
     </section>
 
+    <!-- Progress Track -->
     <section class="module-section">
       <div class="container">
+        <div class="progress-track">
+          <div class="progress-nodes">
+            <a href="modulo-01.html" class="progress-node completed" title="Módulo 01"><span>01</span><small>Fundamentos</small></a>
+            <a href="modulo-02.html" class="progress-node completed" title="Módulo 02"><span>02</span><small>Controle</small></a>
+            <a href="modulo-03.html" class="progress-node completed" title="Módulo 03"><span>03</span><small>Funções</small></a>
+            <a href="modulo-04.html" class="progress-node active" title="Módulo 04"><span>04</span><small>Dados</small></a>
+            <a href="modulo-05.html" class="progress-node" title="Módulo 05"><span>05</span><small>Arquivos</small></a>
+            <a href="modulo-06.html" class="progress-node" title="Módulo 06"><span>06</span><small>POO</small></a>
+            <a href="modulo-07.html" class="progress-node" title="Módulo 07"><span>07</span><small>Bibliotecas</small></a>
+            <a href="modulo-08.html" class="progress-node" title="Módulo 08"><span>08</span><small>APIs</small></a>
+            <a href="modulo-09.html" class="progress-node" title="Módulo 09"><span>09</span><small>AWS boto3</small></a>
+            <a href="modulo-10.html" class="progress-node" title="Módulo 10"><span>10</span><small>IA Bedrock</small></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1: LISTAS — FUNDAMENTOS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Listas — Fundamentos</h2>
+          <p>Listas são a estrutura de dados mais versátil do Python. São coleções ordenadas, mutáveis e permitem elementos duplicados. Dominar listas é essencial para qualquer programador Python.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Listas</h3>
+          <h3>1.1 Criando Listas</h3>
           <div class="command-grid">
             <div class="command-card wide">
-              <div class="command-header"><code>list</code><span class="cmd-tag">Mutável</span></div>
-              <pre><code># Criação e manipulação
-frutas = ["maçã", "banana", "uva", "manga"]
+              <div class="command-header"><code>Formas de criar listas</code><span class="cmd-tag">Criação</span></div>
+              <pre><code># 1. Literal com colchetes (mais comum)
+servidores = ["web-01", "web-02", "api-01", "db-01"]
+portas = [80, 443, 8080, 3306, 5432]
+vazio = []
 
-# Acesso e slicing
-print(frutas[0])       # maçã
-print(frutas[-1])      # manga
-print(frutas[1:3])     # ['banana', 'uva']
-print(frutas[::2])     # ['maçã', 'uva']
+# 2. Construtor list()
+letras = list("Python")          # ['P', 'y', 't', 'h', 'o', 'n']
+intervalo = list(range(1, 11))   # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+copia = list(servidores)         # cria uma cópia independente
 
-# Métodos principais
-frutas.append("kiwi")        # adiciona ao final
-frutas.insert(1, "laranja")  # insere na posição
-frutas.remove("banana")      # remove por valor
-frutas.pop()                 # remove último
-frutas.sort()                # ordena in-place
-frutas.reverse()             # inverte
+# 3. List Comprehension (forma pythônica)
+quadrados = [x**2 for x in range(10)]  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+pares = [x for x in range(20) if x % 2 == 0]
 
-# Desempacotamento
-primeiro, *meio, ultimo = frutas</code></pre>
+# 4. Repetição com operador *
+zeros = [0] * 10                 # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+template = ["pending"] * 5       # ['pending', 'pending', 'pending', 'pending', 'pending']
+
+# 5. Listas heterogêneas (Python permite!)
+misto = ["servidor", 42, True, 3.14, None, ["aninhado"]]
+
+# 6. split() para criar listas a partir de strings
+ips = "10.0.1.1 10.0.1.2 10.0.1.3".split()
+# ['10.0.1.1', '10.0.1.2', '10.0.1.3']
+
+csv_line = "web-01,running,us-east-1".split(",")
+# ['web-01', 'running', 'us-east-1']</code></pre>
             </div>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Dicionários</h3>
+          <h3>1.2 Indexação e Fatiamento (Slicing)</h3>
           <div class="command-card wide">
-            <div class="command-header"><code>dict</code><span class="cmd-tag">Chave-Valor</span></div>
-            <pre><code># Criação
-servidor = {
-    "nome": "web-01",
-    "ip": "10.0.1.50",
-    "porta": 8080,
-    "ativo": True,
-    "tags": ["prod", "api"]
+            <div class="command-header"><code>Acesso por índice e fatias</code><span class="cmd-tag">Indexação</span></div>
+            <pre><code># Índices positivos (da esquerda, começam em 0)
+regioes = ["us-east-1", "us-west-2", "eu-west-1", "sa-east-1", "ap-southeast-1"]
+
+print(regioes[0])    # 'us-east-1'  (primeiro)
+print(regioes[2])    # 'eu-west-1'  (terceiro)
+print(regioes[-1])   # 'ap-southeast-1'  (último)
+print(regioes[-2])   # 'sa-east-1'  (penúltimo)
+
+# Slicing: lista[início:fim:passo]
+print(regioes[1:3])   # ['us-west-2', 'eu-west-1']  (índice 1 e 2)
+print(regioes[:3])    # ['us-east-1', 'us-west-2', 'eu-west-1']  (do início ao 2)
+print(regioes[2:])    # ['eu-west-1', 'sa-east-1', 'ap-southeast-1']  (do 2 ao fim)
+print(regioes[::2])   # ['us-east-1', 'eu-west-1', 'ap-southeast-1']  (passo 2)
+print(regioes[::-1])  # lista invertida
+
+# Slicing cria uma NOVA lista (cópia rasa)
+copia_parcial = regioes[1:4]
+copia_parcial[0] = "modificado"
+print(regioes[1])  # 'us-west-2' — original não muda
+
+# Atribuição por fatia (modifica a lista original)
+numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+numeros[2:5] = [30, 40, 50]      # substitui posições 2, 3, 4
+numeros[6:6] = [100, 200]        # insere sem remover
+numeros[1:4] = []                # remove posições 1, 2, 3</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 Mutabilidade — Listas são Mutáveis!</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Modificação in-place</code><span class="cmd-tag">Mutabilidade</span></div>
+            <pre><code># Listas podem ser modificadas após criação
+instancias = ["i-001", "i-002", "i-003"]
+
+# Modificar elemento por índice
+instancias[1] = "i-002-new"
+print(instancias)  # ['i-001', 'i-002-new', 'i-003']
+
+# CUIDADO: Referências compartilhadas!
+lista_a = [1, 2, 3]
+lista_b = lista_a        # lista_b aponta para o MESMO objeto!
+lista_b.append(4)
+print(lista_a)           # [1, 2, 3, 4] — lista_a também mudou!
+
+# Solução: criar uma cópia
+lista_c = lista_a.copy()      # cópia rasa
+lista_d = lista_a[:]          # outra forma de cópia rasa
+lista_e = list(lista_a)       # mais uma forma
+
+lista_c.append(5)
+print(lista_a)           # [1, 2, 3, 4] — original intacto
+
+# IMPORTANTE PARA FUNÇÕES:
+def processar(items):
+    # Modificar items aqui ALTERA a lista original!
+    items.append("novo")
+
+servidores = ["web-01", "web-02"]
+processar(servidores)
+print(servidores)  # ['web-01', 'web-02', 'novo']
+
+# Para evitar efeitos colaterais:
+def processar_seguro(items):
+    items = items.copy()  # trabalha com cópia local
+    items.append("novo")
+    return items</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Armadilha Clássica: Argumento Padrão Mutável</h4>
+            <pre><code># ❌ ERRADO — lista padrão é compartilhada entre chamadas!
+def adicionar_item(item, lista=[]):
+    lista.append(item)
+    return lista
+
+print(adicionar_item("a"))  # ['a']
+print(adicionar_item("b"))  # ['a', 'b'] — acumulou!
+
+# ✅ CORRETO — use None como padrão
+def adicionar_item(item, lista=None):
+    if lista is None:
+        lista = []
+    lista.append(item)
+    return lista</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 Métodos de Lista — Referência Completa</h3>
+          <div class="styled-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Método</th>
+                  <th>Descrição</th>
+                  <th>Retorno</th>
+                  <th>Modifica?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>.append(x)</code></td><td>Adiciona x ao final</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.extend(iter)</code></td><td>Adiciona todos os itens do iterável</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.insert(i, x)</code></td><td>Insere x na posição i</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.remove(x)</code></td><td>Remove primeira ocorrência de x</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.pop([i])</code></td><td>Remove e retorna item na posição i (padrão: último)</td><td>item</td><td>✅ Sim</td></tr>
+                <tr><td><code>.clear()</code></td><td>Remove todos os itens</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.sort(key, reverse)</code></td><td>Ordena a lista in-place</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.reverse()</code></td><td>Inverte a lista in-place</td><td>None</td><td>✅ Sim</td></tr>
+                <tr><td><code>.copy()</code></td><td>Retorna cópia rasa</td><td>list</td><td>❌ Não</td></tr>
+                <tr><td><code>.index(x)</code></td><td>Retorna índice da primeira ocorrência de x</td><td>int</td><td>❌ Não</td></tr>
+                <tr><td><code>.count(x)</code></td><td>Conta ocorrências de x</td><td>int</td><td>❌ Não</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Exemplos práticos de cada método</code><span class="cmd-tag">Métodos</span></div>
+            <pre><code># ════════════════════════════════════════════
+# append() — adiciona UM elemento ao final
+# ════════════════════════════════════════════
+logs = []
+logs.append("[INFO] Servidor iniciado")
+logs.append("[WARN] Memória alta: 85%")
+logs.append("[ERROR] Conexão recusada")
+print(logs)
+# ['[INFO] Servidor iniciado', '[WARN] Memória alta: 85%', '[ERROR] Conexão recusada']
+
+# ════════════════════════════════════════════
+# extend() — adiciona MÚLTIPLOS elementos
+# ════════════════════════════════════════════
+sg_rules = ["22/tcp", "80/tcp"]
+novas_regras = ["443/tcp", "8080/tcp"]
+sg_rules.extend(novas_regras)
+print(sg_rules)  # ['22/tcp', '80/tcp', '443/tcp', '8080/tcp']
+
+# Diferença entre append e extend:
+lista = [1, 2, 3]
+lista.append([4, 5])   # [1, 2, 3, [4, 5]]  — adiciona A LISTA como elemento
+lista = [1, 2, 3]
+lista.extend([4, 5])   # [1, 2, 3, 4, 5]    — adiciona CADA ITEM
+
+# ════════════════════════════════════════════
+# insert(posição, elemento) — insere em posição específica
+# ════════════════════════════════════════════
+pipeline = ["build", "test", "deploy"]
+pipeline.insert(2, "security-scan")  # insere antes do deploy
+print(pipeline)  # ['build', 'test', 'security-scan', 'deploy']
+
+pipeline.insert(0, "lint")  # insere no início
+print(pipeline)  # ['lint', 'build', 'test', 'security-scan', 'deploy']
+
+# ════════════════════════════════════════════
+# remove(valor) — remove PRIMEIRA ocorrência
+# ════════════════════════════════════════════
+services = ["nginx", "redis", "nginx", "postgres"]
+services.remove("nginx")
+print(services)  # ['redis', 'nginx', 'postgres'] — só removeu o primeiro
+
+# ValueError se não existir!
+# services.remove("mysql")  # ValueError: list.remove(x): x not in list
+
+# Forma segura:
+if "mysql" in services:
+    services.remove("mysql")
+
+# ════════════════════════════════════════════
+# pop([índice]) — remove e RETORNA o elemento
+# ════════════════════════════════════════════
+fila = ["task-1", "task-2", "task-3", "task-4"]
+ultimo = fila.pop()       # remove do final: 'task-4'
+primeiro = fila.pop(0)    # remove do início: 'task-1'
+print(fila)               # ['task-2', 'task-3']
+print(f"Processado: {primeiro}")
+
+# ════════════════════════════════════════════
+# sort() e reverse()
+# ════════════════════════════════════════════
+custos = [120.50, 45.00, 230.75, 89.90, 15.00]
+custos.sort()                    # ordena crescente in-place
+print(custos)                    # [15.0, 45.0, 89.9, 120.5, 230.75]
+
+custos.sort(reverse=True)        # ordena decrescente
+print(custos)                    # [230.75, 120.5, 89.9, 45.0, 15.0]
+
+nomes = ["Zabbix", "ansible", "Terraform", "docker"]
+nomes.sort(key=str.lower)        # ordena ignorando maiúsculas
+print(nomes)                     # ['ansible', 'docker', 'Terraform', 'Zabbix']
+
+nomes.reverse()                  # inverte a ordem atual
+print(nomes)                     # ['Zabbix', 'Terraform', 'docker', 'ansible']
+
+# ════════════════════════════════════════════
+# index() e count()
+# ════════════════════════════════════════════
+status = ["running", "stopped", "running", "terminated", "running"]
+print(status.index("stopped"))   # 1 (primeira ocorrência)
+print(status.count("running"))   # 3</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 Listas Aninhadas (Matrizes)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Listas dentro de listas</code><span class="cmd-tag">Aninhamento</span></div>
+            <pre><code># Matriz 3x3 (lista de listas)
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+print(matriz[0])      # [1, 2, 3]  — primeira linha
+print(matriz[1][2])   # 6          — linha 1, coluna 2
+print(matriz[2][0])   # 7          — linha 2, coluna 0
+
+# Iterar sobre matriz
+for linha in matriz:
+    for valor in linha:
+        print(f"{valor:3}", end="")
+    print()
+
+# Exemplo DevOps: tabela de instâncias
+instancias = [
+    ["i-001", "t3.micro", "running", "us-east-1a"],
+    ["i-002", "t3.small", "stopped", "us-east-1b"],
+    ["i-003", "m5.large", "running", "us-east-1a"],
+]
+
+# Filtrar instâncias em execução
+rodando = [inst for inst in instancias if inst[2] == "running"]
+print(f"Instâncias ativas: {len(rodando)}")
+
+# Criar matriz com list comprehension
+# Tabuleiro 8x8
+tabuleiro = [[0 for col in range(8)] for row in range(8)]
+
+# ⚠️ CUIDADO com multiplicação de listas aninhadas!
+# ❌ ERRADO:
+errado = [[0] * 3] * 3   # 3 referências à MESMA lista!
+errado[0][0] = 1
+print(errado)  # [[1, 0, 0], [1, 0, 0], [1, 0, 0]] — todas mudaram!
+
+# ✅ CORRETO:
+correto = [[0] * 3 for _ in range(3)]  # 3 listas independentes
+correto[0][0] = 1
+print(correto)  # [[1, 0, 0], [0, 0, 0], [0, 0, 0]]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.6 Funções Built-in com Listas</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>len, min, max, sum, sorted, any, all</code><span class="cmd-tag">Built-in</span></div>
+            <pre><code># Funções essenciais
+custos_mensais = [1250.00, 980.50, 1450.75, 870.30, 1100.00]
+
+print(f"Total de meses: {len(custos_mensais)}")     # 5
+print(f"Menor custo:    ${min(custos_mensais)}")     # $870.3
+print(f"Maior custo:    ${max(custos_mensais)}")     # $1450.75
+print(f"Custo total:    ${sum(custos_mensais)}")     # $5651.55
+print(f"Média mensal:   ${sum(custos_mensais)/len(custos_mensais):.2f}")  # $1130.31
+
+# sorted() — retorna NOVA lista ordenada (não modifica a original)
+original = [3, 1, 4, 1, 5, 9, 2, 6]
+ordenada = sorted(original)
+print(original)  # [3, 1, 4, 1, 5, 9, 2, 6] — intacta
+print(ordenada)  # [1, 1, 2, 3, 4, 5, 6, 9]
+
+# any() e all()
+status_checks = [True, True, False, True]
+print(any(status_checks))  # True — pelo menos um é True
+print(all(status_checks))  # False — nem todos são True
+
+# Exemplo prático: verificar saúde de serviços
+servicos = [
+    {"nome": "api", "healthy": True},
+    {"nome": "db", "healthy": True},
+    {"nome": "cache", "healthy": False},
+]
+todos_saudaveis = all(s["healthy"] for s in servicos)
+algum_com_problema = any(not s["healthy"] for s in servicos)
+print(f"Todos OK: {todos_saudaveis}")        # False
+print(f"Algum problema: {algum_com_problema}")  # True</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.7 Shallow Copy vs Deep Copy</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>copy vs deepcopy</code><span class="cmd-tag">Cópia</span></div>
+            <pre><code>import copy
+
+# ═══════════════════════════════════════════════
+# CÓPIA RASA (Shallow Copy)
+# Copia a lista, mas objetos internos são referências
+# ═══════════════════════════════════════════════
+original = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+rasa = original.copy()           # ou: list(original) ou original[:]
+rasa[0][0] = 999                 # modifica objeto interno
+print(original[0][0])            # 999 — ORIGINAL AFETADO!
+
+rasa.append([10, 11, 12])        # adiciona nova sublista
+print(len(original))             # 3 — original não afetado (era sobre a lista principal)
+
+# ═══════════════════════════════════════════════
+# CÓPIA PROFUNDA (Deep Copy)
+# Copia tudo recursivamente — totalmente independente
+# ═══════════════════════════════════════════════
+original = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+profunda = copy.deepcopy(original)
+profunda[0][0] = 999
+print(original[0][0])            # 1 — original INTACTO!
+
+# ═══════════════════════════════════════════════
+# QUANDO USAR CADA UM
+# ═══════════════════════════════════════════════
+# Shallow copy: lista de imutáveis (int, str, tuple)
+ips = ["10.0.1.1", "10.0.1.2", "10.0.1.3"]
+backup_ips = ips.copy()  # suficiente! strings são imutáveis
+
+# Deep copy: lista de mutáveis (listas, dicts)
+configs = [
+    {"nome": "web", "porta": 80, "tags": ["prod"]},
+    {"nome": "api", "porta": 8080, "tags": ["prod", "v2"]},
+]
+backup_configs = copy.deepcopy(configs)  # necessário!</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Regra Prática</h4>
+            <p>Use <code>.copy()</code> ou <code>[:]</code> quando a lista contém apenas tipos imutáveis (números, strings, tuplas). Use <code>copy.deepcopy()</code> quando a lista contém objetos mutáveis (outras listas, dicionários, objetos customizados).</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2: LISTAS — OPERAÇÕES AVANÇADAS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Listas — Operações Avançadas</h2>
+          <p>Técnicas avançadas para manipulação eficiente de listas: comprehensions, sorting avançado, padrões funcionais e considerações de performance.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 List Comprehensions</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Comprehensions — a forma pythônica</code><span class="cmd-tag">Comprehension</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# SINTAXE: [expressão for item in iterável if condição]
+# ═══════════════════════════════════════════════
+
+# Básico — transformar cada elemento
+instancias = ["i-001", "i-002", "i-003", "i-004"]
+upper_ids = [inst.upper() for inst in instancias]
+# ['I-001', 'I-002', 'I-003', 'I-004']
+
+# Com condição (filtro)
+numeros = list(range(1, 21))
+pares = [n for n in numeros if n % 2 == 0]
+# [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+# Transformação + filtro
+custos = [10.5, 250.0, 3.2, 500.0, 45.0, 1200.0]
+altos = [f"${c:.2f}" for c in custos if c > 100]
+# ['$250.00', '$500.00', '$1200.00']
+
+# Com if/else (expressão ternária)
+status = ["running", "stopped", "terminated", "running", "stopped"]
+icones = ["🟢" if s == "running" else "🔴" if s == "terminated" else "🟡" for s in status]
+# ['🟢', '🟡', '🔴', '🟢', '🟡']
+
+# ═══════════════════════════════════════════════
+# COMPREHENSIONS ANINHADAS
+# ═══════════════════════════════════════════════
+
+# Equivalente a dois for aninhados
+# for regiao in regioes:
+#     for az in azs:
+#         resultado.append(f"{regiao}{az}")
+regioes = ["us-east-1", "us-west-2"]
+azs = ["a", "b", "c"]
+todas_azs = [f"{regiao}{az}" for regiao in regioes for az in azs]
+# ['us-east-1a', 'us-east-1b', 'us-east-1c', 'us-west-2a', 'us-west-2b', 'us-west-2c']
+
+# Achatar lista de listas (flatten)
+matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+plana = [num for linha in matriz for num in linha]
+# [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Transpor matriz
+transposta = [[matriz[j][i] for j in range(3)] for i in range(3)]
+# [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+
+# ═══════════════════════════════════════════════
+# CENÁRIO DEVOPS: Processar tags de instâncias EC2
+# ═══════════════════════════════════════════════
+instances = [
+    {"id": "i-001", "tags": {"Name": "web-01", "env": "prod"}},
+    {"id": "i-002", "tags": {"Name": "web-02", "env": "dev"}},
+    {"id": "i-003", "tags": {"Name": "api-01", "env": "prod"}},
+    {"id": "i-004", "tags": {"Name": "db-01", "env": "prod"}},
+]
+
+# Filtrar IDs de instâncias de produção
+prod_ids = [inst["id"] for inst in instances if inst["tags"]["env"] == "prod"]
+# ['i-001', 'i-003', 'i-004']
+
+# Extrair todos os nomes
+nomes = [inst["tags"]["Name"] for inst in instances]
+# ['web-01', 'web-02', 'api-01', 'db-01']</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Quando NÃO usar comprehension</h4>
+            <p>Evite comprehensions quando: (1) a lógica é complexa demais (mais de 2 condições), (2) você precisa de efeitos colaterais (print, append em outra lista), ou (3) a expressão fica difícil de ler. Nestes casos, use um loop for explícito. Legibilidade sempre vem primeiro!</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 Ordenação Avançada</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>sort() vs sorted() — key e reverse</code><span class="cmd-tag">Ordenação</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# sort() vs sorted()
+# sort()   → modifica a lista in-place, retorna None
+# sorted() → retorna NOVA lista, original intacta
+# ═══════════════════════════════════════════════
+
+servidores = ["web-03", "web-01", "api-02", "web-02", "api-01"]
+
+# sorted() — não modifica
+ordenados = sorted(servidores)
+print(servidores)  # ['web-03', 'web-01', 'api-02', 'web-02', 'api-01'] — original
+print(ordenados)   # ['api-01', 'api-02', 'web-01', 'web-02', 'web-03']
+
+# sort() — modifica in-place
+servidores.sort()
+print(servidores)  # ['api-01', 'api-02', 'web-01', 'web-02', 'web-03']
+
+# ═══════════════════════════════════════════════
+# PARÂMETRO key — Ordenação customizada
+# ═══════════════════════════════════════════════
+from operator import itemgetter, attrgetter
+
+# Ordenar por tamanho da string
+palavras = ["Python", "AWS", "Terraform", "Docker", "K8s"]
+por_tamanho = sorted(palavras, key=len)
+# ['AWS', 'K8s', 'Docker', 'Python', 'Terraform']
+
+# Ordenar lista de dicts por um campo
+instancias = [
+    {"id": "i-003", "tipo": "m5.large", "custo": 89.90},
+    {"id": "i-001", "tipo": "t3.micro", "custo": 8.50},
+    {"id": "i-002", "tipo": "t3.small", "custo": 17.00},
+    {"id": "i-004", "tipo": "c5.xlarge", "custo": 170.00},
+]
+
+# Por custo (crescente)
+por_custo = sorted(instancias, key=lambda x: x["custo"])
+# Usando operator.itemgetter (mais eficiente)
+por_custo = sorted(instancias, key=itemgetter("custo"))
+
+# Por custo (decrescente)
+mais_caro = sorted(instancias, key=itemgetter("custo"), reverse=True)
+
+# Ordenação múltipla (primeiro por tipo, depois por custo)
+recursos = [
+    {"tipo": "EC2", "custo": 150},
+    {"tipo": "RDS", "custo": 200},
+    {"tipo": "EC2", "custo": 80},
+    {"tipo": "S3", "custo": 10},
+    {"tipo": "RDS", "custo": 50},
+]
+# Ordena por tipo (alfa) e depois por custo (num)
+ordenado = sorted(recursos, key=lambda x: (x["tipo"], x["custo"]))
+
+# ═══════════════════════════════════════════════
+# ESTABILIDADE: sort() e sorted() são estáveis!
+# Elementos iguais mantêm a ordem relativa original
+# ═══════════════════════════════════════════════
+
+# Ordenação natural de versões (não funciona com sort simples)
+versoes = ["1.2.0", "1.10.0", "1.1.0", "2.0.0", "1.9.0"]
+# Ordenação lexicográfica (errada): ['1.1.0', '1.10.0', '1.2.0', '1.9.0', '2.0.0']
+# Ordenação por tupla de inteiros (correta):
+versoes_ord = sorted(versoes, key=lambda v: tuple(int(x) for x in v.split(".")))
+# ['1.1.0', '1.2.0', '1.9.0', '1.10.0', '2.0.0']</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 Filtragem e Mapeamento</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>filter(), map() e alternativas pythônicas</code><span class="cmd-tag">Funcional</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# filter() — seleciona elementos que passam no teste
+# ═══════════════════════════════════════════════
+portas = [22, 80, 443, 3306, 5432, 8080, 9090, 27017]
+
+# Portas acima de 1024 (não-privilegiadas)
+altas = list(filter(lambda p: p > 1024, portas))
+# [3306, 5432, 8080, 9090, 27017]
+
+# Pythônico — comprehension (preferível):
+altas = [p for p in portas if p > 1024]
+
+# ═══════════════════════════════════════════════
+# map() — aplica função a cada elemento
+# ═══════════════════════════════════════════════
+numeros_str = ["10", "20", "30", "40"]
+numeros_int = list(map(int, numeros_str))  # [10, 20, 30, 40]
+
+# Formatar IPs com prefixo
+ips = ["192.168.1.1", "192.168.1.2", "192.168.1.3"]
+formatados = list(map(lambda ip: f"host: {ip}", ips))
+
+# Pythônico — comprehension:
+formatados = [f"host: {ip}" for ip in ips]
+
+# ═══════════════════════════════════════════════
+# Combinando filter + map (vs comprehension)
+# ═══════════════════════════════════════════════
+logs = [
+    "[ERROR] Timeout connecting to DB",
+    "[INFO] Request processed",
+    "[ERROR] Permission denied",
+    "[WARN] Slow response: 2.5s",
+    "[INFO] Health check OK",
+]
+
+# Extrair mensagens de erro (sem o prefixo)
+# Forma funcional:
+erros = list(map(
+    lambda l: l.replace("[ERROR] ", ""),
+    filter(lambda l: l.startswith("[ERROR]"), logs)
+))
+
+# Forma pythônica (preferível):
+erros = [l.replace("[ERROR] ", "") for l in logs if l.startswith("[ERROR]")]
+# ['Timeout connecting to DB', 'Permission denied']</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 Desempacotamento e Operador *</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Unpacking e spread operator</code><span class="cmd-tag">Unpacking</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Desempacotamento básico
+# ═══════════════════════════════════════════════
+coordenadas = [10.5, 20.3, 5.8]
+x, y, z = coordenadas
+print(f"x={x}, y={y}, z={z}")  # x=10.5, y=20.3, z=5.8
+
+# Swap sem variável temporária
+a, b = [1, 2]
+a, b = b, a  # a=2, b=1
+
+# ═══════════════════════════════════════════════
+# Extended unpacking com * (Python 3+)
+# ═══════════════════════════════════════════════
+numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+primeiro, *meio, ultimo = numeros
+print(primeiro)  # 1
+print(meio)      # [2, 3, 4, 5, 6, 7, 8, 9]
+print(ultimo)    # 10
+
+cabeca, *cauda = numeros
+print(cabeca)    # 1
+print(cauda)     # [2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+*inicio, penultimo, ultimo = numeros
+print(inicio)     # [1, 2, 3, 4, 5, 6, 7, 8]
+print(penultimo)  # 9
+print(ultimo)     # 10
+
+# ═══════════════════════════════════════════════
+# Spread para combinar listas
+# ═══════════════════════════════════════════════
+base_tags = ["env:prod", "team:infra"]
+extra_tags = ["region:us-east-1", "cost-center:1234"]
+todas_tags = [*base_tags, *extra_tags, "managed-by:terraform"]
+# ['env:prod', 'team:infra', 'region:us-east-1', 'cost-center:1234', 'managed-by:terraform']
+
+# Útil para passar argumentos
+def deploy(servidor, porta, ambiente):
+    print(f"Deploying to {servidor}:{porta} ({ambiente})")
+
+config = ["web-01.prod.local", 8080, "production"]
+deploy(*config)  # desempacota a lista como argumentos posicionais</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 Lista como Stack e Queue</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Pilha (LIFO) e Fila (FIFO)</code><span class="cmd-tag">Estruturas</span></div>
+            <pre><code>from collections import deque
+
+# ═══════════════════════════════════════════════
+# PILHA (Stack) — LIFO: Last In, First Out
+# Use append() para empilhar e pop() para desempilhar
+# ═══════════════════════════════════════════════
+undo_stack = []
+undo_stack.append("criar instância i-001")    # push
+undo_stack.append("criar security group sg-01") # push
+undo_stack.append("criar subnet sub-01")        # push
+
+print(f"Última ação: {undo_stack[-1]}")  # peek (ver sem remover)
+ultima = undo_stack.pop()                 # pop: 'criar subnet sub-01'
+print(f"Desfazendo: {ultima}")
+print(f"Restante: {undo_stack}")
+
+# ═══════════════════════════════════════════════
+# FILA (Queue) — FIFO: First In, First Out
+# ⚠️ NÃO use lista para fila! pop(0) é O(n)
+# Use collections.deque — O(1) nas duas pontas
+# ═══════════════════════════════════════════════
+fila_tarefas = deque()
+fila_tarefas.append("backup-db")         # enqueue
+fila_tarefas.append("deploy-api")        # enqueue
+fila_tarefas.append("health-check")      # enqueue
+
+proxima = fila_tarefas.popleft()         # dequeue: 'backup-db'
+print(f"Processando: {proxima}")
+print(f"Na fila: {list(fila_tarefas)}")  # ['deploy-api', 'health-check']
+
+# deque com tamanho máximo (janela deslizante)
+ultimos_logs = deque(maxlen=5)
+for i in range(10):
+    ultimos_logs.append(f"log-{i}")
+print(list(ultimos_logs))  # ['log-5', 'log-6', 'log-7', 'log-8', 'log-9']
+
+# ═══════════════════════════════════════════════
+# deque — operações adicionais
+# ═══════════════════════════════════════════════
+d = deque([1, 2, 3, 4, 5])
+d.appendleft(0)    # adiciona à esquerda: deque([0, 1, 2, 3, 4, 5])
+d.rotate(2)        # rotaciona 2 posições: deque([4, 5, 0, 1, 2, 3])
+d.rotate(-1)       # rotaciona -1: deque([5, 0, 1, 2, 3, 4])</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.6 Performance de Listas</h3>
+          <div class="styled-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Operação</th>
+                  <th>Complexidade</th>
+                  <th>Observação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>list[i]</code></td><td>O(1)</td><td>Acesso direto por índice</td></tr>
+                <tr><td><code>list.append(x)</code></td><td>O(1) amortizado</td><td>Adicionar ao final é rápido</td></tr>
+                <tr><td><code>list.pop()</code></td><td>O(1)</td><td>Remover do final é rápido</td></tr>
+                <tr><td><code>list.pop(0)</code></td><td>O(n)</td><td>⚠️ Remover do início é lento! Use deque</td></tr>
+                <tr><td><code>list.insert(0, x)</code></td><td>O(n)</td><td>⚠️ Inserir no início é lento! Use deque</td></tr>
+                <tr><td><code>x in list</code></td><td>O(n)</td><td>Busca linear — use set para O(1)</td></tr>
+                <tr><td><code>list.sort()</code></td><td>O(n log n)</td><td>Timsort — muito eficiente na prática</td></tr>
+                <tr><td><code>list[a:b]</code></td><td>O(b-a)</td><td>Slicing cria nova lista</td></tr>
+                <tr><td><code>list.extend(iter)</code></td><td>O(k)</td><td>k = tamanho do iterável</td></tr>
+                <tr><td><code>list.remove(x)</code></td><td>O(n)</td><td>Precisa encontrar x primeiro</td></tr>
+                <tr><td><code>len(list)</code></td><td>O(1)</td><td>Tamanho armazenado internamente</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Dicas de Performance para DevOps</h4>
+            <p>Ao processar logs grandes ou listas de recursos AWS:</p>
+            <ul>
+              <li>Use <code>deque</code> em vez de lista se precisa remover do início frequentemente</li>
+              <li>Use <code>set</code> para testes de pertinência (in) — 1000x mais rápido para listas grandes</li>
+              <li>Prefira <strong>generators</strong> a listas quando não precisa armazenar todos os resultados</li>
+              <li>Use <code>bisect</code> para inserção/busca em listas ordenadas — O(log n)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.7 Padrões Comuns para DevOps</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Processamento de logs e operações em lote</code><span class="cmd-tag">DevOps</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Padrão 1: Processar logs em lote (chunking)
+# ═══════════════════════════════════════════════
+def chunked(lista, tamanho):
+    """Divide lista em chunks de tamanho fixo."""
+    for i in range(0, len(lista), tamanho):
+        yield lista[i:i + tamanho]
+
+instancias = [f"i-{str(i).zfill(4)}" for i in range(1, 101)]
+# Processar em lotes de 20 (limite da API AWS)
+for lote in chunked(instancias, 20):
+    print(f"Processando lote de {len(lote)} instâncias: {lote[0]}...{lote[-1]}")
+
+# ═══════════════════════════════════════════════
+# Padrão 2: Acumular resultados com paginação
+# ═══════════════════════════════════════════════
+def listar_todos_recursos(cliente):
+    """Simula paginação de API AWS."""
+    todos = []
+    next_token = None
+    while True:
+        # resposta = cliente.list_resources(NextToken=next_token)
+        # todos.extend(resposta["Resources"])
+        # next_token = resposta.get("NextToken")
+        # if not next_token:
+        #     break
+        break
+    return todos
+
+# ═══════════════════════════════════════════════
+# Padrão 3: Filtro multi-critério
+# ═══════════════════════════════════════════════
+recursos = [
+    {"nome": "web-01", "tipo": "EC2", "estado": "running", "custo": 85.0},
+    {"nome": "db-01", "tipo": "RDS", "estado": "running", "custo": 200.0},
+    {"nome": "cache-01", "tipo": "ElastiCache", "estado": "stopped", "custo": 45.0},
+    {"nome": "web-02", "tipo": "EC2", "estado": "terminated", "custo": 0.0},
+    {"nome": "api-01", "tipo": "EC2", "estado": "running", "custo": 120.0},
+]
+
+# Filtros dinâmicos
+filtros = {
+    "tipo": "EC2",
+    "estado": "running",
 }
 
-# Acesso seguro
-print(servidor.get("ip"))              # 10.0.1.50
-print(servidor.get("regiao", "us-east-1"))  # default
+resultado = recursos
+for campo, valor in filtros.items():
+    resultado = [r for r in resultado if r[campo] == valor]
 
-# Métodos úteis
-servidor["cpu"] = 4                    # adiciona/atualiza
-del servidor["porta"]                  # remove
-print(servidor.keys())                 # chaves
-print(servidor.values())               # valores
-print(servidor.items())                # pares (k, v)
+print(f"Encontrados: {len(resultado)} recursos")
+# [{'nome': 'web-01', ...}, {'nome': 'api-01', ...}]</code></pre>
+          </div>
+        </div>
 
-# Iteração
-for chave, valor in servidor.items():
-    print(f"{chave}: {valor}")
+      </div>
+    </section>
 
-# Merge (Python 3.9+)
-config = {"debug": True} | servidor</code></pre>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3: TUPLAS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Tuplas — Coleções Imutáveis</h2>
+          <p>Tuplas são como listas, mas imutáveis. Essa restrição traz benefícios de segurança, performance e clareza semântica — "este dado não deve ser modificado".</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 Criando Tuplas</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Formas de criar tuplas</code><span class="cmd-tag">Criação</span></div>
+            <pre><code># 1. Literal com parênteses
+coordenadas = (10.5, 20.3)
+rgb = (255, 128, 0)
+servidor = ("web-01", "10.0.1.5", 443, "running")
+
+# 2. Sem parênteses (tuple packing)
+ponto = 3, 7          # (3, 7) — parênteses são opcionais!
+configs = "prod", 8080, True
+
+# 3. ⚠️ ARMADILHA: Tupla de um elemento precisa de vírgula!
+nao_e_tupla = ("hello")   # é uma string! parênteses são agrupamento
+e_tupla = ("hello",)      # AGORA é tupla! note a vírgula
+tambem_tupla = "hello",   # vírgula sem parênteses — funciona
+
+print(type(nao_e_tupla))  # <class 'str'>
+print(type(e_tupla))      # <class 'tuple'>
+
+# 4. Construtor tuple()
+letras = tuple("Python")         # ('P', 'y', 't', 'h', 'o', 'n')
+de_lista = tuple([1, 2, 3])     # (1, 2, 3)
+de_range = tuple(range(5))      # (0, 1, 2, 3, 4)
+
+# 5. Tupla vazia
+vazia = ()
+vazia2 = tuple()
+
+# 6. Tupla de tuplas (tabela imutável)
+tabela_precos = (
+    ("t3.micro", 0.0104),
+    ("t3.small", 0.0208),
+    ("t3.medium", 0.0416),
+    ("m5.large", 0.0960),
+    ("c5.xlarge", 0.1700),
+)</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Tuplas e Sets</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>tuple</code><span class="cmd-tag">Imutável</span></div>
-              <pre><code># Tuplas são imutáveis
-coordenadas = (23.5505, -46.6333)
-rgb = (255, 128, 0)
+          <h3>3.2 Imutabilidade e seus Benefícios</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Por que imutabilidade importa</code><span class="cmd-tag">Imutável</span></div>
+            <pre><code># Tuplas NÃO podem ser modificadas após criação
+coordenadas = (10, 20, 30)
 
-# Desempacotamento
-lat, lon = coordenadas
+# ❌ Todas essas operações geram TypeError:
+# coordenadas[0] = 99
+# coordenadas.append(40)
+# del coordenadas[1]
 
-# Named tuple
-from collections import namedtuple
-Servidor = namedtuple("Servidor", ["nome", "ip", "porta"])
-srv = Servidor("web-01", "10.0.1.50", 8080)
-print(srv.nome)  # web-01</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>set</code><span class="cmd-tag">Únicos</span></div>
-              <pre><code># Sets: elementos únicos, sem ordem
-ips_prod = {"10.0.1.1", "10.0.1.2", "10.0.1.3"}
-ips_dev = {"10.0.1.2", "10.0.1.4"}
+# ═══════════════════════════════════════════════
+# BENEFÍCIOS DA IMUTABILIDADE:
+# ═══════════════════════════════════════════════
 
-# Operações de conjuntos
-print(ips_prod | ips_dev)   # união
-print(ips_prod & ips_dev)   # interseção
-print(ips_prod - ips_dev)   # diferença
+# 1. SEGURANÇA — dados protegidos contra modificação acidental
+PORTAS_PERMITIDAS = (22, 80, 443, 8080)
+# Nenhuma parte do código pode alterar essa constante
 
-# Remover duplicatas
-logs = ["erro", "info", "erro", "warn", "info"]
-unicos = list(set(logs))</code></pre>
-            </div>
+# 2. HASHABLE — podem ser chaves de dicionário e elementos de set
+cache = {}
+chave = ("us-east-1", "t3.micro")  # tupla como chave
+cache[chave] = {"preco": 0.0104}
+
+regioes_visitadas = set()
+regioes_visitadas.add(("us-east-1", "web"))
+regioes_visitadas.add(("us-west-2", "api"))
+
+# 3. PERFORMANCE — menor overhead de memória
+import sys
+lista = [1, 2, 3, 4, 5]
+tupla = (1, 2, 3, 4, 5)
+print(f"Lista: {sys.getsizeof(lista)} bytes")  # ~104 bytes
+print(f"Tupla: {sys.getsizeof(tupla)} bytes")  # ~80 bytes
+
+# 4. SEMÂNTICA — comunica intenção ao leitor
+# "Esta coleção é fixa e não deve mudar"
+DIAS_SEMANA = ("seg", "ter", "qua", "qui", "sex", "sab", "dom")
+HTTP_METHODS = ("GET", "POST", "PUT", "DELETE", "PATCH")
+
+# ═══════════════════════════════════════════════
+# ⚠️ CUIDADO: Tupla com elementos mutáveis!
+# A tupla em si é imutável, mas objetos internos podem mudar
+# ═══════════════════════════════════════════════
+tupla_com_lista = ([1, 2, 3], [4, 5, 6])
+tupla_com_lista[0].append(99)  # Funciona! A lista INTERNA é mutável
+print(tupla_com_lista)  # ([1, 2, 3, 99], [4, 5, 6])
+# Mas: tupla_com_lista[0] = [7, 8, 9]  # ❌ TypeError!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 Tuple Packing e Unpacking</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Empacotamento e desempacotamento</code><span class="cmd-tag">Unpacking</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# PACKING — juntar valores em uma tupla
+# ═══════════════════════════════════════════════
+servidor = "web-01", "10.0.1.5", 443  # packing automático
+print(type(servidor))  # <class 'tuple'>
+
+# Funções retornam múltiplos valores como tupla
+def analisar_instancia(instance_id):
+    # ... consultar AWS ...
+    return "running", "t3.micro", "us-east-1"  # retorna tupla
+
+resultado = analisar_instancia("i-001")
+print(type(resultado))  # <class 'tuple'>
+
+# ═══════════════════════════════════════════════
+# UNPACKING — extrair valores de uma tupla
+# ═══════════════════════════════════════════════
+status, tipo, regiao = analisar_instancia("i-001")
+print(f"{tipo} em {regiao}: {status}")
+
+# Ignorar valores com _
+nome, _, porta = ("web-01", "10.0.1.5", 443)
+print(f"{nome}:{porta}")  # usa nome e porta, ignora IP
+
+# Extended unpacking
+primeiro, *resto = (1, 2, 3, 4, 5)
+*inicio, ultimo = (1, 2, 3, 4, 5)
+
+# ═══════════════════════════════════════════════
+# UNPACKING EM LOOPS
+# ═══════════════════════════════════════════════
+servidores = [
+    ("web-01", "10.0.1.1", "running"),
+    ("web-02", "10.0.1.2", "stopped"),
+    ("api-01", "10.0.2.1", "running"),
+]
+
+for nome, ip, status in servidores:
+    icone = "🟢" if status == "running" else "🔴"
+    print(f"{icone} {nome} ({ip})")
+
+# Com enumerate
+for idx, (nome, ip, status) in enumerate(servidores, 1):
+    print(f"{idx}. {nome}")
+
+# ═══════════════════════════════════════════════
+# Swap de variáveis (usa tuple packing/unpacking)
+# ═══════════════════════════════════════════════
+a, b = 10, 20
+a, b = b, a  # swap elegante!
+print(f"a={a}, b={b}")  # a=20, b=10
+
+# Rotação de variáveis
+x, y, z = 1, 2, 3
+x, y, z = y, z, x  # rotação: x=2, y=3, z=1</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 Named Tuples — Tuplas com Nomes</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>collections.namedtuple e typing.NamedTuple</code><span class="cmd-tag">NamedTuple</span></div>
+            <pre><code>from collections import namedtuple
+from typing import NamedTuple
+
+# ═══════════════════════════════════════════════
+# collections.namedtuple (estilo clássico)
+# ═══════════════════════════════════════════════
+Servidor = namedtuple("Servidor", ["nome", "ip", "porta", "status"])
+
+web = Servidor("web-01", "10.0.1.1", 443, "running")
+print(web.nome)    # 'web-01' — acesso por nome!
+print(web[0])      # 'web-01' — acesso por índice (compatível com tupla)
+print(web.status)  # 'running'
+
+# Desempacotamento funciona normalmente
+nome, ip, porta, status = web
+
+# Métodos úteis
+print(web._asdict())  # {'nome': 'web-01', 'ip': '10.0.1.1', ...}
+web2 = web._replace(status="stopped")  # cria NOVA namedtuple
+print(web2)  # Servidor(nome='web-01', ip='10.0.1.1', porta=443, status='stopped')
+
+# ═══════════════════════════════════════════════
+# typing.NamedTuple (estilo moderno — preferível)
+# ═══════════════════════════════════════════════
+class Instancia(NamedTuple):
+    """Representa uma instância EC2."""
+    id: str
+    tipo: str
+    estado: str
+    regiao: str
+    custo_hora: float = 0.0  # valor padrão!
+
+ec2 = Instancia(
+    id="i-0abc123",
+    tipo="t3.micro",
+    estado="running",
+    regiao="us-east-1",
+    custo_hora=0.0104
+)
+
+print(f"Instância {ec2.id} ({ec2.tipo}) em {ec2.regiao}")
+print(f"Custo/hora: ${ec2.custo_hora}")
+
+# Uso em lista (muito legível!)
+frota = [
+    Instancia("i-001", "t3.micro", "running", "us-east-1", 0.0104),
+    Instancia("i-002", "m5.large", "running", "us-east-1", 0.0960),
+    Instancia("i-003", "c5.xlarge", "stopped", "us-west-2", 0.1700),
+]
+
+# Filtrar e calcular
+rodando = [inst for inst in frota if inst.estado == "running"]
+custo_total = sum(inst.custo_hora for inst in rodando)
+print(f"Custo/hora das instâncias ativas: ${custo_total:.4f}")
+
+# ═══════════════════════════════════════════════
+# Vantagens sobre dicionários para dados fixos:
+# - Type hints (IDE mostra erros)
+# - Imutável (seguro)
+# - Menos memória que dict
+# - Acesso por nome E índice
+# - Compatível com tuple (sort, hash, etc)
+# ═══════════════════════════════════════════════</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 Quando Usar Tuplas vs Listas</h3>
+          <div class="styled-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Critério</th>
+                  <th>Use Tupla</th>
+                  <th>Use Lista</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Dados mudam?</td><td>Não — constantes, configs fixas</td><td>Sim — coleção que cresce/encolhe</td></tr>
+                <tr><td>Semântica</td><td>Registro/struct (campos heterogêneos)</td><td>Coleção homogênea de itens</td></tr>
+                <tr><td>Chave de dict?</td><td>✅ Sim (hashable)</td><td>❌ Não</td></tr>
+                <tr><td>Performance</td><td>Levemente mais rápido, menos memória</td><td>Mais flexível</td></tr>
+                <tr><td>Retorno de função</td><td>Retornar múltiplos valores</td><td>Retornar coleção variável</td></tr>
+                <tr><td>Iteração</td><td>Normalmente não itera (acessa por posição)</td><td>Normalmente itera sobre itens</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Regra Geral</h4>
+            <p><strong>Tupla</strong> = "registro" com campos posicionais (como uma linha de CSV ou um ponto no espaço). <strong>Lista</strong> = "coleção" de itens semelhantes que pode crescer. Pense em tupla como uma <code>struct</code> do C e lista como um <code>ArrayList</code> do Java.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.6 Tuplas como Chaves e em Conjuntos</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Tuplas hashable — uso avançado</code><span class="cmd-tag">Hash</span></div>
+            <pre><code># Tuplas (se contêm apenas imutáveis) são hashable
+# Isso permite usá-las como chaves de dict e elementos de set
+
+# ═══════════════════════════════════════════════
+# Cache de resultados com tupla como chave
+# ═══════════════════════════════════════════════
+preco_cache = {}
+
+def get_preco_instancia(regiao, tipo):
+    chave = (regiao, tipo)
+    if chave in preco_cache:
+        return preco_cache[chave]
+    
+    # Simula consulta à API
+    preco = 0.0104  # valor exemplo
+    preco_cache[chave] = preco
+    return preco
+
+# ═══════════════════════════════════════════════
+# Set de coordenadas (ex: AZs visitadas)
+# ═══════════════════════════════════════════════
+regioes_ativas = {
+    ("us-east-1", "a"),
+    ("us-east-1", "b"),
+    ("us-west-2", "a"),
+    ("eu-west-1", "a"),
+}
+
+# Verificar se uma AZ está ativa
+if ("us-east-1", "a") in regioes_ativas:
+    print("AZ us-east-1a está ativa!")
+
+# ═══════════════════════════════════════════════
+# Contar ocorrências de pares
+# ═══════════════════════════════════════════════
+from collections import Counter
+
+acessos = [
+    ("user-01", "/api/deploy"),
+    ("user-02", "/api/status"),
+    ("user-01", "/api/deploy"),
+    ("user-01", "/api/deploy"),
+    ("user-02", "/api/logs"),
+]
+
+contagem = Counter(acessos)
+print(contagem.most_common(2))
+# [(('user-01', '/api/deploy'), 3), (('user-02', '/api/status'), 1)]</code></pre>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- Navigation -->
-    <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-03.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-05.html" class="button primary">Próximo Módulo →</a>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4: DICIONÁRIOS — FUNDAMENTOS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Dicionários — Fundamentos</h2>
+          <p>Dicionários são a estrutura de dados mais poderosa do Python. Mapeiam chaves únicas a valores, com acesso O(1). São a base para JSON, configurações, caches e praticamente tudo em Python.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 Criando Dicionários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Formas de criar dicts</code><span class="cmd-tag">Criação</span></div>
+            <pre><code># 1. Literal com chaves {} (mais comum)
+servidor = {
+    "nome": "web-01",
+    "ip": "10.0.1.5",
+    "porta": 443,
+    "ativo": True,
+    "tags": ["prod", "web"],
+}
+
+# 2. Construtor dict()
+config = dict(host="localhost", port=5432, db="myapp")
+# {'host': 'localhost', 'port': 5432, 'db': 'myapp'}
+
+# dict() a partir de lista de tuplas
+pares = [("nome", "api-01"), ("porta", 8080), ("env", "prod")]
+servidor2 = dict(pares)
+
+# 3. Dict Comprehension
+quadrados = {x: x**2 for x in range(1, 6)}
+# {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+
+# 4. dict.fromkeys() — chaves com valor padrão
+campos = ["nome", "ip", "porta", "status"]
+template = dict.fromkeys(campos, "N/A")
+# {'nome': 'N/A', 'ip': 'N/A', 'porta': 'N/A', 'status': 'N/A'}
+
+# 5. Zip + dict (combinar duas listas)
+chaves = ["nome", "tipo", "regiao"]
+valores = ["web-01", "t3.micro", "us-east-1"]
+instancia = dict(zip(chaves, valores))
+# {'nome': 'web-01', 'tipo': 't3.micro', 'regiao': 'us-east-1'}
+
+# 6. Dicionário vazio
+vazio = {}
+vazio2 = dict()
+
+# ⚠️ Chaves devem ser hashable (imutáveis): str, int, float, tuple, frozenset
+# ❌ lista como chave: {[1,2]: "valor"}  — TypeError!
+# ✅ tupla como chave: {(1,2): "valor"}  — OK!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 Acessando Valores</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>[], .get(), .setdefault()</code><span class="cmd-tag">Acesso</span></div>
+            <pre><code>instancia = {
+    "id": "i-0abc123",
+    "tipo": "t3.micro",
+    "estado": "running",
+    "az": "us-east-1a",
+    "tags": {"Name": "web-01", "env": "prod"},
+}
+
+# ═══════════════════════════════════════════════
+# Acesso com [] — gera KeyError se não existir
+# ═══════════════════════════════════════════════
+print(instancia["id"])        # 'i-0abc123'
+print(instancia["tags"]["Name"])  # 'web-01' (dict aninhado)
+# print(instancia["custo"])    # ❌ KeyError: 'custo'
+
+# ═══════════════════════════════════════════════
+# .get(chave, padrão) — retorna padrão se não existir
+# ═══════════════════════════════════════════════
+print(instancia.get("estado"))         # 'running'
+print(instancia.get("custo"))          # None (padrão é None)
+print(instancia.get("custo", 0.0))     # 0.0 (padrão especificado)
+print(instancia.get("tipo", "unknown"))  # 't3.micro' (existe, ignora padrão)
+
+# Muito útil para configs opcionais:
+config = {"host": "db.prod.local", "port": 5432}
+timeout = config.get("timeout", 30)     # 30 (valor padrão seguro)
+ssl = config.get("ssl", True)           # True (padrão seguro)
+
+# ═══════════════════════════════════════════════
+# .setdefault(chave, padrão) — get + set se não existir
+# ═══════════════════════════════════════════════
+# Retorna o valor se existir; se não, INSERE o padrão e retorna
+contadores = {}
+contadores.setdefault("erros", 0)      # insere 'erros': 0
+contadores.setdefault("sucessos", 0)   # insere 'sucessos': 0
+contadores["erros"] += 1
+
+# Caso de uso: agrupar itens
+grupos = {}
+itens = [("web", "i-001"), ("api", "i-002"), ("web", "i-003"), ("api", "i-004")]
+for grupo, item in itens:
+    grupos.setdefault(grupo, []).append(item)
+print(grupos)
+# {'web': ['i-001', 'i-003'], 'api': ['i-002', 'i-004']}
+
+# ═══════════════════════════════════════════════
+# Verificar existência com 'in'
+# ═══════════════════════════════════════════════
+if "tags" in instancia:
+    print(f"Tags: {instancia['tags']}")
+
+# Padrão seguro para dicts aninhados
+nome = instancia.get("tags", {}).get("Name", "sem-nome")
+print(nome)  # 'web-01'</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 Adicionando e Atualizando</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Inserção, atualização e merge</code><span class="cmd-tag">Modificação</span></div>
+            <pre><code>config = {"host": "localhost", "port": 5432}
+
+# ═══════════════════════════════════════════════
+# Atribuição direta — adiciona ou atualiza
+# ═══════════════════════════════════════════════
+config["db"] = "myapp"          # adiciona nova chave
+config["port"] = 3306           # atualiza chave existente
+print(config)
+# {'host': 'localhost', 'port': 3306, 'db': 'myapp'}
+
+# ═══════════════════════════════════════════════
+# .update() — merge de outro dict/iterável
+# ═══════════════════════════════════════════════
+config.update({"ssl": True, "timeout": 30, "port": 5432})
+# Chaves existentes são sobrescritas, novas são adicionadas
+print(config)
+# {'host': 'localhost', 'port': 5432, 'db': 'myapp', 'ssl': True, 'timeout': 30}
+
+# Também aceita kwargs
+config.update(pool_size=10, retry=3)
+
+# ═══════════════════════════════════════════════
+# Operador | e |= (Python 3.9+)
+# ═══════════════════════════════════════════════
+defaults = {"host": "localhost", "port": 5432, "ssl": False}
+override = {"port": 3306, "ssl": True, "db": "prod"}
+
+# | cria NOVO dicionário (não modifica os originais)
+final = defaults | override
+# {'host': 'localhost', 'port': 3306, 'ssl': True, 'db': 'prod'}
+# Chaves do dict à DIREITA prevalecem
+
+# |= modifica in-place (como +=)
+config = {"host": "localhost", "port": 5432}
+config |= {"ssl": True, "timeout": 30}
+print(config)
+# {'host': 'localhost', 'port': 5432, 'ssl': True, 'timeout': 30}
+
+# ═══════════════════════════════════════════════
+# Merge com ** (unpacking) — Python 3.5+
+# ═══════════════════════════════════════════════
+base = {"env": "prod", "region": "us-east-1"}
+extras = {"team": "infra", "cost_center": "1234"}
+tags = {**base, **extras, "managed_by": "terraform"}
+# {'env': 'prod', 'region': 'us-east-1', 'team': 'infra', 
+#  'cost_center': '1234', 'managed_by': 'terraform'}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 Removendo Itens</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>del, .pop(), .popitem(), .clear()</code><span class="cmd-tag">Remoção</span></div>
+            <pre><code>recurso = {
+    "nome": "web-01",
+    "tipo": "EC2",
+    "estado": "running",
+    "ip": "10.0.1.5",
+    "temp": "valor_temporario",
+}
+
+# ═══════════════════════════════════════════════
+# del — remove chave (KeyError se não existir)
+# ═══════════════════════════════════════════════
+del recurso["temp"]
+# del recurso["inexistente"]  # ❌ KeyError
+
+# ═══════════════════════════════════════════════
+# .pop(chave, padrão) — remove e retorna valor
+# ═══════════════════════════════════════════════
+ip = recurso.pop("ip")           # remove e retorna '10.0.1.5'
+debug = recurso.pop("debug", None)  # não existe, retorna None (sem erro)
+print(f"IP removido: {ip}")
+
+# ═══════════════════════════════════════════════
+# .popitem() — remove e retorna ÚLTIMO par inserido (LIFO)
+# ═══════════════════════════════════════════════
+ultimo = recurso.popitem()
+print(f"Removido: {ultimo}")  # ('estado', 'running')
+
+# ═══════════════════════════════════════════════
+# .clear() — remove TUDO
+# ═══════════════════════════════════════════════
+temp = {"a": 1, "b": 2, "c": 3}
+temp.clear()
+print(temp)  # {}
+
+# ═══════════════════════════════════════════════
+# Remoção condicional (criar novo dict sem itens indesejados)
+# ═══════════════════════════════════════════════
+tags = {
+    "Name": "web-01",
+    "env": "prod",
+    "aws:cloudformation:stack": "my-stack",
+    "aws:cloudformation:id": "abc123",
+    "team": "infra",
+}
+
+# Remover tags que começam com "aws:"
+tags_limpas = {k: v for k, v in tags.items() if not k.startswith("aws:")}
+# {'Name': 'web-01', 'env': 'prod', 'team': 'infra'}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 Iterando sobre Dicionários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>.keys(), .values(), .items()</code><span class="cmd-tag">Iteração</span></div>
+            <pre><code>instancia = {
+    "id": "i-0abc123",
+    "nome": "web-01",
+    "tipo": "t3.micro",
+    "estado": "running",
+    "custo_mensal": 7.49,
+}
+
+# ═══════════════════════════════════════════════
+# Iterar sobre CHAVES (padrão)
+# ═══════════════════════════════════════════════
+for chave in instancia:  # equivalente a instancia.keys()
+    print(chave)
+
+# .keys() explícito
+print(list(instancia.keys()))
+# ['id', 'nome', 'tipo', 'estado', 'custo_mensal']
+
+# ═══════════════════════════════════════════════
+# Iterar sobre VALORES
+# ═══════════════════════════════════════════════
+for valor in instancia.values():
+    print(valor)
+
+# ═══════════════════════════════════════════════
+# Iterar sobre PARES chave-valor (mais comum!)
+# ═══════════════════════════════════════════════
+for chave, valor in instancia.items():
+    print(f"  {chave:15} = {valor}")
+
+# Saída:
+#   id              = i-0abc123
+#   nome            = web-01
+#   tipo            = t3.micro
+#   estado          = running
+#   custo_mensal    = 7.49
+
+# ═══════════════════════════════════════════════
+# Exemplo DevOps: Exibir tags formatadas
+# ═══════════════════════════════════════════════
+tags = {
+    "Name": "production-api",
+    "Environment": "prod",
+    "Team": "backend",
+    "CostCenter": "CC-1234",
+    "ManagedBy": "terraform",
+}
+
+print("Tags do recurso:")
+print("-" * 40)
+for tag, valor in sorted(tags.items()):
+    print(f"  {tag:15} : {valor}")
+
+# ═══════════════════════════════════════════════
+# Views são dinâmicas (refletem mudanças)
+# ═══════════════════════════════════════════════
+d = {"a": 1, "b": 2}
+chaves_view = d.keys()
+d["c"] = 3
+print(list(chaves_view))  # ['a', 'b', 'c'] — reflete a mudança!
+
+# ⚠️ NÃO modifique o dict enquanto itera sobre ele!
+# ❌ for k in d: d[k+"_new"] = d[k]  — RuntimeError!
+
+# ✅ Iterar sobre cópia dos itens:
+for k, v in list(d.items()):
+    if v > 1:
+        d[f"{k}_doubled"] = v * 2</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.6 Ordenação de Dicionários (Python 3.7+)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Insertion order preservada</code><span class="cmd-tag">Ordem</span></div>
+            <pre><code># Desde Python 3.7, dicts mantêm ORDEM DE INSERÇÃO
+# (Na prática, desde CPython 3.6, mas oficializado em 3.7)
+
+config = {}
+config["host"] = "db.prod.local"
+config["port"] = 5432
+config["ssl"] = True
+config["db"] = "production"
+
+# A ordem é garantida: host, port, ssl, db
+for k, v in config.items():
+    print(f"{k}: {v}")
+
+# Reordenar um dict: criar novo dict com chaves sorted
+desordenado = {"banana": 3, "apple": 5, "cherry": 1}
+ordenado = dict(sorted(desordenado.items()))
+# {'apple': 5, 'banana': 3, 'cherry': 1}
+
+# Ordenar por valor
+por_valor = dict(sorted(desordenado.items(), key=lambda x: x[1]))
+# {'cherry': 1, 'banana': 3, 'apple': 5}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.7 Dicionários Aninhados</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Dicts dentro de dicts — padrão JSON</code><span class="cmd-tag">Aninhamento</span></div>
+            <pre><code># Estrutura típica de resposta AWS / API
+infraestrutura = {
+    "vpc": {
+        "id": "vpc-0abc123",
+        "cidr": "10.0.0.0/16",
+        "subnets": {
+            "public": [
+                {"id": "subnet-pub1", "az": "us-east-1a", "cidr": "10.0.1.0/24"},
+                {"id": "subnet-pub2", "az": "us-east-1b", "cidr": "10.0.2.0/24"},
+            ],
+            "private": [
+                {"id": "subnet-priv1", "az": "us-east-1a", "cidr": "10.0.10.0/24"},
+                {"id": "subnet-priv2", "az": "us-east-1b", "cidr": "10.0.20.0/24"},
+            ],
+        },
+    },
+    "instances": [
+        {"id": "i-001", "subnet": "subnet-priv1", "tipo": "t3.micro"},
+        {"id": "i-002", "subnet": "subnet-priv2", "tipo": "m5.large"},
+    ],
+}
+
+# Acessar dados aninhados
+vpc_cidr = infraestrutura["vpc"]["cidr"]
+primeira_subnet_pub = infraestrutura["vpc"]["subnets"]["public"][0]["id"]
+print(f"VPC: {vpc_cidr}")
+print(f"Subnet: {primeira_subnet_pub}")
+
+# Acesso seguro com .get() encadeado
+dns = infraestrutura.get("vpc", {}).get("dns", {}).get("domain", "N/A")
+
+# Iterar sobre estrutura aninhada
+for tipo_subnet, subnets in infraestrutura["vpc"]["subnets"].items():
+    print(f"\n{tipo_subnet.upper()} Subnets:")
+    for subnet in subnets:
+        print(f"  {subnet['id']} — {subnet['az']} ({subnet['cidr']})")
+
+# Modificar dado aninhado
+infraestrutura["vpc"]["subnets"]["public"].append({
+    "id": "subnet-pub3", "az": "us-east-1c", "cidr": "10.0.3.0/24"
+})</code></pre>
+          </div>
+        </div>
+
       </div>
     </section>
-  </main>
 
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
-    </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
-  </footer>
-  <script src="../trail-gate.js"></script>
-  <script src="../config.js"></script>
-  <script src="../app.js"></script>
-</body>
-</html>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5: DICIONÁRIOS — OPERAÇÕES AVANÇADAS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Dicionários — Operações Avançadas</h2>
+          <p>Técnicas avançadas com dicionários: comprehensions, collections especializadas, padrões de contagem, agrupamento e estruturas JSON-like para APIs.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 Dict Comprehensions</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Comprehensions para dicionários</code><span class="cmd-tag">Comprehension</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# SINTAXE: {chave: valor for item in iterável if condição}
+# ═══════════════════════════════════════════════
+
+# Básico — transformar chaves/valores
+nomes = ["web-01", "api-01", "db-01"]
+status_map = {nome: "running" for nome in nomes}
+# {'web-01': 'running', 'api-01': 'running', 'db-01': 'running'}
+
+# Inverter chave/valor
+original = {"a": 1, "b": 2, "c": 3}
+invertido = {v: k for k, v in original.items()}
+# {1: 'a', 2: 'b', 3: 'c'}
+
+# Filtrar itens de um dict
+custos = {"EC2": 150, "RDS": 200, "S3": 5, "Lambda": 2, "CloudFront": 45}
+caros = {servico: custo for servico, custo in custos.items() if custo > 50}
+# {'EC2': 150, 'RDS': 200}
+
+# Transformar valores
+# Converter custos de USD para BRL
+taxa_cambio = 5.20
+custos_brl = {k: round(v * taxa_cambio, 2) for k, v in custos.items()}
+# {'EC2': 780.0, 'RDS': 1040.0, 'S3': 26.0, 'Lambda': 10.4, 'CloudFront': 234.0}
+
+# Normalizar chaves (tudo minúsculo)
+headers = {"Content-Type": "application/json", "X-Request-ID": "abc123", "Authorization": "Bearer ..."}
+headers_lower = {k.lower(): v for k, v in headers.items()}
+# {'content-type': 'application/json', 'x-request-id': 'abc123', 'authorization': 'Bearer ...'}
+
+# ═══════════════════════════════════════════════
+# Dict a partir de duas listas com zip
+# ═══════════════════════════════════════════════
+regioes = ["us-east-1", "us-west-2", "eu-west-1", "sa-east-1"]
+precos_base = [0.0116, 0.0130, 0.0128, 0.0148]
+precos_por_regiao = {regiao: preco for regiao, preco in zip(regioes, precos_base)}
+
+# Condição com if/else na expressão
+status_list = ["running", "stopped", "terminated", "running", "stopped"]
+emojis = {f"inst-{i}": "🟢" if s == "running" else "🔴" if s == "terminated" else "🟡"
+           for i, s in enumerate(status_list, 1)}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 Merge de Dicionários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Combinando múltiplos dicts</code><span class="cmd-tag">Merge</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Cenário DevOps: Config com defaults + overrides
+# ═══════════════════════════════════════════════
+defaults = {
+    "timeout": 30,
+    "retries": 3,
+    "ssl": True,
+    "port": 443,
+    "log_level": "INFO",
+}
+
+ambiente = {
+    "port": 8080,
+    "log_level": "DEBUG",
+    "debug": True,
+}
+
+usuario = {
+    "timeout": 60,
+}
+
+# ═══════════════════════════════════════════════
+# Método 1: Operador | (Python 3.9+) — mais limpo
+# ═══════════════════════════════════════════════
+config_final = defaults | ambiente | usuario
+# Prioridade: usuario > ambiente > defaults
+# {'timeout': 60, 'retries': 3, 'ssl': True, 'port': 8080,
+#  'log_level': 'DEBUG', 'debug': True}
+
+# ═══════════════════════════════════════════════
+# Método 2: ** unpacking (Python 3.5+)
+# ═══════════════════════════════════════════════
+config_final = {**defaults, **ambiente, **usuario}
+# Mesmo resultado — último vence
+
+# ═══════════════════════════════════════════════
+# Método 3: .update() encadeado (modifica in-place)
+# ═══════════════════════════════════════════════
+config_final = defaults.copy()  # não modificar o original!
+config_final.update(ambiente)
+config_final.update(usuario)
+
+# ═══════════════════════════════════════════════
+# Merge profundo (deep merge) — não é nativo!
+# ═══════════════════════════════════════════════
+def deep_merge(base, override):
+    """Merge recursivo de dicts aninhados."""
+    resultado = base.copy()
+    for key, value in override.items():
+        if key in resultado and isinstance(resultado[key], dict) and isinstance(value, dict):
+            resultado[key] = deep_merge(resultado[key], value)
+        else:
+            resultado[key] = value
+    return resultado
+
+config_base = {
+    "database": {"host": "localhost", "port": 5432, "pool": {"min": 2, "max": 10}},
+    "cache": {"host": "localhost", "port": 6379},
+}
+config_prod = {
+    "database": {"host": "db.prod.local", "pool": {"min": 5, "max": 50}},
+    "cache": {"host": "redis.prod.local"},
+}
+
+final = deep_merge(config_base, config_prod)
+# database.port mantido (5432), database.host sobrescrito
+# pool.min e pool.max sobrescritos, cache.host sobrescrito
+print(final["database"]["port"])        # 5432 (mantido)
+print(final["database"]["pool"]["max"]) # 50 (sobrescrito)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 defaultdict — Dict com Valor Padrão</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>collections.defaultdict</code><span class="cmd-tag">defaultdict</span></div>
+            <pre><code>from collections import defaultdict
+
+# ═══════════════════════════════════════════════
+# Problema: agrupar itens (KeyError na primeira vez)
+# ═══════════════════════════════════════════════
+
+# ❌ Forma verbosa com dict normal:
+logs = [
+    ("ERROR", "Connection timeout"),
+    ("INFO", "Request processed"),
+    ("ERROR", "Permission denied"),
+    ("WARN", "Slow query: 2.5s"),
+    ("INFO", "Health check OK"),
+    ("ERROR", "Disk full"),
+]
+
+agrupado = {}
+for nivel, msg in logs:
+    if nivel not in agrupado:
+        agrupado[nivel] = []
+    agrupado[nivel].append(msg)
+
+# ✅ Forma elegante com defaultdict:
+agrupado = defaultdict(list)
+for nivel, msg in logs:
+    agrupado[nivel].append(msg)  # não precisa verificar se existe!
+
+print(dict(agrupado))
+# {'ERROR': ['Connection timeout', 'Permission denied', 'Disk full'],
+#  'INFO': ['Request processed', 'Health check OK'],
+#  'WARN': ['Slow query: 2.5s']}
+
+# ═══════════════════════════════════════════════
+# defaultdict(int) — contadores
+# ═══════════════════════════════════════════════
+contagem_tipos = defaultdict(int)
+instancias = ["t3.micro", "m5.large", "t3.micro", "c5.xlarge", "t3.micro", "m5.large"]
+for tipo in instancias:
+    contagem_tipos[tipo] += 1
+
+print(dict(contagem_tipos))
+# {'t3.micro': 3, 'm5.large': 2, 'c5.xlarge': 1}
+
+# ═══════════════════════════════════════════════
+# defaultdict(set) — coleções únicas
+# ═══════════════════════════════════════════════
+usuario_regioes = defaultdict(set)
+acessos = [
+    ("user-01", "us-east-1"),
+    ("user-02", "us-west-2"),
+    ("user-01", "us-west-2"),
+    ("user-01", "us-east-1"),  # duplicado — set ignora
+    ("user-02", "eu-west-1"),
+]
+for user, regiao in acessos:
+    usuario_regioes[user].add(regiao)
+
+print(dict(usuario_regioes))
+# {'user-01': {'us-east-1', 'us-west-2'}, 'user-02': {'us-west-2', 'eu-west-1'}}
+
+# ═══════════════════════════════════════════════
+# defaultdict com lambda (valor padrão customizado)
+# ═══════════════════════════════════════════════
+status_padrao = defaultdict(lambda: "unknown")
+status_padrao["web-01"] = "running"
+print(status_padrao["web-01"])     # 'running'
+print(status_padrao["web-99"])     # 'unknown' (criado automaticamente)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 Counter — Contagem Especializada</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>collections.Counter</code><span class="cmd-tag">Counter</span></div>
+            <pre><code>from collections import Counter
+
+# ═══════════════════════════════════════════════
+# Counter — dict especializado para contagem
+# ═══════════════════════════════════════════════
+
+# Contar ocorrências em uma lista
+status_codes = [200, 200, 404, 200, 500, 404, 200, 301, 200, 500, 404, 200]
+contagem = Counter(status_codes)
+print(contagem)
+# Counter({200: 6, 404: 3, 500: 2, 301: 1})
+
+# Top N mais comuns
+print(contagem.most_common(2))  # [(200, 6), (404, 3)]
+
+# Contar palavras em log
+log_line = "ERROR timeout ERROR connection ERROR timeout WARN slow INFO ok ERROR timeout"
+palavras = Counter(log_line.split())
+print(palavras.most_common(3))
+# [('ERROR', 4), ('timeout', 3), ('WARN', 1)]
+
+# ═══════════════════════════════════════════════
+# Operações aritméticas com Counter
+# ═══════════════════════════════════════════════
+vendas_jan = Counter({"EC2": 50, "Lambda": 200, "S3": 80})
+vendas_fev = Counter({"EC2": 45, "Lambda": 250, "RDS": 10})
+
+# Soma
+total = vendas_jan + vendas_fev
+# Counter({'Lambda': 450, 'S3': 80, 'EC2': 95, 'RDS': 10})
+
+# Diferença (mantém só positivos)
+diferenca = vendas_fev - vendas_jan
+# Counter({'Lambda': 50, 'RDS': 10})
+
+# Interseção (mínimo de cada)
+comum = vendas_jan & vendas_fev
+# Counter({'EC2': 45, 'Lambda': 200})
+
+# União (máximo de cada)
+maximo = vendas_jan | vendas_fev
+# Counter({'Lambda': 250, 'S3': 80, 'EC2': 50, 'RDS': 10})
+
+# ═══════════════════════════════════════════════
+# Cenário: Analisar tipos de instância na conta
+# ═══════════════════════════════════════════════
+todas_instancias = [
+    "t3.micro", "t3.micro", "t3.small", "m5.large", "t3.micro",
+    "c5.xlarge", "m5.large", "t3.micro", "r5.xlarge", "t3.small",
+]
+
+distribuicao = Counter(todas_instancias)
+print("\n📊 Distribuição de tipos de instância:")
+for tipo, qtd in distribuicao.most_common():
+    barra = "█" * qtd
+    print(f"  {tipo:12} {barra} ({qtd})")
+
+# Saída:
+#   t3.micro     ████ (4)
+#   t3.small     ██ (2)
+#   m5.large     ██ (2)
+#   c5.xlarge    █ (1)
+#   r5.xlarge    █ (1)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 OrderedDict e ChainMap</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Coleções especializadas</code><span class="cmd-tag">Collections</span></div>
+            <pre><code>from collections import OrderedDict, ChainMap
+
+# ═══════════════════════════════════════════════
+# OrderedDict — Quando a COMPARAÇÃO de ordem importa
+# (Desde Python 3.7, dict normal mantém ordem de inserção,
+#  mas OrderedDict considera ordem na comparação ==)
+# ═══════════════════════════════════════════════
+
+# dict normal: ordem não afeta igualdade
+d1 = {"a": 1, "b": 2}
+d2 = {"b": 2, "a": 1}
+print(d1 == d2)  # True — ordem não importa para dict
+
+# OrderedDict: ordem AFETA igualdade
+od1 = OrderedDict([("a", 1), ("b", 2)])
+od2 = OrderedDict([("b", 2), ("a", 1)])
+print(od1 == od2)  # False — ordem diferente!
+
+# move_to_end() — útil para LRU cache
+od = OrderedDict([("a", 1), ("b", 2), ("c", 3)])
+od.move_to_end("a")        # move 'a' para o final
+print(list(od.keys()))     # ['b', 'c', 'a']
+od.move_to_end("c", last=False)  # move 'c' para o início
+print(list(od.keys()))     # ['c', 'b', 'a']
+
+# ═══════════════════════════════════════════════
+# ChainMap — Visualizar múltiplos dicts como um só
+# (sem criar cópia — busca em cadeia)
+# ═══════════════════════════════════════════════
+import os
+
+# Cenário: Configuração com camadas de prioridade
+cli_args = {"port": 9090, "debug": True}
+env_vars = {"port": os.environ.get("PORT", "8080"), "host": "0.0.0.0"}
+defaults = {"port": 80, "host": "localhost", "timeout": 30, "debug": False}
+
+# ChainMap busca na ordem: cli_args → env_vars → defaults
+config = ChainMap(cli_args, env_vars, defaults)
+
+print(config["port"])      # 9090 (de cli_args — primeiro encontrado)
+print(config["host"])      # '0.0.0.0' (de env_vars)
+print(config["timeout"])   # 30 (de defaults)
+print(config["debug"])     # True (de cli_args)
+
+# Listar todos os valores disponíveis
+print(dict(config))  # merge de todos (primeiro vence)
+
+# Adicionar nova camada com prioridade máxima
+config = config.new_child({"port": 3000})
+print(config["port"])  # 3000 (nova camada tem prioridade)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.6 Padrões Comuns com Dicionários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Contagem, agrupamento, cache</code><span class="cmd-tag">Padrões</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# PADRÃO 1: Agrupar por atributo
+# ═══════════════════════════════════════════════
+instancias = [
+    {"id": "i-001", "tipo": "t3.micro", "regiao": "us-east-1"},
+    {"id": "i-002", "tipo": "m5.large", "regiao": "us-east-1"},
+    {"id": "i-003", "tipo": "t3.micro", "regiao": "us-west-2"},
+    {"id": "i-004", "tipo": "c5.xlarge", "regiao": "us-east-1"},
+    {"id": "i-005", "tipo": "t3.micro", "regiao": "us-west-2"},
+]
+
+# Agrupar por região
+from collections import defaultdict
+por_regiao = defaultdict(list)
+for inst in instancias:
+    por_regiao[inst["regiao"]].append(inst["id"])
+
+# {'us-east-1': ['i-001', 'i-002', 'i-004'], 'us-west-2': ['i-003', 'i-005']}
+
+# ═══════════════════════════════════════════════
+# PADRÃO 2: Memoização / Cache simples
+# ═══════════════════════════════════════════════
+_cache_precos = {}
+
+def get_preco(tipo_instancia, regiao):
+    """Consulta preço com cache em memória."""
+    chave = (tipo_instancia, regiao)
+    if chave not in _cache_precos:
+        # Simula chamada à API (lenta)
+        import time
+        # time.sleep(1)
+        _cache_precos[chave] = 0.0104  # valor fictício
+    return _cache_precos[chave]
+
+# Primeira chamada: "consulta API"
+preco = get_preco("t3.micro", "us-east-1")
+# Segunda chamada: retorna do cache (instantâneo)
+preco = get_preco("t3.micro", "us-east-1")
+
+# ═══════════════════════════════════════════════
+# PADRÃO 3: Indexar lista por campo (lookup table)
+# ═══════════════════════════════════════════════
+# Transformar lista em dict para acesso O(1) por ID
+instancias_por_id = {inst["id"]: inst for inst in instancias}
+
+# Agora acesso é O(1) em vez de O(n)
+print(instancias_por_id["i-003"])
+# {'id': 'i-003', 'tipo': 't3.micro', 'regiao': 'us-west-2'}
+
+# ═══════════════════════════════════════════════
+# PADRÃO 4: Dispatch table (substituir if/elif)
+# ═══════════════════════════════════════════════
+def handle_create(event):
+    print(f"Criando recurso: {event['resource']}")
+
+def handle_delete(event):
+    print(f"Deletando recurso: {event['resource']}")
+
+def handle_update(event):
+    print(f"Atualizando recurso: {event['resource']}")
+
+# Dispatch table — substitui cadeia de if/elif
+handlers = {
+    "CREATE": handle_create,
+    "DELETE": handle_delete,
+    "UPDATE": handle_update,
+}
+
+evento = {"action": "CREATE", "resource": "EC2/i-001"}
+handler = handlers.get(evento["action"])
+if handler:
+    handler(evento)
+else:
+    print(f"Ação desconhecida: {evento['action']}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.7 Estruturas JSON-like para APIs e Configs</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Dicts como formato de troca de dados</code><span class="cmd-tag">JSON</span></div>
+            <pre><code>import json
+
+# ═══════════════════════════════════════════════
+# Estrutura de configuração típica (equivalente a JSON/YAML)
+# ═══════════════════════════════════════════════
+terraform_config = {
+    "terraform": {
+        "required_version": ">= 1.5.0",
+        "backend": {
+            "s3": {
+                "bucket": "my-terraform-state",
+                "key": "prod/terraform.tfstate",
+                "region": "us-east-1",
+                "encrypt": True,
+                "dynamodb_table": "terraform-locks",
+            }
+        }
+    },
+    "provider": {
+        "aws": {
+            "region": "us-east-1",
+            "default_tags": {
+                "tags": {
+                    "Environment": "production",
+                    "ManagedBy": "terraform",
+                    "Team": "infra",
+                }
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "aws_instance",
+            "name": "web_server",
+            "config": {
+                "ami": "ami-0abc123",
+                "instance_type": "t3.micro",
+                "tags": {"Name": "web-01"},
+            }
+        }
+    ]
+}
+
+# Converter para JSON string (para enviar via API)
+json_str = json.dumps(terraform_config, indent=2, ensure_ascii=False)
+
+# Acessar valores profundos de forma segura
+def get_nested(data, *keys, default=None):
+    """Acessa valor em dict aninhado de forma segura."""
+    for key in keys:
+        if isinstance(data, dict):
+            data = data.get(key, default)
+        elif isinstance(data, (list, tuple)) and isinstance(key, int):
+            try:
+                data = data[key]
+            except IndexError:
+                return default
+        else:
+            return default
+    return data
+
+# Uso:
+backend_bucket = get_nested(terraform_config, "terraform", "backend", "s3", "bucket")
+print(backend_bucket)  # 'my-terraform-state'
+
+provider_region = get_nested(terraform_config, "provider", "aws", "region")
+print(provider_region)  # 'us-east-1'
+
+# Chave inexistente retorna default
+valor = get_nested(terraform_config, "provider", "gcp", "project", default="N/A")
+print(valor)  # 'N/A'</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6: SETS (CONJUNTOS)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Sets (Conjuntos)</h2>
+          <p>Sets são coleções não-ordenadas de elementos únicos com teste de pertinência O(1). Baseados em teoria dos conjuntos matemáticos, são perfeitos para deduplicação, comparação e operações de intersecção/diferença.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 Criando Sets</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Formas de criar sets</code><span class="cmd-tag">Criação</span></div>
+            <pre><code># 1. Literal com chaves {} (⚠️ {} vazio é dict, não set!)
+portas = {22, 80, 443, 8080, 3306}
+regioes = {"us-east-1", "us-west-2", "eu-west-1"}
+
+# 2. Construtor set()
+vazio = set()                     # ⚠️ set vazio DEVE usar set()!
+de_lista = set([1, 2, 2, 3, 3, 3])  # {1, 2, 3} — remove duplicados
+de_string = set("Mississippi")    # {'M', 'i', 's', 'p'}
+de_range = set(range(1, 11))     # {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+# 3. Set Comprehension
+quadrados = {x**2 for x in range(10)}
+# {0, 1, 4, 9, 16, 25, 36, 49, 64, 81}
+
+# Pares de 0 a 20
+pares = {x for x in range(21) if x % 2 == 0}
+# {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20}
+
+# 4. frozenset — set IMUTÁVEL (pode ser chave de dict)
+PORTAS_PROD = frozenset({80, 443})
+PORTAS_DEV = frozenset({3000, 8080, 5173})
+
+# frozenset como chave de dict ou elemento de set
+configs = {
+    PORTAS_PROD: "production",
+    PORTAS_DEV: "development",
+}
+
+# ═══════════════════════════════════════════════
+# Características dos Sets:
+# - Não ordenados (sem índice!)
+# - Elementos únicos (duplicados ignorados)
+# - Elementos devem ser hashable (imutáveis)
+# - Test de pertinência (in) em O(1)!
+# ═══════════════════════════════════════════════
+
+# ❌ NÃO funciona com sets:
+# portas[0]     — TypeError: set não suporta indexação
+# portas[1:3]   — TypeError: set não suporta slicing
+
+# Elementos devem ser hashable:
+# {[1, 2, 3]}   — TypeError: lista não é hashable
+# {{}}          — TypeError: dict não é hashable
+{(1, 2, 3)}    # ✅ tupla é hashable
+{"abc"}         # ✅ string é hashable</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 Operações de Conjuntos</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>União, Interseção, Diferença, Simétrica</code><span class="cmd-tag">Operações</span></div>
+            <pre><code># Sets para DevOps
+portas_web = {80, 443, 8080, 8443}
+portas_db = {3306, 5432, 6379, 27017}
+portas_abertas = {22, 80, 443, 3306, 8080}
+portas_permitidas = {80, 443, 22}
+
+# ═══════════════════════════════════════════════
+# UNIÃO (|) — todos os elementos de ambos
+# ═══════════════════════════════════════════════
+todas_portas = portas_web | portas_db
+# {80, 443, 3306, 5432, 6379, 8080, 8443, 27017}
+
+# Equivalente com método:
+todas_portas = portas_web.union(portas_db)
+
+# ═══════════════════════════════════════════════
+# INTERSEÇÃO (&) — apenas elementos em AMBOS
+# ═══════════════════════════════════════════════
+portas_web_abertas = portas_web & portas_abertas
+# {80, 443, 8080}
+
+# Equivalente:
+portas_web_abertas = portas_web.intersection(portas_abertas)
+
+# ═══════════════════════════════════════════════
+# DIFERENÇA (-) — elementos no primeiro mas NÃO no segundo
+# ═══════════════════════════════════════════════
+portas_nao_permitidas = portas_abertas - portas_permitidas
+# {3306, 8080} — portas abertas que NÃO deveriam estar!
+print(f"⚠️ Portas não autorizadas: {portas_nao_permitidas}")
+
+# Equivalente:
+portas_nao_permitidas = portas_abertas.difference(portas_permitidas)
+
+# ═══════════════════════════════════════════════
+# DIFERENÇA SIMÉTRICA (^) — em um OU outro, mas não ambos
+# ═══════════════════════════════════════════════
+apenas_em_um = portas_web ^ portas_abertas
+# Portas que estão em web XOR abertas (não nos dois)
+
+# Equivalente:
+apenas_em_um = portas_web.symmetric_difference(portas_abertas)
+
+# ═══════════════════════════════════════════════
+# SUBCONJUNTO e SUPERCONJUNTO
+# ═══════════════════════════════════════════════
+portas_https = {443}
+print(portas_https <= portas_web)        # True — subset
+print(portas_https.issubset(portas_web)) # True
+
+print(portas_web >= portas_https)          # True — superset
+print(portas_web.issuperset(portas_https)) # True
+
+# Conjuntos disjuntos (nenhum elemento em comum)
+print(portas_web.isdisjoint(portas_db))  # True — sem interseção
+
+# ═══════════════════════════════════════════════
+# Operações com múltiplos sets
+# ═══════════════════════════════════════════════
+set_a = {1, 2, 3, 4}
+set_b = {3, 4, 5, 6}
+set_c = {4, 5, 6, 7}
+
+# Interseção de todos (elemento que está em TODOS)
+comum_todos = set_a & set_b & set_c  # {4}
+
+# União de todos
+total = set_a | set_b | set_c  # {1, 2, 3, 4, 5, 6, 7}</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Operadores vs Métodos</h4>
+            <p>Os operadores (<code>|</code>, <code>&</code>, <code>-</code>, <code>^</code>) exigem que ambos os lados sejam sets. Os métodos (<code>.union()</code>, <code>.intersection()</code>, etc.) aceitam qualquer iterável como argumento — mais flexível!</p>
+            <pre><code># Operador exige set:
+# {1,2,3} | [4,5]  — TypeError!
+
+# Método aceita qualquer iterável:
+{1,2,3}.union([4,5])  # {1, 2, 3, 4, 5} ✅</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 Métodos de Set</h3>
+          <div class="styled-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Método</th>
+                  <th>Descrição</th>
+                  <th>Modifica?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>.add(x)</code></td><td>Adiciona elemento x</td><td>✅ Sim</td></tr>
+                <tr><td><code>.remove(x)</code></td><td>Remove x (KeyError se não existir)</td><td>✅ Sim</td></tr>
+                <tr><td><code>.discard(x)</code></td><td>Remove x (NÃO gera erro se não existir)</td><td>✅ Sim</td></tr>
+                <tr><td><code>.pop()</code></td><td>Remove e retorna elemento arbitrário</td><td>✅ Sim</td></tr>
+                <tr><td><code>.clear()</code></td><td>Remove todos os elementos</td><td>✅ Sim</td></tr>
+                <tr><td><code>.update(iter)</code></td><td>Adiciona todos do iterável (|=)</td><td>✅ Sim</td></tr>
+                <tr><td><code>.intersection_update(iter)</code></td><td>Mantém só a interseção (&=)</td><td>✅ Sim</td></tr>
+                <tr><td><code>.difference_update(iter)</code></td><td>Remove elementos do iterável (-=)</td><td>✅ Sim</td></tr>
+                <tr><td><code>.copy()</code></td><td>Retorna cópia rasa</td><td>❌ Não</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Exemplos práticos</code><span class="cmd-tag">Métodos</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# add() e remove()/discard()
+# ═══════════════════════════════════════════════
+sg_rules = {22, 80, 443}
+
+sg_rules.add(8080)        # adiciona porta
+sg_rules.add(80)          # já existe — ignorado silenciosamente
+print(sg_rules)           # {8080, 80, 443, 22}
+
+sg_rules.remove(22)       # remove porta SSH
+# sg_rules.remove(9090)   # ❌ KeyError!
+
+sg_rules.discard(9090)    # não existe — sem erro
+sg_rules.discard(8080)    # remove sem erro
+
+# ═══════════════════════════════════════════════
+# update() — adicionar múltiplos de uma vez
+# ═══════════════════════════════════════════════
+ips_bloqueados = {"192.168.1.100", "10.0.0.55"}
+novos_bloqueios = ["172.16.0.1", "192.168.1.100", "10.0.0.99"]
+
+ips_bloqueados.update(novos_bloqueios)  # aceita qualquer iterável
+print(ips_bloqueados)
+# {'192.168.1.100', '10.0.0.55', '172.16.0.1', '10.0.0.99'}
+
+# ═══════════════════════════════════════════════
+# Operações com atribuição (in-place)
+# ═══════════════════════════════════════════════
+permitidos = {80, 443, 22, 8080, 3000}
+bloquear = {3000, 8080}
+
+permitidos -= bloquear   # equivale a difference_update
+print(permitidos)        # {80, 443, 22}
+
+permitidos |= {8443}     # equivale a update
+print(permitidos)        # {80, 443, 22, 8443}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 Membership Testing — O(1)!</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Busca ultrarrápida com sets</code><span class="cmd-tag">Performance</span></div>
+            <pre><code>import time
+
+# ═══════════════════════════════════════════════
+# COMPARAÇÃO: list vs set para teste de pertinência
+# ═══════════════════════════════════════════════
+
+# Criar dados de teste
+todos_ips = [f"10.0.{i//256}.{i%256}" for i in range(65536)]  # 65K IPs
+ips_bloqueados_lista = todos_ips[:10000]  # 10K IPs bloqueados
+ips_bloqueados_set = set(ips_bloqueados_lista)
+
+ip_teste = "10.0.50.100"
+
+# Teste com LISTA — O(n) — LENTO para listas grandes
+inicio = time.perf_counter()
+for _ in range(1000):
+    resultado = ip_teste in ips_bloqueados_lista
+tempo_lista = time.perf_counter() - inicio
+
+# Teste com SET — O(1) — RÁPIDO independente do tamanho
+inicio = time.perf_counter()
+for _ in range(1000):
+    resultado = ip_teste in ips_bloqueados_set
+tempo_set = time.perf_counter() - inicio
+
+print(f"Lista: {tempo_lista:.4f}s")
+print(f"Set:   {tempo_set:.6f}s")
+print(f"Set é {tempo_lista/tempo_set:.0f}x mais rápido!")
+# Típico: Set é 500-1000x mais rápido para 10K elementos!
+
+# ═══════════════════════════════════════════════
+# PADRÃO: Converter para set quando faz múltiplas buscas
+# ═══════════════════════════════════════════════
+# ❌ Lento (O(n) * m verificações):
+ips_permitidos = ["10.0.1.1", "10.0.1.2", "10.0.1.3", ...]
+for request in milhoes_de_requests:
+    if request.ip in ips_permitidos:  # O(n) cada vez!
+        processar(request)
+
+# ✅ Rápido (O(1) * m verificações):
+ips_permitidos_set = set(ips_permitidos)  # converte uma vez
+for request in milhoes_de_requests:
+    if request.ip in ips_permitidos_set:  # O(1) cada vez!
+        processar(request)</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Regra de Ouro</h4>
+            <p>Se você faz <code>x in collection</code> mais de uma vez e a coleção tem mais de ~10 elementos, converta para <code>set</code>. O ganho é dramático: de milissegundos para nanossegundos em coleções grandes.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.5 frozenset — Set Imutável</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>frozenset para hashability</code><span class="cmd-tag">Imutável</span></div>
+            <pre><code># frozenset é um set que NÃO pode ser modificado
+# Vantagem: pode ser chave de dict ou elemento de outro set
+
+# ═══════════════════════════════════════════════
+# Definir permissões como frozensets
+# ═══════════════════════════════════════════════
+ADMIN_PERMS = frozenset({"read", "write", "delete", "admin"})
+EDITOR_PERMS = frozenset({"read", "write"})
+VIEWER_PERMS = frozenset({"read"})
+
+# Mapear roles para permissões
+role_permissions = {
+    ADMIN_PERMS: "Administrator",
+    EDITOR_PERMS: "Editor",
+    VIEWER_PERMS: "Viewer",
+}
+
+# Verificar se um set de permissões é de admin
+user_perms = frozenset({"read", "write", "delete", "admin"})
+if user_perms == ADMIN_PERMS:
+    print("Usuário é admin!")
+
+# ═══════════════════════════════════════════════
+# Set de sets (precisa de frozenset)
+# ═══════════════════════════════════════════════
+# ❌ set de sets não funciona:
+# {{"a", "b"}, {"c", "d"}}  — TypeError!
+
+# ✅ set de frozensets:
+conjuntos = {frozenset({"a", "b"}), frozenset({"c", "d"}), frozenset({"a", "b"})}
+print(len(conjuntos))  # 2 — frozenset duplicado removido!
+
+# ═══════════════════════════════════════════════
+# Operações de set funcionam (retornam frozenset)
+# ═══════════════════════════════════════════════
+a = frozenset({1, 2, 3})
+b = frozenset({3, 4, 5})
+print(a | b)   # frozenset({1, 2, 3, 4, 5})
+print(a & b)   # frozenset({3})
+print(a - b)   # frozenset({1, 2})</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.6 Sets para DevOps — Casos de Uso</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Aplicações práticas em infraestrutura</code><span class="cmd-tag">DevOps</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Caso 1: Encontrar IPs comuns entre security groups
+# ═══════════════════════════════════════════════
+sg_web = {"10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.2.1"}
+sg_api = {"10.0.2.1", "10.0.2.2", "10.0.1.3", "10.0.3.1"}
+sg_db = {"10.0.3.1", "10.0.3.2", "10.0.2.1"}
+
+# Servidores que pertencem a TODOS os SGs (expostos demais?)
+em_todos = sg_web & sg_api & sg_db
+print(f"⚠️ IPs em todos os SGs: {em_todos}")  # {'10.0.2.1'}
+
+# ═══════════════════════════════════════════════
+# Caso 2: Detectar usuários únicos em logs
+# ═══════════════════════════════════════════════
+logs_acesso = [
+    "user-01 GET /api/status",
+    "user-02 POST /api/deploy",
+    "user-01 GET /api/health",
+    "user-03 DELETE /api/cache",
+    "user-01 GET /api/metrics",
+    "user-02 GET /api/status",
+]
+
+usuarios_unicos = {log.split()[0] for log in logs_acesso}
+print(f"Usuários distintos: {len(usuarios_unicos)}")  # 3
+
+# ═══════════════════════════════════════════════
+# Caso 3: Encontrar configs faltantes
+# ═══════════════════════════════════════════════
+configs_necessarias = {"DB_HOST", "DB_PORT", "DB_USER", "DB_PASS", "SECRET_KEY", "API_URL"}
+configs_presentes = {"DB_HOST", "DB_PORT", "DB_USER", "API_URL"}
+
+faltando = configs_necessarias - configs_presentes
+print(f"❌ Configurações faltantes: {faltando}")
+# {'DB_PASS', 'SECRET_KEY'}
+
+if faltando:
+    raise EnvironmentError(f"Variáveis não definidas: {', '.join(sorted(faltando))}")
+
+# ═══════════════════════════════════════════════
+# Caso 4: Deduplicar mantendo ordem (Python 3.7+)
+# ═══════════════════════════════════════════════
+regioes_com_duplicatas = [
+    "us-east-1", "us-west-2", "us-east-1", "eu-west-1",
+    "us-west-2", "ap-southeast-1", "us-east-1"
+]
+
+# set() remove duplicatas mas PERDE a ordem
+# Para manter a ordem de primeira aparição:
+visto = set()
+regioes_unicas = []
+for r in regioes_com_duplicatas:
+    if r not in visto:
+        visto.add(r)
+        regioes_unicas.append(r)
+# ['us-east-1', 'us-west-2', 'eu-west-1', 'ap-southeast-1']
+
+# Python 3.7+ — dict mantém ordem (hack elegante):
+regioes_unicas = list(dict.fromkeys(regioes_com_duplicatas))
+
+# ═══════════════════════════════════════════════
+# Caso 5: Comparar ambientes (diff de infraestrutura)
+# ═══════════════════════════════════════════════
+prod_services = {"nginx", "api-gateway", "auth-service", "db-primary", "redis", "monitoring"}
+staging_services = {"nginx", "api-gateway", "auth-service", "db-primary"}
+
+apenas_prod = prod_services - staging_services
+print(f"Serviços só em produção: {apenas_prod}")  # {'redis', 'monitoring'}
+
+apenas_staging = staging_services - prod_services
+print(f"Serviços só em staging: {apenas_staging}")  # set() — vazio</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7: COMPARAÇÃO E ESCOLHA DE ESTRUTURAS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Comparação e Escolha de Estruturas</h2>
+          <p>Saber QUAL estrutura usar é tão importante quanto saber COMO usar. Esta seção apresenta critérios objetivos para tomar essa decisão.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 Tabela Comparativa Completa</h3>
+          <div class="styled-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Característica</th>
+                  <th>Lista</th>
+                  <th>Tupla</th>
+                  <th>Dicionário</th>
+                  <th>Set</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Sintaxe</strong></td><td><code>[1, 2, 3]</code></td><td><code>(1, 2, 3)</code></td><td><code>{"k": "v"}</code></td><td><code>{1, 2, 3}</code></td></tr>
+                <tr><td><strong>Mutável?</strong></td><td>✅ Sim</td><td>❌ Não</td><td>✅ Sim</td><td>✅ Sim</td></tr>
+                <tr><td><strong>Ordenado?</strong></td><td>✅ Sim</td><td>✅ Sim</td><td>✅ Sim (3.7+)</td><td>❌ Não</td></tr>
+                <tr><td><strong>Duplicados?</strong></td><td>✅ Permite</td><td>✅ Permite</td><td>❌ Chaves únicas</td><td>❌ Únicos</td></tr>
+                <tr><td><strong>Indexável?</strong></td><td>✅ [i]</td><td>✅ [i]</td><td>✅ [key]</td><td>❌ Não</td></tr>
+                <tr><td><strong>Hashable?</strong></td><td>❌ Não</td><td>✅ Sim*</td><td>❌ Não</td><td>❌ Não**</td></tr>
+                <tr><td><strong>Busca (in)</strong></td><td>O(n)</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+                <tr><td><strong>Inserção</strong></td><td>O(1) final</td><td>N/A</td><td>O(1)</td><td>O(1)</td></tr>
+                <tr><td><strong>Remoção</strong></td><td>O(n)</td><td>N/A</td><td>O(1)</td><td>O(1)</td></tr>
+                <tr><td><strong>Caso de uso</strong></td><td>Coleção ordenada</td><td>Dados fixos</td><td>Mapeamento</td><td>Unicidade</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><small>* Tupla é hashable apenas se todos seus elementos forem hashable. ** frozenset é hashable.</small></p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 Big-O das Operações Comuns</h3>
+          <div class="styled-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Operação</th>
+                  <th>Lista</th>
+                  <th>Dict</th>
+                  <th>Set</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Acesso por índice/chave</td><td>O(1)</td><td>O(1)</td><td>N/A</td></tr>
+                <tr><td>Buscar elemento (<code>in</code>)</td><td>O(n) ⚠️</td><td>O(1) ✅</td><td>O(1) ✅</td></tr>
+                <tr><td>Inserir no final</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+                <tr><td>Inserir no início</td><td>O(n) ⚠️</td><td>N/A</td><td>N/A</td></tr>
+                <tr><td>Remover por valor</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+                <tr><td>Remover por índice</td><td>O(n)</td><td>N/A</td><td>N/A</td></tr>
+                <tr><td>Iterar todos</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+                <tr><td>Ordenar</td><td>O(n log n)</td><td>O(n log n)</td><td>N/A</td></tr>
+                <tr><td>Tamanho (<code>len</code>)</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 Quando Usar Cada Estrutura</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Guia de decisão</code><span class="cmd-tag">Decisão</span></div>
+            <pre><code># ═══════════════════════════════════════════════════════
+# 🔹 USE LISTA quando:
+# ═══════════════════════════════════════════════════════
+# - Precisa manter a ORDEM dos elementos
+# - Pode ter DUPLICADOS
+# - Vai ITERAR sequencialmente
+# - Precisa acessar por ÍNDICE
+# - A coleção vai CRESCER/ENCOLHER
+#
+# Exemplos: logs, resultados de query, pipeline de tarefas,
+#           lista de servidores para processar
+
+# ═══════════════════════════════════════════════════════
+# 🔹 USE TUPLA quando:
+# ═══════════════════════════════════════════════════════
+# - Dados são FIXOS após criação
+# - Representa um "registro" com campos posicionais
+# - Precisa ser CHAVE de dict ou elemento de set
+# - Quer garantir que ninguém modifique os dados
+# - Retornar MÚLTIPLOS VALORES de uma função
+#
+# Exemplos: coordenadas, configuração fixa, retorno de função,
+#           versões, constantes, chaves compostas
+
+# ═══════════════════════════════════════════════════════
+# 🔹 USE DICIONÁRIO quando:
+# ═══════════════════════════════════════════════════════
+# - Precisa MAPEAR chaves a valores
+# - Busca RÁPIDA por chave (O(1))
+# - Dados têm estrutura JSON/objeto
+# - Precisa AGRUPAR ou CONTAR
+# - Implementar cache/lookup table
+#
+# Exemplos: configurações, respostas de API, tags de recursos,
+#           mapeamento ID→objeto, contadores, registros
+
+# ═══════════════════════════════════════════════════════
+# 🔹 USE SET quando:
+# ═══════════════════════════════════════════════════════
+# - Elementos devem ser ÚNICOS
+# - Precisa testar PERTINÊNCIA rapidamente (O(1))
+# - Precisa de operações de CONJUNTOS (interseção, diferença)
+# - Quer REMOVER DUPLICATAS de uma coleção
+# - Não importa a ORDEM
+#
+# Exemplos: IPs bloqueados, tags únicas, permissões,
+#           deduplicação, comparação de listas</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 Fluxograma de Decisão</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Algoritmo para escolher a estrutura</code><span class="cmd-tag">Fluxograma</span></div>
+            <pre><code># ═══════════════════════════════════════════════════════
+# FLUXOGRAMA DE DECISÃO:
+# ═══════════════════════════════════════════════════════
+#
+# Precisa mapear CHAVE → VALOR?
+#   └─ SIM → DICT ✅
+#   └─ NÃO ↓
+#
+# Elementos devem ser ÚNICOS?
+#   └─ SIM → SET ✅  (ou frozenset se precisa ser hashable)
+#   └─ NÃO ↓
+#
+# Dados são FIXOS (não mudam)?
+#   └─ SIM → TUPLA ✅  (ou NamedTuple para clareza)
+#   └─ NÃO ↓
+#
+# LISTA ✅
+#
+# ═══════════════════════════════════════════════════════
+# OTIMIZAÇÕES COMUNS:
+# ═══════════════════════════════════════════════════════
+#
+# "Preciso buscar rápido E manter ordem"
+#   → Dict (mantém ordem de inserção desde 3.7)
+#
+# "Preciso de fila (FIFO)"
+#   → collections.deque (não lista!)
+#
+# "Preciso contar elementos"
+#   → collections.Counter (subclasse de dict)
+#
+# "Preciso agrupar por atributo"
+#   → collections.defaultdict(list)
+#
+# "Preciso de prioridade"
+#   → heapq (heap sobre lista)
+
+# ═══════════════════════════════════════════════════════
+# Exemplos do mundo real:
+# ═══════════════════════════════════════════════════════
+
+# ❌ Ineficiente: verificar se IP está bloqueado usando lista
+blocked_ips = ["10.0.1.1", "10.0.1.2", ...]  # milhares de IPs
+if ip in blocked_ips:  # O(n) — lento!
+    deny()
+
+# ✅ Eficiente: usar set para O(1)
+blocked_ips = {"10.0.1.1", "10.0.1.2", ...}
+if ip in blocked_ips:  # O(1) — instantâneo!
+    deny()
+
+# ❌ Ineficiente: buscar instância por ID em lista
+for inst in instances:  # O(n)
+    if inst["id"] == target_id:
+        return inst
+
+# ✅ Eficiente: indexar por ID em dict
+instances_by_id = {i["id"]: i for i in instances}
+return instances_by_id[target_id]  # O(1)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 Comparação de Memória</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Uso de memória por estrutura</code><span class="cmd-tag">Memória</span></div>
+            <pre><code>import sys
+
+# Comparar memória de 1000 elementos
+n = 1000
+dados = list(range(n))
+
+lista = list(dados)
+tupla = tuple(dados)
+conjunto = set(dados)
+dicionario = {i: i for i in dados}
+
+print(f"Lista:       {sys.getsizeof(lista):>8} bytes")
+print(f"Tupla:       {sys.getsizeof(tupla):>8} bytes")
+print(f"Set:         {sys.getsizeof(conjunto):>8} bytes")
+print(f"Dict:        {sys.getsizeof(dicionario):>8} bytes")
+
+# Resultado típico (CPython 3.11, 64-bit):
+# Lista:         8856 bytes
+# Tupla:         8040 bytes  (≈10% menos que lista)
+# Set:          32984 bytes  (hash table — mais memória)
+# Dict:         36960 bytes  (hash table — mais memória)
+
+# ═══════════════════════════════════════════════
+# CONCLUSÃO:
+# - Tupla é a mais eficiente em memória
+# - Lista é quase tão eficiente quanto tupla
+# - Set e Dict usam ~4x mais memória (hash tables)
+# - O custo extra de set/dict COMPENSA pelo acesso O(1)
+# ═══════════════════════════════════════════════
+
+# Para dados grandes onde memória importa:
+# - array.array — arrays tipados (int, float)
+# - numpy.ndarray — arrays numéricos otimizados
+# - generators — processamento lazy (sem armazenar tudo)</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8: DESEMPACOTAMENTO E OPERAÇÕES AVANÇADAS
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Desempacotamento e Operações Avançadas</h2>
+          <p>Técnicas avançadas de manipulação que combinam múltiplas estruturas: zip, enumerate, operações funcionais, walrus operator e padrões de encadeamento.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 Extended Unpacking (Operador *)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Desempacotamento avançado com *</code><span class="cmd-tag">Unpacking</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Extended unpacking — capturar "o resto"
+# ═══════════════════════════════════════════════
+
+# Em atribuições
+log_entry = ["2024-01-15", "10:30:45", "ERROR", "Connection", "timeout", "to", "database"]
+data, hora, nivel, *mensagem = log_entry
+print(f"[{data} {hora}] {nivel}: {' '.join(mensagem)}")
+# [2024-01-15 10:30:45] ERROR: Connection timeout to database
+
+# Primeiro e último
+numeros = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+primeiro, *meio, ultimo = numeros
+print(f"Primeiro: {primeiro}, Último: {ultimo}, Meio: {len(meio)} itens")
+
+# Em chamadas de função
+def calcular_custo(base, *multiplicadores, desconto=0):
+    total = base
+    for m in multiplicadores:
+        total *= m
+    return total * (1 - desconto)
+
+custo = calcular_custo(100, 1.2, 1.1, desconto=0.05)  # 100 * 1.2 * 1.1 * 0.95
+
+# ═══════════════════════════════════════════════
+# Unpacking de dicionários (**)
+# ═══════════════════════════════════════════════
+def criar_instancia(nome, tipo, regiao, **tags):
+    """Cria instância com tags dinâmicas."""
+    print(f"Criando {nome} ({tipo}) em {regiao}")
+    print(f"Tags: {tags}")
+
+# Passar dict como kwargs
+config = {"nome": "web-01", "tipo": "t3.micro", "regiao": "us-east-1"}
+tags_extra = {"env": "prod", "team": "infra", "cost_center": "1234"}
+
+criar_instancia(**config, **tags_extra)
+
+# ═══════════════════════════════════════════════
+# Combinar com pattern matching (Python 3.10+)
+# ═══════════════════════════════════════════════
+def processar_evento(evento):
+    match evento:
+        case {"tipo": "CREATE", "recurso": recurso, **resto}:
+            print(f"Criando: {recurso}, extras: {resto}")
+        case {"tipo": "DELETE", "recurso": recurso}:
+            print(f"Deletando: {recurso}")
+        case _:
+            print(f"Evento desconhecido: {evento}")
+
+processar_evento({"tipo": "CREATE", "recurso": "EC2", "region": "us-east-1", "tags": {}})</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 zip() — Iteração Paralela</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>zip() para combinar iteráveis</code><span class="cmd-tag">zip</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# zip() — combina iteráveis elemento a elemento
+# ═══════════════════════════════════════════════
+nomes = ["web-01", "web-02", "api-01", "db-01"]
+ips = ["10.0.1.1", "10.0.1.2", "10.0.2.1", "10.0.3.1"]
+status = ["running", "stopped", "running", "running"]
+
+# Iterar em paralelo
+for nome, ip, stat in zip(nomes, ips, status):
+    icone = "🟢" if stat == "running" else "🔴"
+    print(f"{icone} {nome:8} → {ip}")
+
+# Criar dict a partir de duas listas
+servidor_ip = dict(zip(nomes, ips))
+# {'web-01': '10.0.1.1', 'web-02': '10.0.1.2', ...}
+
+# ═══════════════════════════════════════════════
+# zip() para com o MENOR iterável (silenciosamente!)
+# ═══════════════════════════════════════════════
+a = [1, 2, 3, 4, 5]
+b = ["a", "b", "c"]
+print(list(zip(a, b)))  # [(1, 'a'), (2, 'b'), (3, 'c')] — perdeu 4 e 5!
+
+# zip_longest — preenche com valor padrão
+from itertools import zip_longest
+print(list(zip_longest(a, b, fillvalue="?")))
+# [(1, 'a'), (2, 'b'), (3, 'c'), (4, '?'), (5, '?')]
+
+# Python 3.10+ — strict=True gera erro se tamanhos diferentes
+# list(zip(a, b, strict=True))  # ValueError!
+
+# ═══════════════════════════════════════════════
+# "Unzip" — transpor com zip(*)
+# ═══════════════════════════════════════════════
+pares = [("web-01", "10.0.1.1"), ("web-02", "10.0.1.2"), ("api-01", "10.0.2.1")]
+nomes_unzip, ips_unzip = zip(*pares)
+print(nomes_unzip)  # ('web-01', 'web-02', 'api-01')
+print(ips_unzip)    # ('10.0.1.1', '10.0.1.2', '10.0.2.1')
+
+# ═══════════════════════════════════════════════
+# Cenário: Comparar resultados de dois ambientes
+# ═══════════════════════════════════════════════
+prod_counts = [100, 200, 150, 80, 175]
+staging_counts = [95, 210, 148, 82, 170]
+dias = ["Seg", "Ter", "Qua", "Qui", "Sex"]
+
+print("\nComparação Prod vs Staging:")
+for dia, prod, stg in zip(dias, prod_counts, staging_counts):
+    diff = prod - stg
+    sinal = "+" if diff > 0 else ""
+    print(f"  {dia}: Prod={prod:3}, Stg={stg:3} (diff: {sinal}{diff})")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 enumerate() — Índice + Valor</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>enumerate() para loops indexados</code><span class="cmd-tag">enumerate</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# enumerate() — obtém índice E valor simultaneamente
+# ═══════════════════════════════════════════════
+
+# ❌ Anti-pattern (estilo C):
+servidores = ["web-01", "web-02", "api-01", "db-01"]
+for i in range(len(servidores)):
+    print(f"{i+1}. {servidores[i]}")
+
+# ✅ Pythônico:
+for i, servidor in enumerate(servidores, start=1):
+    print(f"{i}. {servidor}")
+
+# ═══════════════════════════════════════════════
+# Cenários práticos
+# ═══════════════════════════════════════════════
+
+# Encontrar linha com erro em log
+log_lines = [
+    "[INFO] Starting server",
+    "[INFO] Loading config",
+    "[ERROR] Failed to connect to DB",
+    "[INFO] Retrying...",
+    "[ERROR] Max retries exceeded",
+]
+
+erros = [(num, linha) for num, linha in enumerate(log_lines, 1) if "[ERROR]" in linha]
+for num_linha, texto in erros:
+    print(f"  Linha {num_linha}: {texto}")
+
+# Numerar recursos para exibição
+recursos = [
+    {"nome": "vpc-prod", "tipo": "VPC"},
+    {"nome": "sg-web", "tipo": "SecurityGroup"},
+    {"nome": "i-001", "tipo": "EC2"},
+    {"nome": "rds-prod", "tipo": "RDS"},
+]
+
+print("\n📋 Inventário de Recursos:")
+print(f"{'#':>3} {'Tipo':<15} {'Nome'}")
+print("-" * 35)
+for idx, rec in enumerate(recursos, 1):
+    print(f"{idx:>3} {rec['tipo']:<15} {rec['nome']}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 sorted() com Chaves Complexas</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Ordenação avançada com lambda e operator</code><span class="cmd-tag">Sorting</span></div>
+            <pre><code>from operator import itemgetter, attrgetter
+
+# ═══════════════════════════════════════════════
+# Ordenação por múltiplos critérios
+# ═══════════════════════════════════════════════
+instancias = [
+    {"nome": "web-01", "regiao": "us-east-1", "custo": 85.0, "tipo": "t3.micro"},
+    {"nome": "db-01", "regiao": "us-east-1", "custo": 200.0, "tipo": "m5.large"},
+    {"nome": "web-03", "regiao": "us-west-2", "custo": 85.0, "tipo": "t3.micro"},
+    {"nome": "api-01", "regiao": "us-east-1", "custo": 120.0, "tipo": "t3.medium"},
+    {"nome": "web-02", "regiao": "us-west-2", "custo": 42.5, "tipo": "t3.nano"},
+]
+
+# Ordenar por região (asc) e depois por custo (desc)
+ordenado = sorted(instancias, key=lambda x: (x["regiao"], -x["custo"]))
+for inst in ordenado:
+    print(f"  {inst['regiao']:12} ${inst['custo']:>7.2f}  {inst['nome']}")
+
+# Usando operator.itemgetter (mais rápido para operações simples)
+por_custo = sorted(instancias, key=itemgetter("custo"), reverse=True)
+
+# ═══════════════════════════════════════════════
+# Ordenar com transformação
+# ═══════════════════════════════════════════════
+# Ordenar versões semanticamente
+versoes = ["v2.1.0", "v1.10.0", "v1.2.0", "v3.0.0-beta", "v1.9.0"]
+
+def parse_version(v):
+    """Extrai números da versão para ordenação."""
+    clean = v.lstrip("v").split("-")[0]  # remove 'v' e sufixo
+    return tuple(int(x) for x in clean.split("."))
+
+versoes_ordenadas = sorted(versoes, key=parse_version)
+print(versoes_ordenadas)
+# ['v1.2.0', 'v1.9.0', 'v1.10.0', 'v2.1.0', 'v3.0.0-beta']
+
+# ═══════════════════════════════════════════════
+# min() e max() com key
+# ═══════════════════════════════════════════════
+mais_caro = max(instancias, key=itemgetter("custo"))
+mais_barato = min(instancias, key=itemgetter("custo"))
+print(f"Mais caro: {mais_caro['nome']} (${mais_caro['custo']})")
+print(f"Mais barato: {mais_barato['nome']} (${mais_barato['custo']})")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.5 any() e all() com Generators</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Testes lógicos eficientes</code><span class="cmd-tag">any/all</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# any() — True se ALGUM elemento for True (OR lógico)
+# all() — True se TODOS forem True (AND lógico)
+# Com generators: para na PRIMEIRA resposta (lazy!)
+# ═══════════════════════════════════════════════
+
+instancias = [
+    {"id": "i-001", "estado": "running", "cpu": 45},
+    {"id": "i-002", "estado": "running", "cpu": 92},
+    {"id": "i-003", "estado": "running", "cpu": 30},
+    {"id": "i-004", "estado": "stopped", "cpu": 0},
+    {"id": "i-005", "estado": "running", "cpu": 78},
+]
+
+# Alguma instância com CPU crítica (> 90%)?
+tem_critico = any(inst["cpu"] > 90 for inst in instancias)
+print(f"Alerta CPU: {tem_critico}")  # True (i-002 está em 92%)
+
+# TODAS as instâncias estão rodando?
+todas_rodando = all(inst["estado"] == "running" for inst in instancias)
+print(f"Todas ativas: {todas_rodando}")  # False (i-004 está stopped)
+
+# Nenhuma instância parada?
+nenhuma_parada = not any(inst["estado"] == "stopped" for inst in instancias)
+print(f"Nenhuma parada: {nenhuma_parada}")  # False
+
+# ═══════════════════════════════════════════════
+# Cenário: Validação de configuração
+# ═══════════════════════════════════════════════
+config = {
+    "DB_HOST": "db.prod.local",
+    "DB_PORT": "5432",
+    "DB_USER": "app",
+    "DB_PASS": "secret123",
+    "API_KEY": "",          # ⚠️ vazio!
+    "SECRET": None,         # ⚠️ None!
+}
+
+campos_obrigatorios = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASS", "API_KEY", "SECRET"]
+
+# Verificar se todos os campos obrigatórios estão preenchidos
+todos_preenchidos = all(config.get(campo) for campo in campos_obrigatorios)
+print(f"Config válida: {todos_preenchidos}")  # False
+
+# Encontrar campos inválidos
+invalidos = [campo for campo in campos_obrigatorios if not config.get(campo)]
+print(f"Campos inválidos: {invalidos}")  # ['API_KEY', 'SECRET']
+
+# ═══════════════════════════════════════════════
+# any/all com operações sobre arquivos
+# ═══════════════════════════════════════════════
+import os
+
+# Verificar se algum arquivo de config existe
+config_paths = ["/etc/myapp/config.yml", "./config.yml", "~/.myapp/config.yml"]
+config_existe = any(os.path.exists(os.path.expanduser(p)) for p in config_paths)
+
+# Verificar se todos os diretórios necessários existem
+dirs_necessarios = ["./logs", "./data", "./cache"]
+todos_dirs_ok = all(os.path.isdir(d) for d in dirs_necessarios)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.6 Walrus Operator (:=) com Estruturas de Dados</h3>
+          <div class="command-card wide">
+            <div name="command-header"><code>Operador morsa (Python 3.8+)</code><span class="cmd-tag">:=</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# := atribui e retorna o valor na mesma expressão
+# Útil em comprehensions e condições
+# ═══════════════════════════════════════════════
+
+# Filtrar E transformar em um passo
+dados = ["  web-01  ", "", "  api-01  ", "   ", "  db-01  ", ""]
+
+# Sem walrus — precisa de dois passos ou redundância:
+limpos = [s.strip() for s in dados if s.strip()]  # strip() chamado 2x!
+
+# Com walrus — strip() chamado apenas 1x:
+limpos = [stripped for s in dados if (stripped := s.strip())]
+# ['web-01', 'api-01', 'db-01']
+
+# ═══════════════════════════════════════════════
+# Encontrar primeiro item que satisfaz condição
+# ═══════════════════════════════════════════════
+instancias = [
+    {"id": "i-001", "tipo": "t3.micro", "cpu": 20},
+    {"id": "i-002", "tipo": "m5.large", "cpu": 85},
+    {"id": "i-003", "tipo": "c5.xlarge", "cpu": 95},
+]
+
+# Encontrar primeira instância com CPU > 90
+if alerta := next((i for i in instancias if i["cpu"] > 90), None):
+    print(f"⚠️ CPU alta: {alerta['id']} ({alerta['cpu']}%)")
+
+# ═══════════════════════════════════════════════
+# Em loops while (processar até condição)
+# ═══════════════════════════════════════════════
+import re
+
+log_text = """
+[2024-01-15 10:30] ERROR: Connection failed
+[2024-01-15 10:31] INFO: Retry attempt 1
+[2024-01-15 10:31] ERROR: Timeout exceeded
+[2024-01-15 10:32] INFO: Connection restored
+"""
+
+# Extrair todos os erros com regex + walrus
+erros = []
+for linha in log_text.strip().split("\n"):
+    if match := re.search(r"ERROR: (.+)", linha):
+        erros.append(match.group(1))
+print(erros)  # ['Connection failed', 'Timeout exceeded']</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.7 Encadeamento de Operações (Estilo Funcional)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Pipeline de transformações</code><span class="cmd-tag">Pipeline</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Padrão: cadeia de transformações sobre dados
+# Similar a pipes no shell: cmd1 | cmd2 | cmd3
+# ═══════════════════════════════════════════════
+
+# Dados brutos (resposta de API AWS)
+raw_instances = [
+    {"InstanceId": "i-001", "State": {"Name": "running"}, "InstanceType": "t3.micro",
+     "Tags": [{"Key": "Name", "Value": "web-01"}, {"Key": "env", "Value": "prod"}]},
+    {"InstanceId": "i-002", "State": {"Name": "stopped"}, "InstanceType": "m5.large",
+     "Tags": [{"Key": "Name", "Value": "dev-db"}, {"Key": "env", "Value": "dev"}]},
+    {"InstanceId": "i-003", "State": {"Name": "running"}, "InstanceType": "t3.small",
+     "Tags": [{"Key": "Name", "Value": "api-01"}, {"Key": "env", "Value": "prod"}]},
+    {"InstanceId": "i-004", "State": {"Name": "terminated"}, "InstanceType": "t3.nano",
+     "Tags": [{"Key": "Name", "Value": "temp-test"}, {"Key": "env", "Value": "dev"}]},
+]
+
+# Pipeline de transformação:
+resultado = (
+    # 1. Transformar tags de lista para dict
+    [
+        {
+            "id": inst["InstanceId"],
+            "state": inst["State"]["Name"],
+            "type": inst["InstanceType"],
+            "tags": {t["Key"]: t["Value"] for t in inst.get("Tags", [])},
+        }
+        for inst in raw_instances
+    ]
+)
+
+# 2. Filtrar apenas instâncias ativas em produção
+prod_ativas = [
+    inst for inst in resultado
+    if inst["state"] == "running" and inst["tags"].get("env") == "prod"
+]
+
+# 3. Ordenar por nome
+prod_ativas.sort(key=lambda x: x["tags"].get("Name", ""))
+
+# 4. Formatar saída
+print("🟢 Instâncias de Produção Ativas:")
+for inst in prod_ativas:
+    print(f"  {inst['tags']['Name']:10} | {inst['id']:10} | {inst['type']}")
+
+# ═══════════════════════════════════════════════
+# Versão com funções compostas (mais reutilizável)
+# ═══════════════════════════════════════════════
+def normalizar(instances):
+    """Transforma formato AWS em formato simplificado."""
+    return [
+        {"id": i["InstanceId"], "state": i["State"]["Name"],
+         "type": i["InstanceType"],
+         "tags": {t["Key"]: t["Value"] for t in i.get("Tags", [])}}
+        for i in instances
+    ]
+
+def filtrar_por(instances, **criterios):
+    """Filtra instâncias por critérios."""
+    def match(inst):
+        return all(inst.get(k) == v for k, v in criterios.items())
+    return [i for i in instances if match(i)]
+
+def filtrar_por_tag(instances, **tag_criterios):
+    """Filtra por valores de tags."""
+    return [i for i in instances if all(
+        i["tags"].get(k) == v for k, v in tag_criterios.items()
+    )]
+
+# Uso composicional:
+resultado = filtrar_por_tag(
+    filtrar_por(
+        normalizar(raw_instances),
+        state="running"
+    ),
+    env="prod"
+)</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9: ESTRUTURAS DE DADOS PARA DEVOPS/CLOUD
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 9</span>
+          <h2>Estruturas de Dados para DevOps/Cloud</h2>
+          <p>Aplicação prática das estruturas de dados em cenários reais de infraestrutura cloud, automação e processamento de dados operacionais.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 Processando Respostas JSON de APIs</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Trabalhando com dados de APIs cloud</code><span class="cmd-tag">API/JSON</span></div>
+            <pre><code>import json
+
+# ═══════════════════════════════════════════════
+# Resposta típica de API AWS (describe-instances)
+# ═══════════════════════════════════════════════
+api_response = {
+    "Reservations": [
+        {
+            "ReservationId": "r-001",
+            "Instances": [
+                {
+                    "InstanceId": "i-0abc001",
+                    "InstanceType": "t3.micro",
+                    "State": {"Code": 16, "Name": "running"},
+                    "PrivateIpAddress": "10.0.1.10",
+                    "PublicIpAddress": "54.210.1.100",
+                    "Tags": [
+                        {"Key": "Name", "Value": "prod-web-01"},
+                        {"Key": "Environment", "Value": "production"},
+                        {"Key": "Team", "Value": "platform"},
+                    ],
+                    "SecurityGroups": [
+                        {"GroupId": "sg-web", "GroupName": "web-servers"},
+                        {"GroupId": "sg-ssh", "GroupName": "ssh-access"},
+                    ]
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-002",
+            "Instances": [
+                {
+                    "InstanceId": "i-0abc002",
+                    "InstanceType": "m5.large",
+                    "State": {"Code": 16, "Name": "running"},
+                    "PrivateIpAddress": "10.0.2.20",
+                    "Tags": [
+                        {"Key": "Name", "Value": "prod-db-01"},
+                        {"Key": "Environment", "Value": "production"},
+                        {"Key": "Team", "Value": "data"},
+                    ],
+                    "SecurityGroups": [
+                        {"GroupId": "sg-db", "GroupName": "database"},
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+# ═══════════════════════════════════════════════
+# Extrair e normalizar dados
+# ═══════════════════════════════════════════════
+
+def extrair_instancias(response):
+    """Extrai e normaliza instâncias da resposta AWS."""
+    instancias = []
+    for reservation in response.get("Reservations", []):
+        for inst in reservation.get("Instances", []):
+            # Converter tags de lista para dict
+            tags = {tag["Key"]: tag["Value"] for tag in inst.get("Tags", [])}
+            
+            instancias.append({
+                "id": inst["InstanceId"],
+                "tipo": inst["InstanceType"],
+                "estado": inst["State"]["Name"],
+                "ip_privado": inst.get("PrivateIpAddress"),
+                "ip_publico": inst.get("PublicIpAddress"),
+                "nome": tags.get("Name", "sem-nome"),
+                "ambiente": tags.get("Environment", "unknown"),
+                "team": tags.get("Team", "unknown"),
+                "security_groups": [sg["GroupId"] for sg in inst.get("SecurityGroups", [])],
+            })
+    return instancias
+
+instancias = extrair_instancias(api_response)
+
+# Análises rápidas
+por_team = {}
+for inst in instancias:
+    por_team.setdefault(inst["team"], []).append(inst["nome"])
+
+print("Instâncias por team:")
+for team, nomes in por_team.items():
+    print(f"  {team}: {', '.join(nomes)}")
+
+# Custo estimado por tipo
+precos = {"t3.micro": 8.50, "t3.small": 17.00, "m5.large": 69.12, "c5.xlarge": 122.40}
+custo_total = sum(precos.get(i["tipo"], 0) for i in instancias)
+print(f"\n💰 Custo mensal estimado: ${custo_total:.2f}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 Configurações AWS com Dicts Aninhados</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Manipulação de configurações complexas</code><span class="cmd-tag">Config</span></div>
+            <pre><code># ═══════════════════════════════════════════════
+# Terraform-like configuration em Python
+# ═══════════════════════════════════════════════
+infrastructure = {
+    "vpc": {
+        "cidr_block": "10.0.0.0/16",
+        "enable_dns": True,
+        "tags": {"Name": "main-vpc", "env": "prod"},
+    },
+    "subnets": [
+        {"name": "public-1", "cidr": "10.0.1.0/24", "az": "a", "public": True},
+        {"name": "public-2", "cidr": "10.0.2.0/24", "az": "b", "public": True},
+        {"name": "private-1", "cidr": "10.0.10.0/24", "az": "a", "public": False},
+        {"name": "private-2", "cidr": "10.0.20.0/24", "az": "b", "public": False},
+    ],
+    "security_groups": {
+        "web": {
+            "description": "Web servers",
+            "ingress": [
+                {"port": 80, "protocol": "tcp", "cidr": "0.0.0.0/0"},
+                {"port": 443, "protocol": "tcp", "cidr": "0.0.0.0/0"},
+            ],
+            "egress": [
+                {"port": 0, "protocol": "-1", "cidr": "0.0.0.0/0"},
+            ]
+        },
+        "db": {
+            "description": "Database servers",
+            "ingress": [
+                {"port": 5432, "protocol": "tcp", "cidr": "10.0.0.0/16"},
+            ],
+            "egress": []
+        }
+    }
+}
+
+# ═══════════════════════════════════════════════
+# Operações sobre a configuração
+# ═══════════════════════════════════════════════
+
+# Listar subnets públicas
+subnets_publicas = [s for s in infrastructure["subnets"] if s["public"]]
+print(f"Subnets públicas: {[s['name'] for s in subnets_publicas]}")
+
+# Verificar SGs com porta aberta para 0.0.0.0/0
+def audit_security_groups(infra):
+    """Audita security groups por regras permissivas."""
+    alertas = []
+    for sg_name, sg_config in infra["security_groups"].items():
+        for rule in sg_config.get("ingress", []):
+            if rule["cidr"] == "0.0.0.0/0" and rule["port"] not in (80, 443):
+                alertas.append({
+                    "sg": sg_name,
+                    "porta": rule["port"],
+                    "risco": "Porta não-HTTP aberta para internet"
+                })
+    return alertas
+
+alertas = audit_security_groups(infrastructure)
+for alerta in alertas:
+    print(f"⚠️ SG '{alerta['sg']}': porta {alerta['porta']} — {alerta['risco']}")
+
+# ═══════════════════════════════════════════════
+# Adicionar tags padrão a todos os recursos
+# ═══════════════════════════════════════════════
+TAGS_PADRAO = {
+    "ManagedBy": "python-automation",
+    "Project": "cloudtrilhas",
+    "CostCenter": "CC-1234",
+}
+
+def aplicar_tags_padrao(recurso, tags_padrao):
+    """Adiciona tags padrão sem sobrescrever existentes."""
+    tags_atuais = recurso.get("tags", {})
+    # Tags existentes têm prioridade
+    recurso["tags"] = {**tags_padrao, **tags_atuais}
+    return recurso
+
+infrastructure["vpc"] = aplicar_tags_padrao(infrastructure["vpc"], TAGS_PADRAO)
+print(infrastructure["vpc"]["tags"])
+# {'ManagedBy': 'python-automation', 'Project': 'cloudtrilhas',
+#  'CostCenter': 'CC-1234', 'Name': 'main-vpc', 'env': 'prod'}</code></pre>
+          </div>
+        </div>
