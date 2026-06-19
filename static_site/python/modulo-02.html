@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Python Módulo 02: Estruturas de Controle</title>
+  <meta name="description" content="Guia completo sobre estruturas de controle em Python: condicionais if/elif/else, match-case, loops for e while, comprehensions, geradores, tratamento de erros e exercícios práticos." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,23 +18,20 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../python.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-01.html" class="nav-link">← Anterior</a>
         <a href="modulo-03.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,98 +39,4258 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐍 Python — Módulo 02</span>
-        <h1>Estruturas de Controle: if, for, while</h1>
-        <p>Controle o fluxo de execução do programa com condicionais e loops.</p>
+        <h1>Estruturas de Controle: Condicionais e Repetição</h1>
+        <p>Domine o fluxo de execução em Python — desde decisões com if/elif/else e pattern matching até loops for e while, comprehensions, geradores, controle de fluxo avançado e tratamento básico de erros. Aprenda a escrever código eficiente, legível e profissional.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node active"><span>02</span><small>Controle</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Funções</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Dados</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Arquivos</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>POO</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Bibliotecas</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>APIs</small></a>
+        <a href="modulo-09.html" class="progress-node"><span>09</span><small>AWS boto3</small></a>
+        <a href="modulo-10.html" class="progress-node"><span>10</span><small>IA Bedrock</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1 — CONDICIONAIS: if, elif, else
+    ════════════════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Condicionais — if, elif, else</h2>
+          <p>Aprenda a tomar decisões no seu código com as estruturas condicionais do Python. Entenda como o interpretador avalia expressões booleanas, a diferença entre valores truthy e falsy, e domine todas as formas de escrita de condicionais — do simples if até o operador ternário.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Condicionais</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>if / elif / else</code><span class="cmd-tag">Condicional</span></div>
-              <pre><code># Estrutura completa
+          <h3>1.1 — Contexto Booleano e Valores Truthy/Falsy</h3>
+          <p>Antes de mergulhar nas condicionais, é essencial entender como o Python avalia expressões em um contexto booleano. Todo valor em Python pode ser tratado como <strong>True</strong> ou <strong>False</strong> quando usado em uma condição.</p>
+          <p>Python considera os seguintes valores como <strong>Falsy</strong> (equivalem a False):</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Valores Falsy em Python</code><span class="cmd-tag">conceito</span></div>
+            <p>Estes valores são avaliados como False em qualquer contexto booleano (if, while, and, or, not):</p>
+            <pre><code># Todos estes valores são considerados FALSY (False)
+False           # O próprio booleano False
+None            # O valor nulo do Python
+0               # Zero inteiro
+0.0             # Zero float
+0j              # Zero complexo
+""              # String vazia
+[]              # Lista vazia
+()              # Tupla vazia
+{}              # Dicionário vazio
+set()           # Set vazio
+frozenset()     # Frozenset vazio
+range(0)        # Range vazio
+b""             # Bytes vazio
+bytearray(b"")  # Bytearray vazio
+
+# Verificando com bool()
+print(bool(0))        # False
+print(bool(""))       # False
+print(bool([]))       # False
+print(bool(None))     # False
+print(bool({}))       # False</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Valores Truthy em Python</code><span class="cmd-tag">conceito</span></div>
+            <p>Qualquer valor que NÃO esteja na lista de falsy é considerado Truthy (equivale a True):</p>
+            <pre><code># Todos estes valores são considerados TRUTHY (True)
+True            # O próprio booleano True
+1               # Qualquer número diferente de zero
+-1              # Números negativos também são truthy
+3.14            # Floats diferentes de zero
+"texto"         # Strings não-vazias
+" "             # String com espaço (não é vazia!)
+"0"             # String "0" (não é vazia!)
+"False"         # String "False" (não é vazia!)
+[0]             # Lista com um elemento (não é vazia!)
+(None,)         # Tupla com um elemento (não é vazia!)
+{"a": 1}        # Dicionário com elementos
+{0}             # Set com um elemento
+
+# Verificando com bool()
+print(bool(42))       # True
+print(bool("oi"))     # True
+print(bool([0]))      # True — lista com 1 elemento!
+print(bool(" "))      # True — string com espaço!
+print(bool("False"))  # True — é uma string não-vazia!</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Regra Prática para Truthy/Falsy</h4>
+            <p><strong>Falsy = vazio ou zero.</strong> Se algo está vazio (string, lista, dict, set) ou é zero numérico, é Falsy. Todo o resto é Truthy. Essa regra cobre 99% dos casos no dia a dia.</p>
+            <p>Objetos personalizados podem definir seu próprio comportamento booleano implementando o método <code>__bool__()</code> ou <code>__len__()</code>. Se <code>__len__</code> retorna 0, o objeto é Falsy.</p>
+          </div>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Uso Prático de Truthy/Falsy</code><span class="cmd-tag">padrão</span></div>
+            <p>Use truthy/falsy para escrever condicionais mais Pythônicas e legíveis:</p>
+            <pre><code># ❌ NÃO-PYTHÔNICO: Comparação explícita desnecessária
+if len(lista) > 0:
+    print("A lista tem elementos")
+
+if nome != "":
+    print(f"Olá, {nome}")
+
+if resultado == True:
+    print("Verdadeiro")
+
+if variavel != None:
+    print("Tem valor")
+
+# ✅ PYTHÔNICO: Aproveitando truthy/falsy
+if lista:
+    print("A lista tem elementos")
+
+if nome:
+    print(f"Olá, {nome}")
+
+if resultado:
+    print("Verdadeiro")
+
+if variavel is not None:  # Para None, use 'is not None' (mais específico)
+    print("Tem valor")
+
+# Exemplo real — validação de dados de API
+response = {"users": [], "status": "ok"}
+
+if response.get("users"):
+    # Só executa se 'users' existir E não for lista vazia
+    processar_usuarios(response["users"])
+else:
+    print("Nenhum usuário encontrado")
+
+# Exemplo — valor padrão com 'or'
+nome = input("Seu nome: ") or "Anônimo"
+# Se o input for vazio (""), usa "Anônimo" como fallback</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 — Estrutura if Simples</h3>
+          <p>A estrutura <code>if</code> é a forma mais básica de tomada de decisão. O bloco de código indentado só é executado se a condição for avaliada como <strong>True</strong> (ou truthy).</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>if</code><span class="cmd-tag">sintaxe</span></div>
+            <p>Sintaxe básica do if — note os dois-pontos (:) e a indentação obrigatória:</p>
+            <pre><code># Sintaxe:
+# if condição:
+#     bloco_de_código  (indentado com 4 espaços)
+
+# Exemplo básico
+idade = 18
+if idade >= 18:
+    print("Você é maior de idade")
+    print("Pode acessar o sistema")
+
+# A indentação define o bloco
+temperatura = 35
+if temperatura > 30:
+    print("Está muito quente!")      # Dentro do if
+    print("Beba bastante água!")     # Dentro do if
+print("Temperatura registrada.")     # FORA do if — sempre executa
+
+# Condição com variável booleana
+sistema_ativo = True
+if sistema_ativo:
+    iniciar_monitoramento()
+
+# Condição com expressão
+cpu_usage = 87.5
+if cpu_usage > 80:
+    enviar_alerta("CPU alta", cpu_usage)
+    escalar_recursos()</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Erros Comuns com if</h4>
+            <ul>
+              <li><strong>Esquecer os dois-pontos (:)</strong> — <code>if idade >= 18</code> causa SyntaxError</li>
+              <li><strong>Indentação inconsistente</strong> — Misturar tabs e espaços causa IndentationError</li>
+              <li><strong>Usar = ao invés de ==</strong> — <code>if x = 5</code> é atribuição, não comparação (SyntaxError em Python)</li>
+              <li><strong>Bloco vazio</strong> — Se não tem código ainda, use <code>pass</code> como placeholder</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 — Estrutura if-else</h3>
+          <p>Quando você precisa executar um bloco alternativo caso a condição seja falsa, utilize <code>if-else</code>. Exatamente um dos dois blocos será executado — nunca ambos, nunca nenhum.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>if-else</code><span class="cmd-tag">sintaxe</span></div>
+            <p>O else captura todos os casos que não satisfazem a condição do if:</p>
+            <pre><code># Sintaxe:
+# if condição:
+#     bloco_verdadeiro
+# else:
+#     bloco_falso
+
+# Exemplo: verificar paridade
+numero = 7
+if numero % 2 == 0:
+    print(f"{numero} é PAR")
+else:
+    print(f"{numero} é ÍMPAR")
+# Saída: 7 é ÍMPAR
+
+# Exemplo: autenticação simples
+senha_correta = "CloudTrilhas2026"
+senha_digitada = input("Digite a senha: ")
+
+if senha_digitada == senha_correta:
+    print("✅ Acesso liberado!")
+    carregar_dashboard()
+else:
+    print("❌ Senha incorreta!")
+    registrar_tentativa_falha()
+
+# Exemplo: verificação de status HTTP
+status_code = 404
+if status_code == 200:
+    print("Requisição bem-sucedida")
+else:
+    print(f"Erro na requisição: HTTP {status_code}")
+
+# Exemplo DevOps: verificar saúde do serviço
+health_check = verificar_servico("api-gateway")
+if health_check["status"] == "healthy":
+    print(f"Serviço OK — uptime: {health_check['uptime']}s")
+else:
+    print(f"⚠️ Serviço DEGRADADO — reiniciando...")
+    reiniciar_servico("api-gateway")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 — Estrutura if-elif-else (Cadeia de Condições)</h3>
+          <p>Quando existem múltiplas condições mutuamente exclusivas, use <code>elif</code> (abreviação de "else if"). O Python avalia as condições de cima para baixo e executa <strong>apenas o primeiro bloco</strong> cuja condição seja verdadeira.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>if-elif-else</code><span class="cmd-tag">sintaxe</span></div>
+            <p>Encadeamento de múltiplas condições — apenas um bloco é executado:</p>
+            <pre><code># Sintaxe:
+# if condição_1:
+#     bloco_1
+# elif condição_2:
+#     bloco_2
+# elif condição_3:
+#     bloco_3
+# else:
+#     bloco_padrão (nenhuma condição anterior foi verdadeira)
+
+# Exemplo: classificação de notas
 nota = 7.5
 
-if nota >= 9:
+if nota >= 9.0:
     conceito = "A"
-elif nota >= 7:
+    mensagem = "Excelente!"
+elif nota >= 7.0:
     conceito = "B"
-elif nota >= 5:
+    mensagem = "Bom desempenho"
+elif nota >= 5.0:
     conceito = "C"
-else:
+    mensagem = "Aprovado"
+elif nota >= 3.0:
     conceito = "D"
+    mensagem = "Recuperação"
+else:
+    conceito = "E"
+    mensagem = "Reprovado"
 
-print(f"Nota {nota} = Conceito {conceito}")
+print(f"Nota: {nota} | Conceito: {conceito} | {mensagem}")
+# Saída: Nota: 7.5 | Conceito: B | Bom desempenho
 
-# Operador ternário
-status = "Aprovado" if nota >= 7 else "Reprovado"
+# Exemplo: classificação de HTTP status codes
+def classificar_status(code):
+    if 100 <= code < 200:
+        return "Informacional"
+    elif 200 <= code < 300:
+        return "Sucesso"
+    elif 300 <= code < 400:
+        return "Redirecionamento"
+    elif 400 <= code < 500:
+        return "Erro do Cliente"
+    elif 500 <= code < 600:
+        return "Erro do Servidor"
+    else:
+        return "Código inválido"
 
-# Match/case (Python 3.10+)
-match conceito:
-    case "A":
-        print("Excelente!")
-    case "B":
-        print("Bom trabalho!")
-    case _:
-        print("Continue estudando!")</code></pre>
-            </div>
+print(classificar_status(201))  # Sucesso
+print(classificar_status(404))  # Erro do Cliente
+print(classificar_status(503))  # Erro do Servidor
+
+# Exemplo: menu de opções DevOps
+print("=== Gerenciamento de Infraestrutura ===")
+print("1. Listar instâncias EC2")
+print("2. Verificar status dos serviços")
+print("3. Deploy em staging")
+print("4. Rollback")
+print("5. Sair")
+
+opcao = input("Escolha: ")
+
+if opcao == "1":
+    listar_instancias_ec2()
+elif opcao == "2":
+    verificar_servicos()
+elif opcao == "3":
+    deploy_staging()
+elif opcao == "4":
+    executar_rollback()
+elif opcao == "5":
+    print("Saindo...")
+else:
+    print("❌ Opção inválida!")</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Dica: Ordem das Condições Importa!</h4>
+            <p>No exemplo de notas acima, se invertêssemos a ordem (testando <code>nota >= 3.0</code> primeiro), uma nota 9.5 entraria nesse bloco e nunca chegaria ao teste de <code>nota >= 9.0</code>. <strong>Sempre ordene do mais específico para o mais geral</strong>, ou do maior para o menor, conforme o caso.</p>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Loops</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>for</code><span class="cmd-tag">Loop</span></div>
-              <pre><code># Iterando sobre sequências
-frutas = ["maçã", "banana", "uva"]
-for fruta in frutas:
-    print(fruta)
+          <h3>1.5 — Condicionais Aninhadas (Nested if)</h3>
+          <p>É possível colocar um <code>if</code> dentro de outro <code>if</code>, criando condicionais aninhadas. Porém, <strong>evite aninhar mais de 2-3 níveis</strong> — código profundamente aninhado é difícil de ler e manter.</p>
 
-# range()
-for i in range(5):        # 0, 1, 2, 3, 4
-    print(i)
+          <div class="command-card wide">
+            <div class="command-header"><code>Nested if</code><span class="cmd-tag">padrão</span></div>
+            <p>Condicionais dentro de condicionais — use com moderação:</p>
+            <pre><code># Exemplo: sistema de autorização em camadas
+usuario_autenticado = True
+perfil = "admin"
+mfa_ativo = True
 
-for i in range(1, 11, 2): # 1, 3, 5, 7, 9
-    print(i)
+if usuario_autenticado:
+    if perfil == "admin":
+        if mfa_ativo:
+            print("✅ Acesso total concedido (admin + MFA)")
+            liberar_painel_admin()
+        else:
+            print("⚠️ Admin sem MFA — acesso limitado")
+            liberar_painel_basico()
+    elif perfil == "editor":
+        print("📝 Acesso de editor concedido")
+        liberar_editor()
+    else:
+        print("👤 Acesso de leitor")
+        liberar_leitura()
+else:
+    print("❌ Usuário não autenticado — redirecionando para login")
+    redirecionar_login()
 
-# enumerate (índice + valor)
-for i, fruta in enumerate(frutas):
-    print(f"{i}: {fruta}")</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>while</code><span class="cmd-tag">Loop</span></div>
-              <pre><code># Loop com condição
-contador = 0
-while contador < 5:
-    print(f"Contagem: {contador}")
-    contador += 1
+# ═══════════════════════════════════════════════════════════
+# REFATORAÇÃO: Mesmo código sem aninhamento excessivo
+# (técnica: early return / guard clauses)
+# ═══════════════════════════════════════════════════════════
 
-# break e continue
-for i in range(10):
-    if i == 3:
-        continue  # pula o 3
-    if i == 7:
-        break     # para no 7
-    print(i)
+def autorizar_acesso(usuario_autenticado, perfil, mfa_ativo):
+    """Versão refatorada — mais limpa e fácil de manter."""
+    if not usuario_autenticado:
+        print("❌ Não autenticado")
+        return redirecionar_login()
 
-# while True com break
-while True:
-    resp = input("Sair? (s/n): ")
-    if resp.lower() == "s":
-        break</code></pre>
-            </div>
+    if perfil == "admin" and mfa_ativo:
+        print("✅ Acesso total (admin + MFA)")
+        return liberar_painel_admin()
+
+    if perfil == "admin":
+        print("⚠️ Admin sem MFA — acesso limitado")
+        return liberar_painel_basico()
+
+    if perfil == "editor":
+        print("📝 Acesso de editor")
+        return liberar_editor()
+
+    print("👤 Acesso de leitor")
+    return liberar_leitura()</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Anti-padrão: Pirâmide da Perdição (Pyramid of Doom)</h4>
+            <p>Código com muitos níveis de aninhamento (5+) é chamado de "Pyramid of Doom". Isso torna o código difícil de ler, testar e manter. Prefira <strong>guard clauses</strong> (retornos antecipados) para eliminar níveis de indentação. Se uma função tem mais de 3 níveis de if aninhado, considere refatorar.</p>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>1.6 — Operador Ternário (Expressão Condicional)</h3>
+          <p>Python oferece uma forma compacta de escrever condicionais simples em uma única linha, conhecida como <strong>operador ternário</strong> ou <strong>expressão condicional</strong>.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>x = a if condição else b</code><span class="cmd-tag">sintaxe</span></div>
+            <p>O operador ternário retorna um valor baseado em uma condição:</p>
+            <pre><code># Sintaxe: valor_se_true if condição else valor_se_false
+
+# Exemplo básico
+idade = 20
+status = "maior" if idade >= 18 else "menor"
+print(status)  # "maior"
+
+# Equivalente ao if-else tradicional:
+# if idade >= 18:
+#     status = "maior"
+# else:
+#     status = "menor"
+
+# Exemplo: valor padrão
+nome = input("Nome: ").strip()
+saudacao = f"Olá, {nome}!" if nome else "Olá, visitante!"
+
+# Exemplo: formatação condicional
+quantidade = 1
+texto = f"{quantidade} item" if quantidade == 1 else f"{quantidade} itens"
+print(texto)  # "1 item"
+
+# Exemplo: limitar valor (clamp)
+valor = 150
+valor_limitado = valor if valor <= 100 else 100
+print(valor_limitado)  # 100
+
+# Exemplo DevOps: selecionar ambiente
+ambiente = "production" if deploy_final else "staging"
+endpoint = f"https://api.{'prod' if ambiente == 'production' else 'stg'}.cloudtrilhas.com"
+
+# Ternário aninhado (EVITE — prejudica legibilidade)
+# ❌ Difícil de ler:
+resultado = "A" if nota >= 9 else "B" if nota >= 7 else "C" if nota >= 5 else "F"
+
+# ✅ Preferível — use if-elif-else normal para 3+ condições:
+if nota >= 9:
+    resultado = "A"
+elif nota >= 7:
+    resultado = "B"
+elif nota >= 5:
+    resultado = "C"
+else:
+    resultado = "F"
+
+# Uso legítimo em comprehensions:
+numeros = [1, -2, 3, -4, 5]
+absolutos = [n if n >= 0 else -n for n in numeros]
+print(absolutos)  # [1, 2, 3, 4, 5]
+
+# Uso em argumentos de função:
+print("PAR" if x % 2 == 0 else "ÍMPAR")
+registrar_log(nivel="ERROR" if falha_critica else "WARNING")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.7 — Padrões Comuns e Boas Práticas com Condicionais</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Padrões Idiomáticos</code><span class="cmd-tag">boas práticas</span></div>
+            <p>Formas Pythônicas de usar condicionais no dia a dia:</p>
+            <pre><code># ═══ PADRÃO 1: Verificação de existência em coleções ═══
+frutas = ["maçã", "banana", "laranja"]
+
+# ✅ Pythônico
+if "banana" in frutas:
+    print("Temos banana!")
+
+# Funciona com dicts (verifica as chaves)
+config = {"host": "localhost", "port": 5432}
+if "port" in config:
+    conectar(config["port"])
+
+# ═══ PADRÃO 2: Verificação segura com .get() ═══
+usuario = {"nome": "João", "idade": 30}
+
+# ❌ Pode causar KeyError
+# if usuario["email"]:
+#     enviar_email(usuario["email"])
+
+# ✅ Seguro com .get()
+if usuario.get("email"):
+    enviar_email(usuario["email"])
+
+# ═══ PADRÃO 3: Atribuição com fallback (or) ═══
+configuracao = {}
+timeout = configuracao.get("timeout") or 30  # Se None ou 0, usa 30
+host = configuracao.get("host") or "localhost"
+
+# ═══ PADRÃO 4: Guard clause em funções ═══
+def processar_pedido(pedido):
+    if not pedido:
+        return {"erro": "Pedido vazio"}
+    if not pedido.get("itens"):
+        return {"erro": "Pedido sem itens"}
+    if pedido.get("total", 0) <= 0:
+        return {"erro": "Total inválido"}
+
+    # Lógica principal (sem indentação extra)
+    return calcular_frete(pedido)
+
+# ═══ PADRÃO 5: Verificação de tipo com isinstance ═══
+def formatar_valor(valor):
+    if isinstance(valor, (int, float)):
+        return f"R$ {valor:,.2f}"
+    elif isinstance(valor, str):
+        return valor.upper()
+    elif isinstance(valor, list):
+        return ", ".join(str(v) for v in valor)
+    else:
+        return str(valor)
+
+# ═══ PADRÃO 6: Condições compostas legíveis ═══
+# ❌ Linha muito longa
+if usuario.idade >= 18 and usuario.ativo and usuario.verificado and not usuario.banido:
+    liberar_acesso()
+
+# ✅ Quebra de linha com parênteses (mais legível)
+if (
+    usuario.idade >= 18
+    and usuario.ativo
+    and usuario.verificado
+    and not usuario.banido
+):
+    liberar_acesso()
+
+# ═══ PADRÃO 7: Walrus operator (:=) — Python 3.8+ ═══
+# Atribuir e testar na mesma expressão
+import re
+
+texto = "Meu email é user@cloud.com"
+if match := re.search(r"[\w.]+@[\w.]+", texto):
+    print(f"Email encontrado: {match.group()}")
+
+# Sem walrus operator (mais verboso):
+# match = re.search(r"[\w.]+@[\w.]+", texto)
+# if match:
+#     print(f"Email encontrado: {match.group()}")
+
+# Walrus em while (muito útil)
+while chunk := arquivo.read(8192):
+    processar(chunk)</code></pre>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2 — OPERADORES DE COMPARAÇÃO E LÓGICOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Operadores de Comparação e Lógicos em Condicionais</h2>
+          <p>Domine os operadores que formam as condições em Python — comparações encadeadas, avaliação de curto-circuito, tabelas verdade e os erros mais comuns que até programadores experientes cometem.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — Operadores de Comparação</h3>
+          <p>Python oferece os seguintes operadores de comparação, todos retornando <code>True</code> ou <code>False</code>:</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Operador</th><th>Significado</th><th>Exemplo</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>==</code></td><td>Igual a (valor)</td><td><code>5 == 5</code></td><td>True</td></tr>
+              <tr><td><code>!=</code></td><td>Diferente de</td><td><code>5 != 3</code></td><td>True</td></tr>
+              <tr><td><code>&gt;</code></td><td>Maior que</td><td><code>10 &gt; 5</code></td><td>True</td></tr>
+              <tr><td><code>&lt;</code></td><td>Menor que</td><td><code>3 &lt; 7</code></td><td>True</td></tr>
+              <tr><td><code>&gt;=</code></td><td>Maior ou igual</td><td><code>5 &gt;= 5</code></td><td>True</td></tr>
+              <tr><td><code>&lt;=</code></td><td>Menor ou igual</td><td><code>4 &lt;= 3</code></td><td>False</td></tr>
+              <tr><td><code>is</code></td><td>Mesmo objeto (identidade)</td><td><code>x is None</code></td><td>—</td></tr>
+              <tr><td><code>is not</code></td><td>Objetos diferentes</td><td><code>x is not None</code></td><td>—</td></tr>
+              <tr><td><code>in</code></td><td>Pertence a (membership)</td><td><code>"a" in "abc"</code></td><td>True</td></tr>
+              <tr><td><code>not in</code></td><td>Não pertence a</td><td><code>5 not in [1,2,3]</code></td><td>True</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Comparações Encadeadas (Chained Comparisons)</h3>
+          <p>Python permite encadear comparações de forma natural e matemática — um recurso único que torna o código muito mais legível:</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Chained Comparisons</code><span class="cmd-tag">exclusivo Python</span></div>
+            <p>Encadeie múltiplas comparações sem precisar de 'and' explícito:</p>
+            <pre><code># Comparações encadeadas — exclusividade do Python!
+x = 5
+
+# ✅ Pythônico: comparação encadeada
+if 1 < x < 10:
+    print("x está entre 1 e 10 (exclusivo)")
+
+# Equivalente em outras linguagens (mais verboso):
+if 1 < x and x < 10:
+    print("x está entre 1 e 10 (exclusivo)")
+
+# Vários exemplos de encadeamento:
+nota = 7.5
+if 0 <= nota <= 10:
+    print("Nota válida")
+
+# Verificar faixa de porta de rede
+porta = 8080
+if 1024 <= porta <= 65535:
+    print("Porta válida (não-privilegiada)")
+
+# Pode encadear mais de duas comparações!
+a, b, c = 1, 2, 3
+if a < b < c:
+    print("Sequência crescente")  # True
+
+# Funciona com igualdade também
+if a <= b <= c:
+    print("Sequência não-decrescente")
+
+# Encadeamento complexo (3+ comparações)
+idade = 25
+if 18 <= idade < 30:
+    print("Jovem adulto")
+
+# Verificar se valores são iguais
+x = y = z = 42
+if x == y == z:
+    print("Todos são iguais")
+
+# ⚠️ Cuidado com encadeamentos não-intuitivos:
+# Isso é VÁLIDO mas confuso:
+if 1 < 2 > 1.5:
+    print("True — mas evite isso, é confuso!")
+# Equivale a: 1 < 2 and 2 > 1.5
+
+# Uso prático — validação de intervalo de IP
+octeto = 192
+if 0 <= octeto <= 255:
+    print(f"Octeto {octeto} é válido")
+
+# Uso em DevOps — verificar CPU dentro de limites
+cpu = 75.3
+if 0 <= cpu <= 100:
+    if cpu > 90:
+        nivel = "CRITICAL"
+    elif cpu > 70:
+        nivel = "WARNING"
+    else:
+        nivel = "OK"
+    print(f"CPU: {cpu}% — {nivel}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Avaliação de Curto-Circuito (Short-Circuit Evaluation)</h3>
+          <p>Os operadores <code>and</code> e <code>or</code> em Python utilizam <strong>avaliação de curto-circuito</strong>: eles param de avaliar assim que o resultado final é determinado. Além disso, eles retornam um dos operandos (não necessariamente True/False).</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>and / or — Short-Circuit</code><span class="cmd-tag">importante</span></div>
+            <p>Entenda como Python avalia expressões lógicas e o que elas retornam:</p>
+            <pre><code># ═══ REGRAS DE CURTO-CIRCUITO ═══
+#
+# 'and': retorna o PRIMEIRO valor falsy, ou o ÚLTIMO valor se todos truthy
+# 'or':  retorna o PRIMEIRO valor truthy, ou o ÚLTIMO valor se todos falsy
+
+# ═══ Operador 'and' ═══
+print(1 and 2 and 3)        # 3 (todos truthy → retorna o último)
+print(1 and 0 and 3)        # 0 (0 é falsy → retorna o primeiro falsy)
+print(1 and "" and 3)       # "" (string vazia é falsy)
+print([] and "texto")       # [] (lista vazia é falsy → para aqui)
+
+# O segundo operando NÃO é avaliado se o primeiro é falsy:
+def funcao_cara():
+    print("Fui chamada!")
+    return True
+
+False and funcao_cara()  # "Fui chamada!" NÃO é impresso!
+True and funcao_cara()   # "Fui chamada!" É impresso
+
+# ═══ Operador 'or' ═══
+print(0 or "" or "fallback")    # "fallback" (primeiro truthy)
+print(0 or [] or None)          # None (todos falsy → retorna o último)
+print("valor" or "default")    # "valor" (primeiro truthy)
+print(None or 0 or "achei")    # "achei" (primeiro truthy)
+
+# O segundo operando NÃO é avaliado se o primeiro é truthy:
+True or funcao_cara()   # funcao_cara() NÃO é executada!
+False or funcao_cara()  # funcao_cara() É executada
+
+# ═══ USO PRÁTICO: Valores padrão com 'or' ═══
+nome = input("Nome: ") or "Visitante"
+# Se input for "" (falsy), usa "Visitante"
+
+config_porta = os.environ.get("PORT") or "8080"
+# Se variável de ambiente não existe (None) ou é vazia (""), usa "8080"
+
+# ═══ USO PRÁTICO: Verificação segura com 'and' ═══
+# Evita erros ao acessar atributos que podem ser None
+usuario = obter_usuario(id=42)  # Pode retornar None
+
+# ❌ Perigoso: AttributeError se usuario for None
+# if usuario.ativo:
+#     ...
+
+# ✅ Seguro com curto-circuito:
+if usuario and usuario.ativo:
+    print(f"Usuário {usuario.nome} está ativo")
+# Se usuario for None (falsy), 'usuario.ativo' NÃO é avaliado!
+
+# ═══ USO PRÁTICO: Cadeia de fallbacks ═══
+# Primeiro valor não-vazio vence
+servidor = (
+    os.environ.get("DB_HOST")       # 1ª prioridade: variável de ambiente
+    or config.get("database_host")  # 2ª prioridade: arquivo de config
+    or "localhost"                   # 3ª prioridade: valor padrão
+)</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Armadilha do 'or' com Zero</h4>
+            <p>Cuidado: <code>valor or default</code> substituirá <strong>qualquer</strong> valor falsy, incluindo <code>0</code>, <code>""</code> e <code>[]</code> — que podem ser valores legítimos! Se <code>0</code> é um valor válido, use o operador ternário ou <code>if valor is not None</code> em vez de <code>or</code>.</p>
+            <pre><code># Problema:
+porta = 0  # Porta 0 pode ser válida em alguns contextos
+resultado = porta or 8080  # resultado = 8080 (ERRADO! 0 era o valor desejado)
+
+# Solução:
+resultado = porta if porta is not None else 8080  # resultado = 0 (CORRETO)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — Operador not e Combinações</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>not</code><span class="cmd-tag">operador</span></div>
+            <p>O operador 'not' inverte o valor booleano de uma expressão:</p>
+            <pre><code># Operador not — inverte True/False
+print(not True)       # False
+print(not False)      # True
+print(not 0)          # True (0 é falsy → not falsy = True)
+print(not "texto")    # False ("texto" é truthy → not truthy = False)
+print(not [])         # True (lista vazia é falsy)
+print(not None)       # True
+
+# Uso em condicionais
+lista = []
+if not lista:
+    print("Lista está vazia")  # Executa!
+
+# Negação de membership
+proibidos = ["root", "admin", "system"]
+usuario = "joao"
+if usuario not in proibidos:
+    print(f"Usuário '{usuario}' permitido")
+
+# Negação de identidade
+resultado = buscar_dado()
+if resultado is not None:
+    processar(resultado)
+
+# ═══ COMBINAÇÕES COMPLEXAS ═══
+# Precedência: not > and > or
+
+# Sem parênteses (confuso):
+# not True or False and True
+# Avalia como: (not True) or (False and True) = False or False = False
+
+# Com parênteses (SEMPRE recomendado para clareza):
+if not (usuario_banido or conta_suspensa):
+    permitir_acesso()
+
+# Equivalente a:
+if (not usuario_banido) and (not conta_suspensa):
+    permitir_acesso()
+
+# Regra de De Morgan:
+# not (A and B) == (not A) or (not B)
+# not (A or B)  == (not A) and (not B)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 — Erros Comuns com Comparações</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Erros Frequentes</code><span class="cmd-tag danger">cuidado</span></div>
+            <p>Armadilhas que pegam iniciantes e até programadores intermediários:</p>
+            <pre><code># ═══ ERRO 1: Usar '=' ao invés de '==' ═══
+# Em Python, isso causa SyntaxError (diferente de C/Java onde é um bug silencioso)
+# if x = 5:  ← SyntaxError: invalid syntax
+if x == 5:   # ✅ Correto: comparação
+    pass
+
+# ═══ ERRO 2: Usar 'is' para comparar valores ═══
+a = 1000
+b = 1000
+print(a == b)   # True ✅ (compara VALORES)
+print(a is b)   # PODE ser False! ❌ (compara IDENTIDADE/endereço de memória)
+
+# 'is' verifica se são o MESMO OBJETO na memória, não se têm o mesmo valor
+# Python faz cache de inteiros pequenos (-5 a 256), então:
+x = 5
+y = 5
+print(x is y)   # True (mesmo objeto — cache do Python)
+
+x = 1000
+y = 1000
+print(x is y)   # Pode ser False! (objetos diferentes na memória)
+
+# ✅ REGRA: Use 'is' APENAS para None, True, False
+if resultado is None:       # ✅ Correto
+    pass
+if resultado is not None:   # ✅ Correto
+    pass
+if flag is True:            # ✅ OK (mas 'if flag:' é mais Pythônico)
+    pass
+
+# ❌ NUNCA use 'is' para strings, números ou listas:
+# if nome is "João":   ❌
+# if total is 100:     ❌
+# if lista is []:      ❌
+
+# ═══ ERRO 3: Comparar float com == ═══
+# Floats têm problemas de precisão!
+print(0.1 + 0.2 == 0.3)  # False!! (0.30000000000000004)
+
+# ✅ Solução: usar math.isclose() ou tolerância
+import math
+print(math.isclose(0.1 + 0.2, 0.3))  # True
+
+# Ou com tolerância manual:
+EPSILON = 1e-9
+if abs((0.1 + 0.2) - 0.3) < EPSILON:
+    print("São iguais (com tolerância)")
+
+# ═══ ERRO 4: Modificar lista durante iteração ═══
+# (Veremos mais em loops, mas é relevante aqui)
+
+# ═══ ERRO 5: Condição que sempre é True ═══
+x = 5
+# ❌ ERRADO: sempre True! (string "3" é truthy)
+if x == 5 or "3":
+    print("Sempre executa!")
+
+# ✅ CORRETO:
+if x == 5 or x == 3:
+    print("x é 5 ou 3")
+
+# Ou melhor:
+if x in (5, 3):
+    print("x é 5 ou 3")
+
+# ═══ ERRO 6: Esquecer que 'and' retorna valores ═══
+# Pode causar bugs sutis quando usado em atribuições
+resultado = None and "texto"  # resultado = None (não "texto"!)
+resultado = "" and 42         # resultado = "" (não 42!)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.6 — Tabela Verdade dos Operadores Lógicos</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>True</td><td>True</td><td>True</td><td>True</td><td>False</td></tr>
+              <tr><td>True</td><td>False</td><td>False</td><td>True</td><td>False</td></tr>
+              <tr><td>False</td><td>True</td><td>False</td><td>True</td><td>True</td></tr>
+              <tr><td>False</td><td>False</td><td>False</td><td>False</td><td>True</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Precedência de Operadores (da maior para menor)</h4>
+            <ol>
+              <li><code>not</code> — maior precedência</li>
+              <li><code>and</code> — precedência intermediária</li>
+              <li><code>or</code> — menor precedência</li>
+            </ol>
+            <p>Dica: <strong>sempre use parênteses</strong> em expressões complexas para deixar a intenção clara, independente da precedência.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3 — MATCH-CASE (PATTERN MATCHING)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Match-Case — Pattern Matching (Python 3.10+)</h2>
+          <p>Conheça o poderoso sistema de pattern matching introduzido no Python 3.10, que vai muito além de um simples switch-case — permitindo desestruturação, guards, wildcards e matching de estruturas complexas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — Sintaxe Básica do match-case</h3>
+          <p>O <code>match-case</code> foi introduzido na <strong>PEP 634</strong> (Python 3.10, outubro 2021). Diferente do switch-case de outras linguagens, ele implementa <strong>structural pattern matching</strong> — um sistema sofisticado de correspondência de padrões que pode desestruturar dados.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>match-case</code><span class="cmd-tag">Python 3.10+</span></div>
+            <p>Sintaxe básica — matching de valores literais:</p>
+            <pre><code># Sintaxe básica:
+# match expressão:
+#     case padrão_1:
+#         bloco_1
+#     case padrão_2:
+#         bloco_2
+#     case _:
+#         bloco_padrão (wildcard — captura tudo)
+
+# Exemplo: comando de terminal
+comando = input(">>> ")
+
+match comando:
+    case "help":
+        print("Comandos disponíveis: help, status, deploy, exit")
+    case "status":
+        print("Todos os serviços estão operacionais")
+    case "deploy":
+        print("Iniciando deploy...")
+        executar_deploy()
+    case "exit":
+        print("Saindo...")
+        sys.exit(0)
+    case _:
+        print(f"Comando '{comando}' não reconhecido. Digite 'help'.")
+
+# Exemplo: dia da semana
+dia = "segunda"
+match dia:
+    case "segunda" | "terça" | "quarta" | "quinta" | "sexta":
+        print("Dia útil — trabalhar!")
+    case "sábado" | "domingo":
+        print("Fim de semana — descansar!")
+    case _:
+        print("Dia inválido")
+
+# NOTA: O operador | funciona como OR no pattern matching
+# É diferente do 'or' lógico — aqui significa "case A ou case B"</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Requisito de Versão</h4>
+            <p>O <code>match-case</code> requer <strong>Python 3.10 ou superior</strong>. Se seu projeto precisa suportar versões anteriores, use <code>if-elif-else</code> ou um dicionário de dispatch. Verifique sua versão com <code>python --version</code>.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — Wildcards e Captura de Variáveis</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Wildcards e Capture Patterns</code><span class="cmd-tag">padrão</span></div>
+            <p>O underscore (_) captura qualquer valor sem vinculá-lo a uma variável. Nomes capturam o valor em uma variável:</p>
+            <pre><code># Wildcard: _ (underscore) — captura qualquer valor, descarta
+match status_code:
+    case 200:
+        print("OK")
+    case 404:
+        print("Not Found")
+    case 500:
+        print("Internal Server Error")
+    case _:  # Wildcard — qualquer outro valor
+        print(f"Status não tratado")
+
+# ⚠️ CUIDADO: Variáveis em case CAPTURAM o valor (não comparam!)
+status = "ativo"
+ATIVO = "ativo"  # Constante
+
+match status:
+    case ATIVO:  # ❌ ERRADO! Isso CAPTURA status na variável 'ATIVO'
+        print("Está ativo")  # Sempre executa!
+
+# Para comparar com variáveis, use guards (if):
+match status:
+    case valor if valor == ATIVO:  # ✅ Correto com guard
+        print("Está ativo")
+
+# Ou use valores literais diretamente:
+match status:
+    case "ativo":  # ✅ Correto: literal string
+        print("Está ativo")
+
+# Captura com nome (capture pattern):
+match comando.split():
+    case ["deploy", projeto]:  # 'projeto' captura o segundo elemento
+        print(f"Deploy do projeto: {projeto}")
+    case ["scale", servico, replicas]:
+        print(f"Escalando {servico} para {replicas} réplicas")
+    case ["help"]:
+        print("Uso: deploy <projeto> | scale <servico> <replicas>")
+    case _:
+        print("Comando inválido")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — Guards (Condições Adicionais)</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>case ... if condição</code><span class="cmd-tag">guard</span></div>
+            <p>Guards adicionam uma condição if ao case — o padrão só é aceito se a condição for True:</p>
+            <pre><code># Guards — condição adicional com 'if'
+def classificar_temperatura(temp):
+    match temp:
+        case t if t < 0:
+            return "Congelante ❄️"
+        case t if t < 15:
+            return "Frio 🥶"
+        case t if t < 25:
+            return "Agradável 😊"
+        case t if t < 35:
+            return "Quente 🌡️"
+        case _:
+            return "Extremo 🔥"
+
+print(classificar_temperatura(22))   # "Agradável 😊"
+print(classificar_temperatura(-5))   # "Congelante ❄️"
+print(classificar_temperatura(40))   # "Extremo 🔥"
+
+# Exemplo DevOps: classificar resposta de API
+def tratar_resposta(response):
+    match response:
+        case {"status": status, "data": data} if status == 200:
+            return f"Sucesso: {len(data)} registros"
+        case {"status": status, "error": msg} if 400 <= status < 500:
+            return f"Erro do cliente ({status}): {msg}"
+        case {"status": status} if status >= 500:
+            return f"Erro do servidor ({status}) — retry em 30s"
+        case {"status": 301, "location": url}:
+            return f"Redirecionado para: {url}"
+        case _:
+            return "Resposta inesperada"
+
+# Exemplo: validação de input numérico
+def validar_porta(porta):
+    match porta:
+        case p if not isinstance(p, int):
+            return "Erro: porta deve ser inteiro"
+        case p if p < 0:
+            return "Erro: porta não pode ser negativa"
+        case p if p < 1024:
+            return f"Porta {p}: privilegiada (requer root)"
+        case p if p <= 65535:
+            return f"Porta {p}: válida"
+        case _:
+            return "Erro: porta fora do range (0-65535)"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Matching de Tuplas, Sequências e Dicionários</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Structural Matching</code><span class="cmd-tag">avançado</span></div>
+            <p>O verdadeiro poder do match-case: desestruturar dados complexos:</p>
+            <pre><code># ═══ MATCHING DE TUPLAS/LISTAS ═══
+ponto = (3, 4)
+
+match ponto:
+    case (0, 0):
+        print("Origem")
+    case (x, 0):
+        print(f"No eixo X, posição {x}")
+    case (0, y):
+        print(f"No eixo Y, posição {y}")
+    case (x, y):
+        print(f"Ponto ({x}, {y})")
+    case _:
+        print("Não é um ponto 2D")
+
+# Matching com * (captura múltiplos elementos)
+match comando.split():
+    case ["git", "commit", "-m", *mensagem]:
+        print(f"Commit com mensagem: {' '.join(mensagem)}")
+    case ["git", "push", remote, branch]:
+        print(f"Push para {remote}/{branch}")
+    case ["git", "log", *args]:
+        print(f"Log com args: {args}")
+    case ["git", subcmd, *_]:
+        print(f"Subcomando git: {subcmd}")
+
+# ═══ MATCHING DE DICIONÁRIOS ═══
+evento = {"tipo": "alerta", "severidade": "alta", "servico": "api-gateway"}
+
+match evento:
+    case {"tipo": "alerta", "severidade": "critica", "servico": s}:
+        print(f"🚨 ALERTA CRÍTICO no serviço {s}!")
+        acionar_oncall()
+    case {"tipo": "alerta", "severidade": "alta", "servico": s}:
+        print(f"⚠️ Alerta alto no serviço {s}")
+        enviar_slack(s)
+    case {"tipo": "alerta", "severidade": sev}:
+        print(f"ℹ️ Alerta {sev}")
+    case {"tipo": "metrica", "nome": nome, "valor": valor}:
+        print(f"📊 Métrica {nome} = {valor}")
+    case _:
+        print("Evento não classificado")
+
+# ═══ MATCHING DE CLASSES (muito poderoso!) ═══
+from dataclasses import dataclass
+
+@dataclass
+class Ponto:
+    x: float
+    y: float
+
+@dataclass
+class Circulo:
+    centro: Ponto
+    raio: float
+
+@dataclass
+class Retangulo:
+    p1: Ponto
+    p2: Ponto
+
+def descrever_forma(forma):
+    match forma:
+        case Ponto(x=0, y=0):
+            return "Ponto na origem"
+        case Ponto(x=x, y=y):
+            return f"Ponto em ({x}, {y})"
+        case Circulo(centro=Ponto(x=0, y=0), raio=r):
+            return f"Círculo centrado na origem, raio {r}"
+        case Circulo(centro=c, raio=r) if r > 100:
+            return f"Círculo GRANDE em ({c.x}, {c.y})"
+        case Retangulo(p1=Ponto(x=x1, y=y1), p2=Ponto(x=x2, y=y2)):
+            largura = abs(x2 - x1)
+            altura = abs(y2 - y1)
+            return f"Retângulo {largura}x{altura}"
+        case _:
+            return "Forma desconhecida"
+
+# ═══ QUANDO USAR MATCH vs IF-ELIF ═══
+# Use match-case quando:
+# • Está fazendo matching de estrutura (desestruturação)
+# • Tem muitos valores literais para comparar
+# • Está processando comandos/eventos com formato definido
+# • Quer code readability em dispatch de tipos
+
+# Use if-elif quando:
+# • Condições são ranges numéricos simples (idade > 18)
+# • Precisa suportar Python < 3.10
+# • Condições não se baseiam em pattern matching
+# • Tem poucas opções (2-3 condições)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4 — LOOP FOR: ITERAÇÃO
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Loop for — Iteração sobre Sequências</h2>
+          <p>O loop for do Python é diferente de outras linguagens — ele itera diretamente sobre qualquer objeto iterável (listas, strings, dicionários, arquivos, ranges). Aprenda todas as formas de iteração, funções auxiliares e padrões profissionais.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — for com range()</h3>
+          <p>A função <code>range()</code> gera uma sequência de números inteiros. É a forma mais comum de criar um loop com contagem controlada.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>for i in range()</code><span class="cmd-tag">fundamental</span></div>
+            <p>range(stop), range(start, stop), range(start, stop, step):</p>
+            <pre><code># range(stop) — de 0 até stop-1
+for i in range(5):
+    print(i, end=" ")
+# Saída: 0 1 2 3 4
+
+# range(start, stop) — de start até stop-1
+for i in range(1, 6):
+    print(i, end=" ")
+# Saída: 1 2 3 4 5
+
+# range(start, stop, step) — com incremento personalizado
+for i in range(0, 20, 3):
+    print(i, end=" ")
+# Saída: 0 3 6 9 12 15 18
+
+# Contagem regressiva (step negativo)
+for i in range(10, 0, -1):
+    print(i, end=" ")
+# Saída: 10 9 8 7 6 5 4 3 2 1
+
+print("🚀 Lançamento!")
+
+# Números pares de 0 a 20
+for par in range(0, 21, 2):
+    print(par, end=" ")
+# Saída: 0 2 4 6 8 10 12 14 16 18 20
+
+# ═══ IMPORTANTE: range() é LAZY (não cria lista na memória) ═══
+# Isso funciona sem problemas (não usa 8GB de RAM):
+for i in range(1_000_000_000):
+    if i > 5:
+        break
+    print(i)
+
+# Para converter range em lista:
+numeros = list(range(1, 11))  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# ═══ PADRÃO: Repetir N vezes (ignorar o índice) ═══
+for _ in range(3):  # _ indica que o valor não será usado
+    print("Tentando conexão...")
+
+# Exemplo DevOps: retry pattern
+MAX_RETRIES = 5
+for tentativa in range(1, MAX_RETRIES + 1):
+    print(f"Tentativa {tentativa}/{MAX_RETRIES}...")
+    resultado = tentar_conexao()
+    if resultado.sucesso:
+        print("✅ Conectado!")
+        break
+    time.sleep(2 ** tentativa)  # Exponential backoff</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — for Iterando sobre Sequências</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>for item in sequência</code><span class="cmd-tag">iteração direta</span></div>
+            <p>O for do Python itera diretamente sobre os elementos — não precisa de índice!</p>
+            <pre><code># ═══ ITERANDO SOBRE LISTAS ═══
+servidores = ["web-01", "web-02", "db-01", "cache-01"]
+
+# ✅ Pythônico: iteração direta
+for servidor in servidores:
+    print(f"Verificando {servidor}...")
+
+# ❌ NÃO-Pythônico: usar range(len()) quando não precisa do índice
+for i in range(len(servidores)):
+    print(f"Verificando {servidores[i]}...")  # Funciona, mas é feio
+
+# ═══ ITERANDO SOBRE STRINGS ═══
+palavra = "Python"
+for caractere in palavra:
+    print(caractere, end="-")
+# Saída: P-y-t-h-o-n-
+
+# Contar vogais
+texto = "Estruturas de Controle em Python"
+vogais = 0
+for char in texto.lower():
+    if char in "aeiouáéíóúâêô":
+        vogais += 1
+print(f"Vogais encontradas: {vogais}")
+
+# ═══ ITERANDO SOBRE TUPLAS ═══
+coordenadas = [(1, 2), (3, 4), (5, 6), (7, 8)]
+for x, y in coordenadas:  # Unpacking automático!
+    print(f"Ponto: ({x}, {y}) — Distância da origem: {(x**2 + y**2)**0.5:.2f}")
+
+# ═══ ITERANDO SOBRE DICIONÁRIOS ═══
+config = {
+    "host": "db.cloudtrilhas.com",
+    "port": 5432,
+    "database": "producao",
+    "ssl": True
+}
+
+# Iterar sobre chaves (padrão)
+for chave in config:
+    print(f"  {chave}")
+
+# Iterar sobre valores
+for valor in config.values():
+    print(f"  {valor}")
+
+# Iterar sobre pares chave-valor (mais comum)
+print("Configuração do banco:")
+for chave, valor in config.items():
+    print(f"  {chave:12} = {valor}")
+# Saída:
+#   host         = db.cloudtrilhas.com
+#   port         = 5432
+#   database     = producao
+#   ssl          = True
+
+# ═══ ITERANDO SOBRE SETS ═══
+tecnologias = {"Python", "Docker", "Terraform", "AWS", "Linux"}
+print("Tecnologias dominadas:")
+for tech in sorted(tecnologias):  # sorted() para ordem previsível
+    print(f"  ✅ {tech}")
+
+# ═══ ITERANDO SOBRE ARQUIVOS ═══
+# O arquivo é iterável — cada iteração retorna uma linha
+with open("/var/log/app.log") as f:
+    for linha in f:
+        if "ERROR" in linha:
+            print(f"⚠️ {linha.strip()}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — enumerate() — Índice + Valor</h3>
+          <p>Quando você precisa tanto do <strong>índice</strong> quanto do <strong>valor</strong> durante a iteração, use <code>enumerate()</code> em vez de <code>range(len())</code>.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>enumerate(iterável, start=0)</code><span class="cmd-tag">essencial</span></div>
+            <p>Retorna tuplas (índice, valor) para cada elemento:</p>
+            <pre><code># Sintaxe: enumerate(iterável, start=0)
+
+frutas = ["maçã", "banana", "laranja", "uva", "manga"]
+
+# ❌ NÃO-Pythônico
+for i in range(len(frutas)):
+    print(f"{i+1}. {frutas[i]}")
+
+# ✅ Pythônico com enumerate
+for indice, fruta in enumerate(frutas, start=1):
+    print(f"{indice}. {fruta}")
+# Saída:
+# 1. maçã
+# 2. banana
+# 3. laranja
+# 4. uva
+# 5. manga
+
+# Exemplo: encontrar posição de um elemento
+logs = ["INFO: Servidor iniciado", "WARNING: Memória alta", "ERROR: Conexão perdida", "INFO: Reconectado"]
+for num_linha, log in enumerate(logs, start=1):
+    if "ERROR" in log:
+        print(f"❌ Erro na linha {num_linha}: {log}")
+
+# Exemplo DevOps: numerar servidores para deploy progressivo
+instancias = ["i-abc123", "i-def456", "i-ghi789", "i-jkl012"]
+for batch, instance_id in enumerate(instancias):
+    print(f"[Batch {batch}] Atualizando instância: {instance_id}")
+    # deploy_para_instancia(instance_id)
+    # time.sleep(30)  # Esperar entre batches
+
+# Exemplo: criar dicionário com posições
+alunos = ["Ana", "Bruno", "Carlos", "Diana"]
+ranking = {nome: posicao for posicao, nome in enumerate(alunos, start=1)}
+print(ranking)  # {'Ana': 1, 'Bruno': 2, 'Carlos': 3, 'Diana': 4}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — zip() — Iteração Paralela</h3>
+          <p>A função <code>zip()</code> combina dois ou mais iteráveis, iterando sobre eles em paralelo (elemento por elemento).</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>zip(iterável1, iterável2, ...)</code><span class="cmd-tag">paralelo</span></div>
+            <p>Combina múltiplos iteráveis — para no mais curto por padrão:</p>
+            <pre><code># zip() combina iteráveis em tuplas paralelas
+nomes = ["Alice", "Bob", "Carlos"]
+idades = [28, 35, 42]
+cidades = ["São Paulo", "Rio", "Belo Horizonte"]
+
+for nome, idade, cidade in zip(nomes, idades, cidades):
+    print(f"{nome} ({idade} anos) — {cidade}")
+# Saída:
+# Alice (28 anos) — São Paulo
+# Bob (35 anos) — Rio
+# Carlos (42 anos) — Belo Horizonte
+
+# ⚠️ zip() para no iterável MAIS CURTO
+numeros = [1, 2, 3, 4, 5]
+letras = ["a", "b", "c"]
+for n, l in zip(numeros, letras):
+    print(f"{n}-{l}")
+# Saída: 1-a, 2-b, 3-c (4 e 5 são ignorados!)
+
+# Para incluir todos, use itertools.zip_longest:
+from itertools import zip_longest
+for n, l in zip_longest(numeros, letras, fillvalue="?"):
+    print(f"{n}-{l}")
+# Saída: 1-a, 2-b, 3-c, 4-?, 5-?
+
+# ═══ zip() + dict() — criar dicionários ═══
+chaves = ["host", "port", "db"]
+valores = ["localhost", 5432, "producao"]
+config = dict(zip(chaves, valores))
+print(config)  # {'host': 'localhost', 'port': 5432, 'db': 'producao'}
+
+# ═══ EXEMPLO: Comparar duas listas elemento a elemento ═══
+versao_antiga = ["v1.0", "v2.1", "v3.0", "v4.0"]
+versao_nova   = ["v1.0", "v2.2", "v3.0", "v4.1"]
+
+print("Mudanças detectadas:")
+for i, (antiga, nova) in enumerate(zip(versao_antiga, versao_nova)):
+    if antiga != nova:
+        print(f"  Posição {i}: {antiga} → {nova}")
+# Saída: Posição 1: v2.1 → v2.2 | Posição 3: v4.0 → v4.1
+
+# ═══ EXEMPLO DevOps: Mapear servidores para IPs ═══
+hostnames = ["web-01", "web-02", "db-01"]
+ips = ["10.0.1.10", "10.0.1.11", "10.0.2.10"]
+dns_records = {host: ip for host, ip in zip(hostnames, ips)}
+print(dns_records)
+
+# ═══ zip() com enumerate() ═══
+for idx, (nome, idade) in enumerate(zip(nomes, idades), start=1):
+    print(f"{idx}. {nome} — {idade} anos")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Unpacking em for Loops</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Unpacking / Desestruturação</code><span class="cmd-tag">padrão</span></div>
+            <p>Python permite desestruturar iteráveis diretamente na variável do for:</p>
+            <pre><code># Unpacking de tuplas em lista
+registros = [
+    ("João", "joao@email.com", "admin"),
+    ("Maria", "maria@email.com", "editor"),
+    ("Pedro", "pedro@email.com", "viewer"),
+]
+
+for nome, email, perfil in registros:
+    print(f"Usuário: {nome} | Email: {email} | Perfil: {perfil}")
+
+# Unpacking parcial com * (star expression)
+dados = [
+    ("prod", "web-01", "10.0.1.1", "running", "t3.medium", "us-east-1"),
+    ("prod", "web-02", "10.0.1.2", "running", "t3.medium", "us-east-1"),
+    ("dev", "test-01", "10.0.2.1", "stopped", "t3.micro", "us-west-2"),
+]
+
+for ambiente, nome, ip, *resto in dados:
+    print(f"[{ambiente}] {nome} ({ip}) — extras: {resto}")
+# resto captura: ['running', 't3.medium', 'us-east-1']
+
+# Unpacking aninhado
+pontos = [(1, (2, 3)), (4, (5, 6)), (7, (8, 9))]
+for id_ponto, (x, y) in pontos:
+    print(f"Ponto {id_ponto}: ({x}, {y})")
+
+# Ignorar valores com _
+for nome, _, perfil in registros:  # Ignora o email
+    print(f"{nome} é {perfil}")
+
+# Dict items com unpacking
+servidores = {
+    "web-01": {"ip": "10.0.1.1", "status": "running"},
+    "db-01": {"ip": "10.0.2.1", "status": "running"},
+    "cache-01": {"ip": "10.0.3.1", "status": "stopped"},
+}
+
+for nome_servidor, info in servidores.items():
+    status_emoji = "🟢" if info["status"] == "running" else "🔴"
+    print(f"  {status_emoji} {nome_servidor} — {info['ip']}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.6 — for Loops Aninhados (Nested Loops)</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Nested for</code><span class="cmd-tag">padrão</span></div>
+            <p>Loops dentro de loops — para iterar sobre estruturas multidimensionais:</p>
+            <pre><code># Tabuada completa (1 a 10)
+for i in range(1, 11):
+    for j in range(1, 11):
+        print(f"{i:2} x {j:2} = {i*j:3}", end="  ")
+    print()  # Nova linha após cada multiplicador
+
+# Matriz (lista de listas)
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+print("Matriz:")
+for linha in matriz:
+    for elemento in linha:
+        print(f"{elemento:3}", end=" ")
+    print()
+
+# Produto cartesiano (todas as combinações)
+cores = ["vermelho", "azul", "verde"]
+tamanhos = ["P", "M", "G", "GG"]
+
+print("Combinações disponíveis:")
+for cor in cores:
+    for tamanho in tamanhos:
+        print(f"  Camiseta {cor} — {tamanho}")
+
+# Exemplo DevOps: testar conectividade de múltiplos serviços em múltiplos ambientes
+ambientes = ["dev", "staging", "prod"]
+servicos = ["api-gateway", "auth-service", "payment-service"]
+
+print("═══ Health Check Matrix ═══")
+for ambiente in ambientes:
+    print(f"\n[{ambiente.upper()}]")
+    for servico in servicos:
+        # status = check_health(f"{servico}.{ambiente}.internal")
+        status = "✅ OK"  # Simulado
+        print(f"  {servico:20} {status}")
+
+# ⚠️ CUIDADO com a complexidade!
+# Loops aninhados têm complexidade O(n²), O(n³), etc.
+# Para grandes datasets, considere:
+# - List comprehensions (mais rápidas)
+# - Funções de itertools (product, combinations)
+# - Algoritmos otimizados
+
+# itertools.product é equivalente a for aninhado, mas mais limpo:
+from itertools import product
+for cor, tamanho in product(cores, tamanhos):
+    print(f"  {cor} — {tamanho}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.7 — Padrões Comuns com for (Acumulador, Contador, Busca)</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Padrões de Loop</code><span class="cmd-tag">essencial</span></div>
+            <p>Os padrões mais usados no dia a dia com loops for:</p>
+            <pre><code># ═══ PADRÃO ACUMULADOR ═══
+# Somar valores
+precos = [29.90, 49.90, 15.00, 99.90, 35.50]
+total = 0
+for preco in precos:
+    total += preco
+print(f"Total: R$ {total:.2f}")  # R$ 230.20
+
+# Mais Pythônico: usar sum()
+total = sum(precos)
+
+# Acumular strings
+partes = ["SELECT *", "FROM users", "WHERE active = true", "ORDER BY name"]
+query = ""
+for parte in partes:
+    query += parte + " "
+# Mais Pythônico: usar join()
+query = " ".join(partes)
+
+# ═══ PADRÃO CONTADOR ═══
+logs = ["INFO: ok", "ERROR: falha", "INFO: ok", "WARNING: lento", "ERROR: timeout"]
+contadores = {"INFO": 0, "WARNING": 0, "ERROR": 0}
+
+for log in logs:
+    for nivel in contadores:
+        if log.startswith(nivel):
+            contadores[nivel] += 1
+            break
+
+print(contadores)  # {'INFO': 2, 'WARNING': 1, 'ERROR': 2}
+
+# Mais Pythônico: usar collections.Counter
+from collections import Counter
+niveis = [log.split(":")[0] for log in logs]
+contagem = Counter(niveis)
+print(contagem)  # Counter({'INFO': 2, 'ERROR': 2, 'WARNING': 1})
+
+# ═══ PADRÃO BUSCA (encontrar primeiro match) ═══
+instancias = [
+    {"id": "i-001", "tipo": "t3.micro", "status": "running"},
+    {"id": "i-002", "tipo": "t3.medium", "status": "stopped"},
+    {"id": "i-003", "tipo": "t3.large", "status": "running"},
+]
+
+# Encontrar primeira instância parada
+instancia_parada = None
+for inst in instancias:
+    if inst["status"] == "stopped":
+        instancia_parada = inst
+        break  # Encontrou — sai do loop!
+
+if instancia_parada:
+    print(f"Instância parada: {instancia_parada['id']}")
+
+# Mais Pythônico: usar next() com generator
+instancia_parada = next(
+    (inst for inst in instancias if inst["status"] == "stopped"),
+    None  # valor padrão se não encontrar
+)
+
+# ═══ PADRÃO FILTRO ═══
+numeros = [1, -2, 3, -4, 5, -6, 7, 8, -9, 10]
+positivos = []
+for n in numeros:
+    if n > 0:
+        positivos.append(n)
+print(positivos)  # [1, 3, 5, 7, 8, 10]
+
+# Mais Pythônico: list comprehension
+positivos = [n for n in numeros if n > 0]
+
+# ═══ PADRÃO TRANSFORMAÇÃO (map) ═══
+nomes = ["ana silva", "bruno costa", "carlos lima"]
+formatados = []
+for nome in nomes:
+    formatados.append(nome.title())
+print(formatados)  # ['Ana Silva', 'Bruno Costa', 'Carlos Lima']
+
+# Mais Pythônico:
+formatados = [nome.title() for nome in nomes]
+
+# ═══ PADRÃO MAX/MIN ═══
+temperaturas = [23.5, 28.1, 19.8, 31.2, 25.6, 17.3]
+maior = temperaturas[0]
+for temp in temperaturas[1:]:
+    if temp > maior:
+        maior = temp
+print(f"Maior temperatura: {maior}°C")  # 31.2°C
+
+# Mais Pythônico: usar max()
+print(f"Maior: {max(temperaturas)}°C")
+print(f"Menor: {min(temperaturas)}°C")</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5 — LOOP WHILE: REPETIÇÃO CONDICIONAL
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Loop while — Repetição Condicional</h2>
+          <p>O loop while executa um bloco de código enquanto uma condição for verdadeira. Ideal quando você não sabe antecipadamente quantas iterações serão necessárias — validação de input, conexões de rede, processamento de filas e jogos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — Sintaxe Básica do while</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>while condição:</code><span class="cmd-tag">sintaxe</span></div>
+            <p>O bloco executa repetidamente enquanto a condição for truthy:</p>
+            <pre><code># Sintaxe:
+# while condição:
+#     bloco_de_código
+#     (atualizar condição para evitar loop infinito!)
+
+# Contagem simples
+contador = 1
+while contador <= 5:
+    print(f"Contagem: {contador}")
+    contador += 1  # ⚠️ CRUCIAL: atualizar a variável de controle!
+# Saída: 1, 2, 3, 4, 5
+
+# Contagem regressiva
+tempo = 10
+while tempo > 0:
+    print(f"⏱️ {tempo}...")
+    tempo -= 1
+print("🚀 Lançamento!")
+
+# Exemplo: dividir até encontrar número ímpar
+numero = 64
+passos = 0
+while numero % 2 == 0:
+    numero //= 2
+    passos += 1
+print(f"Resultado: {numero} (após {passos} divisões por 2)")
+# 64 → 32 → 16 → 8 → 4 → 2 → 1 (6 divisões)
+
+# Exemplo DevOps: polling de status
+import time
+
+def verificar_deploy(deploy_id):
+    """Simula verificação de deploy."""
+    return {"status": "in_progress"}  # ou "completed"/"failed"
+
+deploy_id = "deploy-42"
+timeout = 300  # 5 minutos
+intervalo = 10
+tempo_decorrido = 0
+
+while tempo_decorrido < timeout:
+    resultado = verificar_deploy(deploy_id)
+    if resultado["status"] == "completed":
+        print(f"✅ Deploy concluído em {tempo_decorrido}s!")
+        break
+    elif resultado["status"] == "failed":
+        print(f"❌ Deploy falhou após {tempo_decorrido}s!")
+        break
+    print(f"⏳ Deploy em progresso... ({tempo_decorrido}s)")
+    time.sleep(intervalo)
+    tempo_decorrido += intervalo
+else:
+    print(f"⚠️ Timeout! Deploy não concluiu em {timeout}s")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — while True com break (Loop Infinito Controlado)</h3>
+          <p>O padrão <code>while True</code> com <code>break</code> é usado quando a condição de saída é verificada <strong>no meio</strong> do loop (não no início). É um dos padrões mais comuns em programação.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>while True + break</code><span class="cmd-tag">padrão comum</span></div>
+            <p>Loop infinito com saída controlada — essencial para menus, validação de input e servidores:</p>
+            <pre><code># ═══ PADRÃO: Menu interativo ═══
+while True:
+    print("\n═══ Menu Principal ═══")
+    print("1. Listar servidores")
+    print("2. Status dos serviços")
+    print("3. Executar deploy")
+    print("4. Visualizar logs")
+    print("0. Sair")
+
+    opcao = input("\nEscolha uma opção: ").strip()
+
+    if opcao == "0":
+        print("👋 Até logo!")
+        break
+    elif opcao == "1":
+        listar_servidores()
+    elif opcao == "2":
+        verificar_servicos()
+    elif opcao == "3":
+        executar_deploy()
+    elif opcao == "4":
+        visualizar_logs()
+    else:
+        print("❌ Opção inválida! Tente novamente.")
+
+# ═══ PADRÃO: Validação de input ═══
+while True:
+    entrada = input("Digite um número entre 1 e 100: ").strip()
+    if entrada.isdigit():
+        numero = int(entrada)
+        if 1 <= numero <= 100:
+            break
+        else:
+            print("❌ Número fora do intervalo (1-100)")
+    else:
+        print("❌ Entrada inválida — digite apenas números")
+
+print(f"✅ Número válido: {numero}")
+
+# ═══ PADRÃO: Processamento de fila ═══
+from collections import deque
+
+fila_tarefas = deque(["backup_db", "limpar_cache", "enviar_relatorio", "atualizar_dns"])
+
+while True:
+    if not fila_tarefas:
+        print("✅ Todas as tarefas processadas!")
+        break
+
+    tarefa = fila_tarefas.popleft()
+    print(f"⚙️ Executando: {tarefa}...")
+    # processar_tarefa(tarefa)
+    print(f"   ✓ {tarefa} concluída")
+
+# ═══ PADRÃO: Conexão com retry ═══
+import time
+
+tentativas = 0
+max_tentativas = 5
+conectado = False
+
+while True:
+    tentativas += 1
+    print(f"🔌 Tentativa {tentativas}/{max_tentativas}...")
+
+    try:
+        # conexao = conectar_banco(host, porta)
+        conectado = True
+        print("✅ Conexão estabelecida!")
+        break
+    except ConnectionError as e:
+        print(f"   ❌ Falha: {e}")
+        if tentativas >= max_tentativas:
+            print("💀 Máximo de tentativas atingido!")
+            break
+        espera = 2 ** tentativas  # Exponential backoff: 2, 4, 8, 16, 32s
+        print(f"   ⏳ Aguardando {espera}s antes de tentar novamente...")
+        time.sleep(espera)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Valores Sentinela e Validação de Input</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Sentinel Values</code><span class="cmd-tag">padrão</span></div>
+            <p>Um valor sentinela é um valor especial que indica "fim de input" ou "pare":</p>
+            <pre><code># Valor sentinela: loop até digitar valor especial
+print("Digite notas dos alunos (digite -1 para encerrar):")
+notas = []
+while True:
+    entrada = input("Nota: ")
+    try:
+        nota = float(entrada)
+    except ValueError:
+        print("❌ Valor inválido!")
+        continue
+
+    if nota == -1:  # Sentinela
+        break
+    if 0 <= nota <= 10:
+        notas.append(nota)
+    else:
+        print("❌ Nota deve estar entre 0 e 10")
+
+if notas:
+    media = sum(notas) / len(notas)
+    print(f"\n📊 Resumo: {len(notas)} notas")
+    print(f"   Média: {media:.2f}")
+    print(f"   Maior: {max(notas)}")
+    print(f"   Menor: {min(notas)}")
+else:
+    print("Nenhuma nota inserida.")
+
+# ═══ Validação robusta de input com while ═══
+def obter_inteiro(mensagem, minimo=None, maximo=None):
+    """Solicita um inteiro válido ao usuário, com range opcional."""
+    while True:
+        entrada = input(mensagem).strip()
+        try:
+            valor = int(entrada)
+        except ValueError:
+            print(f"  ❌ '{entrada}' não é um número inteiro válido")
+            continue
+
+        if minimo is not None and valor < minimo:
+            print(f"  ❌ Valor mínimo é {minimo}")
+            continue
+        if maximo is not None and valor > maximo:
+            print(f"  ❌ Valor máximo é {maximo}")
+            continue
+
+        return valor
+
+# Uso:
+idade = obter_inteiro("Sua idade: ", minimo=0, maximo=150)
+porta = obter_inteiro("Porta do servidor: ", minimo=1, maximo=65535)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 — while vs for — Quando Usar Cada Um</h3>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Critério</th><th>for</th><th>while</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Número de iterações</td><td>Conhecido antecipadamente</td><td>Desconhecido (depende de condição)</td></tr>
+              <tr><td>Caso de uso típico</td><td>Percorrer coleções, ranges</td><td>Validação, polling, jogos</td></tr>
+              <tr><td>Risco de loop infinito</td><td>Nenhum (iterável é finito)</td><td>Alto (se esquecer de atualizar condição)</td></tr>
+              <tr><td>Variável de controle</td><td>Automática (gerenciada pelo iterável)</td><td>Manual (você atualiza)</td></tr>
+              <tr><td>Legibilidade</td><td>Mais clara para iteração</td><td>Mais clara para "esperar até que..."</td></tr>
+              <tr><td>Performance</td><td>Geralmente melhor (otimizado)</td><td>Pode ser igual se bem escrito</td></tr>
+              <tr><td>Exemplos</td><td>Listas, strings, dicts, ranges, arquivos</td><td>Menu, retry, input, fila, servidor</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Regra Prática</h4>
+            <p>Se você está <strong>percorrendo uma coleção ou um range definido</strong>, use <code>for</code>. Se você está <strong>esperando que algo aconteça</strong> (condição se torne verdadeira/falsa) ou <strong>não sabe quantas vezes vai repetir</strong>, use <code>while</code>.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 — Erros Comuns com while (Loops Infinitos)</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Armadilhas do while</code><span class="cmd-tag danger">cuidado</span></div>
+            <p>Os erros mais comuns que criam loops infinitos acidentais:</p>
+            <pre><code># ═══ ERRO 1: Esquecer de atualizar a variável de controle ═══
+# ❌ LOOP INFINITO!
+i = 0
+while i < 10:
+    print(i)
+    # ESQUECEU: i += 1
+
+# ═══ ERRO 2: Condição que nunca se torna falsa ═══
+# ❌ LOOP INFINITO!
+x = 10
+while x > 0:
+    print(x)
+    x += 1  # ERRADO: deveria ser x -= 1
+
+# ═══ ERRO 3: Comparação errada com float ═══
+# ❌ PODE ser loop infinito!
+x = 0.0
+while x != 1.0:
+    x += 0.1  # 0.1 + 0.1 + ... ≠ 1.0 exatamente!
+    print(f"x = {x}")
+# x nunca será EXATAMENTE 1.0 devido à precisão de float!
+
+# ✅ Correto:
+x = 0.0
+while x < 1.0:  # Usar < em vez de !=
+    x += 0.1
+    print(f"x = {x:.1f}")
+
+# ═══ ERRO 4: Modificar coleção no while errado ═══
+# ❌ Comportamento imprevisível
+lista = [1, 2, 3, 4, 5]
+while lista:
+    # Se processar e re-adicionar, nunca acaba!
+    item = lista.pop(0)
+    if item < 3:
+        lista.append(item + 10)  # Re-adiciona! Cuidado!
+
+# ═══ COMO DEPURAR LOOPS INFINITOS ═══
+# 1. Adicione um print() dentro do loop para ver o estado
+# 2. Adicione um contador de segurança:
+MAX_ITERACOES = 10000
+contador_seguranca = 0
+while condicao_complexa():
+    contador_seguranca += 1
+    if contador_seguranca > MAX_ITERACOES:
+        print("⚠️ SAFETY BREAK: Possível loop infinito detectado!")
+        break
+    # ... resto do código
+
+# 3. No terminal, Ctrl+C interrompe o programa</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6 — CONTROLE DE FLUXO EM LOOPS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Controle de Fluxo em Loops</h2>
+          <p>Domine os mecanismos de controle dentro de loops — break para sair, continue para pular, else para detectar conclusão completa, pass como placeholder e técnicas para controlar loops aninhados.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — break — Sair do Loop Antecipadamente</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>break</code><span class="cmd-tag">controle</span></div>
+            <p>O break encerra imediatamente o loop mais interno (apenas o loop que o contém):</p>
+            <pre><code># break — interrompe o loop quando a condição é satisfeita
+numeros = [4, 7, 2, 9, 1, 8, 3, 6, 5]
+
+# Encontrar o primeiro número maior que 7
+for n in numeros:
+    if n > 7:
+        print(f"Primeiro número > 7: {n}")
+        break  # Sai do loop — não processa o resto
+# Saída: Primeiro número > 7: 9
+
+# Sem break, continuaria verificando todos os números desnecessariamente
+
+# ═══ Buscar em lista de servidores ═══
+servidores = [
+    {"nome": "web-01", "cpu": 45},
+    {"nome": "web-02", "cpu": 92},
+    {"nome": "web-03", "cpu": 38},
+    {"nome": "db-01", "cpu": 78},
+]
+
+print("Procurando servidor com CPU > 90%...")
+for srv in servidores:
+    if srv["cpu"] > 90:
+        print(f"  🚨 ALERTA: {srv['nome']} com CPU em {srv['cpu']}%!")
+        break
+else:
+    # Este else só executa se o break NÃO foi acionado!
+    print("  ✅ Todos os servidores com CPU normal")
+
+# ═══ break em while — parar processamento ═══
+import random
+
+print("Jogando dados até tirar 6...")
+jogadas = 0
+while True:
+    dado = random.randint(1, 6)
+    jogadas += 1
+    print(f"  Jogada {jogadas}: 🎲 {dado}")
+    if dado == 6:
+        print(f"  🎉 Saiu 6 após {jogadas} jogadas!")
+        break</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — continue — Pular para Próxima Iteração</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>continue</code><span class="cmd-tag">controle</span></div>
+            <p>O continue pula o restante do bloco atual e vai direto para a próxima iteração:</p>
+            <pre><code># continue — pula iterações que não nos interessam
+numeros = range(1, 21)
+
+# Imprimir apenas números ímpares (pular pares)
+print("Números ímpares de 1 a 20:")
+for n in numeros:
+    if n % 2 == 0:
+        continue  # Pula o resto do bloco, vai pro próximo n
+    print(f"  {n}", end="")
+# Saída: 1 3 5 7 9 11 13 15 17 19
+
+# ═══ Processar apenas linhas válidas de um arquivo ═══
+linhas = [
+    "# Este é um comentário",
+    "",
+    "host=localhost",
+    "  ",
+    "# Outro comentário",
+    "port=5432",
+    "database=producao",
+    "",
+    "ssl=true"
+]
+
+print("\nConfigurações válidas:")
+config = {}
+for linha in linhas:
+    linha = linha.strip()
+
+    # Pular linhas vazias
+    if not linha:
+        continue
+
+    # Pular comentários
+    if linha.startswith("#"):
+        continue
+
+    # Processar apenas linhas de configuração
+    if "=" in linha:
+        chave, valor = linha.split("=", 1)
+        config[chave.strip()] = valor.strip()
+        print(f"  {chave.strip()} = {valor.strip()}")
+
+# ═══ Filtrar logs — processar apenas erros ═══
+logs = [
+    "2026-01-15 10:00:01 INFO  Servidor iniciado",
+    "2026-01-15 10:00:05 DEBUG Conexão pool criado",
+    "2026-01-15 10:01:23 ERROR Timeout na conexão com DB",
+    "2026-01-15 10:01:24 INFO  Retry automático iniciado",
+    "2026-01-15 10:01:30 ERROR Falha no retry — DB indisponível",
+    "2026-01-15 10:02:00 WARN  Usando cache local",
+]
+
+print("\n🚨 Apenas ERROS:")
+for log in logs:
+    if "ERROR" not in log:
+        continue
+    # Aqui só chegam linhas com ERROR
+    timestamp = log[:19]
+    mensagem = log[26:]
+    print(f"  [{timestamp}] {mensagem}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Cláusula else em Loops</h3>
+          <p>Python tem uma funcionalidade única: a cláusula <code>else</code> em loops. O bloco <code>else</code> é executado <strong>apenas quando o loop termina normalmente</strong> (sem break). Se o break for acionado, o else é pulado.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>for/while ... else</code><span class="cmd-tag">exclusivo Python</span></div>
+            <p>O else do loop detecta se o loop completou sem interrupção:</p>
+            <pre><code># else em for — executado se o loop NÃO foi interrompido por break
+
+# Exemplo: verificar se um número é primo
+def eh_primo(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            break  # Encontrou divisor — NÃO é primo
+    else:
+        # Só executa se o for completou sem break
+        # (nenhum divisor foi encontrado)
+        return True
+    return False
+
+print(eh_primo(17))  # True
+print(eh_primo(15))  # False
+
+# Exemplo: buscar item em lista
+def buscar_servidor(nome, servidores):
+    for srv in servidores:
+        if srv["nome"] == nome:
+            print(f"✅ Encontrado: {srv}")
+            break
+    else:
+        # Loop completou sem encontrar (break não foi chamado)
+        print(f"❌ Servidor '{nome}' não encontrado!")
+
+servidores = [
+    {"nome": "web-01", "ip": "10.0.1.1"},
+    {"nome": "db-01", "ip": "10.0.2.1"},
+]
+buscar_servidor("web-01", servidores)  # ✅ Encontrado
+buscar_servidor("cache-01", servidores)  # ❌ Não encontrado
+
+# else em while
+def aguardar_servico(nome, timeout=30):
+    """Aguarda serviço ficar disponível com timeout."""
+    tempo = 0
+    while tempo < timeout:
+        if verificar_saude(nome):
+            print(f"✅ {nome} está disponível!")
+            break
+        tempo += 5
+        time.sleep(5)
+    else:
+        # Timeout atingido — while terminou naturalmente
+        print(f"❌ Timeout: {nome} não respondeu em {timeout}s")
+        raise TimeoutError(f"Serviço {nome} indisponível")
+
+# ═══ LEITURA DO else ═══
+# Pense no else como "nobreak" — executado quando não houve break.
+# Dica de leitura:
+#   for item in itens:     →  "para cada item..."
+#       if condição:
+#           break          →  "se encontrou, saia"
+#   else:                  →  "se NÃO encontrou (sem break)..."</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Quando Usar else em Loops</h4>
+            <p>O <code>else</code> em loops é útil principalmente para <strong>buscas</strong>: quando você procura algo e quer executar código caso a busca falhe (loop completo sem encontrar). É um padrão Python idiomático, embora nem todos os programadores o conheçam.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — pass — Placeholder (Não Faz Nada)</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>pass</code><span class="cmd-tag">placeholder</span></div>
+            <p>O pass é uma instrução que não faz absolutamente nada — serve como placeholder:</p>
+            <pre><code># pass — placeholder quando Python exige um bloco mas você ainda não tem código
+
+# Em loops (planejamento futuro)
+for servidor in servidores:
+    pass  # TODO: implementar health check
+
+# Em condicionais
+if config.get("modo_debug"):
+    pass  # TODO: ativar logging detalhado
+
+# Em definições de classe/função (stubs)
+class MinhaExcecaoCustomizada(Exception):
+    pass  # Classe vazia — herda tudo de Exception
+
+def funcao_futura():
+    pass  # TODO: implementar na próxima sprint
+
+# ⚠️ pass vs continue — são DIFERENTES!
+for i in range(5):
+    if i == 2:
+        pass   # NÃO faz nada, mas CONTINUA executando o código abaixo
+    print(i)   # Imprime: 0, 1, 2, 3, 4 (todos!)
+
+for i in range(5):
+    if i == 2:
+        continue  # PULA para a próxima iteração
+    print(i)      # Imprime: 0, 1, 3, 4 (2 é pulado!)
+
+# Em Python 3.12+, pode usar Ellipsis (...) como alternativa ao pass:
+def funcao_stub():
+    ...  # Equivalente a pass, mas mais expressivo como "a implementar"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.5 — Controlando Loops Aninhados</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Nested Loop Control</code><span class="cmd-tag">avançado</span></div>
+            <p>O break/continue só afeta o loop mais interno. Para controlar loops externos, use flags ou funções:</p>
+            <pre><code># ═══ PROBLEMA: break só sai do loop INTERNO ═══
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+# Encontrar o número 5 na matriz
+for i, linha in enumerate(matriz):
+    for j, valor in enumerate(linha):
+        if valor == 5:
+            print(f"Encontrado 5 na posição [{i}][{j}]")
+            break  # Sai APENAS do loop interno!
+    # O loop externo CONTINUA! 😕
+
+# ═══ SOLUÇÃO 1: Flag (variável de controle) ═══
+encontrado = False
+for i, linha in enumerate(matriz):
+    for j, valor in enumerate(linha):
+        if valor == 5:
+            print(f"Encontrado na posição [{i}][{j}]")
+            encontrado = True
+            break
+    if encontrado:
+        break  # Agora sai do loop externo também!
+
+# ═══ SOLUÇÃO 2: Encapsular em função (mais Pythônico) ═══
+def encontrar_na_matriz(matriz, alvo):
+    """Busca valor na matriz e retorna posição (i, j) ou None."""
+    for i, linha in enumerate(matriz):
+        for j, valor in enumerate(linha):
+            if valor == alvo:
+                return (i, j)  # return sai de TUDO!
+    return None
+
+posicao = encontrar_na_matriz(matriz, 5)
+if posicao:
+    print(f"Encontrado na posição {posicao}")
+
+# ═══ SOLUÇÃO 3: usar else em loops ═══
+for i, linha in enumerate(matriz):
+    for j, valor in enumerate(linha):
+        if valor == 5:
+            print(f"Posição: [{i}][{j}]")
+            break
+    else:
+        continue  # Se o loop interno NÃO deu break, continue o externo
+    break  # Se chegou aqui, o loop interno DEU break → sai do externo
+
+# ═══ SOLUÇÃO 4: itertools.product + next ═══
+from itertools import product
+
+posicoes = (
+    (i, j) 
+    for i, j in product(range(len(matriz)), range(len(matriz[0])))
+    if matriz[i][j] == 5
+)
+resultado = next(posicoes, None)
+print(f"Resultado: {resultado}")  # (1, 1)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7 — COMPREENSÕES (COMPREHENSIONS)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Compreensões (Comprehensions)</h2>
+          <p>Comprehensions são uma das funcionalidades mais elegantes e poderosas do Python — permitem criar listas, dicionários e sets em uma única expressão concisa. Além de mais legíveis, são significativamente mais rápidas que loops tradicionais para transformação de dados.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — List Comprehension</h3>
+          <p>A list comprehension é a forma mais Pythônica de criar listas derivadas de outros iteráveis. Ela substitui o padrão <code>lista = []; for x in y: lista.append(transformação)</code>.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>[expressão for item in iterável if condição]</code><span class="cmd-tag">sintaxe</span></div>
+            <p>Criar listas de forma concisa e eficiente:</p>
+            <pre><code># Sintaxe: [expressão for variável in iterável]
+# Com filtro: [expressão for variável in iterável if condição]
+
+# ═══ FORMA TRADICIONAL vs COMPREHENSION ═══
+
+# Loop tradicional:
+quadrados = []
+for n in range(1, 11):
+    quadrados.append(n ** 2)
+# quadrados = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# ✅ Comprehension (equivalente):
+quadrados = [n ** 2 for n in range(1, 11)]
+# Mesmo resultado, uma linha, ~30% mais rápido!
+
+# ═══ COM FILTRO (if) ═══
+# Apenas quadrados de números pares:
+quadrados_pares = [n ** 2 for n in range(1, 11) if n % 2 == 0]
+# [4, 16, 36, 64, 100]
+
+# Strings que começam com 'a':
+palavras = ["abacaxi", "banana", "amora", "cereja", "açaí"]
+com_a = [p for p in palavras if p.startswith("a")]
+# ['abacaxi', 'amora', 'açaí']
+
+# ═══ COM TRANSFORMAÇÃO + FILTRO ═══
+# Nomes em maiúscula, apenas os que têm mais de 4 letras:
+nomes = ["ana", "bruno", "carlos", "di", "eduardo", "lia"]
+resultado = [nome.upper() for nome in nomes if len(nome) > 4]
+# ['BRUNO', 'CARLOS', 'EDUARDO']
+
+# ═══ EXEMPLOS PRÁTICOS DevOps ═══
+
+# Extrair IPs de uma lista de servidores
+servidores = [
+    {"nome": "web-01", "ip": "10.0.1.1", "status": "running"},
+    {"nome": "web-02", "ip": "10.0.1.2", "status": "stopped"},
+    {"nome": "db-01", "ip": "10.0.2.1", "status": "running"},
+]
+ips_ativos = [s["ip"] for s in servidores if s["status"] == "running"]
+# ['10.0.1.1', '10.0.2.1']
+
+# Gerar nomes de recursos AWS
+ambientes = ["dev", "staging", "prod"]
+buckets = [f"cloudtrilhas-{env}-assets" for env in ambientes]
+# ['cloudtrilhas-dev-assets', 'cloudtrilhas-staging-assets', 'cloudtrilhas-prod-assets']
+
+# Processar linhas de log
+log_bruto = """
+2026-01-15 ERROR Timeout
+2026-01-15 INFO Started
+2026-01-15 ERROR Connection refused
+2026-01-15 WARN Slow query
+"""
+erros = [linha.strip() for linha in log_bruto.strip().split("\n") if "ERROR" in linha]
+# ['2026-01-15 ERROR Timeout', '2026-01-15 ERROR Connection refused']
+
+# Converter tipos
+str_numeros = ["10", "20", "abc", "30", "xyz", "40"]
+numeros = [int(s) for s in str_numeros if s.isdigit()]
+# [10, 20, 30, 40]
+
+# Achatar lista de listas (flatten)
+matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flat = [num for linha in matriz for num in linha]
+# [1, 2, 3, 4, 5, 6, 7, 8, 9]</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Comprehension com if-else (Expressão Condicional)</h4>
+            <p>Quando você quer transformar TODOS os elementos (sem filtrar), use o ternário ANTES do for:</p>
+            <pre><code># if-else ANTES do for = transformação condicional (mapeia todos)
+numeros = [1, -2, 3, -4, 5]
+absolutos = [n if n >= 0 else -n for n in numeros]
+# [1, 2, 3, 4, 5] — transforma TODOS
+
+# if DEPOIS do for = filtro (remove alguns)
+positivos = [n for n in numeros if n > 0]
+# [1, 3, 5] — mantém apenas positivos
+
+# Combinando ambos: filtro + transformação
+# [transformação for x in iter if filtro]
+resultado = [n * 2 for n in numeros if n > 0]
+# [2, 6, 10] — dobra apenas os positivos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Dictionary Comprehension</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>{chave: valor for item in iterável}</code><span class="cmd-tag">sintaxe</span></div>
+            <p>Criar dicionários de forma concisa:</p>
+            <pre><code># Sintaxe: {chave_expr: valor_expr for variável in iterável if condição}
+
+# Quadrados como dicionário
+quadrados = {n: n**2 for n in range(1, 11)}
+# {1: 1, 2: 4, 3: 9, 4: 16, 5: 25, 6: 36, 7: 49, 8: 64, 9: 81, 10: 100}
+
+# Inverter chave-valor de um dicionário
+original = {"host": "localhost", "port": "5432", "db": "producao"}
+invertido = {v: k for k, v in original.items()}
+# {'localhost': 'host', '5432': 'port', 'producao': 'db'}
+
+# Filtrar dicionário
+notas = {"Ana": 9.5, "Bruno": 6.0, "Carlos": 4.5, "Diana": 8.0, "Eva": 3.0}
+aprovados = {nome: nota for nome, nota in notas.items() if nota >= 7.0}
+# {'Ana': 9.5, 'Diana': 8.0}
+
+# Transformar valores
+precos_usd = {"EC2": 0.023, "Lambda": 0.0000002, "S3": 0.023, "RDS": 0.017}
+dolar = 5.20
+precos_brl = {servico: round(preco * dolar, 4) for servico, preco in precos_usd.items()}
+# {'EC2': 0.1196, 'Lambda': 0.000001, 'S3': 0.1196, 'RDS': 0.0884}
+
+# Criar dicionário a partir de duas listas
+chaves = ["nome", "idade", "cidade"]
+valores = ["João", 30, "São Paulo"]
+pessoa = {k: v for k, v in zip(chaves, valores)}
+# {'nome': 'João', 'idade': 30, 'cidade': 'São Paulo'}
+
+# DevOps: mapear instâncias por status
+instancias = [
+    {"id": "i-001", "status": "running"},
+    {"id": "i-002", "status": "stopped"},
+    {"id": "i-003", "status": "running"},
+    {"id": "i-004", "status": "terminated"},
+]
+por_status = {}
+for status in {"running", "stopped", "terminated"}:
+    por_status[status] = [i["id"] for i in instancias if i["status"] == status]
+# {'running': ['i-001', 'i-003'], 'stopped': ['i-002'], 'terminated': ['i-004']}
+
+# Contar caracteres em uma string
+texto = "abracadabra"
+contagem = {char: texto.count(char) for char in set(texto)}
+# {'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Set Comprehension</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>{expressão for item in iterável}</code><span class="cmd-tag">sintaxe</span></div>
+            <p>Criar sets (conjuntos sem duplicatas) com comprehension:</p>
+            <pre><code># Set comprehension — mesma sintaxe do dict, mas sem ':'
+# Elimina duplicatas automaticamente
+
+# Letras únicas em uma frase
+frase = "estruturas de controle em python"
+letras_unicas = {char for char in frase if char.isalpha()}
+# {'a', 'c', 'd', 'e', 'h', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'y'}
+
+# Extensões de arquivo únicas em uma lista
+arquivos = ["app.py", "config.json", "main.py", "data.csv", "test.py", "schema.json"]
+extensoes = {arquivo.split(".")[-1] for arquivo in arquivos}
+# {'py', 'json', 'csv'}
+
+# IPs únicos de logs
+logs_acesso = [
+    "10.0.1.1 GET /api/users",
+    "10.0.1.2 POST /api/login",
+    "10.0.1.1 GET /api/status",
+    "10.0.2.5 GET /api/health",
+    "10.0.1.2 DELETE /api/cache",
+]
+ips_unicos = {log.split()[0] for log in logs_acesso}
+# {'10.0.1.1', '10.0.1.2', '10.0.2.5'}
+
+# Portas em uso (sem duplicatas)
+conexoes = [("web", 80), ("api", 8080), ("db", 5432), ("cache", 6379), ("web-ssl", 443), ("api-alt", 8080)]
+portas = {porta for _, porta in conexoes}
+# {80, 443, 5432, 6379, 8080}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Generator Expressions (Expressões Geradoras)</h3>
+
+          <div class="command-card wide">
+            <div name="command-header"><code>(expressão for item in iterável)</code><span class="cmd-tag">lazy/memória</span></div>
+            <p>Generators são como list comprehensions, mas NÃO criam a lista na memória — geram valores sob demanda (lazy):</p>
+            <pre><code># Generator expression — parênteses em vez de colchetes
+# NÃO cria lista na memória — gera valores um a um (lazy)
+
+# List comprehension — cria TODA a lista na memória:
+lista = [n ** 2 for n in range(1_000_000)]  # Usa ~8MB de RAM!
+
+# Generator expression — NÃO usa memória extra:
+gen = (n ** 2 for n in range(1_000_000))   # Usa ~120 bytes!
+
+# Generators são iteráveis — usados em for, sum(), max(), etc.
+soma = sum(n ** 2 for n in range(1_000_000))  # Note: sem [] dentro de sum()
+print(f"Soma dos quadrados: {soma}")
+
+# ═══ QUANDO USAR GENERATOR vs LIST COMPREHENSION ═══
+# Use GENERATOR quando:
+# • Dados são grandes (milhões de elementos)
+# • Você só precisa iterar uma vez
+# • Está passando para sum(), max(), min(), any(), all(), "".join()
+
+# Use LIST quando:
+# • Precisa acessar por índice (lista[5])
+# • Precisa iterar múltiplas vezes
+# • Precisa do len()
+# • Dados são pequenos (centenas/milhares de elementos)
+
+# ═══ EXEMPLOS PRÁTICOS ═══
+
+# Verificar se ALGUM servidor está offline (any() + generator)
+servidores = [{"nome": "web-01", "up": True}, {"nome": "db-01", "up": False}]
+algum_offline = any(not s["up"] for s in servidores)
+print(f"Algum servidor offline? {algum_offline}")  # True
+
+# Verificar se TODOS os testes passaram (all() + generator)
+resultados = [{"teste": "auth", "ok": True}, {"teste": "db", "ok": True}]
+todos_ok = all(r["ok"] for r in resultados)
+print(f"Todos os testes passaram? {todos_ok}")  # True
+
+# Somar tamanhos de arquivo
+import os
+# total_bytes = sum(os.path.getsize(f) for f in os.listdir(".") if f.endswith(".py"))
+
+# Maior valor sem criar lista intermediária
+maior_cpu = max(s["cpu"] for s in servidores_info)
+
+# Juntar strings com join (generator dentro de join)
+csv_line = ",".join(str(valor) for valor in [1, "nome", 3.14, True])
+# "1,nome,3.14,True"
+
+# ═══ GENERATORS SÃO SINGLE-USE! ═══
+gen = (n for n in range(5))
+print(list(gen))  # [0, 1, 2, 3, 4]
+print(list(gen))  # [] — VAZIO! Generator já foi consumido!
+
+# Se precisa reusar, converta para lista:
+dados = list(n for n in range(5))
+# Ou simplesmente use list comprehension: dados = [n for n in range(5)]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Comprehensions Aninhadas e Complexas</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Nested Comprehensions</code><span class="cmd-tag">avançado</span></div>
+            <p>Comprehensions com múltiplos for e condições:</p>
+            <pre><code># ═══ COMPREHENSION COM MÚLTIPLOS FOR (equivale a for aninhado) ═══
+# [expr for x in iter1 for y in iter2]
+# Equivale a:
+# for x in iter1:
+#     for y in iter2:
+#         resultado.append(expr)
+
+# Produto cartesiano
+cores = ["vermelho", "azul"]
+tamanhos = ["P", "M", "G"]
+combinacoes = [(cor, tam) for cor in cores for tam in tamanhos]
+# [('vermelho', 'P'), ('vermelho', 'M'), ('vermelho', 'G'),
+#  ('azul', 'P'), ('azul', 'M'), ('azul', 'G')]
+
+# Achatar matriz (flatten)
+matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flat = [num for linha in matriz for num in linha]
+# [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Achatar com filtro
+pares_flat = [num for linha in matriz for num in linha if num % 2 == 0]
+# [2, 4, 6, 8]
+
+# ═══ COMPREHENSION ANINHADA (comprehension DENTRO de comprehension) ═══
+# [[expr for y in iter2] for x in iter1]
+# Cria uma LISTA DE LISTAS
+
+# Transpor matriz
+original = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+transposta = [[linha[i] for linha in original] for i in range(3)]
+# [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+
+# Criar matriz de zeros 4x4
+zeros = [[0 for _ in range(4)] for _ in range(4)]
+
+# Matriz identidade 3x3
+identidade = [[1 if i == j else 0 for j in range(3)] for i in range(3)]
+# [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+# ═══ DevOps: Gerar configurações ═══
+regioes = ["us-east-1", "eu-west-1", "sa-east-1"]
+servicos = ["api", "worker", "scheduler"]
+
+# Gerar nomes de tasks ECS para todas as combinações
+task_definitions = [
+    f"cloudtrilhas-{servico}-{regiao}"
+    for regiao in regioes
+    for servico in servicos
+]
+
+# ═══ QUANDO COMPREHENSION FICA ILEGÍVEL — USE LOOP NORMAL ═══
+# ❌ Muito complexo — difícil de entender:
+resultado = [
+    processar(x, y)
+    for x in dados
+    if x.valido
+    for y in x.itens
+    if y.ativo and y.tipo in tipos_aceitos
+    if calcular_score(x, y) > threshold
+]
+
+# ✅ Prefira loop normal quando a lógica é complexa:
+resultado = []
+for x in dados:
+    if not x.valido:
+        continue
+    for y in x.itens:
+        if y.ativo and y.tipo in tipos_aceitos:
+            if calcular_score(x, y) > threshold:
+                resultado.append(processar(x, y))</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Performance: Comprehension vs Loop</h4>
+            <p>List comprehensions são tipicamente <strong>20-30% mais rápidas</strong> que loops com <code>.append()</code>, porque o interpretador Python otimiza a criação da lista internamente. Porém, a <strong>legibilidade sempre vem primeiro</strong> — se a comprehension ficou confusa, use um loop normal.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8 — ITERADORES E GERADORES
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Iteradores e Geradores (Introdução)</h2>
+          <p>Entenda o protocolo de iteração do Python, a diferença entre iteráveis e iteradores, como criar geradores com yield para processamento eficiente de dados grandes, e conheça o módulo itertools — o canivete suíço da iteração.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 — O que é um Iterador? (iter() e next())</h3>
+          <p>Todo loop for no Python utiliza o <strong>protocolo de iteração</strong> por baixo dos panos. Entender esse protocolo ajuda a criar código mais eficiente e elegante.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>iter() / next()</code><span class="cmd-tag">protocolo</span></div>
+            <p>Como o for funciona internamente — o protocolo de iteração:</p>
+            <pre><code># O for do Python faz isso internamente:
+# 1. Chama iter(objeto) para obter um iterador
+# 2. Chama next(iterador) repetidamente para obter elementos
+# 3. Para quando recebe StopIteration
+
+# Demonstração manual do protocolo:
+frutas = ["maçã", "banana", "laranja"]
+
+# Passo 1: Obter o iterador
+iterador = iter(frutas)  # Cria um iterador a partir da lista
+print(type(iterador))    # <class 'list_iterator'>
+
+# Passo 2: Obter elementos um a um
+print(next(iterador))    # "maçã"
+print(next(iterador))    # "banana"
+print(next(iterador))    # "laranja"
+
+# Passo 3: Fim — StopIteration
+# print(next(iterador))  # ❌ StopIteration exception!
+
+# next() com valor padrão (evita exception)
+iterador2 = iter([1, 2])
+print(next(iterador2, "fim"))  # 1
+print(next(iterador2, "fim"))  # 2
+print(next(iterador2, "fim"))  # "fim" (em vez de StopIteration)
+
+# ═══ ITERÁVEL vs ITERADOR ═══
+# ITERÁVEL: objeto que pode ser iterado (tem __iter__)
+#   Exemplos: list, str, dict, set, tuple, range, file
+#   Pode criar MÚLTIPLOS iteradores
+
+# ITERADOR: objeto que produz valores um a um (tem __next__)
+#   É SINGLE-USE — uma vez consumido, acabou
+#   Todo iterador é iterável, mas nem todo iterável é iterador
+
+# Lista é ITERÁVEL (pode criar iteradores dela)
+lista = [1, 2, 3]
+it1 = iter(lista)  # Iterador 1
+it2 = iter(lista)  # Iterador 2 (independente!)
+print(next(it1))   # 1
+print(next(it2))   # 1 (independente de it1)
+print(next(it1))   # 2
+
+# ═══ O for é açúcar sintático para isso: ═══
+# for item in colecao:
+#     processar(item)
+#
+# Equivale internamente a:
+# _iter = iter(colecao)
+# while True:
+#     try:
+#         item = next(_iter)
+#     except StopIteration:
+#         break
+#     processar(item)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 — Geradores com yield</h3>
+          <p>Um <strong>gerador</strong> é uma função especial que usa <code>yield</code> em vez de <code>return</code>. Ela "pausa" sua execução a cada yield e "retoma" na próxima chamada de <code>next()</code>. Isso permite gerar valores sob demanda, sem ocupar memória.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>yield</code><span class="cmd-tag">gerador</span></div>
+            <p>Funções geradoras produzem valores um de cada vez, sem manter todos na memória:</p>
+            <pre><code># Função NORMAL retorna todos os valores de uma vez:
+def quadrados_lista(n):
+    resultado = []
+    for i in range(n):
+        resultado.append(i ** 2)
+    return resultado  # Retorna lista INTEIRA na memória
+
+# Função GERADORA produz um valor de cada vez:
+def quadrados_gen(n):
+    for i in range(n):
+        yield i ** 2  # "Pausa" aqui e retorna o valor
+        # Próxima chamada de next() retoma DAQUI
+
+# Uso:
+for q in quadrados_gen(5):
+    print(q, end=" ")
+# Saída: 0 1 4 9 16
+
+# A diferença: memória!
+import sys
+lista = quadrados_lista(1_000_000)  # ~8MB na memória
+gen = quadrados_gen(1_000_000)      # ~120 bytes na memória!
+print(sys.getsizeof(lista))  # 8448728
+print(sys.getsizeof(gen))    # 112
+
+# ═══ GERADOR DE FIBONACCI ═══
+def fibonacci():
+    """Gera a sequência de Fibonacci infinitamente."""
+    a, b = 0, 1
+    while True:  # Infinito! Mas OK — é lazy
+        yield a
+        a, b = b, a + b
+
+# Pegar os primeiros 10 números de Fibonacci
+from itertools import islice
+fib10 = list(islice(fibonacci(), 10))
+print(fib10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+# ═══ GERADOR PARA LEITURA DE ARQUIVO GRANDE ═══
+def ler_em_chunks(arquivo, tamanho_chunk=8192):
+    """Lê arquivo grande em pedaços sem carregar tudo na memória."""
+    with open(arquivo, 'r') as f:
+        while True:
+            chunk = f.read(tamanho_chunk)
+            if not chunk:
+                break
+            yield chunk
+
+# Processar arquivo de 10GB sem estourar memória:
+# for chunk in ler_em_chunks("arquivo_gigante.csv"):
+#     processar(chunk)
+
+# ═══ GERADOR PARA PAGINAÇÃO DE API ═══
+def paginar_api(endpoint, items_por_pagina=100):
+    """Busca todas as páginas de uma API paginada."""
+    pagina = 1
+    while True:
+        resposta = requests.get(f"{endpoint}?page={pagina}&per_page={items_por_pagina}")
+        dados = resposta.json()
+        if not dados:
+            break
+        yield from dados  # yield from delega para outro iterável
+        pagina += 1
+
+# Uso:
+# for usuario in paginar_api("https://api.example.com/users"):
+#     processar(usuario)
+
+# ═══ GERADOR COM SEND() — comunicação bidirecional ═══
+def acumulador():
+    """Gerador que acumula valores enviados via send()."""
+    total = 0
+    while True:
+        valor = yield total
+        if valor is not None:
+            total += valor
+
+acc = acumulador()
+next(acc)          # Inicializa o gerador (vai até o primeiro yield)
+print(acc.send(10))  # 10
+print(acc.send(20))  # 30
+print(acc.send(5))   # 35</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 — Módulo itertools — Destaque</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>itertools</code><span class="cmd-tag">biblioteca padrão</span></div>
+            <p>O módulo itertools oferece ferramentas eficientes para iteração avançada:</p>
+            <pre><code>from itertools import count, cycle, chain, islice, product, combinations, permutations, groupby, repeat, starmap
+
+# ═══ count(start, step) — contador infinito ═══
+for i in islice(count(10, 3), 5):
+    print(i, end=" ")
+# 10 13 16 19 22
+
+# ═══ cycle(iterável) — repete infinitamente ═══
+cores = cycle(["vermelho", "verde", "azul"])
+for i, cor in zip(range(7), cores):
+    print(f"Item {i}: {cor}")
+# 0: vermelho, 1: verde, 2: azul, 3: vermelho, 4: verde, 5: azul, 6: vermelho
+
+# Uso prático: round-robin de servidores
+servidores = cycle(["web-01", "web-02", "web-03"])
+for requisicao in range(10):
+    servidor = next(servidores)
+    # encaminhar_requisicao(requisicao, servidor)
+
+# ═══ chain(*iteráveis) — concatena iteráveis ═══
+lista1 = [1, 2, 3]
+lista2 = [4, 5, 6]
+lista3 = [7, 8, 9]
+for num in chain(lista1, lista2, lista3):
+    print(num, end=" ")
+# 1 2 3 4 5 6 7 8 9
+
+# ═══ islice(iterável, start, stop, step) — fatiar iterador ═══
+# Funciona como slice mas para iteradores (que não suportam [n:m])
+infinito = count(0)
+primeiros_10 = list(islice(infinito, 10))
+# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# ═══ product(*iteráveis) — produto cartesiano ═══
+ambientes = ["dev", "prod"]
+servicos = ["api", "web"]
+regioes = ["us-east-1", "sa-east-1"]
+
+for env, svc, reg in product(ambientes, servicos, regioes):
+    print(f"  {svc}-{env}-{reg}")
+# Gera todas as 8 combinações (2 × 2 × 2)
+
+# ═══ combinations(iterável, r) — combinações sem repetição ═══
+tecnologias = ["Python", "Docker", "Terraform", "AWS"]
+duplas = list(combinations(tecnologias, 2))
+# [('Python', 'Docker'), ('Python', 'Terraform'), ('Python', 'AWS'),
+#  ('Docker', 'Terraform'), ('Docker', 'AWS'), ('Terraform', 'AWS')]
+
+# ═══ groupby(iterável, key) — agrupar elementos consecutivos ═══
+from operator import itemgetter
+
+logs = [
+    {"nivel": "ERROR", "msg": "Timeout"},
+    {"nivel": "ERROR", "msg": "Connection refused"},
+    {"nivel": "INFO", "msg": "Server started"},
+    {"nivel": "INFO", "msg": "Ready"},
+    {"nivel": "WARNING", "msg": "Slow query"},
+]
+
+# IMPORTANTE: groupby requer dados ORDENADOS pela key!
+logs_ordenados = sorted(logs, key=itemgetter("nivel"))
+for nivel, grupo in groupby(logs_ordenados, key=itemgetter("nivel")):
+    mensagens = [item["msg"] for item in grupo]
+    print(f"  [{nivel}] {len(mensagens)} mensagens: {mensagens}")</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9 — TRATAMENTO DE ERROS BÁSICO (try/except)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 9</span>
+          <h2>Tratamento de Erros Básico (try/except)</h2>
+          <p>Erros acontecem — especialmente quando lidamos com entrada do usuário, arquivos, rede e APIs externas. Aprenda a usar try/except para lidar com exceções de forma elegante, manter seu programa rodando e fornecer feedback útil ao usuário.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 — Por que Erros Acontecem?</h3>
+          <p>Em Python, erros em tempo de execução são chamados de <strong>exceções</strong> (exceptions). Quando uma exceção ocorre e não é tratada, o programa inteiro é interrompido com um traceback.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>Exceções Comuns</code><span class="cmd-tag">referência</span></div>
+            <p>As exceções mais frequentes que você vai encontrar:</p>
+            <pre><code># ═══ TypeError — Operação com tipo incompatível ═══
+"texto" + 5          # TypeError: can only concatenate str to str
+len(42)              # TypeError: object of type 'int' has no len()
+
+# ═══ ValueError — Valor inapropriado para a operação ═══
+int("abc")           # ValueError: invalid literal for int()
+int("3.14")          # ValueError (use float() primeiro)
+list(range(1, 10)).remove(99)  # ValueError: 99 not in list
+
+# ═══ KeyError — Chave não existe no dicionário ═══
+config = {"host": "localhost"}
+config["porta"]      # KeyError: 'porta'
+
+# ═══ IndexError — Índice fora do range ═══
+lista = [1, 2, 3]
+lista[10]            # IndexError: list index out of range
+
+# ═══ ZeroDivisionError — Divisão por zero ═══
+10 / 0               # ZeroDivisionError: division by zero
+
+# ═══ FileNotFoundError — Arquivo não existe ═══
+open("inexistente.txt")  # FileNotFoundError
+
+# ═══ AttributeError — Atributo/método não existe ═══
+None.upper()         # AttributeError: 'NoneType' has no attribute 'upper'
+
+# ═══ NameError — Variável não definida ═══
+print(variavel_inexistente)  # NameError: name 'variavel_inexistente' is not defined
+
+# ═══ ImportError/ModuleNotFoundError ═══
+import modulo_que_nao_existe  # ModuleNotFoundError
+
+# ═══ PermissionError — Sem permissão ═══
+open("/etc/shadow", "w")  # PermissionError
+
+# ═══ ConnectionError / TimeoutError ═══
+# Ocorrem ao conectar com serviços de rede
+requests.get("http://servidor-offline.com", timeout=5)  # ConnectionError</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Exceção</th><th>Quando Ocorre</th><th>Exemplo Comum</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>TypeError</code></td><td>Operação com tipo errado</td><td><code>"5" + 3</code></td></tr>
+              <tr><td><code>ValueError</code></td><td>Valor inválido para a operação</td><td><code>int("abc")</code></td></tr>
+              <tr><td><code>KeyError</code></td><td>Chave não existe em dict</td><td><code>d["chave_inexistente"]</code></td></tr>
+              <tr><td><code>IndexError</code></td><td>Índice fora dos limites</td><td><code>lista[100]</code></td></tr>
+              <tr><td><code>ZeroDivisionError</code></td><td>Divisão por zero</td><td><code>x / 0</code></td></tr>
+              <tr><td><code>FileNotFoundError</code></td><td>Arquivo não encontrado</td><td><code>open("x.txt")</code></td></tr>
+              <tr><td><code>AttributeError</code></td><td>Atributo/método não existe</td><td><code>None.split()</code></td></tr>
+              <tr><td><code>NameError</code></td><td>Variável não definida</td><td><code>print(xyz)</code></td></tr>
+              <tr><td><code>PermissionError</code></td><td>Sem permissão de acesso</td><td><code>open("/root/x", "w")</code></td></tr>
+              <tr><td><code>TimeoutError</code></td><td>Operação excedeu timeout</td><td>Conexão de rede lenta</td></tr>
+              <tr><td><code>StopIteration</code></td><td>Iterador esgotado</td><td><code>next(iter_vazio)</code></td></tr>
+              <tr><td><code>OverflowError</code></td><td>Resultado numérico muito grande</td><td><code>math.exp(1000)</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 — try/except Básico</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>try/except</code><span class="cmd-tag">sintaxe</span></div>
+            <p>O bloco try/except captura exceções e permite tratamento gracioso de erros:</p>
+            <pre><code># Sintaxe básica:
+# try:
+#     código_que_pode_falhar
+# except TipoDeExcecao:
+#     tratamento_do_erro
+
+# ═══ EXEMPLO SIMPLES ═══
+try:
+    numero = int(input("Digite um número: "))
+    resultado = 100 / numero
+    print(f"100 ÷ {numero} = {resultado}")
+except ValueError:
+    print("❌ Isso não é um número válido!")
+except ZeroDivisionError:
+    print("❌ Não é possível dividir por zero!")
+
+# ═══ CAPTURAR MÚLTIPLAS EXCEÇÕES ═══
+# Opção 1: except separados (tratamento diferente)
+try:
+    dados = carregar_arquivo("config.json")
+    porta = int(dados["port"])
+except FileNotFoundError:
+    print("❌ Arquivo de configuração não encontrado")
+    porta = 8080  # valor padrão
+except KeyError:
+    print("❌ Chave 'port' não encontrada no arquivo")
+    porta = 8080
+except ValueError:
+    print("❌ Valor de porta inválido")
+    porta = 8080
+
+# Opção 2: tupla de exceções (mesmo tratamento)
+try:
+    resultado = operacao_arriscada()
+except (TypeError, ValueError, KeyError) as e:
+    print(f"❌ Erro de dados: {e}")
+    resultado = None
+
+# ═══ CAPTURAR A EXCEÇÃO EM VARIÁVEL (as e) ═══
+try:
+    arquivo = open("dados.csv")
+except FileNotFoundError as e:
+    print(f"Erro: {e}")
+    # Saída: Erro: [Errno 2] No such file or directory: 'dados.csv'
+    print(f"Tipo: {type(e).__name__}")
+    # Saída: Tipo: FileNotFoundError
+
+# ═══ EXCEPT GENÉRICO (use com cuidado!) ═══
+# ❌ EVITE: captura TUDO, incluindo bugs que deveriam ser corrigidos
+try:
+    resultado = operacao()
+except:  # Bare except — captura TUDO, até Ctrl+C!
+    print("Algo deu errado")
+
+# ⚠️ ACEITÁVEL: except Exception (não captura SystemExit, KeyboardInterrupt)
+try:
+    resultado = operacao()
+except Exception as e:
+    print(f"Erro inesperado: {type(e).__name__}: {e}")
+    logging.error(f"Erro: {e}", exc_info=True)
+
+# ✅ MELHOR: capturar exceções ESPECÍFICAS
+try:
+    resultado = operacao()
+except (ConnectionError, TimeoutError) as e:
+    print(f"Erro de rede: {e}")
+except ValueError as e:
+    print(f"Dados inválidos: {e}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 — try/except/else/finally (Estrutura Completa)</h3>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>try/except/else/finally</code><span class="cmd-tag">completo</span></div>
+            <p>A estrutura completa de tratamento de exceções com todos os blocos:</p>
+            <pre><code># Estrutura completa:
+# try:
+#     código arriscado
+# except ExcecaoEspecifica as e:
+#     tratamento se der erro
+# else:
+#     executado APENAS se NÃO houve exceção no try
+# finally:
+#     executado SEMPRE (com ou sem exceção) — limpeza/cleanup
+
+# ═══ EXEMPLO COMPLETO ═══
+def conectar_banco(host, porta, database):
+    """Exemplo completo com try/except/else/finally."""
+    conexao = None
+    try:
+        print(f"🔌 Conectando a {host}:{porta}/{database}...")
+        conexao = criar_conexao(host, porta, database)
+        conexao.testar()
+    except ConnectionRefusedError:
+        print(f"❌ Conexão recusada — servidor {host}:{porta} está ativo?")
+        return None
+    except TimeoutError:
+        print(f"❌ Timeout — servidor {host}:{porta} não respondeu")
+        return None
+    except Exception as e:
+        print(f"❌ Erro inesperado: {type(e).__name__}: {e}")
+        return None
+    else:
+        # Só executa se o try teve sucesso (sem exceções)
+        print(f"✅ Conectado com sucesso a {database}!")
+        return conexao
+    finally:
+        # SEMPRE executa — perfeito para cleanup
+        print("🧹 Finalizando tentativa de conexão...")
+        # Se a conexão falhou parcialmente, garantir cleanup
+        if conexao and not conexao.esta_conectado():
+            conexao.fechar()
+
+# ═══ ELSE: quando usar? ═══
+# O else é útil para separar "código que pode falhar" de "código que depende do sucesso"
+
+# Com else (mais claro):
+try:
+    dados = json.loads(texto_json)
+except json.JSONDecodeError as e:
+    print(f"JSON inválido: {e}")
+    dados = {}
+else:
+    # Só executa se o parse foi bem-sucedido
+    print(f"✅ JSON válido — {len(dados)} campos encontrados")
+    processar_dados(dados)
+
+# ═══ FINALLY: garantir limpeza ═══
+# finally SEMPRE executa, mesmo se houver return, break ou exceção não tratada
+
+def ler_arquivo_seguro(caminho):
+    arquivo = None
+    try:
+        arquivo = open(caminho, 'r')
+        conteudo = arquivo.read()
+        return conteudo
+    except FileNotFoundError:
+        print(f"Arquivo '{caminho}' não encontrado")
+        return None
+    except PermissionError:
+        print(f"Sem permissão para ler '{caminho}'")
+        return None
+    finally:
+        # Garante que o arquivo é fechado, mesmo com exceção
+        if arquivo:
+            arquivo.close()
+            print(f"📁 Arquivo '{caminho}' fechado")
+
+# Na prática, use 'with' para arquivos (faz o finally automaticamente):
+# with open(caminho) as f:
+#     conteudo = f.read()
+
+# ═══ FINALLY com return — cuidado! ═══
+def funcao_estranha():
+    try:
+        return "do try"
+    finally:
+        return "do finally"  # ⚠️ Este SOBRESCREVE o return do try!
+
+print(funcao_estranha())  # "do finally" — CUIDADO!
+# Regra: NUNCA coloque return dentro de finally</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 — try/except no Controle de Fluxo (EAFP)</h3>
+          <p>Python segue a filosofia <strong>EAFP</strong> (Easier to Ask Forgiveness than Permission) — é preferível tentar e tratar o erro do que verificar previamente se a operação é possível.</p>
+
+          <div class="command-card wide">
+            <div class="command-header"><code>EAFP vs LBYL</code><span class="cmd-tag">filosofia</span></div>
+            <p>Duas abordagens para lidar com situações que podem falhar:</p>
+            <pre><code># ═══ LBYL (Look Before You Leap) — verificar antes ═══
+# Estilo de outras linguagens (Java, C++)
+# Verifica se é possível ANTES de tentar
+
+# Verificar se chave existe antes de acessar
+if "email" in usuario:
+    email = usuario["email"]
+else:
+    email = "sem_email@default.com"
+
+# Verificar se arquivo existe antes de abrir
+import os
+if os.path.exists("config.json"):
+    with open("config.json") as f:
+        config = json.load(f)
+else:
+    config = {}
+
+# ═══ EAFP (Easier to Ask Forgiveness than Permission) — tentar e tratar ═══
+# Estilo Pythônico — tenta e trata o erro se acontecer
+
+# Tentar acessar, tratar se não existir
+try:
+    email = usuario["email"]
+except KeyError:
+    email = "sem_email@default.com"
+
+# Mais Pythônico ainda: .get()
+email = usuario.get("email", "sem_email@default.com")
+
+# Tentar abrir, tratar se não existir
+try:
+    with open("config.json") as f:
+        config = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    config = {}
+
+# ═══ POR QUE EAFP É PREFERÍVEL? ═══
+# 1. Evita race conditions (arquivo pode ser deletado ENTRE o check e o open)
+# 2. Mais conciso em muitos casos
+# 3. Melhor performance quando o caso de sucesso é comum (exceções são raras)
+# 4. Mais seguro para operações concorrentes
+
+# ═══ VALIDAÇÃO DE INPUT COM try/except ═══
+def obter_numero(mensagem="Digite um número: "):
+    """EAFP: tenta converter e trata o erro."""
+    while True:
+        try:
+            return float(input(mensagem))
+        except ValueError:
+            print("❌ Valor inválido! Digite um número.")
+
+# ═══ CONVERSÃO SEGURA DE TIPOS ═══
+def safe_int(valor, padrao=0):
+    """Converte para int com fallback seguro."""
+    try:
+        return int(valor)
+    except (ValueError, TypeError):
+        return padrao
+
+# Uso:
+porta = safe_int(os.environ.get("PORT"), padrao=8080)
+timeout = safe_int(config.get("timeout"), padrao=30)
+
+# ═══ ACESSAR ATRIBUTOS COM FALLBACK ═══
+def obter_nome_servico(obj):
+    """Tenta várias formas de obter o nome."""
+    try:
+        return obj.nome
+    except AttributeError:
+        pass
+    try:
+        return obj["nome"]
+    except (KeyError, TypeError):
+        pass
+    return str(obj)</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Quando NÃO Usar try/except</h4>
+            <ul>
+              <li>Não use para mascarar bugs — se um TypeError acontece, geralmente é um bug no SEU código</li>
+              <li>Não use <code>except:</code> genérico — sempre especifique a exceção</li>
+              <li>Não use para controle de fluxo normal quando um <code>if</code> simples resolve</li>
+              <li>Não silencie exceções com <code>pass</code> sem logging — isso cria bugs invisíveis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 10 — EXERCÍCIOS PRÁTICOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 10</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Consolide tudo que aprendeu neste módulo com exercícios progressivos — desde condicionais simples até desafios combinando loops, comprehensions e tratamento de erros. Cada exercício inclui a solução detalhada para referência.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Classificador de Triângulos (Condicionais)</h3>
+          <p><strong>Nível:</strong> ⭐ Iniciante</p>
+          <p>Escreva um programa que recebe 3 lados de um triângulo e classifica como: equilátero (3 lados iguais), isósceles (2 lados iguais) ou escaleno (nenhum lado igual). Antes de classificar, verifique se os lados formam um triângulo válido (a soma de dois lados deve ser maior que o terceiro).</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>def classificar_triangulo(a, b, c):
+    """
+    Classifica um triângulo com base nos seus lados.
+    Retorna o tipo ou mensagem de erro se não for válido.
+    """
+    # Validar se são números positivos
+    if a <= 0 or b <= 0 or c <= 0:
+        return "❌ Os lados devem ser positivos"
+
+    # Verificar desigualdade triangular
+    if (a + b <= c) or (a + c <= b) or (b + c <= a):
+        return "❌ Estes lados não formam um triângulo válido"
+
+    # Classificar
+    if a == b == c:
+        return "Equilátero (3 lados iguais)"
+    elif a == b or b == c or a == c:
+        return "Isósceles (2 lados iguais)"
+    else:
+        return "Escaleno (todos os lados diferentes)"
+
+# Testes
+print(classificar_triangulo(5, 5, 5))    # Equilátero
+print(classificar_triangulo(5, 5, 3))    # Isósceles
+print(classificar_triangulo(3, 4, 5))    # Escaleno
+print(classificar_triangulo(1, 1, 10))   # Não forma triângulo
+print(classificar_triangulo(-1, 2, 3))   # Lados devem ser positivos
+
+# Versão com input do usuário
+while True:
+    try:
+        entrada = input("Digite os 3 lados (separados por espaço): ").strip()
+        if entrada.lower() == "sair":
+            break
+        a, b, c = map(float, entrada.split())
+        print(f"  → {classificar_triangulo(a, b, c)}\n")
+    except ValueError:
+        print("  ❌ Digite 3 números separados por espaço\n")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Calculadora com Menu (while + match-case)</h3>
+          <p><strong>Nível:</strong> ⭐ Iniciante</p>
+          <p>Crie uma calculadora interativa com menu que suporte as 4 operações básicas, potenciação e raiz quadrada. O programa deve continuar rodando até o usuário escolher sair. Trate divisão por zero e entradas inválidas.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>import math
+
+def calculadora():
+    """Calculadora interativa com menu."""
+    print("\n╔══════════════════════════════════╗")
+    print("║   🧮 CALCULADORA CLOUDTRILHAS   ║")
+    print("╚══════════════════════════════════╝")
+
+    while True:
+        print("\nOperações disponíveis:")
+        print("  1. Adição (+)")
+        print("  2. Subtração (-)")
+        print("  3. Multiplicação (×)")
+        print("  4. Divisão (÷)")
+        print("  5. Potenciação (^)")
+        print("  6. Raiz quadrada (√)")
+        print("  0. Sair")
+
+        opcao = input("\nEscolha a operação: ").strip()
+
+        match opcao:
+            case "0":
+                print("\n👋 Até a próxima!")
+                break
+
+            case "6":
+                try:
+                    n = float(input("Número: "))
+                    if n < 0:
+                        print("❌ Não existe raiz quadrada real de número negativo")
+                    else:
+                        print(f"√{n} = {math.sqrt(n):.4f}")
+                except ValueError:
+                    print("❌ Entrada inválida")
+
+            case "1" | "2" | "3" | "4" | "5":
+                try:
+                    a = float(input("Primeiro número: "))
+                    b = float(input("Segundo número: "))
+                except ValueError:
+                    print("❌ Entrada inválida — digite números")
+                    continue
+
+                match opcao:
+                    case "1":
+                        print(f"{a} + {b} = {a + b}")
+                    case "2":
+                        print(f"{a} - {b} = {a - b}")
+                    case "3":
+                        print(f"{a} × {b} = {a * b}")
+                    case "4":
+                        if b == 0:
+                            print("❌ Divisão por zero!")
+                        else:
+                            print(f"{a} ÷ {b} = {a / b:.4f}")
+                    case "5":
+                        try:
+                            print(f"{a} ^ {b} = {a ** b}")
+                        except OverflowError:
+                            print("❌ Resultado muito grande!")
+
+            case _:
+                print("❌ Opção inválida!")
+
+calculadora()</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — FizzBuzz Avançado (for + condicionais)</h3>
+          <p><strong>Nível:</strong> ⭐⭐ Intermediário</p>
+          <p>Implemente o clássico FizzBuzz de 1 a 100, mas com regras extras: se divisível por 3 → "Fizz", por 5 → "Buzz", por 7 → "Bazz", por 3 e 5 → "FizzBuzz", por 3 e 7 → "FizzBazz", por 5 e 7 → "BuzzBazz", por 3, 5 e 7 → "FizzBuzzBazz". Imprima o número nos demais casos. Conte quantos de cada tipo apareceram.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>def fizzbuzz_avancado(limite=100):
+    """FizzBuzz com 3 divisores e contagem de resultados."""
+    contadores = {
+        "FizzBuzzBazz": 0,
+        "FizzBuzz": 0,
+        "FizzBazz": 0,
+        "BuzzBazz": 0,
+        "Fizz": 0,
+        "Buzz": 0,
+        "Bazz": 0,
+        "Número": 0
+    }
+
+    for n in range(1, limite + 1):
+        resultado = ""
+        if n % 3 == 0:
+            resultado += "Fizz"
+        if n % 5 == 0:
+            resultado += "Buzz"
+        if n % 7 == 0:
+            resultado += "Bazz"
+
+        if resultado:
+            print(f"{n:3}: {resultado}")
+            contadores[resultado] += 1
+        else:
+            print(f"{n:3}: {n}")
+            contadores["Número"] += 1
+
+    # Relatório final
+    print(f"\n{'═' * 40}")
+    print(f"📊 RELATÓRIO (1 a {limite}):")
+    print(f"{'═' * 40}")
+    for tipo, qtd in sorted(contadores.items(), key=lambda x: -x[1]):
+        if qtd > 0:
+            barra = "█" * qtd
+            print(f"  {tipo:14} : {qtd:3} {barra}")
+
+fizzbuzz_avancado(105)  # 105 = 3×5×7 (primeiro FizzBuzzBazz)</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — Jogo de Adivinhação (while + random + try/except)</h3>
+          <p><strong>Nível:</strong> ⭐⭐ Intermediário</p>
+          <p>Crie um jogo onde o computador escolhe um número entre 1 e 100 e o jogador tenta adivinhar. A cada tentativa, dê dicas ("maior" ou "menor"). Conte tentativas. Dê classificação: até 5 tentativas = "Gênio!", 6-8 = "Muito bom!", 9-12 = "Bom", mais de 12 = "Pode melhorar".</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>import random
+
+def jogo_adivinhacao():
+    """Jogo de adivinhação com dicas e classificação."""
+    print("\n🎯 JOGO DE ADIVINHAÇÃO")
+    print("Pensei em um número entre 1 e 100. Tente adivinhar!\n")
+
+    numero_secreto = random.randint(1, 100)
+    tentativas = 0
+    historico = []
+
+    while True:
+        try:
+            palpite = int(input(f"Tentativa {tentativas + 1}: "))
+        except ValueError:
+            print("  ❌ Digite um número inteiro!\n")
+            continue
+
+        if palpite < 1 or palpite > 100:
+            print("  ❌ O número está entre 1 e 100!\n")
+            continue
+
+        tentativas += 1
+        historico.append(palpite)
+
+        if palpite == numero_secreto:
+            print(f"\n🎉 PARABÉNS! Você acertou o número {numero_secreto}!")
+            print(f"   Tentativas: {tentativas}")
+            print(f"   Histórico: {historico}")
+
+            # Classificação
+            if tentativas <= 5:
+                print("   🏆 Classificação: GÊNIO!")
+            elif tentativas <= 8:
+                print("   🥈 Classificação: Muito bom!")
+            elif tentativas <= 12:
+                print("   🥉 Classificação: Bom!")
+            else:
+                print("   📚 Classificação: Pode melhorar!")
+
+            # Dica matemática
+            print(f"\n   💡 Dica: o ideal é ~7 tentativas (busca binária)")
+            break
+
+        elif palpite < numero_secreto:
+            diferenca = numero_secreto - palpite
+            if diferenca > 30:
+                print("  ⬆️ MUITO maior!")
+            elif diferenca > 10:
+                print("  ⬆️ Maior")
+            else:
+                print("  ⬆️ Um pouco maior (está perto!)")
+        else:
+            diferenca = palpite - numero_secreto
+            if diferenca > 30:
+                print("  ⬇️ MUITO menor!")
+            elif diferenca > 10:
+                print("  ⬇️ Menor")
+            else:
+                print("  ⬇️ Um pouco menor (está perto!)")
+
+# Executar
+jogo_adivinhacao()</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 5 — Validador de Senhas (for + condicionais + flags)</h3>
+          <p><strong>Nível:</strong> ⭐⭐ Intermediário</p>
+          <p>Crie uma função que valida a força de uma senha. Critérios: mínimo 8 caracteres, pelo menos 1 maiúscula, 1 minúscula, 1 número, 1 caractere especial. Retorne todas as regras que falharam, não apenas a primeira.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>def validar_senha(senha):
+    """
+    Valida força da senha e retorna lista de problemas encontrados.
+    Retorna lista vazia se a senha atende todos os critérios.
+    """
+    problemas = []
+
+    if len(senha) < 8:
+        problemas.append(f"Mínimo 8 caracteres (atual: {len(senha)})")
+
+    if len(senha) > 128:
+        problemas.append("Máximo 128 caracteres")
+
+    tem_maiuscula = any(c.isupper() for c in senha)
+    tem_minuscula = any(c.islower() for c in senha)
+    tem_numero = any(c.isdigit() for c in senha)
+    tem_especial = any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/~`" for c in senha)
+
+    if not tem_maiuscula:
+        problemas.append("Deve conter pelo menos 1 letra MAIÚSCULA")
+    if not tem_minuscula:
+        problemas.append("Deve conter pelo menos 1 letra minúscula")
+    if not tem_numero:
+        problemas.append("Deve conter pelo menos 1 número")
+    if not tem_especial:
+        problemas.append("Deve conter pelo menos 1 caractere especial (!@#$%...)")
+
+    # Verificar sequências comuns (bônus)
+    sequencias_proibidas = ["123", "abc", "qwerty", "password", "senha"]
+    for seq in sequencias_proibidas:
+        if seq in senha.lower():
+            problemas.append(f"Não pode conter a sequência '{seq}'")
+
+    return problemas
+
+
+def classificar_forca(senha):
+    """Classifica a força da senha em uma escala."""
+    score = 0
+    score += min(len(senha), 20) * 2  # Tamanho (max 40 pontos)
+    score += 10 if any(c.isupper() for c in senha) else 0
+    score += 10 if any(c.islower() for c in senha) else 0
+    score += 15 if any(c.isdigit() for c in senha) else 0
+    score += 20 if any(not c.isalnum() for c in senha) else 0
+    score += 5 if len(set(senha)) > len(senha) * 0.7 else 0  # Variedade
+
+    if score >= 80:
+        return "🟢 FORTE", score
+    elif score >= 60:
+        return "🟡 MÉDIA", score
+    elif score >= 40:
+        return "🟠 FRACA", score
+    else:
+        return "🔴 MUITO FRACA", score
+
+
+# Interface interativa
+print("🔐 VALIDADOR DE SENHAS\n")
+while True:
+    senha = input("Digite uma senha (ou 'sair'): ")
+    if senha.lower() == "sair":
+        break
+
+    problemas = validar_senha(senha)
+    forca, score = classificar_forca(senha)
+
+    print(f"\n  Força: {forca} (score: {score}/100)")
+
+    if problemas:
+        print(f"  ❌ {len(problemas)} problema(s) encontrado(s):")
+        for p in problemas:
+            print(f"     • {p}")
+    else:
+        print("  ✅ Senha válida! Atende todos os critérios.")
+    print()</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 6 — Gerador de Relatório de Servidores (comprehensions + dict)</h3>
+          <p><strong>Nível:</strong> ⭐⭐⭐ Intermediário-Avançado</p>
+          <p>Dada uma lista de servidores com suas métricas, use comprehensions para: (a) filtrar servidores com CPU > 80%, (b) agrupar por status, (c) calcular médias por ambiente, (d) gerar alertas formatados.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>servidores = [
+    {"nome": "web-01", "env": "prod", "cpu": 85, "mem": 72, "status": "running"},
+    {"nome": "web-02", "env": "prod", "cpu": 45, "mem": 60, "status": "running"},
+    {"nome": "web-03", "env": "prod", "cpu": 92, "mem": 88, "status": "running"},
+    {"nome": "api-01", "env": "prod", "cpu": 67, "mem": 55, "status": "running"},
+    {"nome": "api-02", "env": "prod", "cpu": 23, "mem": 30, "status": "stopped"},
+    {"nome": "db-01",  "env": "prod", "cpu": 78, "mem": 91, "status": "running"},
+    {"nome": "dev-01", "env": "dev",  "cpu": 15, "mem": 25, "status": "running"},
+    {"nome": "dev-02", "env": "dev",  "cpu": 5,  "mem": 10, "status": "stopped"},
+    {"nome": "stg-01", "env": "staging", "cpu": 55, "mem": 45, "status": "running"},
+    {"nome": "stg-02", "env": "staging", "cpu": 88, "mem": 70, "status": "running"},
+]
+
+# (a) Servidores com CPU > 80%
+cpu_alta = [s["nome"] for s in servidores if s["cpu"] > 80]
+print(f"🚨 Servidores com CPU > 80%: {cpu_alta}")
+# ['web-01', 'web-03', 'stg-02']
+
+# (b) Agrupar por status
+por_status = {
+    status: [s["nome"] for s in servidores if s["status"] == status]
+    for status in {s["status"] for s in servidores}
+}
+print(f"\n📊 Por status:")
+for status, nomes in por_status.items():
+    print(f"  {status}: {nomes}")
+
+# (c) Médias por ambiente
+ambientes = {s["env"] for s in servidores}
+medias = {
+    env: {
+        "cpu_media": round(
+            sum(s["cpu"] for s in servidores if s["env"] == env) /
+            sum(1 for s in servidores if s["env"] == env), 1
+        ),
+        "mem_media": round(
+            sum(s["mem"] for s in servidores if s["env"] == env) /
+            sum(1 for s in servidores if s["env"] == env), 1
+        ),
+        "total": sum(1 for s in servidores if s["env"] == env)
+    }
+    for env in ambientes
+}
+
+print(f"\n📈 Médias por ambiente:")
+for env, stats in medias.items():
+    print(f"  [{env:8}] CPU: {stats['cpu_media']:5.1f}% | MEM: {stats['mem_media']:5.1f}% | Servidores: {stats['total']}")
+
+# (d) Gerar alertas formatados
+alertas = [
+    f"⚠️ [{s['env'].upper():8}] {s['nome']:8} — CPU: {s['cpu']}% | MEM: {s['mem']}%"
+    for s in servidores
+    if s["cpu"] > 80 or s["mem"] > 85
+]
+
+print(f"\n🚨 ALERTAS ({len(alertas)}):")
+for alerta in alertas:
+    print(f"  {alerta}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 7 — Números Primos com Crivo de Eratóstenes (for + list manipulation)</h3>
+          <p><strong>Nível:</strong> ⭐⭐⭐ Intermediário-Avançado</p>
+          <p>Implemente o Crivo de Eratóstenes para encontrar todos os números primos até N. Use comprehensions onde possível. Compare a performance com verificação ingênua.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>import time
+
+def primos_ingenuo(limite):
+    """Método ingênuo: testa cada número individualmente. O(n√n)"""
+    primos = []
+    for n in range(2, limite + 1):
+        eh_primo = True
+        for i in range(2, int(n**0.5) + 1):
+            if n % i == 0:
+                eh_primo = False
+                break
+        if eh_primo:
+            primos.append(n)
+    return primos
+
+def crivo_eratostenes(limite):
+    """Crivo de Eratóstenes: elimina múltiplos progressivamente. O(n log log n)"""
+    if limite < 2:
+        return []
+
+    # Criar lista de booleanos (True = possivelmente primo)
+    eh_primo = [True] * (limite + 1)
+    eh_primo[0] = eh_primo[1] = False  # 0 e 1 não são primos
+
+    # Para cada número primo encontrado, marcar seus múltiplos como não-primo
+    for i in range(2, int(limite**0.5) + 1):
+        if eh_primo[i]:
+            # Marcar todos os múltiplos de i como não-primo
+            # Começar de i² (múltiplos menores já foram marcados)
+            for multiplo in range(i * i, limite + 1, i):
+                eh_primo[multiplo] = False
+
+    # Extrair os primos (comprehension!)
+    return [n for n in range(2, limite + 1) if eh_primo[n]]
+
+def crivo_comprehension(limite):
+    """Versão mais concisa com set comprehension."""
+    nao_primos = {j for i in range(2, int(limite**0.5) + 1) for j in range(i*i, limite+1, i)}
+    return [n for n in range(2, limite + 1) if n not in nao_primos]
+
+# Testar corretude
+limite = 50
+print(f"Primos até {limite}: {crivo_eratostenes(limite)}")
+
+# Comparar performance
+limite = 100_000
+print(f"\nComparando performance (primos até {limite:,}):")
+
+inicio = time.perf_counter()
+p1 = primos_ingenuo(limite)
+t1 = time.perf_counter() - inicio
+print(f"  Ingênuo:     {t1:.4f}s — {len(p1):,} primos encontrados")
+
+inicio = time.perf_counter()
+p2 = crivo_eratostenes(limite)
+t2 = time.perf_counter() - inicio
+print(f"  Crivo:       {t2:.4f}s — {len(p2):,} primos encontrados")
+
+print(f"\n  Crivo é {t1/t2:.1f}x mais rápido!")
+print(f"  Resultados iguais: {p1 == p2}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 8 — Sistema de Votação com Validação (while + dict + try/except)</h3>
+          <p><strong>Nível:</strong> ⭐⭐ Intermediário</p>
+          <p>Crie um sistema de votação onde: candidatos são definidos em um dicionário, o usuário vota digitando o número do candidato, votos inválidos são contados separadamente, e ao final mostre o resultado com percentuais e gráfico de barras em ASCII.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>def sistema_votacao():
+    """Sistema de votação com validação e relatório visual."""
+    candidatos = {
+        1: {"nome": "Python", "votos": 0},
+        2: {"nome": "JavaScript", "votos": 0},
+        3: {"nome": "Go", "votos": 0},
+        4: {"nome": "Rust", "votos": 0},
+        5: {"nome": "TypeScript", "votos": 0},
+    }
+    votos_nulos = 0
+    votos_branco = 0
+
+    print("╔══════════════════════════════════════╗")
+    print("║  🗳️  VOTAÇÃO: Linguagem Favorita    ║")
+    print("╚══════════════════════════════════════╝\n")
+
+    print("Candidatos:")
+    for num, info in candidatos.items():
+        print(f"  {num}. {info['nome']}")
+    print("  0. Voto em branco")
+    print("  'fim' para encerrar votação\n")
+
+    # Loop de votação
+    total_votos = 0
+    while True:
+        voto = input(f"Voto #{total_votos + 1}: ").strip().lower()
+
+        if voto == "fim":
+            if total_votos == 0:
+                print("❌ Nenhum voto registrado!")
+                continue
+            break
+
+        try:
+            num_voto = int(voto)
+        except ValueError:
+            votos_nulos += 1
+            total_votos += 1
+            print("  ⚠️ Voto NULO (entrada inválida)")
+            continue
+
+        if num_voto == 0:
+            votos_branco += 1
+            total_votos += 1
+            print("  ⬜ Voto em BRANCO registrado")
+        elif num_voto in candidatos:
+            candidatos[num_voto]["votos"] += 1
+            total_votos += 1
+            print(f"  ✅ Voto para {candidatos[num_voto]['nome']} registrado")
+        else:
+            votos_nulos += 1
+            total_votos += 1
+            print(f"  ⚠️ Voto NULO (candidato {num_voto} não existe)")
+
+    # Relatório final
+    print(f"\n{'═' * 50}")
+    print(f"📊 RESULTADO FINAL — {total_votos} votos")
+    print(f"{'═' * 50}\n")
+
+    # Ordenar por votos (maior primeiro)
+    ranking = sorted(candidatos.values(), key=lambda c: c["votos"], reverse=True)
+
+    votos_validos = total_votos - votos_nulos - votos_branco
+    max_votos = max(c["votos"] for c in ranking) if ranking else 1
+
+    for i, cand in enumerate(ranking, 1):
+        pct = (cand["votos"] / votos_validos * 100) if votos_validos > 0 else 0
+        barra_tamanho = int(cand["votos"] / max(max_votos, 1) * 20)
+        barra = "█" * barra_tamanho + "░" * (20 - barra_tamanho)
+        medalha = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else "  "
+        print(f"  {medalha} {cand['nome']:12} {barra} {cand['votos']:3} votos ({pct:.1f}%)")
+
+    print(f"\n  ⬜ Brancos: {votos_branco} ({votos_branco/total_votos*100:.1f}%)")
+    print(f"  ❌ Nulos:  {votos_nulos} ({votos_nulos/total_votos*100:.1f}%)")
+    print(f"  📋 Total:  {total_votos}")
+
+    # Vencedor
+    if ranking[0]["votos"] > 0:
+        print(f"\n  🏆 VENCEDOR: {ranking[0]['nome']}!")
+
+sistema_votacao()</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 9 — Parser de Logs com Comprehensions e Pattern Matching</h3>
+          <p><strong>Nível:</strong> ⭐⭐⭐ Avançado</p>
+          <p>Crie um programa que processa linhas de log no formato "TIMESTAMP LEVEL MESSAGE", extrai informações usando split e pattern matching, agrupa por nível, e gera um relatório resumido. Use comprehensions para transformações e generators para processamento eficiente.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>from collections import Counter, defaultdict
+from datetime import datetime
+
+# Simulação de log de aplicação
+LOG_ENTRIES = """
+2026-01-15 08:00:01 INFO  Application started successfully
+2026-01-15 08:00:02 INFO  Database connection pool created (size=10)
+2026-01-15 08:01:15 WARNING Memory usage above 70% (current: 73%)
+2026-01-15 08:05:30 ERROR Connection timeout to redis-cache:6379
+2026-01-15 08:05:31 ERROR Retry 1/3 failed for redis-cache
+2026-01-15 08:05:35 ERROR Retry 2/3 failed for redis-cache
+2026-01-15 08:05:40 INFO  Retry 3/3 succeeded for redis-cache
+2026-01-15 08:10:00 INFO  Health check: all services operational
+2026-01-15 08:15:22 WARNING Slow query detected (duration: 2.3s)
+2026-01-15 08:20:45 ERROR Unhandled exception in /api/users endpoint
+2026-01-15 08:20:46 ERROR Stack trace: NullPointerException at line 42
+2026-01-15 08:25:00 INFO  Auto-scaling triggered: 2 -> 3 instances
+2026-01-15 08:30:00 INFO  Metrics exported to CloudWatch
+2026-01-15 08:35:10 WARNING Disk usage at 85% on /var/log
+2026-01-15 08:40:00 INFO  Scheduled backup completed
+2026-01-15 08:45:55 ERROR SSL certificate expires in 7 days
+2026-01-15 08:50:00 INFO  Cache hit ratio: 94.2%
+2026-01-15 08:55:30 WARNING API rate limit approaching (90%)
+2026-01-15 09:00:00 INFO  Hourly report generated
+""".strip()
+
+def parse_log_line(linha):
+    """Parseia uma linha de log e retorna dict estruturado."""
+    partes = linha.split(maxsplit=3)
+    if len(partes) < 4:
+        return None
+    return {
+        "data": partes[0],
+        "hora": partes[1],
+        "nivel": partes[2],
+        "mensagem": partes[3]
+    }
+
+def analisar_logs(texto_log):
+    """Análise completa de logs com comprehensions e generators."""
+    # Parsear todas as linhas (generator + filter None)
+    linhas = texto_log.split("\n")
+    entries = [e for e in (parse_log_line(l) for l in linhas) if e]
+
+    print(f"📋 Total de entradas: {len(entries)}\n")
+
+    # Contar por nível (Counter)
+    niveis = Counter(e["nivel"] for e in entries)
+    print("📊 Distribuição por nível:")
+    for nivel, qtd in niveis.most_common():
+        emoji = {"INFO": "ℹ️", "WARNING": "⚠️", "ERROR": "❌"}.get(nivel, "❓")
+        barra = "█" * (qtd * 2)
+        print(f"  {emoji} {nivel:8} {barra} ({qtd})")
+
+    # Erros agrupados (dict comprehension + filter)
+    erros = [e for e in entries if e["nivel"] == "ERROR"]
+    print(f"\n🚨 ERROS DETALHADOS ({len(erros)}):")
+    for erro in erros:
+        print(f"  [{erro['hora']}] {erro['mensagem']}")
+
+    # Warnings
+    warnings = [e for e in entries if e["nivel"] == "WARNING"]
+    print(f"\n⚠️ WARNINGS ({len(warnings)}):")
+    for w in warnings:
+        print(f"  [{w['hora']}] {w['mensagem']}")
+
+    # Timeline (primeiro e último evento)
+    print(f"\n⏱️ Timeline:")
+    print(f"  Início: {entries[0]['hora']}")
+    print(f"  Fim:    {entries[-1]['hora']}")
+
+    # Análise de padrões
+    retry_entries = [e for e in entries if "retry" in e["mensagem"].lower()]
+    timeout_entries = [e for e in entries if "timeout" in e["mensagem"].lower()]
+    print(f"\n🔍 Padrões detectados:")
+    print(f"  Retries: {len(retry_entries)}")
+    print(f"  Timeouts: {len(timeout_entries)}")
+
+    # Score de saúde
+    score = 100 - (len(erros) * 10) - (len(warnings) * 5)
+    score = max(0, min(100, score))
+    emoji_score = "🟢" if score >= 80 else "🟡" if score >= 50 else "🔴"
+    print(f"\n{emoji_score} Health Score: {score}/100")
+
+analisar_logs(LOG_ENTRIES)</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 10 — Simulador de Deploy Pipeline (Projeto Integrador)</h3>
+          <p><strong>Nível:</strong> ⭐⭐⭐⭐ Avançado</p>
+          <p>Crie um simulador de pipeline de deploy que executa etapas sequenciais (lint, test, build, deploy). Cada etapa pode falhar aleatoriamente. Implemente retry com backoff, timeout, logging estruturado e relatório final. Use todos os conceitos do módulo: condicionais, loops, comprehensions, generators, try/except e match-case.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>import random
+import time
+from datetime import datetime
+
+class PipelineSimulator:
+    """Simulador de CI/CD Pipeline com todos os conceitos do módulo."""
+
+    def __init__(self, projeto="cloudtrilhas-api"):
+        self.projeto = projeto
+        self.logs = []
+        self.resultados = {}
+        self.inicio = None
+        self.fim = None
+
+    def log(self, nivel, mensagem):
+        """Registra log com timestamp."""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        entrada = {"timestamp": timestamp, "nivel": nivel, "msg": mensagem}
+        self.logs.append(entrada)
+        emoji = {"INFO": "ℹ️", "SUCCESS": "✅", "ERROR": "❌",
+                 "WARNING": "⚠️", "STEP": "🔧"}.get(nivel, "•")
+        print(f"  [{timestamp}] {emoji} {mensagem}")
+
+    def executar_etapa(self, nome, chance_sucesso=0.7, max_retries=3):
+        """Executa uma etapa com retry e backoff exponencial."""
+        self.log("STEP", f"Iniciando etapa: {nome.upper()}")
+
+        for tentativa in range(1, max_retries + 1):
+            # Simular execução (com chance de falha)
+            time.sleep(0.3)  # Simular trabalho
+            sucesso = random.random() < chance_sucesso
+
+            if sucesso:
+                duracao = round(random.uniform(0.5, 3.0), 2)
+                self.log("SUCCESS", f"{nome} concluído em {duracao}s")
+                return {"status": "success", "duracao": duracao, "tentativas": tentativa}
+            else:
+                if tentativa < max_retries:
+                    espera = 2 ** tentativa
+                    self.log("WARNING", f"{nome} falhou (tentativa {tentativa}/{max_retries}) — retry em {espera}s")
+                    time.sleep(0.2)  # Simular espera
+                else:
+                    self.log("ERROR", f"{nome} FALHOU após {max_retries} tentativas!")
+                    return {"status": "failed", "duracao": 0, "tentativas": tentativa}
+
+    def executar_pipeline(self):
+        """Executa o pipeline completo."""
+        self.inicio = datetime.now()
+
+        print(f"\n{'═' * 55}")
+        print(f"  🚀 PIPELINE: {self.projeto}")
+        print(f"  📅 {self.inicio.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"{'═' * 55}\n")
+
+        # Definir etapas com suas chances de sucesso
+        etapas = [
+            ("lint", 0.95),        # Lint raramente falha
+            ("unit-tests", 0.85),  # Testes podem falhar
+            ("build", 0.90),       # Build geralmente funciona
+            ("integration-tests", 0.75),  # Integração é mais instável
+            ("security-scan", 0.92),
+            ("deploy-staging", 0.80),
+            ("smoke-tests", 0.88),
+            ("deploy-production", 0.85),
+        ]
+
+        pipeline_ok = True
+        for nome, chance in etapas:
+            resultado = self.executar_etapa(nome, chance_sucesso=chance)
+            self.resultados[nome] = resultado
+
+            # Se falhou, decidir se continua ou para
+            match resultado["status"]:
+                case "failed":
+                    pipeline_ok = False
+                    self.log("ERROR", f"Pipeline ABORTADO na etapa '{nome}'")
+                    break
+                case "success":
+                    pass  # Continua para próxima etapa
+
+        self.fim = datetime.now()
+        self._gerar_relatorio(pipeline_ok)
+        return pipeline_ok
+
+    def _gerar_relatorio(self, sucesso):
+        """Gera relatório final do pipeline."""
+        duracao_total = (self.fim - self.inicio).total_seconds()
+
+        print(f"\n{'═' * 55}")
+        print(f"  📊 RELATÓRIO DO PIPELINE")
+        print(f"{'═' * 55}\n")
+
+        # Status final
+        status_emoji = "✅ SUCESSO" if sucesso else "❌ FALHOU"
+        print(f"  Status: {status_emoji}")
+        print(f"  Duração total: {duracao_total:.2f}s")
+        print(f"  Etapas executadas: {len(self.resultados)}")
+
+        # Detalhes por etapa
+        print(f"\n  {'Etapa':<20} {'Status':<10} {'Duração':<10} {'Tentativas'}")
+        print(f"  {'─' * 55}")
+
+        for etapa, res in self.resultados.items():
+            status_icon = "✅" if res["status"] == "success" else "❌"
+            print(f"  {etapa:<20} {status_icon:<10} {res['duracao']:<10.2f}s {res['tentativas']}")
+
+        # Estatísticas com comprehensions
+        etapas_ok = sum(1 for r in self.resultados.values() if r["status"] == "success")
+        etapas_fail = sum(1 for r in self.resultados.values() if r["status"] == "failed")
+        total_retries = sum(r["tentativas"] - 1 for r in self.resultados.values())
+        duracao_etapas = sum(r["duracao"] for r in self.resultados.values())
+
+        print(f"\n  📈 Estatísticas:")
+        print(f"     Etapas OK: {etapas_ok}")
+        print(f"     Etapas FAIL: {etapas_fail}")
+        print(f"     Total retries: {total_retries}")
+        print(f"     Tempo em etapas: {duracao_etapas:.2f}s")
+
+        # Contagem de logs por nível
+        niveis_log = Counter(l["nivel"] for l in self.logs)
+        print(f"\n  📋 Logs: {dict(niveis_log)}")
+
+# Executar simulação
+pipeline = PipelineSimulator("cloudtrilhas-api")
+resultado = pipeline.executar_pipeline()
+
+# Decisão final
+if resultado:
+    print("\n  🎉 Deploy realizado com sucesso!")
+else:
+    print("\n  💀 Deploy falhou — investigar e corrigir antes de novo attempt")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 11 — Jogo da Velha (Tic-Tac-Toe) — Desafio Bônus</h3>
+          <p><strong>Nível:</strong> ⭐⭐⭐⭐ Avançado</p>
+          <p>Implemente um jogo da velha completo para 2 jogadores no terminal. Use uma matriz 3x3, valide jogadas, detecte vitória (linhas, colunas, diagonais) e empate. Permita jogar múltiplas partidas com placar acumulado.</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>def jogo_da_velha():
+    """Jogo da Velha completo para 2 jogadores."""
+
+    placar = {"X": 0, "O": 0, "Empate": 0}
+
+    def criar_tabuleiro():
+        return [[" " for _ in range(3)] for _ in range(3)]
+
+    def exibir_tabuleiro(tab):
+        print("\n       1   2   3")
+        print("     ┌───┬───┬───┐")
+        for i, linha in enumerate(tab):
+            celulas = " │ ".join(
+                f"\033[91m{c}\033[0m" if c == "X" else
+                f"\033[94m{c}\033[0m" if c == "O" else
+                c for c in linha
+            )
+            print(f"  {i+1}  │ {celulas} │")
+            if i < 2:
+                print("     ├───┼───┼───┤")
+        print("     └───┴───┴───┘")
+
+    def verificar_vitoria(tab, jogador):
+        # Verificar linhas
+        for linha in tab:
+            if all(c == jogador for c in linha):
+                return True
+        # Verificar colunas
+        for col in range(3):
+            if all(tab[linha][col] == jogador for linha in range(3)):
+                return True
+        # Verificar diagonais
+        if all(tab[i][i] == jogador for i in range(3)):
+            return True
+        if all(tab[i][2-i] == jogador for i in range(3)):
+            return True
+        return False
+
+    def tabuleiro_cheio(tab):
+        return all(tab[i][j] != " " for i in range(3) for j in range(3))
+
+    def obter_jogada(tab, jogador):
+        while True:
+            try:
+                entrada = input(f"  Jogador {jogador}, sua vez (linha coluna): ").strip()
+                if entrada.lower() == "sair":
+                    return None
+                partes = entrada.split()
+                if len(partes) != 2:
+                    print("  ❌ Digite: linha coluna (ex: 1 2)")
+                    continue
+                linha, col = int(partes[0]) - 1, int(partes[1]) - 1
+                if not (0 <= linha <= 2 and 0 <= col <= 2):
+                    print("  ❌ Posição fora do tabuleiro (use 1-3)")
+                    continue
+                if tab[linha][col] != " ":
+                    print("  ❌ Posição já ocupada!")
+                    continue
+                return (linha, col)
+            except ValueError:
+                print("  ❌ Digite números válidos!")
+
+    # Loop de partidas
+    print("\n🎮 JOGO DA VELHA — CloudTrilhas Edition\n")
+    print("Instruções: digite 'linha coluna' (1-3). Ex: 2 1")
+    print("Digite 'sair' para encerrar.\n")
+
+    partida = 0
+    while True:
+        partida += 1
+        print(f"\n{'═' * 35}")
+        print(f"  Partida #{partida} | Placar: X={placar['X']} O={placar['O']} E={placar['Empate']}")
+        print(f"{'═' * 35}")
+
+        tab = criar_tabuleiro()
+        jogador_atual = "X"
+
+        while True:
+            exibir_tabuleiro(tab)
+            jogada = obter_jogada(tab, jogador_atual)
+
+            if jogada is None:
+                print("\n👋 Jogo encerrado!")
+                print(f"Placar final: X={placar['X']} | O={placar['O']} | Empates={placar['Empate']}")
+                return
+
+            linha, col = jogada
+            tab[linha][col] = jogador_atual
+
+            if verificar_vitoria(tab, jogador_atual):
+                exibir_tabuleiro(tab)
+                print(f"\n  🏆 Jogador {jogador_atual} VENCEU!")
+                placar[jogador_atual] += 1
+                break
+            elif tabuleiro_cheio(tab):
+                exibir_tabuleiro(tab)
+                print("\n  🤝 EMPATE!")
+                placar["Empate"] += 1
+                break
+            else:
+                jogador_atual = "O" if jogador_atual == "X" else "X"
+
+        # Perguntar se quer jogar novamente
+        novamente = input("\n  Jogar novamente? (s/n): ").strip().lower()
+        if novamente != "s":
+            print(f"\n📊 Placar final: X={placar['X']} | O={placar['O']} | Empates={placar['Empate']}")
+            print("👋 Até a próxima!")
+            break
+
+jogo_da_velha()</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 12 — Conversor de Unidades com match-case (Python 3.10+)</h3>
+          <p><strong>Nível:</strong> ⭐⭐ Intermediário</p>
+          <p>Crie um conversor de unidades usando match-case que suporte: temperatura (°C ↔ °F ↔ K), distância (km ↔ mi ↔ m), peso (kg ↔ lb ↔ oz) e dados (B ↔ KB ↔ MB ↔ GB ↔ TB).</p>
+
+          <details>
+            <summary>💡 Ver Solução</summary>
+            <div class="command-card wide">
+              <pre><code>def converter_unidade(valor, de, para):
+    """
+    Conversor universal usando match-case.
+    Suporta temperatura, distância, peso e dados.
+    """
+    # Normalizar input
+    de = de.lower().strip()
+    para = para.lower().strip()
+
+    if de == para:
+        return valor
+
+    match (de, para):
+        # ═══ TEMPERATURA ═══
+        case ("c", "f"):
+            return valor * 9/5 + 32
+        case ("f", "c"):
+            return (valor - 32) * 5/9
+        case ("c", "k"):
+            return valor + 273.15
+        case ("k", "c"):
+            return valor - 273.15
+        case ("f", "k"):
+            return (valor - 32) * 5/9 + 273.15
+        case ("k", "f"):
+            return (valor - 273.15) * 9/5 + 32
+
+        # ═══ DISTÂNCIA ═══
+        case ("km", "mi"):
+            return valor * 0.621371
+        case ("mi", "km"):
+            return valor * 1.60934
+        case ("km", "m"):
+            return valor * 1000
+        case ("m", "km"):
+            return valor / 1000
+        case ("mi", "m"):
+            return valor * 1609.34
+        case ("m", "mi"):
+            return valor / 1609.34
+
+        # ═══ PESO ═══
+        case ("kg", "lb"):
+            return valor * 2.20462
+        case ("lb", "kg"):
+            return valor * 0.453592
+        case ("kg", "oz"):
+            return valor * 35.274
+        case ("oz", "kg"):
+            return valor / 35.274
+        case ("lb", "oz"):
+            return valor * 16
+        case ("oz", "lb"):
+            return valor / 16
+
+        # ═══ DADOS (bytes) ═══
+        case ("b", "kb") | ("kb", "mb") | ("mb", "gb") | ("gb", "tb"):
+            return valor / 1024
+        case ("kb", "b") | ("mb", "kb") | ("gb", "mb") | ("tb", "gb"):
+            return valor * 1024
+        case ("b", "mb"):
+            return valor / (1024 ** 2)
+        case ("b", "gb"):
+            return valor / (1024 ** 3)
+        case ("gb", "b"):
+            return valor * (1024 ** 3)
+        case ("mb", "gb"):
+            return valor / 1024
+        case ("gb", "tb"):
+            return valor / 1024
+        case ("tb", "gb"):
+            return valor * 1024
+
+        # ═══ NÃO SUPORTADO ═══
+        case _:
+            return None
+
+# Interface interativa
+def conversor_interativo():
+    print("\n🔄 CONVERSOR DE UNIDADES")
+    print("Unidades suportadas:")
+    print("  Temperatura: C, F, K")
+    print("  Distância: km, mi, m")
+    print("  Peso: kg, lb, oz")
+    print("  Dados: B, KB, MB, GB, TB")
+    print("  Digite 'sair' para encerrar\n")
+
+    while True:
+        try:
+            entrada = input("Converter (ex: 100 C F): ").strip()
+            if entrada.lower() == "sair":
+                break
+
+            partes = entrada.split()
+            if len(partes) != 3:
+                print("  ❌ Formato: VALOR UNIDADE_ORIGEM UNIDADE_DESTINO\n")
+                continue
+
+            valor = float(partes[0])
+            de = partes[1]
+            para = partes[2]
+
+            resultado = converter_unidade(valor, de, para)
+            if resultado is not None:
+                print(f"  ✅ {valor} {de.upper()} = {resultado:.4f} {para.upper()}\n")
+            else:
+                print(f"  ❌ Conversão de {de} para {para} não suportada\n")
+
+        except ValueError:
+            print("  ❌ Valor numérico inválido\n")
+
+conversor_interativo()</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="info-box highlight">
+          <h4>🎯 Desafios Extras para Praticar</h4>
+          <ul>
+            <li><strong>Desafio 1:</strong> Implemente um gerador de senhas aleatórias usando comprehensions (comprimento configurável, com/sem especiais)</li>
+            <li><strong>Desafio 2:</strong> Crie um programa que encontra anagramas de uma palavra em uma lista de palavras (use sorted + comprehension)</li>
+            <li><strong>Desafio 3:</strong> Implemente um "Caesar Cipher" (cifra de César) com encrypt/decrypt usando for e chr/ord</li>
+            <li><strong>Desafio 4:</strong> Crie um programa que valida endereços IP (IPv4) usando split, try/except e condicionais</li>
+            <li><strong>Desafio 5:</strong> Implemente o "Jogo da Forca" com dicas progressivas e banco de palavras temático (DevOps/Cloud)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <section class="learning-section">
       <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
         <a href="modulo-01.html" class="button secondary">← Módulo Anterior</a>
@@ -145,7 +4303,7 @@ while True:
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

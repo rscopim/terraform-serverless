@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Python Módulo 01: Fundamentos</title>
+  <meta name="description" content="Guia completo sobre fundamentos de Python: variáveis, tipos de dados, operadores, entrada/saída, f-strings, type hints e boas práticas." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -20,20 +21,16 @@
         <a href="../python.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,117 +39,4043 @@
       <div class="container training-hero-content">
         <span class="pill">🐍 Python — Módulo 01</span>
         <h1>Fundamentos: Variáveis, Tipos e Operadores</h1>
-        <p>Python é uma linguagem de alto nível, interpretada e com tipagem dinâmica. Ideal para automação, dados, web e IA.</p>
+        <p>Domine os alicerces da linguagem Python — desde a criação de variáveis até operações complexas com tipos de dados, operadores aritméticos e lógicos, entrada/saída formatada e as melhores práticas para escrever código limpo e profissional.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node active"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Controle</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Funções</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Dados</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Arquivos</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>POO</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Bibliotecas</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>APIs</small></a>
+        <a href="modulo-09.html" class="progress-node"><span>09</span><small>AWS boto3</small></a>
+        <a href="modulo-10.html" class="progress-node"><span>10</span><small>IA Bedrock</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1 — INTRODUÇÃO AO PYTHON
+    ════════════════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h3>1. Variáveis e Tipos de Dados</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Variáveis</code><span class="cmd-tag">Básico</span></div>
-              <p>Em Python, variáveis são criadas na atribuição. Não é necessário declarar tipo.</p>
-              <pre><code># Tipos primitivos
-nome = "Ricardo"          # str
-idade = 30                # int
-altura = 1.75             # float
-ativo = True              # bool
-nulo = None               # NoneType
-
-# Verificar tipo
-print(type(nome))         # &lt;class 'str'&gt;
-print(isinstance(idade, int))  # True</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>f-strings</code><span class="cmd-tag">Formatação</span></div>
-              <p>F-strings são a forma moderna e eficiente de formatar strings em Python 3.6+.</p>
-              <pre><code># f-strings (Python 3.6+)
-nome = "Ricardo"
-idade = 30
-print(f"Olá, {nome}! Você tem {idade} anos.")
-
-# Expressões dentro de f-strings
-preco = 49.90
-print(f"Preço: R${preco:.2f}")
-print(f"{'Python':^20}")      # centralizado
-print(f"{1024:_}")            # 1_024 (separador)</code></pre>
-            </div>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Introdução ao Python</h2>
+          <p>Conheça a linguagem de programação mais versátil e popular do mundo — sua história, filosofia, ecossistema e por que ela é a escolha ideal para quem está começando na área de tecnologia e DevOps/Cloud.</p>
         </div>
 
         <div class="topic-block">
-          <h3>2. Operadores</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Aritméticos</code><span class="cmd-tag">Operadores</span></div>
-              <pre><code>a, b = 10, 3
-print(a + b)    # 13
-print(a - b)    # 7
-print(a * b)    # 30
-print(a / b)    # 3.333...
-print(a // b)   # 3 (divisão inteira)
-print(a % b)    # 1 (módulo)
-print(a ** b)   # 1000 (potência)</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Comparação e Lógicos</code><span class="cmd-tag">Operadores</span></div>
-              <pre><code># Comparação
-x = 5
-print(x == 5)    # True
-print(x != 3)    # True
-print(x > 3)     # True
-print(x >= 5)    # True
+          <h3>1.1 — O que é Python?</h3>
+          <p>Python é uma <strong>linguagem de programação de alto nível</strong>, interpretada, de tipagem dinâmica e com gerenciamento automático de memória. Foi criada por <strong>Guido van Rossum</strong> e teve sua primeira versão pública lançada em <strong>1991</strong>.</p>
+          <p>O nome "Python" não vem da cobra — vem do grupo de comédia britânico <strong>Monty Python</strong>, do qual Guido era fã. Isso já diz muito sobre o espírito da linguagem: ela foi projetada para ser <strong>divertida de usar</strong> e <strong>fácil de ler</strong>.</p>
 
-# Lógicos
-print(x > 3 and x < 10)  # True
-print(x > 10 or x < 3)   # False
-print(not (x > 10))       # True</code></pre>
-            </div>
+          <div class="info-box highlight">
+            <h4>🎯 Características Fundamentais do Python</h4>
+            <ul>
+              <li><strong>Interpretada:</strong> O código é executado linha a linha, sem necessidade de compilação prévia</li>
+              <li><strong>Alto nível:</strong> Abstrai detalhes complexos do hardware (memória, registradores)</li>
+              <li><strong>Tipagem dinâmica:</strong> O tipo da variável é definido em tempo de execução</li>
+              <li><strong>Multiparadigma:</strong> Suporta programação procedural, orientada a objetos e funcional</li>
+              <li><strong>Multiplataforma:</strong> Funciona em Windows, Linux, macOS e muitos outros sistemas</li>
+              <li><strong>Código aberto:</strong> Licença PSF (Python Software Foundation) — livre para uso comercial</li>
+              <li><strong>Batteries included:</strong> Biblioteca padrão enorme com módulos para quase tudo</li>
+            </ul>
           </div>
+
+          <p>Python está presente em praticamente todas as áreas da tecnologia moderna:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Área</th><th>Uso do Python</th><th>Exemplos</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>DevOps/Cloud</td><td>Automação, IaC, scripts</td><td>boto3, Ansible, Fabric</td></tr>
+              <tr><td>Data Science</td><td>Análise de dados, ML</td><td>pandas, scikit-learn, numpy</td></tr>
+              <tr><td>Web</td><td>Backend, APIs</td><td>Django, Flask, FastAPI</td></tr>
+              <tr><td>Automação</td><td>Scripts, scraping</td><td>Selenium, BeautifulSoup</td></tr>
+              <tr><td>IA/ML</td><td>Redes neurais, NLP</td><td>TensorFlow, PyTorch, LangChain</td></tr>
+              <tr><td>Segurança</td><td>Pentest, análise</td><td>Scapy, Nmap scripts</td></tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="topic-block">
-          <h3>3. Entrada e Conversão de Tipos</h3>
+          <h3>1.2 — A Filosofia do Python (Zen of Python)</h3>
+          <p>O Python tem uma filosofia de design documentada que guia todas as decisões da linguagem. Para ver essa filosofia, basta digitar <code>import this</code> no interpretador Python:</p>
+
           <div class="command-card wide">
-            <div class="command-header"><code>input / casting</code><span class="cmd-tag">I/O</span></div>
-            <pre><code># Entrada do usuário (sempre retorna str)
-nome = input("Seu nome: ")
-idade = int(input("Sua idade: "))
-peso = float(input("Seu peso: "))
+            <h4>📋 O Zen do Python (traduzido)</h4>
+            <pre><code># No terminal Python, digite:
+>>> import this
 
-# Conversões (casting)
-numero_str = "42"
-numero_int = int(numero_str)      # 42
-numero_float = float(numero_str)  # 42.0
-texto = str(123)                  # "123"
-booleano = bool(1)                # True (0 = False)</code></pre>
+# Os princípios mais importantes:
+# 1. Bonito é melhor que feio.
+# 2. Explícito é melhor que implícito.
+# 3. Simples é melhor que complexo.
+# 4. Complexo é melhor que complicado.
+# 5. Plano é melhor que aglomerado.
+# 6. Esparso é melhor que denso.
+# 7. Legibilidade conta.
+# 8. Casos especiais não são especiais o bastante para quebrar as regras.
+# 9. Embora a praticidade vença a pureza.
+# 10. Erros nunca devem passar silenciosamente.
+# 11. A menos que sejam explicitamente silenciados.
+# 12. Diante da ambiguidade, recuse a tentação de adivinhar.
+# 13. Deve haver um — e preferencialmente apenas um — modo óbvio de fazer.
+# 14. Agora é melhor que nunca.
+# 15. Embora nunca frequentemente seja melhor que *agora mesmo*.
+# 16. Se a implementação é difícil de explicar, é uma má ideia.
+# 17. Se a implementação é fácil de explicar, pode ser uma boa ideia.
+# 18. Namespaces são uma grande ideia — vamos fazer mais desses!</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ O Princípio Mais Importante</h4>
+            <p><strong>"Legibilidade conta"</strong> — Em Python, código é lido muito mais vezes do que escrito. Por isso, a linguagem prioriza a clareza acima de tudo. Se você precisa escolher entre código "esperto" e código "claro", sempre escolha o claro.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 — Por que Python é tão Popular?</h3>
+          <p>Python consistentemente ocupa os primeiros lugares nos rankings de linguagens de programação (TIOBE, Stack Overflow Survey, GitHub Octoverse). Os motivos são claros:</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>📖 Curva de Aprendizado Suave</h4>
+              <p>A sintaxe do Python é quase como pseudocódigo em inglês. Comparando um "Hello World" em diferentes linguagens:</p>
+              <pre><code># Python
+print("Hello, World!")
+
+// Java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+
+// C
+#include &lt;stdio.h&gt;
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>🌐 Comunidade Gigantesca</h4>
+              <p>A comunidade Python é uma das mais ativas e acolhedoras do mundo:</p>
+              <ul>
+                <li><strong>PyPI:</strong> +500.000 pacotes disponíveis</li>
+                <li><strong>Stack Overflow:</strong> Milhões de perguntas respondidas</li>
+                <li><strong>GitHub:</strong> Linguagem #1 em repositórios</li>
+                <li><strong>Conferências:</strong> PyCon em dezenas de países</li>
+                <li><strong>Documentação:</strong> Exemplar e completa</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 — Python 2 vs Python 3</h3>
+          <p>Historicamente, Python teve duas versões principais coexistindo por anos. Mas desde <strong>1º de janeiro de 2020</strong>, o Python 2 foi oficialmente descontinuado (End of Life).</p>
+
+          <div class="info-box warning">
+            <h4>⚠️ Regra Absoluta</h4>
+            <p><strong>SEMPRE use Python 3.</strong> Python 2 está morto. Não há mais atualizações de segurança, correções de bugs ou suporte. Se você encontrar tutoriais usando <code>print "algo"</code> (sem parênteses), eles são de Python 2 — ignore-os ou adapte para Python 3.</p>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Característica</th><th>Python 2 (morto ☠️)</th><th>Python 3 (use este ✅)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Print</td><td><code>print "texto"</code></td><td><code>print("texto")</code></td></tr>
+              <tr><td>Divisão</td><td><code>3/2 = 1</code> (inteiro)</td><td><code>3/2 = 1.5</code> (float)</td></tr>
+              <tr><td>Strings</td><td>ASCII por padrão</td><td>Unicode por padrão</td></tr>
+              <tr><td>Input</td><td><code>raw_input()</code></td><td><code>input()</code></td></tr>
+              <tr><td>Range</td><td><code>range()</code> retorna lista</td><td><code>range()</code> retorna iterador</td></tr>
+              <tr><td>Suporte</td><td>Encerrado em 2020</td><td>Ativo — versão atual 3.12+</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 — Instalando Python</h3>
+          <p>Vamos instalar Python nos três principais sistemas operacionais. A versão recomendada é sempre a <strong>última estável</strong> (atualmente 3.12+).</p>
+
+          <div class="command-card wide">
+            <h4>📋 Instalação no Windows</h4>
+            <pre><code># Opção 1: Download direto
+# Acesse https://python.org/downloads
+# Baixe o instalador .exe
+# IMPORTANTE: Marque "Add Python to PATH" durante a instalação!
+
+# Opção 2: Via winget (Windows Package Manager)
+winget install Python.Python.3.12
+
+# Opção 3: Via chocolatey
+choco install python --version=3.12.0
+
+# Verificando a instalação:
+python --version
+# Python 3.12.x
+
+pip --version
+# pip 24.x from ... (python 3.12)</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Instalação no Linux (Ubuntu/Debian)</h4>
+            <pre><code># Python geralmente já vem instalado no Linux
+python3 --version
+
+# Se não estiver instalado ou quiser atualizar:
+sudo apt update
+sudo apt install python3 python3-pip python3-venv
+
+# Para instalar versões específicas (via deadsnakes PPA):
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.12 python3.12-venv python3.12-dev
+
+# Verificando:
+python3 --version
+pip3 --version
+
+# Dica: criar alias (adicione ao ~/.bashrc)
+alias python=python3
+alias pip=pip3</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Instalação no macOS</h4>
+            <pre><code># Opção 1: Via Homebrew (recomendado)
+brew install python@3.12
+
+# Opção 2: Download do python.org
+# Acesse https://python.org/downloads e baixe o .pkg
+
+# Verificando:
+python3 --version
+pip3 --version
+
+# No macOS, NUNCA use o Python do sistema (/usr/bin/python)
+# Sempre use o Python instalado via Homebrew ou pyenv</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.6 — Executando Python</h3>
+          <p>Existem várias formas de executar código Python. Cada uma tem seu uso ideal:</p>
+
+          <div class="command-card wide">
+            <h4>📋 Modo Interativo (REPL)</h4>
+            <pre><code># REPL = Read-Eval-Print Loop
+# Abra o terminal e digite:
+python3
+
+# Você verá algo como:
+Python 3.12.0 (main, Oct  2 2023, 00:00:00)
+[GCC 12.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+
+# Agora pode digitar comandos Python diretamente:
+>>> 2 + 2
+4
+>>> print("Olá, Python!")
+Olá, Python!
+>>> nome = "CloudTrilhas"
+>>> len(nome)
+12
+
+# Para sair:
+>>> exit()
+# ou Ctrl+D (Linux/Mac) / Ctrl+Z + Enter (Windows)</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Executando Scripts (.py)</h4>
+            <pre><code># Crie um arquivo chamado primeiro.py com seu editor favorito:
+# primeiro.py
+print("🐍 Meu primeiro programa Python!")
+print("Estou aprendendo na CloudTrilhas!")
+
+nome = "Estudante"
+print(f"Bem-vindo(a), {nome}!")
+
+# Execute no terminal:
+python3 primeiro.py
+
+# Saída:
+# 🐍 Meu primeiro programa Python!
+# Estou aprendendo na CloudTrilhas!
+# Bem-vindo(a), Estudante!</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Dica: Shebang Line (Linux/Mac)</h4>
+            <p>No início de scripts Python em sistemas Unix, adicione a "shebang line" para poder executar diretamente:</p>
+            <pre><code>#!/usr/bin/env python3
+# Agora o script pode ser executado com: ./meu_script.py
+# (após dar permissão: chmod +x meu_script.py)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.7 — O Interpretador Python e Arquivos .pyc</h3>
+          <p>Quando você executa um script Python, o seguinte processo acontece nos bastidores:</p>
+
+          <div class="info-box highlight">
+            <h4>🔄 Fluxo de Execução do Python</h4>
+            <ol>
+              <li><strong>Código-fonte (.py)</strong> → Você escreve seu código em texto legível</li>
+              <li><strong>Compilação para bytecode (.pyc)</strong> → Python compila para bytecode (automático)</li>
+              <li><strong>Python Virtual Machine (PVM)</strong> → O bytecode é executado pela PVM</li>
+            </ol>
+            <p>Os arquivos <code>.pyc</code> ficam na pasta <code>__pycache__/</code> e servem como cache para acelerar execuções futuras. Você <strong>nunca</strong> precisa se preocupar com eles — o Python gerencia automaticamente.</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Entendendo o __pycache__</h4>
+            <pre><code># Estrutura após executar um módulo:
+projeto/
+├── meu_modulo.py
+├── __pycache__/
+│   └── meu_modulo.cpython-312.pyc    # Cache de bytecode
+└── main.py
+
+# O .pyc é gerado automaticamente ao importar um módulo
+# Ele NÃO é gerado para o script principal (o que você executa diretamente)
+
+# Você pode desabilitar a geração de .pyc:
+python3 -B meu_script.py
+
+# Ou via variável de ambiente:
+export PYTHONDONTWRITEBYTECODE=1
+
+# IMPORTANTE: Sempre adicione __pycache__/ ao seu .gitignore!</code></pre>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- Navigation -->
-    <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="../python.html" class="button secondary">← Voltar ao Curso</a>
-        <a href="modulo-02.html" class="button primary">Próximo Módulo →</a>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2 — VARIÁVEIS E ATRIBUIÇÃO
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Variáveis e Atribuição</h2>
+          <p>Entenda como Python armazena e gerencia dados na memória — variáveis não são "caixas" que guardam valores, são "etiquetas" que apontam para objetos na memória.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — O Conceito de Variável em Python</h3>
+          <p>Em muitas linguagens, variáveis são como <strong>caixas</strong> que armazenam valores dentro delas. Em Python, o modelo mental correto é diferente: variáveis são <strong>etiquetas (labels)</strong> que você cola em objetos na memória.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>❌ Modelo Mental Errado (Caixa)</h4>
+              <pre><code># Pensar assim está ERRADO:
+# x é uma caixa que contém 42
+x = 42
+# Agora "42" está DENTRO de x
+
+# Problema deste modelo:
+# Não explica por que:
+y = x
+# y e x parecem independentes
+# mas na verdade apontam para
+# o MESMO objeto!</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>✅ Modelo Mental Correto (Etiqueta)</h4>
+              <pre><code># Pensar assim está CORRETO:
+# x é uma etiqueta colada no objeto 42
+x = 42
+# O objeto 42 existe na memória
+# x é apenas um nome que aponta para ele
+
+# Isso explica perfeitamente:
+y = x
+# Agora tanto x quanto y são etiquetas
+# coladas no MESMO objeto 42
+# Não há cópia! É o mesmo objeto.</code></pre>
+            </div>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Comprovando com id() — O Endereço de Memória</h4>
+            <pre><code># A função id() retorna o endereço de memória do objeto
+>>> x = 42
+>>> y = x
+>>> id(x)
+140234567890  # endereço de memória (varia a cada execução)
+>>> id(y)
+140234567890  # MESMO endereço! x e y apontam para o mesmo objeto
+
+>>> x = 100  # Agora x aponta para um NOVO objeto (100)
+>>> id(x)
+140234567999  # endereço diferente!
+>>> id(y)
+140234567890  # y ainda aponta para 42
+
+# Isso é fundamental para entender Python:
+# Reatribuição (x = 100) não modifica o objeto 42
+# Ela faz x apontar para um objeto DIFERENTE</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Regras para Nomes de Variáveis</h3>
+          <p>Python tem regras rígidas para nomes de variáveis (identificadores). Violar essas regras causa <code>SyntaxError</code>.</p>
+
+          <div class="info-box highlight">
+            <h4>📏 Regras Obrigatórias (SyntaxError se violadas)</h4>
+            <ul>
+              <li>Deve começar com <strong>letra</strong> (a-z, A-Z) ou <strong>underscore</strong> (_)</li>
+              <li>Pode conter letras, números (0-9) e underscores após o primeiro caractere</li>
+              <li><strong>Não pode</strong> começar com número</li>
+              <li><strong>Não pode</strong> conter espaços ou caracteres especiais (@, #, $, etc.)</li>
+              <li><strong>Não pode</strong> ser uma palavra reservada do Python</li>
+              <li>É <strong>case-sensitive</strong>: <code>nome</code>, <code>Nome</code> e <code>NOME</code> são variáveis DIFERENTES</li>
+            </ul>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplos de Nomes Válidos e Inválidos</h4>
+            <pre><code># ✅ NOMES VÁLIDOS
+nome = "João"
+idade_usuario = 25
+_variavel_privada = "interno"
+__dunder = "especial"
+camelCase = "funciona, mas não é pythônico"
+nome2 = "ok, pode ter número depois"
+CONSTANTE = 3.14
+_1 = "começa com underscore, ok"
+
+# ❌ NOMES INVÁLIDOS (causam SyntaxError)
+2nome = "erro"          # Começa com número
+meu-nome = "erro"       # Hífen não é permitido
+meu nome = "erro"       # Espaço não é permitido
+class = "erro"          # Palavra reservada
+import = "erro"         # Palavra reservada
+@email = "erro"         # Caractere especial</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Palavras Reservadas do Python (35 no total)</h4>
+            <pre><code># Para ver todas as palavras reservadas:
+>>> import keyword
+>>> print(keyword.kwlist)
+
+# Lista completa (Python 3.12):
+# False      await      else       import     pass
+# None       break      except     in         raise
+# True       class      finally    is         return
+# and        continue   for        lambda     try
+# as         def        from       nonlocal   while
+# assert     del        global     not        with
+# async      elif       if         or         yield
+
+# Essas palavras NÃO podem ser usadas como nomes de variáveis!</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🐍 Convenção Python: snake_case</h4>
+            <p>A convenção oficial do Python (PEP 8) define:</p>
+            <ul>
+              <li><strong>Variáveis e funções:</strong> <code>snake_case</code> — letras minúsculas separadas por underscore</li>
+              <li><strong>Classes:</strong> <code>CamelCase</code> (PascalCase) — cada palavra com inicial maiúscula</li>
+              <li><strong>Constantes:</strong> <code>UPPER_SNAKE_CASE</code> — tudo maiúsculo</li>
+              <li><strong>Privadas:</strong> <code>_prefixo_underscore</code> — indica uso interno</li>
+              <li><strong>Dunder (magic):</strong> <code>__duplo_underscore__</code> — métodos especiais do Python</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Atribuição Simples e Múltipla</h3>
+          <p>Python oferece várias formas de atribuir valores a variáveis, incluindo formas elegantes que economizam linhas de código.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Formas de Atribuição</h4>
+            <pre><code># Atribuição simples
+nome = "Maria"
+idade = 30
+salario = 8500.50
+
+# Atribuição múltipla (desempacotamento)
+# Atribui múltiplos valores em uma única linha
+x, y, z = 1, 2, 3
+print(x)  # 1
+print(y)  # 2
+print(z)  # 3
+
+# Atribuição múltipla com tipos diferentes
+nome, idade, ativo = "Carlos", 28, True
+
+# Mesmo valor para múltiplas variáveis
+a = b = c = 0
+print(a, b, c)  # 0 0 0
+
+# Desempacotamento de listas/tuplas
+coordenadas = (10.5, 20.3)
+latitude, longitude = coordenadas
+print(latitude)   # 10.5
+print(longitude)  # 20.3
+
+# Desempacotamento com * (coletar restante)
+primeiro, *meio, ultimo = [1, 2, 3, 4, 5]
+print(primeiro)  # 1
+print(meio)      # [2, 3, 4]
+print(ultimo)    # 5</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Swap (Troca de Valores) — Jeito Pythônico</h4>
+            <pre><code># Em outras linguagens, trocar valores requer variável temporária:
+# temp = a
+# a = b
+# b = temp
+
+# Em Python, é MUITO mais elegante:
+a = "primeiro"
+b = "segundo"
+
+a, b = b, a  # Swap em uma linha!
+
+print(a)  # "segundo"
+print(b)  # "primeiro"
+
+# Funciona porque Python avalia o lado direito INTEIRO
+# antes de fazer as atribuições do lado esquerdo
+
+# Swap com três variáveis:
+x, y, z = 1, 2, 3
+x, y, z = z, x, y
+print(x, y, z)  # 3 1 2</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — Tipagem Dinâmica</h3>
+          <p>Python usa <strong>tipagem dinâmica</strong>, o que significa que o tipo de uma variável é determinado automaticamente pelo valor atribuído a ela — e pode mudar durante a execução do programa.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Tipagem Dinâmica em Ação</h4>
+            <pre><code># A mesma variável pode apontar para tipos diferentes
+x = 42          # x é int
+print(type(x))  # &lt;class 'int'&gt;
+
+x = "texto"     # Agora x é str (sem erro!)
+print(type(x))  # &lt;class 'str'&gt;
+
+x = [1, 2, 3]   # Agora x é list
+print(type(x))  # &lt;class 'list'&gt;
+
+x = True        # Agora x é bool
+print(type(x))  # &lt;class 'bool'&gt;
+
+# Isso é DIFERENTE de linguagens com tipagem estática:
+# Em Java/C#: int x = 42; x = "texto";  ← ERRO!
+# Em Python:  x = 42;     x = "texto";  ← OK!
+
+# CUIDADO: Tipagem dinâmica dá liberdade, mas pode causar bugs
+# Use Type Hints (Seção 7) para deixar o código mais seguro</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Tipagem Dinâmica ≠ Tipagem Fraca</h4>
+            <p>Python é <strong>dinamicamente tipado</strong> (o tipo pode mudar) mas <strong>fortemente tipado</strong> (não faz conversões implícitas perigosas):</p>
+            <pre><code># Python NÃO converte implicitamente:
+>>> "idade: " + 25
+TypeError: can only concatenate str (not "int") to str
+
+# Você PRECISA converter explicitamente:
+>>> "idade: " + str(25)
+'idade: 25'
+
+# JavaScript (tipagem FRACA) faria: "idade: " + 25 → "idade: 25" (conversão implícita)
+# Python RECUSA fazer isso — é mais seguro!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 — Constantes e o Statement del</h3>
+          <p>Python <strong>não possui constantes reais</strong> (como <code>const</code> em JavaScript ou <code>final</code> em Java). A convenção é usar <strong>LETRAS MAIÚSCULAS</strong> para indicar que um valor não deve ser alterado.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Constantes por Convenção</h4>
+            <pre><code># Constantes (CONVENÇÃO — nada impede a alteração)
+PI = 3.14159265358979
+VELOCIDADE_LUZ = 299_792_458  # metros/segundo
+MAX_CONEXOES = 100
+URL_BASE = "https://api.cloudtrilhas.com"
+VERSAO = "1.0.0"
+
+# Python permite underscores em números para legibilidade:
+POPULACAO_BRASIL = 215_000_000  # 215 milhões
+BYTE_MAXIMO = 0xFF  # 255 em hexadecimal
+
+# ATENÇÃO: Nada impede tecnicamente de fazer:
+PI = 999  # Python NÃO impede isso!
+# Mas NUNCA faça — é uma violação da convenção
+# Ferramentas como mypy podem avisar sobre isso</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 O Statement del — Removendo Referências</h4>
+            <pre><code># del remove a referência (etiqueta) de uma variável
+>>> x = 42
+>>> print(x)
+42
+>>> del x
+>>> print(x)
+NameError: name 'x' is not defined
+
+# del NÃO deleta o objeto da memória diretamente
+# Ele remove a referência. Se ninguém mais aponta para o objeto,
+# o Garbage Collector do Python remove o objeto depois.
+
+# Uso prático: liberar memória em scripts com dados grandes
+dados_enormes = [i for i in range(10_000_000)]
+# ... processamento ...
+del dados_enormes  # Libera a referência para o GC
+
+# del também funciona com índices de lista:
+lista = [1, 2, 3, 4, 5]
+del lista[2]  # Remove o item no índice 2
+print(lista)  # [1, 2, 4, 5]
+
+# E com slices:
+del lista[1:3]  # Remove índices 1 e 2
+print(lista)  # [1, 5]</code></pre>
+          </div>
+        </div>
+
       </div>
     </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3 — TIPOS DE DADOS PRIMITIVOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Tipos de Dados Primitivos</h2>
+          <p>Python possui tipos de dados embutidos (built-in) poderosos e flexíveis. Conheça em profundidade cada tipo primitivo: inteiros, floats, strings, booleanos e o especial None.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — int (Números Inteiros)</h3>
+          <p>O tipo <code>int</code> em Python é especial: ele tem <strong>precisão ilimitada</strong>. Diferente de C ou Java, onde inteiros têm limite (32/64 bits), Python pode trabalhar com números inteiros de qualquer tamanho!</p>
+
+          <div class="command-card wide">
+            <h4>📋 Inteiros em Python</h4>
+            <pre><code># Inteiros simples
+idade = 25
+populacao = 215000000
+temperatura = -10
+
+# Precisão ILIMITADA — Python não tem overflow!
+numero_gigante = 99999999999999999999999999999999999999
+print(numero_gigante + 1)  # Funciona perfeitamente!
+
+# Em C/Java isso causaria overflow, mas Python lida com qualquer tamanho
+
+# Underscores para legibilidade (ignorados pelo Python)
+bilhao = 1_000_000_000
+cpf = 123_456_789_00
+hex_color = 0xFF_AA_BB
+
+# Diferentes bases numéricas
+decimal = 42        # Base 10 (padrão)
+binario = 0b101010  # Base 2 (prefixo 0b)
+octal = 0o52        # Base 8 (prefixo 0o)
+hexadecimal = 0x2A  # Base 16 (prefixo 0x)
+
+# Todos representam o mesmo valor: 42
+print(decimal == binario == octal == hexadecimal)  # True
+
+# Conversão entre bases:
+print(bin(42))   # '0b101010'
+print(oct(42))   # '0o52'
+print(hex(42))   # '0x2a'
+print(int('2A', 16))  # 42 (string hex → int)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — float (Números de Ponto Flutuante)</h3>
+          <p>O tipo <code>float</code> representa números com casas decimais. Internamente, usa o padrão <strong>IEEE 754</strong> (64 bits / double precision), o que traz algumas peculiaridades importantes.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Floats em Python</h4>
+            <pre><code># Floats básicos
+preco = 19.99
+temperatura = -3.5
+pi = 3.14159265358979
+
+# Notação científica
+distancia_sol = 1.496e11      # 1.496 × 10¹¹ metros
+carga_eletron = 1.6e-19       # 1.6 × 10⁻¹⁹ coulombs
+avogadro = 6.022e23           # Número de Avogadro
+
+# Valores especiais
+import math
+print(math.inf)    # Infinito positivo
+print(-math.inf)   # Infinito negativo
+print(math.nan)    # Not a Number (NaN)
+
+# float() também aceita strings:
+print(float("inf"))   # inf
+print(float("-inf"))  # -inf
+print(float("nan"))   # nan</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ CUIDADO: Problemas de Precisão com Float</h4>
+            <p>Floats têm um problema fundamental: nem todos os números decimais podem ser representados exatamente em binário. Isso afeta TODAS as linguagens que usam IEEE 754.</p>
+            <pre><code># O problema clássico:
+>>> 0.1 + 0.2
+0.30000000000000004  # NÃO é 0.3!
+
+>>> 0.1 + 0.2 == 0.3
+False  # Surpresa!
+
+# Por que isso acontece?
+# 0.1 em binário é uma dízima periódica infinita (como 1/3 em decimal)
+# O computador armazena uma APROXIMAÇÃO
+
+# SOLUÇÕES:
+
+# 1. Usar round() para comparações
+>>> round(0.1 + 0.2, 10) == round(0.3, 10)
+True
+
+# 2. Usar math.isclose() (melhor opção)
+>>> import math
+>>> math.isclose(0.1 + 0.2, 0.3)
+True
+
+# 3. Usar o módulo decimal para precisão exata (financeiro!)
+>>> from decimal import Decimal
+>>> Decimal('0.1') + Decimal('0.2')
+Decimal('0.3')  # Exato!
+>>> Decimal('0.1') + Decimal('0.2') == Decimal('0.3')
+True</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Módulo decimal para Cálculos Financeiros</h4>
+            <pre><code>from decimal import Decimal, ROUND_HALF_UP
+
+# NUNCA use float para dinheiro!
+# ❌ ERRADO:
+preco_float = 0.1 + 0.1 + 0.1  # 0.30000000000000004
+
+# ✅ CORRETO:
+preco = Decimal('19.99')
+quantidade = Decimal('3')
+total = preco * quantidade
+print(total)  # 59.97 (exato!)
+
+# Arredondamento bancário:
+valor = Decimal('10.555')
+arredondado = valor.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+print(arredondado)  # 10.56
+
+# Regra de ouro: use Decimal() com STRINGS, não números!
+# ❌ Decimal(0.1) → já perde precisão ao converter float
+# ✅ Decimal('0.1') → precisão total</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — str (Strings / Texto)</h3>
+          <p>Strings são sequências <strong>imutáveis</strong> de caracteres Unicode. São um dos tipos mais usados em Python e merecem uma seção inteira dedicada (Seção 4). Aqui veremos os fundamentos.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Criando Strings</h4>
+            <pre><code># Aspas simples ou duplas — são equivalentes
+nome = 'Maria'
+sobrenome = "Silva"
+
+# Quando usar cada uma:
+# Use aspas duplas quando o texto contém apóstrofo:
+mensagem = "It's a beautiful day"
+
+# Use aspas simples quando o texto contém aspas duplas:
+html = '<div class="container">Texto</div>'
+
+# Aspas triplas — strings multilinha
+poema = """Roses are red,
+Violets are blue,
+Python is awesome,
+And so are you."""
+
+# Também funciona com aspas simples triplas
+sql = '''
+SELECT *
+FROM usuarios
+WHERE ativo = true
+ORDER BY nome
+'''
+
+# String vazia
+vazia = ""
+tambem_vazia = ''
+print(len(vazia))  # 0
+print(bool(vazia))  # False (string vazia é falsy)</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Caracteres de Escape e Raw Strings</h4>
+            <pre><code># Caracteres de escape (sequências especiais)
+print("Linha 1\nLinha 2")     # \n = nova linha
+print("Coluna1\tColuna2")     # \t = tab
+print("Aspas: \"texto\"")      # \" = aspas literal
+print("Barra: \\caminho")      # \\ = barra invertida
+print("Unicode: \u2764")       # \u = caractere Unicode (❤)
+
+# Raw strings (r"...") — ignora caracteres de escape
+# Muito útil para caminhos Windows e regex!
+caminho_windows = r"C:\Users\nome\Desktop\arquivo.txt"
+print(caminho_windows)  # C:\Users\nome\Desktop\arquivo.txt
+
+# Sem o r, Python interpretaria \U, \n, \D como escapes
+# caminho_windows = "C:\Users\nome\Desktop"  ← ERRO!
+
+# Raw strings são essenciais para expressões regulares:
+import re
+padrao = r"\d{3}\.\d{3}\.\d{3}-\d{2}"  # Padrão de CPF</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — bool (Booleanos)</h3>
+          <p>O tipo <code>bool</code> tem apenas dois valores possíveis: <code>True</code> e <code>False</code>. É fundamental para controle de fluxo e decisões lógicas. Em Python, <code>bool</code> é uma subclasse de <code>int</code>!</p>
+
+          <div class="command-card wide">
+            <h4>📋 Booleanos em Python</h4>
+            <pre><code># Valores booleanos
+ativo = True
+deletado = False
+
+# bool é subclasse de int!
+print(isinstance(True, int))   # True
+print(True + True)             # 2 (True = 1)
+print(False + False)           # 0 (False = 0)
+print(True * 10)               # 10
+
+# Comparações retornam booleanos
+print(5 > 3)      # True
+print(10 == 20)   # False
+print("a" < "b")  # True (comparação lexicográfica)
+
+# Operadores lógicos
+print(True and False)   # False
+print(True or False)    # True
+print(not True)         # False</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🔑 Valores Truthy e Falsy</h4>
+            <p>Em Python, <strong>qualquer objeto</strong> pode ser avaliado como booleano. Estes são os valores considerados <code>False</code> (falsy):</p>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Valor Falsy</th><th>Valor Truthy (exemplo)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>bool</td><td><code>False</code></td><td><code>True</code></td></tr>
+              <tr><td>int</td><td><code>0</code></td><td><code>1</code>, <code>-1</code>, <code>42</code></td></tr>
+              <tr><td>float</td><td><code>0.0</code></td><td><code>0.1</code>, <code>-3.14</code></td></tr>
+              <tr><td>str</td><td><code>""</code> (vazia)</td><td><code>"qualquer texto"</code></td></tr>
+              <tr><td>list</td><td><code>[]</code> (vazia)</td><td><code>[1, 2, 3]</code></td></tr>
+              <tr><td>dict</td><td><code>{}</code> (vazio)</td><td><code>{"a": 1}</code></td></tr>
+              <tr><td>tuple</td><td><code>()</code> (vazia)</td><td><code>(1, 2)</code></td></tr>
+              <tr><td>set</td><td><code>set()</code> (vazio)</td><td><code>{1, 2, 3}</code></td></tr>
+              <tr><td>NoneType</td><td><code>None</code></td><td>— (não se aplica)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📋 Truthy/Falsy na Prática</h4>
+            <pre><code># Truthy/Falsy é usado constantemente em Python:
+
+# Verificar se uma lista tem elementos:
+usuarios = ["Alice", "Bob"]
+if usuarios:  # Truthy se não vazia
+    print(f"Temos {len(usuarios)} usuários")
+
+# Verificar se uma string não está vazia:
+nome = input("Seu nome: ")
+if nome:  # Truthy se não vazia
+    print(f"Olá, {nome}!")
+else:
+    print("Nome não informado")
+
+# Verificar se um valor existe:
+resultado = None
+if resultado:  # None é Falsy
+    print(resultado)
+else:
+    print("Nenhum resultado")
+
+# Padrão comum: valor padrão com or
+nome = ""
+nome_exibir = nome or "Anônimo"  # "Anônimo" (pois "" é falsy)
+
+# CUIDADO com zero!
+quantidade = 0
+if quantidade:  # 0 é Falsy! Isso pode ser um bug
+    print("Tem itens")
+else:
+    print("Sem itens")  # Vai entrar aqui mesmo com quantidade = 0
+
+# Correto: ser explícito quando 0 é um valor válido
+if quantidade is not None:
+    print(f"Quantidade: {quantidade}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.5 — NoneType (None — O Nulo do Python)</h3>
+          <p><code>None</code> é o valor nulo do Python. Representa a <strong>ausência de valor</strong>. É o equivalente a <code>null</code> em Java/JavaScript, <code>nil</code> em Ruby ou <code>NULL</code> em C.</p>
+
+          <div class="command-card wide">
+            <h4>📋 None em Python</h4>
+            <pre><code># None é um singleton — existe apenas UM objeto None
+>>> type(None)
+&lt;class 'NoneType'&gt;
+
+# Usos comuns de None:
+
+# 1. Valor padrão para variáveis não inicializadas
+resultado = None
+
+# 2. Retorno padrão de funções sem return
+def saudacao(nome):
+    print(f"Olá, {nome}!")
+
+retorno = saudacao("Maria")
+print(retorno)  # None (função não tem return)
+
+# 3. Parâmetro padrão em funções
+def buscar_usuario(id, cache=None):
+    if cache is None:
+        cache = {}
+    # ...
+
+# REGRA IMPORTANTE: Use 'is' para comparar com None, NUNCA '=='
+# ✅ CORRETO:
+if resultado is None:
+    print("Sem resultado")
+
+if resultado is not None:
+    print(f"Resultado: {resultado}")
+
+# ❌ ERRADO:
+if resultado == None:  # Funciona, mas é anti-padrão!
+    print("Sem resultado")
+
+# Por quê? Porque == pode ser sobrescrito por classes customizadas
+# 'is' verifica identidade (é o mesmo objeto), que é mais seguro</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.6 — Verificação de Tipo (type() e isinstance())</h3>
+          <p>Python oferece duas formas de verificar o tipo de um objeto: <code>type()</code> e <code>isinstance()</code>. Entenda quando usar cada uma.</p>
+
+          <div class="command-card wide">
+            <h4>📋 type() vs isinstance()</h4>
+            <pre><code># type() retorna o tipo EXATO do objeto
+>>> type(42)
+&lt;class 'int'&gt;
+>>> type("texto")
+&lt;class 'str'&gt;
+>>> type(3.14)
+&lt;class 'float'&gt;
+>>> type(True)
+&lt;class 'bool'&gt;
+>>> type(None)
+&lt;class 'NoneType'&gt;
+>>> type([1, 2, 3])
+&lt;class 'list'&gt;
+
+# Comparando tipos:
+>>> type(42) == int
+True
+>>> type("texto") == str
+True
+
+# isinstance() é mais flexível — considera herança
+>>> isinstance(42, int)
+True
+>>> isinstance(True, int)   # bool É subclasse de int!
+True
+>>> isinstance(True, bool)
+True
+
+# isinstance com múltiplos tipos (tupla):
+>>> isinstance(42, (int, float))
+True
+>>> isinstance("texto", (int, float))
+False
+
+# QUANDO USAR CADA UM:
+# type() → quando precisa do tipo EXATO
+# isinstance() → na maioria dos casos (respeita herança)
+
+# Exemplo prático: validar entrada
+def processar_valor(valor):
+    if isinstance(valor, str):
+        return valor.upper()
+    elif isinstance(valor, (int, float)):
+        return valor * 2
+    elif valor is None:
+        return "Nenhum valor"
+    else:
+        raise TypeError(f"Tipo não suportado: {type(valor)}")</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Exemplo</th><th>Mutável?</th><th>Ordenado?</th><th>Tamanho Memória</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>int</code></td><td><code>42</code></td><td>Não</td><td>—</td><td>28 bytes (pequeno)</td></tr>
+              <tr><td><code>float</code></td><td><code>3.14</code></td><td>Não</td><td>—</td><td>24 bytes</td></tr>
+              <tr><td><code>str</code></td><td><code>"olá"</code></td><td>Não</td><td>Sim</td><td>52+ bytes</td></tr>
+              <tr><td><code>bool</code></td><td><code>True</code></td><td>Não</td><td>—</td><td>28 bytes</td></tr>
+              <tr><td><code>NoneType</code></td><td><code>None</code></td><td>Não</td><td>—</td><td>16 bytes</td></tr>
+              <tr><td><code>list</code></td><td><code>[1, 2]</code></td><td>Sim</td><td>Sim</td><td>56+ bytes</td></tr>
+              <tr><td><code>tuple</code></td><td><code>(1, 2)</code></td><td>Não</td><td>Sim</td><td>40+ bytes</td></tr>
+              <tr><td><code>dict</code></td><td><code>{"a": 1}</code></td><td>Sim</td><td>Sim*</td><td>64+ bytes</td></tr>
+              <tr><td><code>set</code></td><td><code>{1, 2}</code></td><td>Sim</td><td>Não</td><td>216+ bytes</td></tr>
+            </tbody>
+          </table>
+          <p><small>* Dicts mantêm ordem de inserção desde Python 3.7+</small></p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4 — STRINGS EM PROFUNDIDADE
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Strings em Profundidade</h2>
+          <p>Strings são onipresentes em programação — desde URLs e caminhos de arquivos até logs e configurações. Domine todas as operações de string que você usará diariamente como profissional.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — Métodos de String Essenciais</h3>
+          <p>Strings em Python possuem <strong>dezenas de métodos embutidos</strong>. Eles <strong>nunca modificam a string original</strong> (strings são imutáveis) — sempre retornam uma <strong>nova string</strong>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Métodos de Transformação</h4>
+            <pre><code>texto = "  Olá, Mundo Python!  "
+
+# Remoção de espaços
+print(texto.strip())       # "Olá, Mundo Python!" (ambos os lados)
+print(texto.lstrip())      # "Olá, Mundo Python!  " (esquerda)
+print(texto.rstrip())      # "  Olá, Mundo Python!" (direita)
+
+# Mudança de caso
+msg = "Hello World Python"
+print(msg.upper())         # "HELLO WORLD PYTHON"
+print(msg.lower())         # "hello world python"
+print(msg.title())         # "Hello World Python"
+print(msg.capitalize())    # "Hello world python" (só primeira)
+print(msg.swapcase())      # "hELLO wORLD pYTHON"
+print(msg.casefold())      # "hello world python" (para comparações)
+
+# Substituição
+frase = "Python é legal, Python é poderoso"
+print(frase.replace("Python", "Java"))      # Substitui TODAS
+print(frase.replace("Python", "Java", 1))   # Substitui apenas a primeira
+
+# Centralização e alinhamento
+titulo = "Python"
+print(titulo.center(20, "="))   # "=======Python======="
+print(titulo.ljust(20, "."))    # "Python.............."
+print(titulo.rjust(20, "."))    # "..............Python"
+print(titulo.zfill(10))         # "0000Python"</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Métodos de Busca e Verificação</h4>
+            <pre><code>texto = "DevOps com Python na AWS Cloud"
+
+# Busca
+print(texto.find("Python"))       # 10 (índice da primeira ocorrência)
+print(texto.find("Java"))         # -1 (não encontrado)
+print(texto.rfind("o"))           # 23 (última ocorrência, da direita)
+print(texto.index("Python"))      # 10 (como find, mas dá ValueError se não achar)
+print(texto.count("o"))           # 3 (conta ocorrências)
+
+# Verificações (retornam bool)
+print(texto.startswith("DevOps"))   # True
+print(texto.endswith("Cloud"))      # True
+print(texto.startswith(("Dev", "Ops")))  # True (aceita tupla)
+
+# Verificações de conteúdo
+print("12345".isdigit())      # True (só dígitos)
+print("abc".isalpha())        # True (só letras)
+print("abc123".isalnum())     # True (letras + dígitos)
+print("   ".isspace())        # True (só espaços/tabs/newlines)
+print("hello".islower())      # True (tudo minúsculo)
+print("HELLO".isupper())      # True (tudo maiúsculo)
+print("Hello World".istitle()) # True (formato título)
+
+# Contém substring (operador 'in')
+print("Python" in texto)      # True
+print("Java" in texto)        # False
+print("python" in texto.lower())  # True (busca case-insensitive)</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Split e Join — Operações Mais Usadas em DevOps</h4>
+            <pre><code># split() — Divide string em lista
+frase = "Python é incrível para DevOps"
+palavras = frase.split()  # Divide por espaço (padrão)
+print(palavras)  # ['Python', 'é', 'incrível', 'para', 'DevOps']
+
+# Split com separador específico
+csv_line = "nome,email,idade,cargo"
+campos = csv_line.split(",")
+print(campos)  # ['nome', 'email', 'idade', 'cargo']
+
+# Split com limite
+path = "/usr/local/bin/python3"
+partes = path.split("/", 2)  # Divide no máximo 2 vezes
+print(partes)  # ['', 'usr', 'local/bin/python3']
+
+# splitlines() — Divide por quebras de linha
+log = """INFO: Servidor iniciado
+WARNING: Memória alta
+ERROR: Conexão perdida"""
+linhas = log.splitlines()
+print(linhas)  # ['INFO: Servidor iniciado', 'WARNING: Memória alta', 'ERROR: Conexão perdida']
+
+# join() — Junta lista em string (OPOSTO do split)
+palavras = ['Python', 'é', 'incrível']
+frase = " ".join(palavras)
+print(frase)  # "Python é incrível"
+
+# Uso real em DevOps:
+path_parts = ["home", "usuario", "projetos", "app"]
+path_unix = "/" + "/".join(path_parts)
+print(path_unix)  # "/home/usuario/projetos/app"
+
+# Criar CSV:
+dados = ["Maria", "maria@email.com", "30", "DevOps"]
+linha_csv = ",".join(dados)
+print(linha_csv)  # "Maria,maria@email.com,30,DevOps"
+
+# Formatar tags:
+tags = ["python", "devops", "aws", "terraform"]
+print(" | ".join(tags))  # "python | devops | aws | terraform"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — Indexação e Fatiamento (Slicing)</h3>
+          <p>Strings são <strong>sequências indexadas</strong>. Cada caractere tem uma posição (índice), começando do 0. Python também suporta índices negativos (contando do final).</p>
+
+          <div class="command-card wide">
+            <h4>📋 Indexação de Strings</h4>
+            <pre><code>texto = "CloudTrilhas"
+#        C l o u d T r i l h a  s
+# Índice:0 1 2 3 4 5 6 7 8 9 10 11
+# Negat.:-12 -11 -10 -9 -8 -7 -6 -5 -4 -3 -2 -1
+
+# Acesso por índice positivo (da esquerda, começa em 0)
+print(texto[0])    # 'C'
+print(texto[5])    # 'T'
+print(texto[11])   # 's'
+
+# Acesso por índice negativo (da direita, começa em -1)
+print(texto[-1])   # 's' (último)
+print(texto[-2])   # 'a' (penúltimo)
+print(texto[-7])   # 'T'
+
+# IndexError se o índice não existe:
+# print(texto[20])  # IndexError: string index out of range</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Fatiamento (Slicing) — [start:stop:step]</h4>
+            <pre><code>texto = "CloudTrilhas"
+
+# Sintaxe: string[início:fim:passo]
+# O 'fim' NÃO é incluído (exclusivo)
+
+# Slicing básico
+print(texto[0:5])    # "Cloud" (índices 0, 1, 2, 3, 4)
+print(texto[5:12])   # "Trilhas" (índices 5 até 11)
+print(texto[5:])     # "Trilhas" (do 5 até o final)
+print(texto[:5])     # "Cloud" (do início até 4)
+print(texto[:])      # "CloudTrilhas" (cópia completa)
+
+# Slicing com passo
+print(texto[::2])    # "CodTihs" (a cada 2 caracteres)
+print(texto[::3])    # "CuTla" (a cada 3 caracteres)
+print(texto[1::2])   # "lurlal" (começa no 1, pula 2)
+
+# Slicing com passo negativo (inverte!)
+print(texto[::-1])   # "sahliTduolC" (string invertida!)
+print(texto[::-2])   # "slrdol" (invertida, a cada 2)
+print(texto[8:3:-1]) # "lirTd" (de 8 até 4, reverso)
+
+# Slicing com negativos
+print(texto[-7:])    # "Trilhas" (últimos 7 caracteres)
+print(texto[:-7])    # "Cloud" (tudo menos últimos 7)
+print(texto[-7:-2])  # "Trilh" (de -7 até -3)
+
+# Slicing NUNCA causa IndexError (diferente de indexação)
+print(texto[0:100])  # "CloudTrilhas" (não dá erro!)
+print(texto[50:60])  # "" (string vazia, sem erro)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Formatação de Strings (f-strings)</h3>
+          <p>Python evoluiu suas formas de formatar strings ao longo do tempo. Hoje, <strong>f-strings</strong> (Python 3.6+) são o padrão recomendado por serem rápidas, legíveis e poderosas.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Evolução da Formatação de Strings</h4>
+            <pre><code>nome = "Maria"
+idade = 28
+salario = 8500.50
+
+# 1️⃣ Operador % (estilo C) — ANTIGO, evite
+msg = "Nome: %s, Idade: %d, Salário: %.2f" % (nome, idade, salario)
+print(msg)  # Nome: Maria, Idade: 28, Salário: 8500.50
+
+# 2️⃣ Método .format() — OK, mas verboso
+msg = "Nome: {}, Idade: {}, Salário: {:.2f}".format(nome, idade, salario)
+print(msg)  # Nome: Maria, Idade: 28, Salário: 8500.50
+
+# Com índices e nomes:
+msg = "Nome: {0}, Idade: {1}, {0} tem {1} anos".format(nome, idade)
+msg = "Nome: {n}, Idade: {i}".format(n=nome, i=idade)
+
+# 3️⃣ f-strings (Python 3.6+) — RECOMENDADO! ✅
+msg = f"Nome: {nome}, Idade: {idade}, Salário: R${salario:.2f}"
+print(msg)  # Nome: Maria, Idade: 28, Salário: R$8500.50
+
+# Por que f-strings são melhores:
+# ✅ Mais legíveis (variável dentro da string)
+# ✅ Mais rápidas (compiladas em tempo de execução)
+# ✅ Suportam expressões Python completas</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 f-strings Avançadas — Expressões e Formatação</h4>
+            <pre><code># Expressões dentro de f-strings
+a, b = 10, 3
+print(f"{a} + {b} = {a + b}")          # "10 + 3 = 13"
+print(f"{a} * {b} = {a * b}")          # "10 * 3 = 30"
+print(f"Maior: {max(a, b)}")           # "Maior: 10"
+print(f"{'Par' if a % 2 == 0 else 'Ímpar'}")  # "Par"
+
+# Chamadas de método
+nome = "python"
+print(f"Upper: {nome.upper()}")        # "Upper: PYTHON"
+print(f"Tamanho: {len(nome)}")         # "Tamanho: 6"
+
+# Formatação de números
+valor = 1234567.891
+print(f"Padrão: {valor}")              # "Padrão: 1234567.891"
+print(f"2 decimais: {valor:.2f}")      # "2 decimais: 1234567.89"
+print(f"Separador milhar: {valor:,.2f}")  # "Separador milhar: 1,234,567.89"
+print(f"Largura 15: {valor:>15,.2f}")  # "Largura 15:    1,234,567.89"
+
+# Formatação de porcentagem
+taxa = 0.1567
+print(f"Taxa: {taxa:.1%}")             # "Taxa: 15.7%"
+print(f"Taxa: {taxa:.2%}")             # "Taxa: 15.67%"
+
+# Alinhamento
+item = "Python"
+print(f"|{item:<20}|")   # "|Python              |" (esquerda)
+print(f"|{item:>20}|")   # "|              Python|" (direita)
+print(f"|{item:^20}|")   # "|       Python       |" (centro)
+print(f"|{item:=^20}|")  # "|=======Python=======|" (centro com preenchimento)
+
+# Formatação de inteiros
+num = 42
+print(f"Decimal: {num:d}")     # "Decimal: 42"
+print(f"Binário: {num:b}")     # "Binário: 101010"
+print(f"Octal: {num:o}")       # "Octal: 52"
+print(f"Hex: {num:x}")         # "Hex: 2a"
+print(f"Hex: {num:X}")         # "Hex: 2A"
+print(f"Com prefixo: {num:#x}") # "Com prefixo: 0x2a"
+print(f"Preenchido: {num:08d}") # "Preenchido: 00000042"
+
+# Debug (Python 3.8+) — mostra nome=valor
+x = 42
+y = "hello"
+print(f"{x=}")          # "x=42"
+print(f"{y=}")          # "y='hello'"
+print(f"{x + 1=}")      # "x + 1=43"
+print(f"{nome.upper()=}")  # "nome.upper()='PYTHON'"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — Imutabilidade de Strings</h3>
+          <p>Strings em Python são <strong>imutáveis</strong> — uma vez criadas, não podem ser modificadas. Qualquer operação que "modifica" uma string na verdade cria uma <strong>nova string</strong>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Entendendo a Imutabilidade</h4>
+            <pre><code># Strings NÃO podem ser modificadas in-place
+>>> texto = "Python"
+>>> texto[0] = "J"
+TypeError: 'str' object does not support item assignment
+
+# Para "modificar", crie uma nova string:
+>>> texto = "Python"
+>>> novo_texto = "J" + texto[1:]
+>>> print(novo_texto)
+"Jython"
+
+# Cada operação cria um NOVO objeto:
+>>> s = "hello"
+>>> id(s)
+140234567890
+>>> s = s.upper()  # Cria nova string, reatribui
+>>> id(s)
+140234567999  # ID diferente! Novo objeto!
+>>> s
+'HELLO'
+
+# Implicação de performance:
+# Concatenar em loop é INEFICIENTE (cria N objetos):
+# ❌ LENTO:
+resultado = ""
+for i in range(10000):
+    resultado += str(i) + ", "  # Cria nova string a cada iteração!
+
+# ✅ RÁPIDO (use join):
+partes = [str(i) for i in range(10000)]
+resultado = ", ".join(partes)  # Cria UMA string no final
+
+# ✅ RÁPIDO (use lista + join):
+partes = []
+for i in range(10000):
+    partes.append(str(i))
+resultado = ", ".join(partes)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Strings no Contexto DevOps/Cloud</h3>
+          <p>No dia a dia de DevOps e Cloud, você manipulará strings constantemente: caminhos, URLs, logs, configurações, IPs e muito mais.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Operações com Strings para DevOps</h4>
+            <pre><code># Manipulação de caminhos (use pathlib para produção!)
+caminho = "/var/log/nginx/access.log"
+diretorio = caminho.rsplit("/", 1)[0]   # "/var/log/nginx"
+arquivo = caminho.rsplit("/", 1)[1]     # "access.log"
+extensao = arquivo.rsplit(".", 1)[1]    # "log"
+
+# Construção de URLs
+base_url = "https://api.aws.amazon.com"
+servico = "s3"
+regiao = "us-east-1"
+endpoint = f"{base_url}/{servico}.{regiao}"
+print(endpoint)  # https://api.aws.amazon.com/s3.us-east-1
+
+# Parsing de logs
+log_line = "2024-01-15 10:30:45 ERROR [app.server] Connection timeout"
+data = log_line[:10]                    # "2024-01-15"
+hora = log_line[11:19]                  # "10:30:45"
+nivel = log_line.split()[2]             # "ERROR"
+modulo = log_line.split("[")[1].split("]")[0]  # "app.server"
+
+# Validação de IP (simplificada)
+ip = "192.168.1.100"
+partes = ip.split(".")
+ip_valido = (
+    len(partes) == 4 and
+    all(p.isdigit() and 0 <= int(p) <= 255 for p in partes)
+)
+print(f"{ip} válido: {ip_valido}")  # True
+
+# Geração de nomes de recursos
+projeto = "cloudtrilhas"
+ambiente = "prod"
+recurso = "bucket"
+nome_recurso = f"{projeto}-{ambiente}-{recurso}-001"
+print(nome_recurso)  # "cloudtrilhas-prod-bucket-001"
+
+# Template de configuração
+config_template = """
+[server]
+host = {host}
+port = {port}
+workers = {workers}
+debug = {debug}
+"""
+config = config_template.format(
+    host="0.0.0.0",
+    port=8080,
+    workers=4,
+    debug="false"
+)
+print(config)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.6 — Introdução a Expressões Regulares (regex)</h3>
+          <p>Expressões regulares são padrões de busca poderosos para encontrar e manipular texto. Python usa o módulo <code>re</code> para regex.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Regex Básico com o Módulo re</h4>
+            <pre><code>import re
+
+# Buscar padrão em texto
+texto = "Meu email é user@exemplo.com e telefone 11-98765-4321"
+
+# re.search() — encontra a primeira ocorrência
+match = re.search(r"\d{2}-\d{5}-\d{4}", texto)
+if match:
+    print(f"Telefone encontrado: {match.group()}")  # 11-98765-4321
+
+# re.findall() — encontra TODAS as ocorrências
+emails = "contato@empresa.com, admin@server.org, user@gmail.com"
+padrao_email = r"[\w.]+@[\w.]+"
+todos_emails = re.findall(padrao_email, emails)
+print(todos_emails)  # ['contato@empresa.com', 'admin@server.org', 'user@gmail.com']
+
+# re.sub() — substituir padrão
+log = "ERROR 2024-01-15: Falha na conexão"
+# Mascarar data:
+log_mascarado = re.sub(r"\d{4}-\d{2}-\d{2}", "XXXX-XX-XX", log)
+print(log_mascarado)  # "ERROR XXXX-XX-XX: Falha na conexão"
+
+# Padrões mais comuns:
+# \d  → dígito (0-9)
+# \w  → palavra (letras, dígitos, _)
+# \s  → espaço em branco
+# .   → qualquer caractere
+# +   → um ou mais
+# *   → zero ou mais
+# ?   → zero ou um
+# {n} → exatamente n vezes
+# []  → conjunto de caracteres
+# ^   → início da string
+# $   → final da string
+
+# Validar CPF (formato):
+cpf = "123.456.789-00"
+if re.match(r"^\d{3}\.\d{3}\.\d{3}-\d{2}$", cpf):
+    print("CPF com formato válido")
+
+# Extrair IPs de um log:
+log_text = "Acesso de 192.168.1.1 e 10.0.0.5 bloqueado"
+ips = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", log_text)
+print(ips)  # ['192.168.1.1', '10.0.0.5']</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Regex: Use com Moderação</h4>
+            <p>Expressões regulares são poderosas, mas podem se tornar ilegíveis rapidamente. Siga a regra: <em>"Se um método de string resolve, não use regex."</em> Reserve regex para padrões complexos que não podem ser resolvidos com <code>split()</code>, <code>find()</code> ou <code>replace()</code>.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5 — NÚMEROS E OPERADORES
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Números e Operadores</h2>
+          <p>Domine todos os operadores do Python — desde os aritméticos básicos até operadores bitwise usados em redes e programação de sistemas. Entenda a precedência e evite bugs sutis.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — Operadores Aritméticos</h3>
+          <p>Os operadores aritméticos realizam cálculos matemáticos. Python tem 7 operadores aritméticos, incluindo alguns que não existem em outras linguagens.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Os 7 Operadores Aritméticos</h4>
+            <pre><code>a = 17
+b = 5
+
+# Adição
+print(a + b)     # 22
+
+# Subtração
+print(a - b)     # 12
+
+# Multiplicação
+print(a * b)     # 85
+
+# Divisão (SEMPRE retorna float!)
+print(a / b)     # 3.4
+print(10 / 2)    # 5.0 (float, mesmo quando "dá exato")
+
+# Divisão inteira (floor division — arredonda para BAIXO)
+print(a // b)    # 3 (17÷5 = 3.4 → arredonda para 3)
+print(-17 // 5)  # -4 (arredonda para BAIXO, não para zero!)
+print(17 // -5)  # -4
+
+# Módulo (resto da divisão)
+print(a % b)     # 2 (17 = 5*3 + 2)
+print(10 % 3)    # 1
+print(10 % 2)    # 0 (número par!)
+
+# Exponenciação (potência)
+print(2 ** 10)   # 1024
+print(9 ** 0.5)  # 3.0 (raiz quadrada!)
+print(2 ** -1)   # 0.5 (1/2)
+
+# Uso prático do módulo:
+# Verificar se número é par/ímpar
+numero = 42
+if numero % 2 == 0:
+    print("Par")
+else:
+    print("Ímpar")
+
+# Converter segundos para horas:minutos:segundos
+total_segundos = 3725
+horas = total_segundos // 3600        # 1
+minutos = (total_segundos % 3600) // 60  # 2
+segundos = total_segundos % 60         # 5
+print(f"{horas:02d}:{minutos:02d}:{segundos:02d}")  # "01:02:05"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — Operadores de Comparação</h3>
+          <p>Operadores de comparação comparam dois valores e retornam <code>True</code> ou <code>False</code>. São essenciais para condicionais e loops.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Operadores de Comparação</h4>
+            <pre><code># Igualdade e diferença
+print(5 == 5)     # True
+print(5 == 5.0)   # True (int e float são comparáveis!)
+print("abc" == "abc")  # True
+print(5 != 3)     # True
+print("a" != "A")  # True (case-sensitive!)
+
+# Maior/menor
+print(10 > 5)     # True
+print(10 < 5)     # False
+print(10 >= 10)   # True
+print(10 <= 9)    # False
+
+# Comparação de strings (lexicográfica — ordem do Unicode)
+print("abc" < "abd")   # True ('c' < 'd')
+print("abc" < "abcd")  # True (prefixo é "menor")
+print("B" < "a")       # True (maiúsculas vêm antes!)
+# Cuidado: 'Z' (90) < 'a' (97) no Unicode!
+
+# Comparação em cadeia (Python exclusivo!)
+x = 15
+print(10 < x < 20)       # True (x está entre 10 e 20)
+print(0 <= x <= 100)     # True
+print(1 < 2 < 3 < 4)    # True
+
+# Isso é equivalente a:
+print(10 < x and x < 20)  # True
+
+# Comparação com None (SEMPRE use 'is')
+valor = None
+print(valor is None)      # True ✅
+print(valor is not None)  # False ✅
+# print(valor == None)    # Funciona, mas é anti-padrão ❌</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Operadores Lógicos</h3>
+          <p>Operadores lógicos combinam expressões booleanas. Python usa palavras em inglês (<code>and</code>, <code>or</code>, <code>not</code>) em vez de símbolos (<code>&&</code>, <code>||</code>, <code>!</code>).</p>
+
+          <div class="command-card wide">
+            <h4>📋 and, or, not — e Short-Circuit Evaluation</h4>
+            <pre><code># and — True somente se AMBOS forem True
+print(True and True)    # True
+print(True and False)   # False
+print(False and True)   # False
+print(False and False)  # False
+
+# or — True se PELO MENOS UM for True
+print(True or True)     # True
+print(True or False)    # True
+print(False or True)    # True
+print(False or False)   # False
+
+# not — Inverte o valor
+print(not True)         # False
+print(not False)        # True
+
+# Uso prático em condicionais:
+idade = 25
+tem_carteira = True
+if idade >= 18 and tem_carteira:
+    print("Pode dirigir")
+
+# SHORT-CIRCUIT EVALUATION (Avaliação em Curto-Circuito)
+# Python para de avaliar assim que sabe o resultado:
+
+# 'and' para no primeiro False (retorna ele):
+print(0 and "hello")     # 0 (0 é falsy, para aqui)
+print("" and "hello")    # "" (string vazia é falsy)
+print("a" and "b")       # "b" (ambos truthy, retorna último)
+
+# 'or' para no primeiro True (retorna ele):
+print(0 or "hello")      # "hello" (0 é falsy, tenta próximo)
+print("" or "default")   # "default" (padrão se vazio!)
+print("a" or "b")        # "a" (primeiro é truthy, retorna)
+
+# Padrão comum: valor padrão
+nome = ""
+nome_exibir = nome or "Anônimo"    # "Anônimo"
+
+# Padrão comum: execução condicional
+lista = [1, 2, 3]
+primeiro = lista and lista[0]       # 1 (se lista não vazia, pega primeiro)
+
+lista_vazia = []
+primeiro = lista_vazia and lista_vazia[0]  # [] (para antes do IndexError!)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 — Operadores Bitwise (Bit a Bit)</h3>
+          <p>Operadores bitwise trabalham com a representação binária dos números. São essenciais para programação de redes, máscaras de IP e flags de permissão.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Operadores Bitwise</h4>
+            <pre><code># Representação binária:
+# 12 em binário = 1100
+# 10 em binário = 1010
+
+a = 12  # 1100
+b = 10  # 1010
+
+# AND bitwise (&) — 1 apenas se AMBOS bits são 1
+print(a & b)    # 8 (1000)
+# 1100
+# 1010
+# ----
+# 1000 = 8
+
+# OR bitwise (|) — 1 se QUALQUER bit é 1
+print(a | b)    # 14 (1110)
+# 1100
+# 1010
+# ----
+# 1110 = 14
+
+# XOR bitwise (^) — 1 se bits são DIFERENTES
+print(a ^ b)    # 6 (0110)
+# 1100
+# 1010
+# ----
+# 0110 = 6
+
+# NOT bitwise (~) — inverte todos os bits
+print(~a)       # -13 (complemento de dois)
+
+# Shift left (<<) — multiplica por 2^n
+print(a << 1)   # 24 (11000) — 12 * 2
+print(a << 2)   # 48 (110000) — 12 * 4
+
+# Shift right (>>) — divide por 2^n
+print(a >> 1)   # 6 (110) — 12 / 2
+print(a >> 2)   # 3 (11) — 12 / 4
+
+# USO REAL: Máscaras de rede
+ip = 0xC0A80164          # 192.168.1.100
+mascara = 0xFFFFFF00     # 255.255.255.0 (/24)
+rede = ip & mascara      # 192.168.1.0
+print(f"Rede: {(rede >> 24) & 0xFF}.{(rede >> 16) & 0xFF}.{(rede >> 8) & 0xFF}.{rede & 0xFF}")
+
+# USO REAL: Flags de permissão (como chmod)
+READ = 0b100     # 4
+WRITE = 0b010    # 2
+EXECUTE = 0b001  # 1
+
+# Definir permissões:
+permissao = READ | WRITE  # 6 (leitura + escrita)
+
+# Verificar permissão:
+pode_ler = bool(permissao & READ)       # True
+pode_executar = bool(permissao & EXECUTE)  # False
+
+# Adicionar permissão:
+permissao = permissao | EXECUTE  # 7 (rwx)
+
+# Remover permissão:
+permissao = permissao & ~WRITE   # 5 (r-x)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 — Operadores de Atribuição Composta</h3>
+          <p>Operadores de atribuição composta combinam uma operação com a atribuição, tornando o código mais conciso.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Atribuição Composta</h4>
+            <pre><code># Equivalente a: variavel = variavel operador valor
+
+x = 10
+x += 5      # x = x + 5   → 15
+x -= 3      # x = x - 3   → 12
+x *= 2      # x = x * 2   → 24
+x /= 4      # x = x / 4   → 6.0
+x //= 2     # x = x // 2  → 3.0
+x **= 3     # x = x ** 3  → 27.0
+x %= 5      # x = x % 5   → 2.0
+
+# Também funciona com bitwise:
+flags = 0b1100
+flags &= 0b1010    # AND assignment
+flags |= 0b0001    # OR assignment
+flags ^= 0b0010    # XOR assignment
+flags <<= 1        # Left shift assignment
+flags >>= 1        # Right shift assignment
+
+# Concatenação de strings:
+nome = "Cloud"
+nome += "Trilhas"   # "CloudTrilhas"
+
+# Repetição de strings:
+separador = "=-"
+separador *= 20     # "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+
+# Extensão de listas:
+lista = [1, 2]
+lista += [3, 4]    # [1, 2, 3, 4] (equivale a extend)
+lista *= 2         # [1, 2, 3, 4, 1, 2, 3, 4]
+
+# NOTA: Python NÃO tem ++ ou -- (diferente de C/Java)
+# Use x += 1 em vez de x++</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.6 — Operadores de Identidade e Pertencimento</h3>
+          <p>Python possui operadores especiais para verificar identidade de objetos (<code>is</code>) e pertencimento a coleções (<code>in</code>).</p>
+
+          <div class="command-card wide">
+            <h4>📋 is / is not (Identidade)</h4>
+            <pre><code># 'is' verifica se dois nomes apontam para o MESMO OBJETO
+# (compara endereço de memória, não valor)
+
+a = [1, 2, 3]
+b = [1, 2, 3]
+c = a
+
+# == compara VALOR:
+print(a == b)   # True (mesmo conteúdo)
+print(a == c)   # True
+
+# is compara IDENTIDADE (mesmo objeto na memória):
+print(a is b)   # False (objetos diferentes!)
+print(a is c)   # True (c aponta para o mesmo objeto que a)
+
+# Prova com id():
+print(id(a) == id(b))  # False
+print(id(a) == id(c))  # True
+
+# REGRA: Use 'is' SOMENTE para:
+# 1. Comparar com None
+# 2. Comparar com True/False (raro)
+# 3. Verificar se é o mesmo objeto (raro)
+
+# CUIDADO: Interning de inteiros pequenos
+x = 256
+y = 256
+print(x is y)   # True (Python reutiliza inteiros -5 a 256)
+
+x = 257
+y = 257
+print(x is y)   # False ou True (depende da implementação!)
+# NUNCA use 'is' para comparar números — use ==</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 in / not in (Pertencimento)</h4>
+            <pre><code># 'in' verifica se um elemento existe em uma coleção
+
+# Em listas:
+frutas = ["maçã", "banana", "uva"]
+print("banana" in frutas)       # True
+print("manga" in frutas)        # False
+print("manga" not in frutas)    # True
+
+# Em strings (busca substring):
+texto = "Python para DevOps"
+print("DevOps" in texto)        # True
+print("Java" in texto)          # False
+print("python" in texto.lower())  # True (busca case-insensitive)
+
+# Em dicionários (verifica CHAVES, não valores):
+config = {"host": "localhost", "port": 8080}
+print("host" in config)         # True
+print("localhost" in config)    # False (é valor, não chave!)
+print(8080 in config.values())  # True (busca em valores)
+
+# Em sets (muito rápido! O(1)):
+ips_bloqueados = {"192.168.1.1", "10.0.0.5", "172.16.0.1"}
+ip_atual = "10.0.0.5"
+if ip_atual in ips_bloqueados:
+    print(f"IP {ip_atual} está bloqueado!")
+
+# Em ranges:
+print(5 in range(10))           # True (eficiente!)
+print(1000000 in range(2000000))  # True (O(1), não itera!)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.7 — Precedência de Operadores</h3>
+          <p>Quando uma expressão tem múltiplos operadores, Python segue uma ordem de precedência definida (similar à matemática). Use parênteses para explicitar a ordem quando houver dúvida.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Prioridade</th><th>Operador</th><th>Descrição</th><th>Associatividade</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1 (mais alta)</td><td><code>()</code></td><td>Parênteses</td><td>—</td></tr>
+              <tr><td>2</td><td><code>**</code></td><td>Exponenciação</td><td>Direita → Esquerda</td></tr>
+              <tr><td>3</td><td><code>+x, -x, ~x</code></td><td>Unários</td><td>—</td></tr>
+              <tr><td>4</td><td><code>*, /, //, %</code></td><td>Multiplicação, divisão</td><td>Esquerda → Direita</td></tr>
+              <tr><td>5</td><td><code>+, -</code></td><td>Adição, subtração</td><td>Esquerda → Direita</td></tr>
+              <tr><td>6</td><td><code>&lt;&lt;, &gt;&gt;</code></td><td>Shift bitwise</td><td>Esquerda → Direita</td></tr>
+              <tr><td>7</td><td><code>&amp;</code></td><td>AND bitwise</td><td>Esquerda → Direita</td></tr>
+              <tr><td>8</td><td><code>^</code></td><td>XOR bitwise</td><td>Esquerda → Direita</td></tr>
+              <tr><td>9</td><td><code>|</code></td><td>OR bitwise</td><td>Esquerda → Direita</td></tr>
+              <tr><td>10</td><td><code>==, !=, &lt;, &gt;, &lt;=, &gt;=, is, in</code></td><td>Comparação</td><td>Esquerda → Direita</td></tr>
+              <tr><td>11</td><td><code>not</code></td><td>NOT lógico</td><td>—</td></tr>
+              <tr><td>12</td><td><code>and</code></td><td>AND lógico</td><td>Esquerda → Direita</td></tr>
+              <tr><td>13 (mais baixa)</td><td><code>or</code></td><td>OR lógico</td><td>Esquerda → Direita</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>📋 Exemplos de Precedência</h4>
+            <pre><code># Exponenciação tem precedência sobre multiplicação
+print(2 * 3 ** 2)      # 18 (não 36!) → 2 * (3**2) = 2 * 9
+print((2 * 3) ** 2)    # 36
+
+# Multiplicação tem precedência sobre adição
+print(2 + 3 * 4)       # 14 (não 20!) → 2 + (3*4) = 2 + 12
+print((2 + 3) * 4)     # 20
+
+# and tem precedência sobre or
+print(True or False and False)   # True → True or (False and False)
+print((True or False) and False) # False
+
+# not tem precedência sobre and/or
+print(not True or True)    # True → (not True) or True = False or True
+print(not (True or True))  # False
+
+# Comparações em cadeia
+x = 5
+print(1 < x < 10)         # True (1 < 5 AND 5 < 10)
+print(1 < x > 10)         # False (1 < 5 AND 5 > 10)
+
+# DICA: Na dúvida, USE PARÊNTESES!
+# Código legível é mais importante que código curto
+resultado = (a > 0) and (b < 100) or (c == "especial")  # Claro!
+resultado = a > 0 and b < 100 or c == "especial"         # Confuso...</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.8 — Módulo math</h3>
+          <p>O módulo <code>math</code> fornece funções matemáticas avançadas que complementam os operadores básicos.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Funções do Módulo math</h4>
+            <pre><code>import math
+
+# Constantes
+print(math.pi)      # 3.141592653589793
+print(math.e)       # 2.718281828459045
+print(math.inf)     # Infinito
+print(math.nan)     # Not a Number
+print(math.tau)     # 6.283... (2 * pi)
+
+# Arredondamento
+print(math.ceil(4.1))    # 5 (arredonda para CIMA)
+print(math.floor(4.9))   # 4 (arredonda para BAIXO)
+print(math.trunc(4.9))   # 4 (trunca decimal)
+print(round(4.5))        # 4 (banker's rounding!)
+print(round(4.6))        # 5
+
+# Potência e raiz
+print(math.sqrt(144))    # 12.0 (raiz quadrada)
+print(math.pow(2, 10))   # 1024.0 (potência como float)
+print(math.isqrt(10))    # 3 (raiz quadrada inteira)
+
+# Logaritmos
+print(math.log(100, 10))  # 2.0 (log base 10)
+print(math.log2(1024))    # 10.0 (log base 2)
+print(math.log10(1000))   # 3.0 (log base 10)
+print(math.log(math.e))   # 1.0 (log natural)
+
+# Trigonometria (ângulos em radianos)
+print(math.sin(math.pi / 2))  # 1.0
+print(math.cos(0))             # 1.0
+print(math.degrees(math.pi))   # 180.0
+print(math.radians(180))       # 3.14159...
+
+# Valores absolutos e sinais
+print(math.fabs(-5.5))    # 5.5 (absolute float)
+print(abs(-5))             # 5 (built-in, funciona com int)
+print(math.copysign(5, -1))  # -5.0 (copia o sinal)
+
+# Verificações
+print(math.isfinite(42))     # True
+print(math.isfinite(math.inf))  # False
+print(math.isinf(math.inf))    # True
+print(math.isnan(math.nan))    # True
+print(math.isclose(0.1 + 0.2, 0.3))  # True! (resolve float imprecision)
+
+# Fatorial e combinações
+print(math.factorial(5))    # 120 (5!)
+print(math.comb(10, 3))     # 120 (combinação C(10,3))
+print(math.perm(10, 3))     # 720 (permutação P(10,3))
+
+# GCD e LCM (MDC e MMC)
+print(math.gcd(48, 36))     # 12
+print(math.lcm(4, 6))       # 12 (Python 3.9+)</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6 — ENTRADA E SAÍDA (I/O)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Entrada e Saída (I/O)</h2>
+          <p>Aprenda a interagir com o usuário — recebendo dados via teclado e exibindo informações formatadas na tela. Domine todos os parâmetros de print() e as técnicas de conversão de tipos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — A Função print() em Detalhes</h3>
+          <p>O <code>print()</code> é a função mais básica de saída em Python, mas possui parâmetros poderosos que muitos iniciantes desconhecem.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Assinatura Completa do print()</h4>
+            <pre><code># Assinatura: print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+
+# Básico — múltiplos argumentos
+print("Olá", "Mundo", "Python")
+# Saída: Olá Mundo Python (separados por espaço)
+
+# Parâmetro sep (separador entre argumentos)
+print("2024", "01", "15", sep="-")     # 2024-01-15
+print("192", "168", "1", "100", sep=".")  # 192.168.1.100
+print("usr", "local", "bin", sep="/")   # usr/local/bin
+print(1, 2, 3, 4, 5, sep=" → ")        # 1 → 2 → 3 → 4 → 5
+
+# Parâmetro end (caractere final — padrão é \n)
+print("Carregando", end="")
+print(".", end="")
+print(".", end="")
+print(".", end="\n")
+# Saída: Carregando...
+
+# Barra de progresso simples:
+import time
+for i in range(5):
+    print(f"\rProgresso: {'█' * (i+1)}{'░' * (4-i)} {(i+1)*20}%", end="", flush=True)
+    time.sleep(0.5)
+print()  # Nova linha no final
+
+# Parâmetro file (direcionar saída para arquivo)
+import sys
+print("Isso vai para stderr", file=sys.stderr)
+
+with open("log.txt", "w") as f:
+    print("Isso vai para o arquivo", file=f)
+    print("Linha 2 do arquivo", file=f)
+
+# Parâmetro flush (forçar escrita imediata)
+print("Log importante", flush=True)  # Não fica no buffer</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Técnicas Avançadas de print()</h4>
+            <pre><code># Imprimir sem print (para debug rápido)
+# Em scripts Python, o REPL mostra automaticamente o resultado
+# Mas em scripts .py, precisa de print()
+
+# Imprimir objetos complexos
+lista = [1, 2, 3, 4, 5]
+dicio = {"nome": "Maria", "idade": 30}
+print(lista)   # [1, 2, 3, 4, 5]
+print(dicio)   # {'nome': 'Maria', 'idade': 30}
+
+# Para formatação bonita, use pprint:
+from pprint import pprint
+dados = {
+    "servidor": "web-01",
+    "status": "running",
+    "servicos": ["nginx", "python", "redis"],
+    "metricas": {"cpu": 45.2, "memoria": 78.1, "disco": 62.5}
+}
+pprint(dados, indent=2, width=60)
+
+# Desempacotamento com * no print
+numeros = [1, 2, 3, 4, 5]
+print(*numeros)           # 1 2 3 4 5 (sem colchetes!)
+print(*numeros, sep=", ") # 1, 2, 3, 4, 5
+
+# ASCII art / tabelas simples
+print("=" * 40)
+print(f"{'RELATÓRIO':^40}")
+print("=" * 40)
+print(f"{'Item':<20}{'Valor':>20}")
+print("-" * 40)
+print(f"{'CPU':.<20}{'45.2%':.>20}")
+print(f"{'Memória':.<20}{'78.1%':.>20}")
+print(f"{'Disco':.<20}{'62.5%':.>20}")
+print("=" * 40)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — A Função input()</h3>
+          <p>O <code>input()</code> lê dados digitados pelo usuário no terminal. <strong>SEMPRE retorna uma string</strong>, mesmo que o usuário digite um número.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Usando input()</h4>
+            <pre><code># Básico
+nome = input("Digite seu nome: ")
+print(f"Olá, {nome}!")
+
+# IMPORTANTE: input() SEMPRE retorna string!
+idade = input("Sua idade: ")
+print(type(idade))  # &lt;class 'str'&gt; — SEMPRE string!
+
+# Para usar como número, precisa CONVERTER:
+idade = int(input("Sua idade: "))        # Converte para inteiro
+altura = float(input("Sua altura: "))     # Converte para float
+print(f"Idade: {idade}, Altura: {altura}m")
+
+# Cuidado com ValueError!
+# Se o usuário digitar "abc" e você fizer int("abc") → ERRO!
+# Solução: try/except (veremos no módulo de controle de fluxo)
+try:
+    numero = int(input("Digite um número: "))
+    print(f"O dobro é {numero * 2}")
+except ValueError:
+    print("Erro: isso não é um número válido!")
+
+# input() sem prompt (sem mensagem)
+resposta = input()  # Apenas espera digitação
+
+# Truque: input múltiplo em uma linha
+# O usuário digita: 10 20 30
+x, y, z = input("Três números (espaço): ").split()
+x, y, z = int(x), int(y), int(z)
+# Ou mais elegante:
+x, y, z = map(int, input("Três números: ").split())</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Segurança: NUNCA use eval() com input()</h4>
+            <p>Alguns tutoriais antigos mostram <code>eval(input())</code> para converter automaticamente. Isso é <strong>extremamente perigoso</strong> — permite que o usuário execute código arbitrário!</p>
+            <pre><code># ❌ PERIGOSO — NUNCA FAÇA ISSO:
+# resultado = eval(input("Expressão: "))
+# O usuário pode digitar: __import__('os').system('rm -rf /')
+
+# ✅ SEGURO — sempre converta explicitamente:
+numero = int(input("Número: "))
+decimal = float(input("Decimal: "))</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Conversão de Tipos (Casting)</h3>
+          <p>Como Python é fortemente tipado, você precisa converter explicitamente entre tipos. As funções de conversão mais usadas são <code>int()</code>, <code>float()</code>, <code>str()</code> e <code>bool()</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Funções de Conversão</h4>
+            <pre><code># str → int
+print(int("42"))        # 42
+print(int("-10"))       # -10
+print(int("0xFF", 16)) # 255 (hexadecimal)
+print(int("0b1010", 2)) # 10 (binário)
+print(int("0o52", 8))  # 42 (octal)
+# int("3.14")           # ValueError! Use float() primeiro
+print(int(float("3.14")))  # 3
+
+# str → float
+print(float("3.14"))    # 3.14
+print(float("-2.5"))    # -2.5
+print(float("1e10"))    # 10000000000.0
+print(float("inf"))     # inf
+print(float("-inf"))    # -inf
+
+# int → str
+print(str(42))          # "42"
+print(str(-10))         # "-10"
+
+# float → str
+print(str(3.14))        # "3.14"
+print(str(1e10))        # "10000000000.0"
+
+# int ↔ float
+print(float(42))        # 42.0
+print(int(3.14))        # 3 (TRUNCA, não arredonda!)
+print(int(3.99))        # 3 (TRUNCA!)
+print(int(-3.7))        # -3 (TRUNCA em direção a zero!)
+print(round(3.7))       # 4 (arredonda)
+
+# → bool
+print(bool(0))          # False
+print(bool(42))         # True
+print(bool(""))         # False
+print(bool("texto"))    # True
+print(bool([]))         # False
+print(bool([1, 2]))     # True
+print(bool(None))       # False
+
+# Conversões comuns em DevOps:
+# String de porta → número
+porta = int("8080")
+
+# Byte para KB/MB
+bytes_total = 1073741824
+gb = bytes_total / (1024 ** 3)
+print(f"{gb:.1f} GB")  # 1.0 GB
+
+# String booleana (cuidado!)
+print(bool("False"))    # True!! (string não vazia!)
+print(bool(""))         # False
+# Para converter "true"/"false" string:
+texto = "true"
+valor = texto.lower() in ("true", "1", "yes", "sim")
+print(valor)  # True</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — Entrada/Saída via Linha de Comando</h3>
+          <p>Para scripts de automação e DevOps, é comum receber parâmetros via linha de comando em vez de pedir com <code>input()</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 sys.argv — Argumentos de Linha de Comando</h4>
+            <pre><code># arquivo: deploy.py
+import sys
+
+# sys.argv é uma lista com os argumentos do comando
+# sys.argv[0] é sempre o nome do script
+
+print(f"Script: {sys.argv[0]}")
+print(f"Total de argumentos: {len(sys.argv)}")
+print(f"Argumentos: {sys.argv[1:]}")
+
+# Execução: python3 deploy.py prod us-east-1 web-server
+# Saída:
+# Script: deploy.py
+# Total de argumentos: 4
+# Argumentos: ['prod', 'us-east-1', 'web-server']
+
+# Exemplo prático: script de deploy
+if len(sys.argv) < 3:
+    print("Uso: python3 deploy.py &lt;ambiente&gt; &lt;regiao&gt;")
+    print("Exemplo: python3 deploy.py prod us-east-1")
+    sys.exit(1)
+
+ambiente = sys.argv[1]
+regiao = sys.argv[2]
+print(f"Deploying para {ambiente} na região {regiao}...")
+
+# Para scripts mais complexos, use a biblioteca argparse:
+import argparse
+
+parser = argparse.ArgumentParser(description="Script de deploy")
+parser.add_argument("ambiente", choices=["dev", "staging", "prod"])
+parser.add_argument("--regiao", "-r", default="us-east-1")
+parser.add_argument("--verbose", "-v", action="store_true")
+parser.add_argument("--replicas", "-n", type=int, default=2)
+
+args = parser.parse_args()
+print(f"Ambiente: {args.ambiente}")
+print(f"Região: {args.regiao}")
+print(f"Verbose: {args.verbose}")
+print(f"Réplicas: {args.replicas}")
+
+# Execução: python3 deploy.py prod -r sa-east-1 -v -n 3</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 sys.stdin e sys.stdout</h4>
+            <pre><code>import sys
+
+# sys.stdout — saída padrão (onde print() escreve)
+sys.stdout.write("Olá via stdout\n")  # Equivalente a print("Olá via stdout")
+
+# sys.stderr — saída de erro (não é capturada por pipes)
+sys.stderr.write("ERRO: algo deu errado\n")
+
+# sys.stdin — entrada padrão (ler de pipes)
+# Útil para ler dados de pipes no terminal:
+# echo "dados" | python3 script.py
+# cat arquivo.txt | python3 script.py
+
+# Exemplo: processar input de pipe
+# for linha in sys.stdin:
+#     linha = linha.strip()
+#     if linha:
+#         print(f"Processando: {linha}")
+
+# Verificar se há dados em stdin (pipe ou terminal)
+if not sys.stdin.isatty():
+    # Dados estão vindo via pipe
+    dados = sys.stdin.read()
+    print(f"Recebi via pipe: {dados}")
+else:
+    # Execução interativa (terminal)
+    print("Execução interativa — use input()")
+
+# Saída com código de status
+# sys.exit(0)  # Sucesso
+# sys.exit(1)  # Erro genérico
+# sys.exit(2)  # Uso incorreto do comando</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7 — TYPE HINTS (ANOTAÇÕES DE TIPO)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Type Hints (Anotações de Tipo)</h2>
+          <p>Type Hints adicionam informações de tipo ao código Python sem alterar seu comportamento. Melhoram a legibilidade, facilitam a detecção de bugs e habilitam autocompletar em IDEs.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — Por que Usar Type Hints?</h3>
+          <p>Python é dinamicamente tipado — mas isso não significa que tipos não importam! Type Hints são <strong>anotações opcionais</strong> que documentam os tipos esperados sem afetar a execução.</p>
+
+          <div class="command-grid">
+            <div class="command-card">
+              <h4>❌ Sem Type Hints</h4>
+              <pre><code># O que essa função espera?
+# O que ela retorna?
+def calcular_preco(quantidade, valor, desconto):
+    total = quantidade * valor
+    return total - (total * desconto)
+
+# Sem type hints, você precisa:
+# 1. Ler a implementação
+# 2. Adivinhar os tipos
+# 3. Testar para descobrir</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>✅ Com Type Hints</h4>
+              <pre><code># CLARO! Sabemos exatamente o que esperar
+def calcular_preco(
+    quantidade: int,
+    valor: float,
+    desconto: float
+) -> float:
+    total = quantidade * valor
+    return total - (total * desconto)
+
+# Com type hints:
+# 1. IDE mostra autocompletar correto
+# 2. mypy detecta erros antes de executar
+# 3. Documentação embutida no código</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Type Hints NÃO são enforced em runtime!</h4>
+            <p>Type Hints são <strong>apenas anotações</strong>. Python <strong>não verifica</strong> tipos em tempo de execução. Para verificação, use ferramentas externas como <code>mypy</code>, <code>pyright</code> ou <code>pytype</code>. As anotações servem para: documentação, IDE autocompletar, e análise estática.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Anotações Básicas para Variáveis</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Type Hints para Variáveis</h4>
+            <pre><code># Tipos básicos
+nome: str = "Maria"
+idade: int = 30
+altura: float = 1.68
+ativo: bool = True
+nulo: None = None
+
+# Tipos compostos (Python 3.9+)
+numeros: list[int] = [1, 2, 3, 4, 5]
+coordenadas: tuple[float, float] = (10.5, 20.3)
+configuracao: dict[str, str] = {"host": "localhost", "port": "8080"}
+tags: set[str] = {"python", "devops", "aws"}
+
+# Para Python 3.8 e anteriores, use typing:
+from typing import List, Dict, Tuple, Set
+numeros: List[int] = [1, 2, 3]
+config: Dict[str, str] = {"key": "value"}
+
+# Tipos opcionais (pode ser None)
+from typing import Optional
+nome_meio: Optional[str] = None  # str ou None
+# Python 3.10+: usar | em vez de Optional
+nome_meio: str | None = None
+
+# Tipos union (pode ser vários tipos)
+from typing import Union
+identificador: Union[int, str] = "ABC123"
+# Python 3.10+:
+identificador: int | str = "ABC123"
+
+# Declarar tipo sem atribuir valor:
+total: int  # Apenas declara o tipo
+# print(total)  # NameError — não foi atribuído!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — Anotações para Funções</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Type Hints em Funções</h4>
+            <pre><code># Parâmetros e retorno
+def saudacao(nome: str, idade: int) -> str:
+    return f"Olá {nome}, você tem {idade} anos!"
+
+# Função que não retorna nada
+def log_mensagem(msg: str, nivel: str = "INFO") -> None:
+    print(f"[{nivel}] {msg}")
+
+# Parâmetros com valor padrão
+def criar_usuario(
+    nome: str,
+    email: str,
+    idade: int = 0,
+    ativo: bool = True,
+    tags: list[str] | None = None
+) -> dict[str, any]:
+    if tags is None:
+        tags = []
+    return {
+        "nome": nome,
+        "email": email,
+        "idade": idade,
+        "ativo": ativo,
+        "tags": tags
+    }
+
+# Função com múltiplos retornos possíveis
+def dividir(a: float, b: float) -> float | None:
+    if b == 0:
+        return None
+    return a / b
+
+# Callback / funções como parâmetro
+from typing import Callable
+
+def aplicar_operacao(
+    valor: float,
+    operacao: Callable[[float], float]
+) -> float:
+    return operacao(valor)
+
+# Uso:
+resultado = aplicar_operacao(25.0, lambda x: x ** 0.5)  # 5.0</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Verificação com mypy</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Usando mypy para Verificar Tipos</h4>
+            <pre><code># Instalar mypy:
+# pip install mypy
+
+# arquivo: meu_script.py
+def soma(a: int, b: int) -> int:
+    return a + b
+
+resultado: str = soma(1, 2)  # ERRO: soma retorna int, não str!
+
+# Executar verificação:
+# $ mypy meu_script.py
+# meu_script.py:4: error: Incompatible types in assignment
+#   (expression has type "int", variable has type "str")
+
+# mypy detecta erros ANTES de executar o código!
+# É como ter um compilador para Python.
+
+# Configuração recomendada (pyproject.toml):
+# [tool.mypy]
+# python_version = "3.12"
+# warn_return_any = true
+# warn_unused_configs = true
+# disallow_untyped_defs = true
+
+# Ou crie um mypy.ini:
+# [mypy]
+# python_version = 3.12
+# strict = True
+
+# Dica: comece com strict = False e vá adicionando
+# verificações gradualmente em projetos existentes</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Quando Usar Type Hints</h4>
+            <ul>
+              <li><strong>Sempre em funções públicas:</strong> parâmetros e retorno</li>
+              <li><strong>Em variáveis de módulo:</strong> quando o tipo não é óbvio</li>
+              <li><strong>Em projetos colaborativos:</strong> facilita revisão de código</li>
+              <li><strong>Em bibliotecas:</strong> essencial para quem vai usar sua lib</li>
+              <li><strong>Pode pular em:</strong> scripts descartáveis, variáveis locais óbvias, protótipos rápidos</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8 — BOAS PRÁTICAS E PEP 8
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Boas Práticas e PEP 8</h2>
+          <p>A PEP 8 é o guia de estilo oficial do Python. Seguir essas convenções torna seu código imediatamente legível para qualquer desenvolvedor Python no mundo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 — PEP 8: O Guia de Estilo do Python</h3>
+          <p>PEP (Python Enhancement Proposal) 8 é o documento que define como código Python deve ser formatado. Não é obrigatório para o interpretador, mas é <strong>universalmente seguido</strong> pela comunidade.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Regras Fundamentais da PEP 8</h4>
+            <pre><code># ═══════════════════════════════════════════
+# INDENTAÇÃO: 4 espaços (NUNCA tabs!)
+# ═══════════════════════════════════════════
+
+# ✅ CORRETO (4 espaços):
+def funcao():
+    if True:
+        print("4 espaços")
+        for i in range(5):
+            print(i)
+
+# ❌ ERRADO (tabs ou 2 espaços):
+def funcao():
+  if True:
+    print("2 espaços — errado!")
+
+# ═══════════════════════════════════════════
+# COMPRIMENTO DE LINHA: máximo 79 caracteres
+# (ou 120 em projetos modernos)
+# ═══════════════════════════════════════════
+
+# ✅ Quebrar linhas longas:
+resultado = (
+    variavel_longa_1
+    + variavel_longa_2
+    - variavel_longa_3
+)
+
+# ✅ Parâmetros de função em múltiplas linhas:
+def funcao_com_muitos_parametros(
+    parametro_um: str,
+    parametro_dois: int,
+    parametro_tres: float = 0.0,
+) -> dict:
+    pass
+
+# ✅ Chamada de função longa:
+resultado = funcao_muito_longa(
+    argumento_1="valor",
+    argumento_2=42,
+    argumento_3=True,
+)
+
+# ═══════════════════════════════════════════
+# LINHAS EM BRANCO
+# ═══════════════════════════════════════════
+
+# 2 linhas em branco entre funções/classes de nível superior:
+def funcao_1():
+    pass
+
+
+def funcao_2():
+    pass
+
+
+class MinhaClasse:
+    # 1 linha em branco entre métodos:
+    def metodo_1(self):
+        pass
+
+    def metodo_2(self):
+        pass</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 — Convenções de Nomenclatura</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Nomes Pythônicos</h4>
+            <pre><code># ═══════════════════════════════════════════
+# VARIÁVEIS E FUNÇÕES: snake_case
+# ═══════════════════════════════════════════
+nome_usuario = "Maria"
+idade_atual = 30
+total_de_pedidos = 142
+
+def calcular_desconto(valor: float, percentual: float) -> float:
+    return valor * (percentual / 100)
+
+def obter_conexao_banco() -> object:
+    pass
+
+# ═══════════════════════════════════════════
+# CLASSES: CamelCase (PascalCase)
+# ═══════════════════════════════════════════
+class ServidorWeb:
+    pass
+
+class GerenciadorDeConexoes:
+    pass
+
+class AWSClienteS3:
+    pass
+
+# ═══════════════════════════════════════════
+# CONSTANTES: UPPER_SNAKE_CASE
+# ═══════════════════════════════════════════
+MAX_TENTATIVAS = 3
+TIMEOUT_SEGUNDOS = 30
+URL_BASE_API = "https://api.exemplo.com"
+VERSAO_MINIMA_PYTHON = (3, 9)
+
+# ═══════════════════════════════════════════
+# PRIVADO: prefixo com _underscore
+# ═══════════════════════════════════════════
+_conexao_interna = None        # "privado" — uso interno do módulo
+_cache_temporario = {}
+
+class Usuario:
+    def __init__(self):
+        self._email = ""       # "protegido" — não acesse de fora
+        self.__senha = ""      # "privado" — name mangling
+
+# ═══════════════════════════════════════════
+# NOMES A EVITAR
+# ═══════════════════════════════════════════
+# ❌ Nunca use l (ele), O (ó), I (i) sozinhos — confusos com 1 e 0
+# ❌ Nunca use nomes genéricos: data, info, temp, foo, bar
+# ❌ Nunca use abreviações obscuras: calc_val, proc_msg
+# ✅ Use nomes descritivos: calcular_valor_total, processar_mensagem</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 — Comentários e Docstrings</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Comentários Efetivos</h4>
+            <pre><code># ═══════════════════════════════════════════
+# COMENTÁRIOS — Explicam o PORQUÊ, não o QUÊ
+# ═══════════════════════════════════════════
+
+# ❌ RUIM — diz o que o código já diz:
+x = x + 1  # Incrementa x
+
+# ✅ BOM — explica o porquê:
+x = x + 1  # Compensar índice base-0 para exibição
+
+# ❌ RUIM:
+# Verifica se o usuário é admin
+if usuario.role == "admin":
+    pass
+
+# ✅ BOM:
+# Admins têm acesso total sem verificação de permissões individuais
+if usuario.role == "admin":
+    pass
+
+# ═══════════════════════════════════════════
+# COMENTÁRIOS INLINE — Na mesma linha, com 2 espaços
+# ═══════════════════════════════════════════
+x = 5  # Valor padrão para retry
+porta = 8080  # Porta padrão do servidor de dev
+
+# ═══════════════════════════════════════════
+# DOCSTRINGS — Documentação de módulos, classes e funções
+# ═══════════════════════════════════════════
+
+def calcular_imposto(valor: float, aliquota: float = 0.15) -> float:
+    """Calcula o imposto sobre um valor monetário.
+
+    Aplica a alíquota especificada sobre o valor base.
+    O resultado é arredondado para 2 casas decimais.
+
+    Args:
+        valor: Valor base para cálculo (deve ser positivo).
+        aliquota: Percentual do imposto em decimal (padrão: 0.15 = 15%).
+
+    Returns:
+        Valor do imposto calculado, arredondado para 2 decimais.
+
+    Raises:
+        ValueError: Se o valor for negativo.
+
+    Examples:
+        >>> calcular_imposto(1000.0)
+        150.0
+        >>> calcular_imposto(1000.0, 0.25)
+        250.0
+    """
+    if valor < 0:
+        raise ValueError("Valor não pode ser negativo")
+    return round(valor * aliquota, 2)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 — Imports e Organização</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Organização de Imports (PEP 8)</h4>
+            <pre><code># Imports devem estar no TOPO do arquivo, organizados em 3 grupos:
+
+# Grupo 1: Biblioteca padrão (standard library)
+import os
+import sys
+import json
+from pathlib import Path
+from datetime import datetime, timedelta
+from typing import Optional, List
+
+# Grupo 2: Bibliotecas de terceiros (pip install)
+import boto3
+import requests
+from flask import Flask, jsonify
+from pydantic import BaseModel
+
+# Grupo 3: Imports locais (seu projeto)
+from .config import Settings
+from .models import Usuario
+from .utils import formatar_data
+
+# ═══════════════════════════════════════════
+# REGRAS DE IMPORT
+# ═══════════════════════════════════════════
+
+# ✅ Um import por linha:
+import os
+import sys
+
+# ❌ Múltiplos imports na mesma linha:
+import os, sys
+
+# ✅ Múltiplos from...import é OK:
+from os.path import join, dirname, exists
+
+# ❌ NUNCA use import * (wildcard):
+from os import *  # Polui o namespace, impossível saber o que foi importado
+
+# ✅ Use alias para nomes longos:
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime as dt</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.5 — Ferramentas de Formatação Automática</h3>
+          <p>Você não precisa memorizar todas as regras da PEP 8 — use ferramentas automáticas que formatam o código para você!</p>
+
+          <div class="command-card wide">
+            <h4>📋 Ferramentas Essenciais</h4>
+            <pre><code># ═══════════════════════════════════════════
+# BLACK — O formatador "sem opinião" (na verdade, opinado!)
+# ═══════════════════════════════════════════
+# Instalar: pip install black
+# Usar: black meu_arquivo.py
+# Ou toda a pasta: black .
+# Verificar sem alterar: black --check .
+
+# Black formata automaticamente:
+# - Indentação, espaços, quebras de linha
+# - Aspas (padroniza para duplas)
+# - Vírgulas finais em multilinhas
+# - Linha máxima de 88 caracteres (padrão)
+
+# ═══════════════════════════════════════════
+# FLAKE8 — Linter (verifica erros de estilo)
+# ═══════════════════════════════════════════
+# Instalar: pip install flake8
+# Usar: flake8 meu_arquivo.py
+# Apenas verifica — NÃO modifica o código!
+
+# ═══════════════════════════════════════════
+# ISORT — Organiza imports automaticamente
+# ═══════════════════════════════════════════
+# Instalar: pip install isort
+# Usar: isort meu_arquivo.py
+# Compatível com black: isort --profile black .
+
+# ═══════════════════════════════════════════
+# RUFF — Linter + Formatter ultrarrápido (Rust)
+# ═══════════════════════════════════════════
+# Instalar: pip install ruff
+# Linting: ruff check .
+# Formatação: ruff format .
+# Ruff substitui flake8, isort, e vários outros — é o futuro!
+
+# ═══════════════════════════════════════════
+# CONFIGURAÇÃO RECOMENDADA (pyproject.toml)
+# ═══════════════════════════════════════════
+# [tool.black]
+# line-length = 88
+# target-version = ['py312']
+#
+# [tool.isort]
+# profile = "black"
+#
+# [tool.ruff]
+# line-length = 88
+# select = ["E", "F", "W", "I"]
+#
+# [tool.mypy]
+# python_version = "3.12"
+# strict = true</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Setup Ideal para Iniciante</h4>
+            <ol>
+              <li>Instale a extensão <strong>Python</strong> no VS Code</li>
+              <li>Instale <strong>Ruff</strong> (linter + formatter): <code>pip install ruff</code></li>
+              <li>Configure o VS Code para formatar ao salvar</li>
+              <li>Pronto! O código será formatado automaticamente</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9 — AMBIENTE DE DESENVOLVIMENTO
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 9</span>
+          <h2>Ambiente de Desenvolvimento</h2>
+          <p>Configure um ambiente profissional de desenvolvimento Python — ambientes virtuais, gerenciamento de pacotes, editores e estrutura de projetos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 — Ambientes Virtuais (venv)</h3>
+          <p>Ambientes virtuais são <strong>isolamentos</strong> que permitem cada projeto ter suas próprias dependências sem conflitar com outros projetos ou com o Python do sistema.</p>
+
+          <div class="info-box warning">
+            <h4>⚠️ REGRA DE OURO: Sempre Use Virtual Environment!</h4>
+            <p><strong>NUNCA</strong> instale pacotes diretamente no Python do sistema com <code>pip install</code> sem estar em um ambiente virtual. Isso pode quebrar o sistema operacional (especialmente no Linux) e causa conflitos entre projetos.</p>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Criando e Usando Virtual Environments</h4>
+            <pre><code># Criar um ambiente virtual (pasta .venv no projeto)
+python3 -m venv .venv
+
+# Ativar o ambiente virtual:
+# Linux/Mac:
+source .venv/bin/activate
+
+# Windows (CMD):
+.venv\Scripts\activate.bat
+
+# Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+
+# Após ativar, o prompt muda:
+# (.venv) usuario@maquina:~/projeto$
+
+# Verificar que está usando o Python do venv:
+which python    # Linux/Mac: /caminho/projeto/.venv/bin/python
+where python    # Windows: C:\caminho\projeto\.venv\Scripts\python.exe
+
+# Instalar pacotes (agora só no venv!):
+pip install requests boto3 flask
+
+# Ver pacotes instalados:
+pip list
+pip freeze
+
+# Salvar dependências:
+pip freeze > requirements.txt
+
+# Instalar a partir do requirements.txt (em outra máquina/deploy):
+pip install -r requirements.txt
+
+# Desativar o ambiente:
+deactivate
+
+# ESTRUTURA DO PROJETO:
+# meu-projeto/
+# ├── .venv/              ← Ambiente virtual (NÃO commitar!)
+# ├── .gitignore          ← Deve conter: .venv/
+# ├── requirements.txt    ← Lista de dependências
+# ├── src/
+# │   └── main.py
+# └── tests/
+#     └── test_main.py</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 .gitignore para Projetos Python</h4>
+            <pre><code># Ambiente virtual
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribuição/Packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Variáveis de ambiente
+.env
+.env.local
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Mypy
+.mypy_cache/
+
+# OS
+.DS_Store
+Thumbs.db</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 — pip: Gerenciamento de Pacotes</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Comandos Essenciais do pip</h4>
+            <pre><code># Instalar um pacote
+pip install requests
+
+# Instalar versão específica
+pip install requests==2.31.0
+
+# Instalar com restrição de versão
+pip install "requests>=2.28,<3.0"
+
+# Atualizar pacote
+pip install --upgrade requests
+pip install -U requests  # Atalho
+
+# Desinstalar
+pip uninstall requests
+
+# Listar pacotes instalados
+pip list
+
+# Mostrar info de um pacote
+pip show requests
+
+# Gerar requirements.txt
+pip freeze > requirements.txt
+
+# Instalar de requirements.txt
+pip install -r requirements.txt
+
+# Buscar pacotes no PyPI
+pip search flask  # (pode estar desabilitado)
+# Alternativa: use https://pypi.org para buscar
+
+# Instalar pacotes de desenvolvimento separados
+# requirements-dev.txt:
+# -r requirements.txt   ← Inclui o principal
+# pytest==7.4.0
+# black==23.7.0
+# mypy==1.5.0
+pip install -r requirements-dev.txt
+
+# Verificar vulnerabilidades
+pip install pip-audit
+pip-audit</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 — pyenv: Gerenciamento de Versões Python</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Usando pyenv</h4>
+            <pre><code># pyenv permite ter MÚLTIPLAS versões do Python instaladas
+
+# Instalar pyenv (Linux/Mac):
+curl https://pyenv.run | bash
+# Adicione ao ~/.bashrc:
+# export PATH="$HOME/.pyenv/bin:$PATH"
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
+
+# Windows: use pyenv-win
+# pip install pyenv-win --target %USERPROFILE%\.pyenv
+
+# Listar versões disponíveis:
+pyenv install --list | grep "3.1"
+
+# Instalar uma versão:
+pyenv install 3.12.0
+pyenv install 3.11.6
+
+# Definir versão global (padrão do sistema):
+pyenv global 3.12.0
+
+# Definir versão local (por projeto):
+cd meu-projeto/
+pyenv local 3.11.6
+# Cria arquivo .python-version no diretório
+
+# Ver versão ativa:
+pyenv version
+
+# Listar versões instaladas:
+pyenv versions
+
+# pyenv + venv (workflow recomendado):
+cd meu-projeto/
+pyenv local 3.12.0          # Define versão
+python -m venv .venv        # Cria venv com essa versão
+source .venv/bin/activate   # Ativa</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 — VS Code: Setup Ideal para Python</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Extensões e Configurações Recomendadas</h4>
+            <pre><code># ═══════════════════════════════════════════
+# EXTENSÕES ESSENCIAIS DO VS CODE
+# ═══════════════════════════════════════════
+# 1. Python (Microsoft) — Intellisense, debug, linting
+# 2. Pylance — Language server avançado
+# 3. Ruff — Linter + formatter ultrarrápido
+# 4. Python Indent — Indentação inteligente
+# 5. autoDocstring — Gera docstrings automaticamente
+
+# ═══════════════════════════════════════════
+# CONFIGURAÇÕES (.vscode/settings.json)
+# ═══════════════════════════════════════════
+{
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "python.analysis.typeCheckingMode": "basic",
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["tests/"]
+}
+
+# ═══════════════════════════════════════════
+# ATALHOS ÚTEIS
+# ═══════════════════════════════════════════
+# F5 → Executar com debugger
+# Ctrl+F5 → Executar sem debugger
+# F9 → Toggle breakpoint
+# Ctrl+Shift+` → Novo terminal
+# Ctrl+Shift+P → Command Palette → "Python: Select Interpreter"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.5 — Estrutura de Projeto para Iniciantes</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Estrutura Recomendada</h4>
+            <pre><code># Projeto simples (script/automação):
+meu-projeto/
+├── .venv/                  # Ambiente virtual (não commitar)
+├── .gitignore              # Arquivos ignorados pelo git
+├── README.md               # Documentação do projeto
+├── requirements.txt        # Dependências de produção
+├── requirements-dev.txt    # Dependências de desenvolvimento
+├── pyproject.toml          # Configuração do projeto e ferramentas
+├── src/                    # Código-fonte
+│   ├── __init__.py
+│   ├── main.py             # Ponto de entrada
+│   ├── config.py           # Configurações
+│   └── utils.py            # Utilitários
+└── tests/                  # Testes
+    ├── __init__.py
+    ├── test_main.py
+    └── test_utils.py
+
+# Exemplo de pyproject.toml mínimo:
+# [project]
+# name = "meu-projeto"
+# version = "0.1.0"
+# requires-python = ">=3.10"
+# dependencies = [
+#     "requests>=2.28",
+#     "boto3>=1.28",
+# ]
+#
+# [project.optional-dependencies]
+# dev = [
+#     "pytest>=7.0",
+#     "ruff>=0.1",
+#     "mypy>=1.5",
+# ]
+
+# Criar projeto do zero:
+mkdir meu-projeto && cd meu-projeto
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+# Começar a codar!</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 10 — EXERCÍCIOS PRÁTICOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 10</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Pratique todos os conceitos aprendidos neste módulo. Os exercícios vão do básico ao desafiador — tente resolver sozinho antes de ver a resposta!</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Variáveis e Tipos (Fácil)</h3>
+          <p>Crie um programa que declare variáveis para armazenar: seu nome, sua idade, sua altura e se você é estudante (booleano). Use type hints e imprima cada variável com seu tipo usando f-strings.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Saída Esperada</h4>
+            <pre><code>Nome: Maria (tipo: &lt;class 'str'&gt;)
+Idade: 25 (tipo: &lt;class 'int'&gt;)
+Altura: 1.68 (tipo: &lt;class 'float'&gt;)
+Estudante: True (tipo: &lt;class 'bool'&gt;)</code></pre>
+          </div>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 1 — Variáveis e Tipos
+nome: str = "Maria"
+idade: int = 25
+altura: float = 1.68
+estudante: bool = True
+
+print(f"Nome: {nome} (tipo: {type(nome)})")
+print(f"Idade: {idade} (tipo: {type(idade)})")
+print(f"Altura: {altura} (tipo: {type(altura)})")
+print(f"Estudante: {estudante} (tipo: {type(estudante)})")
+
+# Bônus: verificar com isinstance
+print(f"\nnome é str? {isinstance(nome, str)}")
+print(f"idade é int? {isinstance(idade, int)}")
+print(f"altura é float? {isinstance(altura, float)}")
+print(f"estudante é bool? {isinstance(estudante, bool)}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — Swap de Variáveis (Fácil)</h3>
+          <p>Dadas as variáveis <code>a = "Python"</code> e <code>b = "Java"</code>, troque seus valores usando o swap pythônico (uma linha). Depois, faça o swap de três variáveis <code>x = 1, y = 2, z = 3</code> de forma que <code>x</code> receba o valor de <code>z</code>, <code>y</code> receba o de <code>x</code> e <code>z</code> receba o de <code>y</code>.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 2 — Swap de Variáveis
+
+# Parte 1: Swap simples
+a = "Python"
+b = "Java"
+print(f"Antes: a={a}, b={b}")
+
+a, b = b, a  # Swap pythônico!
+print(f"Depois: a={a}, b={b}")
+# Saída: Antes: a=Python, b=Java
+#         Depois: a=Java, b=Python
+
+# Parte 2: Swap de três variáveis
+x, y, z = 1, 2, 3
+print(f"\nAntes: x={x}, y={y}, z={z}")
+
+# x recebe z, y recebe x, z recebe y (valores originais)
+x, y, z = z, x, y
+print(f"Depois: x={x}, y={y}, z={z}")
+# Saída: Antes: x=1, y=2, z=3
+#         Depois: x=3, y=1, z=2</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — Conversão de Tipos (Fácil)</h3>
+          <p>Peça ao usuário: nome, ano de nascimento e altura. Calcule a idade (ano atual - ano nascimento) e exiba tudo formatado. Trate a possibilidade do usuário digitar um valor inválido.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 3 — Conversão de Tipos
+from datetime import datetime
+
+nome = input("Seu nome: ")
+ano_atual = datetime.now().year
+
+try:
+    ano_nascimento = int(input("Ano de nascimento: "))
+    altura = float(input("Sua altura (ex: 1.75): "))
+
+    idade = ano_atual - ano_nascimento
+
+    print(f"\n{'='*35}")
+    print(f"{'CADASTRO':^35}")
+    print(f"{'='*35}")
+    print(f"Nome: {nome}")
+    print(f"Idade: {idade} anos")
+    print(f"Altura: {altura:.2f}m")
+    print(f"{'='*35}")
+
+except ValueError:
+    print("Erro: por favor, digite valores numéricos válidos!")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4 — Operações com Strings (Médio)</h3>
+          <p>Dada a string <code>"  Python Para DevOps e Cloud Engineering  "</code>, realize as seguintes operações:</p>
+          <ol>
+            <li>Remova espaços das extremidades</li>
+            <li>Converta para minúsculas</li>
+            <li>Substitua espaços por hífens</li>
+            <li>Conte quantas vezes a letra "o" aparece (case-insensitive)</li>
+            <li>Extraia apenas "DevOps e Cloud" usando slicing</li>
+            <li>Verifique se começa com "python" (case-insensitive)</li>
+          </ol>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 4 — Operações com Strings
+texto = "  Python Para DevOps e Cloud Engineering  "
+
+# 1. Remover espaços
+limpo = texto.strip()
+print(f"1. Strip: '{limpo}'")
+
+# 2. Converter para minúsculas
+minusculo = limpo.lower()
+print(f"2. Lower: '{minusculo}'")
+
+# 3. Substituir espaços por hífens
+slug = minusculo.replace(" ", "-")
+print(f"3. Slug: '{slug}'")
+
+# 4. Contar letra "o" (case-insensitive)
+contagem_o = limpo.lower().count("o")
+print(f"4. Letra 'o' aparece {contagem_o} vezes")
+
+# 5. Extrair "DevOps e Cloud" usando slicing
+# "Python Para DevOps e Cloud Engineering"
+#  0123456789...
+# "DevOps" começa no índice 11
+extraido = limpo[11:25]
+print(f"5. Slicing: '{extraido}'")
+# Alternativa com find:
+inicio = limpo.find("DevOps")
+fim = limpo.find("Cloud") + len("Cloud")
+extraido2 = limpo[inicio:fim]
+print(f"5b. Com find: '{extraido2}'")
+
+# 6. Verificar início
+comeca_python = limpo.lower().startswith("python")
+print(f"6. Começa com 'python': {comeca_python}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 5 — f-strings e Formatação (Médio)</h3>
+          <p>Crie uma "nota fiscal" formatada usando f-strings. Use os dados: 3 produtos com nome, quantidade e preço unitário. Calcule subtotais, total geral e aplique 10% de desconto. Alinhe tudo em colunas.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 5 — Nota Fiscal com f-strings
+produtos = [
+    ("Teclado Mecânico", 2, 289.90),
+    ("Mouse Gamer", 3, 159.50),
+    ("Monitor 27pol", 1, 1899.00),
+]
+
+desconto_pct = 0.10  # 10%
+
+print("=" * 55)
+print(f"{'NOTA FISCAL - CLOUDTRILHAS TECH':^55}")
+print("=" * 55)
+print(f"{'Produto':<25}{'Qtd':>5}{'Unit':>10}{'Subtotal':>13}")
+print("-" * 55)
+
+total = 0.0
+for nome, qtd, preco in produtos:
+    subtotal = qtd * preco
+    total += subtotal
+    print(f"{nome:<25}{qtd:>5}{preco:>10.2f}{subtotal:>13.2f}")
+
+print("-" * 55)
+print(f"{'Subtotal:':<40}R${total:>10.2f}")
+
+valor_desconto = total * desconto_pct
+print(f"{'Desconto (10%):':<40}-R${valor_desconto:>9.2f}")
+
+total_final = total - valor_desconto
+print(f"{'TOTAL:':<40}R${total_final:>10.2f}")
+print("=" * 55)
+print(f"\nEconomia de R${valor_desconto:.2f} com desconto!")
+print(f"Pagamento em até 12x de R${total_final/12:.2f}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 6 — Operadores Aritméticos (Médio)</h3>
+          <p>Escreva um programa que converta um valor em segundos para o formato <code>HH:MM:SS</code>. Teste com 3661 segundos (deve dar 01:01:01) e 86399 segundos (deve dar 23:59:59).</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 6 — Conversor de Segundos para HH:MM:SS
+
+def segundos_para_hms(total_segundos: int) -> str:
+    """Converte segundos totais para formato HH:MM:SS."""
+    horas = total_segundos // 3600
+    minutos = (total_segundos % 3600) // 60
+    segundos = total_segundos % 60
+    return f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+
+# Testes
+print(segundos_para_hms(3661))    # 01:01:01
+print(segundos_para_hms(86399))   # 23:59:59
+print(segundos_para_hms(0))       # 00:00:00
+print(segundos_para_hms(45))      # 00:00:45
+print(segundos_para_hms(3600))    # 01:00:00
+print(segundos_para_hms(7200))    # 02:00:00
+print(segundos_para_hms(90061))   # 25:01:01 (mais de 24h)
+
+# Versão interativa:
+try:
+    entrada = int(input("\nDigite os segundos: "))
+    if entrada < 0:
+        print("Erro: valor deve ser positivo!")
+    else:
+        print(f"{entrada} segundos = {segundos_para_hms(entrada)}")
+except ValueError:
+    print("Erro: digite um número inteiro válido!")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 7 — Operadores Lógicos e Comparação (Médio)</h3>
+          <p>Crie um verificador de senha que verifica se uma senha atende aos seguintes critérios: mínimo 8 caracteres, pelo menos uma letra maiúscula, pelo menos um número, e não pode ser igual ao nome do usuário. Use operadores lógicos.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 7 — Verificador de Senha
+
+def verificar_senha(senha: str, nome_usuario: str) -> tuple[bool, list[str]]:
+    """Verifica se a senha atende aos critérios de segurança.
+    
+    Retorna uma tupla: (é_válida, lista_de_problemas)
+    """
+    problemas: list[str] = []
+
+    # Critério 1: mínimo 8 caracteres
+    if len(senha) < 8:
+        problemas.append(f"Muito curta ({len(senha)} chars, mínimo 8)")
+
+    # Critério 2: pelo menos uma maiúscula
+    tem_maiuscula = False
+    for char in senha:
+        if char.isupper():
+            tem_maiuscula = True
+            break
+    if not tem_maiuscula:
+        problemas.append("Deve ter pelo menos 1 letra maiúscula")
+
+    # Critério 3: pelo menos um número
+    tem_numero = False
+    for char in senha:
+        if char.isdigit():
+            tem_numero = True
+            break
+    if not tem_numero:
+        problemas.append("Deve ter pelo menos 1 número")
+
+    # Critério 4: não pode ser igual ao nome
+    if senha.lower() == nome_usuario.lower():
+        problemas.append("Senha não pode ser igual ao nome de usuário")
+
+    # Resultado
+    é_valida = len(problemas) == 0
+    return é_valida, problemas
+
+
+# Testes
+testes = [
+    ("admin", "Senh@Fort3"),      # OK
+    ("maria", "abc123"),           # Muito curta + sem maiúscula
+    ("joao", "ABCDEFGH"),         # Sem número
+    ("admin", "admin"),            # Todos os problemas
+    ("user", "MinhaSenh4Forte"),  # OK
+]
+
+for nome, senha in testes:
+    valida, erros = verificar_senha(senha, nome)
+    status = "✅ VÁLIDA" if valida else "❌ INVÁLIDA"
+    print(f"\nUsuário: {nome} | Senha: {senha}")
+    print(f"Status: {status}")
+    if erros:
+        for erro in erros:
+            print(f"  → {erro}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 8 — Calculadora de IMC (Médio)</h3>
+          <p>Crie uma calculadora de IMC (Índice de Massa Corporal) que recebe peso e altura, calcula o IMC, classifica o resultado e exibe tudo formatado. Fórmula: IMC = peso / altura².</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 8 — Calculadora de IMC
+
+def calcular_imc(peso: float, altura: float) -> tuple[float, str]:
+    """Calcula o IMC e retorna o valor e a classificação."""
+    imc = peso / (altura ** 2)
+    
+    if imc < 18.5:
+        classificacao = "Abaixo do peso"
+    elif imc < 25.0:
+        classificacao = "Peso normal"
+    elif imc < 30.0:
+        classificacao = "Sobrepeso"
+    elif imc < 35.0:
+        classificacao = "Obesidade Grau I"
+    elif imc < 40.0:
+        classificacao = "Obesidade Grau II"
+    else:
+        classificacao = "Obesidade Grau III"
+    
+    return imc, classificacao
+
+
+# Versão interativa:
+print("=" * 40)
+print(f"{'CALCULADORA DE IMC':^40}")
+print("=" * 40)
+
+try:
+    peso = float(input("Peso (kg): "))
+    altura = float(input("Altura (m): "))
+    
+    if peso <= 0 or altura <= 0:
+        print("Erro: valores devem ser positivos!")
+    elif altura > 3:
+        print("Dica: a altura deve ser em metros (ex: 1.75)")
+    else:
+        imc, classificacao = calcular_imc(peso, altura)
+        
+        print(f"\n{'─' * 40}")
+        print(f"Peso: {peso:.1f} kg")
+        print(f"Altura: {altura:.2f} m")
+        print(f"IMC: {imc:.1f}")
+        print(f"Classificação: {classificacao}")
+        print(f"{'─' * 40}")
+        
+except ValueError:
+    print("Erro: digite valores numéricos válidos!")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 9 — Gerador de Nomes de Recursos AWS (Desafio)</h3>
+          <p>Crie um gerador de nomes padronizados para recursos AWS. O padrão é: <code>{empresa}-{ambiente}-{regiao}-{servico}-{numero}</code>. Valide que nenhum campo está vazio, que o ambiente é válido (dev/staging/prod) e que o nome final não excede 63 caracteres (limite do S3).</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 9 — Gerador de Nomes de Recursos AWS
+
+AMBIENTES_VALIDOS: list[str] = ["dev", "staging", "prod"]
+LIMITE_CARACTERES: int = 63
+
+def gerar_nome_recurso(
+    empresa: str,
+    ambiente: str,
+    regiao: str,
+    servico: str,
+    numero: int = 1
+) -> str | None:
+    """Gera nome padronizado para recurso AWS.
+    
+    Formato: {empresa}-{ambiente}-{regiao}-{servico}-{numero:03d}
+    
+    Returns:
+        Nome formatado ou None se inválido.
+    """
+    # Validações
+    erros: list[str] = []
+    
+    if not empresa.strip():
+        erros.append("Empresa não pode estar vazio")
+    if ambiente.lower() not in AMBIENTES_VALIDOS:
+        erros.append(f"Ambiente deve ser: {', '.join(AMBIENTES_VALIDOS)}")
+    if not regiao.strip():
+        erros.append("Região não pode estar vazia")
+    if not servico.strip():
+        erros.append("Serviço não pode estar vazio")
+    if numero < 1 or numero > 999:
+        erros.append("Número deve ser entre 1 e 999")
+    
+    if erros:
+        print("❌ Erros de validação:")
+        for erro in erros:
+            print(f"   → {erro}")
+        return None
+    
+    # Gerar nome (tudo minúsculo, sem espaços)
+    nome = (
+        f"{empresa.strip().lower()}-"
+        f"{ambiente.strip().lower()}-"
+        f"{regiao.strip().lower()}-"
+        f"{servico.strip().lower()}-"
+        f"{numero:03d}"
+    )
+    
+    # Remover caracteres inválidos (apenas letras, números e hífens)
+    nome_limpo = ""
+    for char in nome:
+        if char.isalnum() or char == "-":
+            nome_limpo += char
+    
+    # Verificar limite de caracteres
+    if len(nome_limpo) > LIMITE_CARACTERES:
+        print(f"⚠️  Nome excede {LIMITE_CARACTERES} chars ({len(nome_limpo)} chars)")
+        print(f"   Considere abreviar os campos.")
+        return None
+    
+    return nome_limpo
+
+
+# Testes
+print("=" * 55)
+print(f"{'GERADOR DE NOMES AWS':^55}")
+print("=" * 55)
+
+testes = [
+    ("CloudTrilhas", "prod", "us-east-1", "s3-bucket", 1),
+    ("CloudTrilhas", "dev", "sa-east-1", "lambda", 5),
+    ("CT", "staging", "eu-west-1", "rds-postgres", 2),
+    ("empresa", "invalid", "us-east-1", "ec2", 1),  # Erro!
+    ("", "prod", "us-east-1", "s3", 1),              # Erro!
+]
+
+for empresa, amb, reg, svc, num in testes:
+    print(f"\nEntrada: {empresa}/{amb}/{reg}/{svc}/{num}")
+    resultado = gerar_nome_recurso(empresa, amb, reg, svc, num)
+    if resultado:
+        print(f"✅ Nome: {resultado} ({len(resultado)} chars)")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 10 — Parser de Log DevOps (Desafio)</h3>
+          <p>Dada uma string de log no formato <code>"2024-01-15 14:30:45 [ERROR] servidor=web-01 cpu=95.2% mem=87.5% msg=Limite de CPU excedido"</code>, extraia todas as informações usando APENAS métodos de string (sem regex). Monte um dicionário com os dados e exiba formatado.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 10 — Parser de Log DevOps
+
+def parsear_log(linha_log: str) -> dict[str, str]:
+    """Parseia uma linha de log e retorna dicionário com os campos."""
+    resultado: dict[str, str] = {}
+    
+    # Extrair data e hora (posições fixas)
+    resultado["data"] = linha_log[:10]
+    resultado["hora"] = linha_log[11:19]
+    
+    # Extrair nível (entre colchetes)
+    inicio_nivel = linha_log.find("[") + 1
+    fim_nivel = linha_log.find("]")
+    resultado["nivel"] = linha_log[inicio_nivel:fim_nivel]
+    
+    # Extrair campos chave=valor após o ]
+    resto = linha_log[fim_nivel + 2:]  # Pula "] "
+    
+    # Encontrar a mensagem (campo msg= vai até o final)
+    idx_msg = resto.find("msg=")
+    if idx_msg != -1:
+        resultado["msg"] = resto[idx_msg + 4:]
+        resto = resto[:idx_msg].strip()
+    
+    # Parsear campos chave=valor restantes
+    campos = resto.split()
+    for campo in campos:
+        if "=" in campo:
+            chave, valor = campo.split("=", 1)
+            resultado[chave] = valor
+    
+    return resultado
+
+
+# Teste com a linha fornecida:
+log = "2024-01-15 14:30:45 [ERROR] servidor=web-01 cpu=95.2% mem=87.5% msg=Limite de CPU excedido"
+
+dados = parsear_log(log)
+
+print("=" * 50)
+print(f"{'LOG PARSEADO':^50}")
+print("=" * 50)
+for chave, valor in dados.items():
+    print(f"  {chave:<10}: {valor}")
+print("=" * 50)
+
+# Classificar severidade:
+nivel = dados.get("nivel", "")
+if nivel == "ERROR":
+    print("🔴 AÇÃO REQUERIDA: Verificar servidor imediatamente!")
+elif nivel == "WARNING":
+    print("🟡 ATENÇÃO: Monitorar situação.")
+else:
+    print("🟢 INFORMATIVO: Nenhuma ação necessária.")
+
+# Extrair valor numérico da CPU:
+cpu_str = dados.get("cpu", "0%")
+cpu_valor = float(cpu_str.rstrip("%"))
+if cpu_valor > 90:
+    print(f"⚡ CPU CRÍTICA: {cpu_valor}% — considere scaling!")
+
+# Teste com múltiplas linhas:
+logs = [
+    "2024-01-15 14:30:45 [ERROR] servidor=web-01 cpu=95.2% mem=87.5% msg=CPU crítica",
+    "2024-01-15 14:31:00 [WARNING] servidor=web-02 cpu=72.1% mem=65.0% msg=Memória alta",
+    "2024-01-15 14:31:15 [INFO] servidor=web-03 cpu=23.5% mem=45.2% msg=Tudo normal",
+]
+
+print(f"\n{'='*50}")
+print(f"{'RESUMO DE LOGS':^50}")
+print(f"{'='*50}")
+print(f"{'Hora':<10}{'Nível':<8}{'Servidor':<12}{'CPU':<8}{'Memória':<8}")
+print(f"{'-'*50}")
+for log_line in logs:
+    d = parsear_log(log_line)
+    print(f"{d['hora']:<10}{d['nivel']:<8}{d.get('servidor','?'):<12}{d.get('cpu','?'):<8}{d.get('mem','?'):<8}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 11 — Conversor de Unidades de Armazenamento (Médio)</h3>
+          <p>Crie um conversor que recebe um valor em bytes e retorna a representação mais adequada (B, KB, MB, GB, TB). Use operadores aritméticos e formatação com f-strings.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 11 — Conversor de Unidades de Armazenamento
+
+def formatar_bytes(num_bytes: int) -> str:
+    """Converte bytes para a unidade mais adequada."""
+    if num_bytes < 0:
+        return "Erro: valor negativo"
+    
+    unidades = ["B", "KB", "MB", "GB", "TB", "PB"]
+    
+    valor = float(num_bytes)
+    indice = 0
+    
+    while valor >= 1024 and indice < len(unidades) - 1:
+        valor /= 1024
+        indice += 1
+    
+    if indice == 0:
+        return f"{int(valor)} {unidades[indice]}"
+    else:
+        return f"{valor:.2f} {unidades[indice]}"
+
+
+# Testes
+testes_bytes = [
+    0,
+    512,
+    1024,
+    1_048_576,          # 1 MB
+    1_073_741_824,      # 1 GB
+    5_368_709_120,      # 5 GB
+    1_099_511_627_776,  # 1 TB
+]
+
+print("=" * 40)
+print(f"{'CONVERSOR DE BYTES':^40}")
+print("=" * 40)
+for b in testes_bytes:
+    print(f"{b:>20,} bytes = {formatar_bytes(b)}")
+
+# Aplicação prática: tamanho de disco
+print(f"\n{'─' * 40}")
+print("Disco: 500 GB")
+print(f"Total: {formatar_bytes(500 * 1024**3)}")
+print(f"Usado: {formatar_bytes(327 * 1024**3)} (65.4%)")
+print(f"Livre: {formatar_bytes(173 * 1024**3)} (34.6%)")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 12 — Validador de IPv4 (Desafio)</h3>
+          <p>Crie uma função que valida se uma string é um endereço IPv4 válido. Regras: 4 octetos separados por ponto, cada octeto entre 0-255, sem zeros à esquerda (exceto "0" sozinho), sem espaços.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Exercício 12 — Validador de IPv4
+
+def validar_ipv4(ip: str) -> tuple[bool, str]:
+    """Valida um endereço IPv4.
+    
+    Returns:
+        Tupla (é_válido, mensagem)
+    """
+    # Verificar espaços
+    if " " in ip:
+        return False, "IP não pode conter espaços"
+    
+    # Verificar se está vazio
+    if not ip:
+        return False, "IP está vazio"
+    
+    # Separar octetos
+    partes = ip.split(".")
+    
+    # Deve ter exatamente 4 octetos
+    if len(partes) != 4:
+        return False, f"Deve ter 4 octetos (tem {len(partes)})"
+    
+    for i, parte in enumerate(partes):
+        # Octeto não pode estar vazio
+        if not parte:
+            return False, f"Octeto {i+1} está vazio"
+        
+        # Deve conter apenas dígitos
+        if not parte.isdigit():
+            return False, f"Octeto {i+1} contém caracteres inválidos: '{parte}'"
+        
+        # Verificar zeros à esquerda (01, 001, etc.)
+        if len(parte) > 1 and parte[0] == "0":
+            return False, f"Octeto {i+1} tem zero à esquerda: '{parte}'"
+        
+        # Converter e verificar range
+        valor = int(parte)
+        if valor < 0 or valor > 255:
+            return False, f"Octeto {i+1} fora do range (0-255): {valor}"
+    
+    return True, "IPv4 válido"
+
+
+# Testes
+print("=" * 55)
+print(f"{'VALIDADOR DE IPv4':^55}")
+print("=" * 55)
+
+testes_ip = [
+    "192.168.1.100",     # ✅ Válido
+    "10.0.0.1",          # ✅ Válido
+    "0.0.0.0",           # ✅ Válido
+    "255.255.255.255",   # ✅ Válido
+    "256.1.1.1",         # ❌ Octeto > 255
+    "192.168.01.1",      # ❌ Zero à esquerda
+    "192.168.1",         # ❌ Menos de 4 octetos
+    "192.168.1.1.1",     # ❌ Mais de 4 octetos
+    "192.168.1.abc",     # ❌ Não numérico
+    " 192.168.1.1",      # ❌ Espaço
+    "",                   # ❌ Vazio
+    "192.168.1.-1",      # ❌ Negativo
+]
+
+for ip in testes_ip:
+    valido, msg = validar_ipv4(ip)
+    status = "✅" if valido else "❌"
+    print(f"{status} '{ip}'")
+    if not valido:
+        print(f"    → {msg}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>🏆 Desafio Final — Mini Sistema de Cadastro</h3>
+          <p>Combine TUDO que aprendeu neste módulo para criar um mini sistema que: recebe dados via input(), valida, processa e exibe um relatório formatado. Use type hints, f-strings, operadores, conversão de tipos e boas práticas.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="info-box highlight">
+              <pre><code># Desafio Final — Mini Sistema de Cadastro de Servidores
+
+"""
+Sistema simplificado de cadastro de servidores.
+Demonstra: variáveis, tipos, operadores, strings, I/O, formatação.
+"""
+
+# Constantes
+MAX_SERVIDORES: int = 5
+AMBIENTES_VALIDOS: tuple = ("dev", "staging", "prod")
+CPU_ALERTA: float = 80.0
+MEM_ALERTA: float = 75.0
+
+def exibir_banner() -> None:
+    """Exibe o banner do sistema."""
+    print("\n" + "═" * 55)
+    print(f"{'🖥️  SISTEMA DE CADASTRO DE SERVIDORES':^55}")
+    print(f"{'CloudTrilhas Infrastructure Manager':^55}")
+    print("═" * 55)
+
+def coletar_dados_servidor(numero: int) -> dict[str, str | float]:
+    """Coleta dados de um servidor via input."""
+    print(f"\n--- Servidor #{numero} ---")
+    
+    nome = input("  Nome do servidor: ").strip()
+    
+    ambiente = input(f"  Ambiente ({'/'.join(AMBIENTES_VALIDOS)}): ").strip().lower()
+    while ambiente not in AMBIENTES_VALIDOS:
+        print(f"  ❌ Ambiente inválido! Use: {', '.join(AMBIENTES_VALIDOS)}")
+        ambiente = input(f"  Ambiente: ").strip().lower()
+    
+    try:
+        cpu = float(input("  Uso de CPU (%): "))
+        memoria = float(input("  Uso de Memória (%): "))
+    except ValueError:
+        print("  ⚠️ Valor inválido, usando 0%")
+        cpu = 0.0
+        memoria = 0.0
+    
+    return {
+        "nome": nome or f"server-{numero:02d}",
+        "ambiente": ambiente,
+        "cpu": min(max(cpu, 0), 100),  # Clamp entre 0-100
+        "memoria": min(max(memoria, 0), 100),
+    }
+
+def gerar_relatorio(servidores: list[dict]) -> None:
+    """Gera relatório formatado dos servidores."""
+    print("\n" + "═" * 65)
+    print(f"{'📊 RELATÓRIO DE INFRAESTRUTURA':^65}")
+    print("═" * 65)
+    
+    # Cabeçalho
+    print(f"{'Nome':<15}{'Ambiente':<10}{'CPU':>8}{'Memória':>10}{'Status':>12}")
+    print("─" * 65)
+    
+    total_cpu = 0.0
+    total_mem = 0.0
+    alertas = 0
+    
+    for srv in servidores:
+        total_cpu += srv["cpu"]
+        total_mem += srv["memoria"]
+        
+        # Determinar status
+        if srv["cpu"] > CPU_ALERTA or srv["memoria"] > MEM_ALERTA:
+            status = "🔴 ALERTA"
+            alertas += 1
+        elif srv["cpu"] > 50 or srv["memoria"] > 50:
+            status = "🟡 ATENÇÃO"
+        else:
+            status = "🟢 OK"
+        
+        print(
+            f"{srv['nome']:<15}"
+            f"{srv['ambiente']:<10}"
+            f"{srv['cpu']:>7.1f}%"
+            f"{srv['memoria']:>9.1f}%"
+            f"{status:>12}"
+        )
+    
+    # Resumo
+    n = len(servidores)
+    print("─" * 65)
+    print(f"{'MÉDIA:':<25}{total_cpu/n:>7.1f}%{total_mem/n:>9.1f}%")
+    print("═" * 65)
+    
+    print(f"\n📈 Total de servidores: {n}")
+    print(f"🔴 Servidores em alerta: {alertas}")
+    print(f"🟢 Servidores saudáveis: {n - alertas}")
+    
+    if alertas > 0:
+        print(f"\n⚡ RECOMENDAÇÃO: {alertas} servidor(es) precisam de atenção!")
+        print("   Considere scaling horizontal ou otimização de recursos.")
+
+# Execução principal
+exibir_banner()
+
+servidores: list[dict] = []
+n_servidores = 3  # Para demonstração, fixo em 3
+
+print(f"\nCadastre {n_servidores} servidores:")
+for i in range(1, n_servidores + 1):
+    servidor = coletar_dados_servidor(i)
+    servidores.append(servidor)
+
+gerar_relatorio(servidores)</code></pre>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO RESUMO — TABELA DE REFERÊNCIA RÁPIDA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Resumo</span>
+          <h2>Referência Rápida — Módulo 01</h2>
+          <p>Tabela de consulta rápida com os conceitos mais importantes deste módulo. Salve esta página nos favoritos para referência futura!</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Tipos de Dados — Resumo</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Exemplo</th><th>Criação</th><th>Conversão</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>int</code></td><td><code>42, -10, 0xFF</code></td><td>Literal inteiro</td><td><code>int("42")</code></td></tr>
+              <tr><td><code>float</code></td><td><code>3.14, -2.5, 1e10</code></td><td>Literal com ponto</td><td><code>float("3.14")</code></td></tr>
+              <tr><td><code>str</code></td><td><code>"olá", 'mundo'</code></td><td>Entre aspas</td><td><code>str(42)</code></td></tr>
+              <tr><td><code>bool</code></td><td><code>True, False</code></td><td>Literal booleano</td><td><code>bool(1)</code></td></tr>
+              <tr><td><code>None</code></td><td><code>None</code></td><td>Literal None</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>Operadores — Resumo</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Categoria</th><th>Operadores</th><th>Exemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Aritméticos</td><td><code>+ - * / // % **</code></td><td><code>2 ** 10 → 1024</code></td></tr>
+              <tr><td>Comparação</td><td><code>== != &lt; &gt; &lt;= &gt;=</code></td><td><code>5 > 3 → True</code></td></tr>
+              <tr><td>Lógicos</td><td><code>and or not</code></td><td><code>True and False → False</code></td></tr>
+              <tr><td>Atribuição</td><td><code>= += -= *= /= //=</code></td><td><code>x += 5</code></td></tr>
+              <tr><td>Identidade</td><td><code>is, is not</code></td><td><code>x is None</code></td></tr>
+              <tr><td>Pertencimento</td><td><code>in, not in</code></td><td><code>"a" in "abc"</code></td></tr>
+              <tr><td>Bitwise</td><td><code>&amp; | ^ ~ &lt;&lt; &gt;&gt;</code></td><td><code>0b1100 &amp; 0b1010</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>Métodos de String — Mais Usados</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Método</th><th>Descrição</th><th>Exemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>.strip()</code></td><td>Remove espaços</td><td><code>"  hi  ".strip() → "hi"</code></td></tr>
+              <tr><td><code>.split(sep)</code></td><td>Divide em lista</td><td><code>"a,b".split(",") → ["a","b"]</code></td></tr>
+              <tr><td><code>.join(lista)</code></td><td>Junta lista em str</td><td><code>",".join(["a","b"]) → "a,b"</code></td></tr>
+              <tr><td><code>.replace(a,b)</code></td><td>Substitui texto</td><td><code>"hi".replace("h","H") → "Hi"</code></td></tr>
+              <tr><td><code>.upper()</code></td><td>Tudo maiúsculo</td><td><code>"abc".upper() → "ABC"</code></td></tr>
+              <tr><td><code>.lower()</code></td><td>Tudo minúsculo</td><td><code>"ABC".lower() → "abc"</code></td></tr>
+              <tr><td><code>.find(sub)</code></td><td>Busca substring</td><td><code>"hello".find("ll") → 2</code></td></tr>
+              <tr><td><code>.startswith()</code></td><td>Começa com?</td><td><code>"py".startswith("p") → True</code></td></tr>
+              <tr><td><code>.endswith()</code></td><td>Termina com?</td><td><code>"log.txt".endswith(".txt") → True</code></td></tr>
+              <tr><td><code>.count(sub)</code></td><td>Conta ocorrências</td><td><code>"hello".count("l") → 2</code></td></tr>
+              <tr><td><code>.format()</code></td><td>Formatação</td><td><code>"{} {}".format("a","b")</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>f-strings — Formatação de Números</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Spec</th><th>Descrição</th><th>Exemplo</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>:.2f</code></td><td>2 casas decimais</td><td><code>f"{3.14159:.2f}"</code></td><td><code>3.14</code></td></tr>
+              <tr><td><code>:,.2f</code></td><td>Separador milhar</td><td><code>f"{1234567.89:,.2f}"</code></td><td><code>1,234,567.89</code></td></tr>
+              <tr><td><code>:.1%</code></td><td>Porcentagem</td><td><code>f"{0.156:.1%}"</code></td><td><code>15.6%</code></td></tr>
+              <tr><td><code>:&gt;10</code></td><td>Alinhar direita</td><td><code>f"{'hi':&gt;10}"</code></td><td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hi</code></td></tr>
+              <tr><td><code>:&lt;10</code></td><td>Alinhar esquerda</td><td><code>f"{'hi':&lt;10}"</code></td><td><code>hi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code></td></tr>
+              <tr><td><code>:^10</code></td><td>Centralizar</td><td><code>f"{'hi':^10}"</code></td><td><code>&nbsp;&nbsp;&nbsp;&nbsp;hi&nbsp;&nbsp;&nbsp;&nbsp;</code></td></tr>
+              <tr><td><code>:08d</code></td><td>Preencher com zeros</td><td><code>f"{42:08d}"</code></td><td><code>00000042</code></td></tr>
+              <tr><td><code>:b</code></td><td>Binário</td><td><code>f"{42:b}"</code></td><td><code>101010</code></td></tr>
+              <tr><td><code>:x</code></td><td>Hexadecimal</td><td><code>f"{255:x}"</code></td><td><code>ff</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box highlight">
+          <h4>🚀 Próximos Passos</h4>
+          <p>Parabéns por completar o Módulo 01! Você agora domina os fundamentos do Python. No <strong>Módulo 02</strong>, aprenderemos <strong>Estruturas de Controle</strong>: condicionais (if/elif/else), loops (for/while), compreensões de lista e tratamento de exceções (try/except).</p>
+          <p>Antes de avançar, certifique-se de que você consegue:</p>
+          <ul>
+            <li>✅ Criar e atribuir variáveis com nomes adequados</li>
+            <li>✅ Usar todos os tipos primitivos (int, float, str, bool, None)</li>
+            <li>✅ Manipular strings com métodos e fatiamento</li>
+            <li>✅ Formatar saída com f-strings</li>
+            <li>✅ Usar todos os operadores (aritméticos, lógicos, comparação)</li>
+            <li>✅ Receber e converter entrada do usuário</li>
+            <li>✅ Criar e ativar ambientes virtuais</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       NAVEGAÇÃO INFERIOR
+  ════════════════════════════════════════════════════════════════════════════ -->
+  <section class="training-nav">
+    <div class="container">
+      <div class="nav-bottom-grid">
+        <a href="../python.html" class="nav-bottom-card">
+          <span class="direction">← Anterior</span>
+          <span class="title">Voltar ao Curso Python</span>
+        </a>
+        <a href="modulo-02.html" class="nav-bottom-card next">
+          <span class="direction">Próximo →</span>
+          <span class="title">Módulo 02: Controle de Fluxo</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div class="footer-col brand-col">
+        <img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" class="footer-logo" />
+        <p>Formando profissionais de Cloud, DevOps e Infraestrutura com conteúdo prático e atualizado.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Cloud &amp; DevOps</h4>
+        <ul>
+          <li><a href="../linux.html">Linux</a></li>
+          <li><a href="../docker.html">Docker</a></li>
+          <li><a href="../terraform.html">Terraform</a></li>
+          <li><a href="../python.html">Python</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Projeto</h4>
+        <ul>
+          <li><a href="../index.html">Início</a></li>
+          <li><a href="../redes.html">Redes</a></li>
+          <li><a href="https://github.com" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 CloudTrilhas — Ricardo Simines Scopim. Todos os direitos reservados.</p>
+    </div>
   </footer>
+
   <script src="../trail-gate.js"></script>
   <script src="../config.js"></script>
   <script src="../app.js"></script>

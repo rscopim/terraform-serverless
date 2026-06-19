@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Python Módulo 03: Funções e Módulos</title>
+  <meta name="description" content="Guia completo sobre funções em Python: definição, parâmetros, decoradores, closures, lambdas, módulos, pacotes e biblioteca padrão para DevOps e Cloud." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -19,21 +20,17 @@
       <div class="nav-actions">
         <a href="modulo-02.html" class="nav-link">← Anterior</a>
         <a href="modulo-04.html" class="nav-link">Próximo →</a>
-        <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <a href="../python.html" class="nav-button">← Voltar ao Curso</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -42,118 +39,3515 @@
       <div class="container training-hero-content">
         <span class="pill">🐍 Python — Módulo 03</span>
         <h1>Funções e Módulos</h1>
-        <p>Funções organizam código em blocos reutilizáveis. Módulos permitem dividir o projeto em arquivos.</p>
+        <p>Domine a criação de funções reutilizáveis, parâmetros avançados, decoradores, closures, funções lambda, módulos, pacotes e a poderosa biblioteca padrão do Python — fundamentos essenciais para qualquer desenvolvedor que trabalha com automação, DevOps e Cloud.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Controle</small></a>
+        <a href="modulo-03.html" class="progress-node active"><span>03</span><small>Funções</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Dados</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Arquivos</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>POO</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Bibliotecas</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>APIs</small></a>
+        <a href="modulo-09.html" class="progress-node"><span>09</span><small>AWS boto3</small></a>
+        <a href="modulo-10.html" class="progress-node"><span>10</span><small>IA Bedrock</small></a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1 — INTRODUÇÃO A FUNÇÕES
+    ════════════════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Introdução a Funções</h2>
+          <p>Funções são blocos de código reutilizáveis que encapsulam uma lógica específica. Elas são o pilar fundamental da programação modular, permitindo organizar código complexo em unidades menores, testáveis e com responsabilidades bem definidas.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Funções</h3>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>def</code><span class="cmd-tag">Funções</span></div>
-              <pre><code># Função básica
-def saudacao(nome, saudacao="Olá"):
-    """Retorna uma saudação personalizada."""
-    return f"{saudacao}, {nome}!"
+          <h3>1.1 — O que são Funções e Por que Usá-las?</h3>
+          <p>Uma <strong>função</strong> é um bloco nomeado de código que executa uma tarefa específica. Em vez de copiar e colar o mesmo código várias vezes, você define uma função uma vez e a chama quantas vezes precisar.</p>
 
-print(saudacao("Ricardo"))
-print(saudacao("Ana", "Bom dia"))
+          <div class="info-box highlight">
+            <h4>🎯 Princípios Fundamentais — Por que usar Funções?</h4>
+            <ul>
+              <li><strong>DRY (Don't Repeat Yourself):</strong> Elimina duplicação de código — escreva uma vez, use em qualquer lugar</li>
+              <li><strong>Abstração:</strong> Esconde detalhes de implementação — o chamador não precisa saber COMO funciona, apenas O QUE faz</li>
+              <li><strong>Reutilização:</strong> Uma função bem escrita pode ser usada em múltiplos projetos</li>
+              <li><strong>Modularidade:</strong> Divide problemas complexos em partes menores e gerenciáveis</li>
+              <li><strong>Testabilidade:</strong> Funções isoladas são muito mais fáceis de testar</li>
+              <li><strong>Manutenção:</strong> Correções em um único lugar se propagam para todos os usos</li>
+              <li><strong>Legibilidade:</strong> Nomes descritivos de funções documentam a intenção do código</li>
+              <li><strong>Namespace:</strong> Variáveis locais evitam conflitos de nomes no programa</li>
+            </ul>
+          </div>
 
-# *args e **kwargs
-def soma(*numeros):
+          <div class="command-card wide">
+            <h4>📋 A Palavra-chave def — Definindo Funções</h4>
+            <pre><code># Sintaxe básica de uma função
+# def nome_da_funcao(parametros):
+#     """Docstring — documentação da função"""
+#     corpo da função
+#     return valor_de_retorno
+
+# ═══ Função mais simples possível ═══
+def saudacao():
+    """Exibe uma mensagem de boas-vindas."""
+    print("Olá! Bem-vindo ao CloudTrilhas!")
+
+# Chamando a função
+saudacao()  # Olá! Bem-vindo ao CloudTrilhas!
+saudacao()  # Pode chamar quantas vezes quiser
+
+# ═══ Função com parâmetro ═══
+def saudar_usuario(nome):
+    """Saúda um usuário pelo nome."""
+    print(f"Olá, {nome}! Bem-vindo ao CloudTrilhas!")
+
+saudar_usuario("Ricardo")   # Olá, Ricardo! Bem-vindo ao CloudTrilhas!
+saudar_usuario("Ana")       # Olá, Ana! Bem-vindo ao CloudTrilhas!
+
+# ═══ Função com múltiplos parâmetros ═══
+def calcular_custo_ec2(horas, preco_hora, regiao="us-east-1"):
+    """Calcula o custo de uma instância EC2.
+    
+    Args:
+        horas: Número de horas de uso
+        preco_hora: Preço por hora da instância
+        regiao: Região AWS (padrão: us-east-1)
+    
+    Returns:
+        Custo total calculado
+    """
+    custo = horas * preco_hora
+    print(f"[{regiao}] Custo para {horas}h: ${custo:.2f}")
+    return custo
+
+# Chamadas com argumentos posicionais e nomeados
+calcular_custo_ec2(720, 0.0116)                    # 720h × $0.0116 = $8.35
+calcular_custo_ec2(720, 0.0116, "sa-east-1")       # Com região explícita
+calcular_custo_ec2(horas=168, preco_hora=0.096)    # Argumentos nomeados
+
+# ═══ Diferença entre Parâmetro e Argumento ═══
+# Parâmetro: variável na DEFINIÇÃO da função (nome, idade)
+# Argumento: valor passado na CHAMADA da função ("Ricardo", 30)
+def minha_funcao(parametro1, parametro2):  # ← parâmetros
+    pass
+
+minha_funcao("argumento1", "argumento2")   # ← argumentos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.2 — Chamando Funções</h3>
+          <p>Para executar uma função, basta usar seu nome seguido de parênteses. Os parênteses são obrigatórios — sem eles, você está apenas referenciando o objeto função, não executando-o.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Formas de Chamar Funções</h4>
+            <pre><code># ═══ Chamada simples ═══
+def listar_instancias():
+    """Lista todas as instâncias EC2."""
+    print("Listando instâncias...")
+    return ["i-001", "i-002", "i-003"]
+
+# Executar a função
+resultado = listar_instancias()
+print(resultado)  # ['i-001', 'i-002', 'i-003']
+
+# CUIDADO: sem parênteses NÃO executa!
+referencia = listar_instancias  # Apenas referencia o objeto função
+print(referencia)               # &lt;function listar_instancias at 0x...&gt;
+print(type(referencia))         # &lt;class 'function'&gt;
+
+# ═══ Chamada dentro de expressões ═══
+def contar_recursos(servico):
+    recursos = {"ec2": 5, "s3": 12, "lambda": 23}
+    return recursos.get(servico, 0)
+
+# Função como parte de expressão
+total = contar_recursos("ec2") + contar_recursos("s3")
+print(f"Total de recursos: {total}")  # Total de recursos: 17
+
+# Em f-strings
+print(f"Lambdas ativas: {contar_recursos('lambda')}")
+
+# Em condições
+if contar_recursos("ec2") > 3:
+    print("Muitas instâncias! Considere auto-scaling.")
+
+# Em list comprehensions
+servicos = ["ec2", "s3", "lambda", "rds", "sqs"]
+contagem = [(s, contar_recursos(s)) for s in servicos]
+print(contagem)  # [('ec2', 5), ('s3', 12), ('lambda', 23), ('rds', 0), ('sqs', 0)]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 — Valores de Retorno (return)</h3>
+          <p>A instrução <code>return</code> encerra a execução da função e envia um valor de volta ao chamador. Toda função Python retorna um valor — se não houver <code>return</code> explícito, retorna <code>None</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 O Statement return em Detalhes</h4>
+            <pre><code># ═══ Retorno simples ═══
+def quadrado(n):
+    """Retorna o quadrado de um número."""
+    return n ** 2
+
+resultado = quadrado(5)
+print(resultado)  # 25
+
+# ═══ Função sem return explícito retorna None ═══
+def apenas_imprime(msg):
+    print(msg)
+    # Sem return — retorna None implicitamente
+
+valor = apenas_imprime("teste")  # Imprime "teste"
+print(valor)                      # None
+print(type(valor))                # &lt;class 'NoneType'&gt;
+
+# ═══ return sem valor = return None ═══
+def validar_idade(idade):
+    if idade < 0:
+        print("Idade inválida!")
+        return  # Encerra a função, retorna None
+    print(f"Idade válida: {idade}")
+    return idade
+
+# ═══ Múltiplos returns (saída antecipada — early return) ═══
+def classificar_instancia(vcpus, memoria_gb):
+    """Classifica instância EC2 por tamanho."""
+    if vcpus <= 1 and memoria_gb <= 1:
+        return "nano"
+    if vcpus <= 2 and memoria_gb <= 4:
+        return "small"
+    if vcpus <= 4 and memoria_gb <= 16:
+        return "medium"
+    if vcpus <= 8 and memoria_gb <= 32:
+        return "large"
+    return "xlarge"
+
+print(classificar_instancia(2, 4))   # "small"
+print(classificar_instancia(16, 64)) # "xlarge"
+
+# ═══ Retornando múltiplos valores (tupla) ═══
+def analisar_custos(faturas):
+    """Retorna estatísticas de custo."""
+    total = sum(faturas)
+    media = total / len(faturas)
+    maior = max(faturas)
+    menor = min(faturas)
+    return total, media, maior, menor  # Retorna uma tupla!
+
+# Desempacotamento (unpacking)
+faturas_mensais = [150.0, 230.5, 180.0, 320.0, 195.5, 280.0]
+total, media, maior, menor = analisar_custos(faturas_mensais)
+print(f"Total: ${total:.2f}")   # Total: $1356.00
+print(f"Média: ${media:.2f}")   # Média: $226.00
+print(f"Maior: ${maior:.2f}")   # Maior: $320.00
+print(f"Menor: ${menor:.2f}")   # Menor: $150.00
+
+# Ou capturar como tupla
+resultado = analisar_custos(faturas_mensais)
+print(type(resultado))  # &lt;class 'tuple'&gt;
+print(resultado[0])     # 1356.0 (total)
+
+# ═══ Retornando dicionário (mais legível para muitos valores) ═══
+def health_check(servico):
+    """Verifica saúde de um serviço."""
+    # Simulação
+    return {
+        "servico": servico,
+        "status": "healthy",
+        "latencia_ms": 45,
+        "uptime_percent": 99.97,
+        "ultimo_check": "2025-01-15T10:30:00Z"
+    }
+
+status = health_check("api-gateway")
+print(f"{status['servico']}: {status['status']} ({status['latencia_ms']}ms)")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 — Docstrings — Documentando Funções</h3>
+          <p>Docstrings são strings de documentação colocadas como primeira instrução de uma função. Elas são acessíveis via <code>help()</code> e <code>__doc__</code>, e são fundamentais para código profissional.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Estilos de Docstring</h4>
+            <pre><code># ═══ Docstring simples (uma linha) ═══
+def somar(a, b):
+    """Retorna a soma de dois números."""
+    return a + b
+
+# Acessando a docstring
+print(somar.__doc__)  # "Retorna a soma de dois números."
+help(somar)           # Exibe documentação formatada
+
+# ═══ Estilo Google (recomendado para projetos modernos) ═══
+def provisionar_instancia(tipo, regiao, tags=None, dry_run=False):
+    """Provisiona uma nova instância EC2 na AWS.
+
+    Cria uma instância EC2 com as configurações especificadas,
+    aplica tags e retorna o ID da instância criada.
+
+    Args:
+        tipo (str): Tipo da instância (ex: 't3.micro', 'm5.large').
+        regiao (str): Região AWS (ex: 'us-east-1', 'sa-east-1').
+        tags (dict, optional): Dicionário de tags para a instância.
+            Defaults to None.
+        dry_run (bool, optional): Se True, apenas valida sem criar.
+            Defaults to False.
+
+    Returns:
+        str: ID da instância criada (ex: 'i-0abc123def456').
+
+    Raises:
+        ValueError: Se o tipo de instância não for válido.
+        PermissionError: Se as credenciais não tiverem permissão.
+        ConnectionError: Se não conseguir conectar à API AWS.
+
+    Examples:
+        >>> provisionar_instancia('t3.micro', 'us-east-1')
+        'i-0abc123def456'
+
+        >>> provisionar_instancia('m5.large', 'sa-east-1',
+        ...     tags={'Name': 'web-server', 'Env': 'prod'})
+        'i-0def789abc012'
+    """
+    if tags is None:
+        tags = {}
+    # Implementação...
+    return "i-0abc123def456"
+
+# ═══ Estilo NumPy/SciPy (popular em projetos científicos) ═══
+def calcular_metricas(dados, janela=30, metodo="media"):
+    """
+    Calcula métricas estatísticas de séries temporais de custos.
+
+    Parameters
+    ----------
+    dados : list of float
+        Lista de valores numéricos representando custos diários.
+    janela : int, optional
+        Tamanho da janela para média móvel, por padrão 30.
+    metodo : str, optional
+        Método de cálculo: 'media', 'mediana' ou 'exponencial'.
+        Por padrão 'media'.
+
+    Returns
+    -------
+    dict
+        Dicionário contendo:
+        - 'media' (float): Média dos valores.
+        - 'desvio' (float): Desvio padrão.
+        - 'tendencia' (str): 'alta', 'baixa' ou 'estável'.
+
+    Raises
+    ------
+    ValueError
+        Se `dados` estiver vazio ou contiver valores negativos.
+    TypeError
+        Se `metodo` não for uma string válida.
+
+    See Also
+    --------
+    numpy.mean : Cálculo de média com NumPy.
+    pandas.DataFrame.rolling : Média móvel com Pandas.
+
+    Notes
+    -----
+    O algoritmo utiliza janela deslizante para suavizar
+    flutuações diárias nos custos.
+
+    Examples
+    --------
+    >>> custos = [100.0, 120.5, 95.0, 110.0, 130.0]
+    >>> calcular_metricas(custos, janela=3)
+    {'media': 111.1, 'desvio': 13.2, 'tendencia': 'alta'}
+    """
+    pass</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Boas Práticas para Docstrings</h4>
+            <ul>
+              <li>Sempre comece com um resumo de uma linha (imperativo: "Retorna...", "Calcula...", "Valida...")</li>
+              <li>Use triple quotes (<code>"""</code>) mesmo para docstrings de uma linha</li>
+              <li>Documente todos os parâmetros, retornos e exceções em funções públicas</li>
+              <li>Inclua exemplos com <code>&gt;&gt;&gt;</code> que podem ser testados com <code>doctest</code></li>
+              <li>Escolha UM estilo (Google ou NumPy) e seja consistente no projeto</li>
+              <li>Ferramentas como Sphinx, pdoc e mkdocs geram documentação HTML a partir de docstrings</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2 — PARÂMETROS E ARGUMENTOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Parâmetros e Argumentos</h2>
+          <p>Python oferece um sistema de parâmetros extremamente flexível e poderoso. Entender todas as variações — posicionais, nomeados, com valor padrão, *args, **kwargs, keyword-only e positional-only — é essencial para criar APIs elegantes e funções robustas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 — Argumentos Posicionais</h3>
+          <p>Argumentos posicionais são passados na ordem em que foram definidos. A posição determina qual parâmetro recebe qual valor.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Argumentos Posicionais em Detalhes</h4>
+            <pre><code># Argumentos posicionais — a ORDEM importa!
+def criar_bucket(nome, regiao, acl):
+    """Cria um bucket S3 com configurações específicas."""
+    print(f"Bucket: {nome}")
+    print(f"Região: {regiao}")
+    print(f"ACL: {acl}")
+
+# A ordem dos argumentos DEVE corresponder à ordem dos parâmetros
+criar_bucket("meu-app-dados", "sa-east-1", "private")
+# Bucket: meu-app-dados
+# Região: sa-east-1
+# ACL: private
+
+# Se trocar a ordem, os valores vão para parâmetros errados!
+criar_bucket("private", "meu-app-dados", "sa-east-1")  # BUG!
+# Bucket: private       ← ERRADO!
+# Região: meu-app-dados ← ERRADO!
+# ACL: sa-east-1        ← ERRADO!
+
+# TypeError se faltar argumentos
+# criar_bucket("meu-app")  # TypeError: criar_bucket() missing 2 required positional arguments
+
+# TypeError se passar argumentos a mais
+# criar_bucket("a", "b", "c", "d")  # TypeError: takes 3 positional arguments but 4 were given</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 — Argumentos Nomeados (Keyword Arguments)</h3>
+          <p>Argumentos nomeados são passados com a sintaxe <code>nome=valor</code>. A ordem não importa — o nome identifica o parâmetro.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Keyword Arguments — Clareza e Flexibilidade</h4>
+            <pre><code># Keyword arguments — a ORDEM não importa!
+def criar_instancia(tipo, regiao, nome, ambiente):
+    """Cria uma instância EC2."""
+    print(f"Tipo: {tipo}, Região: {regiao}, Nome: {nome}, Env: {ambiente}")
+
+# Todas estas chamadas são equivalentes:
+criar_instancia(tipo="t3.micro", regiao="us-east-1", nome="web", ambiente="prod")
+criar_instancia(ambiente="prod", nome="web", tipo="t3.micro", regiao="us-east-1")
+criar_instancia(regiao="us-east-1", ambiente="prod", tipo="t3.micro", nome="web")
+
+# Misturando posicionais e nomeados
+# REGRA: posicionais SEMPRE vêm antes dos nomeados!
+criar_instancia("t3.micro", "us-east-1", nome="web", ambiente="prod")  # OK
+# criar_instancia(tipo="t3.micro", "us-east-1", "web", "prod")  # SyntaxError!
+
+# Vantagem de keyword arguments: LEGIBILIDADE
+# ❌ Difícil de entender sem ver a definição da função:
+conectar("192.168.1.1", 5432, True, False, 30)
+
+# ✅ Muito mais claro:
+conectar(host="192.168.1.1", porta=5432, ssl=True, verbose=False, timeout=30)
+
+# Dica: Use keyword arguments quando a função tem mais de 2-3 parâmetros
+# ou quando os valores não são óbvios pelo contexto</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.3 — Valores Padrão (Default Values)</h3>
+          <p>Parâmetros podem ter valores padrão, tornando-os opcionais na chamada. Mas cuidado com a armadilha clássica de mutáveis como padrão!</p>
+
+          <div class="command-card wide">
+            <h4>📋 Parâmetros com Valores Padrão</h4>
+            <pre><code># Parâmetros com valor padrão são OPCIONAIS na chamada
+def criar_alarme(nome, metrica, threshold, periodo=300, evaluation_periods=3,
+                 comparison="GreaterThanThreshold", actions=None):
+    """Cria um alarme CloudWatch com configurações padrão sensatas."""
+    if actions is None:
+        actions = []
+    print(f"Alarme: {nome}")
+    print(f"Métrica: {metrica} {comparison} {threshold}")
+    print(f"Período: {periodo}s, Avaliações: {evaluation_periods}")
+    print(f"Ações: {actions}")
+
+# Usando apenas os obrigatórios (os opcionais usam valores padrão)
+criar_alarme("cpu-alta", "CPUUtilization", 80)
+
+# Sobrescrevendo alguns padrões
+criar_alarme("memoria-alta", "MemoryUtilization", 90,
+             periodo=60, actions=["arn:aws:sns:..."])
+
+# REGRA: Parâmetros com padrão devem vir DEPOIS dos sem padrão
+# def errado(a=1, b):  # SyntaxError: non-default argument follows default argument
+def correto(b, a=1):   # OK!</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ ARMADILHA CLÁSSICA: Mutáveis como Valor Padrão!</h4>
+            <pre><code># ❌ BUG CLÁSSICO — Lista mutável como padrão
+def adicionar_tag(tag, tags=[]):
+    """CUIDADO: Este código tem um bug sutil!"""
+    tags.append(tag)
+    return tags
+
+print(adicionar_tag("env:prod"))    # ['env:prod'] — OK
+print(adicionar_tag("app:web"))     # ['env:prod', 'app:web'] — BUG!
+print(adicionar_tag("team:infra"))  # ['env:prod', 'app:web', 'team:infra'] — BUG!
+
+# O que aconteceu? A lista padrão é criada UMA VEZ na definição
+# da função e compartilhada entre todas as chamadas!
+
+# ✅ CORREÇÃO: Use None como padrão e crie dentro da função
+def adicionar_tag(tag, tags=None):
+    """Versão correta: cria nova lista a cada chamada."""
+    if tags is None:
+        tags = []
+    tags.append(tag)
+    return tags
+
+print(adicionar_tag("env:prod"))    # ['env:prod'] — OK!
+print(adicionar_tag("app:web"))     # ['app:web'] — OK!
+
+# O mesmo vale para dicionários:
+# ❌ def config(opts={}):
+# ✅ def config(opts=None):
+#        if opts is None:
+#            opts = {}
+
+# E para qualquer objeto mutável (set, lista, dict, objetos custom)
+# Imutáveis como padrão são sempre seguros: int, float, str, tuple, frozenset, None</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 — *args — Argumentos Posicionais Arbitrários</h3>
+          <p>O prefixo <code>*</code> em um parâmetro coleta todos os argumentos posicionais extras em uma <strong>tupla</strong>. Isso permite funções que aceitam qualquer número de argumentos.</p>
+
+          <div class="command-card wide">
+            <h4>📋 *args em Detalhes</h4>
+            <pre><code># *args coleta argumentos posicionais extras em uma TUPLA
+def somar_todos(*numeros):
+    """Soma qualquer quantidade de números."""
+    print(f"Tipo de numeros: {type(numeros)}")  # &lt;class 'tuple'&gt;
+    print(f"Valores: {numeros}")
     return sum(numeros)
 
-print(soma(1, 2, 3, 4))  # 10
+print(somar_todos(1, 2, 3))           # 6
+print(somar_todos(10, 20, 30, 40))    # 100
+print(somar_todos(5))                  # 5
+print(somar_todos())                   # 0 (tupla vazia)
 
-def criar_perfil(**dados):
-    return {k: v for k, v in dados.items()}
+# ═══ Combinando parâmetros normais com *args ═══
+def log_mensagem(nivel, *mensagens):
+    """Loga múltiplas mensagens com um nível."""
+    for msg in mensagens:
+        print(f"[{nivel.upper()}] {msg}")
 
-perfil = criar_perfil(nome="Ricardo", cargo="DevOps")</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>lambda</code><span class="cmd-tag">Funções</span></div>
-              <p>Funções anônimas de uma linha.</p>
-              <pre><code># Lambda
-dobro = lambda x: x * 2
-print(dobro(5))  # 10
+log_mensagem("info", "Servidor iniciado", "Porta 8080", "Pronto para conexões")
+# [INFO] Servidor iniciado
+# [INFO] Porta 8080
+# [INFO] Pronto para conexões
 
-# Com sorted
-alunos = [("Ana", 8), ("Bia", 9), ("Carlos", 7)]
-ordenados = sorted(alunos, key=lambda x: x[1], reverse=True)
+# ═══ Desempacotando lista/tupla com * na chamada ═══
+custos = [150.0, 230.5, 180.0, 320.0]
+total = somar_todos(*custos)  # Desempacota: somar_todos(150.0, 230.5, 180.0, 320.0)
+print(f"Total: ${total:.2f}")  # Total: $880.50
 
-# Com map e filter
-numeros = [1, 2, 3, 4, 5]
-pares = list(filter(lambda x: x % 2 == 0, numeros))
-dobros = list(map(lambda x: x * 2, numeros))</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>List Comprehension</code><span class="cmd-tag">Pythonic</span></div>
-              <p>Forma concisa e eficiente de criar listas.</p>
-              <pre><code># Básico
-quadrados = [x**2 for x in range(10)]
+# ═══ Exemplo prático: função que aceita múltiplos IDs ═══
+def terminar_instancias(*instance_ids):
+    """Termina múltiplas instâncias EC2."""
+    for iid in instance_ids:
+        print(f"Terminando {iid}...")
+    print(f"Total: {len(instance_ids)} instâncias terminadas")
 
-# Com filtro
-pares = [x for x in range(20) if x % 2 == 0]
+terminar_instancias("i-001", "i-002", "i-003")
 
-# Aninhado
-matriz = [[i*j for j in range(3)] for i in range(3)]
-
-# Dict comprehension
-nomes = ["ana", "bia", "carlos"]
-tamanhos = {n: len(n) for n in nomes}
-
-# Set comprehension
-unicos = {x % 5 for x in range(20)}</code></pre>
-            </div>
+# Ou com uma lista existente
+ids_para_terminar = ["i-004", "i-005", "i-006", "i-007"]
+terminar_instancias(*ids_para_terminar)  # Desempacota a lista</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Módulos e Imports</h3>
+          <h3>2.5 — **kwargs — Argumentos Nomeados Arbitrários</h3>
+          <p>O prefixo <code>**</code> coleta todos os argumentos nomeados extras em um <strong>dicionário</strong>. Ideal para funções que precisam aceitar configurações flexíveis.</p>
+
           <div class="command-card wide">
-            <div class="command-header"><code>import</code><span class="cmd-tag">Módulos</span></div>
-            <pre><code># Importações
-import os
-import json
-from datetime import datetime, timedelta
-from pathlib import Path
+            <h4>📋 **kwargs em Detalhes</h4>
+            <pre><code># **kwargs coleta argumentos nomeados extras em um DICIONÁRIO
+def criar_recurso(tipo, nome, **configuracoes):
+    """Cria um recurso AWS com configurações arbitrárias."""
+    print(f"Tipo: {tipo}")
+    print(f"Nome: {nome}")
+    print(f"Configurações ({type(configuracoes)}):")
+    for chave, valor in configuracoes.items():
+        print(f"  {chave}: {valor}")
 
-# Módulo próprio (utils.py)
-# from utils import minha_funcao
+criar_recurso("EC2", "web-server",
+              tipo_instancia="t3.micro",
+              regiao="sa-east-1",
+              vpc_id="vpc-abc123",
+              subnet_id="subnet-def456",
+              seguranca=["sg-001", "sg-002"])
+# Tipo: EC2
+# Nome: web-server
+# Configurações (&lt;class 'dict'&gt;):
+#   tipo_instancia: t3.micro
+#   regiao: sa-east-1
+#   vpc_id: vpc-abc123
+#   subnet_id: subnet-def456
+#   seguranca: ['sg-001', 'sg-002']
 
-# Variável especial
-if __name__ == "__main__":
-    # Executa apenas quando rodado diretamente
-    print("Executando como script principal")</code></pre>
+# ═══ Desempacotando dicionário com ** na chamada ═══
+config = {
+    "tipo_instancia": "m5.large",
+    "regiao": "us-west-2",
+    "encrypted": True,
+    "monitoring": True
+}
+criar_recurso("EC2", "api-server", **config)
+
+# ═══ Combinando *args e **kwargs ═══
+def super_flexivel(*args, **kwargs):
+    """Aceita literalmente qualquer combinação de argumentos."""
+    print(f"Posicionais: {args}")
+    print(f"Nomeados: {kwargs}")
+
+super_flexivel(1, 2, 3, nome="teste", ativo=True)
+# Posicionais: (1, 2, 3)
+# Nomeados: {'nome': 'teste', 'ativo': True}
+
+# ═══ Padrão wrapper — Repassar argumentos para outra função ═══
+def wrapper_log(func, *args, **kwargs):
+    """Wrapper que loga chamadas de função."""
+    print(f"Chamando {func.__name__} com args={args}, kwargs={kwargs}")
+    resultado = func(*args, **kwargs)
+    print(f"Retornou: {resultado}")
+    return resultado
+
+def soma(a, b):
+    return a + b
+
+wrapper_log(soma, 3, 5)
+# Chamando soma com args=(3, 5), kwargs={}
+# Retornou: 8
+
+# ═══ Mesclando dicionários com ** (Python 3.9+) ═══
+padrao = {"timeout": 30, "retries": 3, "verbose": False}
+usuario = {"timeout": 60, "debug": True}
+final = {**padrao, **usuario}  # usuario sobrescreve padrao
+print(final)  # {'timeout': 60, 'retries': 3, 'verbose': False, 'debug': True}
+
+# Python 3.9+: operador | para merge
+final = padrao | usuario  # Equivalente ao ** merge</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.6 — Keyword-Only Arguments (após *)</h3>
+          <p>Parâmetros definidos <strong>após</strong> <code>*</code> ou <code>*args</code> só podem ser passados por nome — nunca por posição. Isso força clareza na chamada.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Keyword-Only Parameters</h4>
+            <pre><code># Tudo APÓS * ou *args é keyword-only
+def conectar_db(host, porta, *, usuario, senha, database, ssl=True):
+    """
+    host e porta: podem ser posicionais ou nomeados
+    usuario, senha, database, ssl: APENAS nomeados (keyword-only)
+    """
+    protocolo = "ssl" if ssl else "tcp"
+    print(f"{protocolo}://{usuario}:***@{host}:{porta}/{database}")
+
+# ✅ Correto — keyword-only passados por nome
+conectar_db("localhost", 5432, usuario="admin", senha="s3cr3t", database="app")
+
+# ❌ Erro — tentando passar keyword-only por posição
+# conectar_db("localhost", 5432, "admin", "s3cr3t", "app")
+# TypeError: conectar_db() takes 2 positional arguments but 5 were given
+
+# ═══ Usando * sozinho (sem *args) ═══
+def criar_usuario(*, nome, email, role="viewer"):
+    """TODOS os parâmetros são keyword-only (nada posicional)."""
+    print(f"Criando {nome} ({email}) com role={role}")
+
+criar_usuario(nome="Ricardo", email="ricardo@cloud.com", role="admin")
+# criar_usuario("Ricardo", "ricardo@cloud.com")  # TypeError!
+
+# ═══ Caso de uso real: evitar confusão em booleanos ═══
+# ❌ Sem keyword-only — o que significa True e False aqui?
+# deletar_bucket("meu-bucket", True, False)
+
+# ✅ Com keyword-only — cristalino!
+def deletar_bucket(nome, *, force=False, versioned=False):
+    print(f"Deletando {nome} (force={force}, versioned={versioned})")
+
+deletar_bucket("meu-bucket", force=True, versioned=False)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.7 — Positional-Only Arguments (antes de /)</h3>
+          <p>Parâmetros definidos <strong>antes</strong> de <code>/</code> só podem ser passados por posição — nunca por nome. Recurso do Python 3.8+ usado em APIs que imitam funções C built-in.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Positional-Only Parameters (Python 3.8+)</h4>
+            <pre><code># Tudo ANTES de / é positional-only
+def potencia(base, expoente, /):
+    """base e expoente só podem ser passados por posição."""
+    return base ** expoente
+
+# ✅ Correto — passando por posição
+print(potencia(2, 10))  # 1024
+
+# ❌ Erro — tentando passar por nome
+# print(potencia(base=2, expoente=10))
+# TypeError: potencia() got some positional-only arguments passed as keyword arguments
+
+# ═══ Combinando todas as formas ═══
+def complexa(pos_only1, pos_only2, /, normal1, normal2, *, kw_only1, kw_only2):
+    """
+    pos_only1, pos_only2: APENAS posicional (antes de /)
+    normal1, normal2: posicional OU nomeado (entre / e *)
+    kw_only1, kw_only2: APENAS nomeado (depois de *)
+    """
+    print(f"pos_only: {pos_only1}, {pos_only2}")
+    print(f"normal: {normal1}, {normal2}")
+    print(f"kw_only: {kw_only1}, {kw_only2}")
+
+# Chamada válida:
+complexa(1, 2, 3, normal2=4, kw_only1=5, kw_only2=6)
+complexa(1, 2, normal1=3, normal2=4, kw_only1=5, kw_only2=6)
+
+# ═══ Por que usar positional-only? ═══
+# 1. Permite mudar nomes de parâmetros sem quebrar código existente
+# 2. Evita conflito quando **kwargs pode receber o mesmo nome
+# 3. Imita comportamento de funções built-in (len, range, print)
+
+# Exemplo: evitando conflito com **kwargs
+def minha_func(nome, /, **kwargs):
+    """'nome' é positional-only, então kwargs pode ter chave 'nome'."""
+    print(f"Parâmetro nome: {nome}")
+    print(f"kwargs: {kwargs}")
+
+minha_func("Ricardo", nome="outro_valor", idade=30)
+# Parâmetro nome: Ricardo
+# kwargs: {'nome': 'outro_valor', 'idade': 30}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.8 — Ordem Completa dos Parâmetros</h3>
+          <p>Python exige uma ordem específica para os diferentes tipos de parâmetros em uma definição de função.</p>
+
+          <div class="info-box highlight">
+            <h4>📐 Regra de Ordenação de Parâmetros</h4>
+            <pre><code># A ordem OBRIGATÓRIA dos parâmetros é:
+#
+# def func(pos_only, /, normal, *args, kw_only, **kwargs):
+#          ─────┬────  ──┬───  ──┬──  ───┬────  ───┬────
+#               │        │       │        │         │
+#   1. Positional-only   │       │        │         │
+#   2. Normal (pos ou kw)│       │        │         │
+#   3. *args (variadics) │       │        │         │
+#   4. Keyword-only      │       │        │         │
+#   5. **kwargs          ─────────────────────────────
+#
+# Exemplo completo:
+def api_request(method, url, /,          # positional-only
+                headers=None, body=None,  # normal (posicional ou nomeado)
+                *args,                    # captura posicionais extras
+                timeout=30, retries=3,   # keyword-only
+                **kwargs):               # captura nomeados extras
+    """Exemplo com todos os tipos de parâmetros."""
+    pass
+
+# Resumo visual:
+# ┌──────────────┬────────────┬───────┬──────────────┬─────────┐
+# │ positional-  │  normal    │ *args │ keyword-only │ **kwargs│
+# │    only      │            │       │              │         │
+# │ (antes /)    │ (entre)    │       │ (depois *)   │         │
+# └──────────────┴────────────┴───────┴──────────────┴─────────┘</code></pre>
+          </div>
+
+          <styled-table>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Síntaxe</th>
+                  <th>Passagem</th>
+                  <th>Quando Usar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Positional-only</td>
+                  <td>Antes de <code>/</code></td>
+                  <td>Apenas por posição</td>
+                  <td>APIs estáveis, evitar conflito com kwargs</td>
+                </tr>
+                <tr>
+                  <td>Normal</td>
+                  <td>Entre <code>/</code> e <code>*</code></td>
+                  <td>Posição ou nome</td>
+                  <td>Uso geral (maioria dos parâmetros)</td>
+                </tr>
+                <tr>
+                  <td>*args</td>
+                  <td><code>*nome</code></td>
+                  <td>Posicionais extras</td>
+                  <td>Quantidade variável de valores</td>
+                </tr>
+                <tr>
+                  <td>Keyword-only</td>
+                  <td>Após <code>*</code> ou <code>*args</code></td>
+                  <td>Apenas por nome</td>
+                  <td>Flags, configurações, clareza</td>
+                </tr>
+                <tr>
+                  <td>**kwargs</td>
+                  <td><code>**nome</code></td>
+                  <td>Nomeados extras</td>
+                  <td>Configurações flexíveis, wrappers</td>
+                </tr>
+              </tbody>
+            </table>
+          </styled-table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3 — ESCOPO DE VARIÁVEIS (LEGB)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Escopo de Variáveis (LEGB)</h2>
+          <p>O escopo determina onde uma variável é acessível. Python utiliza a regra LEGB (Local, Enclosing, Global, Built-in) para resolver nomes. Entender escopos evita bugs sutis e é essencial para trabalhar com closures e decoradores.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.1 — A Regra LEGB</h3>
+          <p>Quando Python encontra um nome (variável, função), ele busca nessa ordem: <strong>L</strong>ocal → <strong>E</strong>nclosing → <strong>G</strong>lobal → <strong>B</strong>uilt-in. A busca para no primeiro escopo onde o nome é encontrado.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Os 4 Níveis de Escopo</h4>
+            <pre><code># ═══ BUILT-IN — Nomes pré-definidos do Python ═══
+# print, len, range, int, str, list, True, False, None, etc.
+# Sempre disponíveis em qualquer lugar do código
+print(len([1, 2, 3]))  # len e print são built-in
+
+# ═══ GLOBAL — Definido no nível do módulo (arquivo .py) ═══
+AMBIENTE = "production"  # Variável global
+MAX_RETRIES = 3          # Constante global (convenção: MAIÚSCULAS)
+
+def mostrar_ambiente():
+    # Pode LER variáveis globais sem declaração especial
+    print(f"Ambiente: {AMBIENTE}")  # OK — leitura
+
+mostrar_ambiente()  # "Ambiente: production"
+
+# ═══ ENCLOSING — Escopo de função externa (closures) ═══
+def externa():
+    mensagem = "Olá do escopo enclosing"  # Variável no escopo enclosing
+    
+    def interna():
+        # Pode LER variáveis do escopo enclosing
+        print(mensagem)  # Acessa 'mensagem' da função externa
+    
+    interna()
+
+externa()  # "Olá do escopo enclosing"
+
+# ═══ LOCAL — Definido dentro da função atual ═══
+def calcular():
+    resultado = 42  # Variável LOCAL — só existe dentro de calcular()
+    print(resultado)
+
+calcular()  # 42
+# print(resultado)  # NameError: name 'resultado' is not defined
+
+# ═══ Demonstração completa do LEGB ═══
+x = "global"  # G
+
+def externa():
+    x = "enclosing"  # E
+    
+    def interna():
+        x = "local"  # L
+        print(f"Dentro de interna: {x}")  # "local" (L vence)
+    
+    interna()
+    print(f"Dentro de externa: {x}")  # "enclosing" (E — local de externa)
+
+externa()
+print(f"Nível módulo: {x}")  # "global" (G)
+
+# Sem variável local, busca no enclosing:
+def externa2():
+    x = "enclosing"
+    
+    def interna2():
+        # Sem x local — busca no enclosing
+        print(f"Dentro de interna2: {x}")  # "enclosing"
+    
+    interna2()
+
+externa2()</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🔍 Ordem de Busca LEGB — Resumo Visual</h4>
+            <pre><code># Python busca nomes nesta ordem (para no primeiro encontrado):
+#
+#  ┌─────────────────────────────────────────┐
+#  │  BUILT-IN (print, len, int, range...)   │  ← Último recurso
+#  │  ┌─────────────────────────────────┐    │
+#  │  │  GLOBAL (nível do módulo .py)   │    │  ← Terceiro
+#  │  │  ┌─────────────────────────┐    │    │
+#  │  │  │  ENCLOSING (func externa)│   │    │  ← Segundo
+#  │  │  │  ┌─────────────────┐    │    │    │
+#  │  │  │  │  LOCAL (func)   │    │    │    │  ← Primeiro (prioridade)
+#  │  │  │  └─────────────────┘    │    │    │
+#  │  │  └─────────────────────────┘    │    │
+#  │  └─────────────────────────────────┘    │
+#  └─────────────────────────────────────────┘
+#
+# Se não encontrar em nenhum → NameError!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 — A Palavra-chave global</h3>
+          <p>Para <strong>modificar</strong> uma variável global de dentro de uma função, você precisa declará-la com <code>global</code>. Sem isso, Python cria uma variável local com o mesmo nome.</p>
+
+          <div class="command-card wide">
+            <h4>📋 global — Modificando Variáveis Globais</h4>
+            <pre><code># Sem 'global', atribuição cria variável LOCAL
+contador = 0  # Global
+
+def incrementar_errado():
+    # Isto cria uma variável LOCAL 'contador', não modifica a global!
+    contador = 1  # Nova variável local (shadowing)
+    print(f"Local: {contador}")  # 1
+
+incrementar_errado()
+print(f"Global: {contador}")  # 0 — não mudou!
+
+# Com 'global', modifica a variável GLOBAL
+def incrementar_correto():
+    global contador
+    contador += 1
+    print(f"Global modificada: {contador}")
+
+incrementar_correto()  # "Global modificada: 1"
+incrementar_correto()  # "Global modificada: 2"
+print(f"Global: {contador}")  # 2 — foi modificada!
+
+# ═══ Caso de uso legítimo: configuração simples ═══
+_config = {}
+
+def carregar_config(arquivo):
+    global _config
+    import json
+    with open(arquivo) as f:
+        _config = json.load(f)
+
+def get_config(chave):
+    return _config.get(chave)
+
+# ═══ PORÉM: Evite 'global' sempre que possível! ═══
+# Alternativas melhores:
+# 1. Passe como argumento e retorne o valor modificado
+# 2. Use uma classe para encapsular estado
+# 3. Use um dicionário/objeto mutável (não precisa de global para mutar)
+
+# Exemplo: dict mutável não precisa de global
+metricas = {"requests": 0, "errors": 0}
+
+def registrar_request(sucesso=True):
+    # Não precisa de 'global' — estamos MUTANDO o dict, não reatribuindo
+    metricas["requests"] += 1
+    if not sucesso:
+        metricas["errors"] += 1
+
+registrar_request()
+registrar_request(sucesso=False)
+print(metricas)  # {'requests': 2, 'errors': 1}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 — A Palavra-chave nonlocal</h3>
+          <p><code>nonlocal</code> permite modificar variáveis do escopo <strong>enclosing</strong> (função externa). Essencial para closures que mantêm estado.</p>
+
+          <div class="command-card wide">
+            <h4>📋 nonlocal — Modificando Escopo Enclosing</h4>
+            <pre><code># nonlocal permite modificar variável da função EXTERNA
+def criar_contador(inicio=0):
+    """Factory que cria um contador com closure."""
+    contagem = inicio  # Variável no escopo enclosing
+    
+    def incrementar():
+        nonlocal contagem  # Permite MODIFICAR a variável enclosing
+        contagem += 1
+        return contagem
+    
+    def decrementar():
+        nonlocal contagem
+        contagem -= 1
+        return contagem
+    
+    def valor():
+        return contagem  # Apenas LER não precisa de nonlocal
+    
+    return incrementar, decrementar, valor
+
+# Usando o contador
+inc, dec, val = criar_contador(10)
+print(inc())  # 11
+print(inc())  # 12
+print(inc())  # 13
+print(dec())  # 12
+print(val())  # 12
+
+# Cada chamada a criar_contador cria um contador INDEPENDENTE
+inc2, _, val2 = criar_contador(100)
+print(inc2())  # 101
+print(val())   # 12  — primeiro contador não foi afetado
+
+# ═══ Sem nonlocal — UnboundLocalError ═══
+def externa():
+    x = 10
+    
+    def interna():
+        # x += 1  # UnboundLocalError: local variable 'x' referenced before assignment
+        # Python vê a atribuição e assume que x é LOCAL
+        pass
+    
+    # Com nonlocal funciona:
+    def interna_correta():
+        nonlocal x
+        x += 1
+        return x
+    
+    return interna_correta
+
+# ═══ Diferença: global vs nonlocal ═══
+# global  → modifica variável do MÓDULO (nível mais externo)
+# nonlocal → modifica variável da FUNÇÃO EXTERNA (um nível acima)
+nivel_modulo = "global"
+
+def func_externa():
+    nivel_externo = "enclosing"
+    
+    def func_interna():
+        # global nivel_modulo      → modifica variável do módulo
+        # nonlocal nivel_externo   → modifica variável de func_externa
+        pass</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 — Variable Shadowing — Armadilhas</h3>
+          <p><strong>Shadowing</strong> ocorre quando uma variável local tem o mesmo nome de uma variável em escopo superior. Isso pode causar bugs difíceis de detectar.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Armadilhas Comuns de Escopo</h4>
+            <pre><code># ═══ Shadowing de built-ins (MUITO comum!) ═══
+# ❌ Evite usar nomes de built-ins como variáveis!
+list = [1, 2, 3]        # Sombra o built-in list()!
+# print(list("abc"))    # TypeError: 'list' object is not callable
+# Agora list é [1, 2, 3], não a classe list!
+
+# ❌ Outros nomes perigosos:
+# id = 42              # Sombra id()
+# type = "EC2"         # Sombra type()
+# input = "dados"      # Sombra input()
+# print = "mensagem"   # Sombra print()!
+# dict = {}            # Sombra dict()
+# str = "texto"        # Sombra str()
+# len = 5              # Sombra len()
+# max = 100            # Sombra max()
+# min = 0              # Sombra min()
+# sum = 0              # Sombra sum()
+
+# ✅ Use nomes descritivos em vez de nomes genéricos:
+lista_servidores = [1, 2, 3]   # Em vez de 'list'
+tipo_instancia = "EC2"          # Em vez de 'type'
+id_recurso = 42                 # Em vez de 'id'
+
+# ═══ UnboundLocalError — O bug mais confuso ═══
+x = 10
+
+def confusa():
+    print(x)  # Parece que deveria ler o global...
+    x = 20    # ... mas Python vê ESTA linha e assume x é LOCAL!
+
+# confusa()  # UnboundLocalError: local variable 'x' referenced before assignment
+
+# Isso acontece porque Python analisa o corpo INTEIRO da função
+# antes de executar. Se encontra atribuição, marca como local.
+
+# ═══ Solução: use nomes diferentes ou global/nonlocal ═══
+x = 10
+
+def clara():
+    x_local = x + 5  # Nome diferente — sem ambiguidade
+    print(x_local)   # 15
+
+clara()
+print(x)  # 10 — não foi afetada</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Boas Práticas de Escopo</h4>
+            <ul>
+              <li><strong>Minimize variáveis globais</strong> — passem valores como argumentos</li>
+              <li><strong>Nunca use nomes de built-ins</strong> como variáveis (list, dict, str, id, type, input, print)</li>
+              <li><strong>Prefira retornar valores</strong> em vez de modificar globais</li>
+              <li><strong>Use classes</strong> quando precisar de estado compartilhado entre funções</li>
+              <li><strong>Evite <code>global</code></strong> — torna o código difícil de testar e debuggar</li>
+              <li><strong>Use <code>nonlocal</code> com parcimônia</strong> — closures são poderosas mas podem confundir</li>
+            </ul>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- Navigation -->
-    <section class="learning-section">
-      <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
-        <a href="modulo-02.html" class="button secondary">← Módulo Anterior</a>
-        <a href="modulo-04.html" class="button primary">Próximo Módulo →</a>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4 — FUNÇÕES COMO OBJETOS DE PRIMEIRA CLASSE
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Funções como Objetos de Primeira Classe</h2>
+          <p>Em Python, funções são <strong>first-class objects</strong> — podem ser atribuídas a variáveis, passadas como argumentos, retornadas por outras funções e armazenadas em estruturas de dados. Esse conceito é a base para closures, decoradores e programação funcional.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 — Funções como Variáveis</h3>
+          <p>Uma função em Python é um objeto como qualquer outro. Quando você define <code>def foo():</code>, está criando um objeto função e atribuindo-o ao nome <code>foo</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Funções São Objetos</h4>
+            <pre><code># Funções são objetos — podem ser atribuídas a variáveis
+def saudar(nome):
+    return f"Olá, {nome}!"
+
+# Atribuindo a outra variável (sem parênteses = referência ao objeto)
+cumprimentar = saudar  # 'cumprimentar' agora aponta para o mesmo objeto função
+
+print(saudar("Ana"))        # "Olá, Ana!"
+print(cumprimentar("Ana"))  # "Olá, Ana!" — mesmo resultado!
+print(saudar is cumprimentar)  # True — mesmo objeto!
+
+# Funções têm atributos como qualquer objeto
+print(saudar.__name__)      # "saudar"
+print(saudar.__doc__)       # None (sem docstring)
+print(type(saudar))         # &lt;class 'function'&gt;
+
+# ═══ Armazenando funções em estruturas de dados ═══
+def start_ec2(instance_id):
+    return f"Starting {instance_id}"
+
+def stop_ec2(instance_id):
+    return f"Stopping {instance_id}"
+
+def terminate_ec2(instance_id):
+    return f"Terminating {instance_id}"
+
+# Dicionário de funções — padrão Strategy/Dispatch
+acoes = {
+    "start": start_ec2,
+    "stop": stop_ec2,
+    "terminate": terminate_ec2
+}
+
+# Dispatch — escolher ação em runtime
+acao = "stop"
+resultado = acoes[acao]("i-0abc123")
+print(resultado)  # "Stopping i-0abc123"
+
+# Equivalente a um switch/case gigante, mas muito mais elegante!
+for acao_nome, funcao in acoes.items():
+    print(f"{acao_nome}: {funcao('i-999')}")
+
+# ═══ Lista de funções ═══
+validacoes = [
+    lambda x: len(x) > 0,
+    lambda x: x.isalnum(),
+    lambda x: not x.startswith("-"),
+]
+
+nome_bucket = "meu-bucket-123"
+resultados = [v(nome_bucket) for v in validacoes]
+print(resultados)  # [True, False, False]
+todos_validos = all(v(nome_bucket) for v in validacoes)
+print(f"Válido: {todos_validos}")  # False</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 — Funções como Argumentos (Callbacks)</h3>
+          <p>Funções podem ser passadas como argumentos para outras funções. Isso é a base para callbacks, strategies e programação funcional.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Higher-Order Functions — Recebendo Funções</h4>
+            <pre><code># Uma função que RECEBE outra função como argumento
+def aplicar_a_todos(funcao, lista):
+    """Aplica 'funcao' a cada elemento de 'lista'."""
+    return [funcao(item) for item in lista]
+
+# Passando diferentes funções
+numeros = [1, -2, 3, -4, 5]
+print(aplicar_a_todos(abs, numeros))        # [1, 2, 3, 4, 5]
+print(aplicar_a_todos(str, numeros))        # ['1', '-2', '3', '-4', '5']
+print(aplicar_a_todos(lambda x: x**2, numeros))  # [1, 4, 9, 16, 25]
+
+# ═══ Padrão Callback — Execução assíncrona/condicional ═══
+def processar_instancias(instancias, filtro, acao):
+    """Filtra instâncias e aplica ação nas que passam."""
+    for inst in instancias:
+        if filtro(inst):
+            acao(inst)
+
+# Definindo filtros e ações
+def esta_parada(inst):
+    return inst["estado"] == "stopped"
+
+def esta_cara(inst):
+    return inst["custo_hora"] > 0.5
+
+def iniciar(inst):
+    print(f"  Iniciando {inst['id']}...")
+
+def notificar(inst):
+    print(f"  ⚠️ Instância cara: {inst['id']} (${inst['custo_hora']}/h)")
+
+instancias = [
+    {"id": "i-001", "estado": "stopped", "custo_hora": 0.1},
+    {"id": "i-002", "estado": "running", "custo_hora": 1.2},
+    {"id": "i-003", "estado": "stopped", "custo_hora": 0.8},
+]
+
+print("Instâncias paradas:")
+processar_instancias(instancias, esta_parada, iniciar)
+
+print("Instâncias caras:")
+processar_instancias(instancias, esta_cara, notificar)
+
+# ═══ sorted() com key — Exemplo clássico de callback ═══
+servidores = [
+    {"nome": "web-01", "cpu": 75, "mem": 60},
+    {"nome": "api-01", "cpu": 45, "mem": 80},
+    {"nome": "db-01", "cpu": 90, "mem": 95},
+]
+
+# Ordenar por CPU (a função key é um callback!)
+por_cpu = sorted(servidores, key=lambda s: s["cpu"], reverse=True)
+print([s["nome"] for s in por_cpu])  # ['db-01', 'web-01', 'api-01']</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 — Funções Retornando Funções (Factories)</h3>
+          <p>Funções podem <strong>criar e retornar</strong> outras funções. Esse padrão é chamado de <em>function factory</em> ou <em>closure factory</em> e é a base para decoradores.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Function Factories</h4>
+            <pre><code># ═══ Factory simples — cria funções customizadas ═══
+def criar_multiplicador(fator):
+    """Cria uma função que multiplica por 'fator'."""
+    def multiplicar(x):
+        return x * fator  # 'fator' é capturado do escopo enclosing
+    return multiplicar
+
+dobro = criar_multiplicador(2)
+triplo = criar_multiplicador(3)
+dez_vezes = criar_multiplicador(10)
+
+print(dobro(5))     # 10
+print(triplo(5))    # 15
+print(dez_vezes(5)) # 50
+
+# Cada função criada "lembra" seu fator — isso é uma CLOSURE!
+
+# ═══ Factory de validadores ═══
+def criar_validador(min_val=None, max_val=None, tipo=None):
+    """Cria função de validação com regras configuráveis."""
+    def validar(valor):
+        if tipo and not isinstance(valor, tipo):
+            return False, f"Tipo inválido: esperado {tipo.__name__}"
+        if min_val is not None and valor < min_val:
+            return False, f"Valor {valor} menor que mínimo {min_val}"
+        if max_val is not None and valor > max_val:
+            return False, f"Valor {valor} maior que máximo {max_val}"
+        return True, "Válido"
+    return validar
+
+# Criando validadores específicos
+validar_porta = criar_validador(min_val=1, max_val=65535, tipo=int)
+validar_percentual = criar_validador(min_val=0, max_val=100, tipo=(int, float))
+
+print(validar_porta(8080))     # (True, 'Válido')
+print(validar_porta(99999))    # (False, 'Valor 99999 maior que máximo 65535')
+print(validar_porta("80"))     # (False, 'Tipo inválido: esperado int')
+
+# ═══ Factory de loggers com prefixo ═══
+def criar_logger(modulo):
+    """Cria função de log com prefixo do módulo."""
+    def log(nivel, mensagem):
+        from datetime import datetime
+        ts = datetime.now().strftime("%H:%M:%S")
+        print(f"[{ts}] [{nivel.upper()}] [{modulo}] {mensagem}")
+    return log
+
+log_api = criar_logger("API")
+log_db = criar_logger("Database")
+log_auth = criar_logger("Auth")
+
+log_api("info", "Request recebida em /users")
+log_db("warning", "Query lenta detectada (2.3s)")
+log_auth("error", "Token expirado para user_id=42")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 — Closures (Funções com Memória)</h3>
+          <p>Uma <strong>closure</strong> é uma função interna que "lembra" variáveis do escopo onde foi criada, mesmo depois que a função externa terminou. É o mecanismo que dá "memória" às funções.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Closures — Capturando Estado</h4>
+            <pre><code># ═══ O que é uma Closure? ═══
+# Closure = função interna + variáveis capturadas do escopo externo
+
+def criar_acumulador():
+    """Cria um acumulador que mantém estado entre chamadas."""
+    total = 0  # Variável capturada pela closure
+    
+    def adicionar(valor):
+        nonlocal total
+        total += valor
+        return total
+    
+    return adicionar
+
+# Cada acumulador é independente!
+acc1 = criar_acumulador()
+acc2 = criar_acumulador()
+
+print(acc1(10))  # 10
+print(acc1(20))  # 30
+print(acc1(5))   # 35
+
+print(acc2(100)) # 100 — acc2 tem seu próprio 'total'
+print(acc1(0))   # 35  — acc1 não foi afetado
+
+# Verificando que é uma closure
+print(acc1.__closure__)  # (&lt;cell ...&gt;,) — contém referência ao 'total'
+print(acc1.__closure__[0].cell_contents)  # 35
+
+# ═══ Closure prática: rate limiter ═══
+import time
+
+def criar_rate_limiter(max_chamadas, periodo_segundos):
+    """Cria um rate limiter com sliding window."""
+    chamadas = []  # Lista de timestamps — capturada pela closure
+    
+    def pode_executar():
+        nonlocal chamadas
+        agora = time.time()
+        # Remove chamadas fora da janela
+        chamadas = [t for t in chamadas if agora - t < periodo_segundos]
+        
+        if len(chamadas) < max_chamadas:
+            chamadas.append(agora)
+            return True
+        return False
+    
+    return pode_executar
+
+# Máximo 3 chamadas por segundo
+limiter = criar_rate_limiter(3, 1.0)
+for i in range(5):
+    if limiter():
+        print(f"Request {i+1}: ✅ Permitida")
+    else:
+        print(f"Request {i+1}: ❌ Rate limited!")
+
+# ═══ Closure vs Classe — Quando usar cada um? ═══
+# Closure: estado simples, poucas operações, funcional
+# Classe: estado complexo, muitos métodos, herança necessária
+
+# Equivalente como classe:
+class Acumulador:
+    def __init__(self):
+        self.total = 0
+    
+    def adicionar(self, valor):
+        self.total += valor
+        return self.total
+
+# A closure é mais concisa para casos simples!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.5 — Higher-Order Functions (map, filter, reduce)</h3>
+          <p>Funções de alta ordem são funções que recebem ou retornam outras funções. Python oferece várias built-in: <code>map()</code>, <code>filter()</code>, <code>sorted()</code>, e <code>functools.reduce()</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 map(), filter() e reduce()</h4>
+            <pre><code># ═══ map(funcao, iteravel) — Aplica função a cada elemento ═══
+# Retorna um iterator (lazy) — use list() para materializar
+
+instancias = ["i-001", "i-002", "i-003", "i-004"]
+
+# Transformar cada ID em um dict
+def criar_info(iid):
+    return {"id": iid, "status": "running"}
+
+infos = list(map(criar_info, instancias))
+print(infos[0])  # {'id': 'i-001', 'status': 'running'}
+
+# map com lambda
+custos_usd = [100.0, 250.5, 180.0, 320.0]
+custos_brl = list(map(lambda x: x * 5.2, custos_usd))
+print(custos_brl)  # [520.0, 1302.6, 936.0, 1664.0]
+
+# map com múltiplos iteráveis
+nomes = ["web", "api", "worker"]
+regioes = ["us-east-1", "eu-west-1", "ap-south-1"]
+tags = list(map(lambda n, r: f"{n}-{r}", nomes, regioes))
+print(tags)  # ['web-us-east-1', 'api-eu-west-1', 'worker-ap-south-1']
+
+# ═══ filter(funcao, iteravel) — Filtra elementos ═══
+# Mantém apenas elementos onde funcao(elem) é True
+
+numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+pares = list(filter(lambda x: x % 2 == 0, numeros))
+print(pares)  # [2, 4, 6, 8, 10]
+
+# Filtrar instâncias caras
+instancias = [
+    {"id": "i-001", "custo": 0.05},
+    {"id": "i-002", "custo": 1.20},
+    {"id": "i-003", "custo": 0.50},
+    {"id": "i-004", "custo": 2.30},
+]
+caras = list(filter(lambda i: i["custo"] > 0.5, instancias))
+print([i["id"] for i in caras])  # ['i-002', 'i-004']
+
+# filter(None, ...) remove elementos "falsy"
+dados = [0, 1, "", "hello", None, [], [1], False, True]
+truthy = list(filter(None, dados))
+print(truthy)  # [1, 'hello', [1], True]
+
+# ═══ functools.reduce(funcao, iteravel) — Reduz a um valor ═══
+from functools import reduce
+
+# Soma (equivalente a sum())
+numeros = [1, 2, 3, 4, 5]
+total = reduce(lambda acc, x: acc + x, numeros)
+print(total)  # 15
+
+# Produto
+produto = reduce(lambda acc, x: acc * x, numeros)
+print(produto)  # 120 (1*2*3*4*5)
+
+# Encontrar o maior custo
+custos = [150, 320, 180, 420, 95]
+maior = reduce(lambda acc, x: x if x > acc else acc, custos)
+print(maior)  # 420
+
+# Flatten de listas
+listas = [[1, 2], [3, 4], [5, 6]]
+flat = reduce(lambda acc, x: acc + x, listas)
+print(flat)  # [1, 2, 3, 4, 5, 6]
+
+# ═══ Preferência Pythônica ═══
+# Em geral, list comprehension é preferível a map/filter:
+# map + lambda → [f(x) for x in lista]
+# filter + lambda → [x for x in lista if cond(x)]
+# reduce → use sum(), max(), min(), ou loop explícito</code></pre>
+          </div>
+        </div>
+
       </div>
     </section>
-  </main>
 
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
-      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
-      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
-    </div>
-    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
-  </footer>
-  <script src="../trail-gate.js"></script>
-  <script src="../config.js"></script>
-  <script src="../app.js"></script>
-</body>
-</html>
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5 — FUNÇÕES LAMBDA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Funções Lambda</h2>
+          <p>Funções lambda são funções anônimas de uma única expressão. São concisas e ideais para operações simples passadas como argumentos — como chaves de ordenação, callbacks rápidos e transformações em map/filter.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.1 — Sintaxe Lambda</h3>
+          <p>Uma função lambda é definida com a palavra-chave <code>lambda</code>, seguida dos parâmetros e uma única expressão (que é automaticamente retornada).</p>
+
+          <div class="command-card wide">
+            <h4>📋 Lambda — Sintaxe e Exemplos Básicos</h4>
+            <pre><code># Sintaxe: lambda parametros: expressao
+#          ^^^^^^ ^^^^^^^^^  ^^^^^^^^
+#          keyword  args      retorno automático (sem return!)
+
+# ═══ Equivalência lambda vs def ═══
+# Com def:
+def somar(a, b):
+    return a + b
+
+# Com lambda (equivalente):
+somar_lambda = lambda a, b: a + b
+
+print(somar(3, 5))        # 8
+print(somar_lambda(3, 5)) # 8
+
+# ═══ Exemplos de lambdas ═══
+# Lambda sem argumentos
+saudacao = lambda: "Olá, mundo!"
+print(saudacao())  # "Olá, mundo!"
+
+# Lambda com um argumento
+quadrado = lambda x: x ** 2
+print(quadrado(7))  # 49
+
+# Lambda com múltiplos argumentos
+custo_total = lambda horas, preco: horas * preco
+print(custo_total(720, 0.0116))  # 8.352
+
+# Lambda com valor padrão
+saudar = lambda nome, titulo="Sr.": f"Olá, {titulo} {nome}!"
+print(saudar("Ricardo"))         # "Olá, Sr. Ricardo!"
+print(saudar("Ana", "Dra."))     # "Olá, Dra. Ana!"
+
+# Lambda com condicional (ternário)
+classificar = lambda x: "positivo" if x > 0 else "negativo" if x < 0 else "zero"
+print(classificar(5))   # "positivo"
+print(classificar(-3))  # "negativo"
+print(classificar(0))   # "zero"
+
+# Lambda com operações de string
+limpar = lambda s: s.strip().lower().replace(" ", "_")
+print(limpar("  Meu Bucket  "))  # "meu_bucket"
+
+# NOTA: Lambdas NÃO têm nome (são "anônimas")
+print(somar.__name__)        # "somar"
+print(somar_lambda.__name__) # "&lt;lambda&gt;" — não tem nome real!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 — Lambda com sorted(), map() e filter()</h3>
+          <p>O uso mais comum de lambdas é como argumento para funções que esperam um callback curto.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Usos Práticos de Lambda</h4>
+            <pre><code># ═══ sorted() com lambda como key ═══
+instancias = [
+    {"id": "i-001", "tipo": "t3.micro", "custo": 0.0116, "cpu": 25},
+    {"id": "i-002", "tipo": "m5.large", "custo": 0.096, "cpu": 80},
+    {"id": "i-003", "tipo": "t3.small", "custo": 0.0208, "cpu": 45},
+    {"id": "i-004", "tipo": "c5.xlarge", "custo": 0.17, "cpu": 92},
+]
+
+# Ordenar por custo (ascendente)
+por_custo = sorted(instancias, key=lambda i: i["custo"])
+print([i["id"] for i in por_custo])  # ['i-001', 'i-003', 'i-002', 'i-004']
+
+# Ordenar por CPU (descendente)
+por_cpu = sorted(instancias, key=lambda i: i["cpu"], reverse=True)
+print([i["id"] for i in por_cpu])  # ['i-004', 'i-002', 'i-003', 'i-001']
+
+# Ordenar por múltiplos critérios: custo desc, depois CPU asc
+multi = sorted(instancias, key=lambda i: (-i["custo"], i["cpu"]))
+
+# ═══ map() com lambda ═══
+# Extrair apenas os IDs
+ids = list(map(lambda i: i["id"], instancias))
+print(ids)  # ['i-001', 'i-002', 'i-003', 'i-004']
+
+# Formatar como relatório
+relatorio = list(map(
+    lambda i: f"{i['id']} ({i['tipo']}): ${i['custo']}/h - CPU {i['cpu']}%",
+    instancias
+))
+for linha in relatorio:
+    print(linha)
+
+# ═══ filter() com lambda ═══
+# Instâncias com CPU alta (> 50%)
+alta_cpu = list(filter(lambda i: i["cpu"] > 50, instancias))
+print(f"Alta CPU: {[i['id'] for i in alta_cpu]}")  # ['i-002', 'i-004']
+
+# Instâncias baratas (< $0.05/h)
+baratas = list(filter(lambda i: i["custo"] < 0.05, instancias))
+print(f"Baratas: {[i['id'] for i in baratas]}")  # ['i-001', 'i-003']
+
+# ═══ max() e min() com lambda ═══
+mais_cara = max(instancias, key=lambda i: i["custo"])
+print(f"Mais cara: {mais_cara['id']} (${mais_cara['custo']}/h)")
+
+menor_cpu = min(instancias, key=lambda i: i["cpu"])
+print(f"Menor CPU: {menor_cpu['id']} ({menor_cpu['cpu']}%)")
+
+# ═══ Agrupando com lambda (itertools.groupby) ═══
+from itertools import groupby
+
+logs = [
+    {"nivel": "ERROR", "msg": "Timeout"},
+    {"nivel": "INFO", "msg": "Started"},
+    {"nivel": "ERROR", "msg": "Connection lost"},
+    {"nivel": "WARNING", "msg": "High memory"},
+    {"nivel": "INFO", "msg": "Request OK"},
+]
+
+# Precisa ordenar antes de groupby!
+logs_sorted = sorted(logs, key=lambda l: l["nivel"])
+for nivel, grupo in groupby(logs_sorted, key=lambda l: l["nivel"]):
+    msgs = [l["msg"] for l in grupo]
+    print(f"  {nivel}: {msgs}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 — Limitações e Quando Usar Lambda vs def</h3>
+          <p>Lambdas são poderosas mas limitadas. Saber quando usar cada uma é uma marca de código profissional.</p>
+
+          <div class="info-box highlight">
+            <h4>⚖️ Lambda vs def — Guia de Decisão</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Característica</th>
+                  <th>Lambda</th>
+                  <th>def</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Linhas</td>
+                  <td>Apenas 1 expressão</td>
+                  <td>Múltiplas linhas</td>
+                </tr>
+                <tr>
+                  <td>Statements</td>
+                  <td>❌ Sem if/for/while/try</td>
+                  <td>✅ Qualquer statement</td>
+                </tr>
+                <tr>
+                  <td>Docstring</td>
+                  <td>❌ Não suporta</td>
+                  <td>✅ Suporta</td>
+                </tr>
+                <tr>
+                  <td>Nome</td>
+                  <td>Anônima (&lt;lambda&gt;)</td>
+                  <td>Nomeada</td>
+                </tr>
+                <tr>
+                  <td>Decoradores</td>
+                  <td>❌ Não pode receber</td>
+                  <td>✅ Pode receber</td>
+                </tr>
+                <tr>
+                  <td>Type Hints</td>
+                  <td>❌ Não suporta</td>
+                  <td>✅ Suporta</td>
+                </tr>
+                <tr>
+                  <td>Debug</td>
+                  <td>Difícil (sem nome no traceback)</td>
+                  <td>Fácil (nome aparece no traceback)</td>
+                </tr>
+                <tr>
+                  <td>Uso ideal</td>
+                  <td>key=, callbacks curtos, inline</td>
+                  <td>Tudo que não cabe em lambda</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Quando NÃO Usar Lambda</h4>
+            <pre><code># ❌ RUIM — Lambda complexa demais (difícil de ler)
+processar = lambda d: {k: v.strip().lower() for k, v in d.items() if isinstance(v, str) and len(v) > 0}
+
+# ✅ BOM — Use def para lógica complexa
+def processar(d):
+    """Remove espaços e converte strings para minúsculo."""
+    return {
+        k: v.strip().lower()
+        for k, v in d.items()
+        if isinstance(v, str) and len(v) > 0
+    }
+
+# ❌ RUIM — Atribuir lambda a variável (anti-pattern PEP 8!)
+# Se vai nomear, use def!
+dobrar = lambda x: x * 2  # PEP 8 desencoraja isso
+
+# ✅ BOM — Use def quando precisa de nome
+def dobrar(x):
+    """Retorna o dobro do valor."""
+    return x * 2
+
+# ✅ BOM — Lambda inline (uso ideal)
+sorted(dados, key=lambda x: x["prioridade"])
+map(lambda x: x.upper(), nomes)
+filter(lambda x: x > 0, numeros)
+
+# ❌ RUIM — Lambda com efeitos colaterais
+# acoes = list(map(lambda x: print(x), dados))  # Não faça isso!
+
+# ✅ BOM — Use for loop para side effects
+for item in dados:
+    print(item)</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6 — DECORADORES (DECORATORS)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Decoradores (Decorators)</h2>
+          <p>Decoradores são uma das features mais elegantes do Python. Permitem modificar ou estender o comportamento de funções sem alterar seu código-fonte — aplicando o princípio Open/Closed (aberto para extensão, fechado para modificação).</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.1 — O que São Decoradores?</h3>
+          <p>Um decorador é simplesmente uma <strong>função que recebe uma função e retorna uma nova função</strong> (geralmente com comportamento adicional). É a aplicação prática de closures e funções de alta ordem.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Construindo um Decorador do Zero</h4>
+            <pre><code># ═══ Passo 1: Entendendo o conceito ═══
+# Um decorador é uma função que:
+# 1. Recebe uma função como argumento
+# 2. Cria uma função wrapper que adiciona comportamento
+# 3. Retorna a função wrapper
+
+def meu_decorador(func):
+    """Decorador que loga antes e depois da execução."""
+    def wrapper(*args, **kwargs):
+        print(f"▶ Chamando {func.__name__}...")
+        resultado = func(*args, **kwargs)  # Chama a função original
+        print(f"◀ {func.__name__} retornou: {resultado}")
+        return resultado
+    return wrapper
+
+# ═══ Passo 2: Aplicando manualmente (sem @) ═══
+def somar(a, b):
+    return a + b
+
+# Decorando manualmente:
+somar_com_log = meu_decorador(somar)
+resultado = somar_com_log(3, 5)
+# ▶ Chamando somar...
+# ◀ somar retornou: 8
+
+# ═══ Passo 3: Usando a sintaxe @ (syntactic sugar) ═══
+@meu_decorador  # Equivale a: subtrair = meu_decorador(subtrair)
+def subtrair(a, b):
+    return a - b
+
+resultado = subtrair(10, 4)
+# ▶ Chamando subtrair...
+# ◀ subtrair retornou: 6
+
+# A sintaxe @ é apenas açúcar sintático para:
+# subtrair = meu_decorador(subtrair)
+
+# ═══ Visualizando o que acontece ═══
+@meu_decorador
+def calcular_custo(horas, preco_hora):
+    """Calcula custo de instância EC2."""
+    return round(horas * preco_hora, 2)
+
+# Quando chamamos calcular_custo(), na verdade chamamos wrapper()
+# que chama a calcular_custo original internamente
+custo = calcular_custo(720, 0.096)
+# ▶ Chamando calcular_custo...
+# ◀ calcular_custo retornou: 69.12</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 — functools.wraps — Preservando Metadados</h3>
+          <p>Sem <code>functools.wraps</code>, o wrapper substitui o nome e docstring da função original, dificultando debugging. Sempre use <code>@wraps</code> em decoradores profissionais.</p>
+
+          <div class="command-card wide">
+            <h4>📋 @functools.wraps — Decorador Profissional</h4>
+            <pre><code>from functools import wraps
+
+# ═══ Problema SEM @wraps ═══
+def decorador_ruim(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+@decorador_ruim
+def minha_funcao():
+    """Documentação importante."""
+    pass
+
+print(minha_funcao.__name__)  # "wrapper" — PERDEU o nome original!
+print(minha_funcao.__doc__)   # None — PERDEU a docstring!
+
+# ═══ Solução COM @wraps ═══
+def decorador_bom(func):
+    @wraps(func)  # Copia __name__, __doc__, __module__, etc.
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+@decorador_bom
+def minha_funcao():
+    """Documentação importante."""
+    pass
+
+print(minha_funcao.__name__)  # "minha_funcao" — ✅ Preservado!
+print(minha_funcao.__doc__)   # "Documentação importante." — ✅ Preservado!
+
+# ═══ Template padrão para QUALQUER decorador ═══
+def template_decorador(func):
+    """Template padrão — copie e adapte."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # === Código ANTES da função ===
+        # (setup, validação, logging, timing...)
+        
+        resultado = func(*args, **kwargs)  # Chama a original
+        
+        # === Código DEPOIS da função ===
+        # (cleanup, logging, transformação do resultado...)
+        
+        return resultado
+    return wrapper</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.3 — Decoradores com Argumentos</h3>
+          <p>Para criar decoradores que aceitam argumentos, você precisa de um nível extra de aninhamento — uma "fábrica de decoradores".</p>
+
+          <div class="command-card wide">
+            <h4>📋 Decorador com Parâmetros</h4>
+            <pre><code>from functools import wraps
+import time
+
+# ═══ Decorador COM argumentos — 3 níveis de aninhamento ═══
+def repetir(vezes=3, delay=0):
+    """Fábrica de decorador: repete a função N vezes."""
+    def decorador(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            resultados = []
+            for i in range(vezes):
+                resultado = func(*args, **kwargs)
+                resultados.append(resultado)
+                if delay and i < vezes - 1:
+                    time.sleep(delay)
+            return resultados
+        return wrapper
+    return decorador
+
+@repetir(vezes=3, delay=0.1)
+def ping(host):
+    """Faz ping em um host."""
+    return f"Pong de {host}!"
+
+# Executa 3 vezes com 0.1s entre cada
+respostas = ping("api.cloudtrilhas.com")
+print(respostas)
+# ['Pong de api.cloudtrilhas.com!', 'Pong de api.cloudtrilhas.com!', ...]
+
+# ═══ Decorador retry com backoff exponencial ═══
+def retry(max_tentativas=3, excecoes=(Exception,), backoff=2):
+    """Retenta a função em caso de falha com backoff exponencial."""
+    def decorador(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for tentativa in range(1, max_tentativas + 1):
+                try:
+                    return func(*args, **kwargs)
+                except excecoes as e:
+                    if tentativa == max_tentativas:
+                        print(f"❌ Falhou após {max_tentativas} tentativas: {e}")
+                        raise
+                    espera = backoff ** tentativa
+                    print(f"⚠️ Tentativa {tentativa} falhou: {e}. "
+                          f"Retentando em {espera}s...")
+                    time.sleep(espera)
+        return wrapper
+    return decorador
+
+@retry(max_tentativas=3, excecoes=(ConnectionError, TimeoutError))
+def chamar_api(endpoint):
+    """Chama API externa com retry automático."""
+    import random
+    if random.random() < 0.7:  # 70% chance de falha (simulação)
+        raise ConnectionError("Servidor indisponível")
+    return {"status": "ok", "endpoint": endpoint}
+
+# resultado = chamar_api("/health")  # Retenta automaticamente!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.4 — Decoradores Práticos — Exemplos do Mundo Real</h3>
+          <p>Veja decoradores que você encontrará (e criará) em projetos profissionais de DevOps e Cloud.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Decorador de Timing (Medir Performance)</h4>
+            <pre><code>import time
+from functools import wraps
+
+def timer(func):
+    """Mede e exibe o tempo de execução da função."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        inicio = time.perf_counter()
+        resultado = func(*args, **kwargs)
+        fim = time.perf_counter()
+        duracao = fim - inicio
+        
+        if duracao < 1:
+            print(f"⏱️  {func.__name__}: {duracao*1000:.2f}ms")
+        else:
+            print(f"⏱️  {func.__name__}: {duracao:.2f}s")
+        
+        return resultado
+    return wrapper
+
+@timer
+def processar_dados(n):
+    """Simula processamento pesado."""
+    total = sum(i**2 for i in range(n))
+    return total
+
+processar_dados(1_000_000)  # ⏱️  processar_dados: 152.34ms</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Decorador de Cache (Memoização)</h4>
+            <pre><code>from functools import wraps
+
+def cache(func):
+    """Decorador de cache simples (memoização)."""
+    _cache = {}  # Closure captura este dict
+    
+    @wraps(func)
+    def wrapper(*args):
+        if args in _cache:
+            print(f"  📦 Cache hit para {func.__name__}{args}")
+            return _cache[args]
+        
+        resultado = func(*args)
+        _cache[args] = resultado
+        print(f"  💾 Cache miss — armazenando {func.__name__}{args}")
+        return resultado
+    
+    # Expõe método para limpar cache
+    wrapper.cache_clear = lambda: _cache.clear()
+    wrapper.cache_info = lambda: f"Entradas: {len(_cache)}"
+    
+    return wrapper
+
+@cache
+def fibonacci(n):
+    """Calcula Fibonacci recursivamente (com cache é O(n))."""
+    if n < 2:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+print(fibonacci(10))  # 55 (muito rápido com cache!)
+print(fibonacci.cache_info())  # "Entradas: 11"
+
+# NOTA: Python já tem isso built-in! Use @functools.lru_cache
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def fibonacci_builtin(n):
+    if n < 2:
+        return n
+    return fibonacci_builtin(n - 1) + fibonacci_builtin(n - 2)
+
+print(fibonacci_builtin(100))  # Instantâneo!
+print(fibonacci_builtin.cache_info())  # CacheInfo(hits=98, misses=101, ...)</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 Decorador de Logging e Autenticação</h4>
+            <pre><code>from functools import wraps
+from datetime import datetime
+
+# ═══ Decorador de Logging Completo ═══
+def log_chamada(nivel="INFO"):
+    """Loga entrada, saída e erros de funções."""
+    def decorador(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print(f"[{ts}] [{nivel}] → {func.__name__}("
+                  f"args={args}, kwargs={kwargs})")
+            try:
+                resultado = func(*args, **kwargs)
+                print(f"[{ts}] [{nivel}] ← {func.__name__} = {resultado}")
+                return resultado
+            except Exception as e:
+                print(f"[{ts}] [ERROR] ✗ {func.__name__} raised {type(e).__name__}: {e}")
+                raise
+        return wrapper
+    return decorador
+
+@log_chamada(nivel="DEBUG")
+def dividir(a, b):
+    return a / b
+
+dividir(10, 2)  # Loga entrada e saída
+# dividir(10, 0)  # Loga o ZeroDivisionError!
+
+# ═══ Decorador de Autenticação ═══
+def requer_role(*roles_permitidas):
+    """Verifica se o usuário tem a role necessária."""
+    def decorador(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Em produção, pegaria do request/session
+            usuario_atual = kwargs.get("_usuario", {"role": "viewer"})
+            
+            if usuario_atual["role"] not in roles_permitidas:
+                raise PermissionError(
+                    f"Acesso negado: role '{usuario_atual['role']}' "
+                    f"não está em {roles_permitidas}"
+                )
+            return func(*args, **kwargs)
+        return wrapper
+    return decorador
+
+@requer_role("admin", "operator")
+def deletar_recurso(recurso_id, _usuario=None):
+    """Deleta um recurso (requer admin ou operator)."""
+    return f"Recurso {recurso_id} deletado!"
+
+# Admin pode deletar
+resultado = deletar_recurso("vpc-123", _usuario={"role": "admin"})
+print(resultado)  # "Recurso vpc-123 deletado!"
+
+# Viewer não pode
+try:
+    deletar_recurso("vpc-123", _usuario={"role": "viewer"})
+except PermissionError as e:
+    print(f"🔒 {e}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.5 — Decoradores Built-in do Python</h3>
+          <p>Python vem com vários decoradores nativos que você usará frequentemente em classes.</p>
+
+          <div class="command-card wide">
+            <h4>📋 @property, @staticmethod, @classmethod</h4>
+            <pre><code># ═══ @property — Transforma método em atributo ═══
+class Instancia:
+    def __init__(self, tipo, horas):
+        self._tipo = tipo
+        self._horas = horas
+        self._precos = {"t3.micro": 0.0116, "m5.large": 0.096, "c5.xlarge": 0.17}
+    
+    @property
+    def custo_total(self):
+        """Custo total calculado automaticamente."""
+        preco = self._precos.get(self._tipo, 0)
+        return round(self._horas * preco, 2)
+    
+    @property
+    def tipo(self):
+        return self._tipo
+    
+    @tipo.setter
+    def tipo(self, novo_tipo):
+        if novo_tipo not in self._precos:
+            raise ValueError(f"Tipo inválido: {novo_tipo}")
+        self._tipo = novo_tipo
+
+inst = Instancia("t3.micro", 720)
+print(inst.custo_total)  # 8.35 — acesso como ATRIBUTO (sem parênteses!)
+inst.tipo = "m5.large"   # Usa o setter
+print(inst.custo_total)  # 69.12
+
+# ═══ @staticmethod — Método sem self/cls ═══
+class AWSUtils:
+    @staticmethod
+    def validar_arn(arn):
+        """Valida formato de ARN (não precisa de instância)."""
+        partes = arn.split(":")
+        return len(partes) >= 6 and partes[0] == "arn"
+
+# Pode chamar sem instanciar a classe!
+print(AWSUtils.validar_arn("arn:aws:s3:::meu-bucket"))  # True
+print(AWSUtils.validar_arn("invalido"))  # False
+
+# ═══ @classmethod — Método que recebe a classe (cls) ═══
+class Config:
+    _instance = None
+    
+    def __init__(self, ambiente, regiao):
+        self.ambiente = ambiente
+        self.regiao = regiao
+    
+    @classmethod
+    def from_env(cls):
+        """Factory method — cria Config a partir de variáveis de ambiente."""
+        import os
+        return cls(
+            ambiente=os.getenv("APP_ENV", "development"),
+            regiao=os.getenv("AWS_REGION", "us-east-1")
+        )
+    
+    @classmethod
+    def producao(cls):
+        """Factory method — configuração de produção."""
+        return cls("production", "us-east-1")
+
+config = Config.from_env()     # Cria a partir do ambiente
+config = Config.producao()     # Factory predefinida
+print(f"{config.ambiente} - {config.regiao}")  # "production - us-east-1"</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7 — MÓDULOS E PACOTES
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Módulos e Pacotes</h2>
+          <p>Módulos permitem organizar código Python em arquivos separados e reutilizáveis. Pacotes agrupam módulos relacionados em diretórios. Juntos, formam o sistema de organização que torna possível projetos Python de qualquer tamanho.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.1 — O que é um Módulo?</h3>
+          <p>Um <strong>módulo</strong> é simplesmente um arquivo <code>.py</code>. Qualquer arquivo Python pode ser importado como módulo por outro arquivo. Quando você importa, todo o código do módulo é executado uma vez.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Criando e Usando Módulos</h4>
+            <pre><code># ═══ Arquivo: aws_utils.py (nosso módulo) ═══
+"""
+Módulo de utilitários para AWS.
+Fornece funções auxiliares para trabalhar com recursos AWS.
+"""
+
+# Constantes do módulo
+REGIOES_DISPONIVEIS = [
+    "us-east-1", "us-west-2", "eu-west-1",
+    "sa-east-1", "ap-southeast-1"
+]
+
+DEFAULT_REGION = "us-east-1"
+
+# Funções do módulo
+def validar_regiao(regiao):
+    """Valida se a região AWS é válida."""
+    return regiao in REGIOES_DISPONIVEIS
+
+def formatar_arn(servico, recurso, regiao=DEFAULT_REGION, conta="123456789012"):
+    """Gera um ARN formatado."""
+    return f"arn:aws:{servico}:{regiao}:{conta}:{recurso}"
+
+def calcular_custo_mensal(preco_hora, horas_dia=24, dias=30):
+    """Calcula custo mensal estimado."""
+    return round(preco_hora * horas_dia * dias, 2)
+
+# Classe do módulo
+class EC2Instance:
+    def __init__(self, instance_id, tipo="t3.micro"):
+        self.instance_id = instance_id
+        self.tipo = tipo
+        self.estado = "stopped"
+    
+    def start(self):
+        self.estado = "running"
+        return f"{self.instance_id} iniciada"
+    
+    def stop(self):
+        self.estado = "stopped"
+        return f"{self.instance_id} parada"
+
+
+# ═══ Arquivo: main.py (importando o módulo) ═══
+# Existem VÁRIAS formas de importar:</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 — Formas de Importação</h3>
+          <p>Python oferece várias sintaxes de importação, cada uma com vantagens e desvantagens.</p>
+
+          <div class="command-card wide">
+            <h4>📋 import — Todas as Variações</h4>
+            <pre><code># ═══ 1. import modulo — Importa o módulo inteiro ═══
+import aws_utils
+
+# Acesso com prefixo do módulo (namespace)
+print(aws_utils.DEFAULT_REGION)
+print(aws_utils.validar_regiao("sa-east-1"))
+arn = aws_utils.formatar_arn("s3", "meu-bucket")
+inst = aws_utils.EC2Instance("i-001")
+
+# Vantagem: fica claro de onde vem cada nome
+# Desvantagem: nomes mais longos
+
+# ═══ 2. from modulo import nome — Importa nomes específicos ═══
+from aws_utils import validar_regiao, formatar_arn, DEFAULT_REGION
+
+# Uso direto sem prefixo
+print(validar_regiao("us-east-1"))  # True
+print(DEFAULT_REGION)  # "us-east-1"
+
+# Vantagem: nomes curtos, explicita o que você usa
+# Desvantagem: pode conflitar com nomes locais
+
+# ═══ 3. from modulo import * — Importa TUDO (evite!) ═══
+from aws_utils import *
+
+# Importa todos os nomes públicos (sem _ no início)
+# ❌ EVITE: polui o namespace, difícil saber de onde vem cada nome
+# Exceção: OK em sessões interativas (REPL)
+
+# ═══ 4. import modulo as alias — Alias (apelido) ═══
+import aws_utils as aws
+
+# Uso com alias curto
+print(aws.validar_regiao("eu-west-1"))
+print(aws.DEFAULT_REGION)
+
+# Convenções de alias conhecidas:
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import boto3.session as session
+
+# ═══ 5. from modulo import nome as alias ═══
+from aws_utils import calcular_custo_mensal as custo_mes
+from aws_utils import EC2Instance as EC2
+
+# Útil para evitar conflitos ou nomes longos
+print(custo_mes(0.096))  # 69.12
+inst = EC2("i-001")
+
+# ═══ 6. Importações condicionais ═══
+try:
+    import ujson as json  # Tenta importar versão rápida
+except ImportError:
+    import json           # Fallback para stdlib
+
+# Importação condicional por plataforma
+import sys
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import termios</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 — O Guard __name__ == "__main__"</h3>
+          <p>Quando um arquivo é executado diretamente, <code>__name__</code> é <code>"__main__"</code>. Quando é importado, <code>__name__</code> é o nome do módulo. Esse padrão permite que um arquivo funcione como módulo E como script.</p>
+
+          <div class="command-card wide">
+            <h4>📋 O Padrão if __name__ == "__main__"</h4>
+            <pre><code># ═══ Arquivo: aws_utils.py ═══
+"""Utilitários AWS — pode ser importado como módulo ou executado como script."""
+
+def validar_regiao(regiao):
+    REGIOES = ["us-east-1", "us-west-2", "sa-east-1", "eu-west-1"]
+    return regiao in REGIOES
+
+def listar_regioes():
+    return ["us-east-1", "us-west-2", "sa-east-1", "eu-west-1"]
+
+# ═══ Este bloco SÓ executa quando o arquivo é rodado diretamente ═══
+if __name__ == "__main__":
+    # Testes rápidos ou CLI
+    print("Executando aws_utils.py como script!")
+    print(f"Regiões disponíveis: {listar_regioes()}")
+    
+    # Teste das funções
+    assert validar_regiao("us-east-1") == True
+    assert validar_regiao("invalida") == False
+    print("✅ Todos os testes passaram!")
+
+# ═══ O que acontece em cada cenário: ═══
+# 1. python aws_utils.py → __name__ == "__main__" → executa o bloco if
+# 2. import aws_utils    → __name__ == "aws_utils" → NÃO executa o bloco if
+
+# ═══ Por que isso é importante? ═══
+# Sem o guard, o código de teste/execução rodaria TODA VEZ que alguém
+# importasse o módulo — provavelmente não é o que você quer!
+
+# ═══ Padrão mais completo com argparse ═══
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="AWS Utilities CLI")
+    parser.add_argument("--regiao", default="us-east-1", help="Região AWS")
+    parser.add_argument("--validar", action="store_true", help="Validar região")
+    args = parser.parse_args()
+    
+    if args.validar:
+        valida = validar_regiao(args.regiao)
+        print(f"Região '{args.regiao}': {'✅ válida' if valida else '❌ inválida'}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.4 — Caminho de Busca de Módulos (sys.path)</h3>
+          <p>Quando você faz <code>import modulo</code>, Python busca o módulo em uma lista ordenada de diretórios chamada <code>sys.path</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 sys.path — Onde Python Procura Módulos</h4>
+            <pre><code>import sys
+
+# Ver todos os caminhos de busca
+for caminho in sys.path:
+    print(caminho)
+
+# Ordem de busca:
+# 1. Diretório do script sendo executado (ou '' para interativo)
+# 2. PYTHONPATH (variável de ambiente, se definida)
+# 3. Diretórios de instalação (site-packages, lib/)
+# 4. Diretórios .pth (path configuration files)
+
+# ═══ Adicionando diretórios ao sys.path ═══
+# Útil para projetos sem setup.py/pyproject.toml
+
+import sys
+from pathlib import Path
+
+# Adicionar o diretório pai
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Agora pode importar módulos do diretório pai
+# from meu_pacote import utils
+
+# ═══ Verificar de onde um módulo foi carregado ═══
+import json
+print(json.__file__)   # /usr/lib/python3.11/json/__init__.py
+
+import os
+print(os.__file__)     # /usr/lib/python3.11/os.py
+
+# Módulos built-in (escritos em C) não têm __file__
+import sys
+# print(sys.__file__)  # AttributeError — é built-in!
+
+# ═══ Listar todos os módulos importados ═══
+print(list(sys.modules.keys())[:20])  # Primeiros 20 módulos carregados
+
+# Verificar se um módulo está disponível sem importar
+import importlib.util
+spec = importlib.util.find_spec("boto3")
+if spec is not None:
+    print("boto3 está instalado!")
+else:
+    print("boto3 NÃO está instalado.")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.5 — Pacotes (__init__.py)</h3>
+          <p>Um <strong>pacote</strong> é um diretório contendo módulos Python. O arquivo <code>__init__.py</code> marca o diretório como pacote e pode conter código de inicialização.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Estrutura de Pacotes</h4>
+            <pre><code># ═══ Estrutura de diretórios ═══
+# meu_projeto/
+# ├── main.py
+# ├── cloud/                    ← Pacote principal
+# │   ├── __init__.py           ← Marca como pacote
+# │   ├── aws/                  ← Sub-pacote
+# │   │   ├── __init__.py
+# │   │   ├── ec2.py
+# │   │   ├── s3.py
+# │   │   └── lambda_utils.py
+# │   ├── azure/                ← Outro sub-pacote
+# │   │   ├── __init__.py
+# │   │   └── vm.py
+# │   └── utils.py
+# └── tests/
+#     ├── __init__.py
+#     └── test_aws.py
+
+# ═══ cloud/__init__.py — Inicialização do pacote ═══
+"""
+Pacote Cloud — Abstrações para provedores de nuvem.
+"""
+__version__ = "1.0.0"
+__author__ = "Ricardo Scopim"
+
+# Importações de conveniência (API pública do pacote)
+from .utils import validar_regiao, formatar_tags
+from .aws.ec2 import EC2Client
+from .aws.s3 import S3Client
+
+# Define o que from cloud import * exporta
+__all__ = ["EC2Client", "S3Client", "validar_regiao", "formatar_tags"]
+
+# ═══ cloud/aws/__init__.py ═══
+"""Sub-pacote AWS."""
+from .ec2 import EC2Client
+from .s3 import S3Client
+from .lambda_utils import LambdaClient
+
+# ═══ cloud/aws/ec2.py ═══
+"""Módulo de gerenciamento EC2."""
+
+class EC2Client:
+    def __init__(self, regiao="us-east-1"):
+        self.regiao = regiao
+    
+    def listar_instancias(self):
+        pass
+    
+    def criar_instancia(self, tipo, ami):
+        pass
+
+# ═══ Importando do pacote em main.py ═══
+# Graças ao __init__.py, podemos fazer:
+from cloud import EC2Client, S3Client  # Importação de conveniência
+from cloud.aws.ec2 import EC2Client    # Importação direta
+from cloud.aws import s3               # Importa o módulo s3
+import cloud.aws.lambda_utils as lu    # Com alias
+
+# ═══ Importações relativas (dentro do pacote) ═══
+# Em cloud/aws/ec2.py:
+from . import s3                    # Importa módulo irmão (mesmo pacote)
+from .s3 import S3Client           # Importa nome de módulo irmão
+from .. import utils                # Importa do pacote PAI (cloud/)
+from ..utils import validar_regiao  # Nome do pacote pai
+# from ... import algo              # Avô (dois níveis acima)</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>📦 Namespace Packages (Python 3.3+)</h4>
+            <p>Desde Python 3.3, o <code>__init__.py</code> é <strong>opcional</strong> para criar pacotes. Diretórios sem <code>__init__.py</code> se tornam "namespace packages" — úteis para pacotes distribuídos em múltiplos diretórios. Porém, para projetos normais, <strong>sempre inclua <code>__init__.py</code></strong> — é mais explícito e permite controlar a API pública.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8 — BIBLIOTECA PADRÃO — MÓDULOS ESSENCIAIS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Biblioteca Padrão — Módulos Essenciais</h2>
+          <p>A biblioteca padrão do Python ("batteries included") contém centenas de módulos prontos para uso — sem instalar nada. Aqui estão os mais importantes para o dia a dia de quem trabalha com DevOps, automação e Cloud.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.1 — os e pathlib (Sistema de Arquivos)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 pathlib — A Forma Moderna (Python 3.4+)</h4>
+            <pre><code>from pathlib import Path
+
+# ═══ Criando objetos Path ═══
+home = Path.home()                    # /home/usuario
+projeto = Path("/opt/app")            # Path absoluto
+relativo = Path("src/main.py")        # Path relativo
+atual = Path.cwd()                    # Diretório atual (current working dir)
+
+# ═══ Operações com Path ═══
+config = Path("/opt/app/config/settings.json")
+
+print(config.name)       # "settings.json"
+print(config.stem)       # "settings" (sem extensão)
+print(config.suffix)     # ".json"
+print(config.parent)     # Path('/opt/app/config')
+print(config.parts)      # ('/', 'opt', 'app', 'config', 'settings.json')
+
+# Construindo paths com / (operador sobrecarregado!)
+logs_dir = Path("/var") / "log" / "app"
+print(logs_dir)  # /var/log/app
+
+# ═══ Verificações ═══
+arquivo = Path("main.py")
+print(arquivo.exists())      # True/False
+print(arquivo.is_file())     # True se for arquivo
+print(arquivo.is_dir())      # True se for diretório
+print(arquivo.is_absolute()) # True se for caminho absoluto
+
+# ═══ Listando arquivos ═══
+src = Path("src")
+# Todos os arquivos .py no diretório
+for py_file in src.glob("*.py"):
+    print(py_file)
+
+# Recursivo (todos os subdiretórios)
+for py_file in src.rglob("*.py"):
+    print(py_file)
+
+# ═══ Lendo/Escrevendo arquivos ═══
+config_path = Path("config.json")
+conteudo = config_path.read_text(encoding="utf-8")  # Lê como string
+config_path.write_text('{"key": "value"}', encoding="utf-8")  # Escreve
+
+dados = config_path.read_bytes()  # Lê como bytes
+
+# ═══ Criando diretórios ═══
+Path("logs/2025/01").mkdir(parents=True, exist_ok=True)
+# parents=True: cria diretórios pai se não existirem
+# exist_ok=True: não levanta erro se já existir</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>📋 os — Operações do Sistema Operacional</h4>
+            <pre><code>import os
+
+# ═══ Variáveis de Ambiente (CRUCIAL para DevOps!) ═══
+# Ler variável de ambiente
+regiao = os.environ.get("AWS_REGION", "us-east-1")  # Com fallback
+access_key = os.environ.get("AWS_ACCESS_KEY_ID")     # None se não existir
+
+# Verificar se existe
+if "DATABASE_URL" in os.environ:
+    print("Database configurado!")
+
+# Definir variável (apenas para o processo atual)
+os.environ["APP_ENV"] = "testing"
+
+# ═══ Execução de comandos (prefira subprocess!) ═══
+# os.system("ls -la")  # Funciona mas não captura output
+
+# ═══ Informações do sistema ═══
+print(os.name)           # 'posix' (Linux/Mac) ou 'nt' (Windows)
+print(os.cpu_count())    # Número de CPUs
+print(os.getpid())       # PID do processo atual
+print(os.getlogin())     # Nome do usuário logado
+
+# ═══ Operações com arquivos/diretórios ═══
+os.makedirs("output/reports", exist_ok=True)  # Cria diretórios
+os.rename("old.txt", "new.txt")               # Renomeia
+os.remove("temp.txt")                          # Remove arquivo
+os.rmdir("empty_dir")                          # Remove dir vazio
+
+# Listar diretório
+for item in os.listdir("."):
+    print(item)
+
+# Walk — percorre toda a árvore de diretórios
+for raiz, dirs, arquivos in os.walk("/opt/app"):
+    for arquivo in arquivos:
+        caminho_completo = os.path.join(raiz, arquivo)
+        print(caminho_completo)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 — json (Serialização de Dados)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 json — Trabalhando com JSON</h4>
+            <pre><code>import json
+
+# ═══ Python → JSON (serialização) ═══
+dados = {
+    "nome": "web-server-01",
+    "tipo": "t3.micro",
+    "tags": {"env": "prod", "team": "infra"},
+    "portas": [80, 443, 8080],
+    "ativo": True,
+    "metadata": None
+}
+
+# Para string JSON
+json_str = json.dumps(dados, indent=2, ensure_ascii=False)
+print(json_str)
+
+# Para arquivo
+with open("config.json", "w", encoding="utf-8") as f:
+    json.dump(dados, f, indent=2, ensure_ascii=False)
+
+# ═══ JSON → Python (deserialização) ═══
+# De string
+json_texto = '{"nome": "api", "porta": 8080, "debug": false}'
+obj = json.loads(json_texto)
+print(obj["nome"])   # "api"
+print(type(obj))     # &lt;class 'dict'&gt;
+
+# De arquivo
+with open("config.json", "r", encoding="utf-8") as f:
+    config = json.load(f)
+
+# ═══ Mapeamento de tipos Python ↔ JSON ═══
+# Python       → JSON
+# dict         → object {}
+# list, tuple  → array []
+# str          → string ""
+# int, float   → number
+# True         → true
+# False        → false
+# None         → null
+
+# ═══ Opções avançadas de dumps() ═══
+print(json.dumps(dados, indent=4))          # Indentação bonita
+print(json.dumps(dados, sort_keys=True))    # Chaves ordenadas
+print(json.dumps(dados, separators=(",", ":")))  # Compacto (sem espaços)
+
+# Serializar objetos custom
+from datetime import datetime
+
+def serializar_custom(obj):
+    """Converte tipos não-JSON para string."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Tipo não serializável: {type(obj)}")
+
+dado_com_data = {"evento": "deploy", "timestamp": datetime.now()}
+json_str = json.dumps(dado_com_data, default=serializar_custom)
+print(json_str)  # {"evento": "deploy", "timestamp": "2025-01-15T..."}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 — datetime (Datas e Horários)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 datetime — Manipulação de Datas</h4>
+            <pre><code>from datetime import datetime, date, time, timedelta, timezone
+
+# ═══ Criando objetos datetime ═══
+agora = datetime.now()                          # Data/hora local
+utc_agora = datetime.now(timezone.utc)          # Data/hora UTC
+especifica = datetime(2025, 6, 15, 14, 30, 0)  # 15/Jun/2025 14:30:00
+
+print(agora)       # 2025-01-15 10:30:45.123456
+print(utc_agora)   # 2025-01-15 13:30:45.123456+00:00
+
+# ═══ Formatação (datetime → string) ═══
+print(agora.strftime("%d/%m/%Y %H:%M:%S"))  # "15/01/2025 10:30:45"
+print(agora.strftime("%Y-%m-%dT%H:%M:%SZ")) # "2025-01-15T10:30:45Z" (ISO)
+print(agora.isoformat())                     # "2025-01-15T10:30:45.123456"
+
+# ═══ Parsing (string → datetime) ═══
+data_str = "2025-03-20 15:45:00"
+data_obj = datetime.strptime(data_str, "%Y-%m-%d %H:%M:%S")
+print(data_obj)  # 2025-03-20 15:45:00
+
+# ISO format
+iso_str = "2025-01-15T10:30:00+00:00"
+data_iso = datetime.fromisoformat(iso_str)  # Python 3.7+
+
+# ═══ Aritmética com timedelta ═══
+agora = datetime.now()
+amanha = agora + timedelta(days=1)
+uma_semana = agora + timedelta(weeks=1)
+duas_horas_atras = agora - timedelta(hours=2)
+
+# Diferença entre datas
+inicio = datetime(2025, 1, 1)
+fim = datetime(2025, 12, 31)
+diferenca = fim - inicio
+print(f"Dias: {diferenca.days}")         # 364
+print(f"Segundos: {diferenca.total_seconds()}")  # 31449600.0
+
+# ═══ Uso prático: calcular idade de recursos ═══
+criacao_instancia = datetime(2025, 1, 10, 8, 0, 0, tzinfo=timezone.utc)
+agora_utc = datetime.now(timezone.utc)
+idade = agora_utc - criacao_instancia
+
+if idade.days > 30:
+    print(f"⚠️ Instância com {idade.days} dias — verificar necessidade!")
+else:
+    print(f"✅ Instância recente ({idade.days} dias)")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.4 — collections (Estruturas de Dados Especializadas)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 Counter, defaultdict e namedtuple</h4>
+            <pre><code>from collections import Counter, defaultdict, namedtuple, deque
+
+# ═══ Counter — Contagem de elementos ═══
+logs = ["ERROR", "INFO", "WARNING", "ERROR", "INFO", "INFO", "ERROR",
+        "DEBUG", "INFO", "WARNING"]
+
+contagem = Counter(logs)
+print(contagem)
+# Counter({'INFO': 4, 'ERROR': 3, 'WARNING': 2, 'DEBUG': 1})
+
+print(contagem.most_common(2))  # [('INFO', 4), ('ERROR', 3)]
+print(contagem["ERROR"])         # 3
+print(contagem["CRITICAL"])      # 0 (não existe, retorna 0)
+
+# Contar caracteres em string
+letras = Counter("abracadabra")
+print(letras)  # Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+
+# ═══ defaultdict — Dict com valor padrão automático ═══
+# Dict normal levanta KeyError para chaves inexistentes
+# defaultdict retorna um valor padrão!
+
+# Agrupar instâncias por região
+instancias = [
+    ("us-east-1", "i-001"), ("sa-east-1", "i-002"),
+    ("us-east-1", "i-003"), ("eu-west-1", "i-004"),
+    ("sa-east-1", "i-005"), ("us-east-1", "i-006"),
+]
+
+por_regiao = defaultdict(list)  # Valor padrão: lista vazia
+for regiao, inst_id in instancias:
+    por_regiao[regiao].append(inst_id)  # Não precisa verificar se key existe!
+
+print(dict(por_regiao))
+# {'us-east-1': ['i-001', 'i-003', 'i-006'],
+#  'sa-east-1': ['i-002', 'i-005'],
+#  'eu-west-1': ['i-004']}
+
+# defaultdict com int (contagem)
+contagem = defaultdict(int)
+for palavra in "o gato viu o rato e o gato correu".split():
+    contagem[palavra] += 1
+print(dict(contagem))  # {'o': 3, 'gato': 2, 'viu': 1, ...}
+
+# ═══ namedtuple — Tupla com nomes ═══
+# Leve como tupla, legível como classe!
+Instancia = namedtuple("Instancia", ["id", "tipo", "regiao", "estado"])
+
+inst = Instancia("i-001", "t3.micro", "us-east-1", "running")
+print(inst.id)      # "i-001" — acesso por nome!
+print(inst.tipo)    # "t3.micro"
+print(inst[0])      # "i-001" — acesso por índice também funciona
+
+# Imutável (como tupla)
+# inst.estado = "stopped"  # AttributeError!
+
+# Converter para dict
+print(inst._asdict())  # {'id': 'i-001', 'tipo': 't3.micro', ...}
+
+# ═══ deque — Fila de dupla entrada (double-ended queue) ═══
+fila = deque(maxlen=5)  # Fila com tamanho máximo
+
+# Adicionar elementos
+fila.append("request_1")     # Adiciona no final
+fila.appendleft("urgente")   # Adiciona no início
+fila.extend(["r2", "r3", "r4"])
+
+# Remover elementos
+fila.pop()       # Remove do final: O(1)
+fila.popleft()   # Remove do início: O(1) — muito mais rápido que list.pop(0)!
+
+# Rotação
+fila = deque([1, 2, 3, 4, 5])
+fila.rotate(2)   # [4, 5, 1, 2, 3]
+fila.rotate(-1)  # [5, 1, 2, 3, 4]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.5 — functools (Ferramentas Funcionais)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 lru_cache, partial e reduce</h4>
+            <pre><code>from functools import lru_cache, partial, reduce, wraps
+
+# ═══ lru_cache — Cache automático (memoização) ═══
+@lru_cache(maxsize=256)
+def consultar_preco(tipo_instancia, regiao):
+    """Simula consulta cara à API de preços."""
+    # Em produção, faria request HTTP
+    precos = {
+        ("t3.micro", "us-east-1"): 0.0116,
+        ("m5.large", "us-east-1"): 0.096,
+        ("t3.micro", "sa-east-1"): 0.0148,
+    }
+    return precos.get((tipo_instancia, regiao), 0.0)
+
+# Primeira chamada: executa a função
+print(consultar_preco("t3.micro", "us-east-1"))  # 0.0116
+
+# Segunda chamada com mesmos args: retorna do cache!
+print(consultar_preco("t3.micro", "us-east-1"))  # 0.0116 (instantâneo)
+
+# Informações do cache
+print(consultar_preco.cache_info())
+# CacheInfo(hits=1, misses=1, maxsize=256, currsize=1)
+
+# Limpar cache
+consultar_preco.cache_clear()
+
+# Python 3.9+: @cache (sem limite de tamanho)
+from functools import cache
+
+@cache
+def fatorial(n):
+    return n * fatorial(n-1) if n > 1 else 1
+
+# ═══ partial — Fixar argumentos de uma função ═══
+def conectar(host, porta, protocolo="tcp", timeout=30):
+    return f"{protocolo}://{host}:{porta} (timeout={timeout}s)"
+
+# Criar versão especializada com argumentos fixos
+conectar_redis = partial(conectar, porta=6379, protocolo="redis")
+conectar_postgres = partial(conectar, porta=5432, protocolo="postgresql")
+conectar_local = partial(conectar, "localhost")
+
+print(conectar_redis("cache.internal"))
+# redis://cache.internal:6379 (timeout=30s)
+
+print(conectar_postgres("db.internal", timeout=5))
+# postgresql://db.internal:5432 (timeout=5s)
+
+# partial é mais limpo que lambda para fixar argumentos!
+# lambda: conectar_redis = lambda host, **kw: conectar(host, 6379, "redis", **kw)
+# partial: conectar_redis = partial(conectar, porta=6379, protocolo="redis")
+
+# ═══ reduce — Reduzir iterável a um valor ═══
+numeros = [1, 2, 3, 4, 5]
+
+# Produto de todos os números
+produto = reduce(lambda a, b: a * b, numeros)
+print(produto)  # 120
+
+# Mesclar múltiplos dicionários
+configs = [
+    {"debug": False, "port": 8080},
+    {"debug": True, "host": "0.0.0.0"},
+    {"port": 9090, "workers": 4}
+]
+merged = reduce(lambda a, b: {**a, **b}, configs)
+print(merged)  # {'debug': True, 'port': 9090, 'host': '0.0.0.0', 'workers': 4}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.6 — itertools e Outros Módulos Úteis</h3>
+
+          <div class="command-card wide">
+            <h4>📋 itertools — Iteradores Eficientes</h4>
+            <pre><code>from itertools import chain, islice, cycle, repeat, product, combinations
+
+# ═══ chain — Concatenar iteráveis ═══
+lista1 = [1, 2, 3]
+lista2 = [4, 5, 6]
+lista3 = [7, 8, 9]
+todos = list(chain(lista1, lista2, lista3))
+print(todos)  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# ═══ islice — Fatiar iteradores (lazy) ═══
+from itertools import count  # Contador infinito!
+primeiros_10_pares = list(islice(count(0, 2), 10))
+print(primeiros_10_pares)  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+# ═══ cycle — Repetir infinitamente ═══
+regioes = cycle(["us-east-1", "eu-west-1", "ap-south-1"])
+# Distribui 6 serviços entre 3 regiões (round-robin)
+servicos = ["api", "web", "worker", "cron", "monitor", "cache"]
+distribuicao = {s: next(regioes) for s in servicos}
+print(distribuicao)
+# {'api': 'us-east-1', 'web': 'eu-west-1', 'worker': 'ap-south-1',
+#  'cron': 'us-east-1', 'monitor': 'eu-west-1', 'cache': 'ap-south-1'}
+
+# ═══ product — Produto cartesiano ═══
+ambientes = ["dev", "staging", "prod"]
+servicos = ["api", "web"]
+regioes = ["us-east-1", "sa-east-1"]
+
+# Todas as combinações possíveis
+for env, svc, reg in product(ambientes, servicos, regioes):
+    print(f"  {env}-{svc}-{reg}")
+# dev-api-us-east-1, dev-api-sa-east-1, dev-web-us-east-1, ...
+
+# ═══ combinations — Combinações sem repetição ═══
+servidores = ["web-01", "web-02", "web-03", "web-04"]
+# Todas as combinações de 2 servidores para failover
+pares = list(combinations(servidores, 2))
+print(pares)  # [('web-01', 'web-02'), ('web-01', 'web-03'), ...]</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>📚 Outros Módulos Essenciais da Biblioteca Padrão</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Módulo</th>
+                  <th>Função</th>
+                  <th>Uso Principal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>sys</code></td><td>Sistema</td><td>argv, exit, path, stdin/stdout</td></tr>
+                <tr><td><code>subprocess</code></td><td>Processos</td><td>Executar comandos do sistema</td></tr>
+                <tr><td><code>re</code></td><td>Regex</td><td>Expressões regulares</td></tr>
+                <tr><td><code>logging</code></td><td>Logs</td><td>Sistema de logging profissional</td></tr>
+                <tr><td><code>hashlib</code></td><td>Hashing</td><td>SHA256, MD5 para integridade</td></tr>
+                <tr><td><code>secrets</code></td><td>Segurança</td><td>Gerar tokens, senhas seguras</td></tr>
+                <tr><td><code>typing</code></td><td>Type Hints</td><td>Anotações de tipo (List, Dict, Optional)</td></tr>
+                <tr><td><code>dataclasses</code></td><td>Classes</td><td>Classes de dados com menos boilerplate</td></tr>
+                <tr><td><code>abc</code></td><td>Abstração</td><td>Classes e métodos abstratos</td></tr>
+                <tr><td><code>contextlib</code></td><td>Context</td><td>Context managers customizados</td></tr>
+                <tr><td><code>tempfile</code></td><td>Temporários</td><td>Arquivos e diretórios temporários</td></tr>
+                <tr><td><code>shutil</code></td><td>Shell</td><td>Copiar, mover, compactar arquivos</td></tr>
+                <tr><td><code>argparse</code></td><td>CLI</td><td>Parser de argumentos de linha de comando</td></tr>
+                <tr><td><code>unittest</code></td><td>Testes</td><td>Framework de testes unitários</td></tr>
+                <tr><td><code>concurrent.futures</code></td><td>Paralelo</td><td>Execução paralela (threads/processos)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.7 — logging (Sistema de Logs Profissional)</h3>
+
+          <div class="command-card wide">
+            <h4>📋 logging — Configuração e Uso</h4>
+            <pre><code>import logging
+
+# ═══ Configuração básica ═══
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+# Criar logger nomeado (boa prática)
+logger = logging.getLogger(__name__)
+
+# Níveis de log (em ordem de severidade)
+logger.debug("Detalhes para debugging")        # Só aparece se level=DEBUG
+logger.info("Operação normal executada")       # Informativo
+logger.warning("Algo inesperado mas não fatal") # Atenção
+logger.error("Erro que impede uma operação")   # Erro
+logger.critical("Sistema em estado crítico!")   # Catástrofe
+
+# ═══ Logging com contexto ═══
+def processar_evento(evento_id, dados):
+    logger.info(f"Processando evento {evento_id}")
+    try:
+        # processamento...
+        resultado = len(dados)
+        logger.info(f"Evento {evento_id} processado: {resultado} registros")
+        return resultado
+    except Exception as e:
+        logger.error(f"Falha no evento {evento_id}: {e}", exc_info=True)
+        raise
+
+# ═══ Configuração avançada com handlers ═══
+import logging.handlers
+
+# Logger que escreve em arquivo com rotação
+file_handler = logging.handlers.RotatingFileHandler(
+    "app.log", maxBytes=10_000_000, backupCount=5
+)
+file_handler.setFormatter(logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+))
+
+logger.addHandler(file_handler)</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9 — BOAS PRÁTICAS PARA FUNÇÕES
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 9</span>
+          <h2>Boas Práticas para Funções</h2>
+          <p>Escrever funções é fácil — escrever <strong>boas</strong> funções é uma arte. Esta seção cobre princípios, convenções e técnicas que diferenciam código amador de código profissional, mantível e testável.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 — Princípio da Responsabilidade Única (SRP)</h3>
+          <p>Uma função deve fazer <strong>uma única coisa</strong>, fazê-la bem e fazê-la completamente. Se você precisa usar "e" para descrever o que a função faz, provavelmente ela faz coisas demais.</p>
+
+          <div class="command-card wide">
+            <h4>📋 SRP em Funções</h4>
+            <pre><code># ❌ RUIM — Função faz MUITAS coisas
+def processar_e_enviar_relatorio(instancias):
+    """Faz tudo: filtra, calcula, formata, envia email e salva log."""
+    # Filtra instâncias ativas
+    ativas = [i for i in instancias if i["estado"] == "running"]
+    
+    # Calcula custos
+    for inst in ativas:
+        inst["custo_mensal"] = inst["preco_hora"] * 720
+    
+    # Formata relatório HTML
+    html = "<html><body><h1>Relatório</h1>"
+    for inst in ativas:
+        html += f"<p>{inst['id']}: ${inst['custo_mensal']:.2f}</p>"
+    html += "</body></html>"
+    
+    # Envia email
+    import smtplib
+    # ... código de envio ...
+    
+    # Salva log
+    with open("relatorio.log", "a") as f:
+        f.write(f"Relatório enviado: {len(ativas)} instâncias\n")
+    
+    return html
+
+# ✅ BOM — Cada função tem UMA responsabilidade
+def filtrar_instancias_ativas(instancias):
+    """Filtra apenas instâncias em estado running."""
+    return [i for i in instancias if i["estado"] == "running"]
+
+def calcular_custos_mensais(instancias):
+    """Adiciona custo mensal calculado a cada instância."""
+    for inst in instancias:
+        inst["custo_mensal"] = inst["preco_hora"] * 720
+    return instancias
+
+def formatar_relatorio_html(instancias):
+    """Gera relatório HTML a partir de lista de instâncias."""
+    linhas = [f"<p>{i['id']}: ${i['custo_mensal']:.2f}</p>" for i in instancias]
+    return f"<html><body><h1>Relatório</h1>{''.join(linhas)}</body></html>"
+
+def enviar_email(destinatario, assunto, corpo_html):
+    """Envia email com corpo HTML."""
+    pass  # Implementação...
+
+def registrar_log(mensagem):
+    """Registra mensagem no arquivo de log."""
+    import logging
+    logging.info(mensagem)
+
+# Orquestração limpa e clara:
+def gerar_relatorio(instancias, email_destino):
+    """Orquestra a geração e envio do relatório."""
+    ativas = filtrar_instancias_ativas(instancias)
+    com_custo = calcular_custos_mensais(ativas)
+    html = formatar_relatorio_html(com_custo)
+    enviar_email(email_destino, "Relatório Mensal", html)
+    registrar_log(f"Relatório enviado: {len(ativas)} instâncias")
+    return html</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 — Nomenclatura e Tamanho</h3>
+
+          <div class="info-box highlight">
+            <h4>📐 Regras de Nomenclatura para Funções</h4>
+            <ul>
+              <li><strong>Use verbos:</strong> Funções fazem algo → <code>calcular_custo()</code>, <code>validar_email()</code>, <code>enviar_notificacao()</code></li>
+              <li><strong>snake_case:</strong> PEP 8 exige snake_case para funções e variáveis</li>
+              <li><strong>Seja específico:</strong> <code>obter_instancias_ativas()</code> é melhor que <code>get_data()</code></li>
+              <li><strong>Prefixos convencionais:</strong>
+                <ul>
+                  <li><code>is_</code> / <code>has_</code> / <code>can_</code> → retorna bool: <code>is_valid()</code>, <code>has_permission()</code></li>
+                  <li><code>get_</code> / <code>fetch_</code> → busca/retorna dados: <code>get_user()</code></li>
+                  <li><code>set_</code> / <code>update_</code> → modifica estado: <code>set_config()</code></li>
+                  <li><code>create_</code> / <code>build_</code> → cria algo novo: <code>create_bucket()</code></li>
+                  <li><code>delete_</code> / <code>remove_</code> → remove: <code>delete_resource()</code></li>
+                  <li><code>validate_</code> / <code>check_</code> → validação: <code>validate_input()</code></li>
+                  <li><code>parse_</code> / <code>convert_</code> → transformação: <code>parse_json()</code></li>
+                </ul>
+              </li>
+              <li><strong>Underscore prefix:</strong> <code>_funcao_privada()</code> indica uso interno (convenção)</li>
+              <li><strong>Tamanho ideal:</strong> 5-20 linhas. Se passar de 30, provavelmente precisa ser dividida</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 — Type Hints (Anotações de Tipo)</h3>
+          <p>Type hints documentam os tipos esperados e permitem que ferramentas como mypy, pyright e IDEs detectem erros antes da execução.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Type Hints — Exemplos Completos</h4>
+            <pre><code>from typing import Optional, Union, List, Dict, Tuple, Callable, Any
+
+# ═══ Tipos básicos ═══
+def saudar(nome: str) -> str:
+    """Parâmetro: str, Retorno: str"""
+    return f"Olá, {nome}!"
+
+def calcular_custo(horas: int, preco: float) -> float:
+    """Parâmetro: int e float, Retorno: float"""
+    return horas * preco
+
+def is_ativo(recurso_id: str) -> bool:
+    """Retorna bool"""
+    return True
+
+# ═══ Optional (pode ser None) ═══
+def buscar_instancia(instance_id: str) -> Optional[dict]:
+    """Retorna dict ou None se não encontrar."""
+    instancias = {"i-001": {"tipo": "t3.micro"}}
+    return instancias.get(instance_id)  # Pode retornar None!
+
+# ═══ Union (múltiplos tipos possíveis) ═══
+def converter_para_int(valor: Union[str, float, int]) -> int:
+    """Aceita str, float ou int — retorna int."""
+    return int(valor)
+
+# Python 3.10+: sintaxe com | (mais limpa)
+def converter_para_int(valor: str | float | int) -> int:
+    return int(valor)
+
+# ═══ Coleções tipadas ═══
+def filtrar_por_regiao(instancias: List[Dict[str, Any]], 
+                       regiao: str) -> List[Dict[str, Any]]:
+    """Lista de dicts filtrada por região."""
+    return [i for i in instancias if i.get("regiao") == regiao]
+
+# Python 3.9+: use tipos built-in diretamente
+def filtrar_por_regiao(instancias: list[dict[str, Any]], 
+                       regiao: str) -> list[dict[str, Any]]:
+    return [i for i in instancias if i.get("regiao") == regiao]
+
+# ═══ Callable (funções como tipo) ═══
+def executar_com_retry(funcao: Callable[..., Any], 
+                       max_tentativas: int = 3) -> Any:
+    """Aceita qualquer função como argumento."""
+    for i in range(max_tentativas):
+        try:
+            return funcao()
+        except Exception:
+            if i == max_tentativas - 1:
+                raise
+
+# Callable mais específico: recebe str, retorna bool
+def aplicar_filtro(dados: list[str], 
+                   filtro: Callable[[str], bool]) -> list[str]:
+    return [d for d in dados if filtro(d)]
+
+# ═══ TypedDict (Python 3.8+) — dicts com estrutura definida ═══
+from typing import TypedDict
+
+class InstanciaInfo(TypedDict):
+    id: str
+    tipo: str
+    regiao: str
+    custo_hora: float
+    tags: dict[str, str]
+
+def criar_instancia(config: InstanciaInfo) -> str:
+    """Aceita apenas dicts com a estrutura InstanciaInfo."""
+    return f"Criando {config['id']} ({config['tipo']}) em {config['regiao']}"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.4 — Funções Puras e Efeitos Colaterais</h3>
+          <p>Uma <strong>função pura</strong> sempre retorna o mesmo resultado para os mesmos argumentos e não modifica nada fora dela. Funções puras são fáceis de testar, cachear e paralelizar.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Puras vs Impuras</h4>
+            <pre><code># ═══ Função PURA ═══
+# ✅ Sem efeitos colaterais, determinística, testável
+def calcular_desconto(preco: float, percentual: float) -> float:
+    """Pura: mesmo input → sempre mesmo output."""
+    return round(preco * (1 - percentual / 100), 2)
+
+# Sempre retorna o mesmo resultado:
+assert calcular_desconto(100, 20) == 80.0  # Sempre!
+assert calcular_desconto(100, 20) == 80.0  # Sempre!
+
+# ═══ Função IMPURA ═══
+# ❌ Depende de estado externo, efeitos colaterais
+total_vendas = 0  # Estado global
+
+def registrar_venda(valor):
+    """Impura: modifica estado global, depende de estado externo."""
+    global total_vendas
+    total_vendas += valor  # Efeito colateral!
+    print(f"Venda: {valor}")  # Outro efeito colateral (I/O)!
+    return total_vendas
+
+# Resultado muda a cada chamada:
+registrar_venda(100)  # 100
+registrar_venda(100)  # 200 — mesmo input, output diferente!
+
+# ═══ Refatorando impuro → puro ═══
+# ✅ Versão pura: recebe estado, retorna novo estado
+def registrar_venda_puro(total_atual: float, valor: float) -> float:
+    """Pura: recebe estado como input, retorna novo estado."""
+    return total_atual + valor
+
+# Uso:
+total = 0
+total = registrar_venda_puro(total, 100)  # 100
+total = registrar_venda_puro(total, 100)  # 200
+
+# ═══ Quando efeitos colaterais são NECESSÁRIOS ═══
+# - Escrever em banco de dados
+# - Enviar requests HTTP
+# - Imprimir no console / escrever logs
+# - Ler/escrever arquivos
+#
+# Estratégia: isole efeitos colaterais nas "bordas" do sistema
+# e mantenha a lógica central pura!
+
+# Exemplo: separar lógica pura da I/O impura
+def calcular_instancias_ociosas(instancias, threshold_cpu=5):
+    """PURA: apenas cálculo, sem I/O."""
+    return [i for i in instancias if i["cpu_percent"] < threshold_cpu]
+
+def notificar_ociosas(instancias_ociosas, notifier):
+    """IMPURA: faz I/O (notificação) — isolada."""
+    for inst in instancias_ociosas:
+        notifier.send(f"Instância {inst['id']} ociosa: {inst['cpu_percent']}% CPU")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.5 — Tratamento de Erros em Funções</h3>
+          <p>Boas funções comunicam erros de forma clara. Há duas filosofias: <strong>raise</strong> (exceções) ou <strong>return</strong> (valores sentinela/Result pattern).</p>
+
+          <div class="command-card wide">
+            <h4>📋 Raise vs Return para Erros</h4>
+            <pre><code># ═══ Filosofia 1: RAISE (EAFP — Easier to Ask Forgiveness) ═══
+# Preferência do Python: tente fazer, trate a exceção se falhar
+
+def buscar_recurso(recurso_id: str) -> dict:
+    """Levanta exceção se o recurso não existir."""
+    recursos = {"vpc-001": {"tipo": "vpc", "cidr": "10.0.0.0/16"}}
+    
+    if not recurso_id:
+        raise ValueError("recurso_id não pode ser vazio")
+    
+    if recurso_id not in recursos:
+        raise KeyError(f"Recurso '{recurso_id}' não encontrado")
+    
+    return recursos[recurso_id]
+
+# Uso com try/except
+try:
+    recurso = buscar_recurso("vpc-999")
+except KeyError as e:
+    print(f"Não encontrado: {e}")
+except ValueError as e:
+    print(f"Input inválido: {e}")
+
+# ═══ Filosofia 2: RETURN None/Sentinel (LBYL — Look Before You Leap) ═══
+# Retorna None ou valor especial para indicar falha
+
+def buscar_recurso_safe(recurso_id: str) -> Optional[dict]:
+    """Retorna None se não encontrar (sem exceção)."""
+    recursos = {"vpc-001": {"tipo": "vpc"}}
+    return recursos.get(recurso_id)  # None se não existir
+
+# Uso com verificação
+recurso = buscar_recurso_safe("vpc-999")
+if recurso is None:
+    print("Recurso não encontrado")
+else:
+    print(f"Encontrado: {recurso}")
+
+# ═══ Quando usar cada abordagem? ═══
+# RAISE quando:
+# - A falha é EXCEPCIONAL (não deveria acontecer no fluxo normal)
+# - O chamador PRECISA saber que algo deu errado
+# - Validação de input (ValueError)
+# - Recurso obrigatório não encontrado
+
+# RETURN None quando:
+# - Não encontrar é um resultado VÁLIDO/ESPERADO
+# - Funções de busca onde "não existe" é normal
+# - APIs que retornam listas (lista vazia em vez de exceção)
+
+# ═══ Pattern: Result Tuple ═══
+def validar_config(config: dict) -> tuple[bool, str]:
+    """Retorna (sucesso, mensagem)."""
+    erros = []
+    if "host" not in config:
+        erros.append("Campo 'host' obrigatório")
+    if "port" not in config:
+        erros.append("Campo 'port' obrigatório")
+    elif not (1 <= config["port"] <= 65535):
+        erros.append(f"Porta inválida: {config['port']}")
+    
+    if erros:
+        return False, "; ".join(erros)
+    return True, "Configuração válida"
+
+valido, msg = validar_config({"host": "localhost"})
+print(f"Válido: {valido}, Msg: {msg}")
+# Válido: False, Msg: Campo 'port' obrigatório</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 10 — EXERCÍCIOS PRÁTICOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 10</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Coloque em prática tudo o que aprendeu neste módulo! Os exercícios progridem em dificuldade e utilizam cenários reais de DevOps e Cloud. Tente resolver antes de ver a resposta.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1 — Função Básica: Calculadora de Custos AWS</h3>
+          <p>Crie uma função <code>calcular_custo_ec2</code> que receba o tipo da instância, a quantidade de horas e a região, e retorne o custo total. Use um dicionário interno de preços. A função deve ter docstring no estilo Google e type hints.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="command-card wide">
+              <pre><code>def calcular_custo_ec2(tipo: str, horas: int, regiao: str = "us-east-1") -> float:
+    """Calcula o custo de uma instância EC2.
+
+    Args:
+        tipo: Tipo da instância (ex: 't3.micro', 'm5.large').
+        horas: Número de horas de uso.
+        regiao: Região AWS. Defaults to "us-east-1".
+
+    Returns:
+        Custo total em USD.
+
+    Raises:
+        ValueError: Se o tipo de instância não for reconhecido.
+
+    Examples:
+        >>> calcular_custo_ec2("t3.micro", 720)
+        8.35
+        >>> calcular_custo_ec2("m5.large", 720, "sa-east-1")
+        82.08
+    """
+    precos = {
+        "us-east-1": {
+            "t3.micro": 0.0116,
+            "t3.small": 0.0208,
+            "t3.medium": 0.0416,
+            "m5.large": 0.096,
+            "m5.xlarge": 0.192,
+            "c5.large": 0.085,
+            "c5.xlarge": 0.17,
+        },
+        "sa-east-1": {
+            "t3.micro": 0.0148,
+            "t3.small": 0.0296,
+            "t3.medium": 0.0592,
+            "m5.large": 0.114,
+            "m5.xlarge": 0.228,
+            "c5.large": 0.106,
+            "c5.xlarge": 0.212,
+        }
+    }
+
+    if regiao not in precos:
+        raise ValueError(f"Região '{regiao}' não suportada. "
+                        f"Regiões válidas: {list(precos.keys())}")
+    
+    if tipo not in precos[regiao]:
+        raise ValueError(f"Tipo '{tipo}' não encontrado na região '{regiao}'. "
+                        f"Tipos válidos: {list(precos[regiao].keys())}")
+    
+    custo = horas * precos[regiao][tipo]
+    return round(custo, 2)
+
+# Testes
+print(calcular_custo_ec2("t3.micro", 720))            # 8.35
+print(calcular_custo_ec2("m5.large", 720, "sa-east-1"))  # 82.08
+print(calcular_custo_ec2("c5.xlarge", 168))           # 28.56
+
+try:
+    calcular_custo_ec2("p4d.24xlarge", 720)
+except ValueError as e:
+    print(f"Erro: {e}")</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2 — *args e **kwargs: Logger Flexível</h3>
+          <p>Crie uma função <code>log_evento</code> que aceite uma mensagem obrigatória, qualquer número de tags posicionais (*args) e metadados nomeados (**kwargs). Formate a saída como JSON-like.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="command-card wide">
+              <pre><code>from datetime import datetime
+
+def log_evento(mensagem: str, *tags: str, nivel: str = "INFO", **metadata) -> dict:
+    """Registra um evento com tags e metadados flexíveis.
+
+    Args:
+        mensagem: Descrição do evento.
+        *tags: Tags de categorização (ex: "deploy", "prod", "api").
+        nivel: Nível do log (INFO, WARNING, ERROR). Keyword-only.
+        **metadata: Metadados adicionais (chave=valor).
+
+    Returns:
+        Dict com o evento estruturado.
+
+    Examples:
+        >>> log_evento("Deploy iniciado", "deploy", "prod", versao="2.1.0")
+        {'timestamp': '...', 'nivel': 'INFO', 'mensagem': 'Deploy iniciado',
+         'tags': ['deploy', 'prod'], 'metadata': {'versao': '2.1.0'}}
+    """
+    evento = {
+        "timestamp": datetime.now().isoformat(),
+        "nivel": nivel.upper(),
+        "mensagem": mensagem,
+        "tags": list(tags),
+        "metadata": metadata
+    }
+    
+    # Formatar saída
+    tags_str = ", ".join(tags) if tags else "nenhuma"
+    meta_str = ", ".join(f"{k}={v}" for k, v in metadata.items())
+    
+    print(f"[{evento['timestamp']}] [{evento['nivel']}] {mensagem}")
+    print(f"  Tags: {tags_str}")
+    if meta_str:
+        print(f"  Metadata: {meta_str}")
+    print()
+    
+    return evento
+
+# Testes
+log_evento("Servidor iniciado", "startup", "infra",
+           host="web-01", porta=8080, pid=12345)
+
+log_evento("CPU alta detectada", "monitoring", "alerta",
+           nivel="WARNING", instancia="i-001", cpu_percent=95.3)
+
+log_evento("Deploy concluído", "deploy", "prod", "api",
+           versao="3.2.0", commit="abc123f", duracao_s=45)</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3 — Closure: Criador de Filtros</h3>
+          <p>Crie uma função <code>criar_filtro_recurso</code> que retorne uma closure para filtrar recursos AWS. A closure deve aceitar uma lista de recursos e retornar apenas os que atendem aos critérios configurados na criação.</p>
+
+          <details>
+            <summary>💡 Resposta</summary>
+            <div class="command-card wide">
+              <pre><code>from typing import Callable, Any
+
+def criar_filtro_recurso(tipo: str = None,
+                         estado: str = None,
+                         regiao: str = None,
+                         custo_max: float = None,
+                         tags: dict = None) -> Callable:
+    """Factory de filtros para recursos AWS.
+
+    Retorna uma closure que filtra recursos pelos critérios fornecidos.
+    Apenas critérios não-None são aplicados (AND lógico).
+
+    Args:
+        tipo: Filtrar por tipo de recurso (ex: 'ec2', 's3').
+        estado: Filtrar por estado (ex: 'running', 'stopped').
+        regiao: Filtrar por região AWS.
+        custo_max: Custo máximo por hora.
+        tags: Dict de tags que o recurso deve ter.
+
+    Returns:
+        Função que recebe lista de recursos e retorna lista filtrada.
+    """
+    def filtrar(recursos: list[dict]) -> list[dict]:
+        resultado = recursos
+        
+        if tipo is not None:
+            resultado = [r for r in resultado if r.get("tipo") == tipo]
+        
+        if estado is not None:
+            resultado = [r for r in resultado if r.get("estado") == estado]
+        
+        if regiao is not None:
+            resultado = [r for r in resultado if r.get("regiao") == regiao]
+        
+        if custo_max is not None:
+            resultado = [r for r in resultado 
+                        if r.get("custo_hora", 0) <= custo_max]
+        
+        if tags is not None:
+            resultado = [r for r in resultado
+                        if all(r.get("tags", {}).get(k) == v 
+                              for k, v in tags.items())]
+        
+        return resultado
+    
+    # Adicionar metadata à closure para inspeção
+    filtrar.criterios = {
+        "tipo": tipo, "estado": estado, "regiao": regiao,
+        "custo_max": custo_max, "tags": tags
+    }
+    
+    return filtrar
+
+# ═══ Uso ═══
+recursos = [
+    {"id": "i-001", "tipo": "ec2", "estado": "running", "regiao": "us-east-1",
+     "custo_hora": 0.096, "tags": {"env": "prod", "team": "api"}},
+    {"id": "i-002", "tipo": "ec2", "estado": "stopped", "regiao": "us-east-1",
+     "custo_hora": 0.0, "tags": {"env": "dev", "team": "api"}},
+    {"id": "i-003", "tipo": "ec2", "estado": "running", "regiao": "sa-east-1",
+     "custo_hora": 0.17, "tags": {"env": "prod", "team": "data"}},
+    {"id": "b-001", "tipo": "s3", "estado": "active", "regiao": "us-east-1",
+     "custo_hora": 0.023, "tags": {"env": "prod"}},
+]
+
+# Criar filtros especializados
+filtro_prod_running = criar_filtro_recurso(estado="running", tags={"env": "prod"})
+filtro_baratos = criar_filtro_recurso(custo_max=0.1)
+filtro_ec2_us = criar_filtro_recurso(tipo="ec2", regiao="us-east-1")
+
+# Aplicar filtros
+print("Prod + Running:", [r["id"] for r in filtro_prod_running(recursos)])
+# ['i-001', 'i-003']
+
+print("Baratos:", [r["id"] for r in filtro_baratos(recursos)])
+# ['i-001', 'i-002', 'b-001']
+
+print("EC2 em US:", [r["id"] for r in filtro_ec2_us(recursos)])
+# ['i-001', 'i-002']</code></pre>
+            </div>
+          </details>
+        </div>
