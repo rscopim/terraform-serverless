@@ -163,6 +163,8 @@ button,input{font:inherit;border:none;outline:none}
 
 /* LEARNING / CTA */
 .learning-section{padding:80px 0;background:var(--gray-100)}
+.learning-section .button.secondary{color:var(--gray-800);border-color:var(--gray-300);background:rgba(0,0,0,0.04)}
+.learning-section .button.secondary:hover{background:rgba(0,0,0,0.08);color:var(--gray-900)}
 .learning-box{display:flex;align-items:center;justify-content:space-between;gap:32px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-xl);padding:38px;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
 .learning-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary-500),var(--accent-400),var(--primary-400))}
 .learning-box p{max-width:580px}
