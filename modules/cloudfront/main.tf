@@ -6,6 +6,14 @@ resource "aws_cloudfront_origin_access_control" "this" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_function" "block_invalid_requests" {
+  name    = "${var.project_name}-${var.environment}-block-invalid-requests"
+  runtime = "cloudfront-js-2.0"
+  comment = "Blocks bot crawlers, vulnerability scanners, and invalid path requests at the edge"
+  publish = true
+  code    = file("${path.module}/block-invalid-requests.js")
+}
+
 resource "aws_cloudfront_distribution" "this" {
   enabled             = true
   comment             = "CloudFront Distribution - ${var.domain_name}"
@@ -26,7 +34,7 @@ resource "aws_cloudfront_distribution" "this" {
     target_origin_id       = "s3-private-origin"
     viewer_protocol_policy = "redirect-to-https"
 
-    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods = ["GET", "HEAD"]
     cached_methods  = ["GET", "HEAD"]
 
     compress = true
@@ -41,6 +49,11 @@ resource "aws_cloudfront_distribution" "this" {
       cookies {
         forward = "none"
       }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.block_invalid_requests.arn
     }
   }
 
@@ -64,11 +77,6 @@ resource "aws_cloudfront_distribution" "this" {
 
       locations = [
         "BR", # Brasil
-        "AR", # Argentina
-        "CL", # Chile
-        "CO", # Colômbia
-        "EC", # Equador
-        "PY", # Paraguai
         "CA"  # Canadá
       ]
     }
