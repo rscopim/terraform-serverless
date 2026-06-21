@@ -64,13 +64,6 @@ resource "aws_cloudfront_distribution" "this" {
     error_caching_min_ttl = 86400
   }
 
-  custom_error_response {
-    error_code            = 403
-    response_code         = 403
-    response_page_path    = "/404.html"
-    error_caching_min_ttl = 86400
-  }
-
   restrictions {
     geo_restriction {
       restriction_type = "whitelist"
