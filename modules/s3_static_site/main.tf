@@ -244,10 +244,11 @@ resource "aws_s3_object" "solutions_architect_pro_page" {
 }
 
 resource "aws_s3_object" "style" {
-  bucket       = aws_s3_bucket.this.id
-  key          = "style.css"
-  source       = var.style_file_path
-  content_type = "text/css"
+  bucket        = aws_s3_bucket.this.id
+  key           = "style.css"
+  source        = var.style_file_path
+  content_type  = "text/css"
+  cache_control = "public, max-age=604800, immutable"
 
   etag = filemd5(var.style_file_path)
 }
@@ -439,11 +440,12 @@ resource "aws_s3_object" "simulado_js" {
 }
 
 resource "aws_s3_object" "config_js" {
-  bucket       = aws_s3_bucket.this.id
-  key          = "config.js"
-  content      = "window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };"
-  content_type = "application/javascript"
-  etag         = md5("window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };")
+  bucket        = aws_s3_bucket.this.id
+  key           = "config.js"
+  content       = "window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };"
+  content_type  = "application/javascript"
+  cache_control = "no-cache, no-store, must-revalidate"
+  etag          = md5("window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };")
 }
 
 resource "aws_s3_object" "sitemap_xml" {

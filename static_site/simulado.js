@@ -220,7 +220,6 @@ function createUserForm() {
       quizSetup.style.display = 'block';
     } else if (quizContainer) {
       quizContainer.style.display = 'block';
-      trackSimuladoAccess();
       initQuiz();
     }
   });
@@ -242,8 +241,12 @@ function checkSavedUser() {
 
 // ===== TRACKING DE ACESSO AOS SIMULADOS =====
 function trackSimuladoAccess() {
+  // Only track when explicitly called (on quiz start), not on page load
   var page = window.location.pathname.split('/').slice(-2).join('/');
-  var apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
+  var apiUrl = (window.CLOUDTRILHAS_CONFIG && window.CLOUDTRILHAS_CONFIG.apiEndpoint)
+    ? window.CLOUDTRILHAS_CONFIG.apiEndpoint + '/leads'
+    : null;
+  if (!apiUrl) return;
   try {
     fetch(apiUrl, {
       method: 'POST',
@@ -262,7 +265,10 @@ function trackSimuladoAccess() {
 
 function trackSimuladoResult(scoreVal, totalVal) {
   var page = window.location.pathname.split('/').slice(-2).join('/');
-  var apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
+  var apiUrl = (window.CLOUDTRILHAS_CONFIG && window.CLOUDTRILHAS_CONFIG.apiEndpoint)
+    ? window.CLOUDTRILHAS_CONFIG.apiEndpoint + '/leads'
+    : null;
+  if (!apiUrl) return;
   try {
     fetch(apiUrl, {
       method: 'POST',
@@ -288,7 +294,6 @@ if (checkSavedUser()) {
   // Já identificado — inicia normalmente
   var qc = document.getElementById('quizContainer');
   if (qc && qc.style.display !== 'none') {
-    trackSimuladoAccess();
     initQuiz();
   }
 } else {
