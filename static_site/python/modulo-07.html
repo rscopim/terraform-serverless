@@ -19,21 +19,17 @@
       <div class="nav-actions">
         <a href="modulo-06.html" class="nav-link">← Anterior</a>
         <a href="modulo-08.html" class="nav-link">Próximo →</a>
-        <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <a href="../python.html" class="nav-button">← Voltar ao Curso</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,146 +37,4912 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐍 Python — Módulo 07</span>
-        <h1>Bibliotecas Essenciais: regex, datetime, subprocess, pytest</h1>
-        <p>Bibliotecas da standard library que todo desenvolvedor Python precisa dominar.</p>
+        <h1>Bibliotecas Essenciais para DevOps</h1>
+        <p>Domine as bibliotecas da standard library que todo profissional DevOps e Cloud precisa conhecer para automação, segurança e produtividade.</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
+    <!-- Progress Track -->
+    <section class="module-section" style="padding: 20px 0;">
       <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>🚧 Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
+        <div class="progress-track">
+          <a href="modulo-01.html" class="track-node completed" title="Módulo 01">01</a>
+          <a href="modulo-02.html" class="track-node completed" title="Módulo 02">02</a>
+          <a href="modulo-03.html" class="track-node completed" title="Módulo 03">03</a>
+
+          <a href="modulo-04.html" class="track-node completed" title="Módulo 04">04</a>
+          <a href="modulo-05.html" class="track-node completed" title="Módulo 05">05</a>
+          <a href="modulo-06.html" class="track-node completed" title="Módulo 06">06</a>
+          <a href="modulo-07.html" class="track-node active" title="Módulo 07">07</a>
+          <a href="modulo-08.html" class="track-node" title="Módulo 08">08</a>
+          <a href="modulo-09.html" class="track-node" title="Módulo 09">09</a>
+          <a href="modulo-10.html" class="track-node" title="Módulo 10">10</a>
         </div>
       </div>
     </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1: os e sys — Interação com o Sistema
+    ════════════════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <h2>1. os e sys — Interação com o Sistema Operacional</h2>
+        <p>Os módulos <code>os</code> e <code>sys</code> são a ponte entre seu código Python e o sistema operacional. Para profissionais DevOps, são ferramentas indispensáveis para scripts de automação, manipulação de caminhos, execução de comandos e gerenciamento de variáveis de ambiente.</p>
+
+        <div class="info-box">
+          <h4>💡 Quando usar os vs sys?</h4>
+          <p><strong>os</strong> — Interage com o sistema operacional: arquivos, diretórios, variáveis de ambiente, processos.</p>
+          <p><strong>sys</strong> — Interage com o interpretador Python: argumentos de linha de comando, caminhos de módulos, saída do programa.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Expressões Regulares (re)</h3>
+          <h3>1.1 os.path vs pathlib — Guia de Migração</h3>
+          <p>O módulo <code>os.path</code> é a forma clássica de manipular caminhos. A partir do Python 3.4, o módulo <code>pathlib</code> oferece uma API orientada a objetos mais elegante e legível. Para projetos novos, <strong>prefira pathlib</strong>.</p>
           <div class="command-card wide">
-            <div class="command-header"><code>re</code><span class="cmd-tag">Regex</span></div>
-            <pre><code>import re
+            <div class="command-header"><code>os.path (forma clássica)</code><span class="cmd-tag">sistema</span></div>
+            <pre><code>import os
 
-# Busca simples
-texto = "IP do servidor: 192.168.1.100, porta: 8080"
-ip = re.search(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", texto)
-print(ip.group())  # 192.168.1.100
+# Construindo caminhos
+base_dir = "/opt/deploy"
+config_path = os.path.join(base_dir, "configs", "app.yaml")
+print(config_path)  # /opt/deploy/configs/app.yaml
 
-# findall - todas as ocorrências
-log = "ERROR auth failed | INFO ok | ERROR timeout | WARN slow"
-erros = re.findall(r"ERROR \w+", log)
-print(erros)  # ['ERROR auth', 'ERROR timeout']
+# Informações sobre caminhos
+print(os.path.basename(config_path))   # app.yaml
+print(os.path.dirname(config_path))    # /opt/deploy/configs
+print(os.path.splitext(config_path))   # ('/opt/deploy/configs/app', '.yaml')
+print(os.path.exists(config_path))     # True/False
+print(os.path.isfile(config_path))     # True/False
+print(os.path.isdir(base_dir))         # True/False
+print(os.path.getsize(config_path))    # Tamanho em bytes
 
-# sub - substituição
-limpo = re.sub(r"\d{3}\.\d{3}\.\d{3}-\d{2}", "***CPF***", "CPF: 123.456.789-00")
+# Caminho absoluto
+relativo = "./scripts/deploy.sh"
+print(os.path.abspath(relativo))       # /home/user/projeto/scripts/deploy.sh
 
-# Grupos nomeados
-padrao = r"(?P&lt;ano&gt;\d{4})-(?P&lt;mes&gt;\d{2})-(?P&lt;dia&gt;\d{2})"
-match = re.search(padrao, "Data: 2025-01-15")
-if match:
-    print(match.group("ano"))  # 2025
-
-# Compilar para reutilização
-EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
-emails = EMAIL_RE.findall("Contato: admin@empresa.com e dev@startup.io")</code></pre>
+# Expandir ~ para home do usuário
+print(os.path.expanduser("~/.ssh/id_rsa"))  # /home/user/.ssh/id_rsa</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. datetime e subprocess</h3>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>datetime</code><span class="cmd-tag">Data/Hora</span></div>
-              <pre><code>from datetime import datetime, timedelta, timezone
+          <h3>1.2 pathlib — A Forma Moderna (Python 3.4+)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>pathlib.Path</code><span class="cmd-tag">moderno</span></div>
+            <pre><code>from pathlib import Path
 
-# Agora
-agora = datetime.now()
-utc = datetime.now(timezone.utc)
+# Construindo caminhos (usa / como operador)
+base_dir = Path("/opt/deploy")
+config_path = base_dir / "configs" / "app.yaml"
+print(config_path)  # /opt/deploy/configs/app.yaml
 
-# Formatação
-print(agora.strftime("%d/%m/%Y %H:%M"))
-print(agora.isoformat())
+# Informações sobre caminhos (métodos e propriedades)
+print(config_path.name)       # app.yaml
+print(config_path.stem)       # app
+print(config_path.suffix)     # .yaml
+print(config_path.parent)     # /opt/deploy/configs
+print(config_path.parents[1]) # /opt/deploy
+print(config_path.exists())   # True/False
+print(config_path.is_file())  # True/False
+print(config_path.is_dir())   # False
 
-# Parse de string
-data = datetime.strptime("2025-06-15", "%Y-%m-%d")
+# Leitura e escrita direta (sem open!)
+conteudo = config_path.read_text(encoding="utf-8")
+config_path.write_text("nova config", encoding="utf-8")
 
-# Aritmética
-amanha = agora + timedelta(days=1)
-semana_passada = agora - timedelta(weeks=1)
-diff = datetime(2025, 12, 31) - agora
-print(f"Faltam {diff.days} dias")</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>subprocess</code><span class="cmd-tag">Sistema</span></div>
-              <pre><code>import subprocess
+# Iterando sobre diretórios
+for arquivo in Path("/var/log").glob("*.log"):
+    print(f"{arquivo.name}: {arquivo.stat().st_size} bytes")
 
-# Executar comando
-result = subprocess.run(
-    ["ls", "-la", "/var/log"],
-    capture_output=True,
-    text=True,
-    timeout=30
+# Busca recursiva (equivalente ao find)
+for py_file in Path("/opt/app").rglob("*.py"):
+    print(py_file)
+
+# Criando diretórios
+Path("/opt/deploy/backups/2024").mkdir(parents=True, exist_ok=True)
+
+# Resolvendo caminhos relativos
+caminho_rel = Path("./configs/../scripts/deploy.sh")
+print(caminho_rel.resolve())  # /home/user/projeto/scripts/deploy.sh
+
+# Home do usuário
+ssh_key = Path.home() / ".ssh" / "id_rsa"
+print(ssh_key)  # /home/user/.ssh/id_rsa</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.3 Tabela de Migração: os.path → pathlib</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Equivalências</code><span class="cmd-tag">referência</span></div>
+            <pre><code># ╔══════════════════════════════════════╦══════════════════════════════════════╗
+# ║ os.path (clássico)                  ║ pathlib (moderno)                    ║
+# ╠══════════════════════════════════════╬══════════════════════════════════════╣
+# ║ os.path.join(a, b)                  ║ Path(a) / b                          ║
+# ║ os.path.basename(p)                 ║ Path(p).name                         ║
+# ║ os.path.dirname(p)                  ║ Path(p).parent                       ║
+# ║ os.path.splitext(p)                 ║ Path(p).stem + Path(p).suffix        ║
+# ║ os.path.exists(p)                   ║ Path(p).exists()                     ║
+# ║ os.path.isfile(p)                   ║ Path(p).is_file()                    ║
+# ║ os.path.isdir(p)                    ║ Path(p).is_dir()                     ║
+# ║ os.path.abspath(p)                  ║ Path(p).resolve()                    ║
+# ║ os.path.expanduser("~")            ║ Path.home()                          ║
+# ║ os.path.getsize(p)                  ║ Path(p).stat().st_size               ║
+# ║ os.listdir(p)                       ║ list(Path(p).iterdir())              ║
+# ║ os.makedirs(p, exist_ok=True)       ║ Path(p).mkdir(parents=True, ...)     ║
+# ║ open(p).read()                      ║ Path(p).read_text()                  ║
+# ╚══════════════════════════════════════╩══════════════════════════════════════╝</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.4 os.environ — Variáveis de Ambiente</h3>
+          <p>Variáveis de ambiente são fundamentais em DevOps. Elas configuram aplicações sem alterar código, seguindo o princípio dos <strong>12 Factor Apps</strong>.</p>
+          <div class="command-card wide">
+            <div class="command-header"><code>os.environ</code><span class="cmd-tag">config</span></div>
+            <pre><code>import os
+
+# Lendo variáveis de ambiente
+aws_region = os.environ.get("AWS_REGION", "us-east-1")  # com default
+aws_key = os.environ.get("AWS_ACCESS_KEY_ID")            # None se não existir
+
+# PERIGO: os.environ["VAR"] lança KeyError se não existir!
+# Prefira sempre .get() com valor padrão
+try:
+    db_host = os.environ["DATABASE_HOST"]
+except KeyError:
+    print("ERRO: DATABASE_HOST não configurado!")
+    sys.exit(1)
+
+# Definindo variáveis (afeta apenas o processo atual e filhos)
+os.environ["APP_ENV"] = "production"
+os.environ["LOG_LEVEL"] = "INFO"
+
+# Removendo variáveis
+del os.environ["LOG_LEVEL"]
+# ou
+os.environ.pop("LOG_LEVEL", None)  # seguro, não lança erro
+
+# Listando todas as variáveis
+for chave, valor in sorted(os.environ.items()):
+    if chave.startswith("AWS_"):
+        print(f"  {chave} = {valor[:10]}...")
+
+# Padrão DevOps: carregar configuração do ambiente
+class Config:
+    """Configuração baseada em variáveis de ambiente."""
+    
+    DB_HOST = os.environ.get("DB_HOST", "localhost")
+    DB_PORT = int(os.environ.get("DB_PORT", "5432"))
+    DB_NAME = os.environ.get("DB_NAME", "app_db")
+    DB_USER = os.environ.get("DB_USER", "admin")
+    DB_PASS = os.environ.get("DB_PASS", "")  # nunca hardcode!
+    DEBUG = os.environ.get("DEBUG", "false").lower() == "true"
+    
+    @classmethod
+    def validate(cls):
+        """Valida que variáveis obrigatórias existem."""
+        required = ["DB_HOST", "DB_USER", "DB_PASS"]
+        missing = [v for v in required if not os.environ.get(v)]
+        if missing:
+            raise EnvironmentError(
+                f"Variáveis obrigatórias não configuradas: {missing}"
+            )</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.5 sys — Interação com o Interpretador Python</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>sys module</code><span class="cmd-tag">sistema</span></div>
+            <pre><code>import sys
+
+# ═══ sys.argv — Argumentos da linha de comando ═══
+# python deploy.py --env production --region sa-east-1
+print(sys.argv)       # ['deploy.py', '--env', 'production', '--region', 'sa-east-1']
+print(sys.argv[0])    # Nome do script: 'deploy.py'
+
+# Uso simples (para CLIs complexas, use argparse)
+if len(sys.argv) < 2:
+    print("Uso: python script.py <ambiente>")
+    sys.exit(1)
+
+ambiente = sys.argv[1]
+
+# ═══ sys.exit() — Encerrar o programa ═══
+# Código 0 = sucesso, diferente de 0 = erro
+if not config_valida:
+    print("ERRO: Configuração inválida", file=sys.stderr)
+    sys.exit(1)  # Sai com código de erro
+
+# ═══ sys.path — Caminhos de importação ═══
+print(sys.path)  # Lista de diretórios onde Python busca módulos
+
+# Adicionar diretório ao path (útil para scripts)
+sys.path.insert(0, "/opt/app/lib")
+
+# ═══ sys.platform — Plataforma atual ═══
+print(sys.platform)  # 'linux', 'darwin', 'win32'
+
+if sys.platform == "linux":
+    config_dir = Path("/etc/myapp")
+elif sys.platform == "darwin":
+    config_dir = Path.home() / "Library" / "Application Support" / "myapp"
+elif sys.platform == "win32":
+    config_dir = Path(os.environ["APPDATA"]) / "myapp"
+
+# ═══ sys.version — Versão do Python ═══
+print(sys.version)         # '3.11.5 (main, Sep 11 2023, ...)'
+print(sys.version_info)    # sys.version_info(major=3, minor=11, micro=5, ...)
+
+# Verificar versão mínima
+if sys.version_info < (3, 9):
+    print("ERRO: Python 3.9+ é necessário!")
+    sys.exit(1)
+
+# ═══ sys.stdin/stdout/stderr — Streams padrão ═══
+print("Info normal", file=sys.stdout)   # stdout (padrão)
+print("ERRO!", file=sys.stderr)          # stderr (erros)
+
+# Redirecionar stdout para arquivo
+import io
+old_stdout = sys.stdout
+sys.stdout = io.StringIO()
+print("Isso vai para o buffer")
+output = sys.stdout.getvalue()
+sys.stdout = old_stdout  # Restaurar</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>1.6 Detecção de Plataforma e Diretório de Trabalho</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>platform + os.getcwd</code><span class="cmd-tag">multiplataforma</span></div>
+            <pre><code>import os
+import platform
+
+# ═══ Detecção de Plataforma ═══
+print(os.name)              # 'posix' (Linux/Mac) ou 'nt' (Windows)
+print(platform.system())    # 'Linux', 'Darwin', 'Windows'
+print(platform.release())   # '5.15.0-86-generic' (kernel Linux)
+print(platform.machine())   # 'x86_64', 'aarch64', 'arm64'
+print(platform.python_version())  # '3.11.5'
+
+# Informações completas
+print(platform.platform())
+# 'Linux-5.15.0-86-generic-x86_64-with-glibc2.35'
+
+# Script multiplataforma
+def get_temp_dir():
+    """Retorna diretório temporário da plataforma."""
+    if platform.system() == "Windows":
+        return Path(os.environ.get("TEMP", "C:\\Temp"))
+    return Path("/tmp")
+
+def get_shell():
+    """Retorna shell padrão da plataforma."""
+    if platform.system() == "Windows":
+        return "powershell.exe"
+    return os.environ.get("SHELL", "/bin/bash")
+
+# ═══ Diretório de Trabalho ═══
+# Obter diretório atual
+cwd = os.getcwd()
+print(f"Diretório atual: {cwd}")
+
+# Mudar diretório (CUIDADO: afeta todo o processo!)
+os.chdir("/opt/deploy")
+print(os.getcwd())  # /opt/deploy
+
+# Padrão seguro: usar context manager
+import contextlib
+
+@contextlib.contextmanager
+def working_directory(path):
+    """Context manager para mudar diretório temporariamente."""
+    original = os.getcwd()
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(original)
+
+# Uso seguro
+with working_directory("/opt/deploy"):
+    # Aqui estamos em /opt/deploy
+    os.system("ls -la")
+# Aqui voltamos ao diretório original
+
+# ═══ Operações com Diretórios ═══
+# Criar diretório
+os.makedirs("/opt/deploy/logs/2024", exist_ok=True)
+
+# Listar conteúdo
+for item in os.listdir("/opt/deploy"):
+    full_path = os.path.join("/opt/deploy", item)
+    tipo = "DIR" if os.path.isdir(full_path) else "FILE"
+    print(f"  [{tipo}] {item}")
+
+# Remover diretório vazio
+os.rmdir("/opt/deploy/temp")
+
+# Walk: percorrer árvore de diretórios recursivamente
+for raiz, dirs, arquivos in os.walk("/opt/app"):
+    # Ignorar diretórios ocultos e __pycache__
+    dirs[:] = [d for d in dirs if not d.startswith(('.', '__'))]
+    for arquivo in arquivos:
+        if arquivo.endswith('.py'):
+            caminho = os.path.join(raiz, arquivo)
+            tamanho = os.path.getsize(caminho)
+            print(f"  {caminho} ({tamanho} bytes)")</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2: subprocess — Executando Comandos
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <h2>2. subprocess — Executando Comandos do Sistema</h2>
+        <p>O módulo <code>subprocess</code> é a forma recomendada de executar comandos externos em Python. Para DevOps, é essencial para integrar com ferramentas como <strong>Terraform</strong>, <strong>Docker</strong>, <strong>kubectl</strong>, <strong>git</strong> e <strong>ansible</strong>.</p>
+
+        <div class="info-box warning">
+          <h4>⚠️ Não use os.system()!</h4>
+          <p><code>os.system()</code> é inseguro (vulnerável a injeção de comandos) e não permite capturar saída. Sempre use <code>subprocess.run()</code> em código profissional.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.1 subprocess.run() — O Método Recomendado</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>subprocess.run()</code><span class="cmd-tag">execução</span></div>
+            <pre><code>import subprocess
+
+# ═══ Forma básica ═══
+# Argumentos como LISTA (seguro, recomendado!)
+resultado = subprocess.run(
+    ["ls", "-la", "/opt/deploy"],
+    capture_output=True,   # Captura stdout e stderr
+    text=True,             # Retorna strings (não bytes)
+    check=True             # Lança CalledProcessError se retornar != 0
 )
-print(result.stdout)
-print(result.returncode)  # 0 = sucesso
 
-# Com shell (cuidado com injeção!)
-result = subprocess.run(
-    "df -h | grep /dev/sda",
+print(resultado.stdout)        # Saída padrão
+print(resultado.stderr)        # Saída de erro
+print(resultado.returncode)    # Código de saída (0 = sucesso)
+
+# ═══ Parâmetros importantes ═══
+resultado = subprocess.run(
+    ["terraform", "plan", "-no-color"],
+    capture_output=True,       # Captura stdout e stderr
+    text=True,                 # Decodifica para str (default: bytes)
+    check=True,                # Lança exceção se returncode != 0
+    cwd="/opt/infra/projeto",  # Diretório de execução
+    timeout=300,               # Timeout em segundos
+    env={                       # Variáveis de ambiente personalizadas
+        **os.environ,           # Herda as existentes
+        "TF_VAR_region": "sa-east-1",
+        "TF_VAR_env": "production"
+    }
+)
+
+# ═══ Tratamento de erros ═══
+try:
+    resultado = subprocess.run(
+        ["docker", "build", "-t", "minha-app:latest", "."],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=600
+    )
+    print("✅ Build concluído com sucesso!")
+    print(resultado.stdout)
+except subprocess.CalledProcessError as e:
+    print(f"❌ Comando falhou com código {e.returncode}")
+    print(f"STDERR: {e.stderr}")
+except subprocess.TimeoutExpired as e:
+    print(f"⏰ Timeout após {e.timeout} segundos")
+except FileNotFoundError:
+    print("❌ Comando 'docker' não encontrado no PATH")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.2 Shell=True — Riscos e Quando Usar</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>shell=True</code><span class="cmd-tag">segurança</span></div>
+            <pre><code>import subprocess
+import shlex
+
+# ═══ PERIGO: shell=True com input do usuário ═══
+# NUNCA faça isso com dados não-confiáveis!
+usuario_input = "arquivo.txt; rm -rf /"  # Input malicioso!
+
+# VULNERÁVEL a command injection:
+subprocess.run(f"cat {usuario_input}", shell=True)  # PERIGO!!!
+
+# SEGURO: usar lista de argumentos (sem shell)
+subprocess.run(["cat", usuario_input])  # Trata como argumento literal
+
+# ═══ Quando shell=True é aceitável ═══
+# 1. Comandos com pipe, redirecionamento ou globbing
+resultado = subprocess.run(
+    "ps aux | grep python | wc -l",
     shell=True,
     capture_output=True,
     text=True
 )
 
-# Verificar erro
-if result.returncode != 0:
-    print(f"Erro: {result.stderr}")</code></pre>
-            </div>
+# 2. Alternativa SEGURA para pipes: encadear subprocessos
+ps = subprocess.run(["ps", "aux"], capture_output=True, text=True)
+grep = subprocess.run(
+    ["grep", "python"],
+    input=ps.stdout,
+    capture_output=True,
+    text=True
+)
+wc = subprocess.run(
+    ["wc", "-l"],
+    input=grep.stdout,
+    capture_output=True,
+    text=True
+)
+print(f"Processos Python: {wc.stdout.strip()}")
+
+# ═══ shlex.quote() — Escapar argumentos para shell ═══
+# Se PRECISA usar shell=True, escape os argumentos:
+arquivo = "meu arquivo com espaços.log"
+cmd = f"cat {shlex.quote(arquivo)}"
+subprocess.run(cmd, shell=True)
+
+# ═══ shlex.split() — Dividir string em argumentos ═══
+comando_str = 'docker run -d --name "meu container" -p 8080:80 nginx'
+args = shlex.split(comando_str)
+# ['docker', 'run', '-d', '--name', 'meu container', '-p', '8080:80', 'nginx']
+subprocess.run(args)</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Testes com pytest</h3>
+          <h3>2.3 Pipes e Comunicação entre Processos</h3>
           <div class="command-card wide">
-            <div class="command-header"><code>pytest</code><span class="cmd-tag">Testes</span></div>
-            <pre><code># test_calculadora.py
-import pytest
+            <div class="command-header"><code>Piping</code><span class="cmd-tag">avançado</span></div>
+            <pre><code>import subprocess
 
-def somar(a, b):
-    return a + b
+# ═══ Pipe entre processos (forma programática) ═══
+def pipe_commands(*commands):
+    """Encadeia múltiplos comandos via pipe."""
+    input_data = None
+    for cmd in commands:
+        result = subprocess.run(
+            cmd,
+            input=input_data,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        input_data = result.stdout
+    return input_data
 
-def dividir(a, b):
-    if b == 0:
-        raise ValueError("Divisão por zero")
-    return a / b
+# Equivalente a: cat access.log | grep "ERROR" | sort | uniq -c | sort -rn
+output = pipe_commands(
+    ["cat", "/var/log/access.log"],
+    ["grep", "ERROR"],
+    ["sort"],
+    ["uniq", "-c"],
+    ["sort", "-rn"]
+)
+print(output)
 
-# Testes básicos
-def test_somar():
-    assert somar(2, 3) == 5
-    assert somar(-1, 1) == 0
+# ═══ Enviando input para um processo ═══
+# Útil para comandos interativos
+resultado = subprocess.run(
+    ["python3", "-c", "nome = input('Nome: '); print(f'Olá, {nome}!')"],
+    input="DevOps Engineer\n",
+    capture_output=True,
+    text=True
+)
+print(resultado.stdout)  # "Olá, DevOps Engineer!"
 
-def test_dividir():
-    assert dividir(10, 2) == 5.0
+# ═══ Streaming de saída em tempo real ═══
+import sys
 
-# Testar exceções
-def test_dividir_por_zero():
-    with pytest.raises(ValueError, match="Divisão por zero"):
-        dividir(10, 0)
+def run_streaming(cmd, cwd=None):
+    """Executa comando mostrando saída em tempo real."""
+    processo = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+        cwd=cwd
+    )
+    
+    output_lines = []
+    for linha in processo.stdout:
+        print(linha, end="")  # Mostra em tempo real
+        output_lines.append(linha)
+    
+    processo.wait()
+    return processo.returncode, "".join(output_lines)
 
-# Parametrize - múltiplos cenários
-@pytest.mark.parametrize("a,b,esperado", [
-    (1, 1, 2),
-    (0, 0, 0),
-    (-1, -1, -2),
-    (100, 200, 300),
+# Terraform plan com saída em tempo real
+returncode, output = run_streaming(
+    ["terraform", "plan", "-no-color"],
+    cwd="/opt/infra"
+)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.4 Timeout e Controle de Execução</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>timeout + retry</code><span class="cmd-tag">resiliência</span></div>
+            <pre><code>import subprocess
+import time
+
+# ═══ Timeout ═══
+try:
+    resultado = subprocess.run(
+        ["ping", "-c", "10", "8.8.8.8"],
+        capture_output=True,
+        text=True,
+        timeout=5  # Mata o processo após 5 segundos
+    )
+except subprocess.TimeoutExpired as e:
+    print(f"Processo cancelado após {e.timeout}s")
+    # e.stdout e e.stderr podem conter saída parcial
+    if e.stdout:
+        print(f"Saída parcial: {e.stdout[:200]}")
+
+# ═══ Retry com backoff exponencial ═══
+def run_with_retry(cmd, max_retries=3, base_delay=1, timeout=30):
+    """Executa comando com retry e backoff exponencial."""
+    for tentativa in range(max_retries):
+        try:
+            resultado = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=timeout
+            )
+            return resultado
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            if tentativa < max_retries - 1:
+                delay = base_delay * (2 ** tentativa)
+                print(f"  ⚠️  Tentativa {tentativa + 1} falhou. "
+                      f"Retry em {delay}s...")
+                time.sleep(delay)
+            else:
+                print(f"  ❌ Todas as {max_retries} tentativas falharam!")
+                raise
+
+# Uso: tentar conectar com retry
+resultado = run_with_retry(
+    ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", 
+     "https://api.exemplo.com/health"],
+    max_retries=5,
+    base_delay=2
+)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>2.5 Exemplos Reais: Terraform, Docker e Git</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>DevOps Automation</code><span class="cmd-tag">prática</span></div>
+            <pre><code>import subprocess
+import json
+import os
+
+# ═══ Wrapper para Terraform ═══
+class TerraformRunner:
+    """Wrapper Python para comandos Terraform."""
+    
+    def __init__(self, working_dir, env_vars=None):
+        self.working_dir = working_dir
+        self.env = {**os.environ, **(env_vars or {})}
+    
+    def _run(self, args, check=True):
+        """Executa comando terraform."""
+        cmd = ["terraform"] + args
+        print(f"  🔧 Executando: {' '.join(cmd)}")
+        return subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=check,
+            cwd=self.working_dir,
+            env=self.env,
+            timeout=600
+        )
+    
+    def init(self, backend_config=None):
+        args = ["init", "-no-color"]
+        if backend_config:
+            for key, value in backend_config.items():
+                args.append(f"-backend-config={key}={value}")
+        return self._run(args)
+    
+    def plan(self, var_file=None, out=None):
+        args = ["plan", "-no-color", "-detailed-exitcode"]
+        if var_file:
+            args.extend(["-var-file", var_file])
+        if out:
+            args.extend(["-out", out])
+        result = self._run(args, check=False)
+        # Exit code 2 = mudanças pendentes
+        return result, result.returncode == 2
+    
+    def apply(self, plan_file=None, auto_approve=False):
+        args = ["apply", "-no-color"]
+        if auto_approve:
+            args.append("-auto-approve")
+        if plan_file:
+            args.append(plan_file)
+        return self._run(args)
+    
+    def output(self, name=None, as_json=True):
+        args = ["output", "-no-color"]
+        if as_json:
+            args.append("-json")
+        if name:
+            args.append(name)
+        result = self._run(args)
+        if as_json:
+            return json.loads(result.stdout)
+        return result.stdout
+    
+    def destroy(self, auto_approve=False):
+        args = ["destroy", "-no-color"]
+        if auto_approve:
+            args.append("-auto-approve")
+        return self._run(args)
+
+# Uso
+tf = TerraformRunner(
+    "/opt/infra/environments/production",
+    env_vars={"TF_VAR_region": "sa-east-1"}
+)
+tf.init()
+result, has_changes = tf.plan(out="tfplan")
+if has_changes:
+    tf.apply("tfplan")
+
+# ═══ Wrapper para Docker ═══
+def docker_build(image_name, tag="latest", dockerfile="Dockerfile", context="."):
+    """Build de imagem Docker com tratamento de erros."""
+    full_tag = f"{image_name}:{tag}"
+    try:
+        resultado = subprocess.run(
+            ["docker", "build", 
+             "-t", full_tag,
+             "-f", dockerfile,
+             "--no-cache",
+             context],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=900
+        )
+        print(f"✅ Imagem {full_tag} construída com sucesso!")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Falha no build: {e.stderr[-500:]}")
+        return False
+
+def docker_push(image_name, tag="latest", registry=None):
+    """Push de imagem para registry."""
+    full_tag = f"{image_name}:{tag}"
+    if registry:
+        remote_tag = f"{registry}/{full_tag}"
+        subprocess.run(["docker", "tag", full_tag, remote_tag], check=True)
+        full_tag = remote_tag
+    
+    subprocess.run(["docker", "push", full_tag], check=True, text=True)
+    print(f"✅ Push de {full_tag} concluído!")
+
+# ═══ Wrapper para Git ═══
+def git_info(repo_path="."):
+    """Obtém informações do repositório Git."""
+    def git(*args):
+        result = subprocess.run(
+            ["git"] + list(args),
+            capture_output=True, text=True,
+            cwd=repo_path, check=True
+        )
+        return result.stdout.strip()
+    
+    return {
+        "branch": git("rev-parse", "--abbrev-ref", "HEAD"),
+        "commit": git("rev-parse", "--short", "HEAD"),
+        "commit_full": git("rev-parse", "HEAD"),
+        "message": git("log", "-1", "--format=%s"),
+        "author": git("log", "-1", "--format=%an"),
+        "date": git("log", "-1", "--format=%ai"),
+        "dirty": bool(git("status", "--porcelain")),
+    }
+
+info = git_info()
+print(f"Branch: {info['branch']}")
+print(f"Commit: {info['commit']} - {info['message']}")
+print(f"Autor: {info['author']} em {info['date']}")</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3: datetime e time — Manipulação de Tempo
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <h2>3. datetime e time — Manipulação de Tempo</h2>
+        <p>Gerenciar datas e horários é crucial em DevOps: logs, agendamentos, cálculos de SLA, rotação de backups e expiração de certificados. Python oferece ferramentas robustas para isso.</p>
+
+        <div class="topic-block">
+          <h3>3.1 Objetos datetime — date, time, datetime, timedelta</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>datetime basics</code><span class="cmd-tag">tempo</span></div>
+            <pre><code>from datetime import date, time, datetime, timedelta
+
+# ═══ date — Apenas data (ano, mês, dia) ═══
+hoje = date.today()
+print(hoje)            # 2024-11-15
+print(hoje.year)       # 2024
+print(hoje.month)      # 11
+print(hoje.day)        # 15
+print(hoje.weekday())  # 4 (0=segunda, 6=domingo)
+print(hoje.isoformat())  # '2024-11-15'
+
+# Criar data específica
+lancamento = date(2024, 12, 1)
+dias_ate = (lancamento - hoje).days
+print(f"Faltam {dias_ate} dias para o lançamento")
+
+# ═══ time — Apenas horário ═══
+horario = time(14, 30, 45)
+print(horario)           # 14:30:45
+print(horario.hour)      # 14
+print(horario.minute)    # 30
+
+# ═══ datetime — Data + Horário (o mais usado) ═══
+agora = datetime.now()
+print(agora)  # 2024-11-15 14:30:45.123456
+
+# Criar datetime específico
+deploy_time = datetime(2024, 11, 15, 22, 0, 0)
+print(f"Deploy agendado para: {deploy_time}")
+
+# UTC (sempre use UTC para logs e servidores!)
+from datetime import timezone
+agora_utc = datetime.now(timezone.utc)
+print(f"UTC: {agora_utc}")
+
+# ═══ timedelta — Diferenças de tempo ═══
+# Quanto tempo se passou?
+inicio = datetime(2024, 1, 1)
+decorrido = datetime.now() - inicio
+print(f"Dias desde 1/Jan: {decorrido.days}")
+print(f"Segundos totais: {decorrido.total_seconds()}")
+
+# Calcular datas futuras e passadas
+amanha = datetime.now() + timedelta(days=1)
+semana_passada = datetime.now() - timedelta(weeks=1)
+daqui_2h = datetime.now() + timedelta(hours=2)
+ontem_23h = datetime.now() - timedelta(days=1, hours=1)
+
+# Expiração de certificado
+cert_expira = datetime(2025, 3, 15)
+dias_restantes = (cert_expira - datetime.now()).days
+if dias_restantes < 30:
+    print(f"⚠️  ALERTA: Certificado expira em {dias_restantes} dias!")
+elif dias_restantes < 7:
+    print(f"🚨 CRÍTICO: Certificado expira em {dias_restantes} dias!")
+
+# Janela de manutenção
+janela_inicio = datetime(2024, 11, 16, 2, 0, 0)   # 02:00
+janela_fim = datetime(2024, 11, 16, 6, 0, 0)       # 06:00
+duracao = janela_fim - janela_inicio
+print(f"Janela de manutenção: {duracao}")  # 4:00:00</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.2 Formatação (strftime) e Parsing (strptime)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>strftime / strptime</code><span class="cmd-tag">formatação</span></div>
+            <pre><code>from datetime import datetime
+
+agora = datetime.now()
+
+# ═══ strftime — datetime → string ═══
+# Códigos mais usados:
+# %Y = ano 4 dígitos    %m = mês 01-12     %d = dia 01-31
+# %H = hora 00-23       %M = minuto 00-59  %S = segundo 00-59
+# %f = microsegundo     %z = timezone       %Z = nome timezone
+# %A = dia da semana    %B = mês por extenso
+
+print(agora.strftime("%Y-%m-%d %H:%M:%S"))      # 2024-11-15 14:30:45
+print(agora.strftime("%d/%m/%Y"))                # 15/11/2024
+print(agora.strftime("%Y%m%d_%H%M%S"))           # 20241115_143045
+print(agora.strftime("%Y-%m-%dT%H:%M:%S%z"))     # ISO 8601
+
+# Formatos comuns em DevOps
+log_timestamp = agora.strftime("[%Y-%m-%d %H:%M:%S.%f]")
+backup_suffix = agora.strftime("%Y%m%d_%H%M%S")
+s3_prefix = agora.strftime("logs/%Y/%m/%d/")
+
+print(f"Log: {log_timestamp}")           # [2024-11-15 14:30:45.123456]
+print(f"Backup: backup_{backup_suffix}.tar.gz")  # backup_20241115_143045.tar.gz
+print(f"S3: s3://bucket/{s3_prefix}")    # s3://bucket/logs/2024/11/15/
+
+# ═══ strptime — string → datetime ═══
+# Parse de diferentes formatos
+dt1 = datetime.strptime("2024-11-15 14:30:45", "%Y-%m-%d %H:%M:%S")
+dt2 = datetime.strptime("15/11/2024", "%d/%m/%Y")
+dt3 = datetime.strptime("Nov 15, 2024 2:30 PM", "%b %d, %Y %I:%M %p")
+
+# Parse de log real (Apache/Nginx)
+log_line = '10.0.1.5 - - [15/Nov/2024:14:30:45 +0000] "GET /api/health HTTP/1.1" 200'
+date_str = log_line.split("[")[1].split("]")[0]
+log_dt = datetime.strptime(date_str, "%d/%b/%Y:%H:%M:%S %z")
+print(f"Log de: {log_dt}")
+
+# Parse de timestamp AWS CloudWatch
+aws_timestamp = "2024-11-15T14:30:45.123Z"
+# Remover o Z e usar timezone UTC
+dt_aws = datetime.fromisoformat(aws_timestamp.replace("Z", "+00:00"))
+print(f"CloudWatch: {dt_aws}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.3 Timezone — Trabalhando com Fusos Horários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>zoneinfo (Python 3.9+)</code><span class="cmd-tag">timezone</span></div>
+            <pre><code>from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo  # Python 3.9+
+
+# ═══ Regra de ouro: armazene SEMPRE em UTC ═══
+agora_utc = datetime.now(timezone.utc)
+print(f"UTC: {agora_utc}")
+
+# ═══ zoneinfo — Fusos horários (Python 3.9+) ═══
+# Converter UTC para horário de São Paulo
+sp_tz = ZoneInfo("America/Sao_Paulo")
+agora_sp = agora_utc.astimezone(sp_tz)
+print(f"São Paulo: {agora_sp}")        # UTC-3
+print(f"Timezone: {agora_sp.tzname()}")  # -03 ou BRT
+
+# Outros fusos úteis para DevOps global
+ny_tz = ZoneInfo("America/New_York")
+tokyo_tz = ZoneInfo("Asia/Tokyo")
+london_tz = ZoneInfo("Europe/London")
+
+# Converter entre fusos
+agora_ny = agora_utc.astimezone(ny_tz)
+agora_tokyo = agora_utc.astimezone(tokyo_tz)
+
+print(f"  São Paulo: {agora_sp.strftime('%H:%M')}")
+print(f"  New York:  {agora_ny.strftime('%H:%M')}")
+print(f"  Tokyo:     {agora_tokyo.strftime('%H:%M')}")
+print(f"  UTC:       {agora_utc.strftime('%H:%M')}")
+
+# ═══ Criar datetime com timezone ═══
+# Deploy agendado para 22:00 de São Paulo
+deploy_sp = datetime(2024, 11, 15, 22, 0, 0, tzinfo=sp_tz)
+deploy_utc = deploy_sp.astimezone(timezone.utc)
+print(f"Deploy SP: {deploy_sp}")
+print(f"Deploy UTC: {deploy_utc}")  # 01:00 UTC do dia seguinte
+
+# ═══ Cálculos de SLA considerando timezone ═══
+def calcular_sla_uptime(incidentes, periodo_dias=30, tz_nome="America/Sao_Paulo"):
+    """Calcula uptime SLA desconsiderando janela de manutenção."""
+    tz = ZoneInfo(tz_nome)
+    total_minutos = periodo_dias * 24 * 60
+    
+    # Janela de manutenção: Domingos 02:00-06:00
+    domingos = periodo_dias // 7
+    manutencao_minutos = domingos * 4 * 60  # 4h por domingo
+    
+    minutos_validos = total_minutos - manutencao_minutos
+    
+    # Calcular downtime dos incidentes
+    downtime_total = sum(
+        (inc["fim"] - inc["inicio"]).total_seconds() / 60
+        for inc in incidentes
+    )
+    
+    uptime = ((minutos_validos - downtime_total) / minutos_validos) * 100
+    return round(uptime, 4)
+
+# Exemplo
+incidentes = [
+    {"inicio": datetime(2024, 11, 5, 10, 0, tzinfo=sp_tz),
+     "fim": datetime(2024, 11, 5, 10, 15, tzinfo=sp_tz)},  # 15 min
+]
+sla = calcular_sla_uptime(incidentes)
+print(f"SLA Uptime: {sla}%")  # 99.9653%</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>3.4 Timestamps e ISO 8601</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>timestamps</code><span class="cmd-tag">padrão</span></div>
+            <pre><code>import time
+from datetime import datetime, timezone
+
+# ═══ time.time() — Unix Timestamp (epoch) ═══
+# Segundos desde 1 de janeiro de 1970 (UTC)
+timestamp = time.time()
+print(timestamp)  # 1731680245.123456
+
+# Converter timestamp para datetime
+dt = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+print(dt)  # 2024-11-15 14:30:45+00:00
+
+# Converter datetime para timestamp
+ts = datetime.now(timezone.utc).timestamp()
+print(ts)  # 1731680245.123456
+
+# ═══ ISO 8601 — Formato universal ═══
+agora = datetime.now(timezone.utc)
+
+# Formato ISO completo
+iso_str = agora.isoformat()
+print(iso_str)  # 2024-11-15T14:30:45.123456+00:00
+
+# Parse ISO 8601 (Python 3.7+)
+dt = datetime.fromisoformat("2024-11-15T14:30:45+00:00")
+
+# Formato com Z (Zulu time = UTC)
+iso_z = agora.strftime("%Y-%m-%dT%H:%M:%SZ")
+print(iso_z)  # 2024-11-15T14:30:45Z
+
+# ═══ Medindo tempo de execução ═══
+# Forma simples
+inicio = time.time()
+# ... operação demorada ...
+time.sleep(0.5)
+fim = time.time()
+print(f"Tempo: {fim - inicio:.3f}s")
+
+# Forma precisa (monotonic clock, não afetada por ajuste de relógio)
+inicio = time.perf_counter()
+# ... operação ...
+time.sleep(0.5)
+fim = time.perf_counter()
+print(f"Tempo preciso: {fim - inicio:.6f}s")
+
+# ═══ time.sleep() — Pausar execução ═══
+# Útil para polling e rate limiting
+def wait_for_resource(check_fn, timeout=120, interval=5):
+    """Espera recurso ficar pronto com timeout."""
+    inicio = time.time()
+    while time.time() - inicio < timeout:
+        if check_fn():
+            elapsed = time.time() - inicio
+            print(f"✅ Recurso pronto em {elapsed:.1f}s")
+            return True
+        print(f"  ⏳ Aguardando... ({interval}s)")
+        time.sleep(interval)
+    raise TimeoutError(f"Timeout após {timeout}s")
+
+# Uso: esperar instância EC2 ficar running
+# wait_for_resource(lambda: get_ec2_status() == "running")</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4: re — Expressões Regulares
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <h2>4. re — Expressões Regulares</h2>
+        <p>Expressões regulares são essenciais para parsing de logs, validação de dados, extração de informações e transformações de texto. O módulo <code>re</code> fornece suporte completo a regex em Python.</p>
+
+        <div class="info-box">
+          <h4>💡 Dica: Use raw strings!</h4>
+          <p>Sempre use <code>r"padrão"</code> (raw strings) para evitar conflitos com escape sequences do Python. Ex: <code>r"\d+"</code> em vez de <code>"\\d+"</code>.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.1 Sintaxe de Padrões</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Regex Syntax</code><span class="cmd-tag">referência</span></div>
+            <pre><code>import re
+
+# ═══ Caracteres Especiais ═══
+# .     Qualquer caractere (exceto \n)
+# ^     Início da string/linha
+# $     Fim da string/linha
+# \     Escape de caractere especial
+
+# ═══ Quantificadores ═══
+# *     Zero ou mais       (greedy)
+# +     Um ou mais         (greedy)
+# ?     Zero ou um         (greedy)
+# {n}   Exatamente n
+# {n,}  n ou mais
+# {n,m} Entre n e m
+# *?    Zero ou mais       (lazy/non-greedy)
+# +?    Um ou mais         (lazy/non-greedy)
+
+# ═══ Classes de Caracteres ═══
+# \d    Dígito [0-9]
+# \D    Não-dígito [^0-9]
+# \w    Word char [a-zA-Z0-9_]
+# \W    Não-word char
+# \s    Whitespace [ \t\n\r\f\v]
+# \S    Não-whitespace
+# [abc] Um de: a, b ou c
+# [^abc] Qualquer exceto a, b, c
+# [a-z] Range: a até z
+
+# ═══ Grupos e Alternância ═══
+# (...)     Grupo de captura
+# (?:...)   Grupo sem captura
+# (?P<n>...)  Grupo nomeado
+# |         Alternância (OR)
+
+# ═══ Âncoras ═══
+# \b    Word boundary (limite de palavra)
+# \B    Não-boundary
+
+# ═══ Exemplos Práticos ═══
+# IP address: 192.168.1.100
+padrao_ip = r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"
+
+# Email simples
+padrao_email = r"[\w.-]+@[\w.-]+\.\w{2,}"
+
+# AWS ARN
+padrao_arn = r"arn:aws:[a-z0-9-]+:[a-z0-9-]*:\d{12}:[\w/:-]+"
+
+# Timestamp de log [2024-11-15 14:30:45]
+padrao_log_ts = r"\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\]"
+
+# Versão semântica (semver): v1.2.3 ou 1.2.3-beta.1
+padrao_semver = r"v?(\d+)\.(\d+)\.(\d+)(?:-([\w.]+))?"</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.2 Funções Principais do Módulo re</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>re.search, match, findall, sub</code><span class="cmd-tag">funções</span></div>
+            <pre><code>import re
+
+texto = """
+2024-11-15 14:30:45 ERROR [web-server-01] Connection refused to 10.0.1.50:5432
+2024-11-15 14:30:46 INFO  [web-server-01] Retry attempt 1/3
+2024-11-15 14:30:47 ERROR [web-server-01] Connection refused to 10.0.1.50:5432
+2024-11-15 14:30:48 WARN  [api-gateway]  Response time > 2000ms for /api/users
+2024-11-15 14:30:50 INFO  [web-server-01] Connection established to 10.0.1.50:5432
+"""
+
+# ═══ re.search() — Encontra PRIMEIRA ocorrência ═══
+match = re.search(r"ERROR.*?Connection refused to ([\d.]+):(\d+)", texto)
+if match:
+    print(f"Match completo: {match.group(0)}")
+    print(f"IP: {match.group(1)}")     # 10.0.1.50
+    print(f"Porta: {match.group(2)}")  # 5432
+    print(f"Posição: {match.start()}-{match.end()}")
+
+# ═══ re.match() — Apenas no INÍCIO da string ═══
+# Diferença: match() só verifica o início, search() busca em qualquer posição
+linha = "2024-11-15 14:30:45 ERROR [web-server-01] Timeout"
+match = re.match(r"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) (\w+)", linha)
+if match:
+    data, hora, nivel = match.groups()
+    print(f"Data: {data}, Hora: {hora}, Nível: {nivel}")
+
+# ═══ re.findall() — Todas as ocorrências ═══
+# Retorna lista de strings (ou tuplas se tiver grupos)
+ips = re.findall(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b", texto)
+print(f"IPs encontrados: {ips}")  # ['10.0.1.50', '10.0.1.50', '10.0.1.50']
+
+# Com grupos: retorna tuplas
+erros = re.findall(r"(\d{2}:\d{2}:\d{2}) (ERROR|WARN)\s+\[(\w+-?\w*-?\d*)\]", texto)
+for hora, nivel, servidor in erros:
+    print(f"  {hora} | {nivel} | {servidor}")
+
+# ═══ re.finditer() — Iterador de Match objects ═══
+# Mais eficiente que findall para textos grandes
+for match in re.finditer(r"(?P<hora>\d{2}:\d{2}:\d{2}) (?P<nivel>ERROR|WARN)", texto):
+    print(f"  {match.group('hora')} - {match.group('nivel')}")
+
+# ═══ re.sub() — Substituição ═══
+# Mascarar IPs em logs para compartilhamento
+log_seguro = re.sub(
+    r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b",
+    "[IP_REDACTED]",
+    texto
+)
+print(log_seguro)
+
+# Substituição com função
+def mascarar_parcial(match):
+    """Mantém primeiro octeto, mascara o resto."""
+    ip = match.group(0)
+    primeiro_octeto = ip.split('.')[0]
+    return f"{primeiro_octeto}.xxx.xxx.xxx"
+
+log_parcial = re.sub(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b", mascarar_parcial, texto)
+
+# ═══ re.split() — Dividir por padrão ═══
+# Dividir por múltiplos separadores
+linha = "cpu_usage=85%;mem_usage=72%;disk_io=45%"
+metricas = re.split(r"[;=]", linha)
+# ['cpu_usage', '85%', 'mem_usage', '72%', 'disk_io', '45%']
+
+# Converter para dicionário
+pares = re.findall(r"(\w+)=([\d.]+%?)", linha)
+metricas_dict = dict(pares)
+print(metricas_dict)  # {'cpu_usage': '85%', 'mem_usage': '72%', 'disk_io': '45%'}</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.3 Padrões Compilados e Grupos Nomeados</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>re.compile + named groups</code><span class="cmd-tag">avançado</span></div>
+            <pre><code>import re
+
+# ═══ re.compile() — Compilar padrões reutilizáveis ═══
+# Quando o mesmo padrão é usado múltiplas vezes, compile é mais eficiente
+LOG_PATTERN = re.compile(
+    r"(?P<timestamp>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\s+"
+    r"(?P<level>DEBUG|INFO|WARN|ERROR|CRITICAL)\s+"
+    r"\[(?P<source>[\w.-]+)\]\s+"
+    r"(?P<message>.*)",
+    re.MULTILINE
+)
+
+AWS_ARN_PATTERN = re.compile(
+    r"arn:"
+    r"(?P<partition>aws|aws-cn|aws-us-gov):"
+    r"(?P<service>[a-z0-9-]+):"
+    r"(?P<region>[a-z0-9-]*):"
+    r"(?P<account>\d{12}|):"
+    r"(?P<resource>[\w/:.+-]+)"
+)
+
+IP_PATTERN = re.compile(
+    r"\b(?P<ip>(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\."
+    r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\."
+    r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\."
+    r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?))\b"
+)
+
+# ═══ Usando padrões compilados ═══
+log_line = "2024-11-15 14:30:45 ERROR [web-server-01] Connection timeout after 30s"
+match = LOG_PATTERN.match(log_line)
+if match:
+    print(f"Timestamp: {match.group('timestamp')}")
+    print(f"Level: {match.group('level')}")
+    print(f"Source: {match.group('source')}")
+    print(f"Message: {match.group('message')}")
+    
+    # groupdict() retorna dicionário com todos os grupos nomeados
+    log_dict = match.groupdict()
+    print(log_dict)
+    # {'timestamp': '2024-11-15 14:30:45', 'level': 'ERROR', 
+    #  'source': 'web-server-01', 'message': 'Connection timeout after 30s'}
+
+# ═══ Parser de log completo ═══
+def parse_log_file(filepath):
+    """Parse de arquivo de log estruturado."""
+    entries = []
+    with open(filepath) as f:
+        for line in f:
+            match = LOG_PATTERN.match(line.strip())
+            if match:
+                entries.append(match.groupdict())
+    return entries
+
+# Análise de ARN
+arn = "arn:aws:s3:us-east-1:123456789012:bucket/my-bucket/key"
+match = AWS_ARN_PATTERN.match(arn)
+if match:
+    print(f"Serviço: {match.group('service')}")
+    print(f"Região: {match.group('region')}")
+    print(f"Account: {match.group('account')}")
+    print(f"Recurso: {match.group('resource')}")
+
+# ═══ Flags de compilação ═══
+# re.IGNORECASE (re.I) — Case-insensitive
+padrao = re.compile(r"error|warning|critical", re.IGNORECASE)
+
+# re.MULTILINE (re.M) — ^ e $ em cada linha
+padrao_ml = re.compile(r"^ERROR.*$", re.MULTILINE)
+
+# re.DOTALL (re.S) — . também casa com \n
+padrao_ds = re.compile(r"<error>.*?</error>", re.DOTALL)
+
+# re.VERBOSE (re.X) — Permite comentários no padrão
+NGINX_LOG = re.compile(r"""
+    (?P<ip>\S+)\s+              # IP do cliente
+    (?P<ident>\S+)\s+           # Identidade (geralmente -)
+    (?P<user>\S+)\s+            # Usuário (geralmente -)
+    \[(?P<time>[^\]]+)\]\s+     # Timestamp entre []
+    "(?P<request>[^"]+)"\s+     # Request line entre ""
+    (?P<status>\d{3})\s+        # Status HTTP
+    (?P<size>\d+|-)\s*          # Tamanho da resposta
+    "(?P<referer>[^"]*)"\s*     # Referer
+    "(?P<agent>[^"]*)"          # User-Agent
+""", re.VERBOSE)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>4.4 Padrões Práticos para DevOps</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Padrões úteis</code><span class="cmd-tag">prática</span></div>
+            <pre><code>import re
+
+# ═══ Validação de IP ═══
+def is_valid_ip(ip_str):
+    """Valida endereço IPv4."""
+    pattern = re.compile(
+        r"^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}"
+        r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$"
+    )
+    return bool(pattern.match(ip_str))
+
+print(is_valid_ip("192.168.1.1"))    # True
+print(is_valid_ip("256.1.1.1"))      # False
+print(is_valid_ip("10.0.0.999"))     # False
+
+# ═══ Validação de CIDR ═══
+CIDR_PATTERN = re.compile(
+    r"^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}"
+    r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)"
+    r"/(?:[12]?\d|3[0-2])$"
+)
+print(bool(CIDR_PATTERN.match("10.0.0.0/24")))   # True
+print(bool(CIDR_PATTERN.match("10.0.0.0/33")))   # False
+
+# ═══ Extração de métricas de log ═══
+def extrair_metricas_nginx(log_path):
+    """Extrai métricas de access log do Nginx."""
+    pattern = re.compile(
+        r'(?P<ip>\S+).*?"(?P<method>\w+) (?P<path>\S+).*?" '
+        r'(?P<status>\d{3}) (?P<bytes>\d+)'
+    )
+    
+    metricas = {"total": 0, "erros": 0, "status_codes": {}, "paths": {}}
+    
+    with open(log_path) as f:
+        for linha in f:
+            match = pattern.search(linha)
+            if match:
+                metricas["total"] += 1
+                status = match.group("status")
+                path = match.group("path")
+                
+                metricas["status_codes"][status] = \
+                    metricas["status_codes"].get(status, 0) + 1
+                
+                if status.startswith(("4", "5")):
+                    metricas["erros"] += 1
+    
+    if metricas["total"] > 0:
+        metricas["taxa_erro"] = metricas["erros"] / metricas["total"] * 100
+    
+    return metricas
+
+# ═══ Quando NÃO usar regex ═══
+# 1. Para JSON → use json.loads()
+# 2. Para XML/HTML → use lxml ou BeautifulSoup
+# 3. Para CSV → use csv module
+# 4. Para paths → use pathlib
+# 5. Para URLs → use urllib.parse
+# 6. Operações simples de string → use str.split(), str.startswith(), etc.
+
+# Exemplo: str methods vs regex
+texto = "ERROR: Connection timeout"
+
+# ❌ Overkill com regex
+if re.match(r"^ERROR:", texto):
+    pass
+
+# ✅ Simples com str
+if texto.startswith("ERROR:"):
+    pass</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5: collections — Estruturas Especializadas
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <h2>5. collections — Estruturas de Dados Especializadas</h2>
+        <p>O módulo <code>collections</code> fornece estruturas de dados alternativas ao dict, list e tuple padrão. São otimizadas para casos de uso específicos e muito úteis para análise de logs, contagem e gerenciamento de configurações.</p>
+
+        <div class="topic-block">
+          <h3>5.1 Counter — Contando Ocorrências</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Counter</code><span class="cmd-tag">contagem</span></div>
+            <pre><code>from collections import Counter
+
+# ═══ Básico: contar elementos ═══
+status_codes = [200, 200, 200, 404, 500, 200, 301, 404, 200, 500, 503]
+contagem = Counter(status_codes)
+print(contagem)
+# Counter({200: 5, 404: 2, 500: 2, 301: 1, 503: 1})
+
+# Os N mais comuns
+print(contagem.most_common(3))  # [(200, 5), (404, 2), (500, 2)]
+
+# Acessar contagem individual
+print(contagem[200])   # 5
+print(contagem[999])   # 0 (não lança KeyError!)
+
+# ═══ Contar palavras em logs ═══
+log_levels = ["INFO", "ERROR", "INFO", "WARN", "INFO", "ERROR", "DEBUG"]
+nivel_count = Counter(log_levels)
+print(f"Erros: {nivel_count['ERROR']}")  # 2
+print(f"Total entries: {sum(nivel_count.values())}")  # 7
+
+# ═══ Contar a partir de texto ═══
+log_text = "ERROR connection refused ERROR timeout ERROR connection refused WARN slow"
+words = log_text.split()
+word_count = Counter(words)
+print(word_count.most_common(5))
+
+# ═══ Operações com Counter ═══
+turno_1 = Counter({"ERROR": 5, "WARN": 10, "INFO": 100})
+turno_2 = Counter({"ERROR": 3, "WARN": 8, "INFO": 150})
+
+# Soma
+total = turno_1 + turno_2
+print(total)  # Counter({'INFO': 250, 'WARN': 18, 'ERROR': 8})
+
+# Subtração (remove zeros e negativos)
+diferenca = turno_2 - turno_1
+print(diferenca)  # Counter({'INFO': 50})
+
+# ═══ Análise de logs real ═══
+def analisar_access_log(filepath):
+    """Analisa access.log e retorna estatísticas."""
+    ips = Counter()
+    paths = Counter()
+    status = Counter()
+    
+    with open(filepath) as f:
+        for linha in f:
+            partes = linha.split()
+            if len(partes) >= 9:
+                ips[partes[0]] += 1
+                paths[partes[6]] += 1
+                status[partes[8]] += 1
+    
+    return {
+        "top_ips": ips.most_common(10),
+        "top_paths": paths.most_common(10),
+        "status_codes": dict(status.most_common()),
+        "total_requests": sum(ips.values()),
+        "unique_ips": len(ips),
+        "error_rate": (status.get("5", 0) + status.get("4", 0)) / 
+                      max(sum(status.values()), 1) * 100
+    }</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.2 defaultdict — Valores Padrão para Chaves Ausentes</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>defaultdict</code><span class="cmd-tag">dicionário</span></div>
+            <pre><code>from collections import defaultdict
+
+# ═══ Problema com dict normal ═══
+logs_por_servidor = {}
+log_entries = [
+    ("web-01", "ERROR: timeout"),
+    ("api-01", "INFO: request ok"),
+    ("web-01", "WARN: slow query"),
+    ("db-01", "ERROR: connection lost"),
+    ("api-01", "ERROR: 500"),
+]
+
+# Com dict normal: precisa verificar se a chave existe
+for servidor, msg in log_entries:
+    if servidor not in logs_por_servidor:
+        logs_por_servidor[servidor] = []
+    logs_por_servidor[servidor].append(msg)
+
+# ═══ Com defaultdict: automático! ═══
+logs_por_servidor = defaultdict(list)
+for servidor, msg in log_entries:
+    logs_por_servidor[servidor].append(msg)  # Cria lista automaticamente
+
+print(dict(logs_por_servidor))
+# {'web-01': ['ERROR: timeout', 'WARN: slow query'],
+#  'api-01': ['INFO: request ok', 'ERROR: 500'],
+#  'db-01': ['ERROR: connection lost']}
+
+# ═══ defaultdict(int) — Contagem simples ═══
+contagem_erros = defaultdict(int)
+for servidor, msg in log_entries:
+    if "ERROR" in msg:
+        contagem_erros[servidor] += 1
+
+print(dict(contagem_erros))  # {'web-01': 1, 'db-01': 1, 'api-01': 1}
+
+# ═══ defaultdict(set) — Valores únicos ═══
+ips_por_servico = defaultdict(set)
+conexoes = [
+    ("nginx", "10.0.1.50"),
+    ("nginx", "10.0.1.51"),
+    ("nginx", "10.0.1.50"),  # duplicado
+    ("postgres", "10.0.2.10"),
+    ("redis", "10.0.3.5"),
+]
+for servico, ip in conexoes:
+    ips_por_servico[servico].add(ip)
+
+print(dict(ips_por_servico))
+# {'nginx': {'10.0.1.50', '10.0.1.51'}, 'postgres': {'10.0.2.10'}, ...}
+
+# ═══ defaultdict aninhado — Estruturas complexas ═══
+def nested_dict():
+    return defaultdict(nested_dict)
+
+metricas = nested_dict()
+metricas["web-01"]["cpu"]["avg"] = 75.5
+metricas["web-01"]["cpu"]["max"] = 95.0
+metricas["web-01"]["memory"]["used"] = 8192
+metricas["api-01"]["cpu"]["avg"] = 45.2
+
+# ═══ Agrupamento de recursos por região e tipo ═══
+recursos_aws = defaultdict(lambda: defaultdict(list))
+instances = [
+    {"type": "ec2", "region": "us-east-1", "name": "web-01"},
+    {"type": "ec2", "region": "us-east-1", "name": "web-02"},
+    {"type": "rds", "region": "us-east-1", "name": "db-master"},
+    {"type": "ec2", "region": "sa-east-1", "name": "api-01"},
+    {"type": "s3", "region": "us-east-1", "name": "assets-bucket"},
+]
+for inst in instances:
+    recursos_aws[inst["region"]][inst["type"]].append(inst["name"])
+
+# recursos_aws["us-east-1"]["ec2"] → ["web-01", "web-02"]
+# recursos_aws["us-east-1"]["rds"] → ["db-master"]</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.3 namedtuple — Objetos Imutáveis Leves</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>namedtuple</code><span class="cmd-tag">imutável</span></div>
+            <pre><code>from collections import namedtuple
+
+# ═══ Criando namedtuples ═══
+# Mais legível que tuplas e mais leve que classes
+Server = namedtuple("Server", ["name", "ip", "port", "status"])
+Metric = namedtuple("Metric", "name value unit timestamp")
+
+# Criar instâncias
+web_01 = Server("web-01", "10.0.1.50", 443, "running")
+cpu = Metric("cpu_usage", 75.5, "percent", "2024-11-15T14:30:00Z")
+
+# Acessar por nome (mais legível que índice!)
+print(web_01.name)    # web-01
+print(web_01.ip)      # 10.0.1.50
+print(cpu.value)      # 75.5
+
+# Também funciona por índice (compatível com tuplas)
+print(web_01[0])  # web-01
+
+# Imutáveis (seguras para uso como chaves de dict, sets, etc.)
+# web_01.status = "stopped"  # ❌ AttributeError!
+
+# Criar nova instância com valores alterados
+web_01_stopped = web_01._replace(status="stopped")
+print(web_01_stopped)  # Server(name='web-01', ..., status='stopped')
+
+# ═══ Conversões ═══
+# Para dicionário
+print(web_01._asdict())
+# {'name': 'web-01', 'ip': '10.0.1.50', 'port': 443, 'status': 'running'}
+
+# De dicionário
+data = {"name": "api-01", "ip": "10.0.2.10", "port": 8080, "status": "running"}
+api_01 = Server(**data)
+
+# ═══ Valores padrão (Python 3.6.1+) ═══
+Deployment = namedtuple("Deployment", 
+    ["app", "version", "env", "region", "replicas"],
+    defaults=["production", "us-east-1", 3]  # Últimos N campos
+)
+
+deploy = Deployment("api", "2.1.0")
+print(deploy)  # Deployment(app='api', version='2.1.0', env='production', ...)
+
+# ═══ Uso prático: resultado de health check ═══
+HealthResult = namedtuple("HealthResult", [
+    "service", "status", "response_time_ms", "timestamp", "details"
 ])
-def test_somar_parametrizado(a, b, esperado):
-    assert somar(a, b) == esperado
 
-# Executar: pytest -v test_calculadora.py</code></pre>
+def check_service(service_url):
+    """Retorna resultado estruturado do health check."""
+    import time
+    inicio = time.time()
+    # ... fazer request ...
+    elapsed = (time.time() - inicio) * 1000
+    return HealthResult(
+        service=service_url,
+        status="healthy",
+        response_time_ms=round(elapsed, 2),
+        timestamp=datetime.now().isoformat(),
+        details={"version": "1.2.3"}
+    )
+
+# Listar servidores como namedtuples
+servidores = [
+    Server("web-01", "10.0.1.50", 443, "running"),
+    Server("web-02", "10.0.1.51", 443, "running"),
+    Server("api-01", "10.0.2.10", 8080, "stopped"),
+    Server("db-01", "10.0.3.5", 5432, "running"),
+]
+
+# Filtrar servidores parados
+parados = [s for s in servidores if s.status == "stopped"]
+print(f"Servidores parados: {[s.name for s in parados]}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.4 deque — Fila de Dupla Extremidade</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>deque</code><span class="cmd-tag">fila</span></div>
+            <pre><code>from collections import deque
+
+# ═══ deque vs list ═══
+# list: O(1) append/pop à direita, O(n) insert/pop à esquerda
+# deque: O(1) em AMBAS as extremidades!
+
+# ═══ Buffer de logs circular (últimas N entradas) ═══
+log_buffer = deque(maxlen=100)  # Mantém apenas os últimos 100
+
+# Adicionar logs (automaticamente descarta os mais antigos)
+log_buffer.append("2024-11-15 14:30:45 INFO Startup complete")
+log_buffer.append("2024-11-15 14:30:46 INFO Request received")
+log_buffer.append("2024-11-15 14:30:47 ERROR Connection refused")
+
+# Últimos 5 logs
+ultimos_5 = list(log_buffer)[-5:]
+
+# ═══ Fila de tarefas (FIFO) ═══
+task_queue = deque()
+
+# Adicionar tarefas (à direita)
+task_queue.append({"action": "deploy", "app": "api", "env": "staging"})
+task_queue.append({"action": "backup", "db": "production"})
+task_queue.append({"action": "scale", "app": "web", "replicas": 5})
+
+# Processar tarefas (da esquerda - FIFO)
+while task_queue:
+    task = task_queue.popleft()  # O(1)!
+    print(f"Processando: {task['action']}")
+
+# ═══ Sliding window para métricas ═══
+class MetricWindow:
+    """Janela deslizante para cálculo de métricas."""
+    
+    def __init__(self, window_size=60):
+        self.values = deque(maxlen=window_size)
+    
+    def add(self, value):
+        self.values.append(value)
+    
+    @property
+    def average(self):
+        if not self.values:
+            return 0
+        return sum(self.values) / len(self.values)
+    
+    @property
+    def max_value(self):
+        return max(self.values) if self.values else 0
+    
+    @property
+    def min_value(self):
+        return min(self.values) if self.values else 0
+
+# Uso: monitorar CPU nos últimos 60 segundos
+cpu_window = MetricWindow(60)
+for valor in [45, 52, 67, 78, 85, 72, 63, 55]:
+    cpu_window.add(valor)
+print(f"CPU média: {cpu_window.average:.1f}%")
+print(f"CPU máx: {cpu_window.max_value}%")
+
+# ═══ Rotação ═══
+d = deque([1, 2, 3, 4, 5])
+d.rotate(2)   # Rotação à direita
+print(d)  # deque([4, 5, 1, 2, 3])
+d.rotate(-1)  # Rotação à esquerda
+print(d)  # deque([5, 1, 2, 3, 4])</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>5.5 OrderedDict e ChainMap</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>OrderedDict + ChainMap</code><span class="cmd-tag">avançado</span></div>
+            <pre><code>from collections import OrderedDict, ChainMap
+
+# ═══ OrderedDict — Quando ainda é útil? ═══
+# Desde Python 3.7+, dict padrão mantém ordem de inserção
+# OrderedDict ainda é útil para:
+# 1. Comparação sensível à ordem
+# 2. move_to_end()
+# 3. popitem(last=False) — remover do início
+
+# Cache LRU simples com OrderedDict
+class LRUCache:
+    """Least Recently Used cache."""
+    
+    def __init__(self, capacity=100):
+        self.cache = OrderedDict()
+        self.capacity = capacity
+    
+    def get(self, key):
+        if key in self.cache:
+            self.cache.move_to_end(key)  # Move para o final (mais recente)
+            return self.cache[key]
+        return None
+    
+    def put(self, key, value):
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)  # Remove o mais antigo
+
+# Cache de respostas DNS
+dns_cache = LRUCache(capacity=1000)
+dns_cache.put("api.exemplo.com", "10.0.1.50")
+dns_cache.put("db.exemplo.com", "10.0.2.10")
+print(dns_cache.get("api.exemplo.com"))  # 10.0.1.50
+
+# ═══ ChainMap — Busca em múltiplos dicionários ═══
+# Perfeito para configuração com precedência (override)
+
+# Configuração com 3 níveis de precedência:
+cli_args = {"env": "production", "debug": False}
+env_vars = {"env": "staging", "region": "sa-east-1", "log_level": "INFO"}
+defaults = {"env": "development", "region": "us-east-1", 
+            "log_level": "DEBUG", "timeout": 30, "debug": True}
+
+# ChainMap busca na ordem: cli_args → env_vars → defaults
+config = ChainMap(cli_args, env_vars, defaults)
+
+print(config["env"])        # "production" (do cli_args)
+print(config["region"])     # "sa-east-1" (do env_vars)
+print(config["timeout"])    # 30 (do defaults)
+print(config["log_level"])  # "INFO" (do env_vars)
+
+# Listar todas as chaves (sem duplicatas)
+print(list(config.keys()))
+
+# Ver de onde vem cada valor
+for key in config:
+    for i, mapping in enumerate(config.maps):
+        if key in mapping:
+            source = ["CLI", "ENV", "DEFAULT"][i]
+            print(f"  {key} = {config[key]} (from {source})")
+            break
+
+# ═══ Padrão DevOps: Config com múltiplas fontes ═══
+import json
+import os
+
+def load_config(config_files, env_prefix="APP_"):
+    """Carrega configuração com precedência: ENV > files (último > primeiro) > defaults."""
+    defaults = {"port": 8080, "host": "0.0.0.0", "workers": 4}
+    
+    # Carregar arquivos de config (na ordem)
+    file_configs = []
+    for filepath in config_files:
+        if os.path.exists(filepath):
+            with open(filepath) as f:
+                file_configs.append(json.load(f))
+    
+    # Variáveis de ambiente com prefixo
+    env_config = {}
+    for key, value in os.environ.items():
+        if key.startswith(env_prefix):
+            config_key = key[len(env_prefix):].lower()
+            env_config[config_key] = value
+    
+    # Ordem: env > último arquivo > primeiro arquivo > defaults
+    return ChainMap(env_config, *reversed(file_configs), defaults)
+
+config = load_config([
+    "/etc/myapp/config.json",       # Base config
+    "/etc/myapp/config.local.json"  # Override local
+])</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6: itertools e functools — Programação Funcional
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <h2>6. itertools e functools — Programação Funcional</h2>
+        <p>Estes módulos oferecem ferramentas poderosas para processamento eficiente de dados. <code>itertools</code> gera iteradores otimizados (lazy evaluation) e <code>functools</code> fornece utilitários para funções de ordem superior, caching e decoradores.</p>
+
+        <div class="topic-block">
+          <h3>6.1 itertools — Iteradores Eficientes</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>itertools essenciais</code><span class="cmd-tag">iteração</span></div>
+            <pre><code>import itertools
+
+# ═══ chain() — Concatenar iteráveis ═══
+# Útil para processar múltiplas fontes como uma só
+logs_servidor1 = ["ERROR: timeout", "INFO: ok", "WARN: slow"]
+logs_servidor2 = ["ERROR: disk full", "INFO: backup done"]
+logs_servidor3 = ["CRITICAL: OOM", "ERROR: crash"]
+
+# Processar todos os logs juntos (sem criar nova lista!)
+for log in itertools.chain(logs_servidor1, logs_servidor2, logs_servidor3):
+    if "ERROR" in log or "CRITICAL" in log:
+        print(f"  🚨 {log}")
+
+# chain.from_iterable — para lista de listas
+all_servers_logs = [logs_servidor1, logs_servidor2, logs_servidor3]
+for log in itertools.chain.from_iterable(all_servers_logs):
+    print(log)
+
+# ═══ islice() — Fatiar iteradores (sem carregar tudo na memória) ═══
+# Útil para arquivos enormes
+def read_large_log(filepath):
+    """Gerador que lê arquivo linha por linha."""
+    with open(filepath) as f:
+        for line in f:
+            yield line.strip()
+
+# Pegar apenas as primeiras 100 linhas
+primeiras_100 = itertools.islice(read_large_log("/var/log/syslog"), 100)
+
+# Pegar linhas 50 a 150
+linhas_50_150 = itertools.islice(read_large_log("/var/log/syslog"), 50, 150)
+
+# Pegar a cada 10 linhas (amostragem)
+amostras = itertools.islice(read_large_log("/var/log/syslog"), 0, None, 10)
+
+# ═══ groupby() — Agrupar elementos consecutivos ═══
+# IMPORTANTE: dados devem estar ORDENADOS pela chave de agrupamento!
+log_entries = [
+    {"level": "ERROR", "msg": "timeout", "server": "web-01"},
+    {"level": "ERROR", "msg": "refused", "server": "web-01"},
+    {"level": "INFO", "msg": "ok", "server": "api-01"},
+    {"level": "ERROR", "msg": "crash", "server": "db-01"},
+    {"level": "INFO", "msg": "ready", "server": "api-01"},
+    {"level": "WARN", "msg": "slow", "server": "web-02"},
+]
+
+# Ordenar por nível ANTES de agrupar
+log_entries.sort(key=lambda x: x["level"])
+
+# Agrupar por nível
+for level, entries in itertools.groupby(log_entries, key=lambda x: x["level"]):
+    entries_list = list(entries)
+    print(f"  {level}: {len(entries_list)} ocorrências")
+
+# ═══ product() — Produto cartesiano ═══
+# Testar todas as combinações possíveis
+regioes = ["us-east-1", "sa-east-1", "eu-west-1"]
+ambientes = ["dev", "staging", "prod"]
+servicos = ["api", "web", "worker"]
+
+# Todas as combinações possíveis
+for regiao, env, servico in itertools.product(regioes, ambientes, servicos):
+    resource_name = f"{servico}-{env}-{regiao}"
+    # Gera: api-dev-us-east-1, api-dev-sa-east-1, ...
+
+# Total: 3 × 3 × 3 = 27 combinações
+
+# ═══ combinations() e permutations() ═══
+servidores = ["web-01", "web-02", "web-03", "web-04"]
+
+# Combinações de 2 servidores (para testar conectividade)
+for par in itertools.combinations(servidores, 2):
+    print(f"  Testando conexão: {par[0]} ↔ {par[1]}")
+# 6 pares: C(4,2) = 6
+
+# ═══ count() e cycle() — Iteradores infinitos ═══
+# count: contador infinito
+for i, server in zip(itertools.count(1), servidores):
+    print(f"  #{i}: {server}")
+
+# cycle: ciclar infinitamente (round-robin load balancer)
+server_pool = itertools.cycle(["web-01", "web-02", "web-03"])
+for request_num in range(10):
+    server = next(server_pool)
+    print(f"  Request {request_num} → {server}")
+# Distribui: web-01, web-02, web-03, web-01, web-02, ...
+
+# ═══ repeat() — Repetir valor N vezes ═══
+# Criar 5 instâncias com mesma config
+configs = list(itertools.repeat({"type": "t3.micro", "region": "us-east-1"}, 5))</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>6.2 functools — Utilitários para Funções</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>functools</code><span class="cmd-tag">funções</span></div>
+            <pre><code>import functools
+import time
+
+# ═══ lru_cache — Cache de resultados (memoization) ═══
+@functools.lru_cache(maxsize=128)
+def get_instance_info(instance_id):
+    """Consulta info da instância (cacheado para evitar chamadas repetidas)."""
+    print(f"  [API] Consultando {instance_id}...")  # Só imprime na 1ª vez
+    # Simula chamada à API AWS
+    time.sleep(0.5)
+    return {"id": instance_id, "type": "t3.micro", "status": "running"}
+
+# Primeira chamada: consulta a API
+info1 = get_instance_info("i-1234567890")  # Lento (0.5s)
+# Segunda chamada: retorna do cache instantaneamente!
+info2 = get_instance_info("i-1234567890")  # Instantâneo!
+
+# Estatísticas do cache
+print(get_instance_info.cache_info())
+# CacheInfo(hits=1, misses=1, maxsize=128, currsize=1)
+
+# Limpar cache
+get_instance_info.cache_clear()
+
+# ═══ Cache com TTL (Time-To-Live) ═══
+def timed_cache(seconds=300):
+    """Decorator de cache com expiração."""
+    def decorator(func):
+        cache = {}
+        
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            key = (args, tuple(sorted(kwargs.items())))
+            now = time.time()
+            
+            if key in cache:
+                result, timestamp = cache[key]
+                if now - timestamp < seconds:
+                    return result
+            
+            result = func(*args, **kwargs)
+            cache[key] = (result, now)
+            return result
+        
+        wrapper.cache_clear = cache.clear
+        return wrapper
+    return decorator
+
+@timed_cache(seconds=60)
+def get_ec2_status(instance_id):
+    """Status cacheado por 60 segundos."""
+    # Chamada real à API...
+    return "running"
+
+# ═══ partial() — Fixar argumentos de função ═══
+def deploy_service(service, env, region, version):
+    """Deploy de serviço."""
+    print(f"Deploying {service} v{version} to {env} in {region}")
+
+# Criar funções especializadas
+deploy_to_prod = functools.partial(deploy_service, env="production", region="sa-east-1")
+deploy_to_staging = functools.partial(deploy_service, env="staging", region="sa-east-1")
+
+# Uso simplificado
+deploy_to_prod("api", version="2.1.0")
+deploy_to_staging("web", version="3.0.0-beta")
+
+# Partial com logging
+import logging
+
+def log_with_context(logger, level, msg, **context):
+    logger.log(level, f"{msg} | context={context}")
+
+# Logger especializado por serviço
+api_log = functools.partial(log_with_context, 
+    logging.getLogger("api"), logging.INFO, service="api-gateway")
+
+# ═══ reduce() — Reduzir sequência a um valor ═══
+# Combinar múltiplos dicionários de configuração
+configs = [
+    {"port": 8080, "host": "0.0.0.0"},
+    {"port": 9090, "debug": True},
+    {"log_level": "INFO", "workers": 4}
+]
+
+merged = functools.reduce(lambda a, b: {**a, **b}, configs)
+print(merged)
+# {'port': 9090, 'host': '0.0.0.0', 'debug': True, 'log_level': 'INFO', 'workers': 4}
+
+# ═══ wraps() — Preservar metadata em decoradores ═══
+def retry(max_attempts=3, delay=1):
+    """Decorator de retry com backoff."""
+    def decorator(func):
+        @functools.wraps(func)  # Preserva __name__, __doc__, etc.
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_attempts):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt < max_attempts - 1:
+                        print(f"  Tentativa {attempt + 1} falhou: {e}")
+                        time.sleep(delay * (2 ** attempt))
+                    else:
+                        raise
+        return wrapper
+    return decorator
+
+@retry(max_attempts=3, delay=2)
+def call_external_api(url):
+    """Chama API externa com retry automático."""
+    # ...
+    pass
+
+# Metadata preservada graças a @functools.wraps
+print(call_external_api.__name__)  # "call_external_api" (não "wrapper")
+print(call_external_api.__doc__)   # "Chama API externa com retry automático."</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7: shutil e tempfile — Operações de Arquivo
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <h2>7. shutil e tempfile — Operações de Arquivo Avançadas</h2>
+        <p>O módulo <code>shutil</code> fornece operações de alto nível para cópia, movimentação e remoção de arquivos/diretórios. O módulo <code>tempfile</code> cria arquivos e diretórios temporários de forma segura — essencial para scripts de deploy e processamento intermediário.</p>
+
+        <div class="topic-block">
+          <h3>7.1 shutil — Operações de Cópia e Movimentação</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>shutil</code><span class="cmd-tag">arquivos</span></div>
+            <pre><code>import shutil
+import os
+
+# ═══ Copiar arquivos ═══
+# copy() — copia conteúdo + permissões
+shutil.copy("config.yaml", "/opt/deploy/config.yaml")
+
+# copy2() — copia conteúdo + permissões + metadados (timestamps)
+shutil.copy2("config.yaml", "/opt/deploy/config.yaml")
+
+# copyfile() — copia apenas conteúdo (mais rápido)
+shutil.copyfile("app.tar.gz", "/tmp/app.tar.gz")
+
+# ═══ Copiar diretórios recursivamente ═══
+# copytree() — copia diretório inteiro
+shutil.copytree(
+    "/opt/app/v1",
+    "/opt/app/v2",
+    dirs_exist_ok=True  # Python 3.8+ (não falha se destino existe)
+)
+
+# Com filtro: ignorar certos arquivos/diretórios
+shutil.copytree(
+    "/opt/app/source",
+    "/opt/deploy/release",
+    ignore=shutil.ignore_patterns(
+        "*.pyc", "__pycache__", ".git", "*.log", "node_modules"
+    )
+)
+
+# Filtro personalizado
+def ignore_large_files(directory, files):
+    """Ignora arquivos maiores que 10MB."""
+    ignored = []
+    for f in files:
+        filepath = os.path.join(directory, f)
+        if os.path.isfile(filepath) and os.path.getsize(filepath) > 10 * 1024 * 1024:
+            ignored.append(f)
+    return set(ignored)
+
+shutil.copytree("/opt/source", "/opt/dest", ignore=ignore_large_files)
+
+# ═══ Mover e Renomear ═══
+shutil.move("old_config.yaml", "configs/app.yaml")
+shutil.move("/tmp/release.tar.gz", "/opt/releases/v2.1.0.tar.gz")
+
+# ═══ Remover diretórios (CUIDADO!) ═══
+# rmtree() — remove recursivamente (equivalente a rm -rf)
+shutil.rmtree("/opt/deploy/old_release", ignore_errors=True)
+
+# Com handler de erro
+def handle_rm_error(func, path, exc_info):
+    """Handler para erros de remoção (ex: permissão negada)."""
+    import stat
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+shutil.rmtree("/opt/deploy/locked_dir", onerror=handle_rm_error)
+
+# ═══ Informações de disco ═══
+usage = shutil.disk_usage("/")
+print(f"Total: {usage.total / (1024**3):.1f} GB")
+print(f"Usado: {usage.used / (1024**3):.1f} GB")
+print(f"Livre: {usage.free / (1024**3):.1f} GB")
+print(f"Uso: {usage.used / usage.total * 100:.1f}%")
+
+# Verificar espaço antes de deploy
+MINIMUM_FREE_GB = 5
+if usage.free < MINIMUM_FREE_GB * 1024**3:
+    print(f"⚠️  Espaço insuficiente! Livre: {usage.free / 1024**3:.1f} GB")
+
+# ═══ Encontrar executáveis no PATH ═══
+terraform_path = shutil.which("terraform")
+docker_path = shutil.which("docker")
+kubectl_path = shutil.which("kubectl")
+
+if not terraform_path:
+    print("❌ Terraform não encontrado no PATH!")
+else:
+    print(f"✅ Terraform: {terraform_path}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.2 Arquivos — Compactação e Descompactação</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>make_archive / unpack_archive</code><span class="cmd-tag">arquivo</span></div>
+            <pre><code>import shutil
+from pathlib import Path
+from datetime import datetime
+
+# ═══ Criar arquivos compactados ═══
+# make_archive(nome_base, formato, diretório_raiz)
+# Formatos: 'zip', 'tar', 'gztar' (tar.gz), 'bztar' (tar.bz2), 'xztar' (tar.xz)
+
+# Backup com timestamp
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+# Criar tar.gz do diretório de deploy
+arquivo = shutil.make_archive(
+    f"/opt/backups/app_{timestamp}",  # Nome base (sem extensão)
+    "gztar",                            # Formato
+    "/opt/app",                         # Diretório raiz
+    "current"                           # Subdiretório a compactar
+)
+print(f"Backup criado: {arquivo}")
+# /opt/backups/app_20241115_143045.tar.gz
+
+# Criar ZIP
+shutil.make_archive(
+    f"/tmp/release_{timestamp}",
+    "zip",
+    "/opt/app/dist"
+)
+
+# ═══ Extrair arquivos ═══
+# unpack_archive detecta formato automaticamente
+shutil.unpack_archive(
+    "/opt/releases/v2.1.0.tar.gz",
+    "/opt/app/v2.1.0"
+)
+
+# Com formato explícito
+shutil.unpack_archive(
+    "/opt/releases/package.zip",
+    "/opt/app/extracted",
+    "zip"
+)
+
+# ═══ Listar formatos suportados ═══
+print("Formatos para compactação:")
+for fmt, desc in shutil.get_archive_formats():
+    print(f"  {fmt}: {desc}")
+
+print("\nFormatos para extração:")
+for fmt, exts, desc in shutil.get_unpack_formats():
+    print(f"  {fmt} ({exts}): {desc}")
+
+# ═══ Script de backup completo ═══
+def backup_application(app_dir, backup_dir, max_backups=10):
+    """Cria backup com rotação automática."""
+    Path(backup_dir).mkdir(parents=True, exist_ok=True)
+    
+    # Criar backup
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_name = f"backup_{timestamp}"
+    
+    arquivo = shutil.make_archive(
+        str(Path(backup_dir) / backup_name),
+        "gztar",
+        app_dir
+    )
+    
+    tamanho = Path(arquivo).stat().st_size / (1024 * 1024)
+    print(f"✅ Backup criado: {arquivo} ({tamanho:.1f} MB)")
+    
+    # Rotação: manter apenas os últimos N backups
+    backups = sorted(Path(backup_dir).glob("backup_*.tar.gz"))
+    while len(backups) > max_backups:
+        oldest = backups.pop(0)
+        oldest.unlink()
+        print(f"  🗑️  Removido backup antigo: {oldest.name}")
+    
+    return arquivo
+
+# backup_application("/opt/app", "/opt/backups", max_backups=7)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>7.3 tempfile — Arquivos e Diretórios Temporários</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>tempfile</code><span class="cmd-tag">temporário</span></div>
+            <pre><code>import tempfile
+import os
+from pathlib import Path
+
+# ═══ NamedTemporaryFile — Arquivo temporário com nome ═══
+# Apagado automaticamente ao fechar (no Linux)
+with tempfile.NamedTemporaryFile(
+    mode="w",
+    suffix=".yaml",
+    prefix="deploy_config_",
+    delete=True  # Apagar ao fechar (default)
+) as tmp:
+    tmp.write("apiVersion: v1\nkind: ConfigMap\n")
+    tmp.flush()
+    
+    # Usar o arquivo temporário
+    print(f"Arquivo temp: {tmp.name}")
+    # /tmp/deploy_config_abc123.yaml
+    
+    # Passar para outro processo
+    os.system(f"kubectl apply -f {tmp.name}")
+# Arquivo apagado automaticamente aqui
+
+# ═══ Manter arquivo temporário (delete=False) ═══
+tmp = tempfile.NamedTemporaryFile(
+    mode="w", suffix=".tf", prefix="terraform_",
+    delete=False
+)
+try:
+    tmp.write('resource "aws_s3_bucket" "temp" { bucket = "test" }')
+    tmp.close()  # Fechar para permitir leitura por outros processos
+    
+    # Usar o arquivo
+    print(f"Terraform file: {tmp.name}")
+    # subprocess.run(["terraform", "plan", "-no-color"], ...)
+finally:
+    # Limpar manualmente
+    os.unlink(tmp.name)
+
+# ═══ TemporaryDirectory — Diretório temporário ═══
+# Perfeito para builds, testes e processamento intermediário
+with tempfile.TemporaryDirectory(prefix="build_") as tmpdir:
+    print(f"Build dir: {tmpdir}")
+    # /tmp/build_abc123/
+    
+    # Criar estrutura de build
+    src_dir = Path(tmpdir) / "src"
+    dist_dir = Path(tmpdir) / "dist"
+    src_dir.mkdir()
+    dist_dir.mkdir()
+    
+    # Copiar fontes, compilar, empacotar...
+    shutil.copytree("/opt/app/src", str(src_dir), dirs_exist_ok=True)
+    
+    # Criar artefato
+    shutil.make_archive(
+        str(dist_dir / "release"),
+        "gztar",
+        str(src_dir)
+    )
+    
+    # Mover artefato para destino final
+    shutil.move(
+        str(dist_dir / "release.tar.gz"),
+        "/opt/releases/v2.1.0.tar.gz"
+    )
+# Diretório temporário apagado automaticamente aqui
+
+# ═══ Padrão de deploy seguro ═══
+def safe_deploy(source_dir, target_dir, version):
+    """Deploy atômico usando diretório temporário."""
+    target = Path(target_dir)
+    
+    with tempfile.TemporaryDirectory(
+        dir=target.parent,  # Mesmo filesystem para mv atômico
+        prefix=f".deploy_{version}_"
+    ) as tmpdir:
+        # 1. Preparar no temporário
+        tmp_path = Path(tmpdir) / "app"
+        shutil.copytree(source_dir, str(tmp_path))
+        
+        # 2. Validar (testes, health check, etc.)
+        # subprocess.run(["python", "-m", "pytest", str(tmp_path / "tests")])
+        
+        # 3. Swap atômico
+        backup_path = target.with_suffix(".backup")
+        
+        if target.exists():
+            target.rename(backup_path)  # Backup do atual
+        
+        tmp_path.rename(target)  # Ativar novo deploy
+        
+        if backup_path.exists():
+            shutil.rmtree(str(backup_path))  # Limpar backup
+    
+    print(f"✅ Deploy v{version} concluído!")
+
+# ═══ tempfile.mkstemp() e mkdtemp() — Baixo nível ═══
+# Retorna file descriptor (fd) + caminho
+fd, path = tempfile.mkstemp(suffix=".log", prefix="process_")
+try:
+    os.write(fd, b"Log content here\n")
+finally:
+    os.close(fd)
+    os.unlink(path)
+
+# Diretório temporário (sem context manager)
+tmpdir = tempfile.mkdtemp(prefix="workspace_")
+try:
+    # ... trabalhar ...
+    pass
+finally:
+    shutil.rmtree(tmpdir)
+
+# ═══ Onde ficam os temporários? ═══
+print(tempfile.gettempdir())  # /tmp (Linux/Mac) ou C:\Users\X\AppData\Local\Temp</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8: hashlib e secrets — Segurança
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <h2>8. hashlib e secrets — Segurança e Integridade</h2>
+        <p>Verificação de integridade de arquivos, geração de tokens seguros e identificadores únicos são operações fundamentais em pipelines de CI/CD, gerenciamento de artefatos e segurança de infraestrutura.</p>
+
+        <div class="topic-block">
+          <h3>8.1 hashlib — Hashes e Checksums</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>hashlib</code><span class="cmd-tag">integridade</span></div>
+            <pre><code>import hashlib
+
+# ═══ Hashes disponíveis ═══
+print(hashlib.algorithms_available)
+# {'sha256', 'sha512', 'md5', 'sha1', 'sha3_256', 'blake2b', ...}
+
+# ═══ Hash de strings ═══
+texto = "deploy-v2.1.0-production"
+# IMPORTANTE: hashlib trabalha com bytes, não strings!
+
+# SHA-256 (mais usado atualmente)
+hash_sha256 = hashlib.sha256(texto.encode("utf-8")).hexdigest()
+print(f"SHA-256: {hash_sha256}")
+# ex: a1b2c3d4e5f6...
+
+# MD5 (apenas para checksums, NÃO para segurança!)
+hash_md5 = hashlib.md5(texto.encode("utf-8")).hexdigest()
+print(f"MD5: {hash_md5}")
+
+# SHA-512
+hash_sha512 = hashlib.sha512(texto.encode("utf-8")).hexdigest()
+
+# ═══ Hash de arquivos (checksum) ═══
+def file_hash(filepath, algorithm="sha256", chunk_size=8192):
+    """Calcula hash de arquivo de forma eficiente (qualquer tamanho)."""
+    h = hashlib.new(algorithm)
+    with open(filepath, "rb") as f:
+        while chunk := f.read(chunk_size):
+            h.update(chunk)
+    return h.hexdigest()
+
+# Verificar integridade de artefatos de deploy
+artifact = "/opt/releases/app-v2.1.0.tar.gz"
+checksum = file_hash(artifact)
+print(f"SHA-256: {checksum}")
+
+# Comparar com checksum esperado
+expected = "a1b2c3d4e5f6..."
+if checksum == expected:
+    print("✅ Integridade verificada!")
+else:
+    print("❌ ALERTA: Arquivo corrompido ou adulterado!")
+
+# ═══ Verificar múltiplos arquivos ═══
+def verify_checksums(manifest_file):
+    """Verifica checksums de um arquivo de manifesto.
+    
+    Formato do manifesto (SHA256SUMS):
+    a1b2c3d4... arquivo1.tar.gz
+    e5f6g7h8... arquivo2.zip
+    """
+    results = {"ok": [], "failed": [], "missing": []}
+    
+    with open(manifest_file) as f:
+        for line in f:
+            expected_hash, filename = line.strip().split(None, 1)
+            
+            if not os.path.exists(filename):
+                results["missing"].append(filename)
+                continue
+            
+            actual_hash = file_hash(filename)
+            if actual_hash == expected_hash:
+                results["ok"].append(filename)
+            else:
+                results["failed"].append(filename)
+    
+    return results
+
+# ═══ Gerar manifesto de checksums ═══
+def generate_manifest(directory, output_file="SHA256SUMS"):
+    """Gera arquivo de manifesto com checksums."""
+    from pathlib import Path
+    
+    manifesto = []
+    for arquivo in sorted(Path(directory).rglob("*")):
+        if arquivo.is_file() and arquivo.name != output_file:
+            checksum = file_hash(str(arquivo))
+            relpath = arquivo.relative_to(directory)
+            manifesto.append(f"{checksum}  {relpath}")
+    
+    output_path = Path(directory) / output_file
+    output_path.write_text("\n".join(manifesto) + "\n")
+    print(f"✅ Manifesto gerado: {output_path} ({len(manifesto)} arquivos)")
+
+# ═══ Hash para deduplicação ═══
+def find_duplicates(directory):
+    """Encontra arquivos duplicados por conteúdo."""
+    hashes = {}
+    duplicates = []
+    
+    for arquivo in Path(directory).rglob("*"):
+        if arquivo.is_file():
+            h = file_hash(str(arquivo))
+            if h in hashes:
+                duplicates.append((str(arquivo), hashes[h]))
+            else:
+                hashes[h] = str(arquivo)
+    
+    return duplicates</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.2 secrets — Geração Segura de Tokens</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>secrets</code><span class="cmd-tag">segurança</span></div>
+            <pre><code>import secrets
+import string
+
+# ═══ IMPORTANTE: secrets vs random ═══
+# random — para simulações e jogos (previsível!)
+# secrets — para criptografia e segurança (imprevisível!)
+
+# ═══ Gerar tokens seguros ═══
+# Token hexadecimal (32 bytes = 64 caracteres hex)
+api_key = secrets.token_hex(32)
+print(f"API Key: {api_key}")
+# ex: 7f3a9c2b1d4e5f6a8b9c0d1e2f3a4b5c...
+
+# Token URL-safe (base64)
+session_token = secrets.token_urlsafe(32)
+print(f"Session: {session_token}")
+# ex: dGhpcyBpcyBhIHNlY3VyZSB0b2tlbg...
+
+# Token em bytes
+random_bytes = secrets.token_bytes(16)
+
+# ═══ Gerar senhas seguras ═══
+def generate_password(length=20, 
+                      use_upper=True, 
+                      use_lower=True,
+                      use_digits=True, 
+                      use_special=True):
+    """Gera senha criptograficamente segura."""
+    chars = ""
+    required = []
+    
+    if use_upper:
+        chars += string.ascii_uppercase
+        required.append(secrets.choice(string.ascii_uppercase))
+    if use_lower:
+        chars += string.ascii_lowercase
+        required.append(secrets.choice(string.ascii_lowercase))
+    if use_digits:
+        chars += string.digits
+        required.append(secrets.choice(string.digits))
+    if use_special:
+        special = "!@#$%^&*()-_=+[]{}|;:,.<>?"
+        chars += special
+        required.append(secrets.choice(special))
+    
+    # Gerar resto da senha
+    remaining = length - len(required)
+    password = required + [secrets.choice(chars) for _ in range(remaining)]
+    
+    # Embaralhar (secrets.SystemRandom para shuffle seguro)
+    rng = secrets.SystemRandom()
+    rng.shuffle(password)
+    
+    return "".join(password)
+
+# Gerar senhas para diferentes usos
+db_password = generate_password(24)
+api_secret = generate_password(32, use_special=False)
+print(f"DB Password: {db_password}")
+print(f"API Secret: {api_secret}")
+
+# ═══ Comparação segura (timing-safe) ═══
+# NUNCA use == para comparar tokens! (vulnerável a timing attack)
+user_token = "abc123..."
+stored_token = "abc123..."
+
+# ❌ INSEGURO (timing attack):
+# if user_token == stored_token:
+
+# ✅ SEGURO (tempo constante):
+if secrets.compare_digest(user_token, stored_token):
+    print("Token válido!")
+
+# ═══ Gerar IDs para deploys e recursos ═══
+deploy_id = f"deploy-{secrets.token_hex(8)}"
+print(f"Deploy ID: {deploy_id}")  # deploy-a1b2c3d4e5f6g7h8
+
+# Prefixo temporal + random
+from datetime import datetime
+resource_id = f"{datetime.now().strftime('%Y%m%d')}-{secrets.token_hex(6)}"
+print(f"Resource: {resource_id}")  # 20241115-a1b2c3d4e5f6</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>8.3 uuid — Identificadores Únicos Universais</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>uuid</code><span class="cmd-tag">identificação</span></div>
+            <pre><code>import uuid
+
+# ═══ UUID v4 — Aleatório (mais usado) ═══
+# 128 bits de aleatoriedade, praticamente impossível colidir
+id_recurso = uuid.uuid4()
+print(f"UUID: {id_recurso}")
+# ex: f47ac10b-58cc-4372-a567-0e02b2c3d479
+print(f"Hex: {id_recurso.hex}")
+# ex: f47ac10b58cc4372a5670e02b2c3d479
+
+# ═══ UUID v1 — Baseado em tempo + MAC address ═══
+# Útil quando precisa de ordenação temporal
+id_temporal = uuid.uuid1()
+print(f"UUID v1: {id_temporal}")
+
+# ═══ UUID v5 — Baseado em namespace + nome (determinístico) ═══
+# Mesmo input = mesmo UUID (idempotente)
+namespace = uuid.NAMESPACE_DNS
+id_servico = uuid.uuid5(namespace, "api.cloudtrilhas.com")
+print(f"UUID v5: {id_servico}")
+# Sempre gera o mesmo UUID para o mesmo input!
+
+# ═══ Uso prático em DevOps ═══
+# IDs de deployment
+deployment = {
+    "id": str(uuid.uuid4()),
+    "app": "api-gateway",
+    "version": "2.1.0",
+    "environment": "production",
+    "timestamp": datetime.now().isoformat()
+}
+
+# Correlation ID para rastreamento distribuído
+def create_correlation_id():
+    """Gera correlation ID para rastrear requests entre microsserviços."""
+    return f"corr-{uuid.uuid4().hex[:16]}"
+
+correlation_id = create_correlation_id()
+print(f"X-Correlation-ID: {correlation_id}")
+# ex: corr-f47ac10b58cc4372
+
+# IDs curtos (para uso em nomes de recursos AWS)
+def short_id(length=8):
+    """Gera ID curto baseado em UUID."""
+    return uuid.uuid4().hex[:length]
+
+bucket_suffix = short_id()
+print(f"Bucket: my-app-{bucket_suffix}")  # my-app-f47ac10b
+
+# ═══ Validar UUID ═══
+def is_valid_uuid(value, version=4):
+    """Verifica se string é UUID válido."""
+    try:
+        parsed = uuid.UUID(str(value), version=version)
+        return str(parsed) == str(value).lower()
+    except ValueError:
+        return False
+
+print(is_valid_uuid("f47ac10b-58cc-4372-a567-0e02b2c3d479"))  # True
+print(is_valid_uuid("not-a-uuid"))  # False</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9: concurrent.futures — Paralelismo
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <h2>9. concurrent.futures — Paralelismo e Concorrência</h2>
+        <p>O módulo <code>concurrent.futures</code> simplifica a execução paralela de tarefas. Para DevOps, é essencial para acelerar operações como health checks em múltiplos servidores, processamento de logs em paralelo e chamadas simultâneas a APIs.</p>
+
+        <div class="info-box">
+          <h4>💡 Threads vs Processes — Quando usar cada um?</h4>
+          <p><strong>ThreadPoolExecutor</strong> — Para tarefas I/O-bound (rede, disco, APIs). Threads compartilham memória.</p>
+          <p><strong>ProcessPoolExecutor</strong> — Para tarefas CPU-bound (cálculos pesados, compressão). Processos separados contornam o GIL.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.1 ThreadPoolExecutor — Paralelismo para I/O</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>ThreadPoolExecutor</code><span class="cmd-tag">threads</span></div>
+            <pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+import urllib.request
+
+# ═══ Exemplo básico com submit() ═══
+def check_server_health(server):
+    """Verifica health de um servidor."""
+    url = f"http://{server}/health"
+    try:
+        inicio = time.time()
+        # Simula request HTTP
+        time.sleep(0.5)  # Simulação
+        elapsed = (time.time() - inicio) * 1000
+        return {"server": server, "status": "healthy", "ms": round(elapsed)}
+    except Exception as e:
+        return {"server": server, "status": "unhealthy", "error": str(e)}
+
+servers = [
+    "10.0.1.50:8080",
+    "10.0.1.51:8080",
+    "10.0.1.52:8080",
+    "10.0.2.10:9090",
+    "10.0.2.11:9090",
+    "10.0.3.5:5432",
+    "10.0.3.6:6379",
+    "10.0.4.10:443",
+]
+
+# ═══ SEQUENCIAL (lento!) ═══
+# inicio = time.time()
+# resultados = [check_server_health(s) for s in servers]
+# print(f"Sequencial: {time.time() - inicio:.2f}s")  # ~4 segundos
+
+# ═══ PARALELO (rápido!) ═══
+inicio = time.time()
+with ThreadPoolExecutor(max_workers=5) as executor:
+    # submit() retorna Future objects
+    futures = {
+        executor.submit(check_server_health, server): server
+        for server in servers
+    }
+    
+    # as_completed() retorna futures conforme terminam
+    for future in as_completed(futures):
+        server = futures[future]
+        try:
+            result = future.result(timeout=10)
+            status_icon = "✅" if result["status"] == "healthy" else "❌"
+            print(f"  {status_icon} {result['server']}: {result['status']}")
+        except Exception as e:
+            print(f"  ❌ {server}: Exception - {e}")
+
+print(f"Paralelo: {time.time() - inicio:.2f}s")  # ~0.5 segundos!
+
+# ═══ Usando map() — mais simples para mesma função ═══
+with ThreadPoolExecutor(max_workers=10) as executor:
+    resultados = list(executor.map(check_server_health, servers, timeout=30))
+    
+    saudaveis = [r for r in resultados if r["status"] == "healthy"]
+    doentes = [r for r in resultados if r["status"] == "unhealthy"]
+    
+    print(f"\n📊 Resumo: {len(saudaveis)}/{len(resultados)} healthy")
+    if doentes:
+        print(f"  ⚠️  Unhealthy: {[r['server'] for r in doentes]}")
+
+# ═══ Rate limiting com Semaphore ═══
+import threading
+
+class RateLimitedPool:
+    """Pool de threads com rate limiting."""
+    
+    def __init__(self, max_workers=10, requests_per_second=5):
+        self.executor = ThreadPoolExecutor(max_workers=max_workers)
+        self.semaphore = threading.Semaphore(requests_per_second)
+        self.interval = 1.0 / requests_per_second
+    
+    def submit(self, fn, *args, **kwargs):
+        self.semaphore.acquire()
+        future = self.executor.submit(self._rate_limited, fn, *args, **kwargs)
+        return future
+    
+    def _rate_limited(self, fn, *args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        finally:
+            time.sleep(self.interval)
+            self.semaphore.release()</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.2 ProcessPoolExecutor — Paralelismo para CPU</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>ProcessPoolExecutor</code><span class="cmd-tag">processos</span></div>
+            <pre><code>from concurrent.futures import ProcessPoolExecutor
+import hashlib
+from pathlib import Path
+
+# ═══ CPU-bound: calcular hash de muitos arquivos ═══
+def compute_file_hash(filepath):
+    """Calcula SHA-256 de um arquivo (CPU-intensive para arquivos grandes)."""
+    h = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return str(filepath), h.hexdigest()
+
+# Processar em paralelo usando múltiplos CPUs
+def hash_all_files(directory, pattern="*"):
+    """Calcula hash de todos os arquivos em paralelo."""
+    files = list(Path(directory).rglob(pattern))
+    results = {}
+    
+    # Usa todos os CPUs disponíveis por padrão
+    with ProcessPoolExecutor() as executor:
+        futures = executor.map(compute_file_hash, files)
+        for filepath, file_hash in futures:
+            results[filepath] = file_hash
+    
+    return results
+
+# checksums = hash_all_files("/opt/releases", "*.tar.gz")
+
+# ═══ Processamento de logs em paralelo ═══
+def analyze_log_chunk(filepath):
+    """Analisa um arquivo de log (CPU-bound: parsing + regex)."""
+    import re
+    
+    stats = {"total": 0, "errors": 0, "ips": set(), "slow_requests": 0}
+    error_pattern = re.compile(r"(ERROR|CRITICAL)")
+    slow_pattern = re.compile(r"response_time=(\d+)ms")
+    ip_pattern = re.compile(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")
+    
+    with open(filepath) as f:
+        for line in f:
+            stats["total"] += 1
+            if error_pattern.search(line):
+                stats["errors"] += 1
+            
+            ip_match = ip_pattern.search(line)
+            if ip_match:
+                stats["ips"].add(ip_match.group())
+            
+            slow_match = slow_pattern.search(line)
+            if slow_match and int(slow_match.group(1)) > 2000:
+                stats["slow_requests"] += 1
+    
+    stats["ips"] = len(stats["ips"])  # Sets não são serializáveis
+    stats["file"] = str(filepath)
+    return stats
+
+def analyze_logs_parallel(log_directory):
+    """Analisa todos os arquivos de log em paralelo."""
+    log_files = list(Path(log_directory).glob("*.log"))
+    
+    print(f"Analisando {len(log_files)} arquivos de log...")
+    inicio = time.time()
+    
+    with ProcessPoolExecutor() as executor:
+        results = list(executor.map(analyze_log_chunk, log_files))
+    
+    # Agregar resultados
+    total_lines = sum(r["total"] for r in results)
+    total_errors = sum(r["errors"] for r in results)
+    total_slow = sum(r["slow_requests"] for r in results)
+    
+    elapsed = time.time() - inicio
+    print(f"  📊 {total_lines:,} linhas analisadas em {elapsed:.2f}s")
+    print(f"  ❌ {total_errors:,} erros ({total_errors/max(total_lines,1)*100:.2f}%)")
+    print(f"  🐌 {total_slow:,} requests lentos (>2000ms)")
+    
+    return results
+
+# ═══ Escolhendo o número de workers ═══
+import os
+
+# Para I/O-bound (threads): pode usar muitos mais que CPUs
+io_workers = min(32, len(servers))  # Até 32 threads
+
+# Para CPU-bound (processos): usar número de CPUs
+cpu_workers = os.cpu_count()  # Ex: 8 em máquina de 8 cores
+print(f"CPUs disponíveis: {cpu_workers}")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>9.3 Exemplos Práticos: Multi-Server Operations</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>DevOps Paralelo</code><span class="cmd-tag">prática</span></div>
+            <pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+import subprocess
+import time
+
+# ═══ Deploy paralelo em múltiplos servidores ═══
+def deploy_to_server(server_info):
+    """Executa deploy em um servidor via SSH."""
+    host = server_info["host"]
+    app = server_info["app"]
+    version = server_info["version"]
+    
+    commands = [
+        f"docker pull registry.io/{app}:{version}",
+        f"docker stop {app} || true",
+        f"docker rm {app} || true",
+        f"docker run -d --name {app} -p 8080:8080 registry.io/{app}:{version}",
+    ]
+    
+    results = []
+    for cmd in commands:
+        full_cmd = ["ssh", host, cmd]
+        result = subprocess.run(full_cmd, capture_output=True, text=True, timeout=120)
+        results.append(result.returncode == 0)
+        if result.returncode != 0:
+            return {"host": host, "status": "failed", "error": result.stderr}
+    
+    return {"host": host, "status": "success", "version": version}
+
+# Deploy em 10 servidores simultaneamente
+servers = [
+    {"host": f"10.0.1.{50+i}", "app": "api", "version": "2.1.0"}
+    for i in range(10)
+]
+
+print("🚀 Iniciando deploy paralelo...")
+with ThreadPoolExecutor(max_workers=5) as executor:
+    futures = {executor.submit(deploy_to_server, s): s for s in servers}
+    
+    success = 0
+    failed = 0
+    for future in as_completed(futures):
+        result = future.result()
+        if result["status"] == "success":
+            success += 1
+            print(f"  ✅ {result['host']}: deployed v{result['version']}")
+        else:
+            failed += 1
+            print(f"  ❌ {result['host']}: {result['error'][:100]}")
+
+print(f"\n📊 Resultado: {success} sucesso, {failed} falhas")
+
+# ═══ Batch API calls com progresso ═══
+def batch_api_calls(items, api_fn, max_workers=10, desc="Processing"):
+    """Executa chamadas de API em batch com progresso."""
+    total = len(items)
+    completed = 0
+    results = []
+    errors = []
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(api_fn, item): item for item in items}
+        
+        for future in as_completed(futures):
+            item = futures[future]
+            completed += 1
+            
+            try:
+                result = future.result()
+                results.append(result)
+            except Exception as e:
+                errors.append({"item": item, "error": str(e)})
+            
+            # Progresso
+            pct = completed / total * 100
+            print(f"\r  {desc}: {completed}/{total} ({pct:.0f}%)", end="", flush=True)
+    
+    print()  # Nova linha
+    return results, errors
+
+# ═══ Multi-region health checker ═══
+class MultiRegionChecker:
+    """Verifica saúde de serviços em múltiplas regiões."""
+    
+    def __init__(self, regions, services):
+        self.regions = regions
+        self.services = services
+    
+    def check_all(self, timeout=10):
+        """Verifica todos os serviços em todas as regiões em paralelo."""
+        checks = [
+            {"region": region, "service": service}
+            for region in self.regions
+            for service in self.services
+        ]
+        
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            futures = {
+                executor.submit(self._check_one, check): check
+                for check in checks
+            }
+            
+            results = []
+            for future in as_completed(futures, timeout=timeout):
+                try:
+                    results.append(future.result())
+                except Exception as e:
+                    check = futures[future]
+                    results.append({
+                        **check, "status": "error", "error": str(e)
+                    })
+        
+        return results
+    
+    def _check_one(self, check):
+        """Verifica um serviço em uma região."""
+        inicio = time.time()
+        # Simula health check
+        time.sleep(0.2)
+        elapsed = (time.time() - inicio) * 1000
+        return {
+            **check,
+            "status": "healthy",
+            "latency_ms": round(elapsed)
+        }
+
+# Uso
+checker = MultiRegionChecker(
+    regions=["us-east-1", "sa-east-1", "eu-west-1"],
+    services=["api", "web", "auth", "payments"]
+)
+results = checker.check_all()
+for r in results:
+    icon = "✅" if r["status"] == "healthy" else "❌"
+    print(f"  {icon} {r['region']}/{r['service']}: {r.get('latency_ms', 'N/A')}ms")</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 10: argparse — CLI Profissional
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <h2>10. argparse — Construindo CLIs Profissionais</h2>
+        <p>O módulo <code>argparse</code> permite criar interfaces de linha de comando profissionais com validação automática, help text, subcomandos e autocompletion. Para DevOps, é a base de ferramentas CLI personalizadas.</p>
+
+        <div class="topic-block">
+          <h3>10.1 Argumentos Posicionais e Opcionais</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>argparse basics</code><span class="cmd-tag">CLI</span></div>
+            <pre><code>import argparse
+import sys
+
+# ═══ Parser básico ═══
+def create_parser():
+    parser = argparse.ArgumentParser(
+        prog="devops-tool",
+        description="Ferramenta DevOps para gerenciamento de infraestrutura",
+        epilog="Exemplos:\n  devops-tool deploy api --env production --version 2.1.0",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    # ═══ Argumentos posicionais (obrigatórios) ═══
+    parser.add_argument(
+        "action",
+        choices=["deploy", "rollback", "status", "logs"],
+        help="Ação a executar"
+    )
+    
+    parser.add_argument(
+        "service",
+        help="Nome do serviço (ex: api, web, worker)"
+    )
+    
+    # ═══ Argumentos opcionais ═══
+    parser.add_argument(
+        "--env", "-e",
+        choices=["development", "staging", "production"],
+        default="staging",
+        help="Ambiente de deploy (default: staging)"
+    )
+    
+    parser.add_argument(
+        "--version", "-v",
+        required=False,
+        help="Versão a deployar (ex: 2.1.0)"
+    )
+    
+    parser.add_argument(
+        "--region", "-r",
+        default="sa-east-1",
+        help="Região AWS (default: sa-east-1)"
+    )
+    
+    # Flag booleana (True se presente, False se ausente)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Simular sem executar de fato"
+    )
+    
+    parser.add_argument(
+        "--force", "-f",
+        action="store_true",
+        help="Forçar operação sem confirmação"
+    )
+    
+    # Múltiplos valores
+    parser.add_argument(
+        "--tags",
+        nargs="+",  # Um ou mais valores
+        help="Tags para o deploy (ex: --tags team=backend sprint=42)"
+    )
+    
+    # Argumento com tipo
+    parser.add_argument(
+        "--replicas",
+        type=int,
+        default=3,
+        help="Número de réplicas (default: 3)"
+    )
+    
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=300,
+        help="Timeout em segundos (default: 300)"
+    )
+    
+    # Verbosidade (contável: -v, -vv, -vvv)
+    parser.add_argument(
+        "--verbose",
+        action="count",
+        default=0,
+        help="Nível de verbosidade (-v, -vv, -vvv)"
+    )
+    
+    return parser
+
+# ═══ Uso ═══
+# python devops-tool.py deploy api --env production --version 2.1.0 --dry-run
+parser = create_parser()
+args = parser.parse_args()
+
+print(f"Ação: {args.action}")
+print(f"Serviço: {args.service}")
+print(f"Ambiente: {args.env}")
+print(f"Versão: {args.version}")
+print(f"Dry-run: {args.dry_run}")
+print(f"Verbosidade: {args.verbose}")
+
+# Validação customizada
+if args.action == "deploy" and not args.version:
+    parser.error("--version é obrigatório para deploy")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.2 Subcomandos (estilo git/docker/kubectl)</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>subcommands</code><span class="cmd-tag">avançado</span></div>
+            <pre><code>import argparse
+
+def build_cli():
+    """Constrói CLI com subcomandos estilo kubectl."""
+    
+    # Parser principal
+    parser = argparse.ArgumentParser(
+        prog="infra",
+        description="🚀 CloudTrilhas Infrastructure CLI"
+    )
+    parser.add_argument("--config", default="~/.infra/config.yaml",
+                       help="Caminho do arquivo de configuração")
+    
+    # Criar subparsers
+    subparsers = parser.add_subparsers(dest="command", help="Comandos disponíveis")
+    
+    # ═══ Subcomando: deploy ═══
+    deploy_parser = subparsers.add_parser("deploy", help="Deploy de aplicação")
+    deploy_parser.add_argument("app", help="Nome da aplicação")
+    deploy_parser.add_argument("--version", "-v", required=True, help="Versão")
+    deploy_parser.add_argument("--env", "-e", default="staging",
+                              choices=["dev", "staging", "prod"])
+    deploy_parser.add_argument("--strategy",
+                              choices=["rolling", "blue-green", "canary"],
+                              default="rolling",
+                              help="Estratégia de deploy")
+    deploy_parser.add_argument("--canary-weight", type=int, default=10,
+                              help="Peso do canário (%%, default: 10)")
+    
+    # ═══ Subcomando: scale ═══
+    scale_parser = subparsers.add_parser("scale", help="Escalar aplicação")
+    scale_parser.add_argument("app", help="Nome da aplicação")
+    scale_parser.add_argument("--replicas", "-r", type=int, required=True,
+                             help="Número de réplicas")
+    scale_parser.add_argument("--min", type=int, help="Mínimo (autoscaling)")
+    scale_parser.add_argument("--max", type=int, help="Máximo (autoscaling)")
+    
+    # ═══ Subcomando: logs ═══
+    logs_parser = subparsers.add_parser("logs", help="Visualizar logs")
+    logs_parser.add_argument("app", help="Nome da aplicação")
+    logs_parser.add_argument("--follow", "-f", action="store_true",
+                            help="Seguir logs em tempo real")
+    logs_parser.add_argument("--tail", type=int, default=100,
+                            help="Últimas N linhas (default: 100)")
+    logs_parser.add_argument("--since", help="Desde quando (ex: 1h, 30m, 2024-11-15)")
+    logs_parser.add_argument("--level", choices=["DEBUG", "INFO", "WARN", "ERROR"],
+                            help="Filtrar por nível")
+    
+    # ═══ Subcomando: status ═══
+    status_parser = subparsers.add_parser("status", help="Status da infraestrutura")
+    status_parser.add_argument("--all", "-a", action="store_true",
+                              help="Mostrar todos os serviços")
+    status_parser.add_argument("--region", nargs="+",
+                              help="Filtrar por região")
+    status_parser.add_argument("--format", choices=["table", "json", "yaml"],
+                              default="table", help="Formato de saída")
+    
+    # ═══ Subcomando: config ═══
+    config_parser = subparsers.add_parser("config", help="Gerenciar configuração")
+    config_sub = config_parser.add_subparsers(dest="config_action")
+    
+    config_set = config_sub.add_parser("set", help="Definir valor")
+    config_set.add_argument("key", help="Chave")
+    config_set.add_argument("value", help="Valor")
+    
+    config_get = config_sub.add_parser("get", help="Obter valor")
+    config_get.add_argument("key", help="Chave")
+    
+    config_sub.add_parser("list", help="Listar todas as configurações")
+    
+    return parser
+
+# ═══ Implementar handlers ═══
+def handle_deploy(args):
+    """Handler do subcomando deploy."""
+    print(f"🚀 Deploying {args.app} v{args.version} to {args.env}")
+    print(f"   Estratégia: {args.strategy}")
+    if args.strategy == "canary":
+        print(f"   Canário: {args.canary_weight}% do tráfego")
+
+def handle_scale(args):
+    """Handler do subcomando scale."""
+    print(f"⚖️  Scaling {args.app} to {args.replicas} replicas")
+
+def handle_logs(args):
+    """Handler do subcomando logs."""
+    print(f"📋 Logs de {args.app} (últimas {args.tail} linhas)")
+
+def handle_status(args):
+    """Handler do subcomando status."""
+    print(f"📊 Status da infraestrutura")
+
+# ═══ Main ═══
+def main():
+    parser = build_cli()
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+    
+    handlers = {
+        "deploy": handle_deploy,
+        "scale": handle_scale,
+        "logs": handle_logs,
+        "status": handle_status,
+    }
+    
+    handler = handlers.get(args.command)
+    if handler:
+        handler(args)
+    else:
+        parser.print_help()
+
+if __name__ == "__main__":
+    main()
+
+# Exemplos de uso:
+# python infra.py deploy api --version 2.1.0 --env prod --strategy canary
+# python infra.py scale web --replicas 5
+# python infra.py logs api --follow --level ERROR
+# python infra.py status --all --format json
+# python infra.py config set region sa-east-1</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.3 Validação Customizada e Tipos</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Validação + Tipos</code><span class="cmd-tag">validação</span></div>
+            <pre><code>import argparse
+import os
+from pathlib import Path
+
+# ═══ Tipos customizados ═══
+def valid_port(value):
+    """Valida que o valor é uma porta válida (1-65535)."""
+    try:
+        port = int(value)
+        if not 1 <= port <= 65535:
+            raise ValueError
+        return port
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"'{value}' não é uma porta válida (1-65535)"
+        )
+
+def valid_percentage(value):
+    """Valida porcentagem (0-100)."""
+    try:
+        pct = int(value)
+        if not 0 <= pct <= 100:
+            raise ValueError
+        return pct
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"'{value}' não é uma porcentagem válida (0-100)"
+        )
+
+def existing_file(value):
+    """Valida que o arquivo existe."""
+    path = Path(value)
+    if not path.is_file():
+        raise argparse.ArgumentTypeError(f"Arquivo não encontrado: {value}")
+    return path
+
+def existing_dir(value):
+    """Valida que o diretório existe."""
+    path = Path(value)
+    if not path.is_dir():
+        raise argparse.ArgumentTypeError(f"Diretório não encontrado: {value}")
+    return path
+
+def valid_semver(value):
+    """Valida versão semântica (x.y.z)."""
+    import re
+    if not re.match(r"^\d+\.\d+\.\d+(-[\w.]+)?$", value):
+        raise argparse.ArgumentTypeError(
+            f"'{value}' não é uma versão válida (formato: x.y.z)"
+        )
+    return value
+
+def key_value_pair(value):
+    """Parse key=value."""
+    if "=" not in value:
+        raise argparse.ArgumentTypeError(
+            f"'{value}' deve estar no formato key=value"
+        )
+    key, val = value.split("=", 1)
+    return key, val
+
+# ═══ Usando tipos customizados ═══
+parser = argparse.ArgumentParser()
+parser.add_argument("--port", type=valid_port, default=8080)
+parser.add_argument("--config", type=existing_file, help="Arquivo de config")
+parser.add_argument("--output-dir", type=existing_dir, help="Diretório de saída")
+parser.add_argument("--version", type=valid_semver, required=True)
+parser.add_argument("--canary-weight", type=valid_percentage, default=10)
+parser.add_argument("--env-var", type=key_value_pair, nargs="+",
+                   help="Variáveis de ambiente (KEY=VALUE)")
+
+# ═══ Ações customizadas ═══
+class ValidateIPAction(argparse.Action):
+    """Action customizada que valida IP ao parsear."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        import re
+        ip_pattern = re.compile(
+            r"^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}"
+            r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$"
+        )
+        if not ip_pattern.match(values):
+            parser.error(f"IP inválido: {values}")
+        setattr(namespace, self.dest, values)
+
+parser.add_argument("--bind-ip", action=ValidateIPAction, default="0.0.0.0")
+
+# ═══ Grupos mutuamente exclusivos ═══
+group = parser.add_mutually_exclusive_group()
+group.add_argument("--json", action="store_true", help="Saída em JSON")
+group.add_argument("--yaml", action="store_true", help="Saída em YAML")
+group.add_argument("--table", action="store_true", help="Saída em tabela")
+
+# Não pode usar --json e --yaml ao mesmo tempo!</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>10.4 Exemplo Completo: DevOps CLI Tool</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>CLI Completa</code><span class="cmd-tag">projeto</span></div>
+            <pre><code>#!/usr/bin/env python3
+"""
+CloudTrilhas DevOps CLI Tool
+Ferramenta de linha de comando para operações DevOps.
+
+Uso:
+    ct deploy api --version 2.1.0 --env production
+    ct status --all --format json
+    ct logs api --follow --since 1h
+"""
+
+import argparse
+import sys
+import os
+import json
+from datetime import datetime
+from pathlib import Path
+
+__version__ = "1.0.0"
+
+def setup_logging(verbosity):
+    """Configura logging baseado na verbosidade."""
+    import logging
+    levels = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+    level = levels.get(min(verbosity, 2), logging.DEBUG)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S"
+    )
+
+def cmd_deploy(args):
+    """Executa deploy da aplicação."""
+    print(f"🚀 Deploy: {args.app} v{args.version}")
+    print(f"   Ambiente: {args.env}")
+    print(f"   Região: {args.region}")
+    print(f"   Estratégia: {args.strategy}")
+    
+    if args.dry_run:
+        print("   ⚠️  DRY-RUN: Nenhuma alteração será feita")
+        return
+    
+    # Confirmar deploy em produção
+    if args.env == "prod" and not args.force:
+        resp = input("   ⚡ Confirma deploy em PRODUÇÃO? (yes/no): ")
+        if resp.lower() != "yes":
+            print("   ❌ Deploy cancelado.")
+            sys.exit(0)
+    
+    # Executar deploy...
+    print(f"   ✅ Deploy concluído em {datetime.now().strftime('%H:%M:%S')}")
+
+def cmd_rollback(args):
+    """Executa rollback para versão anterior."""
+    print(f"⏪ Rollback: {args.app}")
+    print(f"   Voltando para versão anterior...")
+    if args.to_version:
+        print(f"   Versão alvo: {args.to_version}")
+    print(f"   ✅ Rollback concluído!")
+
+def cmd_status(args):
+    """Mostra status da infraestrutura."""
+    # Simular dados
+    services = [
+        {"name": "api", "status": "running", "replicas": "3/3", "version": "2.1.0"},
+        {"name": "web", "status": "running", "replicas": "5/5", "version": "3.0.1"},
+        {"name": "worker", "status": "degraded", "replicas": "2/3", "version": "1.8.0"},
+    ]
+    
+    if args.format == "json":
+        print(json.dumps(services, indent=2))
+    else:
+        print(f"{'SERVICE':<12} {'STATUS':<12} {'REPLICAS':<10} {'VERSION':<10}")
+        print("-" * 44)
+        for svc in services:
+            icon = "✅" if svc["status"] == "running" else "⚠️"
+            print(f"{icon} {svc['name']:<10} {svc['status']:<12} "
+                  f"{svc['replicas']:<10} {svc['version']:<10}")
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="ct",
+        description="☁️ CloudTrilhas DevOps CLI",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("-v", "--verbose", action="count", default=0)
+    parser.add_argument("--region", default=os.environ.get("CT_REGION", "sa-east-1"))
+    
+    sub = parser.add_subparsers(dest="command")
+    
+    # Deploy
+    deploy = sub.add_parser("deploy", help="Deploy aplicação")
+    deploy.add_argument("app")
+    deploy.add_argument("--version", "-V", required=True)
+    deploy.add_argument("--env", "-e", default="staging", choices=["dev", "staging", "prod"])
+    deploy.add_argument("--strategy", default="rolling", choices=["rolling", "blue-green", "canary"])
+    deploy.add_argument("--dry-run", action="store_true")
+    deploy.add_argument("--force", "-f", action="store_true")
+    deploy.set_defaults(func=cmd_deploy)
+    
+    # Rollback
+    rollback = sub.add_parser("rollback", help="Rollback aplicação")
+    rollback.add_argument("app")
+    rollback.add_argument("--to-version", help="Versão alvo")
+    rollback.set_defaults(func=cmd_rollback)
+    
+    # Status
+    status = sub.add_parser("status", help="Status infraestrutura")
+    status.add_argument("--all", "-a", action="store_true")
+    status.add_argument("--format", choices=["table", "json", "yaml"], default="table")
+    status.set_defaults(func=cmd_status)
+    
+    # Parse
+    args = parser.parse_args()
+    setup_logging(args.verbose)
+    
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+    
+    args.func(args)
+
+if __name__ == "__main__":
+    main()</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 11: Exercícios Práticos
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <h2>11. Exercícios Práticos — Projetos DevOps</h2>
+        <p>Os exercícios abaixo integram múltiplas bibliotecas estudadas neste módulo. Cada um simula um cenário real de DevOps e Cloud Engineering. Implemente-os progressivamente para consolidar o aprendizado.</p>
+
+        <div class="info-box">
+          <h4>📝 Como praticar</h4>
+          <p>Para cada exercício, crie um arquivo Python separado. Comece pelo mais simples e avance gradualmente. Todos os exercícios usam apenas a <strong>standard library</strong> — nenhuma dependência externa necessária.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 1: Parser de Logs Universal</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>log_parser.py</code><span class="cmd-tag">regex + collections</span></div>
+            <pre><code>"""
+EXERCÍCIO 1: Parser de Logs Universal
+======================================
+Bibliotecas: re, collections, datetime, argparse, pathlib
+
+Objetivo: Criar um parser de logs que:
+1. Aceita diferentes formatos de log (Apache, Nginx, syslog, JSON)
+2. Extrai timestamp, nível, fonte e mensagem
+3. Gera estatísticas (Counter) por nível, hora e fonte
+4. Identifica padrões de erro (top IPs, endpoints com falha)
+5. Exporta relatório em JSON
+
+Uso:
+    python log_parser.py /var/log/nginx/access.log --format nginx --output report.json
+    python log_parser.py /var/log/app.log --format syslog --top 20
+"""
+
+import re
+import json
+import argparse
+from collections import Counter, defaultdict
+from datetime import datetime
+from pathlib import Path
+
+# Padrões para diferentes formatos
+PATTERNS = {
+    "nginx": re.compile(
+        r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] '
+        r'"(?P<method>\S+) (?P<path>\S+) \S+" (?P<status>\d{3}) (?P<bytes>\d+)'
+    ),
+    "syslog": re.compile(
+        r'(?P<time>\w{3}\s+\d+\s+\d{2}:\d{2}:\d{2})\s+'
+        r'(?P<host>\S+)\s+(?P<service>\S+?)(?:\[\d+\])?: (?P<message>.*)'
+    ),
+    "app": re.compile(
+        r'(?P<time>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+'
+        r'(?P<level>DEBUG|INFO|WARN|ERROR|CRITICAL)\s+'
+        r'\[(?P<source>[^\]]+)\]\s+(?P<message>.*)'
+    ),
+}
+
+class LogAnalyzer:
+    def __init__(self, format_name="app"):
+        self.pattern = PATTERNS[format_name]
+        self.entries = []
+        self.stats = {
+            "total_lines": 0,
+            "parsed_lines": 0,
+            "levels": Counter(),
+            "sources": Counter(),
+            "hourly": Counter(),
+            "errors": [],
+        }
+    
+    def parse_file(self, filepath):
+        """Parse do arquivo de log."""
+        with open(filepath) as f:
+            for line in f:
+                self.stats["total_lines"] += 1
+                match = self.pattern.match(line.strip())
+                if match:
+                    self.stats["parsed_lines"] += 1
+                    entry = match.groupdict()
+                    self.entries.append(entry)
+                    self._update_stats(entry)
+    
+    def _update_stats(self, entry):
+        """Atualiza estatísticas com nova entrada."""
+        if "level" in entry:
+            self.stats["levels"][entry["level"]] += 1
+        if "source" in entry:
+            self.stats["sources"][entry["source"]] += 1
+        if "level" in entry and entry["level"] in ("ERROR", "CRITICAL"):
+            self.stats["errors"].append(entry)
+    
+    def report(self, top_n=10):
+        """Gera relatório de análise."""
+        return {
+            "summary": {
+                "total_lines": self.stats["total_lines"],
+                "parsed_lines": self.stats["parsed_lines"],
+                "parse_rate": f"{self.stats['parsed_lines']/max(self.stats['total_lines'],1)*100:.1f}%",
+            },
+            "levels": dict(self.stats["levels"].most_common()),
+            "top_sources": dict(self.stats["sources"].most_common(top_n)),
+            "error_count": len(self.stats["errors"]),
+            "recent_errors": self.stats["errors"][-5:],
+        }
+
+# IMPLEMENTE: adicionar CLI com argparse e output para JSON</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 2: Script de Deploy Automatizado</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>deploy.py</code><span class="cmd-tag">subprocess + tempfile + shutil</span></div>
+            <pre><code>"""
+EXERCÍCIO 2: Script de Deploy Automatizado
+============================================
+Bibliotecas: subprocess, shutil, tempfile, os, argparse, datetime, hashlib
+
+Objetivo: Criar um script de deploy que:
+1. Recebe app, versão e ambiente via argparse
+2. Faz git clone/pull do repositório
+3. Executa build em diretório temporário
+4. Verifica integridade do artefato (SHA-256)
+5. Cria backup da versão atual
+6. Faz deploy atômico (swap de diretórios)
+7. Executa health check pós-deploy
+8. Faz rollback automático se health check falhar
+9. Gera log detalhado com timestamps
+
+Uso:
+    python deploy.py --app api --version 2.1.0 --env production
+    python deploy.py --app api --rollback --env production
+"""
+
+import subprocess
+import shutil
+import tempfile
+import hashlib
+import argparse
+import os
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+class DeployManager:
+    def __init__(self, app, version, env, base_dir="/opt/apps"):
+        self.app = app
+        self.version = version
+        self.env = env
+        self.base_dir = Path(base_dir)
+        self.app_dir = self.base_dir / app
+        self.current_link = self.app_dir / "current"
+        self.releases_dir = self.app_dir / "releases"
+        self.backups_dir = self.app_dir / "backups"
+        self.log_entries = []
+    
+    def log(self, message, level="INFO"):
+        """Registra mensagem no log de deploy."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        entry = f"[{timestamp}] [{level}] {message}"
+        self.log_entries.append(entry)
+        print(entry)
+    
+    def run_cmd(self, cmd, cwd=None, check=True):
+        """Executa comando com logging."""
+        self.log(f"CMD: {' '.join(cmd)}")
+        result = subprocess.run(
+            cmd, capture_output=True, text=True,
+            cwd=cwd, check=False, timeout=300
+        )
+        if check and result.returncode != 0:
+            self.log(f"FALHOU: {result.stderr[:200]}", "ERROR")
+            raise RuntimeError(f"Comando falhou: {' '.join(cmd)}")
+        return result
+    
+    def deploy(self):
+        """Executa pipeline de deploy."""
+        self.log(f"Iniciando deploy: {self.app} v{self.version} ({self.env})")
+        
+        # 1. Preparar diretórios
+        self.releases_dir.mkdir(parents=True, exist_ok=True)
+        self.backups_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 2. Build em temp dir
+        # ... (implementar clone, build, verificação)
+        
+        # 3. Backup da versão atual
+        # ... (implementar backup com timestamp)
+        
+        # 4. Deploy atômico
+        # ... (implementar swap de symlinks)
+        
+        # 5. Health check
+        # ... (implementar verificação pós-deploy)
+        
+        # 6. Cleanup
+        # ... (remover releases antigas, manter últimas 5)
+        
+        self.log("✅ Deploy concluído com sucesso!")
+    
+    def rollback(self):
+        """Reverte para versão anterior."""
+        self.log(f"Iniciando rollback: {self.app}")
+        # ... implementar rollback
+    
+    def health_check(self, url, timeout=30, retries=5):
+        """Verifica saúde pós-deploy."""
+        # ... implementar com retry
+
+# IMPLEMENTE: adicionar argparse e completar todos os métodos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 3: Health Checker Multi-Serviço</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>health_checker.py</code><span class="cmd-tag">concurrent.futures + datetime</span></div>
+            <pre><code>"""
+EXERCÍCIO 3: Health Checker Multi-Serviço
+==========================================
+Bibliotecas: concurrent.futures, urllib.request, datetime, json, argparse, collections
+
+Objetivo: Criar um health checker que:
+1. Lê lista de serviços de um arquivo JSON ou YAML
+2. Verifica todos em paralelo (ThreadPoolExecutor)
+3. Mede latência de cada serviço
+4. Classifica status (healthy, degraded, unhealthy)
+5. Calcula SLA baseado em histórico
+6. Envia alertas se threshold for ultrapassado
+7. Gera relatório com timestamp e métricas
+
+Uso:
+    python health_checker.py --config services.json --interval 30
+    python health_checker.py --config services.json --once --format json
+"""
+
+import json
+import time
+import urllib.request
+import urllib.error
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
+from collections import deque, defaultdict
+from dataclasses import dataclass
+
+@dataclass
+class HealthResult:
+    service: str
+    url: str
+    status: str  # healthy, degraded, unhealthy
+    response_time_ms: float
+    status_code: int
+    timestamp: str
+    error: str = None
+
+class HealthChecker:
+    def __init__(self, config_path, max_workers=10):
+        with open(config_path) as f:
+            self.config = json.load(f)
+        self.max_workers = max_workers
+        # Histórico de resultados (últimas 100 verificações por serviço)
+        self.history = defaultdict(lambda: deque(maxlen=100))
+    
+    def check_service(self, service):
+        """Verifica saúde de um serviço individual."""
+        url = service["url"]
+        timeout = service.get("timeout", 10)
+        expected_status = service.get("expected_status", 200)
+        
+        inicio = time.time()
+        try:
+            req = urllib.request.Request(url, method="GET")
+            req.add_header("User-Agent", "HealthChecker/1.0")
+            
+            response = urllib.request.urlopen(req, timeout=timeout)
+            elapsed = (time.time() - inicio) * 1000
+            
+            # Classificar status
+            status = "healthy"
+            if response.status != expected_status:
+                status = "unhealthy"
+            elif elapsed > service.get("warn_threshold_ms", 2000):
+                status = "degraded"
+            
+            return HealthResult(
+                service=service["name"],
+                url=url,
+                status=status,
+                response_time_ms=round(elapsed, 2),
+                status_code=response.status,
+                timestamp=datetime.now().isoformat()
+            )
+        except urllib.error.URLError as e:
+            elapsed = (time.time() - inicio) * 1000
+            return HealthResult(
+                service=service["name"],
+                url=url,
+                status="unhealthy",
+                response_time_ms=round(elapsed, 2),
+                status_code=0,
+                timestamp=datetime.now().isoformat(),
+                error=str(e.reason)
+            )
+        except Exception as e:
+            return HealthResult(
+                service=service["name"],
+                url=url,
+                status="unhealthy",
+                response_time_ms=0,
+                status_code=0,
+                timestamp=datetime.now().isoformat(),
+                error=str(e)
+            )
+    
+    def check_all(self):
+        """Verifica todos os serviços em paralelo."""
+        services = self.config.get("services", [])
+        results = []
+        
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = {
+                executor.submit(self.check_service, svc): svc
+                for svc in services
+            }
+            for future in as_completed(futures):
+                result = future.result()
+                results.append(result)
+                self.history[result.service].append(result)
+        
+        return results
+    
+    def calculate_sla(self, service_name, period_hours=24):
+        """Calcula SLA de um serviço baseado no histórico."""
+        history = self.history[service_name]
+        if not history:
+            return None
+        
+        total = len(history)
+        healthy = sum(1 for r in history if r.status == "healthy")
+        return round(healthy / total * 100, 2)
+    
+    def format_report(self, results, format="table"):
+        """Formata relatório dos resultados."""
+        if format == "json":
+            return json.dumps([vars(r) for r in results], indent=2)
+        
+        # Formato tabela
+        lines = [
+            f"{'SERVICE':<20} {'STATUS':<12} {'LATENCY':<12} {'CODE':<6}",
+            "-" * 50
+        ]
+        for r in sorted(results, key=lambda x: x.status):
+            icon = {"healthy": "✅", "degraded": "⚠️", "unhealthy": "❌"}[r.status]
+            lines.append(
+                f"{icon} {r.service:<18} {r.status:<12} "
+                f"{r.response_time_ms:>8.1f}ms  {r.status_code}"
+            )
+        return "\n".join(lines)
+
+# IMPLEMENTE: argparse com --interval para loop contínuo e --once para execução única
+# Adicione: exportação para arquivo, alertas por limiar, cálculo de SLA</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 4: Validador de Configuração</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>config_validator.py</code><span class="cmd-tag">re + os + pathlib + json</span></div>
+            <pre><code>"""
+EXERCÍCIO 4: Validador de Configuração de Infraestrutura
+=========================================================
+Bibliotecas: re, os, pathlib, json, collections, argparse
+
+Objetivo: Criar um validador que:
+1. Lê arquivos de configuração (JSON, YAML-like, .env)
+2. Valida IPs, CIDRs, portas, URLs
+3. Verifica variáveis de ambiente referenciadas existem
+4. Detecta inconsistências (porta duplicada, IP inválido)
+5. Verifica se caminhos de arquivo referenciados existem
+6. Gera relatório com erros, warnings e sugestões
+
+Uso:
+    python config_validator.py config.json
+    python config_validator.py --dir /opt/configs --recursive
+    python config_validator.py .env --check-env
+"""
+
+import re
+import os
+import json
+import argparse
+from pathlib import Path
+from collections import Counter, defaultdict
+
+# Padrões de validação
+VALIDATORS = {
+    "ip": re.compile(
+        r"^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}"
+        r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$"
+    ),
+    "cidr": re.compile(
+        r"^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}"
+        r"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)/(?:[12]?\d|3[0-2])$"
+    ),
+    "port": re.compile(r"^\d{1,5}$"),
+    "url": re.compile(r"^https?://[\w.-]+(?::\d+)?(?:/[\w./%-]*)?$"),
+    "email": re.compile(r"^[\w.-]+@[\w.-]+\.\w{2,}$"),
+    "env_ref": re.compile(r"\$\{(\w+)\}|\$(\w+)"),
+    "aws_arn": re.compile(r"^arn:aws:[\w-]+:[\w-]*:\d{12}:[\w/:.+-]+$"),
+}
+
+class ConfigValidator:
+    def __init__(self):
+        self.errors = []
+        self.warnings = []
+        self.info = []
+    
+    def validate_ip(self, value, context=""):
+        """Valida endereço IP."""
+        if not VALIDATORS["ip"].match(str(value)):
+            self.errors.append(f"IP inválido: '{value}' {context}")
+            return False
+        return True
+    
+    def validate_port(self, value, context=""):
+        """Valida número de porta."""
+        try:
+            port = int(value)
+            if not 1 <= port <= 65535:
+                self.errors.append(f"Porta fora do range (1-65535): {port} {context}")
+                return False
+            if port < 1024:
+                self.warnings.append(f"Porta privilegiada (<1024): {port} {context}")
+            return True
+        except (ValueError, TypeError):
+            self.errors.append(f"Porta inválida: '{value}' {context}")
+            return False
+    
+    def validate_env_references(self, config_dict):
+        """Verifica se variáveis de ambiente referenciadas existem."""
+        for key, value in self._flatten_dict(config_dict).items():
+            if isinstance(value, str):
+                refs = VALIDATORS["env_ref"].findall(value)
+                for ref in refs:
+                    var_name = ref[0] or ref[1]
+                    if var_name not in os.environ:
+                        self.warnings.append(
+                            f"Variável de ambiente não definida: ${var_name} (em {key})"
+                        )
+    
+    def _flatten_dict(self, d, parent_key="", sep="."):
+        """Achata dicionário aninhado."""
+        items = []
+        for k, v in d.items():
+            new_key = f"{parent_key}{sep}{k}" if parent_key else k
+            if isinstance(v, dict):
+                items.extend(self._flatten_dict(v, new_key, sep).items())
+            else:
+                items.append((new_key, v))
+        return dict(items)
+    
+    def validate_file(self, filepath):
+        """Valida arquivo de configuração JSON."""
+        path = Path(filepath)
+        if not path.exists():
+            self.errors.append(f"Arquivo não encontrado: {filepath}")
+            return
+        
+        with open(path) as f:
+            config = json.load(f)
+        
+        self._validate_recursive(config)
+        self.validate_env_references(config)
+    
+    def _validate_recursive(self, obj, path=""):
+        """Valida recursivamente valores na configuração."""
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                current_path = f"{path}.{key}" if path else key
+                
+                # Auto-detectar tipo pelo nome da chave
+                if any(k in key.lower() for k in ["ip", "host", "address"]):
+                    if isinstance(value, str) and not value.startswith("$"):
+                        self.validate_ip(value, f"(em {current_path})")
+                
+                if "port" in key.lower():
+                    self.validate_port(value, f"(em {current_path})")
+                
+                self._validate_recursive(value, current_path)
+        
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj):
+                self._validate_recursive(item, f"{path}[{i}]")
+    
+    def report(self):
+        """Gera relatório de validação."""
+        print(f"\n{'='*50}")
+        print(f"  RELATÓRIO DE VALIDAÇÃO")
+        print(f"{'='*50}")
+        print(f"  ❌ Erros: {len(self.errors)}")
+        print(f"  ⚠️  Warnings: {len(self.warnings)}")
+        print(f"  ℹ️  Info: {len(self.info)}")
+        
+        if self.errors:
+            print(f"\n{'─'*50}")
+            print("  ERROS:")
+            for e in self.errors:
+                print(f"    ❌ {e}")
+        
+        if self.warnings:
+            print(f"\n{'─'*50}")
+            print("  WARNINGS:")
+            for w in self.warnings:
+                print(f"    ⚠️  {w}")
+        
+        return len(self.errors) == 0
+
+# IMPLEMENTE: argparse e suporte a múltiplos formatos</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 5: Sistema de Backup com Rotação</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>backup_manager.py</code><span class="cmd-tag">shutil + hashlib + datetime</span></div>
+            <pre><code>"""
+EXERCÍCIO 5: Sistema de Backup com Rotação
+============================================
+Bibliotecas: shutil, hashlib, datetime, pathlib, argparse, json
+
+Objetivo: Criar um sistema de backup que:
+1. Faz backup de diretórios especificados
+2. Suporta backup full e incremental (baseado em hash)
+3. Compacta em tar.gz com timestamp no nome
+4. Gera manifesto SHA-256 de todos os arquivos
+5. Implementa rotação (manter últimos N backups)
+6. Verifica integridade na restauração
+7. Gera relatório de espaço usado
+
+Uso:
+    python backup_manager.py backup --source /opt/app --dest /opt/backups
+    python backup_manager.py restore --backup /opt/backups/backup_20241115.tar.gz --dest /opt/app
+    python backup_manager.py verify --backup /opt/backups/backup_20241115.tar.gz
+    python backup_manager.py rotate --dir /opt/backups --keep 7
+"""
+
+import shutil
+import hashlib
+import json
+import argparse
+from datetime import datetime
+from pathlib import Path
+
+class BackupManager:
+    def __init__(self, backup_dir):
+        self.backup_dir = Path(backup_dir)
+        self.backup_dir.mkdir(parents=True, exist_ok=True)
+        self.manifest_file = "MANIFEST.json"
+    
+    def _file_hash(self, filepath):
+        """Calcula SHA-256 de um arquivo."""
+        h = hashlib.sha256()
+        with open(filepath, "rb") as f:
+            while chunk := f.read(8192):
+                h.update(chunk)
+        return h.hexdigest()
+    
+    def _generate_manifest(self, source_dir):
+        """Gera manifesto com hash de todos os arquivos."""
+        manifest = {}
+        source = Path(source_dir)
+        for arquivo in source.rglob("*"):
+            if arquivo.is_file():
+                rel_path = str(arquivo.relative_to(source))
+                manifest[rel_path] = {
+                    "hash": self._file_hash(arquivo),
+                    "size": arquivo.stat().st_size,
+                    "modified": datetime.fromtimestamp(
+                        arquivo.stat().st_mtime
+                    ).isoformat()
+                }
+        return manifest
+    
+    def backup(self, source_dir, compress="gztar"):
+        """Cria backup completo com manifesto."""
+        source = Path(source_dir)
+        if not source.is_dir():
+            raise ValueError(f"Diretório não encontrado: {source_dir}")
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_name = f"backup_{source.name}_{timestamp}"
+        
+        # Gerar manifesto
+        manifest = self._generate_manifest(source_dir)
+        
+        # Criar backup com manifesto
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Copiar fonte para temp
+            tmp_source = Path(tmpdir) / "data"
+            shutil.copytree(source_dir, str(tmp_source))
+            
+            # Adicionar manifesto
+            manifest_path = Path(tmpdir) / self.manifest_file
+            manifest_path.write_text(json.dumps(manifest, indent=2))
+            
+            # Compactar
+            arquivo = shutil.make_archive(
+                str(self.backup_dir / backup_name),
+                compress,
+                tmpdir
+            )
+        
+        tamanho = Path(arquivo).stat().st_size / (1024 * 1024)
+        print(f"✅ Backup criado: {arquivo} ({tamanho:.1f} MB)")
+        print(f"   Arquivos: {len(manifest)}")
+        return arquivo
+    
+    def verify(self, backup_file):
+        """Verifica integridade de um backup."""
+        # IMPLEMENTE: extrair, verificar hashes contra manifesto
+        pass
+    
+    def restore(self, backup_file, dest_dir):
+        """Restaura backup para diretório destino."""
+        # IMPLEMENTE: extrair, verificar, restaurar
+        pass
+    
+    def rotate(self, keep=7):
+        """Remove backups antigos, mantendo os últimos N."""
+        backups = sorted(self.backup_dir.glob("backup_*.tar.gz"))
+        to_remove = backups[:-keep] if len(backups) > keep else []
+        
+        for backup in to_remove:
+            tamanho = backup.stat().st_size / (1024 * 1024)
+            backup.unlink()
+            print(f"  🗑️  Removido: {backup.name} ({tamanho:.1f} MB)")
+        
+        print(f"  📊 Mantidos: {min(len(backups), keep)} backups")
+
+# IMPLEMENTE: argparse e completar verify/restore</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 6: Gerador de Senhas e Tokens para Infraestrutura</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>secret_generator.py</code><span class="cmd-tag">secrets + hashlib + uuid</span></div>
+            <pre><code>"""
+EXERCÍCIO 6: Gerador de Senhas e Tokens
+=========================================
+Bibliotecas: secrets, hashlib, uuid, argparse, json
+
+Objetivo: Criar uma ferramenta CLI que:
+1. Gera senhas seguras com requisitos customizáveis
+2. Gera API keys (hex, base64, custom format)
+3. Gera UUIDs (v4, v5 com namespace)
+4. Gera .env files completos para projetos
+5. Verifica força de senhas existentes
+6. Nunca imprime em logs (apenas stdout direto)
+
+Uso:
+    python secret_generator.py password --length 24 --no-special
+    python secret_generator.py apikey --format hex --length 32
+    python secret_generator.py uuid --version 4 --count 5
+    python secret_generator.py envfile --template project.env.template --output .env
+    python secret_generator.py check --password "MinhaSenh@123"
+"""
+
+import secrets
+import string
+import hashlib
+import uuid
+import argparse
+import json
+import sys
+from pathlib import Path
+
+class SecretGenerator:
+    def generate_password(self, length=20, uppercase=True, lowercase=True,
+                         digits=True, special=True, exclude_chars=""):
+        """Gera senha criptograficamente segura."""
+        chars = ""
+        requirements = []
+        
+        if uppercase:
+            pool = string.ascii_uppercase
+            for c in exclude_chars:
+                pool = pool.replace(c, "")
+            chars += pool
+            requirements.append(("uppercase", pool))
+        
+        if lowercase:
+            pool = string.ascii_lowercase
+            for c in exclude_chars:
+                pool = pool.replace(c, "")
+            chars += pool
+            requirements.append(("lowercase", pool))
+        
+        if digits:
+            pool = string.digits
+            for c in exclude_chars:
+                pool = pool.replace(c, "")
+            chars += pool
+            requirements.append(("digits", pool))
+        
+        if special:
+            pool = "!@#$%^&*()-_=+[]{}|;:,.<>?"
+            for c in exclude_chars:
+                pool = pool.replace(c, "")
+            chars += pool
+            requirements.append(("special", pool))
+        
+        if not chars:
+            raise ValueError("Nenhum conjunto de caracteres selecionado!")
+        
+        # Garantir pelo menos um de cada tipo requerido
+        password = [secrets.choice(pool) for _, pool in requirements]
+        
+        # Preencher o resto
+        remaining = length - len(password)
+        password.extend(secrets.choice(chars) for _ in range(remaining))
+        
+        # Embaralhar
+        rng = secrets.SystemRandom()
+        rng.shuffle(password)
+        
+        return "".join(password)
+    
+    def generate_api_key(self, length=32, format="hex", prefix=""):
+        """Gera API key segura."""
+        if format == "hex":
+            key = secrets.token_hex(length // 2)
+        elif format == "base64":
+            key = secrets.token_urlsafe(length)[:length]
+        elif format == "alphanumeric":
+            chars = string.ascii_letters + string.digits
+            key = "".join(secrets.choice(chars) for _ in range(length))
+        else:
+            raise ValueError(f"Formato desconhecido: {format}")
+        
+        return f"{prefix}{key}" if prefix else key
+    
+    def check_password_strength(self, password):
+        """Avalia força de uma senha."""
+        score = 0
+        feedback = []
+        
+        if len(password) >= 12: score += 2
+        elif len(password) >= 8: score += 1
+        else: feedback.append("Muito curta (mínimo 8)")
+        
+        if any(c.isupper() for c in password): score += 1
+        else: feedback.append("Adicione maiúsculas")
+        
+        if any(c.islower() for c in password): score += 1
+        else: feedback.append("Adicione minúsculas")
+        
+        if any(c.isdigit() for c in password): score += 1
+        else: feedback.append("Adicione dígitos")
+        
+        if any(c in "!@#$%^&*()-_=+[]{}|;:,.<>?" for c in password): score += 1
+        else: feedback.append("Adicione caracteres especiais")
+        
+        if len(set(password)) > len(password) * 0.7: score += 1
+        else: feedback.append("Muitos caracteres repetidos")
+        
+        levels = {0: "Muito fraca", 1: "Fraca", 2: "Fraca", 
+                  3: "Média", 4: "Média", 5: "Forte", 6: "Muito forte", 7: "Excelente"}
+        
+        return {
+            "score": score,
+            "max_score": 7,
+            "level": levels.get(score, "Excelente"),
+            "feedback": feedback,
+            "length": len(password),
+        }
+
+# IMPLEMENTE: argparse com subcomandos e geração de .env</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 7: Monitor de Recursos do Sistema</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>system_monitor.py</code><span class="cmd-tag">os + subprocess + datetime + collections</span></div>
+            <pre><code>"""
+EXERCÍCIO 7: Monitor de Recursos do Sistema
+=============================================
+Bibliotecas: os, subprocess, datetime, collections, time, pathlib
+
+Objetivo: Criar um monitor que:
+1. Coleta métricas de CPU, memória, disco e rede
+2. Armazena em sliding window (deque) para médias
+3. Detecta anomalias (uso acima de threshold)
+4. Gera alertas quando recursos estão críticos
+5. Exporta métricas em formato compatível com Prometheus
+6. Executa em loop com intervalo configurável
+
+Uso:
+    python system_monitor.py --interval 5 --threshold-cpu 80 --threshold-disk 90
+    python system_monitor.py --once --format prometheus
+    python system_monitor.py --export metrics.json
+"""
+
+import os
+import subprocess
+import time
+from datetime import datetime
+from collections import deque, namedtuple
+from pathlib import Path
+
+Metric = namedtuple("Metric", ["name", "value", "unit", "timestamp"])
+
+class SystemMonitor:
+    def __init__(self, window_size=60):
+        self.window_size = window_size
+        self.metrics_history = {
+            "cpu": deque(maxlen=window_size),
+            "memory": deque(maxlen=window_size),
+            "disk": deque(maxlen=window_size),
+        }
+        self.thresholds = {
+            "cpu": 80,
+            "memory": 85,
+            "disk": 90,
+        }
+    
+    def collect_cpu(self):
+        """Coleta uso de CPU (Linux)."""
+        try:
+            # Ler /proc/stat para CPU usage
+            with open("/proc/stat") as f:
+                line = f.readline()
+            values = line.split()[1:]
+            idle = int(values[3])
+            total = sum(int(v) for v in values)
+            
+            # Precisa de duas leituras para calcular %
+            time.sleep(0.1)
+            with open("/proc/stat") as f:
+                line = f.readline()
+            values2 = line.split()[1:]
+            idle2 = int(values2[3])
+            total2 = sum(int(v) for v in values2)
+            
+            idle_delta = idle2 - idle
+            total_delta = total2 - total
+            usage = ((total_delta - idle_delta) / max(total_delta, 1)) * 100
+            
+            return round(usage, 1)
+        except FileNotFoundError:
+            # Fallback para macOS/Windows
+            result = subprocess.run(
+                ["top", "-bn1"], capture_output=True, text=True, timeout=5
+            )
+            # Parse da saída...
+            return 0.0
+    
+    def collect_memory(self):
+        """Coleta uso de memória."""
+        try:
+            with open("/proc/meminfo") as f:
+                lines = f.readlines()
+            
+            mem_info = {}
+            for line in lines:
+                parts = line.split()
+                key = parts[0].rstrip(":")
+                value = int(parts[1])  # em kB
+                mem_info[key] = value
+            
+            total = mem_info["MemTotal"]
+            available = mem_info.get("MemAvailable", mem_info["MemFree"])
+            used_pct = ((total - available) / total) * 100
+            
+            return round(used_pct, 1)
+        except FileNotFoundError:
+            return 0.0
+    
+    def collect_disk(self, path="/"):
+        """Coleta uso de disco."""
+        import shutil
+        usage = shutil.disk_usage(path)
+        return round(usage.used / usage.total * 100, 1)
+    
+    def collect_all(self):
+        """Coleta todas as métricas."""
+        now = datetime.now().isoformat()
+        metrics = {
+            "cpu": Metric("cpu_usage", self.collect_cpu(), "%", now),
+            "memory": Metric("memory_usage", self.collect_memory(), "%", now),
+            "disk": Metric("disk_usage", self.collect_disk(), "%", now),
+        }
+        
+        # Armazenar no histórico
+        for key, metric in metrics.items():
+            self.metrics_history[key].append(metric.value)
+        
+        return metrics
+    
+    def check_alerts(self, metrics):
+        """Verifica se alguma métrica excede o threshold."""
+        alerts = []
+        for key, metric in metrics.items():
+            if metric.value > self.thresholds.get(key, 100):
+                alerts.append({
+                    "metric": key,
+                    "value": metric.value,
+                    "threshold": self.thresholds[key],
+                    "severity": "critical" if metric.value > 95 else "warning"
+                })
+        return alerts
+    
+    def format_prometheus(self, metrics):
+        """Exporta no formato Prometheus."""
+        lines = []
+        for key, metric in metrics.items():
+            lines.append(f"# HELP {metric.name} {key} usage percentage")
+            lines.append(f"# TYPE {metric.name} gauge")
+            lines.append(f'{metric.name} {metric.value}')
+        return "\n".join(lines)
+
+# IMPLEMENTE: argparse, loop com intervalo, exportação</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 8: Ferramenta de Diff para Configurações</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>config_diff.py</code><span class="cmd-tag">json + pathlib + collections</span></div>
+            <pre><code>"""
+EXERCÍCIO 8: Ferramenta de Diff para Configurações
+====================================================
+Bibliotecas: json, pathlib, collections, argparse, datetime
+
+Objetivo: Criar uma ferramenta que:
+1. Compara dois arquivos de configuração (JSON)
+2. Mostra adições, remoções e alterações
+3. Suporta diffs de configurações aninhadas (deep diff)
+4. Gera relatório formatado com cores/símbolos
+5. Pode gerar patch para aplicar mudanças
+6. Útil para: revisar mudanças de Terraform, Kubernetes, etc.
+
+Uso:
+    python config_diff.py config_old.json config_new.json
+    python config_diff.py --format json old/ new/ --recursive
+    python config_diff.py --patch config_old.json config_new.json > changes.patch
+"""
+
+import json
+import argparse
+from pathlib import Path
+from collections import OrderedDict
+
+class ConfigDiff:
+    def __init__(self):
+        self.additions = []
+        self.removals = []
+        self.modifications = []
+    
+    def diff(self, old, new, path=""):
+        """Compara dois objetos recursivamente."""
+        if isinstance(old, dict) and isinstance(new, dict):
+            self._diff_dicts(old, new, path)
+        elif isinstance(old, list) and isinstance(new, list):
+            self._diff_lists(old, new, path)
+        elif old != new:
+            self.modifications.append({
+                "path": path,
+                "old": old,
+                "new": new
+            })
+    
+    def _diff_dicts(self, old, new, path):
+        """Compara dois dicionários."""
+        all_keys = set(old.keys()) | set(new.keys())
+        
+        for key in sorted(all_keys):
+            current_path = f"{path}.{key}" if path else key
+            
+            if key not in old:
+                self.additions.append({"path": current_path, "value": new[key]})
+            elif key not in new:
+                self.removals.append({"path": current_path, "value": old[key]})
+            else:
+                self.diff(old[key], new[key], current_path)
+    
+    def _diff_lists(self, old, new, path):
+        """Compara duas listas."""
+        max_len = max(len(old), len(new))
+        for i in range(max_len):
+            current_path = f"{path}[{i}]"
+            if i >= len(old):
+                self.additions.append({"path": current_path, "value": new[i]})
+            elif i >= len(new):
+                self.removals.append({"path": current_path, "value": old[i]})
+            else:
+                self.diff(old[i], new[i], current_path)
+    
+    def has_changes(self):
+        return bool(self.additions or self.removals or self.modifications)
+    
+    def summary(self):
+        """Resumo das mudanças."""
+        return {
+            "additions": len(self.additions),
+            "removals": len(self.removals),
+            "modifications": len(self.modifications),
+            "total_changes": len(self.additions) + len(self.removals) + len(self.modifications)
+        }
+    
+    def format_report(self):
+        """Gera relatório formatado."""
+        lines = []
+        lines.append("=" * 60)
+        lines.append("  CONFIGURATION DIFF REPORT")
+        lines.append("=" * 60)
+        
+        if self.additions:
+            lines.append(f"\n  ➕ ADIÇÕES ({len(self.additions)}):")
+            for item in self.additions:
+                lines.append(f"    + {item['path']}: {json.dumps(item['value'], ensure_ascii=False)}")
+        
+        if self.removals:
+            lines.append(f"\n  ➖ REMOÇÕES ({len(self.removals)}):")
+            for item in self.removals:
+                lines.append(f"    - {item['path']}: {json.dumps(item['value'], ensure_ascii=False)}")
+        
+        if self.modifications:
+            lines.append(f"\n  ✏️  MODIFICAÇÕES ({len(self.modifications)}):")
+            for item in self.modifications:
+                lines.append(f"    ~ {item['path']}:")
+                lines.append(f"      antes: {json.dumps(item['old'], ensure_ascii=False)}")
+                lines.append(f"      depois: {json.dumps(item['new'], ensure_ascii=False)}")
+        
+        if not self.has_changes():
+            lines.append("\n  ✅ Nenhuma diferença encontrada!")
+        
+        return "\n".join(lines)
+
+# Uso
+# differ = ConfigDiff()
+# differ.diff(old_config, new_config)
+# print(differ.format_report())
+
+# IMPLEMENTE: argparse, suporte a diretórios, geração de patch</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 9: Pipeline de Processamento de Dados</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>data_pipeline.py</code><span class="cmd-tag">itertools + functools + concurrent.futures</span></div>
+            <pre><code>"""
+EXERCÍCIO 9: Pipeline de Processamento de Dados
+=================================================
+Bibliotecas: itertools, functools, concurrent.futures, pathlib, json, csv
+
+Objetivo: Criar um pipeline de processamento que:
+1. Lê dados de múltiplas fontes (CSV, JSON, logs)
+2. Aplica transformações em cadeia (pipeline pattern)
+3. Usa iteradores lazy para processamento eficiente
+4. Paraleliza etapas CPU-bound
+5. Agrega resultados e gera relatório
+6. Suporta plugins de transformação
+
+Uso:
+    python data_pipeline.py --input /var/log/*.log --output report.json
+    python data_pipeline.py --input data.csv --transform normalize,filter,aggregate
+"""
+
+import itertools
+import functools
+import json
+import csv
+from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+
+class Pipeline:
+    """Pipeline de processamento com transformações encadeadas."""
+    
+    def __init__(self):
+        self.steps = []
+    
+    def add_step(self, name, func, parallel=False, workers=4):
+        """Adiciona etapa ao pipeline."""
+        self.steps.append({
+            "name": name,
+            "func": func,
+            "parallel": parallel,
+            "workers": workers
+        })
+        return self  # Permite encadeamento
+    
+    def run(self, data):
+        """Executa pipeline completo."""
+        result = data
+        
+        for step in self.steps:
+            print(f"  ⚙️  Executando: {step['name']}...")
+            
+            if step["parallel"]:
+                # Execução paralela
+                with ProcessPoolExecutor(max_workers=step["workers"]) as executor:
+                    result = list(executor.map(step["func"], result))
+            else:
+                # Execução sequencial (pode ser lazy)
+                result = step["func"](result)
+        
+        return result
+
+# ═══ Transformações reutilizáveis ═══
+def filter_by(field, condition):
+    """Factory de filtros."""
+    def _filter(data):
+        return (item for item in data if condition(item.get(field)))
+    return _filter
+
+def map_field(field, transform):
+    """Factory de transformações de campo."""
+    def _map(data):
+        for item in data:
+            item = dict(item)  # Cópia
+            if field in item:
+                item[field] = transform(item[field])
+            yield item
+    return _map
+
+def aggregate(group_by, metrics):
+    """Agrega dados por grupo."""
+    from collections import defaultdict
+    
+    def _aggregate(data):
+        groups = defaultdict(list)
+        for item in data:
+            key = item.get(group_by, "unknown")
+            groups[key].append(item)
+        
+        results = []
+        for key, items in groups.items():
+            result = {group_by: key, "count": len(items)}
+            for metric_name, metric_fn in metrics.items():
+                values = [item.get(metric_name, 0) for item in items if metric_name in item]
+                if values:
+                    result[f"{metric_name}_avg"] = sum(values) / len(values)
+                    result[f"{metric_name}_max"] = max(values)
+            results.append(result)
+        return results
+    
+    return _aggregate
+
+# ═══ Exemplo de uso ═══
+def example_pipeline():
+    """Pipeline de exemplo: processar logs de acesso."""
+    
+    pipeline = Pipeline()
+    pipeline.add_step("filter_errors", filter_by("status", lambda s: s >= 400))
+    pipeline.add_step("normalize_paths", map_field("path", lambda p: p.split("?")[0]))
+    pipeline.add_step("aggregate", aggregate("path", {"response_time": None}))
+    
+    # Dados de exemplo
+    data = [
+        {"path": "/api/users?page=1", "status": 200, "response_time": 45},
+        {"path": "/api/users?page=2", "status": 500, "response_time": 5000},
+        {"path": "/api/orders", "status": 404, "response_time": 12},
+        {"path": "/api/users?page=3", "status": 502, "response_time": 30000},
+    ]
+    
+    results = pipeline.run(iter(data))
+    return list(results) if hasattr(results, '__iter__') else results
+
+# IMPLEMENTE: leitura de múltiplas fontes, argparse, exportação</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Exercício 10: CLI Completa de Infraestrutura</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>infra_cli.py</code><span class="cmd-tag">PROJETO FINAL - todas as bibliotecas</span></div>
+            <pre><code>"""
+EXERCÍCIO 10 (PROJETO FINAL): CLI Completa de Infraestrutura
+==============================================================
+Bibliotecas: TODAS do módulo 07
+
+Objetivo: Construir uma ferramenta CLI completa que integra todas 
+as bibliotecas estudadas. O projeto simula uma ferramenta tipo 
+Terraform/Pulumi simplificada.
+
+Funcionalidades:
+1. [argparse] CLI com subcomandos: init, plan, apply, destroy, status
+2. [os, pathlib] Gerenciamento de workspace e arquivos de estado
+3. [subprocess] Execução de comandos do sistema (docker, aws cli)
+4. [json] Leitura/escrita de estado e configuração
+5. [hashlib] Verificação de integridade do estado
+6. [secrets, uuid] Geração de IDs de recursos
+7. [datetime] Timestamps e cálculos de tempo
+8. [concurrent.futures] Operações paralelas em múltiplos recursos
+9. [re] Validação de nomes, IPs, ARNs
+10. [collections] Tracking de mudanças e estatísticas
+11. [shutil, tempfile] Backup de estado antes de apply
+12. [itertools, functools] Pipeline de resolução de dependências
+
+Uso:
+    python infra_cli.py init --project my-infra
+    python infra_cli.py plan --config infra.json
+    python infra_cli.py apply --config infra.json --auto-approve
+    python infra_cli.py status
+    python infra_cli.py destroy --force
+"""
+
+import argparse
+import json
+import os
+import re
+import uuid
+import hashlib
+import secrets
+import shutil
+import tempfile
+import time
+from datetime import datetime
+from pathlib import Path
+from collections import Counter, defaultdict, namedtuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import functools
+import itertools
+
+# ═══ Modelos ═══
+Resource = namedtuple("Resource", ["id", "type", "name", "config", "status"])
+
+class InfraState:
+    """Gerencia estado da infraestrutura."""
+    
+    STATE_FILE = ".infra-state.json"
+    
+    def __init__(self, workspace="."):
+        self.workspace = Path(workspace)
+        self.state_path = self.workspace / self.STATE_FILE
+        self.resources = {}
+        self.load()
+    
+    def load(self):
+        """Carrega estado do disco."""
+        if self.state_path.exists():
+            data = json.loads(self.state_path.read_text())
+            self.resources = data.get("resources", {})
+    
+    def save(self):
+        """Salva estado com checksum."""
+        state = {
+            "version": "1.0",
+            "timestamp": datetime.now().isoformat(),
+            "resources": self.resources,
+        }
+        content = json.dumps(state, indent=2)
+        
+        # Adicionar checksum
+        checksum = hashlib.sha256(content.encode()).hexdigest()
+        state["checksum"] = checksum
+        
+        self.state_path.write_text(json.dumps(state, indent=2))
+    
+    def backup(self):
+        """Cria backup do estado antes de mudanças."""
+        if self.state_path.exists():
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_path = self.workspace / f".infra-state.backup.{timestamp}.json"
+            shutil.copy2(self.state_path, backup_path)
+
+class InfraCLI:
+    """CLI principal."""
+    
+    def __init__(self):
+        self.state = None
+    
+    def cmd_init(self, args):
+        """Inicializa workspace."""
+        workspace = Path(args.project)
+        workspace.mkdir(parents=True, exist_ok=True)
+        
+        # Criar configuração padrão
+        config = {
+            "project": args.project,
+            "version": "1.0",
+            "created": datetime.now().isoformat(),
+            "id": str(uuid.uuid4()),
+            "resources": []
+        }
+        
+        config_path = workspace / "infra.json"
+        config_path.write_text(json.dumps(config, indent=2))
+        
+        print(f"✅ Projeto '{args.project}' inicializado!")
+        print(f"   Config: {config_path}")
+        print(f"   ID: {config['id']}")
+    
+    def cmd_plan(self, args):
+        """Mostra mudanças planejadas."""
+        print("📋 Planejando mudanças...")
+        # IMPLEMENTE: comparar config desejada vs estado atual
+        # Mostrar: + criações, ~ modificações, - destruições
+    
+    def cmd_apply(self, args):
+        """Aplica mudanças."""
+        print("🚀 Aplicando mudanças...")
+        # IMPLEMENTE: 
+        # 1. Backup do estado
+        # 2. Resolver dependências (topological sort)
+        # 3. Criar/modificar/destruir recursos em paralelo
+        # 4. Atualizar estado
+    
+    def cmd_status(self, args):
+        """Mostra status atual."""
+        print("📊 Status da infraestrutura:")
+        # IMPLEMENTE: ler estado e mostrar recursos
+    
+    def cmd_destroy(self, args):
+        """Destrói todos os recursos."""
+        if not args.force:
+            resp = input("⚠️  Destruir TODOS os recursos? (yes/no): ")
+            if resp != "yes":
+                print("Cancelado.")
+                return
+        print("💥 Destruindo recursos...")
+        # IMPLEMENTE: destruir em ordem reversa de dependências
+
+def main():
+    parser = argparse.ArgumentParser(prog="infra", description="🏗️  Infrastructure CLI")
+    sub = parser.add_subparsers(dest="command")
+    
+    init_p = sub.add_parser("init")
+    init_p.add_argument("--project", "-p", required=True)
+    
+    plan_p = sub.add_parser("plan")
+    plan_p.add_argument("--config", "-c", default="infra.json")
+    
+    apply_p = sub.add_parser("apply")
+    apply_p.add_argument("--config", "-c", default="infra.json")
+    apply_p.add_argument("--auto-approve", action="store_true")
+    
+    sub.add_parser("status")
+    
+    destroy_p = sub.add_parser("destroy")
+    destroy_p.add_argument("--force", "-f", action="store_true")
+    
+    args = parser.parse_args()
+    cli = InfraCLI()
+    
+    handlers = {
+        "init": cli.cmd_init,
+        "plan": cli.cmd_plan,
+        "apply": cli.cmd_apply,
+        "status": cli.cmd_status,
+        "destroy": cli.cmd_destroy,
+    }
+    
+    if args.command in handlers:
+        handlers[args.command](args)
+    else:
+        parser.print_help()
+
+if __name__ == "__main__":
+    main()</code></pre>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h4>🎯 Desafio Extra</h4>
+          <p>Após completar todos os exercícios individuais, tente integrar os exercícios 1-9 como "plugins" do exercício 10. Por exemplo:</p>
+          <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>O log parser (Ex. 1) pode ser um subcomando <code>infra logs analyze</code></li>
+            <li>O health checker (Ex. 3) pode ser o health check pós-deploy</li>
+            <li>O backup manager (Ex. 5) pode proteger o estado da infraestrutura</li>
+            <li>O config validator (Ex. 4) pode validar <code>infra.json</code> antes do apply</li>
+            <li>O secret generator (Ex. 6) pode gerar credenciais dos recursos</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 12: Resumo e Referência Rápida
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <h2>12. Resumo e Referência Rápida</h2>
+        <p>Tabela de referência rápida com todas as bibliotecas essenciais cobertas neste módulo e seus principais usos em cenários DevOps.</p>
+
+        <div class="topic-block">
+          <h3>Mapa Mental: Quando Usar Cada Biblioteca</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Referência Rápida</code><span class="cmd-tag">resumo</span></div>
+            <pre><code># ╔══════════════════════════╦═══════════════════════════════════════════════════════╗
+# ║ BIBLIOTECA              ║ QUANDO USAR                                           ║
+# ╠══════════════════════════╬═══════════════════════════════════════════════════════╣
+# ║ os / sys                ║ Variáveis de ambiente, info do sistema, paths         ║
+# ║ pathlib                 ║ Manipulação de caminhos (prefira sobre os.path)       ║
+# ║ subprocess              ║ Executar terraform, docker, git, kubectl              ║
+# ║ datetime / time         ║ Logs, timestamps, SLA, scheduling, timeouts          ║
+# ║ re                      ║ Parse de logs, validação de IPs/ARNs, extração       ║
+# ║ collections             ║ Counter (contagem), defaultdict, deque (buffer)       ║
+# ║ itertools               ║ Processar dados grandes sem carregar na memória       ║
+# ║ functools               ║ Cache (lru_cache), retry decorators, partial          ║
+# ║ shutil                  ║ Copiar/mover/remover dirs, compactar, disk_usage     ║
+# ║ tempfile                ║ Builds, processamento intermediário, deploy temp      ║
+# ║ hashlib                 ║ Checksums de artefatos, verificar integridade        ║
+# ║ secrets                 ║ API keys, senhas, tokens (NUNCA use random!)         ║
+# ║ uuid                    ║ IDs únicos para recursos, correlation IDs            ║
+# ║ concurrent.futures      ║ Health checks paralelos, batch operations            ║
+# ║ argparse                ║ CLIs profissionais com validação e help              ║
+# ╚══════════════════════════╩═══════════════════════════════════════════════════════╝
+
+# ═══ Padrões de Import Recomendados ═══
+import os
+import sys
+import re
+import json
+import time
+import shutil
+import hashlib
+import secrets
+import logging
+import tempfile
+import argparse
+import subprocess
+import uuid
+from pathlib import Path
+from datetime import datetime, timedelta, timezone
+from collections import Counter, defaultdict, deque, namedtuple
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+from functools import lru_cache, partial, wraps
+from itertools import chain, islice, groupby
+from zoneinfo import ZoneInfo  # Python 3.9+
+
+# ═══ Boas Práticas Gerais ═══
+# 1. Use pathlib em vez de os.path para caminhos
+# 2. Use subprocess.run() em vez de os.system()
+# 3. Use secrets em vez de random para segurança
+# 4. Sempre capture_output=True + text=True em subprocess
+# 5. Use context managers (with) para arquivos temporários
+# 6. Use ThreadPoolExecutor para I/O, ProcessPoolExecutor para CPU
+# 7. Use lru_cache para cachear chamadas de API repetidas
+# 8. Use Counter para contagens (mais eficiente que dict manual)
+# 9. Use deque(maxlen=N) para buffers circulares
+# 10. Armazene tempos em UTC, converta para local apenas na exibição</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>Checklist de Aprendizado</h3>
+          <div class="command-card wide">
+            <div class="command-header"><code>Autoavaliação</code><span class="cmd-tag">checklist</span></div>
+            <pre><code># Marque com [x] os itens que você domina:
+
+# OS e SYS
+# [ ] Usar pathlib para manipular caminhos
+# [ ] Ler e definir variáveis de ambiente com os.environ
+# [ ] Verificar plataforma e versão do Python
+# [ ] Usar sys.argv para argumentos simples
+
+# SUBPROCESS
+# [ ] Executar comandos com subprocess.run()
+# [ ] Capturar stdout e stderr
+# [ ] Tratar erros (CalledProcessError, TimeoutExpired)
+# [ ] Entender riscos de shell=True
+# [ ] Criar wrappers para terraform/docker/git
+
+# DATETIME e TIME
+# [ ] Criar e formatar datas com strftime/strptime
+# [ ] Trabalhar com timezones (zoneinfo)
+# [ ] Calcular diferenças de tempo (timedelta)
+# [ ] Medir tempo de execução (perf_counter)
+
+# RE (REGEX)
+# [ ] Usar search, findall, sub
+# [ ] Criar padrões compilados (re.compile)
+# [ ] Usar grupos nomeados (?P&lt;nome&gt;...)
+# [ ] Validar IPs, CIDRs, ARNs
+
+# COLLECTIONS
+# [ ] Contar com Counter
+# [ ] Usar defaultdict para agrupamento
+# [ ] Criar namedtuples para dados estruturados
+# [ ] Usar deque para buffers e filas
+
+# ITERTOOLS e FUNCTOOLS
+# [ ] Usar chain para concatenar iteráveis
+# [ ] Usar islice para paginação lazy
+# [ ] Usar lru_cache para memoização
+# [ ] Criar decoradores com functools.wraps
+
+# SHUTIL e TEMPFILE
+# [ ] Copiar diretórios com copytree
+# [ ] Criar/extrair arquivos compactados
+# [ ] Usar TemporaryDirectory para builds
+# [ ] Implementar rotação de backups
+
+# HASHLIB e SECRETS
+# [ ] Calcular checksums de arquivos
+# [ ] Gerar senhas e tokens seguros
+# [ ] Usar secrets.compare_digest
+# [ ] Gerar UUIDs para recursos
+
+# CONCURRENT.FUTURES
+# [ ] Usar ThreadPoolExecutor para I/O paralelo
+# [ ] Usar as_completed para processar conforme terminam
+# [ ] Implementar timeout e error handling
+# [ ] Escolher entre threads e processos
+
+# ARGPARSE
+# [ ] Criar CLI com argumentos posicionais e opcionais
+# [ ] Implementar subcomandos
+# [ ] Criar tipos de validação customizados
+# [ ] Gerar help text útil</code></pre>
           </div>
         </div>
 
