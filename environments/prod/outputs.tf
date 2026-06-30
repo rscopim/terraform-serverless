@@ -42,3 +42,13 @@ output "visitor_counter_table_arn" {
   description = "ARN da tabela DynamoDB do contador de visitantes"
   value       = module.visitor_counter_dynamodb.table_arn
 }
+
+output "visitor_counter_lambda_name" {
+  description = "Nome da Lambda do contador de visitantes"
+  value       = module.visitor_counter_lambda.lambda_function_name
+}
+
+output "visitor_counter_lambda_arn" {
+  description = "ARN da Lambda do contador de visitantes"
+  value       = module.visitor_counter_lambda.lambda_function_arn
+}

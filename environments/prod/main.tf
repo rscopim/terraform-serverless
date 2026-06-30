@@ -204,3 +204,18 @@ module "visitor_counter_dynamodb" {
   environment  = var.environment
   table_name   = "cloudtrilhas-visitor-counter"
 }
+
+module "visitor_counter_lambda" {
+  source = "../../modules/visitor_counter_lambda"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_source_file = "${path.root}/../../lambda_src/visitor_counter/app.py"
+  lambda_output_path = "${path.root}/visitor_counter.zip"
+
+  dynamodb_table_name = module.visitor_counter_dynamodb.table_name
+  dynamodb_table_arn  = module.visitor_counter_dynamodb.table_arn
+
+  allowed_origin = "https://www.cloudtrilhas.com.br"
+}
