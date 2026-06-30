@@ -32,3 +32,13 @@ output "github_actions_role_arn" {
   description = "ARN da role IAM usada pelo GitHub Actions"
   value       = module.github_actions_oidc.github_actions_role_arn
 }
+
+output "visitor_counter_table_name" {
+  description = "Nome da tabela DynamoDB do contador de visitantes"
+  value       = module.visitor_counter_dynamodb.table_name
+}
+
+output "visitor_counter_table_arn" {
+  description = "ARN da tabela DynamoDB do contador de visitantes"
+  value       = module.visitor_counter_dynamodb.table_arn
+}

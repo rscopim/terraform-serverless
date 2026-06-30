@@ -197,3 +197,10 @@ module "analytics" {
   api_gateway_id            = module.api_gateway.api_id
   api_gateway_execution_arn = module.api_gateway.execution_arn
 }
+
+module "visitor_counter_dynamodb" {
+  source       = "../../modules/visitor_counter_dynamodb"
+  project_name = var.project_name
+  environment  = var.environment
+  table_name   = "cloudtrilhas-visitor-counter"
+}
