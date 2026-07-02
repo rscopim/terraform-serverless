@@ -30,7 +30,7 @@ function handler(event) {
   }
   
   // 3. Block requests with suspicious paths (common bot/scanner patterns)
-  var blockedPaths = /\/(wp-admin|wp-login|wp-content|wp-includes|xmlrpc|\.well-known\/|administrator|phpmyadmin|admin\.php|config\.|\.env|\.git)/i;
+  var blockedPaths = /\/(wp-admin|wp-login|wp-content|wp-includes|xmlrpc|\.well-known\/|administrator|phpmyadmin|admin\.php|config\.(php|asp|aspx|jsp)|\.env|\.git)/i;
   if (blockedPaths.test(uri)) {
     return {
       statusCode: 403,
