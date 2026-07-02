@@ -440,12 +440,26 @@ resource "aws_s3_object" "simulado_js" {
 }
 
 resource "aws_s3_object" "config_js" {
-  bucket        = aws_s3_bucket.this.id
-  key           = "config.js"
-  content       = "window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };"
+  bucket = aws_s3_bucket.this.id
+  key    = "config.js"
+
+  content = <<EOT
+window.CLOUDTRILHAS_CONFIG = {
+  apiEndpoint: "${var.api_endpoint}",
+  visitorCounterEndpoint: "${var.visitor_counter_endpoint}"
+};
+EOT
+
   content_type  = "application/javascript"
   cache_control = "no-cache, no-store, must-revalidate"
-  etag          = md5("window.CLOUDTRILHAS_CONFIG = { apiEndpoint: \"${var.api_endpoint}\" };")
+
+  etag = md5(<<EOT
+window.CLOUDTRILHAS_CONFIG = {
+  apiEndpoint: "${var.api_endpoint}",
+  visitorCounterEndpoint: "${var.visitor_counter_endpoint}"
+};
+EOT
+  )
 }
 
 resource "aws_s3_object" "sitemap_xml" {

@@ -1,5 +1,11 @@
 const API_ENDPOINT = window.CLOUDTRILHAS_CONFIG.apiEndpoint;
 
+// ======================================================
+// Endpoint da API do Visitor Counter
+// ======================================================
+const VISITOR_COUNTER_ENDPOINT =
+  window.CLOUDTRILHAS_CONFIG.visitorCounterEndpoint;
+
 function setMessage(element, message, type = "") {
   element.textContent = message;
   element.className = type ? `form-message ${type}` : "form-message";
@@ -56,3 +62,32 @@ document.querySelectorAll(".inline-download-form").forEach((form) => {
     }
   });
 });
+
+// ======================================================
+// Visitor Counter
+// Conta apenas uma visita por navegador utilizando localStorage.
+// ======================================================
+
+async function registerVisitor() {
+
+  // Evita contar múltiplas visitas do mesmo navegador.
+  if (localStorage.getItem("cloudtrilhas-visitor-counted")) {
+    return;
+  }
+
+  try {
+    await fetch(VISITOR_COUNTER_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    localStorage.setItem("cloudtrilhas-visitor-counted", "true");
+    console.log("Visitor registrado com sucesso.");
+  } catch (error) {
+    console.error("Erro ao registrar visitante:", error);
+  }
+}
+// Executa automaticamente ao abrir a página.
+registerVisitor();

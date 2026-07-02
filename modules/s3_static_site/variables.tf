@@ -37,3 +37,8 @@ variable "api_endpoint" {
   description = "Endpoint da API de leads"
   type        = string
 }
+
+variable "visitor_counter_endpoint" {
+  description = "Endpoint da API do contador de visitantes"
+  type        = string
+}
