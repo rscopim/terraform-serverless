@@ -13,3 +13,11 @@ variable "lambda_invoke_arn" {
 variable "lambda_function_name" {
   type = string
 }
+
+variable "visitor_counter_lambda_invoke_arn" {
+  type = string
+}
+
+variable "visitor_counter_lambda_function_name" {
+  type = string
+}

@@ -52,3 +52,8 @@ output "visitor_counter_lambda_arn" {
   description = "ARN da Lambda do contador de visitantes"
   value       = module.visitor_counter_lambda.lambda_function_arn
 }
+
+output "visitor_counter_endpoint" {
+  description = "Endpoint da API do contador de visitantes"
+  value       = module.api_gateway.counter_endpoint
+}

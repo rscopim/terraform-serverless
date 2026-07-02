@@ -112,6 +112,9 @@ module "api_gateway" {
 
   lambda_invoke_arn    = module.register_lead_lambda.lambda_invoke_arn
   lambda_function_name = module.register_lead_lambda.lambda_function_name
+
+  visitor_counter_lambda_invoke_arn    = module.visitor_counter_lambda.lambda_invoke_arn
+  visitor_counter_lambda_function_name = module.visitor_counter_lambda.lambda_function_name
 }
 
 module "route53" {
