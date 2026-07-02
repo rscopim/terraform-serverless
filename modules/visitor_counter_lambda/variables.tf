@@ -28,7 +28,7 @@ variable "dynamodb_table_arn" {
   type        = string
 }
 
-variable "allowed_origin" {
-  description = "Origem permitida para chamada da API"
+variable "allowed_origins" {
+  description = "Origens permitidas para chamada da API, separadas por vírgula"
   type        = string
 }
