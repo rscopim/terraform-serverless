@@ -5,15 +5,21 @@ import boto3
 dynamodb = boto3.client("dynamodb")
 
 TABLE_NAME = os.environ["TABLE_NAME"]
-ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://www.cloudtrilhas.com.br")
+
+ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
+).split(",")
 
 
-def response(status_code, body):
+def response(status_code, body, origin=None):
+    allow_origin = origin if origin in ALLOWED_ORIGINS else ALLOWED_ORIGINS[0]
+
     return {
         "statusCode": status_code,
         "headers": {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+            "Access-Control-Allow-Origin": allow_origin,
             "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type",
         },
@@ -28,10 +34,10 @@ def lambda_handler(event, context):
     origin = headers.get("origin") or headers.get("Origin") or ""
 
     if method == "OPTIONS":
-        return response(200, {"message": "ok"})
+        return response(200, {"message": "ok"}, origin)
 
-    if origin and origin != ALLOWED_ORIGIN:
-        return response(403, {"message": "origin not allowed"})
+    if origin and origin not in ALLOWED_ORIGINS:
+        return response(403, {"message": "origin not allowed"}, origin)
 
     if method == "GET":
         result = dynamodb.get_item(
@@ -41,7 +47,7 @@ def lambda_handler(event, context):
         )
 
         count = int(result.get("Item", {}).get("count", {}).get("N", "0"))
-        return response(200, {"count": count})
+        return response(200, {"count": count}, origin)
 
     if method == "POST":
         result = dynamodb.update_item(
@@ -58,6 +64,6 @@ def lambda_handler(event, context):
         )
 
         count = int(result["Attributes"]["count"]["N"])
-        return response(200, {"count": count})
+        return response(200, {"count": count}, origin)
 
-    return response(405, {"message": "method not allowed"})
+    return response(405, {"message": "method not allowed"}, origin)

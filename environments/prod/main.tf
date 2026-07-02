@@ -217,5 +217,5 @@ module "visitor_counter_lambda" {
   dynamodb_table_name = module.visitor_counter_dynamodb.table_name
   dynamodb_table_arn  = module.visitor_counter_dynamodb.table_arn
 
-  allowed_origin = "https://www.cloudtrilhas.com.br"
+  allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }

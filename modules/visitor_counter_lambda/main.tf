@@ -75,7 +75,7 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = {
       TABLE_NAME     = var.dynamodb_table_name
-      ALLOWED_ORIGIN = var.allowed_origin
+      ALLOWED_ORIGINS = var.allowed_origins
     }
   }
 
