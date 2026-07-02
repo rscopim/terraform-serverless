@@ -246,18 +246,40 @@ node generate-pdf.js terraform
 
 ---
 
-## � Documentação
+## 📚 Documentação
 
-O projeto é documentado por fases evolutivas (24 fases):
+O CloudTrilhas possui dois conjuntos de documentação complementares.
+
+### Engineering Blueprint
+
+Documentação estratégica da plataforma.
+
+Define a visão do projeto, princípios de engenharia, arquitetura, padrões de desenvolvimento e roadmap de evolução.
+
+📁 Localização:
+
+```text
+docs/blueprint/
+```
+
+---
+
+### Documentação por Fases
+
+Documentação técnica de cada evolução implementada na plataforma.
+
+Cada fase registra objetivos, arquitetura, implementação, testes, resultados e decisões técnicas adotadas durante o desenvolvimento.
 
 | Fase | Tema |
-|------|------|
-| 1-7 | Fundamentos (Lambda, SQS, SNS, EventBridge) |
-| 8-11 | Site estático (S3, CloudWatch, métricas) |
-| 12-14 | API Gateway, Lambda leads, DynamoDB |
-| 15-18 | Route 53, ACM, CloudFront, OAC |
-| 19-21 | Well-Architected, Budget, Observabilidade |
-| 22-24 | CI/CD, DEV/PROD, Shared Resources |
+|-------|------|
+| 1–7 | Fundamentos (Lambda, SQS, SNS, EventBridge) |
+| 8–11 | Site Estático (S3, CloudWatch, Métricas) |
+| 12–14 | API Gateway, Lambda Leads, DynamoDB |
+| 15–18 | Route 53, ACM, CloudFront, OAC |
+| 19–21 | Well-Architected, Budget, Observabilidade |
+| 22–24 | CI/CD, DEV/PROD, Shared Resources |
+| 25 | Auditoria Técnica da Plataforma |
+| 26 | CloudTrilhas Operations Center |
 
 ---
 
