@@ -57,3 +57,13 @@ output "visitor_counter_endpoint" {
   description = "Endpoint da API do contador de visitantes"
   value       = module.api_gateway.counter_endpoint
 }
+
+output "costs_lambda_name" {
+  description = "Nome da Lambda de custos AWS"
+  value       = module.costs.lambda_function_name
+}
+
+output "costs_lambda_arn" {
+  description = "ARN da Lambda de custos AWS"
+  value       = module.costs.lambda_function_arn
+}

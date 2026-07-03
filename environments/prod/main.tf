@@ -222,3 +222,12 @@ module "visitor_counter_lambda" {
 
   allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }
+
+module "costs" {
+  source             = "../../modules/costs"
+  project_name       = var.project_name
+  environment        = var.environment
+  lambda_source_file = "${path.root}/../../lambda_src/costs/app.py"
+  lambda_output_path = "${path.root}/costs.zip"
+  allowed_origins    = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
+}
