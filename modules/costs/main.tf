@@ -1,7 +1,7 @@
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_file = var.lambda_source_file
-  output_path = var.lambda_output_path
+  output_path = "${path.module}/costs.zip"
 }
 
 resource "aws_iam_role" "lambda_role" {
