@@ -267,6 +267,16 @@
 
         <!-- Summary Cards -->
         <div class="summary-grid">
+            <!-- ======================================================
+            Visitor Counter
+            ====================================================== -->
+            <div class="card summary-card">
+                <div class="summary-icon users">🌎</div>
+                <div class="summary-info">
+                    <h3 id="visitorCounter">0</h3>
+                    <p>Visitantes</p>
+                </div>
+            </div>
             <div class="card summary-card">
                 <div class="summary-icon users">👥</div>
                 <div class="summary-info">
@@ -437,6 +447,7 @@
     <script>
         // === Configuration ===
         const API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/analytics';
+        const VISITOR_COUNTER_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/counter';
         const DEFAULT_PASSWORD_HASH = 'c02b18eba561dbbd4573637ca5597bef0852da8185509bf61df2086614a272e5';
 
         // Usa hash salvo no localStorage ou o padrão
@@ -507,6 +518,7 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 const data = await response.json();
                 renderDashboard(data);
+                await loadVisitorCounter();
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 document.getElementById('errorMessage').textContent = 
@@ -519,6 +531,29 @@
 
         function refreshData() {
             loadData();
+        }
+
+        // ======================================================
+        // Visitor Counter
+        // Recupera o total de visitantes registrados.
+        // ======================================================
+        async function loadVisitorCounter() {
+            try {
+                const response = await fetch(VISITOR_COUNTER_URL);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                document.getElementById('visitorCounter').textContent =
+                    formatNumber(data.count || 0);
+
+            } catch (error) {
+                console.error('Erro ao carregar Visitor Counter:', error);
+                document.getElementById('visitorCounter').textContent = '—';
+            }
         }
 
         // === Render Dashboard ===
