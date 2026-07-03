@@ -85,6 +85,7 @@ resource "aws_lambda_function" "this" {
   }
 
   depends_on = [
+    data.archive_file.lambda_zip,
     aws_iam_role_policy_attachment.lambda_policy_attachment
   ]
 }
