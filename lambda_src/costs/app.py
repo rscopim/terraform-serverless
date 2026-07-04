@@ -43,6 +43,12 @@ def get_total_by_service(start, end):
         },
         Granularity="MONTHLY",
         Metrics=["UnblendedCost"],
+        Filter={
+            "Tags": {
+                "Key": "Project",
+                "Values": ["Terraform-Serverless"]
+            }
+        },
         GroupBy=[
             {
                 "Type": "DIMENSION",
@@ -56,9 +62,10 @@ def get_total_by_service(start, end):
     for group in result["ResultsByTime"][0].get("Groups", []):
         service = group["Keys"][0]
         amount = float(group["Metrics"]["UnblendedCost"]["Amount"])
+        rounded = round(amount, 2)
 
-        if amount > 0:
-            services[service] = round(amount, 2)
+        if rounded > 0:
+            services[service] = rounded
 
     return dict(sorted(services.items(), key=lambda item: item[1], reverse=True))
 
@@ -71,6 +78,12 @@ def get_daily_costs(start, end):
         },
         Granularity="DAILY",
         Metrics=["UnblendedCost"],
+        Filter={
+            "Tags": {
+                "Key": "Project",
+                "Values": ["Terraform-Serverless"]
+            }
+        },
     )
 
     daily = {}
@@ -99,6 +112,7 @@ def lambda_handler(event, context):
         return response(405, {"message": "method not allowed"}, origin)
 
     start, end = get_period()
+    display_end = (date.fromisoformat(end) - timedelta(days=1)).isoformat()
 
     services = get_total_by_service(start, end)
     daily = get_daily_costs(start, end)
@@ -109,7 +123,7 @@ def lambda_handler(event, context):
         200,
         {
             "total": total,
-            "period": f"{start} a {end}",
+            "period": f"{start} a {display_end}",
             "services": services,
             "daily": daily,
         },
