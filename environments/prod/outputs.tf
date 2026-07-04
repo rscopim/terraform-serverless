@@ -67,8 +67,3 @@ output "costs_lambda_arn" {
   description = "ARN da Lambda de custos AWS"
   value       = module.costs.lambda_function_arn
 }
-
-output "costs_endpoint" {
-  description = "Endpoint da API de custos AWS"
-  value       = module.api_gateway.costs_endpoint
-}
