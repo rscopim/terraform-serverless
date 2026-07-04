@@ -70,6 +70,7 @@ jobs:
             environments/prod/analytics.zip
             environments/prod/visitor_counter.zip
             environments/prod/costs.zip
+            environments/prod/governance.zip
 
   terraform-apply:
     name: Terraform Apply
