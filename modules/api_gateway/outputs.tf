@@ -17,3 +17,7 @@ output "execution_arn" {
 output "counter_endpoint" {
   value = "${aws_apigatewayv2_api.this.api_endpoint}/counter"
 }
+
+output "costs_endpoint" {
+  value = "${aws_apigatewayv2_api.this.api_endpoint}/costs"
+}

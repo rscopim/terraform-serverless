@@ -115,6 +115,9 @@ module "api_gateway" {
 
   visitor_counter_lambda_invoke_arn    = module.visitor_counter_lambda.lambda_invoke_arn
   visitor_counter_lambda_function_name = module.visitor_counter_lambda.lambda_function_name
+
+  costs_lambda_invoke_arn    = module.costs.lambda_invoke_arn
+  costs_lambda_function_name = module.costs.lambda_function_name
 }
 
 module "route53" {
