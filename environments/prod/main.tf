@@ -234,3 +234,15 @@ module "costs" {
   lambda_output_path = "${path.root}/costs.zip"
   allowed_origins    = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }
+
+module "governance" {
+  source = "../../modules/governance"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_source_file = "${path.root}/../../lambda_src/governance/app.py"
+  lambda_output_path = "${path.root}/governance.zip"
+
+  allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
+}

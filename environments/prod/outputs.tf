@@ -72,3 +72,13 @@ output "costs_endpoint" {
   description = "Endpoint da API de custos AWS"
   value       = module.api_gateway.costs_endpoint
 }
+
+output "governance_lambda_name" {
+  description = "Nome da Lambda de governança"
+  value       = module.governance.lambda_function_name
+}
+
+output "governance_lambda_arn" {
+  description = "ARN da Lambda de governança"
+  value       = module.governance.lambda_function_arn
+}
