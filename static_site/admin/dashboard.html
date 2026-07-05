@@ -129,6 +129,7 @@
         .summary-icon.trails { background: rgba(16,185,129,0.15); color: #34d399; }
         .summary-icon.simulados { background: rgba(245,158,11,0.15); color: #fbbf24; }
         .summary-icon.downloads { background: rgba(236,72,153,0.15); color: #f472b6; }
+        .summary-icon.governance { background: rgba(14,165,233,0.15); color: #38bdf8; }
         .summary-info h3 {
             font-size: 1.75rem; font-weight: 700; line-height: 1.2;
         }
@@ -422,6 +423,57 @@
             </div>
         </div>
 
+        <!-- AWS Governance -->
+        <div class="charts-grid">
+            <div class="card">
+                <h2>🛡️ Governança AWS</h2>
+
+                <div class="summary-grid" style="margin-bottom:1.25rem">
+                    <div class="card summary-card" style="box-shadow:none">
+                        <div class="summary-icon governance">📦</div>
+                        <div class="summary-info">
+                            <h3 id="governanceTotal">—</h3>
+                            <p>Recursos do Projeto</p>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card" style="box-shadow:none">
+                        <div class="summary-icon trails">✅</div>
+                        <div class="summary-info">
+                            <h3 id="governanceCompliant">—</h3>
+                            <p>Conformes</p>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card" style="box-shadow:none">
+                        <div class="summary-icon simulados">⚠️</div>
+                        <div class="summary-info">
+                            <h3 id="governancePending">—</h3>
+                            <p>Pendentes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Nome</th>
+                                <th>Status</th>
+                                <th>Tags Ausentes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="governanceTable"></tbody>
+                    </table>
+                </div>
+
+                <p style="color:#64748b;font-size:0.8rem;margin-top:0.75rem" id="governanceMeta">
+                    Inventário aguardando carregamento
+                </p>
+            </div>
+        </div>
+
         <!-- Error State -->
         <div class="error-state hidden" id="errorState">
             <h2>⚠️ Erro ao carregar dados</h2>
@@ -450,6 +502,7 @@
         const VISITOR_COUNTER_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/counter';
         const DEFAULT_PASSWORD_HASH = 'c02b18eba561dbbd4573637ca5597bef0852da8185509bf61df2086614a272e5';
         const COSTS_API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/costs';
+        const GOVERNANCE_API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/governance';
 
         // Usa hash salvo no localStorage ou o padrão
         function getPasswordHash() {
@@ -521,6 +574,7 @@
                 renderDashboard(data);
                 await loadVisitorCounter();
                 await loadCosts();
+                await loadGovernance();
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 document.getElementById('errorMessage').textContent = 
@@ -893,6 +947,97 @@
                     }
                 });
             }
+        }
+
+        // ======================================================
+        // Governance Dashboard
+        // Recupera o inventário de recursos do CloudTrilhas via API /governance.
+        // ======================================================
+        async function loadGovernance() {
+            try {
+                const response = await fetch(GOVERNANCE_API_URL);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const governance = await response.json();
+
+                renderGovernance(governance);
+
+            } catch (error) {
+                console.error('Erro ao carregar governança AWS:', error);
+                renderGovernance(null);
+            }
+        }
+
+        function renderGovernance(governance) {
+            const totalEl = document.getElementById('governanceTotal');
+            const compliantEl = document.getElementById('governanceCompliant');
+            const pendingEl = document.getElementById('governancePending');
+            const tableEl = document.getElementById('governanceTable');
+            const metaEl = document.getElementById('governanceMeta');
+
+            if (!governance || !governance.summary) {
+                totalEl.textContent = '—';
+                compliantEl.textContent = '—';
+                pendingEl.textContent = '—';
+                tableEl.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Dados de governança indisponíveis</td></tr>';
+                metaEl.textContent = 'Dados indisponíveis — aguardando retorno da API de governança';
+                return;
+            }
+
+            const summary = governance.summary;
+            const resources = governance.resources || [];
+
+            totalEl.textContent = formatNumber(summary.total || 0);
+            compliantEl.textContent = formatNumber(summary.compliant || 0);
+            pendingEl.textContent = formatNumber(summary.non_compliant || 0);
+
+            metaEl.textContent = `Projeto: ${summary.project || '—'} | Tags obrigatórias: ${(summary.required_tags || []).join(', ')}`;
+
+            const sortedResources = resources.sort((a, b) => {
+                if (a.compliant !== b.compliant) {
+                    return a.compliant ? 1 : -1;
+                }
+
+                return `${a.service}-${a.name}`.localeCompare(`${b.service}-${b.name}`);
+            });
+
+            tableEl.innerHTML = sortedResources.map(resource => {
+                const missingTags = resource.missing_tags && resource.missing_tags.length > 0
+                    ? resource.missing_tags.join(', ')
+                    : '—';
+
+                const statusBadge = resource.compliant
+                    ? '<span class="badge badge-green">OK</span>'
+                    : '<span class="badge" style="background:rgba(245,158,11,0.2);color:#fbbf24;">Pendente</span>';
+
+                return `
+                    <tr>
+                        <td>${escapeHtml(formatAwsServiceName(resource.service))}</td>
+                        <td>${escapeHtml(resource.name || '—')}</td>
+                        <td>${statusBadge}</td>
+                        <td>${escapeHtml(missingTags)}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;">Nenhum recurso encontrado</td></tr>';
+        }
+
+        function formatAwsServiceName(service) {
+            const names = {
+                apigateway: 'API Gateway',
+                cloudfront: 'CloudFront',
+                dynamodb: 'DynamoDB',
+                events: 'EventBridge',
+                lambda: 'AWS Lambda',
+                logs: 'CloudWatch Logs',
+                s3: 'Amazon S3',
+                sns: 'Amazon SNS',
+                sqs: 'Amazon SQS'
+            };
+
+            return names[service] || service;
         }
 
         function escapeHtml(str) {
