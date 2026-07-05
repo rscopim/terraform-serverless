@@ -4,6 +4,7 @@ resource "aws_sns_topic" "this" {
   tags = {
     Project     = var.project_name
     Environment = var.environment
+    ManagedBy   = "Terraform"
   }
 }
 
