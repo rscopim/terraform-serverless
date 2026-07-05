@@ -29,3 +29,11 @@ variable "costs_lambda_invoke_arn" {
 variable "costs_lambda_function_name" {
   type = string
 }
+
+variable "governance_lambda_invoke_arn" {
+  type = string
+}
+
+variable "governance_lambda_function_name" {
+  type = string
+}
