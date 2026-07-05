@@ -21,3 +21,7 @@ output "counter_endpoint" {
 output "costs_endpoint" {
   value = "${aws_apigatewayv2_api.this.api_endpoint}/costs"
 }
+
+output "governance_endpoint" {
+  value = "${aws_apigatewayv2_api.this.api_endpoint}/governance"
+}

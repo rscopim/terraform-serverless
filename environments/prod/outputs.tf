@@ -82,3 +82,8 @@ output "governance_lambda_arn" {
   description = "ARN da Lambda de governança"
   value       = module.governance.lambda_function_arn
 }
+
+output "governance_endpoint" {
+  description = "Endpoint da API de governança AWS"
+  value       = module.api_gateway.governance_endpoint
+}

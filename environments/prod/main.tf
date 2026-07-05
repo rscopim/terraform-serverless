@@ -118,6 +118,9 @@ module "api_gateway" {
 
   costs_lambda_invoke_arn    = module.costs.lambda_invoke_arn
   costs_lambda_function_name = module.costs.lambda_function_name
+
+  governance_lambda_invoke_arn    = module.governance.lambda_invoke_arn
+  governance_lambda_function_name = module.governance.lambda_function_name
 }
 
 module "route53" {

@@ -95,3 +95,30 @@ resource "aws_lambda_permission" "allow_apigateway_costs" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*/costs"
 }
+
+resource "aws_apigatewayv2_integration" "governance_lambda" {
+  api_id                 = aws_apigatewayv2_api.this.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = var.governance_lambda_invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "governance_get" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "GET /governance"
+  target    = "integrations/${aws_apigatewayv2_integration.governance_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "governance_options" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "OPTIONS /governance"
+  target    = "integrations/${aws_apigatewayv2_integration.governance_lambda.id}"
+}
+
+resource "aws_lambda_permission" "allow_apigateway_governance" {
+  statement_id  = "AllowExecutionFromApiGatewayGovernance"
+  action        = "lambda:InvokeFunction"
+  function_name = var.governance_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*/governance"
+}
