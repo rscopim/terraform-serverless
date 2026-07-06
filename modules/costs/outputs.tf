@@ -12,3 +12,13 @@ output "lambda_invoke_arn" {
   description = "Invoke ARN da Lambda de custos"
   value       = aws_lambda_function.this.invoke_arn
 }
+
+output "cache_table_name" {
+  description = "Nome da tabela DynamoDB de cache de custos"
+  value       = aws_dynamodb_table.costs_cache.name
+}
+
+output "cache_table_arn" {
+  description = "ARN da tabela DynamoDB de cache de custos"
+  value       = aws_dynamodb_table.costs_cache.arn
+}
