@@ -4,6 +4,29 @@ data "archive_file" "lambda_zip" {
   output_path = var.lambda_output_path
 }
 
+resource "aws_dynamodb_table" "costs_cache" {
+  name         = "${var.project_name}-${var.environment}-costs-cache"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Feature     = "FinOpsDashboard"
+  }
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project_name}-${var.environment}-costs-role"
 
@@ -44,6 +67,14 @@ resource "aws_iam_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem"
+        ]
+        Resource = aws_dynamodb_table.costs_cache.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
@@ -74,6 +105,7 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = {
       ALLOWED_ORIGINS = var.allowed_origins
+      CACHE_TABLE     = aws_dynamodb_table.costs_cache.name
     }
   }
 
@@ -100,4 +132,36 @@ resource "aws_cloudwatch_log_group" "this" {
     ManagedBy   = "Terraform"
     Feature     = "FinOpsDashboard"
   }
+}
+
+resource "aws_cloudwatch_event_rule" "weekly_costs_update" {
+  name                = "${var.project_name}-${var.environment}-weekly-costs-update"
+  description         = "Atualiza semanalmente o cache de custos do CloudTrilhas"
+  schedule_expression = "cron(0 6 ? * MON *)"
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Feature     = "FinOpsDashboard"
+  }
+}
+
+resource "aws_cloudwatch_event_target" "weekly_costs_update" {
+  rule      = aws_cloudwatch_event_rule.weekly_costs_update.name
+  target_id = "costs-lambda"
+  arn       = aws_lambda_function.this.arn
+
+  input = jsonencode({
+    source = "eventbridge"
+    action = "refresh_costs_cache"
+  })
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridgeCosts"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.this.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.weekly_costs_update.arn
 }
