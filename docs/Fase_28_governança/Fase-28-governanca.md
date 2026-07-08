@@ -4,7 +4,7 @@
 
 Implementar um mecanismo de Governança para inventariar automaticamente todos os recursos AWS pertencentes ao projeto CloudTrilhas, verificando se seguem o padrão de tags estabelecido.
 
-A solução utiliza a AWS Resource Groups Tagging API para localizar todos os recursos que possuem a tag `Project = Terraform-Serverless`, permitindo acompanhar a conformidade da infraestrutura diretamente pelo Dashboard Administrativo.
+A solução utiliza a AWS Resource Groups Tagging API para localizar todos os os recursos que possuem a tag `Project = Terraform-Serverless`, permitindo acompanhar a conformidade da infraestrutura diretamente pelo Dashboard Administrativo.
 
 ---
 
@@ -18,6 +18,7 @@ A solução utiliza a AWS Resource Groups Tagging API para localizar todos os re
 - Verificação das tags obrigatórias
 - Resumo de conformidade da infraestrutura
 - Listagem completa dos recursos encontrados
+- Identificação das tags ausentes por recurso
 - Módulo Terraform (`modules/governance/`)
 
 ---
@@ -30,11 +31,11 @@ Cloud Governance é o conjunto de práticas utilizadas para garantir que os recu
 
 Essas práticas facilitam:
 
-- controle de custos
-- segurança
-- auditoria
-- automação
-- conformidade
+- Controle de custos
+- Segurança
+- Auditoria
+- Automação
+- Conformidade
 
 ---
 
@@ -42,7 +43,7 @@ Essas práticas facilitam:
 
 Serviço da AWS responsável por localizar recursos através de Tags.
 
-Ao invés de consultar cada serviço individualmente (Lambda, S3, DynamoDB, SNS, etc.), uma única API retorna todos os recursos que possuem determinada Tag.
+Ao invés de consultar cada serviço individualmente (Lambda, S3, DynamoDB, SNS, SQS, EventBridge, CloudWatch, etc.), uma única API retorna todos os recursos que possuem determinada Tag.
 
 ---
 
@@ -77,7 +78,9 @@ Para cada recurso são verificadas:
 - ARN
 - Tags
 - Tags ausentes
-- Conformidade
+- Status de conformidade
+
+O Dashboard apresenta um inventário completo dos recursos pertencentes ao CloudTrilhas, permitindo identificar rapidamente recursos conformes ou pendentes.
 
 ---
 
@@ -94,7 +97,11 @@ AWS Lambda
         ↓
 AWS Resource Groups Tagging API
         ↓
-Retorno em JSON
+Localiza recursos pela Tag Project
+        ↓
+Valida Tags obrigatórias
+        ↓
+Retorna inventário em JSON
         ↓
 Dashboard atualizado
 ```
@@ -144,35 +151,51 @@ Resultado esperado:
 ```json
 {
   "summary": {
-    "total": 18,
-    "compliant": 18,
-    "non_compliant": 0
+    "total": 20,
+    "compliant": 19,
+    "non_compliant": 1,
+    "required_tags": [
+      "Project",
+      "Environment",
+      "ManagedBy"
+    ],
+    "project": "Terraform-Serverless"
   },
   "resources": [
     {
       "service": "lambda",
       "name": "Terraform-Serverless-prod-costs",
-      "compliant": true
+      "compliant": true,
+      "missing_tags": []
     }
   ]
 }
+```
+
+> Após a correção de todas as tags obrigatórias, o resultado esperado passa a ser:
+
+```text
+Total de recursos: 20
+Conformes: 20
+Pendentes: 0
 ```
 
 Validar Dashboard:
 
 - Abrir Dashboard Administrativo
 - Confirmar resumo da Governança
-- Confirmar listagem dos recursos
+- Confirmar inventário completo dos recursos
 - Confirmar status de conformidade
-- Confirmar inventário do projeto
+- Confirmar exibição das tags ausentes (quando houver)
 
 ---
 
 ## 📈 Resultado esperado
 
-- Inventário automático dos recursos AWS
+- Inventário automático dos recursos AWS do CloudTrilhas
 - Recursos identificados através da Tag `Project`
 - Auditoria automática das Tags obrigatórias
 - Dashboard exibindo conformidade da infraestrutura
-- Base preparada para futuras auditorias de Governança
+- Identificação rápida de recursos pendentes
 - Padronização oficial das Tags do projeto
+- Base preparada para futuras evoluções de Governança e FinOps

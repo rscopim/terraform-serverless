@@ -87,3 +87,13 @@ output "governance_endpoint" {
   description = "Endpoint da API de governança AWS"
   value       = module.api_gateway.governance_endpoint
 }
+
+output "admin_auth_lambda_name" {
+  description = "Nome da Lambda de autenticação administrativa"
+  value       = module.admin_auth.lambda_function_name
+}
+
+output "admin_users_table_name" {
+  description = "Nome da tabela DynamoDB de usuários admin"
+  value       = module.admin_auth.admin_users_table_name
+}

@@ -249,3 +249,15 @@ module "governance" {
 
   allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }
+
+module "admin_auth" {
+  source = "../../modules/admin_auth"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_source_file = "${path.root}/../../lambda_src/admin_auth/app.py"
+  lambda_output_path = "${path.root}/admin_auth.zip"
+
+  allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
+}
