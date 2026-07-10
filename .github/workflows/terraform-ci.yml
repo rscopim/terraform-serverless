@@ -71,7 +71,9 @@ jobs:
             environments/prod/visitor_counter.zip
             environments/prod/costs.zip
             environments/prod/governance.zip
-            environments/prod/admin_auth.zip
+            environments/prod/admin_login.zip
+            environments/prod/admin_users.zip
+            
 
   terraform-apply:
     name: Terraform Apply

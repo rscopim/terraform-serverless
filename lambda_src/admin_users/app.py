@@ -3,19 +3,18 @@ import hashlib
 import json
 import os
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import boto3
 
 dynamodb = boto3.client("dynamodb")
 
 TABLE_NAME = os.environ["TABLE_NAME"]
+
 ALLOWED_ORIGINS = os.environ.get(
     "ALLOWED_ORIGINS",
     "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 ).split(",")
-
-SESSION_HOURS = 8
 
 
 def response(status_code, body, origin=None):
@@ -37,6 +36,11 @@ def now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 
+def parse_body(event):
+    body = event.get("body") or "{}"
+    return json.loads(body)
+
+
 def hash_password(password, salt=None):
     if not salt:
         salt = base64.b64encode(secrets.token_bytes(16)).decode("utf-8")
@@ -51,16 +55,6 @@ def hash_password(password, salt=None):
     return salt, base64.b64encode(password_hash).decode("utf-8")
 
 
-def verify_password(password, salt, stored_hash):
-    _, calculated_hash = hash_password(password, salt)
-    return secrets.compare_digest(calculated_hash, stored_hash)
-
-
-def parse_body(event):
-    body = event.get("body") or "{}"
-    return json.loads(body)
-
-
 def get_user(username):
     result = dynamodb.get_item(
         TableName=TABLE_NAME,
@@ -69,10 +63,6 @@ def get_user(username):
     )
 
     return result.get("Item")
-
-
-def create_session_token():
-    return secrets.token_urlsafe(32)
 
 
 def get_auth_username(event):
@@ -121,64 +111,6 @@ def require_auth(event):
         return None
 
     return username
-
-
-def login(event, origin):
-    body = parse_body(event)
-
-    username = body.get("username", "").strip()
-    password = body.get("password", "")
-
-    if not username or not password:
-        return response(400, {"message": "username and password are required"}, origin)
-
-    user = get_user(username)
-
-    if not user:
-        return response(401, {"message": "invalid credentials"}, origin)
-
-    if user.get("active", {}).get("BOOL") is not True:
-        return response(403, {"message": "user inactive"}, origin)
-
-    salt = user["password_salt"]["S"]
-    stored_hash = user["password_hash"]["S"]
-
-    if not verify_password(password, salt, stored_hash):
-        return response(401, {"message": "invalid credentials"}, origin)
-
-    session_token = create_session_token()
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=SESSION_HOURS)
-
-    dynamodb.update_item(
-        TableName=TABLE_NAME,
-        Key={"username": {"S": username}},
-        UpdateExpression="""
-            SET session_token = :token,
-                session_expires_at = :expires,
-                last_login = :last_login
-        """,
-        ExpressionAttributeValues={
-            ":token": {"S": session_token},
-            ":expires": {"S": expires_at.isoformat()},
-            ":last_login": {"S": now_iso()},
-        },
-    )
-
-    return response(
-        200,
-        {
-            "message": "login successful",
-            "token": session_token,
-            "expires_at": expires_at.isoformat(),
-            "user": {
-                "username": username,
-                "name": user.get("name", {}).get("S", ""),
-                "email": user.get("email", {}).get("S", ""),
-                "role": user.get("role", {}).get("S", "admin"),
-            },
-        },
-        origin,
-    )
 
 
 def list_users(event, origin):
@@ -281,7 +213,7 @@ def update_user(event, origin):
 
 def lambda_handler(event, context):
     method = event.get("requestContext", {}).get("http", {}).get("method", "")
-    path = event.get("rawPath", "")
+    path_params = event.get("pathParameters") or {}
 
     headers = event.get("headers") or {}
     origin = headers.get("origin") or headers.get("Origin") or ""
@@ -292,16 +224,13 @@ def lambda_handler(event, context):
     if origin and origin not in ALLOWED_ORIGINS:
         return response(403, {"message": "origin not allowed"}, origin)
 
-    if method == "POST" and path == "/auth/login":
-        return login(event, origin)
-
-    if method == "GET" and path == "/auth/users":
+    if method == "GET":
         return list_users(event, origin)
 
-    if method == "POST" and path == "/auth/users":
+    if method == "POST":
         return create_user(event, origin)
 
-    if method == "PATCH" and path.startswith("/auth/users/"):
+    if method == "PATCH" and path_params.get("username"):
         return update_user(event, origin)
 
     return response(404, {"message": "route not found"}, origin)
