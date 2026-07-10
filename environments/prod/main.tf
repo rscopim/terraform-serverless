@@ -121,6 +121,12 @@ module "api_gateway" {
 
   governance_lambda_invoke_arn    = module.governance.lambda_invoke_arn
   governance_lambda_function_name = module.governance.lambda_function_name
+
+  admin_login_lambda_invoke_arn    = module.admin_auth.admin_login_invoke_arn
+  admin_login_lambda_function_name = module.admin_auth.admin_login_function_name
+
+  admin_users_lambda_invoke_arn    = module.admin_auth.admin_users_invoke_arn
+  admin_users_lambda_function_name = module.admin_auth.admin_users_function_name
 }
 
 module "route53" {

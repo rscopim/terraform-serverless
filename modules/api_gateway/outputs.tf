@@ -25,3 +25,13 @@ output "costs_endpoint" {
 output "governance_endpoint" {
   value = "${aws_apigatewayv2_api.this.api_endpoint}/governance"
 }
+
+output "admin_login_endpoint" {
+  description = "Endpoint de login administrativo"
+  value       = "${aws_apigatewayv2_api.this.api_endpoint}/auth/login"
+}
+
+output "admin_users_endpoint" {
+  description = "Endpoint de gestão de usuários administrativos"
+  value       = "${aws_apigatewayv2_api.this.api_endpoint}/auth/users"
+}

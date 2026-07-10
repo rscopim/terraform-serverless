@@ -112,3 +112,13 @@ output "admin_users_table_name" {
   description = "Nome da tabela DynamoDB de usuários administrativos"
   value       = module.admin_auth.admin_users_table_name
 }
+
+output "admin_login_endpoint" {
+  description = "Endpoint de login administrativo"
+  value       = module.api_gateway.admin_login_endpoint
+}
+
+output "admin_users_endpoint" {
+  description = "Endpoint de gestão de usuários administrativos"
+  value       = module.api_gateway.admin_users_endpoint
+}
