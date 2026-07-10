@@ -256,8 +256,11 @@ module "admin_auth" {
   project_name = var.project_name
   environment  = var.environment
 
-  lambda_source_file = "${path.root}/../../lambda_src/admin_auth/app.py"
-  lambda_output_path = "${path.root}/admin_auth.zip"
+  admin_login_source_file = "${path.root}/../../lambda_src/admin_login/app.py"
+  admin_login_output_path = "${path.root}/admin_login.zip"
+
+  admin_users_source_file = "${path.root}/../../lambda_src/admin_users/app.py"
+  admin_users_output_path = "${path.root}/admin_users.zip"
 
   allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }
