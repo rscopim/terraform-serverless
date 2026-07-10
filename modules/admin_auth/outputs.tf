@@ -37,3 +37,13 @@ output "admin_users_table_arn" {
   description = "ARN da tabela DynamoDB de usuários administrativos"
   value       = aws_dynamodb_table.admin_users.arn
 }
+
+output "admin_sessions_table_name" {
+  description = "Nome da tabela DynamoDB de sessões administrativas"
+  value       = aws_dynamodb_table.admin_sessions.name
+}
+
+output "admin_sessions_table_arn" {
+  description = "ARN da tabela DynamoDB de sessões administrativas"
+  value       = aws_dynamodb_table.admin_sessions.arn
+}
