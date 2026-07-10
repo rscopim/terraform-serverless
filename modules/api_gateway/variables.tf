@@ -37,3 +37,23 @@ variable "governance_lambda_invoke_arn" {
 variable "governance_lambda_function_name" {
   type = string
 }
+
+variable "admin_login_lambda_invoke_arn" {
+  description = "Invoke ARN da Lambda de login administrativo"
+  type        = string
+}
+
+variable "admin_login_lambda_function_name" {
+  description = "Nome da Lambda de login administrativo"
+  type        = string
+}
+
+variable "admin_users_lambda_invoke_arn" {
+  description = "Invoke ARN da Lambda de gestão de usuários"
+  type        = string
+}
+
+variable "admin_users_lambda_function_name" {
+  description = "Nome da Lambda de gestão de usuários"
+  type        = string
+}

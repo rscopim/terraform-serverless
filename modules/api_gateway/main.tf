@@ -3,9 +3,14 @@ resource "aws_apigatewayv2_api" "this" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_headers = ["content-type"]
-    allow_methods = ["GET", "POST", "OPTIONS"]
-    allow_origins = ["*"]
+    allow_headers = ["authorization", "content-type"]
+    allow_methods = ["GET", "POST", "PATCH", "OPTIONS"]
+    allow_origins = [
+    "https://cloudtrilhas.com.br",
+    "https://www.cloudtrilhas.com.br"
+    ]
+
+    max_age = 3600
   }
 }
 
@@ -121,4 +126,70 @@ resource "aws_lambda_permission" "allow_apigateway_governance" {
   function_name = var.governance_lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*/governance"
+}
+
+# ======================================================
+# Fase 29 — Admin Authentication
+# Integração da Lambda responsável pelo login.
+# ======================================================
+
+resource "aws_apigatewayv2_integration" "admin_login_lambda" {
+  api_id                 = aws_apigatewayv2_api.this.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = var.admin_login_lambda_invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "admin_login_post" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "POST /auth/login"
+  target    = "integrations/${aws_apigatewayv2_integration.admin_login_lambda.id}"
+}
+
+resource "aws_lambda_permission" "allow_apigateway_admin_login" {
+  statement_id  = "AllowExecutionFromApiGatewayAdminLogin"
+  action        = "lambda:InvokeFunction"
+  function_name = var.admin_login_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.this.execution_arn}/*/POST/auth/login"
+}
+
+# ======================================================
+# Fase 29 — Admin Authentication
+# Integração da Lambda responsável pela gestão de usuários.
+# ======================================================
+
+resource "aws_apigatewayv2_integration" "admin_users_lambda" {
+  api_id                 = aws_apigatewayv2_api.this.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = var.admin_users_lambda_invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "admin_users_get" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "GET /auth/users"
+  target    = "integrations/${aws_apigatewayv2_integration.admin_users_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "admin_users_post" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "POST /auth/users"
+  target    = "integrations/${aws_apigatewayv2_integration.admin_users_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "admin_users_patch" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "PATCH /auth/users/{username}"
+  target    = "integrations/${aws_apigatewayv2_integration.admin_users_lambda.id}"
+}
+
+resource "aws_lambda_permission" "allow_apigateway_admin_users" {
+  statement_id  = "AllowExecutionFromApiGatewayAdminUsers"
+  action        = "lambda:InvokeFunction"
+  function_name = var.admin_users_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.this.execution_arn}/*/*/auth/users*"
 }
