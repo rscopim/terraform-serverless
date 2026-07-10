@@ -71,7 +71,8 @@ resource "aws_cloudfront_distribution" "this" {
       locations = [
         "BR", # Brasil
         "CA", # Canadá
-        "CL"  # Chile
+        "CL",  # Chile
+        "PT" # Portugal
       ]
     }
   }
