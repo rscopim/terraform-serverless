@@ -38,6 +38,44 @@ resource "aws_dynamodb_table" "admin_users" {
     Environment = var.environment
     ManagedBy   = "Terraform"
     Feature     = "AdminAuthentication"
+    Component   = "AdminUsers"
+  }
+}
+
+# ======================================================
+# DynamoDB — Sessões administrativas
+#
+# Armazena somente o hash do token.
+# O atributo expires_at utiliza TTL para remoção
+# automática de sessões expiradas.
+# ======================================================
+
+resource "aws_dynamodb_table" "admin_sessions" {
+  name         = "${var.project_name}-${var.environment}-admin-sessions"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "token_hash"
+
+  attribute {
+    name = "token_hash"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "expires_at"
+    enabled        = true
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Feature     = "AdminAuthentication"
+    Component   = "AdminSessions"
   }
 }
 
@@ -50,12 +88,15 @@ resource "aws_iam_role" "admin_login_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
         Effect = "Allow"
+
         Principal = {
           Service = "lambda.amazonaws.com"
         }
+
         Action = "sts:AssumeRole"
       }
     ]
@@ -66,6 +107,7 @@ resource "aws_iam_role" "admin_login_role" {
     Environment = var.environment
     ManagedBy   = "Terraform"
     Feature     = "AdminAuthentication"
+    Component   = "AdminLogin"
   }
 }
 
@@ -74,28 +116,51 @@ resource "aws_iam_policy" "admin_login_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
-        Sid    = "ReadAndUpdateAdminSession"
+        Sid    = "ReadAndUpdateAdminUser"
         Effect = "Allow"
+
         Action = [
           "dynamodb:GetItem",
           "dynamodb:UpdateItem"
         ]
+
         Resource = aws_dynamodb_table.admin_users.arn
+      },
+      {
+        Sid    = "CreateAdminSession"
+        Effect = "Allow"
+
+        Action = [
+          "dynamodb:PutItem"
+        ]
+
+        Resource = aws_dynamodb_table.admin_sessions.arn
       },
       {
         Sid    = "WriteLambdaLogs"
         Effect = "Allow"
+
         Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
+
         Resource = "*"
       }
     ]
   })
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Feature     = "AdminAuthentication"
+    Component   = "AdminLogin"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "admin_login_policy_attachment" {
@@ -112,12 +177,15 @@ resource "aws_iam_role" "admin_users_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
         Effect = "Allow"
+
         Principal = {
           Service = "lambda.amazonaws.com"
         }
+
         Action = "sts:AssumeRole"
       }
     ]
@@ -128,6 +196,7 @@ resource "aws_iam_role" "admin_users_role" {
     Environment = var.environment
     ManagedBy   = "Terraform"
     Feature     = "AdminAuthentication"
+    Component   = "AdminUsers"
   }
 }
 
@@ -136,30 +205,53 @@ resource "aws_iam_policy" "admin_users_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
         Sid    = "ManageAdminUsers"
         Effect = "Allow"
+
         Action = [
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
           "dynamodb:Scan"
         ]
+
         Resource = aws_dynamodb_table.admin_users.arn
+      },
+      {
+        Sid    = "ValidateAdminSession"
+        Effect = "Allow"
+
+        Action = [
+          "dynamodb:GetItem"
+        ]
+
+        Resource = aws_dynamodb_table.admin_sessions.arn
       },
       {
         Sid    = "WriteLambdaLogs"
         Effect = "Allow"
+
         Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
+
         Resource = "*"
       }
     ]
   })
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Feature     = "AdminAuthentication"
+    Component   = "AdminUsers"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "admin_users_policy_attachment" {
@@ -173,9 +265,10 @@ resource "aws_iam_role_policy_attachment" "admin_users_policy_attachment" {
 
 resource "aws_lambda_function" "admin_login" {
   function_name = "${var.project_name}-${var.environment}-admin-login"
-  role          = aws_iam_role.admin_login_role.arn
-  handler       = "app.lambda_handler"
-  runtime       = "python3.12"
+
+  role    = aws_iam_role.admin_login_role.arn
+  handler = "app.lambda_handler"
+  runtime = "python3.12"
 
   filename         = data.archive_file.admin_login_zip.output_path
   source_code_hash = data.archive_file.admin_login_zip.output_base64sha256
@@ -185,7 +278,8 @@ resource "aws_lambda_function" "admin_login" {
 
   environment {
     variables = {
-      TABLE_NAME      = aws_dynamodb_table.admin_users.name
+      USERS_TABLE     = aws_dynamodb_table.admin_users.name
+      SESSIONS_TABLE  = aws_dynamodb_table.admin_sessions.name
       ALLOWED_ORIGINS = var.allowed_origins
     }
   }
@@ -209,9 +303,10 @@ resource "aws_lambda_function" "admin_login" {
 
 resource "aws_lambda_function" "admin_users" {
   function_name = "${var.project_name}-${var.environment}-admin-users"
-  role          = aws_iam_role.admin_users_role.arn
-  handler       = "app.lambda_handler"
-  runtime       = "python3.12"
+
+  role    = aws_iam_role.admin_users_role.arn
+  handler = "app.lambda_handler"
+  runtime = "python3.12"
 
   filename         = data.archive_file.admin_users_zip.output_path
   source_code_hash = data.archive_file.admin_users_zip.output_base64sha256
@@ -221,7 +316,8 @@ resource "aws_lambda_function" "admin_users" {
 
   environment {
     variables = {
-      TABLE_NAME      = aws_dynamodb_table.admin_users.name
+      USERS_TABLE     = aws_dynamodb_table.admin_users.name
+      SESSIONS_TABLE  = aws_dynamodb_table.admin_sessions.name
       ALLOWED_ORIGINS = var.allowed_origins
     }
   }
@@ -240,7 +336,7 @@ resource "aws_lambda_function" "admin_users" {
 }
 
 # ======================================================
-# CloudWatch Logs
+# CloudWatch Logs — Admin Login
 # ======================================================
 
 resource "aws_cloudwatch_log_group" "admin_login" {
@@ -255,6 +351,10 @@ resource "aws_cloudwatch_log_group" "admin_login" {
     Component   = "AdminLogin"
   }
 }
+
+# ======================================================
+# CloudWatch Logs — Admin Users
+# ======================================================
 
 resource "aws_cloudwatch_log_group" "admin_users" {
   name              = "/aws/lambda/${aws_lambda_function.admin_users.function_name}"
