@@ -33,3 +33,7 @@ static_site_backup/
 **/questoes.js
 
 PLANO_PROXIMAS_FASES.md
+
+docs_local/
+scripts/
+specs/

@@ -130,11 +130,13 @@ resource "aws_iam_policy" "admin_login_policy" {
         Resource = aws_dynamodb_table.admin_users.arn
       },
       {
-        Sid    = "CreateAdminSession"
+        Sid    = "ManageAdminSession"
         Effect = "Allow"
 
         Action = [
-          "dynamodb:PutItem"
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
         ]
 
         Resource = aws_dynamodb_table.admin_sessions.arn
@@ -221,11 +223,12 @@ resource "aws_iam_policy" "admin_users_policy" {
         Resource = aws_dynamodb_table.admin_users.arn
       },
       {
-        Sid    = "ValidateAdminSession"
+        Sid    = "ValidateAndRenewAdminSession"
         Effect = "Allow"
 
         Action = [
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem"
         ]
 
         Resource = aws_dynamodb_table.admin_sessions.arn
@@ -278,9 +281,11 @@ resource "aws_lambda_function" "admin_login" {
 
   environment {
     variables = {
-      USERS_TABLE     = aws_dynamodb_table.admin_users.name
-      SESSIONS_TABLE  = aws_dynamodb_table.admin_sessions.name
-      ALLOWED_ORIGINS = var.allowed_origins
+      USERS_TABLE          = aws_dynamodb_table.admin_users.name
+      SESSIONS_TABLE       = aws_dynamodb_table.admin_sessions.name
+      ALLOWED_ORIGINS      = var.allowed_origins
+      SESSION_IDLE_MINUTES = "30"
+      SESSION_MAX_HOURS    = "8"
     }
   }
 
@@ -316,9 +321,11 @@ resource "aws_lambda_function" "admin_users" {
 
   environment {
     variables = {
-      USERS_TABLE     = aws_dynamodb_table.admin_users.name
-      SESSIONS_TABLE  = aws_dynamodb_table.admin_sessions.name
-      ALLOWED_ORIGINS = var.allowed_origins
+      USERS_TABLE          = aws_dynamodb_table.admin_users.name
+      SESSIONS_TABLE       = aws_dynamodb_table.admin_sessions.name
+      ALLOWED_ORIGINS      = var.allowed_origins
+      SESSION_IDLE_MINUTES = "30"
+      SESSION_MAX_HOURS    = "8"
     }
   }
 

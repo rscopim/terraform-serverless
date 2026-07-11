@@ -122,3 +122,8 @@ output "admin_users_endpoint" {
   description = "Endpoint de gestão de usuários administrativos"
   value       = module.api_gateway.admin_users_endpoint
 }
+
+output "admin_logout_endpoint" {
+  description = "Endpoint de logout administrativo"
+  value       = module.api_gateway.admin_logout_endpoint
+}

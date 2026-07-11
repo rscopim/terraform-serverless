@@ -224,47 +224,6 @@
         }
         .badge-purple { background: rgba(79,70,229,0.2); color: #a5b4fc; }
         .badge-green { background: rgba(16,185,129,0.2); color: #6ee7b7; }
-
-        .auth-user {
-            color: #cbd5e1;
-            font-size: 0.875rem;
-            padding: 0.45rem 0.75rem;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            background: #111827;
-        }
-        .badge-red { background: rgba(239,68,68,0.2); color: #fca5a5; }
-        .badge-amber { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        .user-form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        .user-form-grid input,
-        .user-form-grid select {
-            width: 100%;
-            padding: 0.7rem 0.85rem;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            background: #0f172a;
-            color: #f1f5f9;
-        }
-        .user-form-grid input:focus,
-        .user-form-grid select:focus { outline: none; border-color: #4f46e5; }
-        .table-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
-        .action-btn {
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: #e2e8f0;
-            border-radius: 0.4rem;
-            padding: 0.35rem 0.6rem;
-            cursor: pointer;
-            font-size: 0.78rem;
-        }
-        .action-btn:hover { border-color: #818cf8; }
-        .action-btn.danger { border-color: #7f1d1d; color: #fca5a5; }
-        .form-message { margin-top: 0.65rem; font-size: 0.85rem; min-height: 1.2rem; }
         @media (max-width: 768px) {
             .container { padding: 1rem; }
             .header { flex-direction: column; align-items: flex-start; }
@@ -277,12 +236,11 @@
     <!-- Auth Overlay -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-box">
-            <h2>🔒 CloudTrilhas Admin</h2>
-            <p style="color:#94a3b8;margin-bottom:1.5rem;">Entre com seu usuário administrativo</p>
-            <input type="text" id="authUsername" placeholder="Usuário" autocomplete="username">
-            <input type="password" id="authPassword" placeholder="Senha" autocomplete="current-password">
-            <button id="loginButton" onclick="authenticate()">Entrar</button>
-            <p class="auth-error" id="authError">Usuário ou senha inválidos.</p>
+            <h2>🔒 CloudTrilhas Analytics</h2>
+            <p style="color:#94a3b8;margin-bottom:1.5rem;">Insira a senha de acesso ao painel</p>
+            <input type="password" id="authPassword" placeholder="Senha de acesso" autocomplete="off">
+            <button onclick="authenticate()">Entrar</button>
+            <p class="auth-error" id="authError">Senha incorreta. Tente novamente.</p>
         </div>
     </div>
 
@@ -304,8 +262,7 @@
                 <button class="period-btn" data-days="30">30 dias</button>
                 <button class="period-btn" data-days="90">90 dias</button>
                 <button class="btn-refresh" onclick="refreshData()">🔄 Atualizar</button>
-                <span class="auth-user" id="loggedUser">—</span>
-                <button class="btn-refresh" onclick="logout()">🚪 Sair</button>
+                <button class="btn-refresh" onclick="openPwdModal()">🔑 Senha</button>
             </div>
         </div>
 
@@ -517,46 +474,6 @@
             </div>
         </div>
 
-
-        <!-- Admin Users -->
-        <div class="charts-grid">
-            <div class="card">
-                <h2>👤 Administração de Usuários</h2>
-
-                <div class="user-form-grid">
-                    <input type="text" id="newUsername" placeholder="Usuário (minúsculo)">
-                    <input type="text" id="newUserName" placeholder="Nome completo">
-                    <input type="email" id="newUserEmail" placeholder="E-mail">
-                    <input type="password" id="newUserPassword" placeholder="Senha inicial">
-                    <select id="newUserRole">
-                        <option value="VIEWER">Viewer</option>
-                        <option value="EDITOR">Editor</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
-                    <button class="btn-refresh" type="button" onclick="createAdminUser()">➕ Criar usuário</button>
-                </div>
-
-                <p class="form-message" id="usersMessage"></p>
-
-                <div class="scrollable-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Usuário</th>
-                                <th>Nome</th>
-                                <th>E-mail</th>
-                                <th>Perfil</th>
-                                <th>Status</th>
-                                <th>Último login</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUsersTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <!-- Error State -->
         <div class="error-state hidden" id="errorState">
             <h2>⚠️ Erro ao carregar dados</h2>
@@ -564,22 +481,33 @@
             <button onclick="refreshData()">Tentar Novamente</button>
         </div>
 
+        <!-- Change Password Modal -->
+        <div class="auth-overlay hidden" id="changePwdOverlay" style="background:rgba(15,23,42,0.9)">
+            <div class="auth-box">
+                <h2>🔑 Alterar Senha</h2>
+                <p style="color:#94a3b8;margin-bottom:1.5rem;">Defina uma nova senha de acesso ao painel</p>
+                <input type="password" id="currentPwd" placeholder="Senha atual" autocomplete="off">
+                <input type="password" id="newPwd" placeholder="Nova senha" autocomplete="off">
+                <input type="password" id="confirmPwd" placeholder="Confirmar nova senha" autocomplete="off">
+                <button onclick="changePassword()">Salvar Nova Senha</button>
+                <button onclick="closePwdModal()" style="background:#334155;margin-top:0.5rem;">Cancelar</button>
+                <p class="auth-error" id="pwdError"></p>
+            </div>
+        </div>
     </div>
 
     <script>
         // === Configuration ===
-        const API_BASE_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com';
-        const API_URL = `${API_BASE_URL}/analytics`;
-        const VISITOR_COUNTER_URL = `${API_BASE_URL}/counter`;
-        const COSTS_API_URL = `${API_BASE_URL}/costs`;
-        const GOVERNANCE_API_URL = `${API_BASE_URL}/governance`;
-        const AUTH_LOGIN_URL = `${API_BASE_URL}/auth/login`;
-        const AUTH_LOGOUT_URL = `${API_BASE_URL}/auth/logout`;
-        const AUTH_USERS_URL = `${API_BASE_URL}/auth/users`;
+        const API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/analytics';
+        const VISITOR_COUNTER_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/counter';
+        const DEFAULT_PASSWORD_HASH = 'c02b18eba561dbbd4573637ca5597bef0852da8185509bf61df2086614a272e5';
+        const COSTS_API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/costs';
+        const GOVERNANCE_API_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/governance';
 
-        const SESSION_TOKEN_KEY = 'ct_admin_token';
-        const SESSION_USER_KEY = 'ct_admin_user';
-        const SESSION_EXPIRES_KEY = 'ct_admin_expires_at';
+        // Usa hash salvo no localStorage ou o padrão
+        function getPasswordHash() {
+            return localStorage.getItem('ct_admin_pwd_hash') || DEFAULT_PASSWORD_HASH;
+        }
 
         let timelineChart = null;
         let trailsChart = null;
@@ -587,160 +515,40 @@
         let currentPeriod = 7;
 
         // === Authentication ===
-        function getAuthToken() {
-            return sessionStorage.getItem(SESSION_TOKEN_KEY) || '';
-        }
-
-        function getAuthHeaders(includeJson = false) {
-            const headers = {};
-            const token = getAuthToken();
-
-            if (token) headers.Authorization = `Bearer ${token}`;
-            if (includeJson) headers['Content-Type'] = 'application/json';
-
-            return headers;
-        }
-
-        function clearSession() {
-            sessionStorage.removeItem(SESSION_TOKEN_KEY);
-            sessionStorage.removeItem(SESSION_USER_KEY);
-            sessionStorage.removeItem(SESSION_EXPIRES_KEY);
-        }
-
-        function showLogin(message = '') {
-            clearSession();
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('authOverlay').classList.remove('hidden');
-            document.getElementById('loadingOverlay').classList.add('hidden');
-
-            const errorEl = document.getElementById('authError');
-            errorEl.textContent = message || 'Usuário ou senha inválidos.';
-            errorEl.style.display = message ? 'block' : 'none';
-            document.getElementById('authPassword').value = '';
-            document.getElementById('authUsername').focus();
-        }
-
-        function showDashboard(user) {
-            document.getElementById('authOverlay').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('loggedUser').textContent =
-                `${user.name || user.username} (${user.role || 'ADMIN'})`;
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function authenticate() {
-            const username = document.getElementById('authUsername').value.trim().toLowerCase();
-            const password = document.getElementById('authPassword').value;
-            const errorEl = document.getElementById('authError');
-            const button = document.getElementById('loginButton');
-
-            errorEl.style.display = 'none';
-
-            if (!username || !password) {
-                errorEl.textContent = 'Informe o usuário e a senha.';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            button.disabled = true;
-            button.textContent = 'Entrando...';
-
-            try {
-                const response = await fetch(AUTH_LOGIN_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const result = await response.json().catch(() => ({}));
-
-                if (!response.ok || !result.token) {
-                    throw new Error(result.message || 'Falha na autenticação.');
-                }
-
-                sessionStorage.setItem(SESSION_TOKEN_KEY, result.token);
-                sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(result.user || {}));
-                sessionStorage.setItem(SESSION_EXPIRES_KEY, result.expires_at || '');
-
-                showDashboard(result.user || { username });
-                await loadData();
-            } catch (error) {
-                console.error('Erro de autenticação:', error);
-                clearSession();
-                errorEl.textContent = 'Usuário ou senha inválidos.';
-                errorEl.style.display = 'block';
+            const input = document.getElementById('authPassword').value;
+            const hash = await hashPassword(input);
+            if (hash === getPasswordHash()) {
+                sessionStorage.setItem('ct_auth', 'true');
+                document.getElementById('authOverlay').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadData();
+            } else {
+                document.getElementById('authError').style.display = 'block';
                 document.getElementById('authPassword').value = '';
                 document.getElementById('authPassword').focus();
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Entrar';
             }
         }
 
-        async function logout() {
-            const token = getAuthToken();
-
-            try {
-                if (token) {
-                    await fetch(AUTH_LOGOUT_URL, {
-                        method: 'POST',
-                        headers: getAuthHeaders()
-                    });
-                }
-            } catch (error) {
-                console.error('Erro ao encerrar sessão:', error);
-            } finally {
-                showLogin();
-            }
-        }
-
-        async function authenticatedFetch(url, options = {}) {
-            const headers = {
-                ...(options.headers || {}),
-                ...getAuthHeaders(false)
-            };
-
-            const response = await fetch(url, { ...options, headers });
-
-            if (response.status === 401 || response.status === 403) {
-                showLogin('Sua sessão expirou. Entre novamente.');
-                throw new Error('Sessão expirada');
-            }
-
-            return response;
-        }
-
-        document.getElementById('authPassword').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') authenticate();
-        });
-        document.getElementById('authUsername').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') authenticate();
+        // Enter key on password field
+        document.getElementById('authPassword').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') authenticate();
         });
 
-        async function restoreSession() {
-            const token = getAuthToken();
-            const storedUser = sessionStorage.getItem(SESSION_USER_KEY);
-
-            if (!token || !storedUser) {
-                showLogin();
-                return;
-            }
-
-            try {
-                const response = await fetch(AUTH_USERS_URL, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) throw new Error('Sessão inválida');
-
-                const user = JSON.parse(storedUser);
-                showDashboard(user);
-                await loadData();
-            } catch (error) {
-                showLogin('Sua sessão expirou. Entre novamente.');
-            }
+        // Check session
+        if (sessionStorage.getItem('ct_auth') === 'true') {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadData();
         }
-
-        restoreSession();
 
         // === Period Selector ===
         document.querySelectorAll('.period-btn').forEach(btn => {
@@ -760,14 +568,13 @@
             errorState.classList.add('hidden');
 
             try {
-                const response = await authenticatedFetch(`${API_URL}?period=${currentPeriod}`);
+                const response = await fetch(`${API_URL}?period=${currentPeriod}`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 const data = await response.json();
                 renderDashboard(data);
                 await loadVisitorCounter();
                 await loadCosts();
                 await loadGovernance();
-                await loadAdminUsers();
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 document.getElementById('errorMessage').textContent = 
@@ -788,7 +595,7 @@
         // ======================================================
         async function loadVisitorCounter() {
             try {
-                const response = await authenticatedFetch(VISITOR_COUNTER_URL);
+                const response = await fetch(VISITOR_COUNTER_URL);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1063,7 +870,7 @@
         // ======================================================
         async function loadCosts() {
             try {
-                const response = await authenticatedFetch(COSTS_API_URL);
+                const response = await fetch(COSTS_API_URL);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1148,7 +955,7 @@
         // ======================================================
         async function loadGovernance() {
             try {
-                const response = await authenticatedFetch(GOVERNANCE_API_URL);
+                const response = await fetch(GOVERNANCE_API_URL);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1240,167 +1047,55 @@
             return div.innerHTML;
         }
 
-        // ======================================================
-        // Admin Users
-        // ======================================================
-        function setUsersMessage(message, isError = false) {
-            const element = document.getElementById('usersMessage');
-            element.textContent = message;
-            element.style.color = isError ? '#fca5a5' : '#6ee7b7';
+        // === Password Change ===
+        function openPwdModal() {
+            document.getElementById('changePwdOverlay').classList.remove('hidden');
+            document.getElementById('currentPwd').value = '';
+            document.getElementById('newPwd').value = '';
+            document.getElementById('confirmPwd').value = '';
+            document.getElementById('pwdError').style.display = 'none';
+            document.getElementById('currentPwd').focus();
         }
 
-        async function loadAdminUsers() {
-            const table = document.getElementById('adminUsersTable');
-
-            try {
-                const response = await authenticatedFetch(AUTH_USERS_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                const data = await response.json();
-                const users = data.users || [];
-
-                table.innerHTML = users.map(user => {
-                    const statusClass = user.status === 'ACTIVE'
-                        ? 'badge-green'
-                        : user.status === 'BLOCKED' ? 'badge-red' : 'badge-amber';
-                    const nextStatus = user.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
-                    const statusAction = user.status === 'ACTIVE' ? 'Desativar' : 'Ativar';
-
-                    return `
-                        <tr>
-                            <td>${escapeHtml(user.username)}</td>
-                            <td>${escapeHtml(user.name || '—')}</td>
-                            <td>${escapeHtml(user.email || '—')}</td>
-                            <td><span class="badge badge-purple">${escapeHtml(user.role || 'VIEWER')}</span></td>
-                            <td><span class="badge ${statusClass}">${escapeHtml(user.status || 'DISABLED')}</span></td>
-                            <td>${formatDateTime(user.last_login)}</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="action-btn" onclick="changeUserStatus('${escapeJs(user.username)}','${nextStatus}')">${statusAction}</button>
-                                    <button class="action-btn" onclick="changeUserRole('${escapeJs(user.username)}','${escapeJs(user.role || 'VIEWER')}')">Perfil</button>
-                                    <button class="action-btn" onclick="resetUserPassword('${escapeJs(user.username)}')">Senha</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('') || '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">Nenhum usuário encontrado</td></tr>';
-            } catch (error) {
-                console.error('Erro ao carregar usuários administrativos:', error);
-                table.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fca5a5;">Não foi possível carregar os usuários</td></tr>';
-            }
+        function closePwdModal() {
+            document.getElementById('changePwdOverlay').classList.add('hidden');
         }
 
-        async function createAdminUser() {
-            const payload = {
-                username: document.getElementById('newUsername').value.trim().toLowerCase(),
-                name: document.getElementById('newUserName').value.trim(),
-                email: document.getElementById('newUserEmail').value.trim().toLowerCase(),
-                password: document.getElementById('newUserPassword').value,
-                role: document.getElementById('newUserRole').value
-            };
+        async function changePassword() {
+            const errorEl = document.getElementById('pwdError');
+            const current = document.getElementById('currentPwd').value;
+            const newPwd = document.getElementById('newPwd').value;
+            const confirm = document.getElementById('confirmPwd').value;
 
-            if (!payload.username || !payload.password) {
-                setUsersMessage('Usuário e senha são obrigatórios.', true);
+            errorEl.style.display = 'none';
+
+            // Validar senha atual
+            const currentHash = await hashPassword(current);
+            if (currentHash !== getPasswordHash()) {
+                errorEl.textContent = 'Senha atual incorreta.';
+                errorEl.style.display = 'block';
                 return;
             }
 
-            try {
-                const response = await authenticatedFetch(AUTH_USERS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json().catch(() => ({}));
-
-                if (!response.ok) throw new Error(result.message || 'Falha ao criar usuário.');
-
-                document.getElementById('newUsername').value = '';
-                document.getElementById('newUserName').value = '';
-                document.getElementById('newUserEmail').value = '';
-                document.getElementById('newUserPassword').value = '';
-                document.getElementById('newUserRole').value = 'VIEWER';
-                setUsersMessage('Usuário criado com sucesso.');
-                await loadAdminUsers();
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
+            // Validar nova senha
+            if (newPwd.length < 6) {
+                errorEl.textContent = 'Nova senha deve ter no mínimo 6 caracteres.';
+                errorEl.style.display = 'block';
+                return;
             }
-        }
 
-        async function updateAdminUser(username, payload) {
-            const response = await authenticatedFetch(`${AUTH_USERS_URL}/${encodeURIComponent(username)}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json().catch(() => ({}));
-
-            if (!response.ok) throw new Error(result.message || 'Falha ao atualizar usuário.');
-            return result;
-        }
-
-        async function changeUserStatus(username, status) {
-            if (!confirm(`Confirma alterar ${username} para ${status}?`)) return;
-
-            try {
-                await updateAdminUser(username, { status });
-                setUsersMessage('Status atualizado com sucesso.');
-                await loadAdminUsers();
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
+            if (newPwd !== confirm) {
+                errorEl.textContent = 'As senhas não coincidem.';
+                errorEl.style.display = 'block';
+                return;
             }
-        }
 
-        async function changeUserRole(username, currentRole) {
-            const role = prompt('Novo perfil: ADMIN, EDITOR ou VIEWER', currentRole);
-            if (!role) return;
+            // Salvar novo hash
+            const newHash = await hashPassword(newPwd);
+            localStorage.setItem('ct_admin_pwd_hash', newHash);
 
-            try {
-                await updateAdminUser(username, { role: role.trim().toUpperCase() });
-                setUsersMessage('Perfil atualizado com sucesso.');
-                await loadAdminUsers();
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
-            }
-        }
-
-        async function resetUserPassword(username) {
-            const password = prompt(`Nova senha para ${username}:`);
-            if (!password) return;
-
-            try {
-                await updateAdminUser(username, { password });
-                setUsersMessage('Senha atualizada com sucesso.');
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
-            }
-        }
-
-        function translateAuthError(message) {
-            const translations = {
-                'user already exists': 'O usuário já existe.',
-                'invalid role': 'Perfil inválido.',
-                'invalid status': 'Status inválido.',
-                'unauthorized': 'Sessão sem autorização.',
-                'password must have at least 10 characters, uppercase, lowercase and number':
-                    'A senha deve ter ao menos 10 caracteres, maiúscula, minúscula e número.'
-            };
-
-            return translations[message] || message || 'Não foi possível concluir a operação.';
-        }
-
-        function formatDateTime(value) {
-            if (!value) return '—';
-            const date = new Date(value);
-            if (Number.isNaN(date.getTime())) return value;
-            return date.toLocaleString('pt-BR');
-        }
-
-        function escapeJs(value) {
-            return String(value || '')
-                .replace(/\\/g, '\\\\')
-                .replace(/'/g, "\\'")
-                .replace(/\r/g, '')
-                .replace(/\n/g, '');
+            closePwdModal();
+            alert('Senha alterada com sucesso!');
         }
     </script>
 </body>
