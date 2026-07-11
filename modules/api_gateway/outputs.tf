@@ -35,3 +35,8 @@ output "admin_users_endpoint" {
   description = "Endpoint de gestão de usuários administrativos"
   value       = "${aws_apigatewayv2_api.this.api_endpoint}/auth/users"
 }
+
+output "admin_logout_endpoint" {
+  description = "Endpoint de logout administrativo"
+  value       = "${aws_apigatewayv2_api.this.api_endpoint}/auth/logout"
+}

@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import secrets
+import uuid
 from datetime import datetime, timedelta, timezone
 
 import boto3
@@ -12,20 +13,30 @@ dynamodb = boto3.client("dynamodb")
 USERS_TABLE = os.environ["USERS_TABLE"]
 SESSIONS_TABLE = os.environ["SESSIONS_TABLE"]
 
-SESSION_HOURS = 8
+SESSION_IDLE_MINUTES = int(os.environ.get("SESSION_IDLE_MINUTES", "30"))
+SESSION_MAX_HOURS = int(os.environ.get("SESSION_MAX_HOURS", "8"))
 PASSWORD_ITERATIONS = 210_000
 
-ALLOWED_ORIGINS = os.environ.get(
-    "ALLOWED_ORIGINS",
-    "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
-).split(",")
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "ALLOWED_ORIGINS",
+        "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br",
+    ).split(",")
+    if origin.strip()
+]
 
 
 # ======================================================
-# Resposta HTTP padronizada com CORS.
+# Retorna uma resposta HTTP padronizada.
+# Cache-Control impede o armazenamento de dados sensíveis.
 # ======================================================
 def response(status_code, body, origin=None):
-    allow_origin = origin if origin in ALLOWED_ORIGINS else ALLOWED_ORIGINS[0]
+    allow_origin = (
+        origin
+        if origin in ALLOWED_ORIGINS
+        else ALLOWED_ORIGINS[0]
+    )
 
     return {
         "statusCode": status_code,
@@ -35,6 +46,7 @@ def response(status_code, body, origin=None):
             "Access-Control-Allow-Methods": "POST,OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type,Authorization",
             "Cache-Control": "no-store",
+            "Pragma": "no-cache",
         },
         "body": json.dumps(body),
     }
@@ -54,14 +66,18 @@ def now_iso():
 def parse_body(event):
     try:
         body = event.get("body") or "{}"
-        return json.loads(body)
-    except json.JSONDecodeError:
+        parsed = json.loads(body)
+
+        if not isinstance(parsed, dict):
+            return None
+
+        return parsed
+    except (json.JSONDecodeError, TypeError):
         return None
 
 
 # ======================================================
 # Gera o hash PBKDF2 da senha.
-# O salt e o número de iterações ficam salvos no usuário.
 # ======================================================
 def hash_password(password, salt, iterations):
     password_hash = hashlib.pbkdf2_hmac(
@@ -75,7 +91,11 @@ def hash_password(password, salt, iterations):
 
 
 def verify_password(password, salt, stored_hash, iterations):
-    calculated_hash = hash_password(password, salt, iterations)
+    calculated_hash = hash_password(
+        password,
+        salt,
+        iterations,
+    )
 
     return secrets.compare_digest(
         calculated_hash,
@@ -98,8 +118,8 @@ def get_user(username):
 
 
 # ======================================================
-# O token original é entregue ao navegador.
-# No DynamoDB é salvo somente o hash SHA-256.
+# Gera um token seguro.
+# Somente o hash SHA-256 do token será salvo no DynamoDB.
 # ======================================================
 def create_session_token():
     return secrets.token_urlsafe(48)
@@ -119,8 +139,53 @@ def get_source_ip(event):
     )
 
 
-def save_session(username, token, expires_at, source_ip):
+def get_user_agent(event):
+    headers = event.get("headers") or {}
+
+    return (
+        headers.get("user-agent")
+        or headers.get("User-Agent")
+        or ""
+    )[:500]
+
+
+def get_bearer_token(event):
+    headers = event.get("headers") or {}
+
+    authorization = (
+        headers.get("authorization")
+        or headers.get("Authorization")
+        or ""
+    )
+
+    if not authorization.startswith("Bearer "):
+        return None
+
+    token = authorization.removeprefix("Bearer ").strip()
+
+    return token or None
+
+
+# ======================================================
+# Cria a sessão administrativa.
+#
+# expires_at:
+#   expiração por inatividade e atributo TTL.
+#
+# absolute_expires_at:
+#   limite máximo da sessão, mesmo com atividade contínua.
+# ======================================================
+def save_session(
+    username,
+    token,
+    session_id,
+    idle_expires_at,
+    absolute_expires_at,
+    source_ip,
+    user_agent,
+):
     token_hash = hash_session_token(token)
+    timestamp = now_iso()
 
     dynamodb.put_item(
         TableName=SESSIONS_TABLE,
@@ -128,19 +193,32 @@ def save_session(username, token, expires_at, source_ip):
             "token_hash": {
                 "S": token_hash
             },
+            "session_id": {
+                "S": session_id
+            },
             "username": {
                 "S": username
             },
             "created_at": {
-                "S": now_iso()
+                "S": timestamp
+            },
+            "last_activity": {
+                "S": timestamp
             },
             "expires_at": {
-                "N": str(int(expires_at.timestamp()))
+                "N": str(int(idle_expires_at.timestamp()))
+            },
+            "absolute_expires_at": {
+                "N": str(int(absolute_expires_at.timestamp()))
             },
             "source_ip": {
                 "S": source_ip
             },
+            "user_agent": {
+                "S": user_agent
+            },
         },
+        ConditionExpression="attribute_not_exists(token_hash)",
     )
 
 
@@ -152,10 +230,10 @@ def update_last_login(username, source_ip):
                 "S": username
             }
         },
-        UpdateExpression="""
-            SET last_login = :last_login,
-                last_login_ip = :last_login_ip
-        """,
+        UpdateExpression=(
+            "SET last_login = :last_login, "
+            "last_login_ip = :last_login_ip"
+        ),
         ExpressionAttributeValues={
             ":last_login": {
                 "S": now_iso()
@@ -168,7 +246,7 @@ def update_last_login(username, source_ip):
 
 
 # ======================================================
-# Autenticação do usuário administrativo.
+# Autentica o usuário e cria uma nova sessão.
 # ======================================================
 def login(event, origin):
     body = parse_body(event)
@@ -180,20 +258,28 @@ def login(event, origin):
             origin,
         )
 
-    username = body.get("username", "").strip().lower()
-    password = body.get("password", "")
+    username = str(
+        body.get("username", "")
+    ).strip().lower()
+
+    password = str(
+        body.get("password", "")
+    )
 
     if not username or not password:
         return response(
             400,
-            {"message": "username and password are required"},
+            {
+                "message": (
+                    "username and password are required"
+                )
+            },
             origin,
         )
 
     user = get_user(username)
 
-    # A mesma mensagem é retornada para usuário inexistente
-    # ou senha incorreta, evitando enumeração de usuários.
+    # Mesma resposta para usuário inexistente ou senha inválida.
     if not user:
         return response(
             401,
@@ -201,7 +287,10 @@ def login(event, origin):
             origin,
         )
 
-    status = user.get("status", {}).get("S", "DISABLED")
+    status = user.get(
+        "status",
+        {},
+    ).get("S", "DISABLED")
 
     if status != "ACTIVE":
         return response(
@@ -210,12 +299,20 @@ def login(event, origin):
             origin,
         )
 
-    salt = user.get("password_salt", {}).get("S", "")
-    stored_hash = user.get("password_hash", {}).get("S", "")
+    salt = user.get(
+        "password_salt",
+        {},
+    ).get("S", "")
+
+    stored_hash = user.get(
+        "password_hash",
+        {},
+    ).get("S", "")
+
     iterations = int(
         user.get(
             "password_iterations",
-            {"N": str(PASSWORD_ITERATIONS)}
+            {"N": str(PASSWORD_ITERATIONS)},
         )["N"]
     )
 
@@ -238,15 +335,29 @@ def login(event, origin):
             origin,
         )
 
+    current_time = now_utc()
+
+    idle_expires_at = current_time + timedelta(
+        minutes=SESSION_IDLE_MINUTES
+    )
+
+    absolute_expires_at = current_time + timedelta(
+        hours=SESSION_MAX_HOURS
+    )
+
     token = create_session_token()
-    expires_at = now_utc() + timedelta(hours=SESSION_HOURS)
+    session_id = str(uuid.uuid4())
     source_ip = get_source_ip(event)
+    user_agent = get_user_agent(event)
 
     save_session(
-        username,
-        token,
-        expires_at,
-        source_ip,
+        username=username,
+        token=token,
+        session_id=session_id,
+        idle_expires_at=idle_expires_at,
+        absolute_expires_at=absolute_expires_at,
+        source_ip=source_ip,
+        user_agent=user_agent,
     )
 
     update_last_login(
@@ -259,14 +370,75 @@ def login(event, origin):
         {
             "message": "login successful",
             "token": token,
-            "expires_at": expires_at.isoformat(),
+            "session_id": session_id,
+            "expires_at": idle_expires_at.isoformat(),
+            "absolute_expires_at": (
+                absolute_expires_at.isoformat()
+            ),
             "user": {
                 "username": username,
-                "name": user.get("name", {}).get("S", ""),
-                "email": user.get("email", {}).get("S", ""),
-                "role": user.get("role", {}).get("S", "ADMIN"),
+                "name": user.get(
+                    "name",
+                    {},
+                ).get("S", ""),
+                "email": user.get(
+                    "email",
+                    {},
+                ).get("S", ""),
+                "role": user.get(
+                    "role",
+                    {},
+                ).get("S", "VIEWER"),
             },
         },
+        origin,
+    )
+
+
+# ======================================================
+# Exclui a sessão associada ao Bearer Token.
+# ======================================================
+def logout(event, origin):
+    token = get_bearer_token(event)
+
+    if not token:
+        return response(
+            401,
+            {"message": "unauthorized"},
+            origin,
+        )
+
+    token_hash = hash_session_token(token)
+
+    result = dynamodb.get_item(
+        TableName=SESSIONS_TABLE,
+        Key={
+            "token_hash": {
+                "S": token_hash
+            }
+        },
+        ConsistentRead=True,
+    )
+
+    if not result.get("Item"):
+        return response(
+            401,
+            {"message": "invalid or expired session"},
+            origin,
+        )
+
+    dynamodb.delete_item(
+        TableName=SESSIONS_TABLE,
+        Key={
+            "token_hash": {
+                "S": token_hash
+            }
+        },
+    )
+
+    return response(
+        200,
+        {"message": "logout successful"},
         origin,
     )
 
@@ -278,8 +450,15 @@ def lambda_handler(event, context):
         .get("method", "")
     )
 
+    raw_path = event.get("rawPath", "")
+
     headers = event.get("headers") or {}
-    origin = headers.get("origin") or headers.get("Origin") or ""
+
+    origin = (
+        headers.get("origin")
+        or headers.get("Origin")
+        or ""
+    )
 
     if method == "OPTIONS":
         return response(
@@ -295,11 +474,14 @@ def lambda_handler(event, context):
             origin,
         )
 
-    if method != "POST":
-        return response(
-            405,
-            {"message": "method not allowed"},
-            origin,
-        )
+    if method == "POST" and raw_path == "/auth/login":
+        return login(event, origin)
 
-    return login(event, origin)
+    if method == "POST" and raw_path == "/auth/logout":
+        return logout(event, origin)
+
+    return response(
+        404,
+        {"message": "route not found"},
+        origin,
+    )

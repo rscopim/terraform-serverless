@@ -6,8 +6,8 @@ resource "aws_apigatewayv2_api" "this" {
     allow_headers = ["authorization", "content-type"]
     allow_methods = ["GET", "POST", "PATCH", "OPTIONS"]
     allow_origins = [
-    "https://cloudtrilhas.com.br",
-    "https://www.cloudtrilhas.com.br"
+      "https://cloudtrilhas.com.br",
+      "https://www.cloudtrilhas.com.br"
     ]
 
     max_age = 3600
@@ -146,13 +146,23 @@ resource "aws_apigatewayv2_route" "admin_login_post" {
   target    = "integrations/${aws_apigatewayv2_integration.admin_login_lambda.id}"
 }
 
+# ======================================================
+# Fase 29 — Encerramento da sessão administrativa
+# ======================================================
+
+resource "aws_apigatewayv2_route" "admin_logout_post" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "POST /auth/logout"
+  target    = "integrations/${aws_apigatewayv2_integration.admin_login_lambda.id}"
+}
+
 resource "aws_lambda_permission" "allow_apigateway_admin_login" {
   statement_id  = "AllowExecutionFromApiGatewayAdminLogin"
   action        = "lambda:InvokeFunction"
   function_name = var.admin_login_lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.this.execution_arn}/*/POST/auth/login"
+  source_arn = "${aws_apigatewayv2_api.this.execution_arn}/*/POST/auth/*"
 }
 
 # ======================================================
