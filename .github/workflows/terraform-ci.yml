@@ -125,5 +125,5 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id E16GA24I7417C2 \
-            --paths "/index.html" "/style.css" "/app.js" "/config.js" "/simulado.js" "/robots.txt" "/404.html"
+            --paths "/index.html" "/style.css" "/app.js" "/config.js" "/simulado.js" "/robots.txt" "/404.html" "/admin/*"
           echo "CloudFront invalidation created - changes will propagate in 2-5 minutes"

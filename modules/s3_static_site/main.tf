@@ -494,6 +494,26 @@ resource "aws_s3_object" "admin_dashboard" {
   etag         = filemd5("${path.root}/../../static_site/admin/dashboard.html")
 }
 
+resource "aws_s3_object" "admin_dashboard_css" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "admin/dashboard.css"
+  source       = "${path.root}/../../static_site/admin/dashboard.css"
+  content_type = "text/css"
+  etag         = filemd5("${path.root}/../../static_site/admin/dashboard.css")
+
+  cache_control = "public, max-age=604800, immutable"
+}
+
+resource "aws_s3_object" "admin_dashboard_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "admin/dashboard.js"
+  source       = "${path.root}/../../static_site/admin/dashboard.js"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.root}/../../static_site/admin/dashboard.js")
+
+  cache_control = "no-cache, no-store, must-revalidate"
+}
+
 resource "aws_s3_object" "error_404" {
   bucket       = aws_s3_bucket.this.id
   key          = "404.html"
