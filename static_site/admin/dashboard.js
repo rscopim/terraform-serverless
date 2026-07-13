@@ -1,573 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudTrilhas Analytics</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #0f172a;
-            color: #f1f5f9;
-            min-height: 100vh;
-            line-height: 1.7;
-            font-size: 15px;
-        }
-        .auth-overlay {
-            position: fixed; inset: 0;
-            background: #0f172a;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999;
-        }
-        .auth-box {
-            background: #1e293b;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            text-align: center;
-            max-width: 400px; width: 90%;
-        }
-        .auth-box h2 { margin-bottom: 1.5rem; color: #4f46e5; }
-        .auth-box input {
-            width: 100%; padding: 0.75rem 1rem;
-            border: 1px solid #334155; border-radius: 0.5rem;
-            background: #0f172a; color: #f1f5f9;
-            font-size: 1rem; margin-bottom: 1rem;
-        }
-        .auth-box input:focus { outline: none; border-color: #4f46e5; }
-        .auth-box button {
-            width: 100%; padding: 0.75rem;
-            background: #4f46e5; color: white;
-            border: none; border-radius: 0.5rem;
-            font-size: 1rem; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .auth-box button:hover { background: #4338ca; }
-        .auth-error { color: #ef4444; margin-top: 0.75rem; display: none; }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .header h1 {
-            font-size: 1.75rem;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .header-meta {
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-        .controls {
-            display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
-        }
-        .period-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #334155;
-            background: transparent;
-            color: #94a3b8;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-        .period-btn:hover { border-color: #4f46e5; color: #f1f5f9; }
-        .period-btn.active {
-            background: #4f46e5; border-color: #4f46e5; color: white;
-        }
-        .btn-refresh {
-            padding: 0.5rem 1.25rem;
-            background: #1e293b; border: 1px solid #334155;
-            color: #f1f5f9; border-radius: 0.5rem;
-            cursor: pointer; font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-        .btn-refresh:hover { border-color: #4f46e5; background: #263348; }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
-        .card {
-            background: #1e293b;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            border: 1px solid #334155;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-        }
-        .summary-card {
-            display: flex; align-items: center; gap: 1rem;
-        }
-        .summary-icon {
-            width: 48px; height: 48px;
-            border-radius: 0.75rem;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-        .summary-icon.users { background: rgba(79,70,229,0.15); color: #818cf8; }
-        .summary-icon.trails { background: rgba(16,185,129,0.15); color: #34d399; }
-        .summary-icon.simulados { background: rgba(245,158,11,0.15); color: #fbbf24; }
-        .summary-icon.downloads { background: rgba(236,72,153,0.15); color: #f472b6; }
-        .summary-icon.governance { background: rgba(14,165,233,0.15); color: #38bdf8; }
-        .summary-info h3 {
-            font-size: 1.75rem; font-weight: 700; line-height: 1.2;
-        }
-        .summary-info p {
-            color: #94a3b8; font-size: 0.9rem;
-        }
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .charts-grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .card h2 {
-            font-size: 1.15rem; margin-bottom: 1.1rem;
-            color: #e2e8f0; font-weight: 600;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-height: 350px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.925rem;
-        }
-        th, td {
-            text-align: left;
-            padding: 0.9rem 1.1rem;
-            border-bottom: 1px solid #334155;
-        }
-        th {
-            color: #94a3b8;
-            font-weight: 600;
-            font-size: 0.84rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        td { color: #e2e8f0; line-height: 1.5; }
-        tr:hover td { background: rgba(79,70,229,0.05); }
-        .scrollable-table {
-            max-height: 350px;
-            overflow-y: auto;
-        }
-        .scrollable-table::-webkit-scrollbar { width: 6px; }
-        .scrollable-table::-webkit-scrollbar-track { background: #1e293b; }
-        .scrollable-table::-webkit-scrollbar-thumb {
-            background: #4f46e5; border-radius: 3px;
-        }
-        .loading-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15,23,42,0.85);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 1000;
-        }
-        .spinner {
-            width: 48px; height: 48px;
-            border: 4px solid #334155;
-            border-top-color: #4f46e5;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { margin-top: 1rem; color: #94a3b8; }
-        .error-state {
-            text-align: center; padding: 3rem;
-        }
-        .error-state h2 { color: #ef4444; margin-bottom: 1rem; }
-        .error-state p { color: #94a3b8; margin-bottom: 1.5rem; }
-        .error-state button {
-            padding: 0.75rem 1.5rem;
-            background: #4f46e5; color: white;
-            border: none; border-radius: 0.5rem;
-            cursor: pointer; font-size: 1rem;
-        }
-
-        .hidden { display: none !important; }
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .badge-purple { background: rgba(79,70,229,0.2); color: #a5b4fc; }
-        .badge-green { background: rgba(16,185,129,0.2); color: #6ee7b7; }
-
-        .auth-user {
-            color: #cbd5e1;
-            font-size: 0.875rem;
-            padding: 0.45rem 0.75rem;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            background: #111827;
-        }
-        .badge-red { background: rgba(239,68,68,0.2); color: #fca5a5; }
-        .badge-amber { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        .user-form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        .user-form-grid input,
-        .user-form-grid select {
-            width: 100%;
-            padding: 0.7rem 0.85rem;
-            border: 1px solid #334155;
-            border-radius: 0.5rem;
-            background: #0f172a;
-            color: #f1f5f9;
-        }
-        .user-form-grid input:focus,
-        .user-form-grid select:focus { outline: none; border-color: #4f46e5; }
-        .table-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
-        .action-btn {
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: #e2e8f0;
-            border-radius: 0.4rem;
-            padding: 0.35rem 0.6rem;
-            cursor: pointer;
-            font-size: 0.78rem;
-        }
-        .action-btn:hover { border-color: #818cf8; }
-        .action-btn.danger { border-color: #7f1d1d; color: #fca5a5; }
-        .form-message { margin-top: 0.65rem; font-size: 0.85rem; min-height: 1.2rem; }
-        @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .charts-grid-2 { grid-template-columns: 1fr; }
-            .summary-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-        }
-    </style>
-</head>
-<body>
-    <!-- Auth Overlay -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-box">
-            <h2>🔒 CloudTrilhas Admin</h2>
-            <p style="color:#94a3b8;margin-bottom:1.5rem;">Entre com seu usuário administrativo</p>
-            <input type="text" id="authUsername" placeholder="Usuário" autocomplete="username">
-            <input type="password" id="authPassword" placeholder="Senha" autocomplete="current-password">
-            <button id="loginButton" onclick="authenticate()">Entrar</button>
-            <p class="auth-error" id="authError">Usuário ou senha inválidos.</p>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay hidden" id="loadingOverlay">
-        <div class="spinner"></div>
-        <p class="loading-text">Carregando dados...</p>
-    </div>
-
-    <!-- Main Dashboard -->
-    <div class="container hidden" id="dashboard">
-        <div class="header">
-            <div>
-                <h1>📊 CloudTrilhas Analytics</h1>
-                <p class="header-meta">Gerado em: <span id="timestamp">—</span></p>
-            </div>
-            <div class="controls">
-                <button class="period-btn active" data-days="7">7 dias</button>
-                <button class="period-btn" data-days="30">30 dias</button>
-                <button class="period-btn" data-days="90">90 dias</button>
-                <button class="btn-refresh" onclick="refreshData()">🔄 Atualizar</button>
-                <span class="auth-user" id="loggedUser">—</span>
-                <button class="btn-refresh" onclick="logout()">🚪 Sair</button>
-            </div>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="summary-grid">
-            <!-- ======================================================
-            Visitor Counter
-            ====================================================== -->
-            <div class="card summary-card">
-                <div class="summary-icon users">🌎</div>
-                <div class="summary-info">
-                    <h3 id="visitorCounter">0</h3>
-                    <p>Visitantes</p>
-                </div>
-            </div>
-            <div class="card summary-card">
-                <div class="summary-icon users">👥</div>
-                <div class="summary-info">
-                    <h3 id="totalUsers">0</h3>
-                    <p>Total de Usuários</p>
-                </div>
-            </div>
-            <div class="card summary-card">
-                <div class="summary-icon trails">🛤️</div>
-                <div class="summary-info">
-                    <h3 id="trailAccess">0</h3>
-                    <p>Acessos às Trilhas</p>
-                </div>
-            </div>
-            <div class="card summary-card">
-                <div class="summary-icon simulados">📝</div>
-                <div class="summary-info">
-                    <h3 id="totalSimulados">0</h3>
-                    <p>Simulados Realizados</p>
-                </div>
-            </div>
-            <div class="card summary-card">
-                <div class="summary-icon downloads">📥</div>
-                <div class="summary-info">
-                    <h3 id="totalDownloads">0</h3>
-                    <p>Downloads</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Timeline Chart -->
-        <div class="charts-grid">
-            <div class="card">
-                <h2>📈 Acessos Diários</h2>
-                <div class="chart-container">
-                    <canvas id="timelineChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row: Top Trails + Sources -->
-        <div class="charts-grid-2">
-            <div class="card">
-                <h2>🏆 Trilhas Mais Acessadas</h2>
-                <div class="chart-container">
-                    <canvas id="trailsChart"></canvas>
-                </div>
-            </div>
-            <div class="card">
-                <h2>🌐 Origem dos Usuários</h2>
-                <div class="chart-container">
-                    <canvas id="sourcesChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tables Row: Institutions + Simulados -->
-        <div class="charts-grid-2">
-            <div class="card">
-                <h2>🏫 Instituições</h2>
-                <div class="scrollable-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Instituição</th>
-                                <th>Acessos</th>
-                            </tr>
-                        </thead>
-                        <tbody id="institutionsTable"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card">
-                <h2>📝 Simulados</h2>
-                <div class="scrollable-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Página</th>
-                                <th>Acessos</th>
-                                <th>Resultados</th>
-                                <th>Média</th>
-                            </tr>
-                        </thead>
-                        <tbody id="simuladosTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Users -->
-        <div class="charts-grid">
-            <div class="card">
-                <h2>🕐 Usuários Recentes</h2>
-                <div class="scrollable-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Página</th>
-                                <th>Data</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentUsersTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- AWS Costs -->
-        <div class="charts-grid-2">
-            <div class="card">
-                <h2>💰 Custos AWS (Mês Atual)</h2>
-                <div id="costsSection">
-                    <div class="summary-card" style="margin-bottom:1rem">
-                        <div class="summary-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24">💲</div>
-                        <div class="summary-info">
-                            <h3 id="totalCost">—</h3>
-                            <p>Total do mês (USD)</p>
-                        </div>
-                    </div>
-                    <div class="scrollable-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Serviço</th>
-                                    <th>Custo (USD)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="costsTable"></tbody>
-                        </table>
-                    </div>
-                    <p style="color:#64748b;font-size:0.8rem;margin-top:0.75rem" id="costsMeta">Dados indisponíveis — aguardando deploy do módulo de custos</p>
-                </div>
-            </div>
-            <div class="card">
-                <h2>📊 Custos por Dia (Mês Atual)</h2>
-                <div class="chart-container">
-                    <canvas id="costsChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- AWS Governance -->
-        <div class="charts-grid">
-            <div class="card">
-                <h2>🛡️ Governança AWS</h2>
-
-                <div class="summary-grid" style="margin-bottom:1.25rem">
-                    <div class="card summary-card" style="box-shadow:none">
-                        <div class="summary-icon governance">📦</div>
-                        <div class="summary-info">
-                            <h3 id="governanceTotal">—</h3>
-                            <p>Recursos do Projeto</p>
-                        </div>
-                    </div>
-
-                    <div class="card summary-card" style="box-shadow:none">
-                        <div class="summary-icon trails">✅</div>
-                        <div class="summary-info">
-                            <h3 id="governanceCompliant">—</h3>
-                            <p>Conformes</p>
-                        </div>
-                    </div>
-
-                    <div class="card summary-card" style="box-shadow:none">
-                        <div class="summary-icon simulados">⚠️</div>
-                        <div class="summary-info">
-                            <h3 id="governancePending">—</h3>
-                            <p>Pendentes</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scrollable-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Serviço</th>
-                                <th>Nome</th>
-                                <th>Status</th>
-                                <th>Tags Ausentes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="governanceTable"></tbody>
-                    </table>
-                </div>
-
-                <p style="color:#64748b;font-size:0.8rem;margin-top:0.75rem" id="governanceMeta">
-                    Inventário aguardando carregamento
-                </p>
-            </div>
-        </div>
-
-
-        <!-- Admin Users -->
-        <div class="charts-grid">
-            <div class="card">
-                <h2>👤 Administração de Usuários</h2>
-
-                <div class="user-form-grid">
-                    <input type="text" id="newUsername" placeholder="Usuário (minúsculo)">
-                    <input type="text" id="newUserName" placeholder="Nome completo">
-                    <input type="email" id="newUserEmail" placeholder="E-mail">
-                    <input type="password" id="newUserPassword" placeholder="Senha inicial">
-                    <select id="newUserRole">
-                        <option value="VIEWER">Viewer</option>
-                        <option value="EDITOR">Editor</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
-                    <button class="btn-refresh" type="button" onclick="createAdminUser()">➕ Criar usuário</button>
-                </div>
-
-                <p class="form-message" id="usersMessage"></p>
-
-                <div class="scrollable-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Usuário</th>
-                                <th>Nome</th>
-                                <th>E-mail</th>
-                                <th>Perfil</th>
-                                <th>Status</th>
-                                <th>Último login</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUsersTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Error State -->
-        <div class="error-state hidden" id="errorState">
-            <h2>⚠️ Erro ao carregar dados</h2>
-            <p id="errorMessage">Não foi possível conectar à API.</p>
-            <button onclick="refreshData()">Tentar Novamente</button>
-        </div>
-
-    </div>
-
-    <script>
-        // === Configuration ===
+// === Configuration ===
         const API_BASE_URL = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com';
         const API_URL = `${API_BASE_URL}/analytics`;
         const VISITOR_COUNTER_URL = `${API_BASE_URL}/counter`;
@@ -589,6 +20,31 @@
         // === Authentication ===
         function getAuthToken() {
             return sessionStorage.getItem(SESSION_TOKEN_KEY) || '';
+        }
+
+        function getAuthenticatedUser() {
+            const storedUser = sessionStorage.getItem(SESSION_USER_KEY);
+
+            if (!storedUser) return null;
+
+            try {
+                return JSON.parse(storedUser);
+            } catch (error) {
+                console.error('Usuário da sessão inválido:', error);
+                return null;
+            }
+        }
+
+        function isAdminUser() {
+            return getAuthenticatedUser()?.role === 'ADMIN';
+        }
+
+        function configureAccessByRole() {
+            const adminUsersSection = document.getElementById('adminUsersSection');
+
+            if (adminUsersSection) {
+                adminUsersSection.classList.toggle('hidden', !isAdminUser());
+            }
         }
 
         function getAuthHeaders(includeJson = false) {
@@ -624,7 +80,9 @@
             document.getElementById('authOverlay').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             document.getElementById('loggedUser').textContent =
-                `${user.name || user.username} (${user.role || 'ADMIN'})`;
+                `${user.name || user.username} (${user.role || 'VIEWER'})`;
+
+            configureAccessByRole();
         }
 
         async function authenticate() {
@@ -701,9 +159,15 @@
 
             const response = await fetch(url, { ...options, headers });
 
-            if (response.status === 401 || response.status === 403) {
+            if (response.status === 401) {
                 showLogin('Sua sessão expirou. Entre novamente.');
                 throw new Error('Sessão expirada');
+            }
+
+            if (response.status === 403) {
+                const error = new Error('Você não possui permissão para esta operação.');
+                error.status = 403;
+                throw error;
             }
 
             return response;
@@ -719,24 +183,29 @@
         async function restoreSession() {
             const token = getAuthToken();
             const storedUser = sessionStorage.getItem(SESSION_USER_KEY);
+            const expiresAt = sessionStorage.getItem(SESSION_EXPIRES_KEY);
 
             if (!token || !storedUser) {
                 showLogin();
                 return;
             }
 
+            if (expiresAt) {
+                const expiration = new Date(expiresAt);
+
+                if (!Number.isNaN(expiration.getTime()) && expiration <= new Date()) {
+                    showLogin('Sua sessão expirou. Entre novamente.');
+                    return;
+                }
+            }
+
             try {
-                const response = await fetch(AUTH_USERS_URL, {
-                    headers: getAuthHeaders()
-                });
-
-                if (!response.ok) throw new Error('Sessão inválida');
-
                 const user = JSON.parse(storedUser);
                 showDashboard(user);
                 await loadData();
             } catch (error) {
-                showLogin('Sua sessão expirou. Entre novamente.');
+                console.error('Erro ao restaurar sessão:', error);
+                showLogin('Não foi possível restaurar a sessão. Entre novamente.');
             }
         }
 
@@ -767,7 +236,10 @@
                 await loadVisitorCounter();
                 await loadCosts();
                 await loadGovernance();
-                await loadAdminUsers();
+
+                if (isAdminUser()) {
+                    await loadAdminUsers();
+                }
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 document.getElementById('errorMessage').textContent = 
@@ -1250,6 +722,8 @@
         }
 
         async function loadAdminUsers() {
+            if (!isAdminUser()) return;
+
             const table = document.getElementById('adminUsersTable');
 
             try {
@@ -1380,7 +854,9 @@
                 'user already exists': 'O usuário já existe.',
                 'invalid role': 'Perfil inválido.',
                 'invalid status': 'Status inválido.',
-                'unauthorized': 'Sessão sem autorização.',
+                'unauthorized': 'Sessão inválida ou expirada.',
+                'admin role required': 'Esta operação exige perfil ADMIN.',
+                'Você não possui permissão para esta operação.': 'Esta operação exige perfil ADMIN.',
                 'password must have at least 10 characters, uppercase, lowercase and number':
                     'A senha deve ter ao menos 10 caracteres, maiúscula, minúscula e número.'
             };
@@ -1402,6 +878,3 @@
                 .replace(/\r/g, '')
                 .replace(/\n/g, '');
         }
-    </script>
-</body>
-</html>
