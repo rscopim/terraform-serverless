@@ -157,7 +157,10 @@ def refresh_cache():
 
 
 def is_eventbridge_event(event):
-    return event.get("source") == "eventbridge" or event.get("action") == "refresh_costs_cache"
+     return (
+        event.get("source") == "eventbridge"
+        and event.get("action") == "refresh_costs_cache"
+    )
 
 
 def lambda_handler(event, context):
@@ -187,8 +190,25 @@ def lambda_handler(event, context):
 
     cached = load_cache()
 
-    if cached:
-        return response(200, cached, origin)
+    if not cached:
+        return response(
+            503,
+            {
+                "message": "cost cache unavailable",
+                "total": 0,
+                "period": "",
+                "services": {},
+                "daily": {},
+                "last_updated": None,
+                "source": "dynamodb-cache",
+                "cache": "weekly",
+                "cache_status": "empty",
+            },
+            origin,
+        )
 
-    payload = refresh_cache()
-    return response(200, payload, origin)
+    cached["source"] = "dynamodb-cache"
+    cached["cache"] = "weekly"
+    cached["cache_status"] = "available"
+
+    return response(200, cached, origin)
