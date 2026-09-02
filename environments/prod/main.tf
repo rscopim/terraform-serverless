@@ -281,4 +281,8 @@ module "cognito" {
 
   project_name = var.project_name
   environment  = var.environment
+
+  # Garante que a policy da role do GitHub Actions (com permissão cognito-idp)
+  # seja atualizada ANTES de tentar criar o User Pool, evitando AccessDenied.
+  depends_on = [module.github_actions_oidc]
 }
