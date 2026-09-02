@@ -30,6 +30,9 @@
         <a href="redes.html" class="nav-link">Redes</a>
         <a href="github.html" class="nav-link">GitHub</a>
         <a href="sandbox.html" class="nav-link">🧪 Sandbox</a>
+        <a href="login.html" class="nav-link" id="navLogin">Entrar</a>
+        <a href="cadastro.html" class="nav-button" id="navCadastro">Criar conta</a>
+        <a href="#" class="nav-link" id="navLogout" style="display:none">Sair</a>
         <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
@@ -44,6 +47,9 @@
       <a href="github.html">GitHub</a>
       <a href="sandbox.html">🧪 Sandbox</a>
       <a href="about.html">Sobre</a>
+      <a href="login.html" id="navLoginMobile">Entrar</a>
+      <a href="cadastro.html" id="navCadastroMobile">Criar conta</a>
+      <a href="#" id="navLogoutMobile" style="display:none">Sair</a>
     </div>
   </header>
   <main>
@@ -199,6 +205,39 @@
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
   </footer>
   <script src="config.js"></script>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Ajusta os botões de acesso conforme a sessão Cognito
+    (function () {
+      if (!window.CloudTrilhasAuth) return;
+      function aplicar(logado) {
+        var login = document.getElementById('navLogin');
+        var cadastro = document.getElementById('navCadastro');
+        var logout = document.getElementById('navLogout');
+        var loginM = document.getElementById('navLoginMobile');
+        var cadastroM = document.getElementById('navCadastroMobile');
+        var logoutM = document.getElementById('navLogoutMobile');
+        [login, cadastro, loginM, cadastroM].forEach(function (el) {
+          if (el) el.style.display = logado ? 'none' : '';
+        });
+        [logout, logoutM].forEach(function (el) {
+          if (el) el.style.display = logado ? '' : 'none';
+        });
+      }
+      function sair(e) {
+        e.preventDefault();
+        window.CloudTrilhasAuth.logout();
+        location.reload();
+      }
+      var lo = document.getElementById('navLogout');
+      var loM = document.getElementById('navLogoutMobile');
+      if (lo) lo.addEventListener('click', sair);
+      if (loM) loM.addEventListener('click', sair);
+      window.CloudTrilhasAuth.isAuthenticated()
+        .then(aplicar)
+        .catch(function () { aplicar(false); });
+    })();
+  </script>
 </body>
 </html>
