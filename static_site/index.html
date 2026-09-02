@@ -30,6 +30,7 @@
         <a href="redes.html" class="nav-link">Redes</a>
         <a href="github.html" class="nav-link">GitHub</a>
         <a href="sandbox.html" class="nav-link">🧪 Sandbox</a>
+        <a href="dashboard.html" class="nav-link" id="navDashboard" style="display:none">📊 Meu Painel</a>
         <a href="login.html" class="nav-link" id="navLogin">Entrar</a>
         <a href="cadastro.html" class="nav-button" id="navCadastro">Criar conta</a>
         <a href="#" class="nav-link" id="navLogout" style="display:none">Sair</a>
@@ -46,6 +47,7 @@
       <a href="redes.html">Redes</a>
       <a href="github.html">GitHub</a>
       <a href="sandbox.html">🧪 Sandbox</a>
+      <a href="dashboard.html" id="navDashboardMobile" style="display:none">📊 Meu Painel</a>
       <a href="about.html">Sobre</a>
       <a href="login.html" id="navLoginMobile">Entrar</a>
       <a href="cadastro.html" id="navCadastroMobile">Criar conta</a>
@@ -218,10 +220,12 @@
         var loginM = document.getElementById('navLoginMobile');
         var cadastroM = document.getElementById('navCadastroMobile');
         var logoutM = document.getElementById('navLogoutMobile');
+        var dash = document.getElementById('navDashboard');
+        var dashM = document.getElementById('navDashboardMobile');
         [login, cadastro, loginM, cadastroM].forEach(function (el) {
           if (el) el.style.display = logado ? 'none' : '';
         });
-        [logout, logoutM].forEach(function (el) {
+        [logout, logoutM, dash, dashM].forEach(function (el) {
           if (el) el.style.display = logado ? '' : 'none';
         });
       }

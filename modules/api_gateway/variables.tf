@@ -57,3 +57,13 @@ variable "admin_users_lambda_function_name" {
   description = "Nome da Lambda de gestão de usuários"
   type        = string
 }
+
+variable "student_progress_lambda_invoke_arn" {
+  description = "Invoke ARN da Lambda de progresso do aluno"
+  type        = string
+}
+
+variable "student_progress_lambda_function_name" {
+  description = "Nome da Lambda de progresso do aluno"
+  type        = string
+}

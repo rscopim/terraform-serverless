@@ -265,6 +265,22 @@ function trackSimuladoAccess() {
 
 function trackSimuladoResult(scoreVal, totalVal) {
   var page = window.location.pathname.split('/').slice(-2).join('/');
+  var trail = window.location.pathname.split('/').filter(Boolean).slice(-2)[0] || page;
+  var percentVal = totalVal ? Math.round((scoreVal / totalVal) * 100) : 0;
+
+  // Salva no dashboard do aluno (progresso persistente, se logado)
+  try {
+    if (window.CloudTrilhasProgress) {
+      window.CloudTrilhasProgress.addQuizResult({
+        trail: trail,
+        quiz: page,
+        score: scoreVal,
+        total: totalVal,
+        percent: percentVal
+      });
+    }
+  } catch (e) {}
+
   var apiUrl = (window.CLOUDTRILHAS_CONFIG && window.CLOUDTRILHAS_CONFIG.apiEndpoint)
     ? window.CLOUDTRILHAS_CONFIG.apiEndpoint + '/leads'
     : null;
