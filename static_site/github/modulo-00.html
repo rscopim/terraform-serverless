@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 00: Configuração de Conta</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 00: Configuração de Conta</title>
+  <meta name="description" content="Configure seu ambiente Git e GitHub do zero: instalação, git config, chaves SSH e GPG, autenticação 2FA, tokens de acesso, e perfil profissional." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -20,116 +21,532 @@
         <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-01.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 00</span>
-        <h1>Configuração de Conta</h1>
-        <p>Criação de conta GitHub, SSH keys, 2FA, perfil profissional. Antes de versionar código, configure seu ambiente corretamente.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 00</span>
+        <h1>Configuração de Conta e Ambiente</h1>
+        <p>Antes de versionar qualquer código, você precisa de um ambiente configurado corretamente. Neste módulo você vai instalar e configurar o Git, entender os níveis de configuração, gerar chaves SSH e GPG, ativar autenticação de dois fatores, criar tokens de acesso pessoal e montar um perfil profissional no GitHub que impressiona recrutadores.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node active"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
+      </div>
+    </section>
 
-    <section class="module-section" style="padding:20px 0">
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1: O QUE É GIT E GITHUB
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
       <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Git vs GitHub — Entendendo a Diferença</h2>
+          <p>Muita gente confunde os dois, mas são coisas distintas e complementares. Entender essa diferença é o primeiro passo para usar as ferramentas com propriedade.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔧 O que é o Git</h3>
+          <p>O <strong>Git</strong> é um sistema de controle de versão distribuído (DVCS) criado por Linus Torvalds em 2005 para o desenvolvimento do kernel Linux. Ele roda localmente na sua máquina e rastreia mudanças em arquivos ao longo do tempo, permitindo que você reverta versões, trabalhe em paralelo através de branches e colabore sem sobrescrever o trabalho dos outros.</p>
+
+          <div class="info-box highlight">
+            <h4>💡 "Distribuído" significa o quê?</h4>
+            <p>Diferente de sistemas centralizados antigos (como SVN), no Git cada desenvolvedor tem uma cópia completa do repositório e de todo o histórico. Você pode fazer commits, criar branches e navegar pelo histórico totalmente offline. A sincronização com o servidor remoto acontece apenas quando você quer (push/pull).</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🐙 O que é o GitHub</h3>
+          <p>O <strong>GitHub</strong> é uma plataforma de hospedagem de repositórios Git na nuvem, com recursos de colaboração construídos por cima do Git: Pull Requests, Issues, Actions (CI/CD), Projects, Pages, revisão de código e controle de acesso. É onde o código "vive" quando compartilhado com o time ou com o mundo. Alternativas incluem GitLab e Bitbucket.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Git</th>
+                <th>GitHub</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>O que é</td>
+                <td>Ferramenta de controle de versão</td>
+                <td>Plataforma de hospedagem + colaboração</td>
+              </tr>
+              <tr>
+                <td>Onde roda</td>
+                <td>Localmente (linha de comando)</td>
+                <td>Na nuvem (web + API)</td>
+              </tr>
+              <tr>
+                <td>Precisa de internet</td>
+                <td>Não (só para push/pull)</td>
+                <td>Sim</td>
+              </tr>
+              <tr>
+                <td>Criado por</td>
+                <td>Linus Torvalds (2005)</td>
+                <td>Chris Wanstrath et al. (2008), hoje Microsoft</td>
+              </tr>
+              <tr>
+                <td>Recursos</td>
+                <td>commit, branch, merge, log</td>
+                <td>PR, Issues, Actions, Pages, Projects</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
-    <section class="module-section">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2: INSTALAÇÃO DO GIT
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Instalação do Git em Cada Sistema</h2>
+          <p>O Git está disponível em todos os sistemas operacionais. Veja como instalar e verificar a instalação em cada plataforma.</p>
+        </div>
 
         <div class="topic-block">
-          <h2>1. Configuração Inicial do Git</h2>
+          <h3>💻 Instalando em Windows, macOS e Linux</h3>
           <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>git config</code><span class="cmd-tag">Essencial</span></div>
-              <p>Define identidade e preferências globais do Git.</p>
-              <pre><code># Identidade (obrigatório)
+            <div class="command-card">
+              <h4>Windows</h4>
+              <pre><code># Opção 1: winget (Windows 10/11)
+winget install --id Git.Git -e
+
+# Opção 2: baixar de git-scm.com
+# Inclui o Git Bash (terminal estilo Unix)
+
+# Opção 3: Chocolatey
+choco install git
+
+# Verificar
+git --version</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>macOS</h4>
+              <pre><code># Opção 1: Homebrew (recomendado)
+brew install git
+
+# Opção 2: Xcode Command Line Tools
+xcode-select --install
+
+# Verificar
+git --version</code></pre>
+            </div>
+            <div class="command-card">
+              <h4>Linux</h4>
+              <pre><code># Debian / Ubuntu
+sudo apt update &amp;&amp; sudo apt install git
+
+# Fedora / RHEL
+sudo dnf install git
+
+# Arch
+sudo pacman -S git
+
+# Verificar
+git --version</code></pre>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>📌 Mantendo o Git atualizado</h4>
+            <p>Versões novas do Git trazem melhorias de segurança e desempenho. Verifique periodicamente com <code>git --version</code> e atualize pelo mesmo gerenciador usado na instalação. A partir do Git 2.28 é possível definir o nome da branch inicial (veremos a seguir), recurso importante para o padrão <code>main</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3: CONFIGURAÇÃO — GIT CONFIG
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Configuração com git config</h2>
+          <p>Antes do primeiro commit, o Git precisa saber quem você é. A configuração também define preferências que tornam seu fluxo de trabalho mais produtivo. Entender os níveis de configuração evita muita confusão.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🎚️ Os Três Níveis de Configuração</h3>
+          <p>O Git lê configurações em cascata, do mais geral para o mais específico. O nível mais específico sempre vence.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Nível</th>
+                <th>Flag</th>
+                <th>Arquivo</th>
+                <th>Escopo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>System</td>
+                <td><code>--system</code></td>
+                <td>/etc/gitconfig</td>
+                <td>Todos os usuários da máquina</td>
+              </tr>
+              <tr>
+                <td>Global</td>
+                <td><code>--global</code></td>
+                <td>~/.gitconfig</td>
+                <td>Seu usuário (todos os repos)</td>
+              </tr>
+              <tr>
+                <td>Local</td>
+                <td><code>--local</code></td>
+                <td>.git/config</td>
+                <td>Apenas o repositório atual</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="topic-block">
+          <h3>⚙️ Configuração Inicial Essencial</h3>
+          <div class="command-card wide">
+            <h4>Identidade e Preferências Globais</h4>
+            <pre><code># IDENTIDADE (obrigatório — aparece em cada commit)
 git config --global user.name "Seu Nome"
 git config --global user.email "seu@email.com"
 
-# Preferências úteis
+# BRANCH PADRÃO como main (Git 2.28+)
 git config --global init.defaultBranch main
-git config --global core.editor "code --wait"
-git config --global pull.rebase true
 
-# Verificar configurações
-git config --list
-git config --global --list</code></pre>
-            </div>
+# EDITOR padrão para mensagens de commit
+git config --global core.editor "code --wait"   # VS Code
+# git config --global core.editor "nano"         # nano
+# git config --global core.editor "vim"          # vim
+
+# COMPORTAMENTO do pull (evita merges automáticos indesejados)
+git config --global pull.rebase false   # merge (padrão)
+# git config --global pull.rebase true  # rebase
+
+# CORES no terminal
+git config --global color.ui auto
+
+# NORMALIZAÇÃO de fim de linha (importante em times multiplataforma)
+git config --global core.autocrlf input   # Linux/macOS
+# git config --global core.autocrlf true   # Windows
+
+# Verificar tudo
+git config --list --show-origin</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ E-mail privado no GitHub</h4>
+            <p>Se não quiser expor seu e-mail real nos commits públicos, o GitHub oferece um e-mail no-reply (<code>ID+usuario@users.noreply.github.com</code>) em Settings → Emails. Configure-o com <code>git config --global user.email</code> e ative "Keep my email addresses private".</p>
           </div>
         </div>
 
         <div class="topic-block">
-          <h2>2. Chave SSH e Autenticação</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>ssh-keygen</code><span class="cmd-tag">Autenticação</span></div>
-              <p>Gera par de chaves para autenticação sem senha no GitHub.</p>
-              <pre><code># Gerar chave SSH (Ed25519 recomendado)
-ssh-keygen -t ed25519 -C "seu@email.com"
+          <h3>🔗 Aliases — Atalhos que Economizam Tempo</h3>
+          <div class="command-card wide">
+            <h4>Criando Atalhos para Comandos Frequentes</h4>
+            <pre><code># Atalhos comuns
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.unstage "reset HEAD --"
 
-# Iniciar o ssh-agent
+# Um log bonito e resumido
+git config --global alias.lg "log --oneline --graph --decorate --all"
+
+# Agora você usa:
+git st          # em vez de git status
+git lg          # log visual com grafo de branches</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4: AUTENTICAÇÃO SSH
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Autenticação com Chaves SSH</h2>
+          <p>SSH é a forma mais segura e conveniente de se autenticar no GitHub. Você gera um par de chaves (pública e privada), adiciona a pública ao GitHub, e nunca mais digita senha ao fazer push/pull.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔐 Gerando e Configurando a Chave SSH</h3>
+          <div class="command-card wide">
+            <h4>Passo a Passo Completo</h4>
+            <pre><code># 1. Gerar par de chaves Ed25519 (mais moderno e seguro que RSA)
+ssh-keygen -t ed25519 -C "seu@email.com"
+# Pressione Enter para aceitar o local padrão (~/.ssh/id_ed25519)
+# Defina uma passphrase (recomendado) ou deixe em branco
+
+# 2. Iniciar o ssh-agent (gerencia as chaves em memória)
 eval "$(ssh-agent -s)"
+
+# 3. Adicionar a chave privada ao agent
 ssh-add ~/.ssh/id_ed25519
 
-# Copiar chave pública para adicionar no GitHub
-cat ~/.ssh/id_ed25519.pub
+# 4. Copiar a chave PÚBLICA para adicionar no GitHub
+cat ~/.ssh/id_ed25519.pub          # Linux/macOS — copie a saída
+# clip &lt; ~/.ssh/id_ed25519.pub     # Windows
+# pbcopy &lt; ~/.ssh/id_ed25519.pub   # macOS
 
-# Testar conexão
+# 5. No GitHub: Settings → SSH and GPG keys → New SSH key
+#    Cole a chave pública e salve
+
+# 6. Testar a conexão
 ssh -T git@github.com
-# Hi usuario! You've successfully authenticated</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>2FA</code><span class="cmd-tag">Segurança</span></div>
-              <p>Ative autenticação de dois fatores no GitHub.</p>
-              <pre><code># GitHub → Settings → Password and authentication
-# → Two-factor authentication → Enable
+# Resposta esperada:
+# Hi seuusuario! You've successfully authenticated...</code></pre>
+          </div>
 
-# Apps recomendados:
-# - Authy
-# - Google Authenticator
-# - 1Password
-
-# Salve os recovery codes em local seguro!</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Perfil GitHub</code><span class="cmd-tag">Dica</span></div>
-              <p>Configure seu perfil profissional no GitHub.</p>
-              <pre><code># Crie um repositório com seu username
-# Ex: github.com/seuuser/seuuser
-
-# Adicione um README.md com:
-# - Sobre você
-# - Tecnologias
-# - Projetos em destaque
-# - Links (LinkedIn, portfólio)
-
-# Use: github.com/anuraghazra/github-readme-stats</code></pre>
-            </div>
+          <div class="info-box warning">
+            <h4>⚠️ Chave pública vs privada</h4>
+            <ul>
+              <li><strong>Chave pública</strong> (<code>.pub</code>): pode ser compartilhada — é o que você cola no GitHub</li>
+              <li><strong>Chave privada</strong> (sem extensão): NUNCA compartilhe ou faça commit dela. É o seu segredo</li>
+            </ul>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>📡 HTTPS vs SSH — Qual Usar</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>HTTPS</th><th>SSH</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>URL do remote</td><td><code>https://github.com/user/repo.git</code></td><td><code>git@github.com:user/repo.git</code></td></tr>
+              <tr><td>Autenticação</td><td>Token de acesso pessoal (PAT)</td><td>Par de chaves SSH</td></tr>
+              <tr><td>Firewall corporativo</td><td>Geralmente liberado (porta 443)</td><td>Pode ser bloqueado (porta 22)</td></tr>
+              <tr><td>Conveniência</td><td>Pede credencial (usa credential helper)</td><td>Sem senha após configurar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5: TOKENS DE ACESSO PESSOAL (PAT)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Tokens de Acesso Pessoal (PAT)</h2>
+          <p>Desde 2021 o GitHub não aceita mais senha para operações Git via HTTPS. No lugar, você usa Personal Access Tokens (PAT). Eles também são usados para autenticar em APIs e ferramentas de terceiros.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🎟️ Criando e Usando um PAT</h3>
+          <div class="command-card wide">
+            <h4>Fluxo de Criação</h4>
+            <pre><code># No GitHub:
+# Settings → Developer settings → Personal access tokens
+#   → Fine-grained tokens (recomendado) OU Tokens (classic)
+#
+# Fine-grained tokens permitem escopo por repositório e permissões
+# granulares (Contents: read/write, Issues, Pull requests, etc.)
+#
+# Defina:
+# - Nome descritivo (ex: "laptop-pessoal-2026")
+# - Expiração (evite "no expiration" — prefira 90 dias)
+# - Repositórios e permissões mínimas necessárias
+
+# Ao clonar via HTTPS, use o token como senha:
+git clone https://github.com/user/repo.git
+# Username: seu-usuario
+# Password: cole-o-token-aqui (NÃO sua senha)
+
+# Armazenar credenciais para não digitar toda vez
+git config --global credential.helper store        # texto plano (cuidado)
+git config --global credential.helper manager       # Windows (seguro)
+git config --global credential.helper osxkeychain    # macOS (seguro)</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🔒 Boas práticas de tokens</h4>
+            <ul>
+              <li>Use <strong>fine-grained tokens</strong> com o menor escopo possível (least privilege)</li>
+              <li>Sempre defina <strong>data de expiração</strong> — tokens eternos são risco de segurança</li>
+              <li>Nunca faça commit de um token no código — use variáveis de ambiente ou secrets</li>
+              <li>Revogue tokens que não usa mais em Settings → Developer settings</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6: 2FA E COMMITS ASSINADOS (GPG)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>2FA e Commits Assinados com GPG</h2>
+          <p>Segurança da conta e autenticidade dos commits são fundamentais. A autenticação de dois fatores protege sua conta; a assinatura GPG prova que os commits realmente vieram de você.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🛡️ Ativando 2FA (Two-Factor Authentication)</h3>
+          <div class="command-card wide">
+            <h4>Configuração no GitHub</h4>
+            <pre><code># GitHub → Settings → Password and authentication
+#   → Two-factor authentication → Enable 2FA
+
+# Métodos disponíveis (do mais para o menos seguro):
+# 1. Security key / Passkey (WebAuthn) — mais seguro
+# 2. Authenticator app (TOTP):
+#    - Authy, Google Authenticator, 1Password, Microsoft Authenticator
+# 3. SMS (menos seguro — evite se possível)
+
+# IMPORTANTE: salve os recovery codes em local seguro!
+# Sem eles, perder o celular = perder acesso à conta.</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ 2FA agora é obrigatório</h4>
+            <p>O GitHub tornou o 2FA obrigatório para todos os usuários que contribuem com código. Configure hoje — não deixe para depois.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>✍️ Assinando Commits com GPG</h3>
+          <p>Commits assinados exibem um selo "Verified" no GitHub, provando que vieram de você. Isso previne que alguém falsifique commits usando seu nome e e-mail.</p>
+          <div class="command-card wide">
+            <h4>Configuração de Assinatura GPG</h4>
+            <pre><code># 1. Gerar uma chave GPG
+gpg --full-generate-key
+# Escolha: RSA and RSA, 4096 bits, validade, seu nome e e-mail
+
+# 2. Listar chaves e pegar o ID
+gpg --list-secret-keys --keyid-format=long
+# Copie o ID após "sec   rsa4096/"  (ex: 3AA5C34371567BD2)
+
+# 3. Exportar a chave pública
+gpg --armor --export 3AA5C34371567BD2
+# Cole no GitHub: Settings → SSH and GPG keys → New GPG key
+
+# 4. Configurar o Git para assinar
+git config --global user.signingkey 3AA5C34371567BD2
+git config --global commit.gpgsign true
+
+# 5. Fazer um commit assinado
+git commit -S -m "feat: commit assinado"
+# (com commit.gpgsign true, o -S é automático)</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>💡 Alternativa: assinatura SSH</h4>
+            <p>Desde o Git 2.34, você pode assinar commits com sua chave SSH (mais simples que GPG): <code>git config --global gpg.format ssh</code> e <code>git config --global user.signingkey ~/.ssh/id_ed25519.pub</code>. Depois adicione a chave como "Signing Key" no GitHub.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7: PERFIL PROFISSIONAL NO GITHUB
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Montando um Perfil Profissional</h2>
+          <p>Seu perfil no GitHub é seu portfólio vivo. Recrutadores e colegas olham antes de entrevistas. Um perfil bem montado comunica competência e cuidado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>📇 O README de Perfil</h3>
+          <p>Ao criar um repositório com o mesmo nome do seu usuário (ex: <code>github.com/seuuser/seuuser</code>), o README dele aparece no topo do seu perfil. É a sua vitrine.</p>
+          <div class="command-card wide">
+            <h4>Estrutura de um Bom README de Perfil</h4>
+            <pre><code># Crie o repositório especial
+# github.com → New repository → nome = seu-usuario
+# Marque "Add a README file"
+
+# Estrutura recomendada do README.md:
+# ─────────────────────────────────────
+# # Olá, eu sou o Ricardo 👋
+#
+# Cloud & DevOps Engineer | AWS | Terraform | Python
+#
+# ## 🛠️ Tecnologias
+# ![AWS](badge) ![Terraform](badge) ![Python](badge)
+#
+# ## 📊 Estatísticas
+# (github-readme-stats gera cards automáticos)
+#
+# ## 📫 Contato
+# - LinkedIn: /in/seu-perfil
+# - Portfólio: seusite.com
+# ─────────────────────────────────────</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>✨ Ferramentas para turbinar o perfil</h4>
+            <ul>
+              <li><strong>github-readme-stats</strong> — cards com suas estatísticas e linguagens mais usadas</li>
+              <li><strong>shields.io</strong> — badges de tecnologias e status</li>
+              <li><strong>Pinned repositories</strong> — fixe seus 6 melhores projetos no topo do perfil</li>
+              <li><strong>Contribution graph</strong> — commits consistentes mostram atividade</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>✅ Checklist de Configuração Inicial</h3>
+          <div class="info-box">
+            <h4>Antes de seguir para o Módulo 01, confirme:</h4>
+            <ul>
+              <li>☐ Git instalado (<code>git --version</code> funciona)</li>
+              <li>☐ <code>user.name</code> e <code>user.email</code> configurados globalmente</li>
+              <li>☐ <code>init.defaultBranch</code> definido como <code>main</code></li>
+              <li>☐ Conta GitHub criada</li>
+              <li>☐ Chave SSH gerada e adicionada ao GitHub (<code>ssh -T git@github.com</code> autentica)</li>
+              <li>☐ 2FA ativado e recovery codes salvos</li>
+              <li>☐ (Opcional) Commits assinados com GPG/SSH</li>
+              <li>☐ (Opcional) README de perfil criado</li>
+            </ul>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 00</h4>
+            <p>Você configurou todo o ambiente necessário para trabalhar com Git e GitHub profissionalmente: instalação, identidade, níveis de configuração, autenticação SSH, tokens, 2FA, assinatura de commits e perfil. Com a base pronta, o Módulo 01 mergulha nos comandos fundamentais do dia a dia.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -146,7 +563,7 @@ ssh -T git@github.com
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

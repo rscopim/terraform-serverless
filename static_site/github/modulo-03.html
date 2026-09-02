@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 03: Colaboração GitHub</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 03: Colaboração no GitHub</title>
+  <meta name="description" content="Colaboração no GitHub: fork, clone, Pull Requests, code review, Issues, labels, milestones, templates de PR/Issue e o fluxo de contribuição open source." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,172 +18,409 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-02.html" class="nav-link">← Anterior</a>
         <a href="modulo-04.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 03</span>
-        <h1>Colaboração: Fork, Pull Request e Code Review</h1>
-        <p>Fork, Pull Request, Code Review, Issues, Templates. Aprenda o fluxo profissional de contribuição em projetos.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 03</span>
+        <h1>Colaboração no GitHub</h1>
+        <p>O GitHub brilha na colaboração. Aqui você aprende o fluxo completo de contribuição: forks, Pull Requests, code review construtivo, Issues bem escritas, labels, milestones e templates que padronizam a comunicação do time. Estas são as habilidades que separam quem "usa git sozinho" de quem "trabalha em time de verdade".</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
-      <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
-        </div>
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node active"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
       </div>
     </section>
+
+    <!-- SEÇÃO 1 -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Fork e o Modelo de Contribuição</h2>
+          <p>Há dois modelos de colaboração no GitHub: o modelo de fork (open source, contribuidores externos) e o modelo de branch compartilhada (times com acesso de escrita). Entender os dois é essencial.</p>
+        </div>
 
         <div class="topic-block">
-          <h2>1. Fork e Contribuição</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Fork Workflow</code><span class="cmd-tag">Colaboração</span></div>
-              <p>Fluxo completo para contribuir em projetos open source.</p>
-              <pre><code># 1. Fork no GitHub (botão Fork)
+          <h3>🍴 O que é um Fork</h3>
+          <p>Um <strong>fork</strong> é uma cópia de um repositório na sua própria conta do GitHub. Você usa forks quando quer contribuir com um projeto no qual não tem permissão de escrita — típico de projetos open source. Você faz mudanças no seu fork e propõe que elas sejam integradas ao original via Pull Request.</p>
 
-# 2. Clone do seu fork
-git clone git@github.com:SEU-USER/projeto.git
+          <div class="command-card wide">
+            <h4>Fluxo de Fork (Contribuição Open Source)</h4>
+            <pre><code># 1. No GitHub, clique em "Fork" no repositório original
+#    Isso cria github.com/SEU-USUARIO/projeto
+
+# 2. Clone o SEU fork
+git clone git@github.com:seu-usuario/projeto.git
 cd projeto
 
-# 3. Adicione o repositório original como upstream
-git remote add upstream git@github.com:ORIGINAL/projeto.git
+# 3. Adicione o repositório ORIGINAL como "upstream"
+git remote add upstream git@github.com:dono-original/projeto.git
+git remote -v
+# origin    → seu fork (push aqui)
+# upstream  → original (pull das novidades daqui)
 
-# 4. Crie branch para sua contribuição
-git checkout -b fix/corrige-typo
-
-# 5. Faça suas mudanças e commit
-git add .
-git commit -m "fix: corrige typo na documentação"
-
-# 6. Push para seu fork
-git push origin fix/corrige-typo
-
-# 7. Abra Pull Request no GitHub (origin → upstream)
-
-# 8. Manter fork atualizado
+# 4. Mantenha seu fork sincronizado com o original
 git fetch upstream
-git checkout main
+git switch main
 git merge upstream/main
-git push origin main</code></pre>
-            </div>
+git push origin main
+
+# 5. Crie uma branch para sua contribuição
+git switch -c fix/corrige-typo-readme</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h2>2. Pull Requests e Code Review</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Pull Request</code><span class="cmd-tag">GitHub</span></div>
-              <p>Boas práticas para criar PRs eficientes.</p>
-              <pre><code># Título claro e descritivo
-feat: implementa autenticação OAuth2
+          <h3>👥 Modelo de Branch Compartilhada</h3>
+          <p>Em times onde todos têm acesso de escrita ao repositório, não se usa fork. Cada pessoa cria branches diretamente no repositório central e abre PRs a partir delas. É o fluxo mais comum em empresas.</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>Fork</th><th>Branch compartilhada</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Quem usa</td><td>Contribuidores externos / open source</td><td>Times com acesso de escrita</td></tr>
+              <tr><td>Onde ficam as branches</td><td>No seu fork</td><td>No repositório central</td></tr>
+              <tr><td>Remotes</td><td>origin (fork) + upstream (original)</td><td>apenas origin</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-# Descrição com template:
-## O que foi feito
-- Implementa login com Google
-- Adiciona middleware de auth
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Pull Requests — O Coração da Colaboração</h2>
+          <p>O Pull Request (PR) é a proposta de integrar as mudanças de uma branch em outra. É onde acontece a revisão de código, a discussão e os testes automatizados antes do merge.</p>
+        </div>
 
-## Como testar
-1. Rodar `npm run dev`
-2. Acessar /login
-3. Clicar em "Login com Google"
+        <div class="topic-block">
+          <h3>🔃 Abrindo um Pull Request</h3>
+          <div class="command-card wide">
+            <h4>Fluxo Completo de um PR</h4>
+            <pre><code># 1. Trabalhe na sua branch e faça push
+git switch -c feature/nova-funcionalidade
+# ... commits ...
+git push -u origin feature/nova-funcionalidade
 
-## Screenshots
-(se aplicável)
+# 2. No GitHub, aparece um botão "Compare &amp; pull request"
+#    OU vá em Pull requests → New pull request
 
-Closes #42</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Code Review</code><span class="cmd-tag">Boas Práticas</span></div>
-              <p>Checklist para revisar código de colegas.</p>
-              <pre><code># O que verificar no Code Review:
+# 3. Configure o PR:
+#    base: main    ←  compare: feature/nova-funcionalidade
+#    (integrar 'compare' DENTRO de 'base')
 
-✅ Código funciona conforme descrito?
-✅ Testes foram adicionados/atualizados?
-✅ Sem código duplicado?
-✅ Nomes de variáveis claros?
-✅ Sem secrets hardcoded?
-✅ Performance aceitável?
-✅ Documentação atualizada?
+# 4. Preencha título e descrição, adicione reviewers, labels
 
-# Tipos de comentário:
-# 🔴 Blocker — precisa corrigir
-# 🟡 Suggestion — melhoria opcional
-# 💬 Question — dúvida/discussão</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Issues</code><span class="cmd-tag">GitHub</span></div>
-              <p>Organize trabalho com Issues e Labels.</p>
-              <pre><code># Criar Issue com template:
-## Descrição do Bug
-Ao clicar em "Salvar", nada acontece.
+# Usando o GitHub CLI (gh):
+gh pr create --base main --head feature/nova-funcionalidade \
+  --title "feat: nova funcionalidade" \
+  --body "Descrição do que foi feito e como testar."
 
-## Passos para Reproduzir
-1. Acessar /settings
-2. Alterar nome
-3. Clicar "Salvar"
-
-## Comportamento Esperado
-Dados salvos com sucesso.
-
-## Ambiente
-- Browser: Chrome 120
-- OS: Ubuntu 22.04
-
-# Labels úteis:
-# bug, enhancement, documentation
-# good first issue, help wanted</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>GitHub CLI</code><span class="cmd-tag">Produtividade</span></div>
-              <p>Gerencie PRs e Issues pelo terminal.</p>
-              <pre><code># Instalar: https://cli.github.com
-gh auth login
-
-# Pull Requests
-gh pr create --title "feat: login"
+# Ver PRs abertos
 gh pr list
-gh pr checkout 42
-gh pr merge 42 --squash
 
-# Issues
-gh issue create --title "Bug: login"
-gh issue list --label "bug"
-gh issue close 42
+# Ver detalhes de um PR
+gh pr view 42</code></pre>
+          </div>
 
-# Repos
-gh repo create meu-projeto --public
-gh repo clone user/repo</code></pre>
-            </div>
+          <div class="info-box highlight">
+            <h4>✍️ Anatomia de uma boa descrição de PR</h4>
+            <ul>
+              <li><strong>O quê:</strong> resumo das mudanças</li>
+              <li><strong>Por quê:</strong> qual problema resolve / qual issue fecha</li>
+              <li><strong>Como testar:</strong> passos para o revisor validar</li>
+              <li><strong>Screenshots</strong> (se for UI)</li>
+              <li>Palavras-chave que fecham issues: <code>Closes #123</code>, <code>Fixes #45</code></li>
+            </ul>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>🔀 Estratégias de Merge de PR</h3>
+          <p>Ao aprovar um PR, o GitHub oferece três formas de integrá-lo:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estratégia</th><th>O que faz</th><th>Quando usar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Merge commit</strong></td><td>Cria commit de merge preservando todos os commits</td><td>Quer histórico completo da branch</td></tr>
+              <tr><td><strong>Squash and merge</strong></td><td>Junta todos os commits do PR em um só</td><td>Histórico limpo, 1 commit por feature (mais popular)</td></tr>
+              <tr><td><strong>Rebase and merge</strong></td><td>Aplica os commits linearmente sem merge commit</td><td>Histórico linear sem commits de merge</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Code Review — Revisão de Código</h2>
+          <p>A revisão de código melhora a qualidade, espalha conhecimento no time e pega bugs cedo. Saber revisar e ser revisado com maturidade é uma habilidade profissional valiosa.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔎 Revisando um PR</h3>
+          <div class="command-card wide">
+            <pre><code># Baixar o PR de alguém para testar localmente
+gh pr checkout 42
+# ... testa, roda, valida ...
+
+# Estados de revisão no GitHub:
+# - Comment  → comentários sem aprovar/rejeitar
+# - Approve  → aprova as mudanças
+# - Request changes → pede alterações antes do merge
+
+# Comentar em linhas específicas: clique no + ao lado da linha no diff
+# Sugerir código diretamente (suggestion):
+# ```suggestion
+# const nome = user.name.trim();
+# ```
+# O autor pode aceitar a sugestão com 1 clique</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>✅ Boas práticas ao revisar</h4>
+            <ul>
+              <li>Seja respeitoso e específico — critique o código, não a pessoa</li>
+              <li>Explique o <em>porquê</em> das sugestões</li>
+              <li>Diferencie o que é bloqueante do que é preferência ("nit:")</li>
+              <li>Elogie boas soluções — review não é só apontar erros</li>
+              <li>Aprove quando estiver bom; não segure o PR por perfeccionismo</li>
+            </ul>
+          </div>
+
+          <div class="info-box">
+            <h4>✅ Boas práticas ao ser revisado</h4>
+            <ul>
+              <li>Mantenha PRs pequenos (mais fáceis de revisar)</li>
+              <li>Responda a todos os comentários</li>
+              <li>Não leve críticas para o pessoal</li>
+              <li>Explique decisões de design quando necessário</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Issues — Rastreando Trabalho</h2>
+          <p>Issues são o sistema de rastreamento de tarefas, bugs e ideias do GitHub. Bem usadas, tornam o projeto organizado e transparente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🐛 Criando e Organizando Issues</h3>
+          <div class="command-card wide">
+            <pre><code># Via GitHub CLI
+gh issue create --title "Bug: login falha com e-mail maiúsculo" \
+  --body "Passos para reproduzir..." \
+  --label bug --assignee @me
+
+# Listar issues
+gh issue list --label bug --state open
+
+# Fechar uma issue
+gh issue close 15
+
+# Referenciar issues em commits/PRs (fecha automaticamente ao mergear):
+#   git commit -m "fix: normaliza e-mail no login. Closes #15"
+# Palavras que fecham: close, closes, closed, fix, fixes, fixed, resolve...</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🏷️ Labels, Milestones e Assignees</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Recurso</th><th>Para que serve</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Labels</strong></td><td>Categorizar: <code>bug</code>, <code>enhancement</code>, <code>documentation</code>, <code>good first issue</code></td></tr>
+              <tr><td><strong>Milestones</strong></td><td>Agrupar issues por entrega/versão (ex: "v2.0", "Sprint 5")</td></tr>
+              <tr><td><strong>Assignees</strong></td><td>Quem é responsável pela issue</td></tr>
+              <tr><td><strong>Projects</strong></td><td>Quadro kanban (veremos no Módulo 08)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Templates de Issue e PR</h2>
+          <p>Templates padronizam a informação que contribuidores fornecem, economizando tempo e melhorando a qualidade das issues e PRs.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>📋 Criando Templates</h3>
+          <div class="command-card wide">
+            <h4>Template de Pull Request</h4>
+            <pre><code># Arquivo: .github/PULL_REQUEST_TEMPLATE.md
+## Descrição
+&lt;!-- O que este PR faz? --&gt;
+
+## Tipo de mudança
+- [ ] Bug fix
+- [ ] Nova feature
+- [ ] Breaking change
+- [ ] Documentação
+
+## Como testar
+&lt;!-- Passos para validar --&gt;
+
+## Checklist
+- [ ] Código segue o style guide
+- [ ] Testes adicionados/atualizados
+- [ ] Documentação atualizada
+
+Closes #</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>Template de Issue (Bug Report)</h4>
+            <pre><code># Arquivo: .github/ISSUE_TEMPLATE/bug_report.md
+---
+name: Bug Report
+about: Reportar um comportamento incorreto
+labels: bug
+---
+
+## Descrição do bug
+
+## Passos para reproduzir
+1.
+2.
+
+## Comportamento esperado
+
+## Ambiente
+- SO:
+- Navegador/versão:</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>💡 Issue Forms (YAML)</h4>
+            <p>O GitHub também suporta <strong>Issue Forms</strong> em <code>.github/ISSUE_TEMPLATE/*.yml</code>, que geram formulários web com campos obrigatórios, dropdowns e checkboxes — mais estruturados que o markdown puro.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Comunicação: Menções, Referências e Markdown</h2>
+          <p>A colaboração no GitHub é textual. Dominar as ferramentas de comunicação torna a interação eficiente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>💬 Recursos de Comunicação</h3>
+          <div class="command-card wide">
+            <pre><code># Mencionar pessoas ou times (recebem notificação)
+@usuario  @org/time-backend
+
+# Referenciar issues e PRs (viram links)
+#42        → issue/PR nº 42 neste repo
+usuario/repo#42  → em outro repositório
+
+# Referenciar commits
+abc1234   → link para o commit
+
+# Fechar issues automaticamente via PR
+Closes #42
+Fixes #10, #11
+
+# Markdown útil em comentários:
+# - [ ] tarefa pendente / - [x] concluída (task lists)
+# ```language  para blocos de código
+# > citações
+# | tabelas | markdown |
+# :emoji:  🎉</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Exercício Prático e Resumo</h2>
+          <p>Simule uma contribuição completa, do fork ao PR aprovado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧪 Sua Primeira Contribuição Open Source</h3>
+          <div class="command-card wide">
+            <pre><code># 1. Fork um repositório com "good first issue" no GitHub
+# 2. Clone seu fork e configure upstream
+git clone git@github.com:seu-usuario/projeto.git
+cd projeto
+git remote add upstream git@github.com:original/projeto.git
+
+# 3. Sincronize e crie a branch
+git fetch upstream &amp;&amp; git switch main &amp;&amp; git merge upstream/main
+git switch -c docs/corrige-instrucoes-instalacao
+
+# 4. Faça a mudança, commite e envie
+git commit -am "docs: corrige comando de instalação no README"
+git push -u origin docs/corrige-instrucoes-instalacao
+
+# 5. Abra o PR contra o repositório original
+gh pr create --base main --title "docs: corrige instalação" \
+  --body "Corrige o comando que estava desatualizado. Closes #7"
+
+# 6. Responda aos comentários da revisão até a aprovação e merge 🎉</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 03</h4>
+            <p>Você aprendeu o fluxo de colaboração do GitHub: forks e os dois modelos de contribuição, Pull Requests com boas descrições e estratégias de merge, code review construtivo (revisando e sendo revisado), Issues com labels e milestones, templates de PR/Issue e recursos de comunicação. No Módulo 04, encaramos o momento inevitável de qualquer colaboração: os conflitos de merge.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -199,7 +437,7 @@ gh repo clone user/repo</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

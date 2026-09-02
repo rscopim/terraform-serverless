@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 06: Fluxos Profissionais</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 06: Fluxos Profissionais</title>
+  <meta name="description" content="Fluxos de trabalho Git: Git Flow, GitHub Flow, Trunk-Based Development, tags e releases, Conventional Commits e Versionamento Semântico (SemVer)." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,172 +18,359 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-05.html" class="nav-link">← Anterior</a>
         <a href="modulo-07.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 06</span>
-        <h1>Fluxos Profissionais: Git Flow, Tags e Conventional Commits</h1>
-        <p>Git Flow, GitHub Flow, Tags, Conventional Commits, SemVer. Estratégias de branching usadas por equipes profissionais.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 06</span>
+        <h1>Fluxos de Trabalho Profissionais</h1>
+        <p>Comandos são só ferramentas — o que diferencia times maduros é a disciplina do fluxo de trabalho. Aqui você compara Git Flow, GitHub Flow e Trunk-Based Development, aprende a versionar releases com tags e SemVer, e adota Conventional Commits para gerar changelogs automáticos. É a ponte entre "saber git" e "trabalhar como engenheiro sênior".</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
-      <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
-        </div>
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node active"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
       </div>
     </section>
+
+    <!-- SEÇÃO 1 -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h2>1. Git Flow vs GitHub Flow</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Git Flow</code><span class="cmd-tag">Fluxo</span></div>
-              <p>Modelo robusto para projetos com releases planejadas.</p>
-              <pre><code># Branches permanentes:
-# main     → código em produção
-# develop  → integração de features
-
-# Branches temporárias:
-# feature/* → novas funcionalidades
-# release/* → preparação de release
-# hotfix/*  → correções urgentes em produção
-
-# Fluxo:
-git checkout develop
-git checkout -b feature/pagamento
-# ... desenvolve ...
-git checkout develop
-git merge --no-ff feature/pagamento
-
-# Release:
-git checkout -b release/1.2.0 develop
-# ... ajustes finais, bump version ...
-git checkout main
-git merge --no-ff release/1.2.0
-git tag -a v1.2.0 -m "Release 1.2.0"
-git checkout develop
-git merge --no-ff release/1.2.0</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>GitHub Flow</code><span class="cmd-tag">Fluxo</span></div>
-              <p>Modelo simplificado — ideal para deploy contínuo.</p>
-              <pre><code># Apenas 1 branch permanente: main (sempre deployável)
-
-# Fluxo:
-# 1. Crie branch a partir de main
-git checkout -b feature/dark-mode
-
-# 2. Faça commits incrementais
-git commit -m "feat: adiciona toggle de tema"
-git commit -m "feat: implementa CSS dark mode"
-
-# 3. Abra Pull Request cedo (Draft PR)
-git push -u origin feature/dark-mode
-# → Abra PR no GitHub
-
-# 4. Code Review + CI passa
-
-# 5. Merge na main (squash ou merge commit)
-
-# 6. Deploy automático após merge
-
-# Quando usar cada um:
-# Git Flow → releases planejadas, múltiplas versões
-# GitHub Flow → deploy contínuo, SaaS, projetos ágeis</code></pre>
-            </div>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>GitHub Flow — Simples e Eficaz</h2>
+          <p>O GitHub Flow é o fluxo mais usado hoje em times ágeis e produtos web. Simples, baseado em branches curtas e deploy contínuo a partir da main.</p>
         </div>
 
         <div class="topic-block">
-          <h2>2. Tags e Versionamento</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git tag</code><span class="cmd-tag">Release</span></div>
-              <p>Marca pontos específicos no histórico (releases).</p>
-              <pre><code># Tag anotada (recomendada)
-git tag -a v1.0.0 -m "Primeira release"
+          <h3>🌊 Como Funciona o GitHub Flow</h3>
+          <div class="command-card wide">
+            <pre><code># A regra central: a branch 'main' está SEMPRE pronta para deploy.
 
-# Tag leve
+# 1. Crie uma branch a partir da main
+git switch main &amp;&amp; git pull
+git switch -c feature/nova-funcionalidade
+
+# 2. Faça commits pequenos e frequentes
+git commit -am "feat: implementa parte 1"
+
+# 3. Abra um Pull Request cedo (mesmo incompleto = draft)
+git push -u origin feature/nova-funcionalidade
+
+# 4. Discussão, review e CI automático rodam no PR
+
+# 5. Após aprovação, merge na main
+
+# 6. Deploy automático da main (CI/CD)
+
+# 7. Delete a branch</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>✅ Quando usar GitHub Flow</h4>
+            <ul>
+              <li>Produtos web / SaaS com deploy contínuo</li>
+              <li>Times que entregam várias vezes por dia</li>
+              <li>Quando não há necessidade de manter várias versões em paralelo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Git Flow — Estruturado para Releases</h2>
+          <p>O Git Flow é mais elaborado, com branches dedicadas para desenvolvimento, releases e hotfixes. Adequado a produtos com ciclos de release formais e versões mantidas em paralelo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌳 As Branches do Git Flow</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Branch</th><th>Propósito</th><th>Nasce de</th><th>Integra em</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>main</code></td><td>Código em produção (tags de versão)</td><td>—</td><td>—</td></tr>
+              <tr><td><code>develop</code></td><td>Integração do próximo release</td><td>main</td><td>—</td></tr>
+              <tr><td><code>feature/*</code></td><td>Novas funcionalidades</td><td>develop</td><td>develop</td></tr>
+              <tr><td><code>release/*</code></td><td>Preparação de um release</td><td>develop</td><td>main + develop</td></tr>
+              <tr><td><code>hotfix/*</code></td><td>Correção urgente em produção</td><td>main</td><td>main + develop</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <pre><code># Iniciar uma feature
+git switch develop &amp;&amp; git switch -c feature/pagamento
+# ... trabalho ... depois merge em develop
+
+# Preparar um release
+git switch -c release/1.2.0 develop
+# ... ajustes finais, bump de versão ...
+git switch main &amp;&amp; git merge release/1.2.0
+git tag -a v1.2.0 -m "Release 1.2.0"
+git switch develop &amp;&amp; git merge release/1.2.0
+
+# Hotfix urgente
+git switch -c hotfix/1.2.1 main
+# ... corrige ...
+git switch main &amp;&amp; git merge hotfix/1.2.1 &amp;&amp; git tag v1.2.1
+git switch develop &amp;&amp; git merge hotfix/1.2.1</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Git Flow pode ser complexo demais</h4>
+            <p>Para produtos web com entrega contínua, o Git Flow costuma ser burocrático demais. Ele faz sentido para software versionado (bibliotecas, apps desktop/mobile, sistemas com múltiplas versões em suporte). Escolha o fluxo pela necessidade real, não por moda.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Trunk-Based Development</h2>
+          <p>Abordagem favorecida por times de alta performance (DevOps/DORA): todos integram na main (trunk) frequentemente, com branches de vida muito curta e feature flags.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌲 Princípios do Trunk-Based</h3>
+          <div class="info-box highlight">
+            <h4>Características</h4>
+            <ul>
+              <li><strong>Branches curtíssimas</strong> (horas a 1-2 dias), integradas rápido na main</li>
+              <li><strong>Feature flags</strong> para esconder código incompleto em produção</li>
+              <li><strong>CI/CD robusto</strong> — testes automáticos garantem que a main nunca quebra</li>
+              <li><strong>Commits pequenos e frequentes</strong> reduzem conflitos ao máximo</li>
+            </ul>
+          </div>
+          <div class="command-card wide">
+            <pre><code># Feature flag: código novo entra na main "desligado"
+if feature_flags.esta_ativa("novo_checkout"):
+    usar_novo_checkout()
+else:
+    usar_checkout_antigo()
+
+# Assim você faz merge de código incompleto sem impactar usuários,
+# e ativa a feature quando estiver pronta — sem branch de longa duração.</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Fluxo</th><th>Complexidade</th><th>Ideal para</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>GitHub Flow</td><td>Baixa</td><td>Web/SaaS, times ágeis</td></tr>
+              <tr><td>Git Flow</td><td>Alta</td><td>Software versionado, releases formais</td></tr>
+              <tr><td>Trunk-Based</td><td>Média (exige CI forte)</td><td>Alta performance, deploy contínuo</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Tags e Releases</h2>
+          <p>Tags marcam pontos importantes no histórico — tipicamente versões. Releases no GitHub adicionam notas, binários e changelog a uma tag.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🏷️ Trabalhando com Tags</h3>
+          <div class="command-card wide">
+            <pre><code># Tag anotada (recomendada — guarda autor, data e mensagem)
+git tag -a v1.0.0 -m "Primeira versão estável"
+
+# Tag leve (apenas um ponteiro, sem metadados)
 git tag v1.0.0-beta
 
-# Listar tags
-git tag -l "v1.*"
+# Taggear um commit antigo específico
+git tag -a v0.9.0 a1b2c3 -m "Versão beta"
 
-# Push tags para remoto
+# Listar tags
+git tag
+git tag -l "v1.*"       # filtrar
+
+# Ver detalhes de uma tag
+git show v1.0.0
+
+# Enviar tags para o GitHub (não vão com git push normal!)
 git push origin v1.0.0
-git push origin --tags    # todas
+git push origin --tags     # todas as tags
 
 # Deletar tag
-git tag -d v1.0.0
-git push origin --delete v1.0.0</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Conventional Commits</code><span class="cmd-tag">Padrão</span></div>
-              <p>Padrão de mensagens para changelog automático.</p>
-              <pre><code># Formato:
-# tipo(escopo): descrição
-
-feat: adiciona autenticação OAuth
-feat(api): implementa endpoint /users
-fix: corrige validação de email
-fix(auth): token não expira corretamente
-docs: atualiza README com exemplos
-style: formata código com prettier
-refactor: extrai lógica para service
-test: adiciona testes para UserService
-chore: atualiza dependências
-ci: adiciona step de lint no pipeline
-
-# Breaking change:
-feat!: remove suporte a Node 14
-# ou
-feat: migra para ESM
-BREAKING CHANGE: require() não funciona mais</code></pre>
-            </div>
+git tag -d v1.0.0                  # local
+git push origin --delete v1.0.0    # remota</code></pre>
           </div>
+
+          <div class="info-box">
+            <h4>📦 GitHub Releases</h4>
+            <p>No GitHub, vá em Releases → Draft a new release, escolha uma tag, adicione título, notas e anexe binários. O GitHub gera automaticamente um changelog a partir dos PRs mesclados desde a última release ("Generate release notes"). Via CLI: <code>gh release create v1.0.0 --generate-notes</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Versionamento Semântico (SemVer)</h2>
+          <p>SemVer é o padrão de numeração de versões mais adotado. Ele comunica, só pelo número, o impacto de uma atualização.</p>
         </div>
 
         <div class="topic-block">
-          <h2>3. Semantic Versioning (SemVer)</h2>
-          <div class="info-box highlight">
-            <strong>MAJOR.MINOR.PATCH — Exemplo: v2.1.3</strong>
-            <pre><code>MAJOR (2) → Breaking changes (incompatível com anterior)
-MINOR (1) → Nova funcionalidade (compatível)
-PATCH (3) → Correção de bug (compatível)
+          <h3>🔢 O Formato MAJOR.MINOR.PATCH</h3>
+          <div class="command-card wide">
+            <pre><code>          v  2  .  4  .  1
+              │     │     │
+              │     │     └── PATCH: correções de bug (compatível)
+              │     └──────── MINOR: novas features (compatível)
+              └────────────── MAJOR: mudanças que QUEBRAM compatibilidade</code></pre>
+          </div>
 
-Exemplos:
-v1.0.0 → v1.0.1  (fix: corrige bug)
-v1.0.1 → v1.1.0  (feat: nova feature)
-v1.1.0 → v2.0.0  (feat!: breaking change)</code></pre>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Mudança</th><th>Incrementa</th><th>Exemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Correção de bug (sem quebrar API)</td><td>PATCH</td><td>1.2.3 → 1.2.4</td></tr>
+              <tr><td>Nova feature compatível</td><td>MINOR (zera PATCH)</td><td>1.2.4 → 1.3.0</td></tr>
+              <tr><td>Mudança incompatível (breaking)</td><td>MAJOR (zera MINOR e PATCH)</td><td>1.3.0 → 2.0.0</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Sufixos de pré-lançamento</h4>
+            <p>Versões instáveis usam sufixos: <code>1.0.0-alpha</code>, <code>1.0.0-beta.2</code>, <code>1.0.0-rc.1</code> (release candidate). A versão <code>0.x.y</code> indica desenvolvimento inicial, onde a API ainda pode mudar a qualquer momento.</p>
           </div>
         </div>
+      </div>
+    </section>
 
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Conventional Commits</h2>
+          <p>Uma convenção de mensagens de commit que padroniza a comunicação e permite gerar changelogs e versões SemVer automaticamente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>📝 A Especificação</h3>
+          <div class="command-card wide">
+            <pre><code># Formato:
+#   &lt;tipo&gt;[escopo opcional]: &lt;descrição&gt;
+#
+#   [corpo opcional]
+#
+#   [rodapé(s) opcional(is)]
+
+# Exemplos:
+feat: adiciona login com Google
+fix: corrige cálculo de frete para o Nordeste
+docs: atualiza instruções de instalação
+refactor(auth): extrai validação para módulo separado
+perf: reduz consultas ao banco no dashboard
+test: adiciona testes para o serviço de e-mail
+chore: atualiza dependências
+
+# Breaking change (gera MAJOR no SemVer):
+feat!: remove suporte à API v1
+# ou no rodapé:
+feat: nova API de pagamentos
+
+BREAKING CHANGE: o endpoint /pay foi removido, use /payments</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Tipo</th><th>Significado</th><th>Impacto SemVer</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>feat</code></td><td>Nova funcionalidade</td><td>MINOR</td></tr>
+              <tr><td><code>fix</code></td><td>Correção de bug</td><td>PATCH</td></tr>
+              <tr><td><code>docs</code></td><td>Documentação</td><td>—</td></tr>
+              <tr><td><code>style</code></td><td>Formatação (sem mudar lógica)</td><td>—</td></tr>
+              <tr><td><code>refactor</code></td><td>Refatoração</td><td>—</td></tr>
+              <tr><td><code>perf</code></td><td>Melhoria de performance</td><td>PATCH</td></tr>
+              <tr><td><code>test</code></td><td>Testes</td><td>—</td></tr>
+              <tr><td><code>chore</code></td><td>Manutenção/build</td><td>—</td></tr>
+              <tr><td><code>feat!</code> / BREAKING CHANGE</td><td>Quebra compatibilidade</td><td>MAJOR</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>🤖 Automação a partir dos commits</h4>
+            <p>Ferramentas como <strong>semantic-release</strong> e <strong>standard-version</strong> leem seus Conventional Commits e automaticamente: calculam a próxima versão SemVer, geram o CHANGELOG, criam a tag e publicam a release. Adotar a convenção destrava toda essa automação.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Escolhendo seu Fluxo e Resumo</h2>
+          <p>Não existe fluxo "certo" universal — existe o fluxo adequado ao seu contexto. Veja como decidir.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧭 Guia de Decisão</h3>
+          <div class="info-box highlight">
+            <h4>Perguntas para escolher o fluxo</h4>
+            <ul>
+              <li><strong>Faz deploy contínuo?</strong> → GitHub Flow ou Trunk-Based</li>
+              <li><strong>Mantém várias versões em suporte?</strong> → Git Flow</li>
+              <li><strong>Time pequeno e ágil?</strong> → GitHub Flow</li>
+              <li><strong>Tem CI/CD maduro e quer máxima velocidade?</strong> → Trunk-Based com feature flags</li>
+              <li><strong>É uma biblioteca publicada?</strong> → SemVer + Conventional Commits + releases automáticas</li>
+            </ul>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 06</h4>
+            <p>Você conhece os principais fluxos de trabalho (GitHub Flow, Git Flow, Trunk-Based) e sabe escolher pelo contexto. Domina tags e GitHub Releases, entende Versionamento Semântico (MAJOR.MINOR.PATCH) e adota Conventional Commits para comunicação padronizada e automação de changelog/versão. Este é o vocabulário de times profissionais. No Módulo 07, automatizamos tudo isso com GitHub Actions e CI/CD.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -199,7 +387,7 @@ v1.1.0 → v2.0.0  (feat!: breaking change)</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

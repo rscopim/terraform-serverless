@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 01: Fundamentos</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 01: Fundamentos</title>
+  <meta name="description" content="Fundamentos do Git: init, clone, add, commit, push, pull, status, log, diff, .gitignore e o modelo de três áreas (working directory, staging, repository)." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,196 +18,534 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-00.html" class="nav-link">← Anterior</a>
         <a href="modulo-02.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 01</span>
-        <h1>Fundamentos</h1>
-        <p>git init, add, commit, push, pull, clone, status, log, .gitignore. O fluxo básico do Git: inicializar, rastrear mudanças, criar snapshots e sincronizar com o GitHub.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 01</span>
+        <h1>Fundamentos do Git</h1>
+        <p>Domine os comandos que você usará todos os dias: iniciar repositórios, rastrear mudanças, criar commits, sincronizar com o GitHub e navegar pelo histórico. Entenda o modelo mental das três áreas do Git — a chave para nunca mais ficar perdido sobre o estado dos seus arquivos.</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
-      <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
-        </div>
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node active"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
       </div>
     </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1: O MODELO DE TRÊS ÁREAS
+    ════════════════════════════════════════════════════════════════════════════ -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>O Modelo Mental do Git — Três Áreas</h2>
+          <p>Entender como o Git organiza os arquivos é o conceito mais importante deste módulo. Uma vez que você "vê" as três áreas, todos os comandos passam a fazer sentido.</p>
+        </div>
 
         <div class="topic-block">
-          <h2>1. Criando e Clonando Repositórios</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git init</code><span class="cmd-tag">Criar</span></div>
-              <p>Inicializa um repositório Git local.</p>
-              <pre><code>mkdir meu-projeto
+          <h3>🗂️ Working Directory, Staging Area e Repository</h3>
+          <p>O Git movimenta arquivos entre três áreas conceituais:</p>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Área</th><th>O que é</th><th>Comando que leva até ela</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Working Directory</strong></td>
+                <td>Seus arquivos como estão no disco, onde você edita</td>
+                <td>(edição de arquivos)</td>
+              </tr>
+              <tr>
+                <td><strong>Staging Area (Index)</strong></td>
+                <td>Área de preparação — o que entrará no próximo commit</td>
+                <td><code>git add</code></td>
+              </tr>
+              <tr>
+                <td><strong>Repository (.git)</strong></td>
+                <td>Histórico permanente de commits</td>
+                <td><code>git commit</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>O Fluxo Básico Visualizado</h4>
+            <pre><code>  Working Directory          Staging Area           Repository
+  ─────────────────          ────────────           ──────────
+   edito arquivo.txt
+          │
+          │  git add arquivo.txt
+          └──────────────────────▶ arquivo.txt (staged)
+                                        │
+                                        │  git commit -m "..."
+                                        └──────────────────────▶ commit abc123
+                                                                      │
+                                                                      │  git push
+                                                                      └──────▶ GitHub</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que existe a staging area?</h4>
+            <p>Ela permite que você monte commits precisos. Você pode ter editado 5 arquivos, mas fazer commit de apenas 2 deles agora (relacionados a uma mesma mudança) e os outros 3 depois. Isso gera um histórico limpo, onde cada commit representa uma unidade lógica de trabalho.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>📊 Os Estados de um Arquivo</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Estado</th><th>Significado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Untracked</strong></td><td>Novo arquivo que o Git ainda não rastreia</td></tr>
+              <tr><td><strong>Modified</strong></td><td>Arquivo rastreado que foi alterado, mas não staged</td></tr>
+              <tr><td><strong>Staged</strong></td><td>Alteração preparada para o próximo commit</td></tr>
+              <tr><td><strong>Committed / Unmodified</strong></td><td>Arquivo salvo no repositório, sem mudanças pendentes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2: INICIANDO UM REPOSITÓRIO
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Iniciando um Repositório — init e clone</h2>
+          <p>Há duas formas de começar: criar um repositório novo do zero (<code>init</code>) ou baixar um existente (<code>clone</code>).</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌱 git init — Criando do Zero</h3>
+          <div class="command-card wide">
+            <h4>Repositório Local Novo</h4>
+            <pre><code># Criar uma pasta e iniciar o repositório
+mkdir meu-projeto
 cd meu-projeto
 git init
-# Initialized empty Git repository</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git clone</code><span class="cmd-tag">Criar</span></div>
-              <p>Clona um repositório remoto para sua máquina.</p>
-              <pre><code># Via SSH (recomendado)
-git clone git@github.com:user/repo.git
+# Initialized empty Git repository in .../meu-projeto/.git/
+
+# O que aconteceu: foi criada a pasta oculta .git/
+# que armazena TODO o histórico e a configuração do repo
+
+# Ver o estado inicial
+git status
+# On branch main
+# No commits yet
+# nothing to commit
+
+# Conectar a um repositório remoto no GitHub (criado vazio)
+git remote add origin git@github.com:seuuser/meu-projeto.git
+git remote -v   # verificar</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>📥 git clone — Baixando um Existente</h3>
+          <div class="command-card wide">
+            <h4>Clonando do GitHub</h4>
+            <pre><code># Via SSH (recomendado se você configurou chave)
+git clone git@github.com:usuario/repositorio.git
 
 # Via HTTPS
-git clone https://github.com/user/repo.git
+git clone https://github.com/usuario/repositorio.git
 
-# Clone com nome customizado
-git clone git@github.com:user/repo.git meu-dir</code></pre>
-            </div>
+# Clonar em uma pasta com nome diferente
+git clone git@github.com:usuario/repo.git minha-pasta
+
+# Clonar apenas a última versão (shallow — mais rápido, sem histórico)
+git clone --depth 1 git@github.com:usuario/repo.git
+
+# Clonar uma branch específica
+git clone -b develop git@github.com:usuario/repo.git
+
+# O clone já configura o remote 'origin' automaticamente</code></pre>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3: RASTREANDO MUDANÇAS — ADD E COMMIT
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Rastreando Mudanças — add e commit</h2>
+          <p>O ciclo central do Git: você edita, adiciona ao staging e faz commit. Vamos detalhar cada comando com suas variações mais úteis.</p>
         </div>
 
         <div class="topic-block">
-          <h2>2. Fluxo Básico: add → commit → push</h2>
-          <div class="info-box highlight">
-            <strong>Os 3 estados do Git:</strong>
-            <pre><code>Working Directory → Staging Area → Repository
-   (modificado)      (preparado)     (commitado)
-      git add →      git commit →    git push →  Remote</code></pre>
-          </div>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git status</code><span class="cmd-tag">Essencial</span></div>
-              <p>Mostra o estado atual dos arquivos.</p>
-              <pre><code>git status
-# On branch main
-# Changes not staged for commit:
-#   modified: index.html
-# Untracked files:
-#   style.css
-
-git status -s  # formato curto
-# M  index.html
-# ?? style.css</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git add</code><span class="cmd-tag">Staging</span></div>
-              <p>Adiciona arquivos à staging area.</p>
-              <pre><code>git add arquivo.txt       # arquivo específico
-git add .                 # tudo no diretório
-git add *.js              # por extensão
-git add -p                # interativo (por hunks)
-
-# Remover do staging (sem perder mudanças)
-git restore --staged arquivo.txt</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git commit</code><span class="cmd-tag">Essencial</span></div>
-              <p>Cria um snapshot das mudanças no staging.</p>
-              <pre><code>git commit -m "feat: adiciona navbar"
-git commit -am "fix: corrige typo"  # add + commit
-git commit --amend  # edita último commit
-
-# Boas práticas de mensagem:
-# tipo: descrição curta (max 72 chars)
-# feat: | fix: | docs: | refactor: | test:</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git log</code><span class="cmd-tag">Histórico</span></div>
-              <p>Visualiza o histórico de commits.</p>
-              <pre><code>git log                    # completo
-git log --oneline          # resumido
-git log --oneline --graph  # com branches
-git log -5                 # últimos 5
-git log --author="João"    # por autor
-git log --since="2024-01-01"</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h2>3. Sincronização com Remoto</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git remote</code><span class="cmd-tag">Remoto</span></div>
-              <p>Gerencia conexões com repositórios remotos.</p>
-              <pre><code>git remote add origin git@github.com:user/repo.git
-git remote -v              # lista remotos
-git remote rename origin upstream
-git remote remove upstream</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git push</code><span class="cmd-tag">Enviar</span></div>
-              <p>Envia commits locais para o remoto.</p>
-              <pre><code>git push origin main
-git push -u origin main    # define upstream
-git push                   # após -u, basta isso
-git push --force-with-lease # force seguro</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git pull</code><span class="cmd-tag">Receber</span></div>
-              <p>Baixa e integra mudanças do remoto.</p>
-              <pre><code>git pull                   # fetch + merge
-git pull --rebase          # fetch + rebase
-git pull origin main       # branch específica</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git fetch</code><span class="cmd-tag">Receber</span></div>
-              <p>Baixa mudanças sem integrar (mais seguro).</p>
-              <pre><code>git fetch origin
-git fetch --all            # todos os remotos
-git log origin/main..main  # ver diferenças
-# Depois: git merge origin/main</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="topic-block">
-          <h2>4. Arquivos Ignorados</h2>
+          <h3>➕ git add — Preparando Mudanças</h3>
           <div class="command-card wide">
-            <div class="command-header"><code>.gitignore</code><span class="cmd-tag">Configuração</span></div>
-            <p>Define quais arquivos o Git deve ignorar.</p>
-            <pre><code># .gitignore — exemplo para Node.js + Terraform
+            <h4>Variações do add</h4>
+            <pre><code># Adicionar um arquivo específico
+git add arquivo.txt
+
+# Adicionar vários arquivos
+git add arquivo1.txt arquivo2.txt
+
+# Adicionar todos os arquivos de uma pasta
+git add src/
+
+# Adicionar TUDO que mudou (novos, modificados, deletados)
+git add .
+git add -A          # equivalente, funciona de qualquer subpasta
+
+# Adicionar interativamente (escolher trechos de um arquivo)
+git add -p arquivo.txt
+# y = incluir trecho, n = pular, s = dividir, q = sair
+
+# Tirar um arquivo do staging (sem perder as edições)
+git restore --staged arquivo.txt
+# ou (Git antigo):
+git reset HEAD arquivo.txt</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>💾 git commit — Salvando no Histórico</h3>
+          <div class="command-card wide">
+            <h4>Formas de Fazer Commit</h4>
+            <pre><code># Commit com mensagem inline
+git commit -m "feat: adiciona validação de e-mail no formulário"
+
+# Commit com título e corpo (boa prática para mudanças relevantes)
+git commit -m "feat: adiciona cache de respostas" -m "Reduz chamadas à API em 60% usando um cache LRU de 5 minutos."
+
+# Adicionar ao staging e commitar de uma vez (só arquivos JÁ rastreados)
+git commit -am "fix: corrige cálculo de total"
+
+# Abrir o editor para escrever a mensagem
+git commit
+
+# Corrigir o ÚLTIMO commit (mensagem ou arquivos esquecidos)
+git add arquivo-esquecido.txt
+git commit --amend -m "mensagem corrigida"
+# ⚠️ Só faça amend em commits que ainda NÃO foram enviados (push)</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>✍️ Anatomia de uma boa mensagem de commit</h4>
+            <ul>
+              <li><strong>Título</strong> curto (até ~50 caracteres), no imperativo: "adiciona", "corrige", "remove"</li>
+              <li>Linha em branco entre título e corpo</li>
+              <li><strong>Corpo</strong> (opcional) explicando o <em>porquê</em>, não o <em>como</em></li>
+              <li>Prefixos convencionais ajudam: <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>refactor:</code> (veremos SemVer e Conventional Commits no Módulo 06)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4: INSPECIONANDO — STATUS, DIFF, LOG
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Inspecionando o Repositório</h2>
+          <p>Saber o estado atual e o histórico é essencial. Estes comandos são os seus "olhos" no Git.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔍 git status — O Estado Atual</h3>
+          <div class="command-card wide">
+            <pre><code># Estado completo
+git status
+
+# Formato resumido (mais rápido de ler)
+git status -s
+#  M arquivo.txt      → modificado, não staged
+# M  outro.txt        → modificado e staged
+# ?? novo.txt         → untracked
+# A  adicionado.txt   → novo arquivo staged</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>📝 git diff — Vendo as Diferenças</h3>
+          <div class="command-card wide">
+            <pre><code># Mudanças no working directory (ainda não staged)
+git diff
+
+# Mudanças que já estão staged (o que entrará no commit)
+git diff --staged      # ou --cached
+
+# Diferença entre dois commits
+git diff abc123 def456
+
+# Diferença de um arquivo específico
+git diff arquivo.txt
+
+# Resumo estatístico (arquivos e linhas alteradas)
+git diff --stat</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>📜 git log — Navegando o Histórico</h3>
+          <div class="command-card wide">
+            <pre><code># Histórico completo
+git log
+
+# Uma linha por commit (compacto)
+git log --oneline
+
+# Com grafo de branches e decoração
+git log --oneline --graph --decorate --all
+
+# Últimos 5 commits
+git log -5
+
+# Filtrar por autor ou por mensagem
+git log --author="Ricardo"
+git log --grep="fix"
+
+# Ver o que mudou em cada commit
+git log -p
+
+# Ver quem alterou cada linha de um arquivo
+git blame arquivo.txt</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5: SINCRONIZANDO COM O GITHUB
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Sincronizando — push, pull e fetch</h2>
+          <p>Até aqui tudo foi local. Estes comandos conectam seu repositório ao GitHub, enviando e recebendo mudanças.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>⬆️ git push — Enviando Commits</h3>
+          <div class="command-card wide">
+            <pre><code># Primeiro push de uma branch nova (define o upstream)
+git push -u origin main
+# -u (--set-upstream) vincula a branch local à remota;
+# depois disso, basta 'git push'
+
+# Pushes seguintes
+git push
+
+# Enviar uma branch específica
+git push origin feature/login
+
+# Enviar tags
+git push --tags</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>⬇️ git pull e git fetch — Recebendo Mudanças</h3>
+          <div class="command-card wide">
+            <pre><code># fetch: baixa as mudanças do remoto SEM aplicá-las
+git fetch origin
+# Você pode inspecionar antes de integrar
+
+# pull: fetch + merge (baixa E integra na sua branch)
+git pull
+git pull origin main
+
+# pull com rebase (histórico mais linear)
+git pull --rebase
+
+# Ver as diferenças entre local e remoto após um fetch
+git log HEAD..origin/main --oneline</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ fetch vs pull</h4>
+            <p><code>fetch</code> é seguro: só baixa, não muda seus arquivos. <code>pull</code> baixa E integra automaticamente, o que pode gerar merges ou conflitos inesperados. Se quiser controle, use <code>fetch</code> e depois <code>merge</code>/<code>rebase</code> manualmente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6: .GITIGNORE
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>.gitignore — Ignorando Arquivos</h2>
+          <p>Nem tudo deve ir para o repositório: dependências, arquivos de build, segredos, caches. O <code>.gitignore</code> diz ao Git o que ignorar.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🚫 Sintaxe e Padrões</h3>
+          <div class="command-card wide">
+            <h4>Exemplo de .gitignore</h4>
+            <pre><code># Comentários começam com #
+
+# Ignorar um arquivo específico
+config.local.json
+
+# Ignorar por extensão
+*.log
+*.tmp
+
+# Ignorar uma pasta inteira
 node_modules/
 dist/
+__pycache__/
+
+# Ignorar tudo em uma pasta, MAS manter um arquivo
+logs/*
+!logs/.gitkeep
+
+# Ignorar arquivos de ambiente e segredos (MUITO IMPORTANTE)
 .env
-.env.local
-*.log
+.env.*
+*.pem
+*.key
+credentials
 
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.backup
-*.tfvars
-
-# IDE
+# Padrões específicos de IDEs / SO
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db</code></pre>
           </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Já commitei um arquivo que deveria ser ignorado!</h4>
+            <p>Adicionar ao <code>.gitignore</code> não remove arquivos já rastreados. Use:</p>
+            <pre><code># Remove do rastreamento (mantém no disco), depois commit
+git rm --cached arquivo-secreto.env
+git commit -m "chore: remove arquivo sensível do versionamento"
+
+# Se um SEGREDO foi commitado, considere-o COMPROMETIDO:
+# rotacione a credencial imediatamente — remover do histórico não basta</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Templates prontos</h4>
+            <p>O site <strong>gitignore.io</strong> e o repositório <strong>github/gitignore</strong> oferecem templates prontos por linguagem/ferramenta (Node, Python, Terraform, etc.). Ao criar um repo no GitHub, você pode escolher um <code>.gitignore</code> inicial automaticamente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7: DESFAZENDO E PRÁTICA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Desfazendo Mudanças e Exercício Guiado</h2>
+          <p>Erros acontecem. Saber desfazer com segurança é tão importante quanto saber fazer. E ao final, um exercício que junta tudo.</p>
         </div>
 
+        <div class="topic-block">
+          <h3>↩️ Desfazendo com Segurança</h3>
+          <div class="command-card wide">
+            <pre><code># Descartar mudanças de um arquivo (volta ao último commit)
+git restore arquivo.txt
+# ⚠️ perde as edições não commitadas!
+
+# Tirar do staging (mantém as edições)
+git restore --staged arquivo.txt
+
+# Desfazer o último commit MAS manter as mudanças no working dir
+git reset --soft HEAD~1
+
+# Desfazer o último commit e as mudanças do staging
+git reset --mixed HEAD~1     # (padrão)
+
+# Desfazer o último commit E descartar tudo (PERIGOSO)
+git reset --hard HEAD~1
+
+# Reverter um commit criando um NOVO commit que o desfaz (seguro p/ histórico público)
+git revert abc123</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ reset --hard e histórico já enviado</h4>
+            <p>Nunca use <code>reset --hard</code> ou reescreva commits que já foram enviados (push) e que outras pessoas podem ter baixado. Para desfazer algo público, prefira <code>git revert</code>, que adiciona um commit de reversão sem apagar o histórico. Reescrita de histórico é tema do Módulo 05.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧪 Exercício Guiado — Seu Primeiro Repositório Completo</h3>
+          <div class="command-card wide">
+            <h4>Do init ao push, passo a passo</h4>
+            <pre><code># 1. Criar e iniciar
+mkdir meu-primeiro-repo &amp;&amp; cd meu-primeiro-repo
+git init
+
+# 2. Criar um .gitignore
+echo ".env" &gt; .gitignore
+echo "node_modules/" &gt;&gt; .gitignore
+
+# 3. Criar um arquivo
+echo "# Meu Primeiro Repositório" &gt; README.md
+
+# 4. Verificar o estado
+git status        # README.md e .gitignore aparecem como untracked
+
+# 5. Preparar e commitar
+git add .
+git status        # agora estão staged
+git commit -m "chore: commit inicial com README e gitignore"
+
+# 6. Ver o histórico
+git log --oneline
+
+# 7. Conectar ao GitHub (crie um repo vazio antes)
+git remote add origin git@github.com:seuuser/meu-primeiro-repo.git
+git branch -M main
+git push -u origin main
+
+# 🎉 Seu código está no GitHub!</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 01</h4>
+            <p>Você domina agora o ciclo fundamental do Git: o modelo das três áreas, iniciar repositórios (init/clone), rastrear mudanças (add/commit), inspecionar (status/diff/log), sincronizar com o GitHub (push/pull/fetch), ignorar arquivos (.gitignore) e desfazer com segurança. Estes comandos representam 80% do uso diário. No Módulo 02, entramos no recurso mais poderoso do Git: branches.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -223,7 +562,7 @@ Thumbs.db</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

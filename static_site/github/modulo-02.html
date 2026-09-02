@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 02: Branches</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 02: Branches</title>
+  <meta name="description" content="Branches no Git: criar, alternar, mergear (fast-forward e 3-way), deletar, convenções de nomes, git stash e estratégias de branching." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,137 +18,359 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-01.html" class="nav-link">← Anterior</a>
         <a href="modulo-03.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 02</span>
-        <h1>Branches: Ramificação e Merge</h1>
-        <p>Criar, mergear, stash, convenções de nomes, estratégias de merge. Branches permitem trabalhar em funcionalidades isoladas sem afetar o código principal.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 02</span>
+        <h1>Branches — Trabalhando em Paralelo</h1>
+        <p>Branches são o recurso que torna o Git tão poderoso. Elas permitem desenvolver funcionalidades, corrigir bugs e experimentar em linhas de trabalho isoladas, sem afetar o código principal. Neste módulo você aprende a criar, alternar, mergear e organizar branches como um profissional.</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
-      <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
-        </div>
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node active"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
       </div>
     </section>
+
+    <!-- SEÇÃO 1 -->
     <section class="module-section">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>O que é uma Branch</h2>
+          <p>Entender o que uma branch realmente é — e não apenas como usá-la — desmistifica todo o resto.</p>
+        </div>
 
         <div class="topic-block">
-          <h2>1. Criando e Navegando entre Branches</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>git branch / checkout / switch</code><span class="cmd-tag">Essencial</span></div>
-              <p>Gerencia branches locais e remotas.</p>
-              <pre><code># Listar branches
-git branch              # locais
-git branch -a           # locais + remotas
-git branch -v           # com último commit
+          <h3>🌿 Branch é um Ponteiro</h3>
+          <p>Ao contrário do que muitos imaginam, uma branch no Git não é uma "cópia" da pasta. É apenas um <strong>ponteiro leve</strong> para um commit específico. Quando você faz um novo commit, o ponteiro da branch atual avança automaticamente. Criar uma branch é uma operação instantânea e barata — o Git só escreve 40 bytes (o hash de um commit) em um arquivo.</p>
 
-# Criar branch
+          <div class="command-card wide">
+            <h4>Visualizando Branches como Ponteiros</h4>
+            <pre><code>          C0 ─── C1 ─── C2  ◀── main  (HEAD)
+                          │
+                          └─── C3 ◀── feature/login
+
+# main aponta para C2
+# feature/login aponta para C3
+# HEAD indica em qual branch você está agora</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 O que é o HEAD?</h4>
+            <p>O <code>HEAD</code> é um ponteiro especial que indica em qual branch (e commit) você está no momento. Quando você troca de branch com <code>git switch</code>, o HEAD passa a apontar para a nova branch, e o Git atualiza os arquivos do working directory para refletirem aquele commit.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Criando e Alternando Branches</h2>
+          <p>O Git moderno (2.23+) introduziu <code>git switch</code> e <code>git restore</code> para separar responsabilidades que antes eram todas do <code>git checkout</code>.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔀 Comandos Essenciais</h3>
+          <div class="command-card wide">
+            <pre><code># Listar branches (a atual tem *)
+git branch
+
+# Listar também as remotas
+git branch -a
+
+# Criar uma branch nova (sem trocar para ela)
 git branch feature/login
-git checkout -b feature/login    # cria e muda
-git switch -c feature/login      # forma moderna
 
-# Mudar de branch
-git checkout main
-git switch main
+# Trocar de branch (forma moderna)
+git switch feature/login
 
-# Deletar branch
-git branch -d feature/login      # seguro (merged)
-git branch -D feature/login      # forçado
-git push origin --delete feature/login  # remota</code></pre>
-            </div>
+# Criar E trocar em um só comando
+git switch -c feature/login
+# equivalente antigo:
+git checkout -b feature/login
+
+# Voltar para a branch anterior (como 'cd -')
+git switch -
+
+# Renomear a branch atual
+git branch -m novo-nome
+
+# Deletar uma branch (já mergeada)
+git branch -d feature/login
+
+# Forçar deleção (mesmo sem merge — cuidado!)
+git branch -D feature/experimento</code></pre>
           </div>
+
           <div class="info-box">
-            <strong>Convenções de nomes:</strong> <code>feature/</code> nova funcionalidade, <code>fix/</code> ou <code>bugfix/</code> correção, <code>hotfix/</code> correção urgente em produção, <code>release/</code> preparação de release, <code>chore/</code> tarefas de manutenção.
+            <h4>💡 switch vs checkout</h4>
+            <p><code>git switch</code> serve apenas para trocar/criar branches — mais claro e seguro. <code>git checkout</code> ainda funciona e faz muito mais (trocar branch, restaurar arquivos, ir a commits), mas justamente por ser sobrecarregado gera confusão. Prefira <code>switch</code> e <code>restore</code> no dia a dia.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Merge — Integrando Branches</h2>
+          <p>Depois de terminar o trabalho em uma branch, você integra as mudanças de volta com <code>git merge</code>. Existem dois tipos principais de merge, e entender a diferença ajuda a ler o histórico.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>⏩ Fast-Forward Merge</h3>
+          <p>Acontece quando a branch de destino não teve novos commits desde que a branch de trabalho foi criada. O Git apenas "avança" o ponteiro — não cria commit de merge.</p>
+          <div class="command-card wide">
+            <pre><code># Situação: main não mudou desde que feature nasceu
+#   C0 ─ C1 ◀── main
+#          └─ C2 ─ C3 ◀── feature
+
+git switch main
+git merge feature
+# Fast-forward! main agora aponta para C3
+#   C0 ─ C1 ─ C2 ─ C3 ◀── main, feature</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h2>2. Merge e Estratégias</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git merge</code><span class="cmd-tag">Integração</span></div>
-              <p>Integra mudanças de uma branch em outra.</p>
-              <pre><code># Merge da feature na main
-git checkout main
-git merge feature/login
+          <h3>🔗 Three-Way Merge (com commit de merge)</h3>
+          <p>Acontece quando ambas as branches evoluíram. O Git cria um novo "commit de merge" que une as duas histórias.</p>
+          <div class="command-card wide">
+            <pre><code># Situação: main E feature receberam commits
+#   C0 ─ C1 ─ C4 ◀── main
+#          └─ C2 ─ C3 ◀── feature
 
-# Merge com commit explícito
-git merge --no-ff feature/login
+git switch main
+git merge feature
+# Cria um commit de merge C5 com dois pais (C4 e C3)
+#   C0 ─ C1 ─ C4 ─── C5 ◀── main
+#          └─ C2 ─ C3 ─┘
 
-# Abortar merge com conflito
-git merge --abort</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git stash</code><span class="cmd-tag">Utilidade</span></div>
-              <p>Salva mudanças temporariamente sem commit.</p>
-              <pre><code># Guardar mudanças
-git stash
-git stash push -m "WIP: navbar"
-
-# Listar e recuperar
-git stash list
-git stash pop           # aplica e remove
-git stash apply stash@{0}  # aplica sem remover
-
-# Limpar
-git stash drop stash@{0}
-git stash clear</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git diff</code><span class="cmd-tag">Comparação</span></div>
-              <p>Mostra diferenças entre estados.</p>
-              <pre><code>git diff                   # working vs staging
-git diff --staged          # staging vs commit
-git diff main..feature     # entre branches
-git diff HEAD~3            # últimos 3 commits
-git diff --stat            # resumo</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Estratégias de Merge</code><span class="cmd-tag">Conceito</span></div>
-              <p>Entenda quando usar cada tipo.</p>
-              <pre><code># Fast-forward (padrão quando possível)
-# Histórico linear, sem commit de merge
-git merge feature  # se main não avançou
-
-# No fast-forward (preserva histórico)
+# Forçar sempre um commit de merge (mesmo quando FF seria possível)
 git merge --no-ff feature
-# Cria commit de merge sempre
 
-# Squash (compacta commits)
-git merge --squash feature
-git commit -m "feat: login completo"</code></pre>
-            </div>
+# Merge sem commitar (para revisar antes)
+git merge --no-commit feature</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 --no-ff em times</h4>
+            <p>Muitos times usam <code>--no-ff</code> em merges de feature para preservar no histórico o "agrupamento" de commits daquela funcionalidade. Assim fica visível onde uma feature começou e terminou, mesmo que um fast-forward fosse possível.</p>
           </div>
         </div>
+      </div>
+    </section>
 
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>git stash — Guardando Trabalho Temporário</h2>
+          <p>Às vezes você está no meio de uma mudança e precisa trocar de branch com urgência (um bug em produção!). O <code>stash</code> guarda suas alterações não commitadas em uma pilha temporária.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>📦 Usando o Stash</h3>
+          <div class="command-card wide">
+            <pre><code># Guardar mudanças atuais (working dir fica limpo)
+git stash
+
+# Guardar com uma descrição
+git stash push -m "wip: formulário de contato pela metade"
+
+# Guardar incluindo arquivos untracked
+git stash -u
+
+# Listar stashes guardados
+git stash list
+# stash@{0}: On main: wip: formulário...
+# stash@{1}: On feature: ...
+
+# Aplicar o stash mais recente e removê-lo da pilha
+git stash pop
+
+# Aplicar sem remover da pilha
+git stash apply stash@{1}
+
+# Ver o conteúdo de um stash
+git stash show -p stash@{0}
+
+# Descartar um stash
+git stash drop stash@{0}
+
+# Limpar todos os stashes
+git stash clear</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>🎯 Caso de uso clássico</h4>
+            <pre><code># Você está codando uma feature e surge um bug urgente
+git stash push -m "feature pela metade"
+git switch main
+git switch -c hotfix/bug-critico
+# ... corrige, commita, faz merge ...
+git switch feature/minha-feature
+git stash pop     # retoma de onde parou</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Convenções de Nomes de Branch</h2>
+          <p>Nomes de branch padronizados tornam o repositório legível e facilitam automações (CI/CD que dispara por prefixo, por exemplo).</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🏷️ Padrão Recomendado</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Prefixo</th><th>Uso</th><th>Exemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>feature/</code></td><td>Nova funcionalidade</td><td><code>feature/login-google</code></td></tr>
+              <tr><td><code>fix/</code></td><td>Correção de bug</td><td><code>fix/calculo-total</code></td></tr>
+              <tr><td><code>hotfix/</code></td><td>Correção urgente em produção</td><td><code>hotfix/pagamento-500</code></td></tr>
+              <tr><td><code>refactor/</code></td><td>Refatoração sem mudar comportamento</td><td><code>refactor/servico-email</code></td></tr>
+              <tr><td><code>docs/</code></td><td>Documentação</td><td><code>docs/readme-api</code></td></tr>
+              <tr><td><code>chore/</code></td><td>Tarefas de manutenção</td><td><code>chore/atualiza-deps</code></td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>✅ Boas práticas de nomeação</h4>
+            <ul>
+              <li>Use letras minúsculas e hífens (kebab-case)</li>
+              <li>Seja descritivo mas conciso</li>
+              <li>Inclua o número da issue quando existir: <code>feature/123-login-google</code></li>
+              <li>Evite espaços, acentos e caracteres especiais</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Branches Remotas e Tracking</h2>
+          <p>Branches locais e remotas são entidades distintas. Entender o vínculo entre elas evita confusão ao colaborar.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌐 Trabalhando com Branches Remotas</h3>
+          <div class="command-card wide">
+            <pre><code># Publicar uma branch local no remoto (e vincular)
+git push -u origin feature/login
+
+# Listar branches remotas
+git branch -r
+
+# Baixar referências de branches remotas novas
+git fetch origin
+
+# Criar branch local a partir de uma remota
+git switch -c feature/login origin/feature/login
+# (Git moderno detecta e vincula automaticamente:)
+git switch feature/login
+
+# Ver o vínculo (tracking) de cada branch
+git branch -vv
+
+# Deletar uma branch remota
+git push origin --delete feature/antiga
+
+# Limpar referências a branches remotas que não existem mais
+git fetch --prune</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Exercício Prático e Resumo</h2>
+          <p>Vamos praticar um fluxo completo com branches, do nascimento ao merge e limpeza.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧪 Fluxo Completo com Branch</h3>
+          <div class="command-card wide">
+            <pre><code># 1. Partir da main atualizada
+git switch main
+git pull
+
+# 2. Criar branch de feature
+git switch -c feature/saudacao
+
+# 3. Fazer mudanças e commitar
+echo "Olá, mundo!" &gt; saudacao.txt
+git add saudacao.txt
+git commit -m "feat: adiciona arquivo de saudação"
+
+# 4. Publicar a branch
+git push -u origin feature/saudacao
+
+# 5. Voltar para main e integrar
+git switch main
+git merge --no-ff feature/saudacao -m "merge: integra saudação"
+
+# 6. Enviar main atualizada
+git push
+
+# 7. Limpar a branch (local e remota)
+git branch -d feature/saudacao
+git push origin --delete feature/saudacao</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 02</h4>
+            <p>Você entendeu que branches são ponteiros leves, aprendeu a criar/alternar (<code>switch</code>), integrar (<code>merge</code> fast-forward e 3-way), guardar trabalho temporário (<code>stash</code>), seguir convenções de nomes e trabalhar com branches remotas. Na prática, quase todo trabalho profissional acontece em branches — nunca direto na main. No Módulo 03, veremos como colaborar via Pull Requests no GitHub.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -164,7 +387,7 @@ git commit -m "feat: login completo"</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

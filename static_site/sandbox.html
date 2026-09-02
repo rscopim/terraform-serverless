@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Sandbox de Prática</title>
+  <meta name="description" content="Sandbox interativo para treinar Python direto no navegador. Sem instalação, sem custo, roda 100% no seu browser." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
+  <style>
+    .sandbox-wrap { display:grid; grid-template-columns: 260px 1fr; gap:20px; margin-top:24px; }
+    @media (max-width: 860px){ .sandbox-wrap{ grid-template-columns:1fr; } }
+    .sandbox-sidebar { background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; height:fit-content; }
+    .sandbox-sidebar h3 { color:#e2e8f0; font-size:0.95rem; margin:0 0 12px; }
+    .example-btn { display:block; width:100%; text-align:left; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1; padding:10px 12px; border-radius:8px; margin-bottom:8px; cursor:pointer; font-size:0.85rem; transition:all .2s; }
+    .example-btn:hover { background:rgba(99,102,241,0.15); border-color:#6366f1; color:#fff; }
+    .editor-card { background:#0b1120; border:1px solid rgba(255,255,255,0.1); border-radius:14px; overflow:hidden; }
+    .editor-toolbar { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#111827; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .editor-toolbar .lang-tag { color:#94a3b8; font-family:'JetBrains Mono',monospace; font-size:0.8rem; }
+    .editor-toolbar .actions { display:flex; gap:8px; }
+    .btn-run { background:#22c55e; color:#04220f; border:none; padding:8px 18px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.85rem; }
+    .btn-run:disabled { background:#475569; color:#94a3b8; cursor:not-allowed; }
+    .btn-clear { background:transparent; color:#94a3b8; border:1px solid rgba(255,255,255,0.15); padding:8px 14px; border-radius:8px; cursor:pointer; font-size:0.85rem; }
+    #codeEditor { width:100%; min-height:280px; background:#0b1120; color:#e2e8f0; border:none; outline:none; resize:vertical; padding:16px; font-family:'JetBrains Mono',monospace; font-size:0.9rem; line-height:1.55; tab-size:4; }
+    .output-card { background:#04070d; border:1px solid rgba(255,255,255,0.1); border-radius:14px; margin-top:16px; overflow:hidden; }
+    .output-header { padding:8px 14px; background:#111827; border-bottom:1px solid rgba(255,255,255,0.08); color:#94a3b8; font-size:0.8rem; font-family:'JetBrains Mono',monospace; }
+    #output { padding:16px; margin:0; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:0.88rem; white-space:pre-wrap; word-break:break-word; min-height:60px; max-height:340px; overflow:auto; }
+    #output .err { color:#f87171; }
+    .loader { color:#fbbf24; }
+    .status-pill { font-size:0.75rem; padding:3px 10px; border-radius:999px; background:rgba(251,191,36,0.15); color:#fbbf24; }
+    .status-pill.ready { background:rgba(34,197,94,0.15); color:#4ade80; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="python.html" class="nav-link">Python</a>
+        <a href="index.html#trilhas" class="nav-link">Trilhas</a>
+        <a href="index.html" class="nav-button">Voltar</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="index.html">Início</a>
+      <a href="linux.html">Linux</a>
+      <a href="docker.html">Docker</a>
+      <a href="terraform.html">Terraform</a>
+      <a href="python.html">Python</a>
+      <a href="redes.html">Redes</a>
+      <a href="github.html">GitHub</a>
+      <a href="sandbox.html">Sandbox</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🧪 Sandbox de Prática</span>
+        <h1>Treine Python no Navegador</h1>
+        <p>Um ambiente Python completo que roda 100% no seu navegador — sem instalar nada, sem cadastro, sem custo. Escreva código, execute e veja o resultado na hora. Ideal para praticar o que você aprende na trilha de Python.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Python Interativo</span>
+          <h2>Editor + Execução em Tempo Real <span id="statusPill" class="status-pill">carregando…</span></h2>
+          <p>Escolha um exemplo na lateral ou escreva seu próprio código. Clique em <strong>Executar</strong> (ou pressione Ctrl+Enter). O interpretador é o CPython real compilado para WebAssembly (Pyodide).</p>
+        </div>
+
+        <div class="sandbox-wrap">
+          <aside class="sandbox-sidebar">
+            <h3>📚 Exemplos</h3>
+            <button class="example-btn" data-ex="ola">👋 Olá, mundo</button>
+            <button class="example-btn" data-ex="variaveis">🔢 Variáveis e tipos</button>
+            <button class="example-btn" data-ex="loops">🔁 Laços e listas</button>
+            <button class="example-btn" data-ex="funcoes">⚙️ Funções</button>
+            <button class="example-btn" data-ex="dict">🗂️ Dicionários</button>
+            <button class="example-btn" data-ex="classes">🏗️ Classes (POO)</button>
+            <button class="example-btn" data-ex="excecoes">🛡️ Exceções</button>
+            <button class="example-btn" data-ex="comprehension">✨ List comprehension</button>
+          </aside>
+
+          <div>
+            <div class="editor-card">
+              <div class="editor-toolbar">
+                <span class="lang-tag">🐍 main.py</span>
+                <div class="actions">
+                  <button class="btn-clear" id="clearBtn">Limpar</button>
+                  <button class="btn-run" id="runBtn" disabled>Carregando…</button>
+                </div>
+              </div>
+              <textarea id="codeEditor" spellcheck="false" autocapitalize="off" autocomplete="off">print("Olá, CloudTrilhas! 🐍")
+
+# Escreva seu código Python aqui e clique em Executar.
+nome = "aluno"
+print(f"Bem-vindo(a), {nome}!")</textarea>
+            </div>
+
+            <div class="output-card">
+              <div class="output-header">Saída (stdout / stderr)</div>
+              <pre id="output">Aguardando o interpretador Python carregar…</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top:24px">
+          <strong>💡 Dica:</strong> tudo roda localmente no seu navegador — nada é enviado para servidores. Você pode fechar a aba e nada é salvo. Use este espaço para experimentar à vontade, sem medo de quebrar nada.
+        </div>
+      </div>
+    </section>
+
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Como funciona</span>
+          <h2>Por que roda sem instalar nada?</h2>
+        </div>
+        <div class="command-grid">
+          <div class="command-card">
+            <h4>🧩 Pyodide (WebAssembly)</h4>
+            <p>O CPython foi compilado para WebAssembly, um formato que o navegador executa nativamente. Você tem Python real — não uma simulação — direto no browser.</p>
+          </div>
+          <div class="command-card">
+            <h4>💰 Custo zero</h4>
+            <p>Como tudo roda no seu dispositivo, não há servidores nem cobrança. O sandbox escala para qualquer número de alunos sem gerar custo de infraestrutura.</p>
+          </div>
+          <div class="command-card">
+            <h4>🔒 Seguro e isolado</h4>
+            <p>O código roda numa caixa de areia (sandbox) do navegador, sem acesso ao seu sistema de arquivos ou à internet. Experimente sem riscos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="ai-practitioner.html">AI Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker &amp; K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a><a href="github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+  <script src="sandbox.js"></script>
+</body>
+</html>

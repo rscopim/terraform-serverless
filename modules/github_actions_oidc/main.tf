@@ -248,6 +248,16 @@ resource "aws_iam_policy" "terraform_apply_cloudtrilhas" {
         Resource = "*"
       },
       {
+        Sid    = "CognitoManagement"
+        Effect = "Allow"
+
+        Action = [
+          "cognito-idp:*"
+        ]
+
+        Resource = "*"
+      },
+      {
         Sid    = "CloudTrailManagement"
         Effect = "Allow"
 

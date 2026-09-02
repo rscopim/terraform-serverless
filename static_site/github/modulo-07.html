@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 07: Automação e CI/CD</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 07: Automação e CI/CD</title>
+  <meta name="description" content="Automação com GitHub Actions: workflows, jobs, steps, triggers, secrets, matrix, CI/CD, deploy, além de Git Hooks, Husky e lint-staged." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,94 +18,316 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-06.html" class="nav-link">← Anterior</a>
         <a href="modulo-08.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 07</span>
-        <h1>Automação: GitHub Actions, CI/CD e Hooks</h1>
-        <p>GitHub Actions, Hooks, Husky, lint-staged, pipelines. Automatize testes, builds e deploys diretamente no GitHub.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 07</span>
+        <h1>Automação e CI/CD com GitHub Actions</h1>
+        <p>Automatizar testes, builds e deploys é o que transforma um repositório em uma máquina de entregar valor. Neste módulo você domina o GitHub Actions — workflows, jobs, triggers, secrets, matrizes — constrói pipelines de CI/CD reais e aprende a rodar validações locais com Git Hooks, Husky e lint-staged.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node active"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
+      </div>
+    </section>
 
-    <section class="module-section" style="padding:20px 0">
+    <!-- SEÇÃO 1 -->
+    <section class="module-section">
       <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Conceitos de CI/CD</h2>
+          <p>Antes das ferramentas, os conceitos. CI/CD é uma prática, não um produto.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔄 CI, CD e CD</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Sigla</th><th>Nome</th><th>O que é</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>CI</strong></td><td>Continuous Integration</td><td>Integrar código com frequência, validando automaticamente (build + testes) a cada push/PR</td></tr>
+              <tr><td><strong>CD</strong></td><td>Continuous Delivery</td><td>Manter o código sempre pronto para deploy; o deploy final é manual (1 clique)</td></tr>
+              <tr><td><strong>CD</strong></td><td>Continuous Deployment</td><td>Deploy automático a cada mudança aprovada, sem intervenção humana</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que CI/CD importa</h4>
+            <ul>
+              <li>Pega bugs cedo (a cada PR, não só no fim)</li>
+              <li>Reduz o medo de fazer deploy (é automatizado e repetível)</li>
+              <li>Feedback rápido para quem escreveu o código</li>
+              <li>Libera tempo do time para o que importa</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
-    <section class="module-section">
+
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Anatomia de um GitHub Actions Workflow</h2>
+          <p>Um workflow é um arquivo YAML em <code>.github/workflows/</code>. Vamos dissecar sua estrutura.</p>
+        </div>
 
         <div class="topic-block">
-          <h2>1. GitHub Actions — Fundamentos</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Workflow YAML</code><span class="cmd-tag">CI/CD</span></div>
-              <p>Arquivo de workflow em <code>.github/workflows/</code>.</p>
-              <pre><code># .github/workflows/ci.yml
-name: CI Pipeline
+          <h3>🧩 Estrutura Fundamental</h3>
+          <div class="command-card wide">
+            <h4>.github/workflows/ci.yml</h4>
+            <pre><code>name: CI                       # nome do workflow
 
-on:
+on:                            # QUANDO rodar (triggers)
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+jobs:                          # um workflow tem 1+ jobs
+  testes:                      # id do job
+    runs-on: ubuntu-latest     # máquina virtual (runner)
+    steps:                     # sequência de passos
+      - name: Checkout do código
+        uses: actions/checkout@v4      # action reutilizável
 
-      - name: Setup Node.js
+      - name: Configura Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Instala dependências
+        run: npm ci             # comando shell
 
-      - name: Run linter
-        run: npm run lint
+      - name: Roda os testes
+        run: npm test</code></pre>
+          </div>
 
-      - name: Run tests
-        run: npm test
+          <table class="styled-table">
+            <thead>
+              <tr><th>Conceito</th><th>Descrição</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Workflow</strong></td><td>Processo automatizado (um arquivo .yml)</td></tr>
+              <tr><td><strong>Event/Trigger</strong></td><td>O que dispara o workflow (push, PR, schedule, manual)</td></tr>
+              <tr><td><strong>Job</strong></td><td>Conjunto de steps que roda em um runner; jobs rodam em paralelo por padrão</td></tr>
+              <tr><td><strong>Step</strong></td><td>Uma tarefa: um comando (<code>run</code>) ou uma action (<code>uses</code>)</td></tr>
+              <tr><td><strong>Runner</strong></td><td>Máquina que executa o job (Ubuntu, Windows, macOS ou self-hosted)</td></tr>
+              <tr><td><strong>Action</strong></td><td>Componente reutilizável (ex: actions/checkout)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-      - name: Build
-        run: npm run build</code></pre>
-            </div>
-            <div class="command-card wide">
-              <div class="command-header"><code>Deploy Workflow</code><span class="cmd-tag">CD</span></div>
-              <p>Exemplo de deploy automático para AWS S3 + CloudFront.</p>
-              <pre><code># .github/workflows/deploy.yml
-name: Deploy to Production
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Triggers — Quando o Workflow Roda</h2>
+          <p>O bloco <code>on:</code> define os eventos que disparam o workflow. Há muitas opções úteis.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>⏰ Principais Triggers</h3>
+          <div class="command-card wide">
+            <pre><code>on:
+  # Em push para branches específicas
+  push:
+    branches: [main, develop]
+    paths: ['src/**', 'package.json']   # só se esses arquivos mudarem
+    tags: ['v*']                         # ou ao criar tags
+
+  # Em Pull Requests
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+  # Agendado (cron) — ex: todo dia às 3h UTC
+  schedule:
+    - cron: '0 3 * * *'
+
+  # Manual (botão "Run workflow" na aba Actions)
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: 'Ambiente de deploy'
+        required: true
+        default: 'staging'
+
+  # Chamado por outro workflow (reutilizável)
+  workflow_call:</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Jobs Avançados — Matrix, Dependências e Condicionais</h2>
+          <p>Recursos que tornam os workflows poderosos e eficientes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔢 Matrix — Testar em Várias Versões</h3>
+          <div class="command-card wide">
+            <pre><code>jobs:
+  testes:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [18, 20, 22]
+    # Gera 3 x 3 = 9 combinações rodando em paralelo!
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci &amp;&amp; npm test</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔗 Dependências entre Jobs e Condicionais</h3>
+          <div class="command-card wide">
+            <pre><code>jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "buildando..."
+
+  deploy:
+    needs: build           # só roda se 'build' passar
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'   # só na main
+    steps:
+      - run: echo "deployando..."
+
+  notificar:
+    needs: [build, deploy]
+    if: always()           # roda mesmo se algo falhar
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "notificando resultado"</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Secrets, Variáveis e Segurança</h2>
+          <p>Pipelines precisam de credenciais (deploy, APIs) sem expô-las no código. GitHub Actions oferece secrets e boas práticas de segurança.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔐 Usando Secrets</h3>
+          <div class="command-card wide">
+            <pre><code># Configurar em: Settings → Secrets and variables → Actions
+# - Secrets: valores sensíveis (mascarados nos logs)
+# - Variables: valores não sensíveis
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production      # exige aprovação (protection rules)
+    steps:
+      - name: Deploy
+        env:
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          REGION: ${{ vars.AWS_REGION }}
+        run: ./deploy.sh</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🔒 OIDC — o padrão moderno (sem secrets estáticos)</h4>
+            <pre><code># Em vez de guardar chaves AWS como secrets, use OIDC:
+# o GitHub Actions assume uma IAM Role temporária. Zero segredos armazenados.
+
+permissions:
+  id-token: write     # necessário para OIDC
+  contents: read
+
+steps:
+  - uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::123456789012:role/github-actions-deploy
+      aws-region: us-east-1
+  - run: aws s3 sync ./dist s3://meu-bucket</code></pre>
+            <p>Este é exatamente o padrão usado nos projetos de referência: autenticação OIDC, sem chaves estáticas no repositório.</p>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Segurança em workflows</h4>
+            <ul>
+              <li>Fixe versões das actions por SHA ou tag confiável (evita supply chain attacks)</li>
+              <li>Use <code>permissions:</code> mínimo necessário (least privilege)</li>
+              <li>Cuidado com <code>pull_request_target</code> — roda com secrets em PRs de forks</li>
+              <li>Nunca ecoe secrets em <code>echo</code> ou logs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Pipeline CI/CD Completo</h2>
+          <p>Vamos montar um pipeline real: lint + testes no CI, e deploy no CD.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🚀 Exemplo de Pipeline de Produção</h3>
+          <div class="command-card wide">
+            <h4>.github/workflows/deploy.yml</h4>
+            <pre><code>name: CI/CD
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 permissions:
@@ -112,98 +335,86 @@ permissions:
   contents: read
 
 jobs:
+  ci:
+    name: Lint &amp; Testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - name: Upload cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+
   deploy:
+    name: Deploy Produção
+    needs: ci
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     steps:
       - uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789:role/github-actions
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
-
-      - name: Sync to S3
-        run: aws s3 sync ./dist s3://meu-bucket --delete
-
-      - name: Invalidate CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CF_DISTRIBUTION_ID }} \
-            --paths "/*"</code></pre>
-            </div>
+      - run: npm ci &amp;&amp; npm run build
+      - name: Sync para S3
+        run: aws s3 sync ./dist s3://meu-site --delete
+      - name: Invalida CloudFront
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_ID }} --paths "/*"</code></pre>
           </div>
+
+          <div class="info-box">
+            <h4>📛 Badge de status no README</h4>
+            <pre><code># Mostre o status do CI no seu README:
+![CI](https://github.com/user/repo/actions/workflows/deploy.yml/badge.svg)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Git Hooks, Husky e lint-staged</h2>
+          <p>Nem toda automação precisa ser na nuvem. Git Hooks rodam validações localmente, antes mesmo do push — feedback instantâneo.</p>
         </div>
 
         <div class="topic-block">
-          <h2>2. Terraform CI com GitHub Actions</h2>
+          <h3>🪝 Git Hooks Nativos</h3>
           <div class="command-card wide">
-            <div class="command-header"><code>Terraform Pipeline</code><span class="cmd-tag">IaC</span></div>
-            <pre><code># .github/workflows/terraform.yml
-name: Terraform CI
+            <pre><code># Hooks ficam em .git/hooks/ (não são versionados por padrão)
+# Principais:
+#   pre-commit  → antes de criar o commit (lint, testes rápidos)
+#   commit-msg  → valida a mensagem de commit
+#   pre-push    → antes do push (testes completos)
 
-on:
-  pull_request:
-    paths: ['**/*.tf', '**/*.tfvars']
-
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
-
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Init
-        run: terraform init -backend=false
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -no-color
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}</code></pre>
+# Exemplo de .git/hooks/pre-commit (torne executável: chmod +x)
+#!/bin/sh
+echo "Rodando lint antes do commit..."
+npm run lint || {
+  echo "❌ Lint falhou. Commit abortado."
+  exit 1
+}</code></pre>
           </div>
         </div>
 
         <div class="topic-block">
-          <h2>3. Git Hooks</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>Hooks Locais</code><span class="cmd-tag">Automação</span></div>
-              <p>Scripts executados automaticamente em eventos Git.</p>
-              <pre><code># .git/hooks/pre-commit
-#!/bin/bash
-echo "Rodando lint antes do commit..."
-npm run lint
-if [ $? -ne 0 ]; then
-  echo "❌ Lint falhou! Corrija antes de commitar."
-  exit 1
-fi
-
-# .git/hooks/commit-msg
-#!/bin/bash
-MSG=$(cat "$1")
-PATTERN="^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"
-if ! echo "$MSG" | grep -qE "$PATTERN"; then
-  echo "❌ Mensagem fora do padrão Conventional Commits"
-  exit 1
-fi</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Husky + lint-staged</code><span class="cmd-tag">Ferramenta</span></div>
-              <p>Gerencia hooks de forma compartilhável com o time.</p>
-              <pre><code># Instalar Husky
-npm install -D husky lint-staged
+          <h3>🐶 Husky + lint-staged</h3>
+          <p>Como os hooks nativos não são versionados, o <strong>Husky</strong> resolve isso: versiona os hooks no repositório e os instala automaticamente. O <strong>lint-staged</strong> roda linters apenas nos arquivos em staging (rápido).</p>
+          <div class="command-card wide">
+            <pre><code># Instalar
+npm install --save-dev husky lint-staged
 npx husky init
 
 # .husky/pre-commit
@@ -217,12 +428,25 @@ npx lint-staged
   }
 }
 
-# Agora todo commit roda lint automaticamente
-# E é compartilhado via package.json!</code></pre>
-            </div>
+# .husky/commit-msg — validar Conventional Commits
+npx --no -- commitlint --edit $1
+
+# Agora, a cada commit:
+# 1. lint-staged formata e corrige só os arquivos staged
+# 2. commitlint valida a mensagem
+# Feedback local ANTES de subir o código</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Hooks locais + CI = defesa em camadas</h4>
+            <p>Hooks locais dão feedback rápido, mas podem ser pulados (<code>--no-verify</code>). Por isso, o CI no GitHub Actions é a barreira final e obrigatória: mesmo que alguém pule o hook local, o CI reprova o PR. Use os dois juntos.</p>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 07</h4>
+            <p>Você entende CI/CD (integração, delivery, deployment), domina a anatomia dos workflows do GitHub Actions (jobs, steps, triggers, runners, actions), usa matrix/needs/if, gerencia secrets e OIDC com segurança, monta pipelines completos de CI + deploy, e adiciona validações locais com Git Hooks, Husky e lint-staged. No Módulo 08, fechamos a trilha com Projects, Pages, segurança e governança de repositório.</p>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -239,7 +463,7 @@ npx lint-staged
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

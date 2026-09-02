@@ -56,6 +56,10 @@ module "s3_static_site" {
   style_file_path             = "${path.root}/../../static_site/style.css"
   materials_path              = "${path.root}/../../static_site/materiais"
   cloudfront_distribution_arn = module.cloudfront.cloudfront_distribution_arn
+
+  cognito_region       = var.aws_region
+  cognito_user_pool_id = module.cognito.user_pool_id
+  cognito_client_id    = module.cognito.client_id
 }
 
 # module "cloudtrail" removido — gerava custo alto de S3 ($5+/mês)
@@ -269,4 +273,12 @@ module "admin_auth" {
   admin_users_output_path = "${path.root}/admin_users.zip"
 
   allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
+}
+
+# Autenticação de alunos via Amazon Cognito (login/senha, self sign-up)
+module "cognito" {
+  source = "../../modules/cognito"
+
+  project_name = var.project_name
+  environment  = var.environment
 }
