@@ -5,6 +5,12 @@ Gera um diagrama PNG com ícones oficiais dos serviços AWS.
 Requisitos:
   pip install diagrams
   Graphviz instalado (https://graphviz.org/download/)
+
+Atualizado para refletir a arquitetura atual:
+  - Autenticação de alunos com Amazon Cognito
+  - CloudTrail REMOVIDO (gerava custo alto de S3; monitoramento via CloudFront metrics)
+  - CloudFront Function bloqueando bots no edge (contenção de custo)
+  - Contador de visitantes, painel admin e sandbox client-side (Pyodide)
 """
 
 from diagrams import Diagram, Cluster, Edge
@@ -13,10 +19,9 @@ from diagrams.aws.network import CloudFront, Route53, APIGateway
 from diagrams.aws.storage import S3
 from diagrams.aws.database import Dynamodb
 from diagrams.aws.integration import SQS, SNS, Eventbridge
-from diagrams.aws.management import Cloudwatch, Cloudtrail
-from diagrams.aws.security import ACM, IAMRole
-from diagrams.aws.general import Users
-from diagrams.aws.devtools import Codebuild
+from diagrams.aws.management import Cloudwatch
+from diagrams.aws.security import ACM, IAMRole, Cognito
+from diagrams.aws.general import Users, Client
 from diagrams.aws.cost import Budgets
 
 import os
@@ -39,28 +44,34 @@ with Diagram(
     outformat="png",
 ):
 
-    users = Users("Usuários")
+    users = Users("Usuários / Alunos")
 
     # --- DNS & CDN ---
     with Cluster("DNS & CDN"):
         route53 = Route53("Route53\ncloudtrilhas.com.br")
         acm = ACM("ACM\nCertificado TLS\n(us-east-1)")
-        cloudfront = CloudFront("CloudFront\nOAC + Geo-Restriction\n(LATAM + PT)")
+        cloudfront = CloudFront("CloudFront\nOAC + Geo-Restriction\n+ Bot-block (edge)")
 
     # --- Static Site ---
     with Cluster("Hospedagem Estática"):
         s3_site = S3("S3 Bucket\nSite Estático\n(HTML/CSS/JS/PDFs)")
+        sandbox = Client("Sandbox Python\n(Pyodide / WASM)\nclient-side")
 
-    # --- API & Lead Capture ---
-    with Cluster("Captura de Leads"):
-        api_gw = APIGateway("API Gateway HTTP\nPOST /leads")
+    # --- Autenticação de Alunos ---
+    with Cluster("Autenticação de Alunos"):
+        cognito = Cognito("Amazon Cognito\nUser Pool\n(login por email)")
+
+    # --- API & Backends ---
+    with Cluster("APIs Serverless"):
+        api_gw = APIGateway("API Gateway HTTP")
         register_lead = Lambda("Lambda\nRegister Lead")
-        dynamodb = Dynamodb("DynamoDB\nLeads Table\n(PAY_PER_REQUEST)")
+        visitor_counter = Lambda("Lambda\nVisitor Counter")
+        admin_auth = Lambda("Lambda\nAdmin Auth")
+        analytics = Lambda("Lambda\nAnalytics")
+        dynamodb = Dynamodb("DynamoDB\nLeads / Counter /\nAdmin (PAY_PER_REQUEST)")
 
-    # --- Download Monitoring ---
-    with Cluster("Monitoramento de Downloads"):
-        cloudtrail = Cloudtrail("CloudTrail\nS3 GetObject\n(materiais/)")
-        s3_trail_logs = S3("S3 Bucket\nCloudTrail Logs")
+    # --- Download Monitoring (sem CloudTrail) ---
+    with Cluster("Métricas de Download"):
         eventbridge = Eventbridge("EventBridge\nPDF Download Rule")
         download_metrics_lambda = Lambda("Lambda\nDownload Metrics")
 
@@ -77,8 +88,8 @@ with Diagram(
 
     # --- Observability ---
     with Cluster("Observabilidade"):
-        cw_dashboard_downloads = Cloudwatch("CloudWatch\nDashboard Downloads\n(Custom Metrics)")
-        cw_operational = Cloudwatch("CloudWatch\nDashboard Operacional\n+ 8 Alarmes")
+        cw_dashboard = Cloudwatch("CloudWatch\nDashboards\n(Downloads + Operacional)")
+        cw_operational = Cloudwatch("CloudWatch\nAlarmes")
 
     # --- CI/CD & Cost (Shared Environment) ---
     with Cluster("Shared (Cross-Environment)"):
@@ -90,31 +101,38 @@ with Diagram(
     route53 >> cloudfront
     acm >> Edge(style="dashed") >> cloudfront
     cloudfront >> Edge(label="OAC\n(private access)") >> s3_site
+    s3_site >> Edge(style="dashed", label="serve") >> sandbox
 
-    # ===== FLUXO 2: Captura de Leads =====
-    users >> Edge(label="POST /leads", color="darkgreen") >> api_gw
+    # ===== FLUXO 2: Autenticação de Alunos =====
+    users >> Edge(label="login/cadastro", color="purple") >> cognito
+    cognito >> Edge(label="token", style="dashed", color="purple") >> users
+
+    # ===== FLUXO 3: APIs (Leads, Counter, Admin, Analytics) =====
+    users >> Edge(label="HTTPS", color="darkgreen") >> api_gw
     api_gw >> register_lead
+    api_gw >> visitor_counter
+    api_gw >> admin_auth
+    api_gw >> analytics
     register_lead >> Edge(label="PutItem") >> dynamodb
-    register_lead >> Edge(label="Retorna PDF URL", style="dashed", color="darkgreen") >> users
+    visitor_counter >> Edge(label="Atomic++") >> dynamodb
+    admin_auth >> dynamodb
+    analytics >> dynamodb
 
-    # ===== FLUXO 3: Monitoramento de Downloads =====
-    s3_site >> Edge(label="GetObject event", style="dashed") >> cloudtrail
-    cloudtrail >> Edge(label="Logs") >> s3_trail_logs
-    cloudtrail >> eventbridge
-    eventbridge >> Edge(label="Notificação") >> sns
+    # ===== FLUXO 4: Métricas de Download (sem CloudTrail) =====
+    cloudfront >> Edge(label="acesso a PDF", style="dashed") >> eventbridge
     eventbridge >> Edge(label="Invoke") >> download_metrics_lambda
-    download_metrics_lambda >> Edge(label="PutMetricData") >> cw_dashboard_downloads
+    download_metrics_lambda >> Edge(label="PutMetricData") >> cw_dashboard
 
-    # ===== FLUXO 4: Eventos Customizados =====
+    # ===== FLUXO 5: Eventos Customizados =====
     eventbridge_custom >> Edge(label="SendMessage") >> sqs_main
     sqs_main >> Edge(label="Trigger") >> hello_lambda
     hello_lambda >> Edge(label="Publish") >> sns
     sqs_main >> Edge(label="Falha (3x)", style="dashed", color="red") >> sqs_dlq
 
-    # ===== FLUXO 5: Observabilidade =====
+    # ===== FLUXO 6: Observabilidade =====
     cw_operational >> Edge(color="orange", label="Alarmes") >> sns
 
     # ===== CI/CD (Shared) =====
     github_oidc >> Edge(style="dotted", label="Terraform\nApply/Plan") >> cloudfront
 
-print("✅ Diagrama gerado: cloudtrilhas_architecture.png")
+print("Diagrama gerado: cloudtrilhas_architecture.png")
