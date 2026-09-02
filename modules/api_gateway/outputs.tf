@@ -40,3 +40,8 @@ output "admin_logout_endpoint" {
   description = "Endpoint de logout administrativo"
   value       = "${aws_apigatewayv2_api.this.api_endpoint}/auth/logout"
 }
+
+output "progress_endpoint" {
+  description = "Endpoint da API de progresso do aluno"
+  value       = "${aws_apigatewayv2_api.this.api_endpoint}/progress"
+}

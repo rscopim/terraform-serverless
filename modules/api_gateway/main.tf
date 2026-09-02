@@ -203,3 +203,52 @@ resource "aws_lambda_permission" "allow_apigateway_admin_users" {
 
   source_arn = "${aws_apigatewayv2_api.this.execution_arn}/*/*/auth/users*"
 }
+
+# ======================================================
+# Progresso do Aluno (Dashboard) — rotas /progress
+# ======================================================
+
+resource "aws_apigatewayv2_integration" "student_progress_lambda" {
+  api_id                 = aws_apigatewayv2_api.this.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = var.student_progress_lambda_invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "progress_get" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "GET /progress"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "progress_post" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "POST /progress"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "progress_quiz_post" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "POST /progress/quiz"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "progress_options" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "OPTIONS /progress"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "progress_quiz_options" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "OPTIONS /progress/quiz"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
+resource "aws_lambda_permission" "allow_apigateway_student_progress" {
+  statement_id  = "AllowExecutionFromApiGatewayStudentProgress"
+  action        = "lambda:InvokeFunction"
+  function_name = var.student_progress_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*/progress*"
+}

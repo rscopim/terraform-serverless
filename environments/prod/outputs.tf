@@ -137,3 +137,18 @@ output "cognito_client_id" {
   description = "ID do client web Cognito (usado pelo frontend)"
   value       = module.cognito.client_id
 }
+
+output "student_progress_table_name" {
+  description = "Nome da tabela DynamoDB de progresso dos alunos"
+  value       = module.student_progress_dynamodb.table_name
+}
+
+output "student_progress_lambda_name" {
+  description = "Nome da Lambda de progresso do aluno"
+  value       = module.student_progress_lambda.lambda_function_name
+}
+
+output "progress_endpoint" {
+  description = "Endpoint da API de progresso do aluno"
+  value       = module.api_gateway.progress_endpoint
+}

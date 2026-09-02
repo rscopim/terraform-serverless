@@ -60,3 +60,9 @@ variable "cognito_client_id" {
   type        = string
   default     = ""
 }
+
+variable "progress_endpoint" {
+  description = "Endpoint da API de progresso do aluno (para o frontend)"
+  type        = string
+  default     = ""
+}

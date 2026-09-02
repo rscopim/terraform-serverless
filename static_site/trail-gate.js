@@ -83,6 +83,16 @@
     } catch (e) {}
   }
 
+  // Registra progresso do módulo atual (marca como concluído ao abrir)
+  async function registrarProgresso() {
+    try {
+      if (!window.CloudTrilhasProgress) { await carregarScript('progress.js'); }
+      if (window.CloudTrilhasProgress && /modulo-/.test(window.location.pathname)) {
+        window.CloudTrilhasProgress.markCurrentModuleDone();
+      }
+    } catch (e) {}
+  }
+
   async function init() {
     // Garante que config.js e auth.js estão carregados
     if (!window.CLOUDTRILHAS_CONFIG) { await carregarScript('config.js'); }
@@ -99,6 +109,7 @@
       if (ok) {
         revelarConteudo();
         registrarAcesso();
+        registrarProgresso();
       } else {
         redirecionarParaLogin();
       }

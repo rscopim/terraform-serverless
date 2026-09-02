@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Meu Dashboard</title>
+  <meta name="description" content="Acompanhe sua evolução nas trilhas de estudo e o histórico dos seus simulados." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .dash-hero { background:linear-gradient(135deg,#0f172a,#1e293b); color:#fff; padding:48px 0 32px; }
+    .dash-hero h1 { margin:0 0 6px; font-size:1.8rem; }
+    .dash-hero p { margin:0; color:#94a3b8; }
+    .dash-section { padding:32px 0; }
+    .dash-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:28px; }
+    .dash-stat { background:#fff; border:1px solid var(--gray-200,#e2e8f0); border-radius:14px; padding:20px; }
+    .dash-stat .num { font-size:2rem; font-weight:800; color:#4f46e5; }
+    .dash-stat .lbl { color:var(--gray-500,#64748b); font-size:0.85rem; margin-top:4px; }
+    .trail-row { background:#fff; border:1px solid var(--gray-200,#e2e8f0); border-radius:12px; padding:16px 18px; margin-bottom:12px; }
+    .trail-row .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .trail-row .name { font-weight:700; color:var(--gray-900,#0f172a); }
+    .trail-row .pct { font-weight:700; color:#4f46e5; font-size:0.9rem; }
+    .bar { height:10px; background:#e2e8f0; border-radius:999px; overflow:hidden; }
+    .bar > span { display:block; height:100%; background:linear-gradient(90deg,#4f46e5,#06b6d4); border-radius:999px; transition:width .4s; }
+    .trail-row .meta { color:var(--gray-500,#64748b); font-size:0.78rem; margin-top:6px; }
+    .quiz-table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; border:1px solid var(--gray-200,#e2e8f0); }
+    .quiz-table th, .quiz-table td { padding:10px 14px; text-align:left; font-size:0.86rem; border-bottom:1px solid var(--gray-100,#f1f5f9); }
+    .quiz-table th { background:var(--gray-50,#f8fafc); color:var(--gray-600,#475569); font-weight:700; }
+    .badge-score { padding:2px 10px; border-radius:999px; font-weight:700; font-size:0.78rem; }
+    .badge-score.high { background:#dcfce7; color:#166534; }
+    .badge-score.mid { background:#fef9c3; color:#854d0e; }
+    .badge-score.low { background:#fee2e2; color:#991b1b; }
+    .chart-wrap { background:#fff; border:1px solid var(--gray-200,#e2e8f0); border-radius:14px; padding:20px; }
+    .dash-empty { text-align:center; color:var(--gray-500,#64748b); padding:24px; }
+    .dash-loading { text-align:center; color:var(--gray-500,#64748b); padding:60px 0; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="index.html#trilhas" class="nav-link">Trilhas</a>
+        <a href="sandbox.html" class="nav-link">🧪 Sandbox</a>
+        <a href="#" class="nav-link" id="navLogout">Sair</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="index.html">Início</a>
+      <a href="index.html#trilhas">Trilhas</a>
+      <a href="sandbox.html">🧪 Sandbox</a>
+      <a href="#" id="navLogoutMobile">Sair</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="dash-hero">
+      <div class="container">
+        <h1>Meu Dashboard</h1>
+        <p id="dashWelcome">Acompanhe sua evolução e o histórico dos seus simulados.</p>
+      </div>
+    </section>
+
+    <div id="dashLoading" class="dash-loading">Carregando seu progresso…</div>
+
+    <div id="dashContent" style="display:none">
+      <!-- RESUMO -->
+      <section class="dash-section">
+        <div class="container">
+          <div class="dash-cards" id="statCards"></div>
+        </div>
+      </section>
+
+      <!-- PROGRESSO POR TRILHA -->
+      <section class="dash-section" style="padding-top:0">
+        <div class="container">
+          <h2 style="font-size:1.3rem;margin-bottom:16px">📚 Progresso por Trilha</h2>
+          <div id="trailsList"></div>
+        </div>
+      </section>
+
+      <!-- SIMULADOS AWS -->
+      <section class="dash-section" style="padding-top:0">
+        <div class="container">
+          <h2 style="font-size:1.3rem;margin-bottom:16px">🎯 Simulados AWS — Evolução da Pontuação</h2>
+          <div class="chart-wrap" style="margin-bottom:20px">
+            <canvas id="scoreChart" height="110"></canvas>
+            <div id="chartEmpty" class="dash-empty" style="display:none">
+              Você ainda não realizou nenhum simulado AWS. Faça um simulado nas trilhas de certificação para ver sua evolução aqui.
+            </div>
+          </div>
+          <div id="quizHistory"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="progress.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -447,6 +447,7 @@ resource "aws_s3_object" "config_js" {
 window.CLOUDTRILHAS_CONFIG = {
   apiEndpoint: "${var.api_endpoint}",
   visitorCounterEndpoint: "${var.visitor_counter_endpoint}",
+  progressEndpoint: "${var.progress_endpoint}",
   cognito: {
     region: "${var.cognito_region}",
     userPoolId: "${var.cognito_user_pool_id}",
@@ -462,6 +463,7 @@ EOT
 window.CLOUDTRILHAS_CONFIG = {
   apiEndpoint: "${var.api_endpoint}",
   visitorCounterEndpoint: "${var.visitor_counter_endpoint}",
+  progressEndpoint: "${var.progress_endpoint}",
   cognito: {
     region: "${var.cognito_region}",
     userPoolId: "${var.cognito_user_pool_id}",
@@ -529,6 +531,33 @@ resource "aws_s3_object" "sandbox_js" {
   source       = "${path.root}/../../static_site/sandbox.js"
   content_type = "application/javascript"
   etag         = filemd5("${path.root}/../../static_site/sandbox.js")
+}
+
+# Dashboard do aluno (progresso + simulados)
+resource "aws_s3_object" "dashboard_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "dashboard.html"
+  source       = "${path.root}/../../static_site/dashboard.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/dashboard.html")
+}
+
+resource "aws_s3_object" "dashboard_js" {
+  bucket        = aws_s3_bucket.this.id
+  key           = "dashboard.js"
+  source        = "${path.root}/../../static_site/dashboard.js"
+  content_type  = "application/javascript"
+  cache_control = "no-cache, no-store, must-revalidate"
+  etag          = filemd5("${path.root}/../../static_site/dashboard.js")
+}
+
+resource "aws_s3_object" "progress_js" {
+  bucket        = aws_s3_bucket.this.id
+  key           = "progress.js"
+  source        = "${path.root}/../../static_site/progress.js"
+  content_type  = "application/javascript"
+  cache_control = "no-cache, no-store, must-revalidate"
+  etag          = filemd5("${path.root}/../../static_site/progress.js")
 }
 
 resource "aws_s3_object" "trail_gate_css" {

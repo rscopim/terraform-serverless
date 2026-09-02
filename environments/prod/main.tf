@@ -60,6 +60,7 @@ module "s3_static_site" {
   cognito_region       = var.aws_region
   cognito_user_pool_id = module.cognito.user_pool_id
   cognito_client_id    = module.cognito.client_id
+  progress_endpoint    = module.api_gateway.progress_endpoint
 }
 
 # module "cloudtrail" removido — gerava custo alto de S3 ($5+/mês)
@@ -131,6 +132,9 @@ module "api_gateway" {
 
   admin_users_lambda_invoke_arn    = module.admin_auth.admin_users_invoke_arn
   admin_users_lambda_function_name = module.admin_auth.admin_users_function_name
+
+  student_progress_lambda_invoke_arn    = module.student_progress_lambda.lambda_invoke_arn
+  student_progress_lambda_function_name = module.student_progress_lambda.lambda_function_name
 }
 
 module "route53" {
@@ -285,4 +289,28 @@ module "cognito" {
   # Garante que a policy da role do GitHub Actions (com permissão cognito-idp)
   # seja atualizada ANTES de tentar criar o User Pool, evitando AccessDenied.
   depends_on = [module.github_actions_oidc]
+}
+
+# Progresso do aluno (Dashboard) — tabela + Lambda autenticada por Cognito
+module "student_progress_dynamodb" {
+  source = "../../modules/student_progress_dynamodb"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "student_progress_lambda" {
+  source = "../../modules/student_progress_lambda"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_source_file = "${path.root}/../../lambda_src/student_progress/app.py"
+  lambda_output_path = "${path.root}/student_progress.zip"
+
+  dynamodb_table_name   = module.student_progress_dynamodb.table_name
+  dynamodb_table_arn    = module.student_progress_dynamodb.table_arn
+  cognito_user_pool_arn = module.cognito.user_pool_arn
+
+  allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }
