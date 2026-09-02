@@ -42,3 +42,21 @@ variable "visitor_counter_endpoint" {
   description = "Endpoint da API do contador de visitantes"
   type        = string
 }
+
+variable "cognito_region" {
+  description = "Região AWS do Cognito User Pool (para o frontend)"
+  type        = string
+  default     = ""
+}
+
+variable "cognito_user_pool_id" {
+  description = "ID do Cognito User Pool (para o frontend)"
+  type        = string
+  default     = ""
+}
+
+variable "cognito_client_id" {
+  description = "ID do client web Cognito (para o frontend)"
+  type        = string
+  default     = ""
+}

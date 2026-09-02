@@ -446,7 +446,12 @@ resource "aws_s3_object" "config_js" {
   content = <<EOT
 window.CLOUDTRILHAS_CONFIG = {
   apiEndpoint: "${var.api_endpoint}",
-  visitorCounterEndpoint: "${var.visitor_counter_endpoint}"
+  visitorCounterEndpoint: "${var.visitor_counter_endpoint}",
+  cognito: {
+    region: "${var.cognito_region}",
+    userPoolId: "${var.cognito_user_pool_id}",
+    clientId: "${var.cognito_client_id}"
+  }
 };
 EOT
 
@@ -456,7 +461,12 @@ EOT
   etag = md5(<<EOT
 window.CLOUDTRILHAS_CONFIG = {
   apiEndpoint: "${var.api_endpoint}",
-  visitorCounterEndpoint: "${var.visitor_counter_endpoint}"
+  visitorCounterEndpoint: "${var.visitor_counter_endpoint}",
+  cognito: {
+    region: "${var.cognito_region}",
+    userPoolId: "${var.cognito_user_pool_id}",
+    clientId: "${var.cognito_client_id}"
+  }
 };
 EOT
   )
@@ -476,6 +486,49 @@ resource "aws_s3_object" "trail_gate_js" {
   source       = "${path.root}/../../static_site/trail-gate.js"
   content_type = "application/javascript"
   etag         = filemd5("${path.root}/../../static_site/trail-gate.js")
+}
+
+# Autenticação de alunos (Cognito) — biblioteca do frontend
+resource "aws_s3_object" "auth_js" {
+  bucket        = aws_s3_bucket.this.id
+  key           = "auth.js"
+  source        = "${path.root}/../../static_site/auth.js"
+  content_type  = "application/javascript"
+  cache_control = "no-cache, no-store, must-revalidate"
+  etag          = filemd5("${path.root}/../../static_site/auth.js")
+}
+
+resource "aws_s3_object" "login_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "login.html"
+  source       = "${path.root}/../../static_site/login.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/login.html")
+}
+
+resource "aws_s3_object" "cadastro_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "cadastro.html"
+  source       = "${path.root}/../../static_site/cadastro.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/cadastro.html")
+}
+
+# Sandbox de prática (Pyodide) — client-side, custo zero
+resource "aws_s3_object" "sandbox_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandbox.html"
+  source       = "${path.root}/../../static_site/sandbox.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/sandbox.html")
+}
+
+resource "aws_s3_object" "sandbox_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandbox.js"
+  source       = "${path.root}/../../static_site/sandbox.js"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.root}/../../static_site/sandbox.js")
 }
 
 resource "aws_s3_object" "trail_gate_css" {

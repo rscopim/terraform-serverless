@@ -127,3 +127,13 @@ output "admin_logout_endpoint" {
   description = "Endpoint de logout administrativo"
   value       = module.api_gateway.admin_logout_endpoint
 }
+
+output "cognito_user_pool_id" {
+  description = "ID do Cognito User Pool de alunos"
+  value       = module.cognito.user_pool_id
+}
+
+output "cognito_client_id" {
+  description = "ID do client web Cognito (usado pelo frontend)"
+  value       = module.cognito.client_id
+}

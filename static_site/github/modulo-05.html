@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 05: Histórico e Reescrita</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 05: Histórico e Reescrita</title>
+  <meta name="description" content="Reescrita de histórico no Git: rebase interativo, cherry-pick, reflog, reset (soft/mixed/hard), revert, amend e recuperação de commits perdidos." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,151 +18,366 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-04.html" class="nav-link">← Anterior</a>
         <a href="modulo-06.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 05</span>
-        <h1>Histórico e Reescrita: Rebase, Cherry-pick e Reflog</h1>
-        <p>Rebase interativo, cherry-pick, reflog, reset, revert. Ferramentas avançadas para manipular o histórico de commits.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 05</span>
+        <h1>Histórico e Reescrita</h1>
+        <p>Um histórico limpo e legível é sinal de profissionalismo. Neste módulo você domina as ferramentas de reescrita do Git: rebase interativo para organizar commits, cherry-pick para transportar mudanças específicas, reset para desfazer e reflog para recuperar o que parecia perdido. Poder que exige responsabilidade — e você vai aprender a usá-lo com segurança.</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
-      <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
-        </div>
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node active"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
       </div>
     </section>
+
+    <!-- SEÇÃO 1 -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h2>1. Git Rebase</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>git rebase</code><span class="cmd-tag">Avançado</span></div>
-              <p>Reaplica commits sobre outra base. Cria histórico linear e limpo.</p>
-              <pre><code># Rebase simples — atualiza feature com main
-git checkout feature/login
-git rebase main
-# Seus commits são reaplicados sobre o topo da main
-
-# Rebase interativo — editar/squash/reorder commits
-git rebase -i HEAD~5
-# pick abc1234 feat: adiciona form
-# squash def5678 fix: ajusta validação
-# reword ghi9012 docs: atualiza README
-# drop jkl3456 WIP: teste temporário
-
-# Continuar após resolver conflito
-git rebase --continue
-
-# Abortar rebase
-git rebase --abort</code></pre>
-              <div class="info-box">
-                <strong>⚠️ Regra de Ouro:</strong> Nunca faça rebase em branches públicas/compartilhadas. Rebase reescreve o histórico — use apenas em branches locais ou pessoais.
-              </div>
-            </div>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Rebase — Reaplicando Commits</h2>
+          <p>Rebase move ou "reaplica" uma sequência de commits sobre uma nova base. É a alternativa ao merge que produz um histórico linear, sem commits de merge.</p>
         </div>
 
         <div class="topic-block">
-          <h2>2. Cherry-pick e Reflog</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>git cherry-pick</code><span class="cmd-tag">Avançado</span></div>
-              <p>Aplica um commit específico em outra branch.</p>
-              <pre><code># Aplicar commit específico
-git cherry-pick abc1234
+          <h3>📐 Rebase vs Merge</h3>
+          <div class="command-card wide">
+            <pre><code># Situação inicial:
+#   C0 ─ C1 ─ C4 ◀── main
+#          └─ C2 ─ C3 ◀── feature
 
-# Aplicar múltiplos commits
-git cherry-pick abc1234 def5678
+# MERGE cria um commit de junção (C5):
+#   C0 ─ C1 ─ C4 ─── C5 ◀── main
+#          └─ C2 ─ C3 ─┘
 
-# Aplicar sem commitar (só staging)
-git cherry-pick --no-commit abc1234
+# REBASE reaplica C2 e C3 depois de C4 (histórico linear):
+#   C0 ─ C1 ─ C4 ─ C2' ─ C3' ◀── feature
+# (C2' e C3' são NOVOS commits — hashes diferentes!)
 
-# Caso de uso: hotfix
-git checkout main
-git cherry-pick fix-commit-hash
-# Aplica a correção sem trazer toda a branch</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git reflog</code><span class="cmd-tag">Recuperação</span></div>
-              <p>Histórico de TODAS as ações — sua rede de segurança.</p>
-              <pre><code># Ver histórico completo de movimentos
-git reflog
-# abc1234 HEAD@{0}: commit: feat: login
-# def5678 HEAD@{1}: checkout: main → feature
-# ghi9012 HEAD@{2}: reset: moving to HEAD~1
+git switch feature
+git rebase main
+# Agora feature está "em cima" da main mais recente</code></pre>
+          </div>
 
-# Recuperar commit "perdido"
-git checkout HEAD@{2}
-git branch recuperada HEAD@{2}
+          <table class="styled-table">
+            <thead>
+              <tr><th>Aspecto</th><th>Merge</th><th>Rebase</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Histórico</td><td>Preserva (com commits de merge)</td><td>Linear (reescrito)</td></tr>
+              <tr><td>Hashes dos commits</td><td>Mantidos</td><td>Alterados (novos commits)</td></tr>
+              <tr><td>Rastreabilidade</td><td>Mostra quando as branches se uniram</td><td>Parece que tudo foi sequencial</td></tr>
+              <tr><td>Uso seguro</td><td>Sempre</td><td>Só em branches não compartilhadas</td></tr>
+            </tbody>
+          </table>
 
-# Recuperar após reset --hard
-git reflog
-git reset --hard HEAD@{1}
+          <div class="info-box warning">
+            <h4>⚠️ A Regra de Ouro do Rebase</h4>
+            <p><strong>Nunca faça rebase de commits que já foram enviados (push) e que outras pessoas podem ter baixado.</strong> Rebase reescreve o histórico criando novos commits — se outra pessoa tem os commits antigos, o histórico diverge e vira uma bagunça. Rebase é seguro apenas na sua branch local antes do primeiro push.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-# Reflog expira em 90 dias (padrão)</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git reset</code><span class="cmd-tag danger">Reescrita</span></div>
-              <p>Move o HEAD para outro commit. <strong>Cuidado com --hard!</strong></p>
-              <pre><code># Soft — mantém mudanças no staging
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Rebase Interativo — Organizando Commits</h2>
+          <p>O rebase interativo (<code>-i</code>) é uma das ferramentas mais poderosas do Git. Ele permite reordenar, juntar, editar, renomear e remover commits antes de finalizar seu trabalho.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🎛️ Comandos do Rebase Interativo</h3>
+          <div class="command-card wide">
+            <pre><code># Rebasear interativamente os últimos 4 commits
+git rebase -i HEAD~4
+
+# Abre um editor com a lista de commits e as ações disponíveis:
+pick   a1b2c3 feat: adiciona login
+pick   d4e5f6 fix: corrige typo
+pick   g7h8i9 wip: teste
+pick   j0k1l2 feat: adiciona logout
+
+# Ações que você pode aplicar a cada linha:
+# pick   (p) → mantém o commit como está
+# reword (r) → mantém, mas edita a mensagem
+# edit   (e) → pausa para você alterar o commit
+# squash (s) → funde com o commit ANTERIOR (combina mensagens)
+# fixup  (f) → funde com o anterior, DESCARTA a mensagem
+# drop   (d) → remove o commit
+# reorder    → só mude a ordem das linhas</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>Exemplo: Limpando uma Branch Antes do PR</h4>
+            <pre><code># Antes: histórico bagunçado
+pick   a1b2c3 feat: adiciona login
+squash d4e5f6 fix: corrige typo do login
+fixup  g7h8i9 wip: teste
+reword j0k1l2 feat: adiciona logout
+
+# Resultado: 2 commits limpos
+#   - "feat: adiciona login" (com o typo e o wip incorporados)
+#   - "feat: adiciona logout" (com mensagem reescrita)
+
+# Histórico profissional, fácil de revisar e de reverter</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Casos de uso comuns</h4>
+            <ul>
+              <li><strong>Squash de "wip":</strong> juntar vários commits de tentativa em um commit final coerente</li>
+              <li><strong>Reword:</strong> corrigir mensagens antes de compartilhar</li>
+              <li><strong>Reorder:</strong> agrupar commits relacionados</li>
+              <li><strong>Drop:</strong> remover um commit experimental que não deu certo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Cherry-Pick — Transportando Commits</h2>
+          <p>Cherry-pick aplica um commit específico de uma branch em outra, sem trazer todo o resto. Útil para levar um hotfix a múltiplas branches ou resgatar um commit isolado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🍒 Usando Cherry-Pick</h3>
+          <div class="command-card wide">
+            <pre><code># Aplicar um commit específico na branch atual
+git cherry-pick a1b2c3
+
+# Aplicar vários commits
+git cherry-pick a1b2c3 d4e5f6
+
+# Aplicar um intervalo de commits
+git cherry-pick a1b2c3..g7h8i9
+
+# Cherry-pick SEM commitar (revisar antes)
+git cherry-pick -n a1b2c3
+
+# Se der conflito, resolva e continue
+git cherry-pick --continue
+git cherry-pick --abort      # ou aborte</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>🎯 Caso de uso: hotfix em duas versões</h4>
+            <pre><code># Você corrigiu um bug crítico na main (commit abc123).
+# A versão antiga (branch release/1.x) também precisa da correção:
+git switch release/1.x
+git cherry-pick abc123
+git push
+# A correção foi replicada sem trazer outras mudanças da main</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Reset — Movendo o Ponteiro</h2>
+          <p>Reset move a branch atual para um commit diferente. Suas três variações controlam o que acontece com o staging e o working directory — a fonte de muita confusão que vamos esclarecer.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🎚️ Os Três Modos de Reset</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Modo</th><th>Move HEAD</th><th>Staging</th><th>Working Dir</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>--soft</code></td><td>✅</td><td>Mantém</td><td>Mantém</td></tr>
+              <tr><td><code>--mixed</code> (padrão)</td><td>✅</td><td>Reseta</td><td>Mantém</td></tr>
+              <tr><td><code>--hard</code></td><td>✅</td><td>Reseta</td><td>⚠️ Descarta</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <pre><code># SOFT: desfaz o commit, mas mantém tudo staged
+# (ótimo para refazer o último commit com mudanças adicionais)
 git reset --soft HEAD~1
 
-# Mixed (padrão) — mantém no working dir
+# MIXED: desfaz o commit e tira do staging (mantém edições no disco)
 git reset HEAD~1
+git reset --mixed HEAD~1     # explícito
 
-# Hard — DESCARTA tudo (perigoso!)
+# HARD: desfaz o commit E descarta TODAS as mudanças (PERIGOSO)
 git reset --hard HEAD~1
 
-# Desfazer último commit (mantendo mudanças)
-git reset --soft HEAD~1
-# Agora pode re-commitar diferente</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>git revert</code><span class="cmd-tag">Seguro</span></div>
-              <p>Cria novo commit que desfaz outro. Seguro para branches públicas.</p>
-              <pre><code># Reverter um commit (cria novo commit)
-git revert abc1234
+# Resetar para um commit específico
+git reset --hard a1b2c3
 
-# Reverter sem commitar automaticamente
-git revert --no-commit abc1234
+# Descartar mudanças e igualar ao remoto
+git reset --hard origin/main</code></pre>
+          </div>
 
-# Reverter merge commit
-git revert -m 1 merge-commit-hash
-
-# Diferença de reset:
-# reset: apaga histórico (perigoso)
-# revert: adiciona ao histórico (seguro)</code></pre>
-            </div>
+          <div class="info-box warning">
+            <h4>⚠️ --hard apaga trabalho não commitado</h4>
+            <p>O <code>reset --hard</code> descarta permanentemente as mudanças do working directory que não foram commitadas. Use com cautela. A boa notícia: commits "perdidos" por reset podem ser recuperados via reflog (próxima seção), mas mudanças nunca commitadas não têm volta.</p>
           </div>
         </div>
+      </div>
+    </section>
 
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Revert — Desfazendo com Segurança</h2>
+          <p>Diferente do reset, o revert não apaga histórico. Ele cria um novo commit que desfaz as mudanças de um commit anterior — a forma segura de reverter algo que já foi compartilhado.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>↩️ Usando Revert</h3>
+          <div class="command-card wide">
+            <pre><code># Reverter um commit específico (cria um NOVO commit de reversão)
+git revert a1b2c3
+
+# Reverter sem abrir editor de mensagem
+git revert --no-edit a1b2c3
+
+# Reverter vários commits
+git revert HEAD~3..HEAD
+
+# Reverter um commit de merge (precisa indicar o "mainline")
+git revert -m 1 &lt;hash-do-merge&gt;
+
+# Reverter sem commitar (agrupar em um commit só)
+git revert -n a1b2c3 d4e5f6
+git commit -m "revert: desfaz mudanças problemáticas"</code></pre>
+          </div>
+
+          <table class="styled-table">
+            <thead>
+              <tr><th>Cenário</th><th>Use</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Commit já enviado / branch pública</td><td><code>git revert</code> (seguro)</td></tr>
+              <tr><td>Commit apenas local, não compartilhado</td><td><code>git reset</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Reflog — A Rede de Segurança</h2>
+          <p>O reflog registra todos os movimentos do HEAD, mesmo os que "somem" do histórico normal. É o seu seguro contra desastres — quase nada é realmente perdido no Git.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🛟 Recuperando Commits Perdidos</h3>
+          <div class="command-card wide">
+            <pre><code># Ver o histórico de TODOS os movimentos do HEAD
+git reflog
+# a1b2c3 HEAD@{0}: reset: moving to HEAD~1
+# d4e5f6 HEAD@{1}: commit: feat: funcionalidade importante
+# g7h8i9 HEAD@{2}: checkout: moving from main to feature
+
+# Ops! Fiz reset --hard e perdi um commit. Recuperar:
+git reset --hard HEAD@{1}
+# ou recriar uma branch a partir do commit perdido:
+git switch -c recuperada d4e5f6
+
+# Recuperar uma branch deletada (encontre o último commit dela no reflog)
+git reflog
+git switch -c branch-recuperada &lt;hash&gt;</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Por que o reflog salva vidas</h4>
+            <p>Mesmo depois de um <code>reset --hard</code>, <code>rebase</code> mal feito ou branch deletada, os commits continuam no repositório por ~90 dias (até o garbage collection). O reflog é o mapa para encontrá-los de volta. Sempre que "perder" algo no Git, seu primeiro reflexo deve ser <code>git reflog</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Exercício Prático e Resumo</h2>
+          <p>Pratique um squash de commits com rebase interativo — a habilidade que mais impressiona em code reviews.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧪 Limpando uma Branch com Squash</h3>
+          <div class="command-card wide">
+            <pre><code># 1. Criar uma branch com histórico "sujo"
+git switch -c feature/calculadora
+echo "def soma(): pass" &gt; calc.py
+git add . &amp;&amp; git commit -m "wip inicio"
+echo "def soma(a,b): return a+b" &gt; calc.py
+git commit -am "corrige soma"
+echo "# calculadora" &gt; calc.py
+git commit -am "typo"
+
+# 2. Ver o histórico bagunçado
+git log --oneline    # 3 commits confusos
+
+# 3. Squash tudo em 1 commit limpo
+git rebase -i HEAD~3
+# No editor: deixe 'pick' no primeiro, 'squash' (ou 's') nos outros 2
+# Depois escreva uma mensagem final:
+#   "feat: adiciona função de soma na calculadora"
+
+# 4. Verificar o resultado
+git log --oneline    # agora só 1 commit limpo!
+
+# 5. Se algo der errado, o reflog te salva:
+git reflog</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 05</h4>
+            <p>Você domina agora as ferramentas de reescrita: <strong>rebase</strong> (linear vs merge) e rebase interativo (squash, reword, reorder, drop), <strong>cherry-pick</strong> (transportar commits), <strong>reset</strong> (soft/mixed/hard e seus efeitos), <strong>revert</strong> (desfazer com segurança em branches públicas) e <strong>reflog</strong> (recuperar o que parecia perdido). Lembre-se da regra de ouro: reescreva apenas o que ainda não foi compartilhado. No Módulo 06, organizamos tudo isso em fluxos de trabalho profissionais.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -178,7 +394,7 @@ git revert -m 1 merge-commit-hash
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

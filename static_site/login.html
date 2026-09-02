@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Entrar</title>
+  <meta name="description" content="Acesse sua conta CloudTrilhas para estudar as trilhas de Cloud, DevOps e programação." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .auth-wrap { min-height:70vh; display:flex; align-items:center; justify-content:center; padding:48px 16px; }
+    .auth-card { width:100%; max-width:420px; background:#0f172a; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:36px; }
+    .auth-card h1 { color:#fff; font-size:1.5rem; margin:0 0 6px; }
+    .auth-card .sub { color:#94a3b8; font-size:0.92rem; margin:0 0 24px; }
+    .auth-field { margin-bottom:16px; }
+    .auth-field label { display:block; color:#cbd5e1; font-size:0.85rem; margin-bottom:6px; }
+    .auth-field input { width:100%; padding:12px 14px; background:#0b1120; border:1px solid rgba(255,255,255,0.15); border-radius:9px; color:#fff; font-size:0.95rem; }
+    .auth-field input:focus { outline:none; border-color:#6366f1; }
+    .auth-btn { width:100%; padding:13px; background:#6366f1; color:#fff; border:none; border-radius:9px; font-weight:700; font-size:0.95rem; cursor:pointer; margin-top:6px; }
+    .auth-btn:disabled { background:#475569; cursor:not-allowed; }
+    .auth-msg { font-size:0.85rem; margin:12px 0 0; min-height:18px; }
+    .auth-msg.error { color:#f87171; }
+    .auth-msg.success { color:#4ade80; }
+    .auth-links { margin-top:20px; text-align:center; font-size:0.88rem; color:#94a3b8; }
+    .auth-links a { color:#818cf8; text-decoration:none; }
+    .auth-links a:hover { text-decoration:underline; }
+    .auth-hidden { display:none; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="cadastro.html" class="nav-button">Criar conta</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-wrap">
+      <!-- LOGIN -->
+      <div class="auth-card" id="loginCard">
+        <h1>Entrar</h1>
+        <p class="sub">Acesse sua conta para estudar as trilhas.</p>
+        <form id="loginForm">
+          <div class="auth-field">
+            <label for="loginEmail">E-mail</label>
+            <input type="email" id="loginEmail" autocomplete="email" required />
+          </div>
+          <div class="auth-field">
+            <label for="loginPass">Senha</label>
+            <input type="password" id="loginPass" autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="auth-btn" id="loginBtn">Entrar</button>
+          <p class="auth-msg" id="loginMsg"></p>
+        </form>
+        <div class="auth-links">
+          <a href="#" id="showForgot">Esqueci minha senha</a> ·
+          <a href="cadastro.html">Criar conta</a>
+        </div>
+      </div>
+
+      <!-- RECUPERAR SENHA -->
+      <div class="auth-card auth-hidden" id="forgotCard">
+        <h1>Recuperar senha</h1>
+        <p class="sub">Enviaremos um código ao seu e-mail para redefinir a senha.</p>
+        <form id="forgotForm">
+          <div class="auth-field">
+            <label for="forgotEmail">E-mail</label>
+            <input type="email" id="forgotEmail" autocomplete="email" required />
+          </div>
+          <button type="submit" class="auth-btn" id="forgotBtn">Enviar código</button>
+          <p class="auth-msg" id="forgotMsg"></p>
+        </form>
+        <form id="resetForm" class="auth-hidden">
+          <div class="auth-field">
+            <label for="resetCode">Código recebido</label>
+            <input type="text" id="resetCode" inputmode="numeric" required />
+          </div>
+          <div class="auth-field">
+            <label for="resetPass">Nova senha</label>
+            <input type="password" id="resetPass" autocomplete="new-password" required />
+          </div>
+          <button type="submit" class="auth-btn" id="resetBtn">Redefinir senha</button>
+          <p class="auth-msg" id="resetMsg"></p>
+        </form>
+        <div class="auth-links"><a href="#" id="backToLogin">← Voltar para o login</a></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var redirect = params.get('redirect') || 'index.html';
+
+      // Se já está logado, vai direto
+      CloudTrilhasAuth.isAuthenticated().then(function (ok) {
+        if (ok) location.href = redirect;
+      });
+
+      var loginForm = document.getElementById('loginForm');
+      var loginMsg = document.getElementById('loginMsg');
+      var loginBtn = document.getElementById('loginBtn');
+
+      loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        loginMsg.className = 'auth-msg';
+        loginMsg.textContent = '';
+        loginBtn.disabled = true; loginBtn.textContent = 'Entrando…';
+        try {
+          await CloudTrilhasAuth.signIn(
+            document.getElementById('loginEmail').value.trim(),
+            document.getElementById('loginPass').value
+          );
+          location.href = redirect;
+        } catch (err) {
+          if (err.code === 'UserNotConfirmedException') {
+            var em = document.getElementById('loginEmail').value.trim();
+            location.href = 'cadastro.html?confirm=' + encodeURIComponent(em);
+            return;
+          }
+          loginMsg.className = 'auth-msg error';
+          loginMsg.textContent = err.message;
+        } finally {
+          loginBtn.disabled = false; loginBtn.textContent = 'Entrar';
+        }
+      });
+
+      // Alternar para recuperação de senha
+      var loginCard = document.getElementById('loginCard');
+      var forgotCard = document.getElementById('forgotCard');
+      document.getElementById('showForgot').addEventListener('click', function (e) {
+        e.preventDefault(); loginCard.classList.add('auth-hidden'); forgotCard.classList.remove('auth-hidden');
+      });
+      document.getElementById('backToLogin').addEventListener('click', function (e) {
+        e.preventDefault(); forgotCard.classList.add('auth-hidden'); loginCard.classList.remove('auth-hidden');
+      });
+
+      // Enviar código de recuperação
+      var forgotForm = document.getElementById('forgotForm');
+      var resetForm = document.getElementById('resetForm');
+      var forgotMsg = document.getElementById('forgotMsg');
+      forgotForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        forgotMsg.className = 'auth-msg'; forgotMsg.textContent = '';
+        try {
+          await CloudTrilhasAuth.forgotPassword(document.getElementById('forgotEmail').value.trim());
+          forgotMsg.className = 'auth-msg success';
+          forgotMsg.textContent = 'Código enviado! Verifique seu e-mail.';
+          resetForm.classList.remove('auth-hidden');
+        } catch (err) {
+          forgotMsg.className = 'auth-msg error'; forgotMsg.textContent = err.message;
+        }
+      });
+
+      // Confirmar nova senha
+      var resetMsg = document.getElementById('resetMsg');
+      resetForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        resetMsg.className = 'auth-msg'; resetMsg.textContent = '';
+        try {
+          await CloudTrilhasAuth.confirmForgotPassword(
+            document.getElementById('forgotEmail').value.trim(),
+            document.getElementById('resetCode').value.trim(),
+            document.getElementById('resetPass').value
+          );
+          resetMsg.className = 'auth-msg success';
+          resetMsg.textContent = 'Senha redefinida! Você já pode entrar.';
+          setTimeout(function () { location.reload(); }, 1500);
+        } catch (err) {
+          resetMsg.className = 'auth-msg error'; resetMsg.textContent = err.message;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

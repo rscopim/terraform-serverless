@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudTrilhas — Python Módulo 10: IA com Amazon Bedrock</title>
+  <meta name="description" content="Guia completo de IA generativa com Amazon Bedrock e Python: Claude, Titan, Llama, embeddings, RAG, streaming, function calling, Converse API e projeto de chatbot com memória." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,23 +18,19 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../python.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-09.html" class="nav-link">← Anterior</a>
-        <a href="../python.html" class="nav-link">Voltar ao Curso</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
-      <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
@@ -41,34 +38,179 @@
     <section class="training-hero">
       <div class="container training-hero-content">
         <span class="pill">🐍 Python — Módulo 10</span>
-        <h1>IA com Amazon Bedrock: Claude, Titan, Embeddings</h1>
-        <p>Integre modelos de IA generativa da AWS em suas aplicações Python usando Amazon Bedrock.</p>
+        <h1>IA Generativa com Amazon Bedrock</h1>
+        <p>Integre modelos de IA generativa da AWS em aplicações Python usando o Amazon Bedrock. Domine a invocação de modelos (Claude, Titan, Llama), a Converse API unificada, streaming de respostas, embeddings para busca semântica, RAG (Retrieval-Augmented Generation), function calling (tool use) e construa um chatbot completo com memória e controle de custos.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Controle</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Funções</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Dados</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Arquivos</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>POO</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>Bibliotecas</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>APIs</small></a>
+        <a href="modulo-09.html" class="progress-node"><span>09</span><small>AWS boto3</small></a>
+        <a href="modulo-10.html" class="progress-node active"><span>10</span><small>IA Bedrock</small></a>
+      </div>
+    </section>
 
-    <section class="module-section" style="padding:20px 0">
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 1: INTRODUÇÃO AO AMAZON BEDROCK
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
       <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>🚧 Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Introdução ao Amazon Bedrock</h2>
+          <p>O Amazon Bedrock é o serviço gerenciado da AWS para IA generativa. Ele oferece acesso via API a modelos de fundação (foundation models) de vários provedores — Anthropic, Amazon, Meta, Mistral, Cohere, AI21 — sem que você precise gerenciar infraestrutura de GPU. Neste módulo você aprenderá a integrar esses modelos em aplicações Python de produção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧠 O que é IA Generativa e Foundation Models</h3>
+          <p>IA generativa refere-se a modelos capazes de gerar conteúdo novo — texto, código, imagens, áudio — a partir de instruções em linguagem natural. Os <strong>foundation models (FMs)</strong> são grandes modelos treinados em enormes volumes de dados, capazes de realizar múltiplas tarefas sem re-treinamento específico. O Bedrock expõe esses modelos através de uma API unificada.</p>
+
+          <div class="info-box highlight">
+            <h4>🎯 Por que usar o Amazon Bedrock?</h4>
+            <ul>
+              <li><strong>Serverless:</strong> sem provisionar ou gerenciar GPUs — você paga por token consumido</li>
+              <li><strong>Multi-modelo:</strong> troque entre Claude, Titan, Llama e outros mudando apenas o <code>modelId</code></li>
+              <li><strong>Privacidade:</strong> seus dados não são usados para treinar os modelos e não saem da sua conta AWS</li>
+              <li><strong>Integração nativa:</strong> IAM, CloudWatch, VPC endpoints, KMS — tudo integrado ao ecossistema AWS</li>
+              <li><strong>Converse API:</strong> interface unificada que abstrai as diferenças de formato entre provedores</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔑 Habilitando Acesso aos Modelos</h3>
+          <p>Antes de invocar qualquer modelo, você precisa solicitar acesso a ele no console do Bedrock (Model access). Esse é um passo único por conta/região. Sem isso, as chamadas retornam <code>AccessDeniedException</code>.</p>
+
+          <div class="command-card wide">
+            <h4>📋 Verificação de Acesso e Listagem de Modelos</h4>
+            <pre><code>import boto3
+
+# Client de controle (gerenciamento) do Bedrock
+bedrock = boto3.client('bedrock', region_name='us-east-1')
+
+# Listar todos os foundation models disponíveis na região
+response = bedrock.list_foundation_models()
+
+for modelo in response['modelSummaries']:
+    print(f"ID: {modelo['modelId']}")
+    print(f"  Provedor: {modelo['providerName']}")
+    print(f"  Modalidades entrada: {modelo.get('inputModalities', [])}")
+    print(f"  Modalidades saída: {modelo.get('outputModalities', [])}")
+    print(f"  Streaming: {modelo.get('responseStreamingSupported', False)}")
+    print()
+
+# Filtrar apenas modelos de texto da Anthropic
+for modelo in response['modelSummaries']:
+    if modelo['providerName'] == 'Anthropic':
+        print(modelo['modelId'])
+
+# Verificar acesso concedido (models que você pode invocar)
+# O acesso é solicitado no Console: Bedrock > Model access > Manage model access</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Dois clients diferentes</h4>
+            <ul>
+              <li><code>boto3.client('bedrock')</code> → operações de <strong>gerenciamento</strong> (listar modelos, custom models, jobs)</li>
+              <li><code>boto3.client('bedrock-runtime')</code> → operações de <strong>inferência</strong> (invocar modelos, gerar respostas)</li>
+            </ul>
+            <p>Confundir os dois é o erro mais comum de quem começa com Bedrock.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>💰 Modelos Disponíveis e Custos</h3>
+          <p>Cada modelo tem um custo por 1.000 tokens de entrada e por 1.000 tokens de saída. Escolher o modelo certo para cada tarefa é a principal alavanca de controle de custo em aplicações de IA.</p>
+
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th>Provedor</th>
+                <th>Melhor para</th>
+                <th>Custo relativo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Claude 3 Haiku</td>
+                <td>Anthropic</td>
+                <td>Tarefas rápidas, classificação, extração, alto volume</td>
+                <td>💲 Baixo</td>
+              </tr>
+              <tr>
+                <td>Claude 3.5 Sonnet</td>
+                <td>Anthropic</td>
+                <td>Raciocínio, código, análise, visão (imagens)</td>
+                <td>💲💲 Médio</td>
+              </tr>
+              <tr>
+                <td>Claude 3 Opus</td>
+                <td>Anthropic</td>
+                <td>Tarefas complexas que exigem máxima qualidade</td>
+                <td>💲💲💲 Alto</td>
+              </tr>
+              <tr>
+                <td>Titan Text Express</td>
+                <td>Amazon</td>
+                <td>Geração de texto simples, resumos</td>
+                <td>💲 Baixo</td>
+              </tr>
+              <tr>
+                <td>Titan Embeddings</td>
+                <td>Amazon</td>
+                <td>Busca semântica, RAG, clustering</td>
+                <td>💲 Muito baixo</td>
+              </tr>
+              <tr>
+                <td>Llama 3</td>
+                <td>Meta</td>
+                <td>Open-weight, chat, tarefas gerais</td>
+                <td>💲 Baixo</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Regra de ouro de custo</h4>
+            <p>Use o modelo mais barato que resolve a tarefa. Haiku para classificação e extração em volume; Sonnet quando precisar de raciocínio ou visão; Opus só quando a qualidade for crítica. Monitore o campo <code>usage</code> retornado em cada chamada para rastrear tokens consumidos.</p>
+          </div>
         </div>
       </div>
     </section>
-    <section class="module-section">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 2: INVOKE MODEL — INVOCAÇÃO DIRETA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>InvokeModel — Invocação Direta de Modelos</h2>
+          <p>O método <code>invoke_model()</code> é a forma de baixo nível de chamar um modelo. Cada provedor tem seu próprio formato de body (JSON), o que exige atenção aos detalhes. É importante conhecê-lo porque dá controle total, mas veremos depois que a Converse API simplifica muito o trabalho multi-modelo.</p>
+        </div>
 
         <div class="topic-block">
-          <h3>1. Invocando Modelos com Bedrock</h3>
+          <h3>🤖 Invocando Claude (Anthropic Messages API)</h3>
+          <p>Os modelos Claude no Bedrock usam o formato de mensagens da Anthropic. O body precisa incluir <code>anthropic_version</code>, <code>max_tokens</code> e a lista de <code>messages</code>.</p>
+
           <div class="command-card wide">
-            <div class="command-header"><code>Bedrock - Claude</code><span class="cmd-tag">IA</span></div>
+            <h4>📋 Invocação Básica do Claude</h4>
             <pre><code>import boto3
 import json
 
-bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
 
-# Invocar Claude (Anthropic)
-def invocar_claude(prompt, max_tokens=1024):
+def invocar_claude(prompt: str, max_tokens: int = 1024) -> str:
+    """Invoca o Claude 3 Sonnet com um prompt simples."""
     body = json.dumps({
         "anthropic_version": "bedrock-2023-05-31",
         "max_tokens": max_tokens,
@@ -77,168 +219,1030 @@ def invocar_claude(prompt, max_tokens=1024):
         ]
     })
 
-    response = bedrock.invoke_model(
+    response = bedrock_runtime.invoke_model(
         modelId="anthropic.claude-3-sonnet-20240229-v1:0",
         contentType="application/json",
         accept="application/json",
         body=body
     )
 
-    resultado = json.loads(response["body"].read())
-    return resultado["content"][0]["text"]
+    resultado = json.loads(response['body'].read())
+    return resultado['content'][0]['text']
 
 # Uso
 resposta = invocar_claude("Explique o que é uma VPC na AWS em 3 frases.")
-print(resposta)
+print(resposta)</code></pre>
+          </div>
 
-# Com contexto de sistema
-def invocar_claude_sistema(prompt, sistema="Você é um especialista AWS."):
+          <div class="command-card wide">
+            <h4>📋 Claude com System Prompt e Parâmetros de Controle</h4>
+            <pre><code>def invocar_claude_avancado(
+    prompt: str,
+    sistema: str = "Você é um especialista AWS certificado.",
+    temperature: float = 0.7,
+    max_tokens: int = 2048
+) -> dict:
+    """Invoca o Claude com system prompt e retorna texto + uso de tokens."""
     body = json.dumps({
         "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 2048,
-        "system": sistema,
-        "messages": [{"role": "user", "content": prompt}]
+        "max_tokens": max_tokens,
+        "system": sistema,        # instrução de comportamento
+        "temperature": temperature,  # 0 = determinístico, 1 = criativo
+        "top_p": 0.9,             # nucleus sampling
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
     })
-    response = bedrock.invoke_model(
+
+    response = bedrock_runtime.invoke_model(
         modelId="anthropic.claude-3-sonnet-20240229-v1:0",
-        contentType="application/json",
-        accept="application/json",
         body=body
     )
-    return json.loads(response["body"].read())["content"][0]["text"]</code></pre>
+
+    resultado = json.loads(response['body'].read())
+    return {
+        "texto": resultado['content'][0]['text'],
+        "tokens_entrada": resultado['usage']['input_tokens'],
+        "tokens_saida": resultado['usage']['output_tokens'],
+        "stop_reason": resultado['stop_reason']
+    }
+
+r = invocar_claude_avancado(
+    "Liste 5 boas práticas de segurança para buckets S3.",
+    temperature=0.3  # mais determinístico para respostas técnicas
+)
+print(r['texto'])
+print(f"\nTokens: {r['tokens_entrada']} entrada + {r['tokens_saida']} saída")</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>🌡️ Entendendo temperature e top_p</h4>
+            <ul>
+              <li><strong>temperature (0–1):</strong> controla a aleatoriedade. Baixo (0–0.3) para respostas técnicas e determinísticas; alto (0.7–1) para brainstorming e criatividade.</li>
+              <li><strong>top_p (0–1):</strong> nucleus sampling — considera apenas os tokens mais prováveis que somam <code>top_p</code> de probabilidade. Ajuste um OU outro, não os dois ao mesmo tempo.</li>
+              <li><strong>max_tokens:</strong> limite de tokens gerados na saída. Impacta diretamente o custo e o tempo de resposta.</li>
+            </ul>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>2. Titan e Embeddings</h3>
+          <h3>📝 Invocando Amazon Titan e Meta Llama</h3>
+          <p>Cada provedor tem um formato de body diferente. Veja como o Titan e o Llama diferem do Claude — é justamente essa fragmentação que a Converse API resolve.</p>
+
           <div class="command-grid">
             <div class="command-card">
-              <div class="command-header"><code>Titan Text</code><span class="cmd-tag">IA</span></div>
-              <pre><code># Invocar Amazon Titan
-def invocar_titan(prompt):
+              <h4>Amazon Titan Text</h4>
+              <pre><code>def invocar_titan(prompt: str) -> str:
     body = json.dumps({
         "inputText": prompt,
         "textGenerationConfig": {
             "maxTokenCount": 512,
             "temperature": 0.7,
-            "topP": 0.9
+            "topP": 0.9,
+            "stopSequences": []
         }
     })
 
-    response = bedrock.invoke_model(
+    response = bedrock_runtime.invoke_model(
         modelId="amazon.titan-text-express-v1",
-        contentType="application/json",
-        accept="application/json",
         body=body
     )
+    resultado = json.loads(response['body'].read())
+    return resultado['results'][0]['outputText']
 
-    resultado = json.loads(response["body"].read())
-    return resultado["results"][0]["outputText"]
-
-resposta = invocar_titan("Liste 5 boas práticas de segurança no S3.")
-print(resposta)</code></pre>
+print(invocar_titan("Resuma o que é o AWS Lambda."))</code></pre>
             </div>
             <div class="command-card">
-              <div class="command-header"><code>Embeddings</code><span class="cmd-tag">IA</span></div>
-              <pre><code># Gerar embeddings para busca semântica
-def gerar_embedding(texto):
+              <h4>Meta Llama 3</h4>
+              <pre><code>def invocar_llama(prompt: str) -> str:
+    # Llama usa formato de prompt com tags especiais
+    prompt_formatado = f"""&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+{prompt}&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;"""
+
     body = json.dumps({
-        "inputText": texto
+        "prompt": prompt_formatado,
+        "max_gen_len": 512,
+        "temperature": 0.7,
+        "top_p": 0.9
     })
 
-    response = bedrock.invoke_model(
-        modelId="amazon.titan-embed-text-v1",
-        contentType="application/json",
-        accept="application/json",
+    response = bedrock_runtime.invoke_model(
+        modelId="meta.llama3-8b-instruct-v1:0",
         body=body
     )
+    resultado = json.loads(response['body'].read())
+    return resultado['generation']
 
-    resultado = json.loads(response["body"].read())
-    return resultado["embedding"]  # vetor 1536D
-
-# Similaridade entre textos
-import numpy as np
-
-emb1 = gerar_embedding("Como criar um bucket S3?")
-emb2 = gerar_embedding("Criação de storage no AWS S3")
-emb3 = gerar_embedding("Receita de bolo de chocolate")
-
-def similaridade(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-print(f"S3 vs S3: {similaridade(emb1, emb2):.3f}")   # ~0.9
-print(f"S3 vs bolo: {similaridade(emb1, emb3):.3f}") # ~0.3</code></pre>
+print(invocar_llama("O que é infraestrutura como código?"))</code></pre>
             </div>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Formatos incompatíveis</h4>
+            <p>Note como cada modelo exige uma estrutura de body totalmente diferente: Claude usa <code>messages</code>, Titan usa <code>inputText</code>/<code>textGenerationConfig</code>, Llama usa <code>prompt</code>/<code>max_gen_len</code>. Manter código para todos é trabalhoso e frágil. Por isso a próxima seção apresenta a <strong>Converse API</strong>.</p>
           </div>
         </div>
 
         <div class="topic-block">
-          <h3>3. Chatbot com Bedrock (Projeto)</h3>
+          <h3>🛡️ Tratamento de Erros na Invocação</h3>
           <div class="command-card wide">
-            <div class="command-header"><code>chatbot_aws.py</code><span class="cmd-tag">Projeto</span></div>
+            <h4>📋 Chamada Robusta com Retry e Tratamento de Exceções</h4>
+            <pre><code>import time
+from botocore.exceptions import ClientError
+
+def invocar_com_retry(prompt: str, tentativas: int = 3) -> str:
+    """Invoca o modelo com retry exponencial para throttling."""
+    for tentativa in range(tentativas):
+        try:
+            return invocar_claude(prompt)
+        except ClientError as e:
+            codigo = e.response['Error']['Code']
+            if codigo == 'ThrottlingException':
+                espera = 2 ** tentativa  # backoff exponencial: 1s, 2s, 4s
+                print(f"⏳ Throttling. Aguardando {espera}s...")
+                time.sleep(espera)
+            elif codigo == 'AccessDeniedException':
+                raise RuntimeError(
+                    "Sem acesso ao modelo. Habilite em Bedrock > Model access."
+                ) from e
+            elif codigo == 'ValidationException':
+                raise ValueError(f"Body inválido: {e}") from e
+            else:
+                raise
+    raise RuntimeError(f"Falhou após {tentativas} tentativas")</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 3: CONVERSE API — INTERFACE UNIFICADA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Converse API — A Interface Unificada</h2>
+          <p>A Converse API (lançada em 2024) é a forma moderna e recomendada de usar o Bedrock. Ela oferece um formato único de request/response que funciona com todos os modelos, elimina a necessidade de conhecer o formato de cada provedor e suporta conversas multi-turno, system prompts, tool use e visão de forma padronizada.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>💬 Converse — Chamada Básica</h3>
+          <div class="command-card wide">
+            <h4>📋 Mesmo Código para Qualquer Modelo</h4>
+            <pre><code>import boto3
+
+bedrock_runtime = boto3.client('bedrock-runtime', region_name='us-east-1')
+
+def conversar(prompt: str, model_id: str = "anthropic.claude-3-sonnet-20240229-v1:0") -> str:
+    """Usa a Converse API — mesmo formato para Claude, Titan, Llama, etc."""
+    response = bedrock_runtime.converse(
+        modelId=model_id,
+        messages=[
+            {
+                "role": "user",
+                "content": [{"text": prompt}]
+            }
+        ],
+        inferenceConfig={
+            "maxTokens": 1024,
+            "temperature": 0.7,
+            "topP": 0.9
+        }
+    )
+
+    return response['output']['message']['content'][0]['text']
+
+# Trocar de modelo é só mudar o argumento — o código não muda!
+print(conversar("Explique o que é o DynamoDB."))
+print(conversar("Explique o que é o DynamoDB.", "meta.llama3-8b-instruct-v1:0"))
+print(conversar("Explique o que é o DynamoDB.", "amazon.titan-text-express-v1"))</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧵 Conversas Multi-turno com System Prompt</h3>
+          <div class="command-card wide">
+            <h4>📋 Mantendo Contexto entre Mensagens</h4>
+            <pre><code>def conversa_completa():
+    system = [{"text": "Você é um tutor de AWS. Seja conciso e didático."}]
+
+    messages = [
+        {"role": "user", "content": [{"text": "O que é o S3?"}]}
+    ]
+
+    response = bedrock_runtime.converse(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        system=system,
+        messages=messages,
+        inferenceConfig={"maxTokens": 512, "temperature": 0.3}
+    )
+
+    resposta_assistente = response['output']['message']
+    print("Assistente:", resposta_assistente['content'][0]['text'])
+
+    # Adiciona a resposta ao histórico e faz nova pergunta com contexto
+    messages.append(resposta_assistente)
+    messages.append({
+        "role": "user",
+        "content": [{"text": "E como ele difere do EBS?"}]
+    })
+
+    response2 = bedrock_runtime.converse(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        system=system,
+        messages=messages,
+        inferenceConfig={"maxTokens": 512}
+    )
+    print("Assistente:", response2['output']['message']['content'][0]['text'])
+
+    # A Converse API retorna uso de tokens padronizado
+    uso = response2['usage']
+    print(f"\nTokens: {uso['inputTokens']} entrada, {uso['outputTokens']} saída, {uso['totalTokens']} total")
+
+conversa_completa()</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>✅ Vantagens da Converse API</h4>
+            <ul>
+              <li>Formato único independente do provedor (troca de modelo sem reescrever código)</li>
+              <li><code>usage</code> padronizado com <code>inputTokens</code>/<code>outputTokens</code>/<code>totalTokens</code></li>
+              <li>Suporte nativo a system prompts, imagens, documentos e tool use</li>
+              <li>Método <code>converse_stream()</code> para streaming com a mesma interface</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>👁️ Visão — Enviando Imagens para o Modelo</h3>
+          <div class="command-card wide">
+            <h4>📋 Análise de Imagem com Claude via Converse</h4>
+            <pre><code>def analisar_imagem(caminho_imagem: str, pergunta: str) -> str:
+    """Envia uma imagem para o Claude 3 analisar."""
+    with open(caminho_imagem, 'rb') as f:
+        bytes_imagem = f.read()
+
+    response = bedrock_runtime.converse(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"text": pergunta},
+                    {
+                        "image": {
+                            "format": "png",  # png, jpeg, gif, webp
+                            "source": {"bytes": bytes_imagem}
+                        }
+                    }
+                ]
+            }
+        ],
+        inferenceConfig={"maxTokens": 1024}
+    )
+    return response['output']['message']['content'][0]['text']
+
+# Uso: analisar um diagrama de arquitetura
+descricao = analisar_imagem(
+    "diagrama_arquitetura.png",
+    "Descreva a arquitetura AWS mostrada nesta imagem e aponte possíveis riscos de segurança."
+)
+print(descricao)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 4: STREAMING DE RESPOSTAS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Streaming de Respostas em Tempo Real</h2>
+          <p>Para experiências de chat responsivas, você não quer esperar a resposta completa antes de exibir algo. O streaming entrega a resposta token a token, conforme o modelo gera — exatamente como você vê em interfaces de chat modernas. O Bedrock suporta streaming tanto no InvokeModel quanto na Converse API.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌊 Streaming com converse_stream()</h3>
+          <div class="command-card wide">
+            <h4>📋 Exibindo Tokens Conforme São Gerados</h4>
+            <pre><code>def conversar_streaming(prompt: str):
+    """Faz streaming da resposta, imprimindo token a token."""
+    response = bedrock_runtime.converse_stream(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        messages=[{"role": "user", "content": [{"text": prompt}]}],
+        inferenceConfig={"maxTokens": 1024}
+    )
+
+    texto_completo = ""
+    for evento in response['stream']:
+        if 'contentBlockDelta' in evento:
+            trecho = evento['contentBlockDelta']['delta']['text']
+            print(trecho, end='', flush=True)  # imprime sem quebra de linha
+            texto_completo += trecho
+
+        # Evento final com metadados de uso
+        elif 'metadata' in evento:
+            uso = evento['metadata']['usage']
+            print(f"\n\n[Tokens: {uso['totalTokens']}]")
+
+    return texto_completo
+
+conversar_streaming("Escreva um tutorial passo a passo de como criar uma função Lambda.")</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>⚡ Streaming com InvokeModelWithResponseStream</h3>
+          <div class="command-card wide">
+            <h4>📋 Streaming de Baixo Nível (Claude)</h4>
+            <pre><code>def invoke_streaming(prompt: str):
+    """Streaming usando invoke_model_with_response_stream."""
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 1024,
+        "messages": [{"role": "user", "content": prompt}]
+    })
+
+    response = bedrock_runtime.invoke_model_with_response_stream(
+        modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+        body=body
+    )
+
+    for evento in response['body']:
+        chunk = json.loads(evento['chunk']['bytes'])
+        if chunk['type'] == 'content_block_delta':
+            print(chunk['delta']['text'], end='', flush=True)
+
+invoke_streaming("Explique o conceito de idempotência em APIs.")</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>💡 Streaming em aplicações web</h4>
+            <p>Em uma API (FastAPI, Flask) você repassa esses chunks como Server-Sent Events (SSE) ou WebSocket para o navegador, criando a experiência de "digitação" em tempo real. Em Lambda + API Gateway, use response streaming das Lambda Function URLs para suportar esse padrão.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 5: EMBEDDINGS E BUSCA SEMÂNTICA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Embeddings e Busca Semântica</h2>
+          <p>Embeddings são representações vetoriais de texto — listas de números que capturam o significado semântico. Textos com significados parecidos ficam próximos no espaço vetorial. São a base da busca semântica, sistemas de recomendação e do RAG que veremos na próxima seção.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔢 Gerando Embeddings com Titan</h3>
+          <div class="command-card wide">
+            <h4>📋 Vetorizando Texto</h4>
+            <pre><code>import json
+import numpy as np
+
+def gerar_embedding(texto: str) -> list:
+    """Gera um vetor de embedding para o texto usando Titan Embeddings."""
+    body = json.dumps({"inputText": texto})
+
+    response = bedrock_runtime.invoke_model(
+        modelId="amazon.titan-embed-text-v2:0",
+        body=body
+    )
+
+    resultado = json.loads(response['body'].read())
+    return resultado['embedding']  # vetor de 1024 dimensões (v2)
+
+def similaridade_cosseno(a: list, b: list) -> float:
+    """Calcula a similaridade de cosseno entre dois vetores (-1 a 1)."""
+    a, b = np.array(a), np.array(b)
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+# Comparando significados
+emb1 = gerar_embedding("Como criar um bucket no S3?")
+emb2 = gerar_embedding("Passos para provisionar armazenamento de objetos na AWS")
+emb3 = gerar_embedding("Receita de bolo de chocolate")
+
+print(f"S3 vs Storage AWS: {similaridade_cosseno(emb1, emb2):.3f}")  # ~0.7 (alto)
+print(f"S3 vs Bolo:        {similaridade_cosseno(emb1, emb3):.3f}")  # ~0.1 (baixo)</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔍 Construindo uma Busca Semântica</h3>
+          <div class="command-card wide">
+            <h4>📋 Mini Motor de Busca por Significado</h4>
+            <pre><code>class BuscaSemantica:
+    """Índice simples de busca semântica em memória."""
+
+    def __init__(self):
+        self.documentos = []   # textos originais
+        self.vetores = []      # embeddings correspondentes
+
+    def indexar(self, textos: list):
+        """Gera e armazena embeddings para uma lista de textos."""
+        for texto in textos:
+            self.documentos.append(texto)
+            self.vetores.append(gerar_embedding(texto))
+        print(f"✅ {len(textos)} documentos indexados")
+
+    def buscar(self, consulta: str, top_k: int = 3) -> list:
+        """Retorna os top_k documentos mais similares à consulta."""
+        vetor_consulta = gerar_embedding(consulta)
+
+        pontuacoes = [
+            (doc, similaridade_cosseno(vetor_consulta, vet))
+            for doc, vet in zip(self.documentos, self.vetores)
+        ]
+        pontuacoes.sort(key=lambda x: x[1], reverse=True)
+        return pontuacoes[:top_k]
+
+# Uso
+indice = BuscaSemantica()
+indice.indexar([
+    "O S3 é um serviço de armazenamento de objetos escalável.",
+    "O Lambda executa código sem provisionar servidores.",
+    "O DynamoDB é um banco de dados NoSQL totalmente gerenciado.",
+    "O EC2 fornece capacidade de computação redimensionável.",
+    "O CloudFront é uma CDN para entrega de conteúdo com baixa latência.",
+])
+
+for doc, score in indice.buscar("Onde guardo meus arquivos na nuvem?"):
+    print(f"{score:.3f} → {doc}")
+# O documento sobre S3 aparece no topo, mesmo sem conter a palavra "arquivo"</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🗄️ Em produção: bancos vetoriais</h4>
+            <p>Para volumes reais, não guarde vetores em listas Python. Use bancos vetoriais como <strong>Amazon OpenSearch Serverless</strong>, <strong>pgvector</strong> (PostgreSQL/RDS), ou o <strong>Amazon Bedrock Knowledge Bases</strong>, que gerenciam a indexação e a busca por vizinhos mais próximos (ANN) de forma eficiente e escalável.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 6: RAG — RETRIEVAL-AUGMENTED GENERATION
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>RAG — Retrieval-Augmented Generation</h2>
+          <p>RAG combina busca semântica com geração de texto. Em vez de o modelo responder só com o que "sabe" do treinamento, você recupera trechos relevantes da sua própria base de conhecimento e os injeta no prompt. Isso reduz alucinações, mantém as respostas atualizadas e permite ao modelo citar fontes específicas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔗 O Padrão RAG na Prática</h3>
+          <div class="command-card wide">
+            <h4>📋 Pipeline RAG Completo</h4>
+            <pre><code>class SistemaRAG:
+    """RAG: busca contexto relevante e gera resposta fundamentada."""
+
+    def __init__(self):
+        self.indice = BuscaSemantica()
+
+    def carregar_base(self, documentos: list):
+        self.indice.indexar(documentos)
+
+    def responder(self, pergunta: str, top_k: int = 3) -> str:
+        # 1. RECUPERAÇÃO: busca os trechos mais relevantes
+        resultados = self.indice.buscar(pergunta, top_k=top_k)
+        contexto = "\n\n".join(f"- {doc}" for doc, _ in resultados)
+
+        # 2. AUMENTO: injeta o contexto no prompt
+        prompt = f"""Use APENAS o contexto abaixo para responder à pergunta.
+Se a resposta não estiver no contexto, diga "Não encontrei essa informação".
+
+CONTEXTO:
+{contexto}
+
+PERGUNTA: {pergunta}
+
+RESPOSTA:"""
+
+        # 3. GERAÇÃO: o modelo responde fundamentado no contexto
+        response = bedrock_runtime.converse(
+            modelId="anthropic.claude-3-haiku-20240307-v1:0",  # Haiku = barato
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            inferenceConfig={"maxTokens": 512, "temperature": 0}  # 0 = factual
+        )
+        return response['output']['message']['content'][0]['text']
+
+# Uso: base de conhecimento interna sobre políticas da empresa
+rag = SistemaRAG()
+rag.carregar_base([
+    "A política de backup exige retenção de 30 dias para dados de produção.",
+    "Deploys em produção só podem ocorrer entre 8h e 18h em dias úteis.",
+    "Todo bucket S3 novo deve ter block public access habilitado por padrão.",
+    "Credenciais IAM devem ser rotacionadas a cada 90 dias.",
+])
+
+print(rag.responder("Por quanto tempo os backups de produção são mantidos?"))
+print(rag.responder("Posso fazer deploy no domingo?"))</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>🎯 Por que RAG é tão usado</h4>
+            <ul>
+              <li><strong>Atualização sem re-treino:</strong> basta adicionar documentos à base</li>
+              <li><strong>Menos alucinação:</strong> o modelo responde com base em fatos fornecidos</li>
+              <li><strong>Rastreabilidade:</strong> você sabe de qual documento veio a resposta</li>
+              <li><strong>Privacidade:</strong> dados sensíveis ficam na sua base, não no modelo</li>
+            </ul>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>⚙️ Bedrock Knowledge Bases</h4>
+            <p>A AWS oferece o <strong>Bedrock Knowledge Bases</strong>, um serviço gerenciado que automatiza todo o pipeline RAG: ingestão de documentos do S3, chunking, geração de embeddings, armazenamento em banco vetorial (OpenSearch) e recuperação. Você usa a API <code>retrieve_and_generate()</code> e o serviço cuida do resto.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 7: FUNCTION CALLING (TOOL USE)
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Function Calling (Tool Use)</h2>
+          <p>Tool use permite que o modelo chame funções do seu código. Você descreve as ferramentas disponíveis (nome, descrição, parâmetros) e o modelo decide quando usá-las, retornando os argumentos estruturados. Isso transforma um LLM de um gerador de texto em um agente capaz de consultar bancos de dados, chamar APIs e executar ações.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🛠️ Definindo e Executando Ferramentas</h3>
+          <div class="command-card wide">
+            <h4>📋 Tool Use com a Converse API</h4>
+            <pre><code>import json
+
+# Funções reais que o modelo poderá "chamar"
+def obter_clima(cidade: str) -> dict:
+    """Simula consulta a uma API de clima."""
+    dados = {"São Paulo": 24, "Rio de Janeiro": 30, "Curitiba": 18}
+    return {"cidade": cidade, "temperatura_c": dados.get(cidade, 22)}
+
+def listar_instancias_ec2(estado: str = "running") -> dict:
+    """Simula listagem de instâncias EC2."""
+    return {"estado": estado, "quantidade": 5, "tipos": ["t3.micro", "t3.small"]}
+
+# Registro de ferramentas disponíveis
+FERRAMENTAS = {"obter_clima": obter_clima, "listar_instancias_ec2": listar_instancias_ec2}
+
+tool_config = {
+    "tools": [
+        {
+            "toolSpec": {
+                "name": "obter_clima",
+                "description": "Obtém a temperatura atual de uma cidade brasileira.",
+                "inputSchema": {"json": {
+                    "type": "object",
+                    "properties": {"cidade": {"type": "string", "description": "Nome da cidade"}},
+                    "required": ["cidade"]
+                }}
+            }
+        },
+        {
+            "toolSpec": {
+                "name": "listar_instancias_ec2",
+                "description": "Lista instâncias EC2 por estado (running, stopped).",
+                "inputSchema": {"json": {
+                    "type": "object",
+                    "properties": {"estado": {"type": "string"}},
+                    "required": []
+                }}
+            }
+        }
+    ]
+}
+
+def agente_com_ferramentas(pergunta: str) -> str:
+    messages = [{"role": "user", "content": [{"text": pergunta}]}]
+
+    while True:
+        response = bedrock_runtime.converse(
+            modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+            messages=messages,
+            toolConfig=tool_config,
+            inferenceConfig={"maxTokens": 1024}
+        )
+
+        saida = response['output']['message']
+        messages.append(saida)
+
+        # O modelo quer usar uma ferramenta?
+        if response['stopReason'] == 'tool_use':
+            for bloco in saida['content']:
+                if 'toolUse' in bloco:
+                    tool = bloco['toolUse']
+                    nome = tool['name']
+                    args = tool['input']
+                    print(f"🔧 Modelo chamou: {nome}({args})")
+
+                    # Executa a função real
+                    resultado = FERRAMENTAS[nome](**args)
+
+                    # Devolve o resultado ao modelo
+                    messages.append({
+                        "role": "user",
+                        "content": [{
+                            "toolResult": {
+                                "toolUseId": tool['toolUseId'],
+                                "content": [{"json": resultado}]
+                            }
+                        }]
+                    })
+        else:
+            # Resposta final em texto
+            return saida['content'][0]['text']
+
+print(agente_com_ferramentas("Qual a temperatura em Curitiba e quantas EC2 estão rodando?"))</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Segurança em tool use</h4>
+            <p>O modelo decide QUAIS argumentos passar, mas VOCÊ controla o que a função faz. Nunca dê ao modelo ferramentas que executem ações destrutivas sem validação. Sempre valide os argumentos, aplique least privilege nas permissões IAM da Lambda, e exija confirmação humana para operações sensíveis (deletar recursos, gastar dinheiro, enviar e-mails em massa).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 8: PROMPT ENGINEERING E CONTROLE DE CUSTOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 8</span>
+          <h2>Prompt Engineering e Controle de Custos</h2>
+          <p>A qualidade e o custo das respostas dependem diretamente de como você escreve os prompts e de quantos tokens consome. Esta seção reúne técnicas práticas para obter respostas melhores gastando menos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>✍️ Técnicas de Prompt Engineering</h3>
+          <div class="command-card wide">
+            <h4>📋 Padrões que Melhoram Respostas</h4>
+            <pre><code># 1. SEJA ESPECÍFICO E DÊ CONTEXTO
+prompt_ruim = "Escreva sobre segurança."
+prompt_bom = """Você é um engenheiro de segurança AWS.
+Liste 5 controles de segurança essenciais para um bucket S3 que armazena
+dados de clientes (LGPD). Para cada um, dê o comando AWS CLI correspondente."""
+
+# 2. USE FEW-SHOT (exemplos) para formatar a saída
+prompt_fewshot = """Classifique o sentimento como POSITIVO, NEGATIVO ou NEUTRO.
+
+Texto: "O deploy funcionou perfeitamente!" → POSITIVO
+Texto: "O sistema caiu de novo." → NEGATIVO
+Texto: "O build terminou." → NEUTRO
+Texto: "Adorei a nova feature, muito rápida!" →"""
+
+# 3. PEÇA RACIOCÍNIO PASSO A PASSO (chain-of-thought)
+prompt_cot = """Resolva passo a passo:
+Um bucket S3 recebe 10 milhões de requests GET por mês a $0.0004 por 1.000 requests.
+Qual o custo mensal? Mostre o cálculo antes da resposta final."""
+
+# 4. FORCE FORMATO ESTRUTURADO (JSON) para parsing automático
+prompt_json = """Extraia as informações e responda APENAS com JSON válido:
+Texto: "Instância i-0abc123 do tipo t3.large na região us-east-1 está parada."
+
+Formato: {"instance_id": "", "tipo": "", "regiao": "", "estado": ""}"""</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>💡 Boas práticas de prompt</h4>
+            <ul>
+              <li><strong>Papel + tarefa + formato:</strong> diga quem o modelo é, o que fazer e como responder</li>
+              <li><strong>Delimitadores:</strong> use marcadores claros (CONTEXTO:, PERGUNTA:) para separar seções</li>
+              <li><strong>Restrições explícitas:</strong> "responda em no máximo 3 frases", "use apenas o contexto"</li>
+              <li><strong>Temperature baixa</strong> para tarefas factuais/extração; alta para criatividade</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>💰 Rastreando e Reduzindo Custos</h3>
+          <div class="command-card wide">
+            <h4>📋 Calculadora de Custo de Tokens</h4>
+            <pre><code># Preços aproximados por 1.000 tokens (verifique a tabela oficial atual)
+PRECOS = {
+    "anthropic.claude-3-haiku-20240307-v1:0":  {"entrada": 0.00025, "saida": 0.00125},
+    "anthropic.claude-3-sonnet-20240229-v1:0": {"entrada": 0.003,   "saida": 0.015},
+    "amazon.titan-text-express-v1":            {"entrada": 0.0002,  "saida": 0.0006},
+}
+
+def calcular_custo(model_id: str, tokens_entrada: int, tokens_saida: int) -> float:
+    p = PRECOS[model_id]
+    custo = (tokens_entrada / 1000 * p["entrada"]) + (tokens_saida / 1000 * p["saida"])
+    return round(custo, 6)
+
+def conversar_com_custo(prompt: str, model_id: str) -> dict:
+    response = bedrock_runtime.converse(
+        modelId=model_id,
+        messages=[{"role": "user", "content": [{"text": prompt}]}],
+        inferenceConfig={"maxTokens": 512}
+    )
+    uso = response['usage']
+    custo = calcular_custo(model_id, uso['inputTokens'], uso['outputTokens'])
+    return {
+        "resposta": response['output']['message']['content'][0]['text'],
+        "tokens": uso['totalTokens'],
+        "custo_usd": custo
+    }
+
+r = conversar_com_custo("Resuma o que é o AWS Bedrock em 2 frases.",
+                        "anthropic.claude-3-haiku-20240307-v1:0")
+print(f"Custo: ${r['custo_usd']} | Tokens: {r['tokens']}")</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Estratégias de redução de custo</h4>
+            <ul>
+              <li><strong>Escolha o modelo certo:</strong> Haiku custa ~12x menos que Sonnet para tarefas simples</li>
+              <li><strong>Limite max_tokens:</strong> não gere mais do que precisa</li>
+              <li><strong>Cache respostas:</strong> perguntas repetidas não precisam nova inferência (use DynamoDB/ElastiCache)</li>
+              <li><strong>Prompt caching:</strong> o Bedrock suporta cache de prompts longos reutilizados, reduzindo custo de entrada</li>
+              <li><strong>Encurte prompts:</strong> contexto desnecessário aumenta tokens de entrada em toda chamada</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 9: PROJETO COMPLETO — CHATBOT AWS COM MEMÓRIA
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 9</span>
+          <h2>Projeto Completo — Chatbot AWS com Memória e Custos</h2>
+          <p>Vamos reunir tudo o que aprendemos em um chatbot especialista em AWS de produção: mantém histórico de conversa, usa system prompt, rastreia custos por sessão, suporta streaming, persiste conversas em disco e controla o modelo usado. Um projeto real que você pode adaptar para um bot interno ou uma feature de produto.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🤖 Implementação do Chatbot</h3>
+          <div class="command-card wide">
+            <h4>📋 chatbot_aws.py — Aplicação Completa</h4>
             <pre><code>"""
-Projeto: Chatbot especialista em AWS usando Bedrock
-- Mantém histórico de conversa
-- Usa Claude como modelo base
-- Contexto de sistema como especialista AWS
-- Salva conversas em JSON
+Chatbot especialista em AWS usando Amazon Bedrock (Converse API).
+Recursos: memória de conversa, streaming, rastreio de custo, persistência.
 """
 import boto3
 import json
 from datetime import datetime
+from pathlib import Path
+
 
 class ChatbotAWS:
-    def __init__(self, modelo="anthropic.claude-3-sonnet-20240229-v1:0"):
-        self.bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
-        self.modelo = modelo
-        self.historico = []
-        self.sistema = (
-            "Você é um especialista AWS certificado. "
-            "Responda de forma clara e prática, com exemplos de código quando relevante. "
-            "Sempre mencione boas práticas de segurança e custo."
+    PRECOS = {
+        "anthropic.claude-3-haiku-20240307-v1:0":  {"entrada": 0.00025, "saida": 0.00125},
+        "anthropic.claude-3-sonnet-20240229-v1:0": {"entrada": 0.003,   "saida": 0.015},
+    }
+
+    def __init__(self, model_id: str = "anthropic.claude-3-haiku-20240307-v1:0"):
+        self.client = boto3.client('bedrock-runtime', region_name='us-east-1')
+        self.model_id = model_id
+        self.messages = []          # histórico da conversa
+        self.custo_total = 0.0      # custo acumulado da sessão
+        self.tokens_total = 0
+        self.system = [{"text": (
+            "Você é um especialista AWS certificado (Solutions Architect). "
+            "Responda de forma clara e prática, com exemplos de código quando "
+            "relevante. Sempre mencione boas práticas de segurança e custo. "
+            "Se não souber, diga que não sabe."
+        )}]
+
+    def _registrar_custo(self, uso: dict):
+        p = self.PRECOS.get(self.model_id, {"entrada": 0, "saida": 0})
+        custo = (uso['inputTokens'] / 1000 * p['entrada'] +
+                 uso['outputTokens'] / 1000 * p['saida'])
+        self.custo_total += custo
+        self.tokens_total += uso['totalTokens']
+
+    def enviar(self, mensagem: str) -> str:
+        """Envia mensagem, mantém contexto e retorna a resposta."""
+        self.messages.append({"role": "user", "content": [{"text": mensagem}]})
+
+        response = self.client.converse(
+            modelId=self.model_id,
+            system=self.system,
+            messages=self.messages,
+            inferenceConfig={"maxTokens": 2048, "temperature": 0.3}
         )
 
-    def enviar(self, mensagem):
-        self.historico.append({"role": "user", "content": mensagem})
+        resposta_msg = response['output']['message']
+        self.messages.append(resposta_msg)
+        self._registrar_custo(response['usage'])
+        return resposta_msg['content'][0]['text']
 
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 2048,
-            "system": self.sistema,
-            "messages": self.historico
-        })
+    def enviar_streaming(self, mensagem: str) -> str:
+        """Versão com streaming — imprime token a token."""
+        self.messages.append({"role": "user", "content": [{"text": mensagem}]})
 
-        response = self.bedrock.invoke_model(
-            modelId=self.modelo,
-            contentType="application/json",
-            accept="application/json",
-            body=body
+        response = self.client.converse_stream(
+            modelId=self.model_id,
+            system=self.system,
+            messages=self.messages,
+            inferenceConfig={"maxTokens": 2048, "temperature": 0.3}
         )
 
-        resultado = json.loads(response["body"].read())
-        resposta = resultado["content"][0]["text"]
-        self.historico.append({"role": "assistant", "content": resposta})
-        return resposta
+        texto = ""
+        for evento in response['stream']:
+            if 'contentBlockDelta' in evento:
+                trecho = evento['contentBlockDelta']['delta']['text']
+                print(trecho, end='', flush=True)
+                texto += trecho
+            elif 'metadata' in evento:
+                self._registrar_custo(evento['metadata']['usage'])
 
-    def salvar_conversa(self):
-        arquivo = f"conversa_{datetime.now():%Y%m%d_%H%M%S}.json"
-        with open(arquivo, "w", encoding="utf-8") as f:
-            json.dump(self.historico, f, indent=2, ensure_ascii=False)
+        self.messages.append({"role": "assistant", "content": [{"text": texto}]})
+        print()
+        return texto
+
+    def resumo_sessao(self) -> str:
+        return (f"Mensagens: {len(self.messages)} | "
+                f"Tokens: {self.tokens_total} | "
+                f"Custo: ${self.custo_total:.4f}")
+
+    def salvar(self, pasta: str = "conversas"):
+        Path(pasta).mkdir(exist_ok=True)
+        arquivo = Path(pasta) / f"conversa_{datetime.now():%Y%m%d_%H%M%S}.json"
+        dados = {
+            "model_id": self.model_id,
+            "custo_total": round(self.custo_total, 6),
+            "tokens_total": self.tokens_total,
+            "messages": self.messages,
+        }
+        arquivo.write_text(json.dumps(dados, indent=2, ensure_ascii=False),
+                           encoding="utf-8")
         print(f"💾 Conversa salva em {arquivo}")
 
-if __name__ == "__main__":
+
+def main():
     bot = ChatbotAWS()
-    print("🤖 Chatbot AWS (digite 'sair' para encerrar)\n")
+    print("🤖 Chatbot AWS — Bedrock (digite 'sair' para encerrar)\n")
+
     while True:
-        pergunta = input("Você: ")
+        pergunta = input("Você: ").strip()
         if pergunta.lower() in ("sair", "exit", "quit"):
-            bot.salvar_conversa()
+            print(f"\n📊 {bot.resumo_sessao()}")
+            bot.salvar()
             break
-        resposta = bot.enviar(pergunta)
-        print(f"\n🤖 {resposta}\n")</code></pre>
+        if not pergunta:
+            continue
+
+        print("\n🤖 ", end="")
+        bot.enviar_streaming(pergunta)
+        print(f"   [{bot.resumo_sessao()}]\n")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🚀 Evoluindo o projeto</h4>
+            <ul>
+              <li><strong>Persistir memória no DynamoDB</strong> para conversas que sobrevivem entre execuções</li>
+              <li><strong>Empacotar em Lambda</strong> + API Gateway (ou Function URL com streaming) para servir via web</li>
+              <li><strong>Adicionar RAG</strong> com Bedrock Knowledge Bases para respostas fundamentadas na sua documentação</li>
+              <li><strong>Tool use</strong> para o bot consultar recursos AWS reais (custos, instâncias, alarmes)</li>
+              <li><strong>Guardrails do Bedrock</strong> para filtrar conteúdo indevido e proteger dados sensíveis</li>
+            </ul>
           </div>
         </div>
+      </div>
+    </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         SEÇÃO 10: EXERCÍCIOS PRÁTICOS
+    ════════════════════════════════════════════════════════════════════════════ -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 10</span>
+          <h2>Exercícios Práticos</h2>
+          <p>Consolide o aprendizado com estes exercícios. Cada um exercita um conceito-chave do módulo. Tente resolver antes de olhar a solução.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>📝 Exercício 1 — Classificador de Sentimento</h3>
+          <p>Crie uma função que use o Claude Haiku para classificar o sentimento de uma lista de comentários como POSITIVO, NEGATIVO ou NEUTRO, retornando um dicionário com a contagem de cada categoria.</p>
+          <details>
+            <summary>Ver solução</summary>
+            <div class="command-card wide">
+              <pre><code>from collections import Counter
+
+def classificar_sentimentos(comentarios: list) -> dict:
+    resultados = []
+    for c in comentarios:
+        prompt = (f"Classifique o sentimento como POSITIVO, NEGATIVO ou NEUTRO. "
+                  f"Responda APENAS a palavra.\nTexto: \"{c}\"")
+        r = conversar(prompt, "anthropic.claude-3-haiku-20240307-v1:0")
+        resultados.append(r.strip().upper())
+    return dict(Counter(resultados))
+
+print(classificar_sentimentos([
+    "Adorei o serviço!", "Péssimo atendimento.", "Chegou no prazo."
+]))</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>📝 Exercício 2 — Extrator de Dados Estruturados</h3>
+          <p>Escreva uma função que receba um texto livre descrevendo um recurso AWS e retorne um dicionário Python estruturado (parseado do JSON gerado pelo modelo) com os campos: serviço, região e estado.</p>
+          <details>
+            <summary>Ver solução</summary>
+            <div class="command-card wide">
+              <pre><code>import json
+
+def extrair_recurso(texto: str) -> dict:
+    prompt = f"""Extraia as informações e responda APENAS com JSON válido,
+sem texto adicional:
+Texto: "{texto}"
+Formato: {{"servico": "", "regiao": "", "estado": ""}}"""
+
+    resposta = conversar(prompt, "anthropic.claude-3-haiku-20240307-v1:0")
+    # Remove eventuais cercas de código markdown
+    resposta = resposta.strip().removeprefix("```json").removeprefix("```").removesuffix("```")
+    return json.loads(resposta)
+
+print(extrair_recurso("A instância EC2 em sa-east-1 está atualmente parada."))</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>📝 Exercício 3 — Resumidor de Logs</h3>
+          <p>Crie uma função que receba várias linhas de log de erro e use o Bedrock para gerar um resumo executivo em português, destacando os principais problemas e sugerindo próximas ações.</p>
+          <details>
+            <summary>Ver solução</summary>
+            <div class="command-card wide">
+              <pre><code>def resumir_logs(logs: list) -> str:
+    texto_logs = "\n".join(logs)
+    prompt = f"""Você é um SRE. Analise os logs de erro abaixo e produza:
+1. Resumo executivo (2 frases)
+2. Principais problemas identificados
+3. Próximas ações recomendadas
+
+LOGS:
+{texto_logs}"""
+
+    return conversar(prompt, "anthropic.claude-3-sonnet-20240229-v1:0")
+
+print(resumir_logs([
+    "ERROR 2026-09-02 DynamoDB ProvisionedThroughputExceeded on table leads",
+    "ERROR 2026-09-02 Lambda register_lead timeout after 3000ms",
+    "WARN  2026-09-02 API Gateway 5xx rate at 12%",
+]))</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="topic-block">
+          <h3>📝 Exercício 4 — RAG sobre suas Anotações</h3>
+          <p>Usando a classe <code>SistemaRAG</code> da Seção 6, carregue 5 fatos sobre um assunto de sua escolha e faça 3 perguntas — incluindo uma cuja resposta NÃO esteja na base, para verificar se o modelo responde corretamente que não encontrou a informação.</p>
+          <details>
+            <summary>Ver solução</summary>
+            <div class="command-card wide">
+              <pre><code>rag = SistemaRAG()
+rag.carregar_base([
+    "O plano gratuito da AWS oferece 750 horas de EC2 t2.micro por mês.",
+    "O free tier do S3 inclui 5 GB de armazenamento standard.",
+    "O Lambda tem 1 milhão de requests gratuitos por mês no free tier.",
+    "O free tier do DynamoDB oferece 25 GB de armazenamento.",
+    "O CloudFront inclui 1 TB de transferência de dados no free tier.",
+])
+
+print(rag.responder("Quantas horas de EC2 o free tier oferece?"))   # na base
+print(rag.responder("Quanto custa o Amazon Bedrock?"))              # NÃO na base
+print(rag.responder("Qual o limite gratuito do Lambda?"))           # na base</code></pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="info-box highlight">
+          <h4>🎯 Resumo do Módulo 10</h4>
+          <p>Neste módulo você aprendeu a integrar IA generativa em aplicações Python com o Amazon Bedrock:</p>
+          <ul>
+            <li><strong>Bedrock</strong> — foundation models gerenciados, clients de gerenciamento vs runtime, custos por modelo</li>
+            <li><strong>InvokeModel</strong> — invocação direta de Claude, Titan e Llama (formatos por provedor)</li>
+            <li><strong>Converse API</strong> — interface unificada, multi-turno, system prompts e visão</li>
+            <li><strong>Streaming</strong> — respostas token a token para experiências responsivas</li>
+            <li><strong>Embeddings</strong> — vetorização e busca semântica por significado</li>
+            <li><strong>RAG</strong> — respostas fundamentadas em base de conhecimento própria</li>
+            <li><strong>Tool use</strong> — o modelo chamando funções do seu código como um agente</li>
+            <li><strong>Prompt engineering e custos</strong> — respostas melhores gastando menos</li>
+            <li><strong>Projeto</strong> — chatbot AWS completo com memória, streaming e rastreio de custo</li>
+          </ul>
+          <p>Este é o último módulo da trilha de Python. Você percorreu dos fundamentos da linguagem até a construção de aplicações inteligentes na nuvem. Parabéns pela jornada! 🎉</p>
+        </div>
       </div>
     </section>
 
@@ -246,7 +1250,7 @@ if __name__ == "__main__":
     <section class="learning-section">
       <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
         <a href="modulo-09.html" class="button secondary">← Módulo Anterior</a>
-        <a href="../python.html" class="button primary">Voltar ao Curso</a>
+        <a href="../python.html" class="button primary">Voltar ao Curso →</a>
       </div>
     </section>
   </main>
@@ -255,7 +1259,7 @@ if __name__ == "__main__":
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

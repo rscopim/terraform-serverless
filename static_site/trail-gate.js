@@ -1,209 +1,115 @@
 /**
- * CloudTrilhas — Trail Gate (Identificação de Usuário)
- * 
- * Componente reutilizável que bloqueia acesso ao conteúdo de trilhas
- * até o usuário se identificar. Dados são salvos no localStorage
- * e enviados ao backend para registro no DynamoDB.
- * 
- * Uso: Incluir este script em qualquer página de módulo/trilha.
- * <script src="../trail-gate.js"></script> (ou src="trail-gate.js" na raiz)
- * 
- * O script deve ser carregado ANTES de config.js e app.js.
+ * CloudTrilhas — Trail Gate (Autenticação de Alunos via Cognito)
+ *
+ * Bloqueia o acesso ao conteúdo das trilhas até o aluno estar autenticado
+ * (sessão Cognito válida). Sem sessão → redireciona para login.html com o
+ * parâmetro ?redirect apontando de volta para a página atual.
+ *
+ * É AUTO-SUFICIENTE: carrega dinamicamente config.js e auth.js caso ainda
+ * não estejam presentes, então não depende da ordem dos <script> na página.
+ * Basta incluir <script src="../trail-gate.js"></script> (ou "trail-gate.js"
+ * na raiz) em qualquer página de trilha.
+ *
+ * Nota de segurança: por ser um site estático, este gate é uma barreira de
+ * navegação. O login Cognito é seguro, mas o HTML ainda pode ser baixado por
+ * quem tiver a URL exata (ver PLANO — decisão de não usar Lambda@Edge para
+ * não impactar o custo do CloudFront).
  */
-
-(function() {
+(function () {
   'use strict';
 
-  var STORAGE_KEY = 'cloudtrilhas_trail_user';
-
-  // ===== VERIFICAR SE USUÁRIO JÁ ESTÁ IDENTIFICADO =====
-  function getSavedUser() {
+  // Descobre o prefixo relativo com base no caminho deste próprio script
+  function basePrefix() {
     try {
-      var data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        var parsed = JSON.parse(data);
-        if (parsed.name && parsed.email && parsed.source && parsed.institution) {
-          return parsed;
+      var scripts = document.getElementsByTagName('script');
+      for (var i = 0; i < scripts.length; i++) {
+        var src = scripts[i].getAttribute('src') || '';
+        if (src.indexOf('trail-gate.js') !== -1) {
+          return src.replace('trail-gate.js', '');
         }
       }
-    } catch(e) {}
-    return null;
+    } catch (e) {}
+    return '';
+  }
+  var PREFIX = basePrefix();
+
+  // Esconde o conteúdo imediatamente para evitar "flash" antes da checagem
+  var styleHide = document.createElement('style');
+  styleHide.id = 'tgHideStyle';
+  styleHide.textContent = 'main{visibility:hidden}';
+  (document.head || document.documentElement).appendChild(styleHide);
+
+  function revelarConteudo() {
+    var s = document.getElementById('tgHideStyle');
+    if (s) s.remove();
   }
 
-  function saveUser(userData) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    } catch(e) {}
+  function redirecionarParaLogin() {
+    var atual = window.location.pathname + window.location.search;
+    // login.html está na raiz do site
+    var loginUrl = PREFIX + 'login.html?redirect=' + encodeURIComponent(atual);
+    window.location.replace(loginUrl);
   }
 
-  // ===== ENVIAR DADOS AO BACKEND =====
-  function sendToBackend(userData) {
-    var apiUrl = '';
-    try {
-      if (window.CLOUDTRILHAS_CONFIG && window.CLOUDTRILHAS_CONFIG.apiEndpoint) {
-        apiUrl = window.CLOUDTRILHAS_CONFIG.apiEndpoint;
+  // Carrega um script dinamicamente (uma vez)
+  function carregarScript(src) {
+    return new Promise(function (resolve) {
+      // Já carregado?
+      var existentes = document.getElementsByTagName('script');
+      for (var i = 0; i < existentes.length; i++) {
+        var s = existentes[i].getAttribute('src') || '';
+        if (s.indexOf(src) !== -1) { resolve(); return; }
       }
-    } catch(e) {}
-
-    // Fallback para URL hardcoded (mesmo padrão do simulado.js)
-    if (!apiUrl) {
-      apiUrl = 'https://eillhz5fkl.execute-api.us-west-2.amazonaws.com/leads';
-    }
-
-    var page = window.location.pathname.split('/').filter(Boolean).slice(-2).join('/');
-
-    try {
-      fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'trail-access',
-          name: userData.name,
-          email: userData.email,
-          source: userData.source,
-          institution: userData.institution,
-          page: page,
-          consent: true,
-          material: page
-        })
-      }).catch(function() {});
-    } catch(e) {}
-  }
-
-  // ===== CRIAR OVERLAY DO FORMULÁRIO =====
-  function createGateOverlay() {
-    // Esconde o conteúdo principal
-    var mainEl = document.querySelector('main');
-    if (mainEl) {
-      mainEl.style.display = 'none';
-    }
-
-    // Cria overlay
-    var overlay = document.createElement('div');
-    overlay.id = 'trailGateOverlay';
-    overlay.innerHTML = '' +
-      '<div class="trail-gate-backdrop">' +
-      '  <div class="trail-gate-card">' +
-      '    <div class="trail-gate-icon">🎓</div>' +
-      '    <h2 class="trail-gate-title">Antes de iniciar esta trilha</h2>' +
-      '    <p class="trail-gate-desc">Preencha seus dados para que possamos entender melhor nosso público e aprimorar nossos conteúdos.</p>' +
-      '    <form id="trailGateForm" class="trail-gate-form">' +
-      '      <div class="trail-gate-field">' +
-      '        <label for="tgName">Nome Completo *</label>' +
-      '        <input type="text" id="tgName" placeholder="Seu nome completo" required autocomplete="name" />' +
-      '      </div>' +
-      '      <div class="trail-gate-field">' +
-      '        <label for="tgEmail">E-mail *</label>' +
-      '        <input type="email" id="tgEmail" placeholder="seu@email.com" required autocomplete="email" />' +
-      '      </div>' +
-      '      <div class="trail-gate-field">' +
-      '        <label for="tgSource">Como nos conheceu? *</label>' +
-      '        <select id="tgSource" required>' +
-      '          <option value="">Selecione...</option>' +
-      '          <option value="LinkedIn">LinkedIn</option>' +
-      '          <option value="Instagram">Instagram</option>' +
-      '          <option value="Indicação de amigo">Indicação de amigo</option>' +
-      '          <option value="Escola da Nuvem">Escola da Nuvem</option>' +
-      '          <option value="AWS Community">AWS Community</option>' +
-      '          <option value="Evento">Evento</option>' +
-      '          <option value="Google">Google</option>' +
-      '          <option value="Outro">Outro</option>' +
-      '        </select>' +
-      '      </div>' +
-      '      <div class="trail-gate-field">' +
-      '        <label for="tgInstitution">Instituição que indicou *</label>' +
-      '        <input type="text" id="tgInstitution" placeholder="Ex: Escola da Nuvem, Empresa, Universidade..." required />' +
-      '      </div>' +
-      '      <p class="trail-gate-error" id="tgError"></p>' +
-      '      <button type="submit" class="trail-gate-btn">Acessar Conteúdo →</button>' +
-      '    </form>' +
-      '  </div>' +
-      '</div>';
-
-    // Insere após o header
-    var header = document.querySelector('header');
-    if (header && header.nextSibling) {
-      header.parentNode.insertBefore(overlay, header.nextSibling);
-    } else {
-      document.body.appendChild(overlay);
-    }
-
-    // Event listener do formulário
-    document.getElementById('trailGateForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      var name = document.getElementById('tgName').value.trim();
-      var email = document.getElementById('tgEmail').value.trim();
-      var source = document.getElementById('tgSource').value;
-      var institution = document.getElementById('tgInstitution').value.trim();
-      var errorEl = document.getElementById('tgError');
-
-      // Validações
-      if (!name || !email || !source || !institution) {
-        errorEl.textContent = 'Todos os campos são obrigatórios.';
-        return;
-      }
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errorEl.textContent = 'Por favor, insira um e-mail válido.';
-        return;
-      }
-
-      errorEl.textContent = '';
-
-      var userData = {
-        name: name,
-        email: email,
-        source: source,
-        institution: institution,
-        created_at: new Date().toISOString()
-      };
-
-      // Salvar no localStorage
-      saveUser(userData);
-
-      // Enviar ao backend (assíncrono, não bloqueia)
-      sendToBackend(userData);
-
-      // Também salva nos campos do simulado (compatibilidade)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('cloudtrilhas_user_name', name);
-        localStorage.setItem('cloudtrilhas_user_email', email);
-      }
-
-      // Remover overlay e mostrar conteúdo
-      unlockContent();
+      var el = document.createElement('script');
+      el.src = PREFIX + src;
+      el.onload = function () { resolve(); };
+      el.onerror = function () { resolve(); };
+      document.head.appendChild(el);
     });
   }
 
-  function unlockContent() {
-    var overlay = document.getElementById('trailGateOverlay');
-    if (overlay) {
-      overlay.remove();
-    }
-    var mainEl = document.querySelector('main');
-    if (mainEl) {
-      mainEl.style.display = '';
-    }
+  // Registra o acesso à trilha no backend (analytics), sem bloquear
+  function registrarAcesso() {
+    try {
+      var apiUrl = (window.CLOUDTRILHAS_CONFIG && window.CLOUDTRILHAS_CONFIG.apiEndpoint) || '';
+      if (!apiUrl) return;
+      var email = window.CloudTrilhasAuth ? window.CloudTrilhasAuth.currentUserEmail() : null;
+      var page = window.location.pathname.split('/').filter(Boolean).slice(-2).join('/');
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'trail-access', email: email, page: page, consent: true, material: page })
+      }).catch(function () {});
+    } catch (e) {}
   }
 
-  // ===== INICIALIZAÇÃO =====
-  function init() {
-    var user = getSavedUser();
-    if (user) {
-      // Já identificado — acesso liberado
-      // Registra acesso silenciosamente
-      sendToBackend(user);
+  async function init() {
+    // Garante que config.js e auth.js estão carregados
+    if (!window.CLOUDTRILHAS_CONFIG) { await carregarScript('config.js'); }
+    if (!window.CloudTrilhasAuth) { await carregarScript('auth.js'); }
+
+    // Se mesmo assim faltou o auth (falha de rede), não trava o site
+    if (!window.CloudTrilhasAuth) {
+      revelarConteudo();
       return;
     }
 
-    // Não identificado — bloquear conteúdo
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', createGateOverlay);
-    } else {
-      createGateOverlay();
+    try {
+      var ok = await window.CloudTrilhasAuth.isAuthenticated();
+      if (ok) {
+        revelarConteudo();
+        registrarAcesso();
+      } else {
+        redirecionarParaLogin();
+      }
+    } catch (e) {
+      redirecionarParaLogin();
     }
   }
 
-  init();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();

@@ -21,8 +21,9 @@ package-lock.json
 # Local templates (não subir)
 templates/
 
-# Documentos internos
-docs/MELHORIAS-E-EVOLUCAO.md
+# Documentos internos soltos na raiz de docs/ (subpastas continuam versionadas)
+docs/*.md
+docs/*.txt
 
 
 
@@ -39,3 +40,40 @@ scripts/
 specs/
 
 static_site/admin/teste
+
+# Artefatos de teste soltos (saída de invocações, etc.)
+response.json
+**/response.json
+event.json
+**/event.json
+
+# ===== Segurança — nunca versionar arquivos sensíveis =====
+# Credenciais e segredos
+.env
+.env.*
+*.env
+credentials
+**/credentials
+aws.json
+secrets.json
+*.secret
+*.secrets
+
+# Chaves e certificados
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+id_rsa
+id_ed25519
+*.ppk
+
+# Config local do frontend (gerado pelo Terraform, contém IDs de infra)
+static_site/config.js
+
+# Credenciais AWS locais
+.aws/
+**/.aws/

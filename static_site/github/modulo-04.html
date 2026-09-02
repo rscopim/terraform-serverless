@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 04: Resolução de Conflitos</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 04: Resolução de Conflitos</title>
+  <meta name="description" content="Conflitos de merge no Git: por que ocorrem, como identificar, marcadores de conflito, resolução manual e com ferramentas, e estratégias de prevenção." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,110 +18,373 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-03.html" class="nav-link">← Anterior</a>
         <a href="modulo-05.html" class="nav-link">Próximo →</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 04</span>
-        <h1>Resolução de Conflitos</h1>
-        <p>Identificar, resolver e prevenir conflitos de merge. Conflitos acontecem quando duas pessoas editam o mesmo trecho — saber resolvê-los é essencial.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 04</span>
+        <h1>Resolução de Conflitos de Merge</h1>
+        <p>Conflitos assustam iniciantes, mas são normais e totalmente gerenciáveis. Neste módulo você entende por que eles acontecem, aprende a ler os marcadores de conflito, a resolvê-los manualmente e com ferramentas visuais, e — o mais importante — a adotar hábitos que previnem conflitos difíceis.</p>
       </div>
     </section>
 
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node active"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node"><span>08</span><small>Projects</small></a>
+      </div>
+    </section>
 
-    <section class="module-section" style="padding:20px 0">
+    <!-- SEÇÃO 1 -->
+    <section class="module-section">
       <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>Por que Conflitos Acontecem</h2>
+          <p>Um conflito ocorre quando o Git não consegue decidir automaticamente como combinar duas mudanças. Entender a causa raiz ajuda a resolvê-los com confiança.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>⚔️ A Origem de um Conflito</h3>
+          <p>O Git resolve merges automaticamente na maioria das vezes. Mas quando <strong>a mesma região do mesmo arquivo</strong> foi alterada de formas diferentes em duas branches, o Git não tem como saber qual versão você quer — e pede sua intervenção.</p>
+
+          <div class="info-box highlight">
+            <h4>💡 Quando o Git resolve sozinho vs quando pede ajuda</h4>
+            <ul>
+              <li><strong>Resolve sozinho:</strong> mudanças em arquivos diferentes, ou em linhas distantes do mesmo arquivo</li>
+              <li><strong>Pede ajuda (conflito):</strong> mudanças nas mesmas linhas, ou um lado editou e o outro deletou o arquivo</li>
+            </ul>
+          </div>
+
+          <div class="command-card wide">
+            <h4>Exemplo que Gera Conflito</h4>
+            <pre><code># Na branch main, a linha 1 do arquivo é:
+#   titulo = "Bem-vindo"
+
+# Você (feature) muda para:
+#   titulo = "Olá, visitante"
+
+# Um colega (main) muda a MESMA linha para:
+#   titulo = "Seja bem-vindo"
+
+# Ao mergear, o Git não sabe qual manter → CONFLITO</code></pre>
+          </div>
         </div>
       </div>
     </section>
-    <section class="module-section">
+
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
       <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>Lendo os Marcadores de Conflito</h2>
+          <p>Quando ocorre um conflito, o Git insere marcadores especiais no arquivo. Saber lê-los é o primeiro passo para resolver.</p>
+        </div>
 
         <div class="topic-block">
-          <h2>1. Entendendo e Resolvendo Conflitos</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Conflito de Merge</code><span class="cmd-tag">Essencial</span></div>
-              <p>Anatomia de um conflito e como resolver.</p>
-              <pre><code># Quando o Git não consegue resolver automaticamente:
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-const titulo = "Versão da branch atual";
+          <h3>🔖 Anatomia dos Marcadores</h3>
+          <div class="command-card wide">
+            <pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+titulo = "Seja bem-vindo"        ← versão da branch ATUAL (onde você está)
 =======
-const titulo = "Versão da branch incoming";
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/nova-funcionalidade
+titulo = "Olá, visitante"        ← versão da branch que está sendo integrada
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/nova-saudacao
 
-# Resolução:
-# 1. Edite o arquivo — escolha uma versão ou combine
-const titulo = "Versão final combinada";
+# Interpretação:
+# &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD      → início da SUA versão
+# =======            → divisor
+# &gt;&gt;&gt;&gt;&gt;&gt;&gt; branch    → fim da versão que vem da OUTRA branch</code></pre>
+          </div>
 
-# 2. Remova os marcadores (&lt;&lt;&lt;&lt;, ====, &gt;&gt;&gt;&gt;)
+          <div class="command-card wide">
+            <h4>Resolvendo: você escolhe o resultado final</h4>
+            <pre><code># Edite o arquivo removendo os marcadores e deixando o texto correto.
+# Pode escolher um lado, o outro, ou combinar os dois:
 
-# 3. Adicione e commite
-git add arquivo-resolvido.js
-git commit -m "fix: resolve conflito no título"
+titulo = "Olá, seja bem-vindo, visitante"
 
-# Ferramentas visuais:
-git mergetool              # abre ferramenta configurada
-# VS Code: aceitar current/incoming/both</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Prevenir Conflitos</code><span class="cmd-tag">Dica</span></div>
-              <p>Boas práticas para minimizar conflitos.</p>
-              <pre><code># 1. Pull frequente
-git pull --rebase origin main
+# Depois marque como resolvido e finalize
+git add arquivo.txt
+git commit          # conclui o merge (mensagem já vem preenchida)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
 
-# 2. Branches curtas (1-3 dias)
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Resolvendo Conflitos Passo a Passo</h2>
+          <p>Vamos ao processo completo, desde detectar o conflito até finalizar a resolução com segurança.</p>
+        </div>
 
-# 3. Comunicação com o time
+        <div class="topic-block">
+          <h3>🛠️ O Processo de Resolução</h3>
+          <div class="command-card wide">
+            <pre><code># 1. Ao mergear, o Git avisa do conflito
+git merge feature/nova-saudacao
+# CONFLICT (content): Merge conflict in index.html
+# Automatic merge failed; fix conflicts and then commit the result.
 
-# 4. Arquivos pequenos e focados
+# 2. Ver quais arquivos estão em conflito
+git status
+# Unmerged paths:
+#   both modified:   index.html
 
-# 5. Rebase antes de abrir PR
-git checkout feature
-git rebase main
-# Resolve conflitos uma vez só</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Abortar e Recomeçar</code><span class="cmd-tag">Segurança</span></div>
-              <p>Quando a resolução fica complexa demais.</p>
-              <pre><code># Abortar merge em andamento
-git merge --abort
+# 3. Abrir o arquivo, resolver os marcadores manualmente
+#    (ou use um editor com suporte a merge, como o VS Code)
 
-# Abortar rebase em andamento
-git rebase --abort
+# 4. Marcar cada arquivo resolvido
+git add index.html
 
-# Voltar ao estado anterior
-git reset --hard HEAD
+# 5. Verificar que não sobrou conflito
+git status        # deve mostrar "All conflicts fixed"
 
-# Ver estado antes do conflito
-git stash
-git log --oneline --graph</code></pre>
-            </div>
+# 6. Concluir o merge
+git commit
+
+# Se quiser ABORTAR o merge e voltar ao estado anterior:
+git merge --abort</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Escolhendo um lado inteiro</h4>
+            <pre><code># Aceitar a versão da branch ATUAL para um arquivo
+git checkout --ours arquivo.txt
+
+# Aceitar a versão da OUTRA branch
+git checkout --theirs arquivo.txt
+
+git add arquivo.txt
+# ⚠️ Cuidado: isso descarta completamente o outro lado daquele arquivo</code></pre>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>🔄 Conflitos Durante Rebase</h3>
+          <p>Conflitos também ocorrem em rebase (Módulo 05). O fluxo é parecido, mas os comandos de continuação são diferentes:</p>
+          <div class="command-card wide">
+            <pre><code># Durante um rebase com conflito:
+# 1. Resolva os marcadores no arquivo
+# 2. Marque como resolvido
+git add arquivo.txt
+# 3. Continue o rebase (NÃO use git commit aqui!)
+git rebase --continue
+
+# Pular o commit problemático
+git rebase --skip
+
+# Abortar o rebase inteiro
+git rebase --abort
+
+# ⚠️ Note: no merge você usa 'git commit'; no rebase, 'git rebase --continue'</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>Ferramentas de Merge</h2>
+          <p>Resolver conflitos "na mão" funciona, mas ferramentas visuais tornam o processo muito mais rápido e seguro, especialmente em conflitos grandes.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🖥️ VS Code e mergetool</h3>
+          <div class="command-card wide">
+            <pre><code># O VS Code detecta conflitos e mostra botões:
+# "Accept Current Change" | "Accept Incoming Change"
+# "Accept Both Changes"   | "Compare Changes"
+# Além de uma visão de 3 painéis (3-way merge editor)
+
+# Configurar uma ferramenta de merge externa
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd 'code --wait $MERGED'
+
+# Abrir a ferramenta configurada nos arquivos em conflito
+git mergetool
+
+# Outras ferramentas populares: meld, kdiff3, Beyond Compare, p4merge
+
+# Evitar arquivos .orig deixados pelo mergetool
+git config --global mergetool.keepBackup false</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>💡 Diff3 — vendo a base comum</h4>
+            <pre><code># Mostrar também a versão ORIGINAL (ancestral comum) nos marcadores
+git config --global merge.conflictStyle diff3
+# ou zdiff3 (Git 2.35+, mais enxuto)
+git config --global merge.conflictStyle zdiff3
+# Isso adiciona uma seção ||||||| com o código-base,
+# ajudando a entender o que cada lado mudou</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Prevenindo Conflitos</h2>
+          <p>O melhor conflito é o que não acontece. Bons hábitos de trabalho reduzem drasticamente a frequência e a gravidade dos conflitos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🛡️ Estratégias de Prevenção</h3>
+          <div class="info-box highlight">
+            <h4>Hábitos que evitam conflitos</h4>
+            <ul>
+              <li><strong>Sincronize com frequência:</strong> faça <code>pull</code> da main várias vezes ao dia</li>
+              <li><strong>Branches curtas:</strong> quanto mais tempo uma branch vive, mais ela diverge</li>
+              <li><strong>PRs pequenos:</strong> mudanças menores conflitam menos e são revisadas mais rápido</li>
+              <li><strong>Comunicação:</strong> combine com o time quem mexe em quais arquivos</li>
+              <li><strong>Formatação consistente:</strong> um formatador automático (Prettier, Black) evita conflitos "cosméticos"</li>
+              <li><strong>Rebase sua branch na main</strong> antes de abrir o PR para pegar conflitos cedo</li>
+            </ul>
+          </div>
+
+          <div class="command-card wide">
+            <h4>Mantendo sua Branch Atualizada</h4>
+            <pre><code># Trazer as novidades da main para sua branch regularmente
+git switch feature/minha-feature
+git fetch origin
+git merge origin/main          # ou: git rebase origin/main
+
+# Resolvendo conflitos cedo, aos poucos, é muito mais fácil
+# do que enfrentar um conflito gigante no dia do merge final</code></pre>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧰 git rerere — Reaproveitando Resoluções</h3>
+          <div class="command-card wide">
+            <pre><code># rerere = "reuse recorded resolution"
+# O Git memoriza como você resolveu um conflito e reaplica
+# automaticamente se o mesmo conflito reaparecer (comum em rebases longos)
+
+git config --global rerere.enabled true
+
+# Muito útil quando você rebaseia a mesma branch várias vezes
+# e enfrenta os mesmos conflitos repetidamente</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Conflitos no GitHub (Web)</h2>
+          <p>PRs com conflitos podem ser resolvidos direto na interface do GitHub para casos simples, ou localmente para casos complexos.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌐 Resolvendo pela Interface</h3>
+          <div class="command-card wide">
+            <pre><code># Quando um PR tem conflito, o GitHub mostra:
+# "This branch has conflicts that must be resolved"
+
+# Para conflitos SIMPLES: botão "Resolve conflicts" abre um
+# editor web onde você remove os marcadores e marca como resolvido.
+
+# Para conflitos COMPLEXOS: resolva localmente
+git switch feature/minha-branch
+git fetch origin
+git merge origin/main
+# ... resolve os conflitos localmente ...
+git add . &amp;&amp; git commit
+git push
+# O PR atualiza automaticamente e o conflito some</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Exercício Prático e Resumo</h2>
+          <p>Crie um conflito de propósito e resolva-o — a melhor forma de perder o medo.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🧪 Criando e Resolvendo um Conflito</h3>
+          <div class="command-card wide">
+            <pre><code># 1. Preparar
+mkdir teste-conflito &amp;&amp; cd teste-conflito &amp;&amp; git init
+echo "cor = azul" &gt; config.txt
+git add . &amp;&amp; git commit -m "inicial"
+
+# 2. Criar conflito em duas branches
+git switch -c branch-a
+echo "cor = vermelho" &gt; config.txt
+git commit -am "muda cor para vermelho"
+
+git switch main
+git switch -c branch-b
+echo "cor = verde" &gt; config.txt
+git commit -am "muda cor para verde"
+
+# 3. Mergear branch-a na main
+git switch main
+git merge branch-a       # fast-forward, sem conflito
+
+# 4. Mergear branch-b → CONFLITO!
+git merge branch-b
+# CONFLICT (content): Merge conflict in config.txt
+
+# 5. Resolver
+git status               # vê o arquivo em conflito
+# edite config.txt, escolha o resultado (ex: cor = vermelho)
+git add config.txt
+git commit
+
+# 6. Confirmar
+git log --oneline --graph</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 04</h4>
+            <p>Conflitos deixaram de ser um bicho de sete cabeças. Você entende por que ocorrem, sabe ler e resolver os marcadores (<code>&lt;&lt;&lt;</code>, <code>===</code>, <code>&gt;&gt;&gt;</code>), usa ferramentas visuais, aplica <code>--ours</code>/<code>--theirs</code> quando faz sentido, lida com conflitos em rebase e — principalmente — adota hábitos que os previnem. No Módulo 05, aprendemos a reescrever o histórico com rebase, cherry-pick e reset.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -137,7 +401,7 @@ git log --oneline --graph</code></pre>
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>

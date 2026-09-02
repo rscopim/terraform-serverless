@@ -77,15 +77,35 @@ O projeto demonstra na prática:
 | **CloudWatch** | Dashboard operacional + 8 alarmes |
 | **IAM** | Roles, policies, OIDC para GitHub Actions |
 | **AWS Budgets** | Controle de custos (limite $10/mês) |
+| **Cognito** | Autenticação de alunos (User Pool, login por email) |
 
 ### DevOps & IaC
 
 | Ferramenta | Uso |
 |-----------|-----|
-| **Terraform** | 17 módulos, remote state (S3 + DynamoDB lock) |
+| **Terraform** | Módulos reutilizáveis, remote state (S3) |
 | **GitHub Actions** | CI/CD com OIDC (sem access keys) |
 | **Python 3.12** | Runtime das Lambda functions |
+| **Pyodide** | Sandbox Python no navegador (WASM, custo zero) |
 | **Puppeteer** | Geração automatizada de PDFs |
+
+---
+
+## 🏦 Conta AWS
+
+| Item | Valor |
+|------|-------|
+| GitHub | github.com/rscopim/terraform-serverless |
+| Região | us-west-2 |
+| Domínio (PROD) | https://www.cloudtrilhas.com.br |
+| CloudFront (PROD) | E16GA24I7417C2 |
+| S3 site (PROD) | materiais-e-trilhas-de-estudos |
+| State bucket | terraform-serverless-projeto-trilhas |
+| API endpoint | https://eillhz5fkl.execute-api.us-west-2.amazonaws.com |
+| Owner | ricardo.simines@gmail.com |
+
+> Detalhes de deploy, rollback e ativação do Cognito em [`docs/deployment.md`](docs/deployment.md).
+> Convenções e regras do projeto em [`.kiro/steering/project.md`](.kiro/steering/project.md).
 
 ---
 
@@ -100,43 +120,38 @@ terraform-serverless/
 │   ├── dev/                 # Ambiente de desenvolvimento
 │   ├── prod/                # Ambiente de produção
 │   └── shared/              # Recursos compartilhados (OIDC, Budget)
-├── lambda_src/
+├── lambda_src/              # Código-fonte das Lambdas (Python 3.12)
 │   ├── hello_lambda/        # Consumer SQS → SNS
 │   ├── register_lead/       # API → DynamoDB (captura leads)
-│   └── download_metrics/    # EventBridge → CloudWatch metrics
-├── modules/                 # 17 módulos Terraform reutilizáveis
-│   ├── acm/
-│   ├── api_gateway/
-│   ├── budget/
-│   ├── cloudfront/
-│   ├── cloudtrail/
-│   ├── cloudwatch_dashboard/
-│   ├── cloudwatch_operational/
-│   ├── download_metrics/
-│   ├── dynamodb/
-│   ├── eventbridge/
-│   ├── github_actions_oidc/
-│   ├── lambda/
-│   ├── register_lead_lambda/
-│   ├── route53/
-│   ├── s3_static_site/
-│   ├── sns/
-│   └── sqs/
-├── static_site/             # Site estático (96 páginas HTML)
-│   ├── docker/              # 7 módulos
-│   ├── kubernetes/          # 4 módulos
-│   ├── terraform/           # 4 módulos
-│   ├── linux/               # 5 módulos
-│   ├── python/              # 10 módulos
-│   ├── redes/               # 12 módulos
-│   ├── github/              # 9 módulos
-│   ├── cloudformation/      # 4 módulos
-│   ├── ai-practitioner/     # 5 domínios
-│   ├── developer/           # 4 domínios
-│   ├── solutions-architect/ # 4 domínios
-│   ├── solutions-architect-pro/ # 7 módulos
-│   ├── cloud-practitioner/  # 4 domínios
-│   └── materiais/           # 13 PDFs para download
+│   ├── download_metrics/    # EventBridge → CloudWatch metrics
+│   ├── analytics/           # Métricas de uso
+│   ├── visitor_counter/     # Contador de visitantes
+│   ├── costs/               # Consulta de custos AWS
+│   ├── governance/          # Governança
+│   ├── admin_login/         # Login administrativo
+│   └── admin_users/         # Gestão de usuários admin
+├── modules/                 # Módulos Terraform reutilizáveis
+│   ├── acm/  api_gateway/  budget/  cloudfront/  cloudwatch_dashboard/
+│   ├── cloudwatch_operational/  cognito/  download_metrics/  dynamodb/
+│   ├── eventbridge/  github_actions_oidc/  lambda/  register_lead_lambda/
+│   ├── route53/  s3_static_site/  sns/  sqs/  analytics/  costs/
+│   ├── governance/  admin_auth/  visitor_counter_dynamodb/  visitor_counter_lambda/
+├── static_site/             # Site estático (HTML/CSS/JS puro)
+│   ├── docker/              # trilha Docker
+│   ├── terraform/           # trilha Terraform
+│   ├── linux/               # trilha Linux
+│   ├── python/              # trilha Python (10 módulos)
+│   ├── redes/               # trilha Redes (8 módulos)
+│   ├── github/              # trilha Git & GitHub (9 módulos)
+│   ├── ai-practitioner/     # domínios AWS AI Practitioner
+│   ├── developer/           # domínios AWS Developer
+│   ├── solutions-architect/ # domínios AWS SA Associate
+│   ├── solutions-architect-pro/ # módulos AWS SA Professional
+│   ├── cloud-practitioner/  # domínios AWS Cloud Practitioner
+│   ├── sandbox.html + sandbox.js  # Sandbox Python (Pyodide, client-side)
+│   ├── login.html + cadastro.html # Auth de alunos (Cognito)
+│   ├── auth.js + trail-gate.js    # Sessão Cognito + gate das trilhas
+│   └── materiais/           # PDFs para download
 ├── generate-pdf.js          # Script de geração de PDFs (Puppeteer)
 └── README.md
 ```

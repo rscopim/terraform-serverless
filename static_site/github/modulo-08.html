@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CloudTrilhas — Git & GitHub Módulo 08: Projects, Pages e Segurança</title>
+  <title>CloudTrilhas — Git &amp; GitHub Módulo 08: Projects, Pages e Segurança</title>
+  <meta name="description" content="GitHub Projects (kanban), GitHub Pages, Environments, Branch Protection Rules, CODEOWNERS, Dependabot e recursos de segurança de repositório." />
   <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../trail-gate.css" />
   <link rel="stylesheet" href="../linux-training.css" />
@@ -17,225 +18,396 @@
     <nav class="nav container">
       <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
       <div class="nav-actions">
+        <a href="../github.html" class="nav-link">← Voltar ao Curso</a>
         <a href="modulo-07.html" class="nav-link">← Anterior</a>
-        <a href="../github.html" class="nav-link">Voltar ao Curso</a>
+        <a href="../github.html" class="nav-link">Concluir Trilha</a>
         <a href="../index.html" class="nav-button">Início</a>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
       </div>
     </nav>
     <div class="nav-mobile">
       <a href="../index.html">Início</a>
-      <a href="../aws.html">AWS</a>
       <a href="../linux.html">Linux</a>
       <a href="../docker.html">Docker</a>
-      <a href="../kubernetes.html">Kubernetes</a>
       <a href="../terraform.html">Terraform</a>
       <a href="../python.html">Python</a>
       <a href="../redes.html">Redes</a>
       <a href="../github.html">GitHub</a>
-      <a href="../cloudformation.html">CloudFormation</a>
     </div>
   </header>
 
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🐙 Git & GitHub — Módulo 08</span>
-        <h1>GitHub: Projects, Pages, Environments e Segurança</h1>
-        <p>GitHub Projects, Pages, Environments, Branch Protection, CODEOWNERS, Dependabot. Recursos avançados para gestão de projetos e segurança.</p>
+        <span class="pill">🐙 Git &amp; GitHub — Módulo 08</span>
+        <h1>Projects, Pages e Segurança</h1>
+        <p>O módulo final reúne os recursos que profissionalizam um repositório: gestão de trabalho com GitHub Projects, publicação de sites com GitHub Pages, proteção de branches, ambientes com aprovação, CODEOWNERS para revisão obrigatória, e a suíte de segurança (Dependabot, code scanning, secret scanning). É a governança que faz um projeto ser confiável.</p>
       </div>
     </section>
 
-
-    <section class="module-section" style="padding:20px 0">
-      <div class="container">
-        <div class="info-box warning" style="text-align:center;padding:24px">
-          <h4>&#x1F6A7; Em breve novas atualizações</h4>
-          <p style="margin:0">Este módulo está sendo reformulado com conteúdo mais profundo e detalhado. O conteúdo atual continua disponível para estudo.</p>
-        </div>
+    <section class="module-progress container">
+      <div class="progress-track">
+        <a href="modulo-00.html" class="progress-node"><span>00</span><small>Conta</small></a>
+        <a href="modulo-01.html" class="progress-node"><span>01</span><small>Fundamentos</small></a>
+        <a href="modulo-02.html" class="progress-node"><span>02</span><small>Branches</small></a>
+        <a href="modulo-03.html" class="progress-node"><span>03</span><small>Colaboração</small></a>
+        <a href="modulo-04.html" class="progress-node"><span>04</span><small>Conflitos</small></a>
+        <a href="modulo-05.html" class="progress-node"><span>05</span><small>Histórico</small></a>
+        <a href="modulo-06.html" class="progress-node"><span>06</span><small>Fluxos</small></a>
+        <a href="modulo-07.html" class="progress-node"><span>07</span><small>CI/CD</small></a>
+        <a href="modulo-08.html" class="progress-node active"><span>08</span><small>Projects</small></a>
       </div>
     </section>
+
+    <!-- SEÇÃO 1 -->
     <section class="module-section">
       <div class="container">
-
-        <div class="topic-block">
-          <h2>1. Branch Protection Rules</h2>
-          <div class="command-grid">
-            <div class="command-card wide">
-              <div class="command-header"><code>Branch Protection</code><span class="cmd-tag">Segurança</span></div>
-              <p>Proteja branches importantes contra push direto e merges sem review.</p>
-              <pre><code># Settings → Branches → Add rule
-# Branch name pattern: main
-
-# Regras recomendadas:
-✅ Require a pull request before merging
-  ✅ Require approvals (mínimo 1)
-  ✅ Dismiss stale pull request approvals
-✅ Require status checks to pass
-  ✅ Require branches to be up to date
-  → Selecione: CI Pipeline, Tests
-✅ Require conversation resolution
-✅ Require signed commits (opcional)
-✅ Do not allow bypassing the above settings
-
-# Resultado: ninguém faz push direto na main
-# Todo código passa por PR + CI + Review</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>CODEOWNERS</code><span class="cmd-tag">Governança</span></div>
-              <p>Define responsáveis automáticos por review.</p>
-              <pre><code># .github/CODEOWNERS
-
-# Donos globais (review em tudo)
-* @tech-lead @senior-dev
-
-# Por diretório
-/src/auth/     @security-team
-/infra/        @devops-team
-/docs/         @tech-writer
-
-# Por extensão
-*.tf           @devops-team
-*.yml          @devops-team
-*.test.ts      @qa-team
-
-# Resultado: PRs que tocam esses arquivos
-# automaticamente pedem review dos owners</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Environments</code><span class="cmd-tag">Deploy</span></div>
-              <p>Controle deploys com aprovações e secrets por ambiente.</p>
-              <pre><code># Settings → Environments
-
-# Ambiente: production
-# - Required reviewers: @tech-lead
-# - Wait timer: 5 minutes
-# - Deployment branches: main only
-# - Secrets: AWS_ROLE_ARN, CF_DIST_ID
-
-# Ambiente: staging
-# - No protection rules
-# - Deployment branches: develop, release/*
-# - Secrets: AWS_ROLE_ARN_STAGING
-
-# No workflow:
-jobs:
-  deploy:
-    environment: production  # ← ativa proteções
-    runs-on: ubuntu-latest</code></pre>
-            </div>
-          </div>
+        <div class="module-header">
+          <span class="module-badge">Seção 1</span>
+          <h2>GitHub Projects — Gestão de Trabalho</h2>
+          <p>O GitHub Projects é um sistema de gestão de projetos integrado ao repositório, conectando issues e PRs a quadros, tabelas e roadmaps.</p>
         </div>
 
         <div class="topic-block">
-          <h2>2. GitHub Projects e Pages</h2>
-          <div class="command-grid">
-            <div class="command-card">
-              <div class="command-header"><code>GitHub Projects</code><span class="cmd-tag">Gestão</span></div>
-              <p>Kanban integrado ao repositório.</p>
-              <pre><code># Criar Project (V2):
-# Repo → Projects → New Project
+          <h3>📋 Quadros, Tabelas e Automações</h3>
+          <div class="info-box highlight">
+            <h4>Recursos do Projects (v2)</h4>
+            <ul>
+              <li><strong>Views:</strong> Board (kanban), Table (planilha), Roadmap (linha do tempo)</li>
+              <li><strong>Campos customizados:</strong> Status, Prioridade, Estimativa, Sprint, Iteration</li>
+              <li><strong>Automações built-in:</strong> mover item para "Done" quando o PR é mesclado, adicionar issues novas automaticamente</li>
+              <li><strong>Filtros e agrupamentos:</strong> por assignee, label, milestone, campo customizado</li>
+            </ul>
+          </div>
 
-# Colunas sugeridas:
-# 📋 Backlog
-# 🏗️ In Progress
-# 👀 In Review
-# ✅ Done
+          <div class="command-card wide">
+            <h4>Gerenciando via GitHub CLI</h4>
+            <pre><code># Listar projetos
+gh project list --owner rscopim
 
-# Automações:
-# - Issue criada → Backlog
-# - PR aberto → In Progress
-# - PR merged → Done
+# Adicionar uma issue a um projeto
+gh project item-add 1 --owner rscopim --url https://github.com/rscopim/repo/issues/42
 
-# Campos customizados:
-# - Priority: P0, P1, P2
-# - Sprint: Sprint 1, Sprint 2
-# - Size: S, M, L, XL</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>GitHub Pages</code><span class="cmd-tag">Deploy</span></div>
-              <p>Hospede sites estáticos gratuitamente.</p>
-              <pre><code># Settings → Pages
+# Ver itens de um projeto
+gh project item-list 1 --owner rscopim</code></pre>
+          </div>
 
-# Source: GitHub Actions (recomendado)
-# ou
-# Source: Deploy from branch (gh-pages)
+          <div class="info-box">
+            <h4>💡 Fluxo típico com Projects</h4>
+            <p>Colunas <em>Backlog → To Do → In Progress → In Review → Done</em>. Issues entram no Backlog, são priorizadas, movidas para To Do em cada sprint, e as automações movem para In Review quando um PR vinculado é aberto e para Done quando é mesclado. Tudo rastreável e transparente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-# Workflow para Pages:
-# .github/workflows/pages.yml
-name: Deploy to GitHub Pages
+    <!-- SEÇÃO 2 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 2</span>
+          <h2>GitHub Pages — Hospedagem de Sites</h2>
+          <p>O GitHub Pages hospeda sites estáticos gratuitamente direto do repositório — perfeito para documentação, portfólios e landing pages.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🌐 Publicando com Pages</h3>
+          <div class="command-card wide">
+            <pre><code># Opção 1: publicar de uma branch
+# Settings → Pages → Source: Deploy from a branch
+# Escolha a branch (ex: main) e a pasta (/ root ou /docs)
+# Seu site fica em: https://SEU-USUARIO.github.io/REPO/
+
+# Opção 2: publicar via GitHub Actions (recomendado)
+# Settings → Pages → Source: GitHub Actions</code></pre>
+          </div>
+
+          <div class="command-card wide">
+            <h4>Workflow de Deploy no Pages</h4>
+            <pre><code>name: Deploy Pages
 on:
   push:
     branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
-      - uses: actions/deploy-pages@v4</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Segurança</code><span class="cmd-tag">GitHub</span></div>
-              <p>Recursos de segurança do repositório.</p>
-              <pre><code># Settings → Security
+      - id: deployment
+        uses: actions/deploy-pages@v4</code></pre>
+          </div>
 
-# Dependabot Alerts
-# → Detecta vulnerabilidades em dependências
-# → Cria PRs automáticos com fix
+          <div class="info-box">
+            <h4>🔗 Domínio customizado</h4>
+            <p>Em Settings → Pages → Custom domain, você aponta um domínio próprio (ex: <code>docs.seusite.com</code>) adicionando um registro CNAME/A no seu DNS. O GitHub provisiona HTTPS automaticamente via Let's Encrypt.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-# Secret Scanning
-# → Detecta tokens/keys commitados
-# → Alerta e pode bloquear push
+    <!-- SEÇÃO 3 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 3</span>
+          <h2>Branch Protection Rules</h2>
+          <p>Proteger a branch principal impede merges perigosos e força boas práticas. É um dos controles mais importantes em times.</p>
+        </div>
 
-# Code Scanning (CodeQL)
-# → Análise estática de segurança
-# → Detecta SQL injection, XSS, etc.
+        <div class="topic-block">
+          <h3>🛡️ Regras de Proteção</h3>
+          <div class="info-box highlight">
+            <h4>Configurar em Settings → Branches → Add branch protection rule</h4>
+            <ul>
+              <li><strong>Require a pull request before merging:</strong> proíbe push direto na main</li>
+              <li><strong>Require approvals:</strong> exige N aprovações (ex: 1 ou 2 reviewers)</li>
+              <li><strong>Dismiss stale approvals:</strong> invalida aprovações se novos commits chegarem</li>
+              <li><strong>Require status checks to pass:</strong> o CI (Actions) precisa passar antes do merge</li>
+              <li><strong>Require branches to be up to date:</strong> a branch deve estar atualizada com a main</li>
+              <li><strong>Require conversation resolution:</strong> todos os comentários resolvidos</li>
+              <li><strong>Require signed commits:</strong> só commits assinados (GPG/SSH)</li>
+              <li><strong>Include administrators:</strong> aplica as regras até para admins</li>
+              <li><strong>Restrict who can push:</strong> limita quem pode mesclar</li>
+            </ul>
+          </div>
 
-# Security Policy
-# → SECURITY.md na raiz
-# → Como reportar vulnerabilidades
+          <div class="info-box warning">
+            <h4>⚠️ Regra mínima recomendada</h4>
+            <p>Para qualquer repositório com mais de uma pessoa: exija PR + pelo menos 1 aprovação + status checks (CI) passando. Isso sozinho previne a maioria dos acidentes em produção. Combine com o fluxo de branches do Módulo 06.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-# Signed Commits (GPG)
-git config --global commit.gpgsign true
-git config --global user.signingkey KEY_ID</code></pre>
-            </div>
-            <div class="command-card">
-              <div class="command-header"><code>Templates</code><span class="cmd-tag">Organização</span></div>
-              <p>Padronize Issues e PRs com templates.</p>
-              <pre><code># .github/ISSUE_TEMPLATE/bug_report.md
----
-name: Bug Report
-about: Reporte um bug
-labels: bug
----
-## Descrição
-## Passos para Reproduzir
-## Comportamento Esperado
-## Screenshots
-## Ambiente
+    <!-- SEÇÃO 4 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 4</span>
+          <h2>CODEOWNERS e Environments</h2>
+          <p>Dois recursos que refinam a governança: revisão obrigatória por especialistas e ambientes de deploy com aprovação.</p>
+        </div>
 
-# .github/PULL_REQUEST_TEMPLATE.md
-## O que foi feito
-## Tipo de mudança
-- [ ] Bug fix
-- [ ] Nova feature
-- [ ] Breaking change
-## Checklist
-- [ ] Testes adicionados
-- [ ] Documentação atualizada
-- [ ] Lint passa sem erros</code></pre>
-            </div>
+        <div class="topic-block">
+          <h3>👤 CODEOWNERS — Revisão por Área</h3>
+          <div class="command-card wide">
+            <h4>Arquivo .github/CODEOWNERS</h4>
+            <pre><code># Sintaxe: &lt;padrão&gt; &lt;owner(s)&gt;
+# Owners são solicitados automaticamente como reviewers em PRs
+# que tocam os arquivos correspondentes.
+
+# Owner padrão de todo o repositório
+*                    @rscopim
+
+# Time de backend revisa a pasta de API
+/src/api/            @org/backend
+
+# Especialista em infra revisa Terraform
+/infra/              @rscopim @org/devops
+*.tf                 @org/devops
+
+# Docs podem ser revisados por qualquer um do time de docs
+/docs/               @org/tech-writers
+
+# Arquivos de CI exigem revisão do time de plataforma
+/.github/workflows/  @org/plataforma</code></pre>
+          </div>
+
+          <div class="info-box">
+            <h4>💡 CODEOWNERS + Branch Protection</h4>
+            <p>Combinado com "Require review from Code Owners" nas branch protection rules, isso força que quem entende de cada área revise as mudanças relevantes — evitando que código de infra, por exemplo, seja mesclado sem o aval do time de DevOps.</p>
           </div>
         </div>
 
+        <div class="topic-block">
+          <h3>🌍 Environments com Aprovação</h3>
+          <div class="command-card wide">
+            <pre><code># Settings → Environments → New environment (ex: production)
+# Configure:
+# - Required reviewers: pessoas que aprovam antes do deploy
+# - Wait timer: espera N minutos antes de liberar
+# - Deployment branches: só a main pode deployar aqui
+# - Environment secrets: secrets exclusivos deste ambiente
+
+# No workflow, referencie o environment:
+jobs:
+  deploy-prod:
+    environment: production   # pausa aguardando aprovação
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./deploy.sh</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 5</span>
+          <h2>Dependabot e Segurança de Dependências</h2>
+          <p>Dependências desatualizadas são uma das maiores fontes de vulnerabilidades. O Dependabot automatiza atualizações e alertas.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🤖 Configurando o Dependabot</h3>
+          <div class="command-card wide">
+            <h4>.github/dependabot.yml</h4>
+            <pre><code>version: 2
+updates:
+  # Atualizações de pacotes npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+
+  # Atualizações do próprio GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+
+  # Terraform providers
+  - package-ecosystem: "terraform"
+    directory: "/infra"
+    schedule:
+      interval: "weekly"</code></pre>
+          </div>
+
+          <div class="info-box highlight">
+            <h4>🛡️ O que o Dependabot faz</h4>
+            <ul>
+              <li><strong>Version updates:</strong> abre PRs atualizando dependências no schedule definido</li>
+              <li><strong>Security updates:</strong> abre PRs urgentes quando uma CVE é descoberta</li>
+              <li><strong>Alerts:</strong> notifica sobre vulnerabilidades conhecidas nas suas dependências</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6 -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 6</span>
+          <h2>Code Scanning e Secret Scanning</h2>
+          <p>A suíte de segurança do GitHub detecta vulnerabilidades no seu código e segredos vazados automaticamente.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>🔍 Recursos de Segurança (aba Security)</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Recurso</th><th>O que faz</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Code scanning (CodeQL)</strong></td><td>Analisa o código em busca de vulnerabilidades (SQL injection, XSS, etc.)</td></tr>
+              <tr><td><strong>Secret scanning</strong></td><td>Detecta tokens, chaves e senhas commitados acidentalmente</td></tr>
+              <tr><td><strong>Push protection</strong></td><td>Bloqueia o push que contém um segredo detectado</td></tr>
+              <tr><td><strong>Dependency graph</strong></td><td>Mapeia todas as dependências e suas versões</td></tr>
+              <tr><td><strong>Security advisories</strong></td><td>Publicar/gerenciar avisos de segurança do seu projeto</td></tr>
+            </tbody>
+          </table>
+
+          <div class="command-card wide">
+            <h4>Ativando CodeQL via workflow</h4>
+            <pre><code># .github/workflows/codeql.yml
+name: CodeQL
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1'   # toda segunda às 3h
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, python
+      - uses: github/codeql-action/analyze@v3</code></pre>
+          </div>
+
+          <div class="info-box warning">
+            <h4>⚠️ Se um segredo vazou</h4>
+            <p>Remover o segredo em um novo commit NÃO basta — ele continua no histórico. Considere o segredo <strong>comprometido</strong> e <strong>rotacione-o imediatamente</strong> (gere uma nova chave/token e revogue o antigo). O secret scanning do GitHub ajuda a detectar, mas a rotação é responsabilidade sua.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7 -->
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Seção 7</span>
+          <h2>Arquivos de Comunidade e Conclusão</h2>
+          <p>Bons repositórios têm arquivos que orientam a comunidade e documentam o projeto. Vamos fechar a trilha com eles.</p>
+        </div>
+
+        <div class="topic-block">
+          <h3>📄 Health Files do Repositório</h3>
+          <table class="styled-table">
+            <thead>
+              <tr><th>Arquivo</th><th>Propósito</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>README.md</code></td><td>Apresentação do projeto (o mais importante)</td></tr>
+              <tr><td><code>LICENSE</code></td><td>Define os direitos de uso do código</td></tr>
+              <tr><td><code>CONTRIBUTING.md</code></td><td>Como contribuir (setup, padrões, fluxo)</td></tr>
+              <tr><td><code>CODE_OF_CONDUCT.md</code></td><td>Regras de convivência da comunidade</td></tr>
+              <tr><td><code>SECURITY.md</code></td><td>Como reportar vulnerabilidades</td></tr>
+              <tr><td><code>CHANGELOG.md</code></td><td>Histórico de mudanças por versão</td></tr>
+              <tr><td><code>.github/CODEOWNERS</code></td><td>Donos de cada área do código</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box highlight">
+            <h4>💡 Reuso via repositório .github</h4>
+            <p>Um repositório especial chamado <code>.github</code> na sua conta/organização pode conter health files padrão (CONTRIBUTING, templates, CODE_OF_CONDUCT) que se aplicam a TODOS os repositórios que não os definem localmente. Ótimo para padronizar uma organização inteira.</p>
+          </div>
+        </div>
+
+        <div class="topic-block">
+          <h3>🎓 Conclusão da Trilha Git &amp; GitHub</h3>
+          <div class="info-box highlight">
+            <h4>🎯 Resumo do Módulo 08</h4>
+            <p>Você fechou a trilha dominando a governança de repositórios: GitHub Projects (kanban/roadmap), GitHub Pages (hospedagem estática), Branch Protection Rules, Environments com aprovação, CODEOWNERS, Dependabot, code/secret scanning e os health files da comunidade.</p>
+          </div>
+
+          <div class="info-box">
+            <h4>🏆 O que você conquistou nesta trilha</h4>
+            <ul>
+              <li><strong>Módulo 00–01:</strong> ambiente configurado e fundamentos do Git</li>
+              <li><strong>Módulo 02–03:</strong> branches e colaboração via PRs</li>
+              <li><strong>Módulo 04–05:</strong> conflitos e reescrita de histórico</li>
+              <li><strong>Módulo 06:</strong> fluxos profissionais, SemVer e Conventional Commits</li>
+              <li><strong>Módulo 07:</strong> automação com GitHub Actions e CI/CD</li>
+              <li><strong>Módulo 08:</strong> governança e segurança de repositório</li>
+            </ul>
+            <p>Você agora tem as habilidades de versionamento e colaboração esperadas de um profissional de tecnologia. Parabéns por concluir a trilha! 🎉</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -243,7 +415,7 @@ labels: bug
     <section class="learning-section">
       <div class="container" style="display:flex;justify-content:space-between;padding:40px 0">
         <a href="modulo-07.html" class="button secondary">← Módulo Anterior</a>
-        <a href="../github.html" class="button primary">Voltar ao Curso</a>
+        <a href="../github.html" class="button primary">Concluir Trilha →</a>
       </div>
     </section>
   </main>
@@ -252,7 +424,7 @@ labels: bug
     <div class="container footer-grid">
       <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
       <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
-      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker & K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
       <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
     </div>
     <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
