@@ -117,11 +117,24 @@ function handler(event) {
   }
 
   if (isProtected) {
-    // Verifica cookie de sessao 'ct_session' (setado pelo auth.js apos login)
+    // Verifica cookie de sessao 'ct_session' (setado pelo auth.js apos login).
+    // CloudFront Functions expoem os cookies em request.cookies (objeto);
+    // usamos isso e caimos para o header 'cookie' como fallback.
     var hasSession = false;
-    if (headers.cookie) {
+
+    if (request.cookies && request.cookies['ct_session']) {
+      hasSession = true;
+    } else if (headers.cookie && headers.cookie.value) {
       hasSession = headers.cookie.value.indexOf('ct_session=') !== -1;
+    } else if (headers.cookie && headers.cookie.multiValue) {
+      for (var k = 0; k < headers.cookie.multiValue.length; k++) {
+        if (headers.cookie.multiValue[k].value.indexOf('ct_session=') !== -1) {
+          hasSession = true;
+          break;
+        }
+      }
     }
+
     if (!hasSession) {
       var redirectTo = '/login.html?redirect=' + encodeURIComponent(uri);
       return {
