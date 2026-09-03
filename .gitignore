@@ -30,6 +30,11 @@ docs/*.txt
 # Backup
 static_site_backup/
 
+# Planilhas/dados fonte soltos (ex.: escopo do exame) — não subir
+*.xlsx
+*.xls
+*.csv
+
 # Bancos de questões dos simulados (ficam locais, upload manual para S3)
 **/questoes.js
 
