@@ -201,6 +201,35 @@ window.CloudTrilhasAuth = (function () {
     return t ? t.email : null;
   }
 
+  // Decodifica o payload do idToken (JWT) sem validar assinatura (só leitura de claims)
+  function decodeIdToken() {
+    var t = getTokens();
+    if (!t || !t.idToken) return null;
+    try {
+      var payload = t.idToken.split('.')[1];
+      payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+      // padding
+      while (payload.length % 4) { payload += '='; }
+      return JSON.parse(atob(payload));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Retorna a lista de grupos Cognito do usuário (cognito:groups)
+  function currentUserGroups() {
+    var claims = decodeIdToken();
+    if (!claims) return [];
+    var g = claims['cognito:groups'];
+    if (!g) return [];
+    return Array.isArray(g) ? g : [g];
+  }
+
+  // O usuário pertence ao grupo 'admin'?
+  function isAdmin() {
+    return currentUserGroups().indexOf('admin') !== -1;
+  }
+
   function logout() {
     localStorage.removeItem(TOKENS_KEY);
     clearSessionCookie();
@@ -216,6 +245,8 @@ window.CloudTrilhasAuth = (function () {
     refreshSession: refreshSession,
     isAuthenticated: isAuthenticated,
     currentUserEmail: currentUserEmail,
+    currentUserGroups: currentUserGroups,
+    isAdmin: isAdmin,
     logout: logout,
     getTokens: getTokens
   };
