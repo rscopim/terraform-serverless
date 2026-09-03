@@ -5,6 +5,10 @@
  * (sessão Cognito válida). Sem sessão → redireciona para login.html com o
  * parâmetro ?redirect apontando de volta para a página atual.
  *
+ * COMPORTAMENTO FAIL-CLOSED: nada é liberado sem login. Qualquer falha
+ * (auth.js não carregou, config ausente, erro de rede) resulta em bloqueio
+ * e redirecionamento para o login — nunca em liberação do conteúdo.
+ *
  * É AUTO-SUFICIENTE: carrega dinamicamente config.js e auth.js caso ainda
  * não estejam presentes, então não depende da ordem dos <script> na página.
  * Basta incluir <script src="../trail-gate.js"></script> (ou "trail-gate.js"
@@ -98,22 +102,26 @@
     if (!window.CLOUDTRILHAS_CONFIG) { await carregarScript('config.js'); }
     if (!window.CloudTrilhasAuth) { await carregarScript('auth.js'); }
 
-    // Se mesmo assim faltou o auth (falha de rede), não trava o site
+    // FAIL-CLOSED: qualquer situação que não seja uma sessão Cognito válida
+    // e confirmada resulta em bloqueio (redireciona para o login).
+    // Nada é liberado sem login — inclusive se auth.js falhar ao carregar.
     if (!window.CloudTrilhasAuth) {
-      revelarConteudo();
+      redirecionarParaLogin();
       return;
     }
 
+    var ok = false;
     try {
-      var ok = await window.CloudTrilhasAuth.isAuthenticated();
-      if (ok) {
-        revelarConteudo();
-        registrarAcesso();
-        registrarProgresso();
-      } else {
-        redirecionarParaLogin();
-      }
+      ok = await window.CloudTrilhasAuth.isAuthenticated();
     } catch (e) {
+      ok = false;
+    }
+
+    if (ok === true) {
+      revelarConteudo();
+      registrarAcesso();
+      registrarProgresso();
+    } else {
       redirecionarParaLogin();
     }
   }
