@@ -525,6 +525,15 @@ resource "aws_s3_object" "sandbox_page" {
   etag         = filemd5("${path.root}/../../static_site/sandbox.html")
 }
 
+# Hub de sandboxes (tela de escolha entre Python, Linux e Redes)
+resource "aws_s3_object" "sandboxes_hub_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandboxes.html"
+  source       = "${path.root}/../../static_site/sandboxes.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/sandboxes.html")
+}
+
 resource "aws_s3_object" "sandbox_js" {
   bucket       = aws_s3_bucket.this.id
   key          = "sandbox.js"
