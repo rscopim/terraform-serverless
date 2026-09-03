@@ -104,7 +104,7 @@ function handler(event) {
     '/ai-practitioner/', '/cloud-practitioner/', '/developer/',
     '/solutions-architect/', '/solutions-architect-pro/', '/admin/'
   ];
-  var protectedPages = ['/sandbox.html', '/dashboard.html'];
+  var protectedPages = ['/sandbox.html', '/sandbox-linux.html', '/dashboard.html'];
 
   var isProtected = false;
   for (var i = 0; i < protectedPrefixes.length; i++) {

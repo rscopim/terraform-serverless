@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Sandbox Linux</title>
+  <meta name="description" content="Pratique comandos Linux no navegador com exercícios guiados por nível e modo livre. Sem instalar nada, custo zero." />
+  <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="linux-training.css" />
+  <style>
+    .sb-wrap { display:grid; grid-template-columns: 300px 1fr; gap:20px; margin-top:24px; }
+    @media (max-width: 900px){ .sb-wrap{ grid-template-columns:1fr; } }
+    .sb-side { background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; height:fit-content; max-height:600px; overflow:auto; }
+    .sb-side h3 { color:#e2e8f0; font-size:0.95rem; margin:0 0 8px; }
+    .sb-side .side-actions { display:flex; gap:8px; margin-bottom:14px; }
+    .sb-btn { flex:1; text-align:center; background:rgba(99,102,241,0.15); border:1px solid #6366f1; color:#c7d2fe; padding:8px; border-radius:8px; cursor:pointer; font-size:0.8rem; }
+    .sb-btn.ghost { background:transparent; border-color:rgba(255,255,255,0.15); color:#94a3b8; }
+    .ex-nivel { color:#fbbf24; font-size:0.78rem; font-weight:700; margin:12px 0 6px; text-transform:uppercase; letter-spacing:.5px; }
+    .ex-item { display:block; width:100%; text-align:left; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1; padding:8px 10px; border-radius:8px; margin-bottom:6px; cursor:pointer; font-size:0.82rem; }
+    .ex-item:hover { background:rgba(99,102,241,0.15); }
+    #exPainel { background:#0b1120; border:1px solid rgba(99,102,241,0.4); border-radius:12px; padding:16px; margin-bottom:14px; }
+    #exPainel .ex-badge { display:inline-block; background:rgba(251,191,36,0.15); color:#fbbf24; padding:2px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; }
+    #exPainel h4 { color:#fff; margin:8px 0 4px; }
+    #exPainel p { color:#cbd5e1; font-size:0.86rem; margin:0 0 8px; }
+    #exDica { color:#93c5fd; font-size:0.82rem; background:rgba(59,130,246,0.1); padding:8px 10px; border-radius:8px; }
+    .term-card { background:#04070d; border:1px solid rgba(255,255,255,0.12); border-radius:14px; overflow:hidden; }
+    .term-top { display:flex; align-items:center; gap:6px; padding:8px 12px; background:#111827; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .term-dot { width:11px; height:11px; border-radius:50%; }
+    #terminal { padding:14px; height:420px; overflow:auto; font-family:'JetBrains Mono',monospace; font-size:0.86rem; color:#e2e8f0; cursor:text; }
+    #terminal div { white-space:pre-wrap; word-break:break-word; line-height:1.5; }
+    #terminal .ex-ok { color:#4ade80; font-weight:700; }
+    .term-inputline { display:flex; align-items:center; font-family:'JetBrains Mono',monospace; font-size:0.86rem; }
+    .term-inputline .ps { color:#4ade80; white-space:pre; }
+    #termInput { flex:1; background:transparent; border:none; outline:none; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:0.86rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a href="index.html" class="brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link">Início</a>
+        <a href="linux.html" class="nav-link">Linux</a>
+        <a href="sandbox.html" class="nav-link">Sandbox Python</a>
+        <a href="index.html" class="nav-button">Voltar</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="index.html">Início</a>
+      <a href="linux.html">Linux</a>
+      <a href="docker.html">Docker</a>
+      <a href="terraform.html">Terraform</a>
+      <a href="python.html">Python</a>
+      <a href="redes.html">Redes</a>
+      <a href="github.html">GitHub</a>
+      <a href="sandbox.html">Sandbox Python</a>
+      <a href="sandbox-linux.html">Sandbox Linux</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">🐧 Sandbox Linux</span>
+        <h1>Pratique Linux no Navegador</h1>
+        <p>Um terminal Linux simulado que roda 100% no seu navegador. Pratique comandos com exercícios guiados por nível (do iniciante ao profissional) ou no modo livre. Sem instalar nada, sem custo.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">Terminal Interativo</span>
+          <h2>Exercícios Guiados + Prática Livre</h2>
+          <p>Escolha um exercício na lateral (validação automática) ou use o modo livre para experimentar comandos. Digite <code>help</code> no terminal para ver os comandos disponíveis.</p>
+        </div>
+
+        <div class="sb-wrap">
+          <aside class="sb-side">
+            <div class="side-actions">
+              <button class="sb-btn" id="modoLivreBtn">🎮 Modo Livre</button>
+              <button class="sb-btn ghost" id="resetBtn">🔄 Reiniciar</button>
+            </div>
+            <h3>📚 Exercícios por Nível</h3>
+            <div id="exList"></div>
+          </aside>
+
+          <div>
+            <div id="exPainel" style="display:none">
+              <span class="ex-badge" id="exNivel">Iniciante</span>
+              <h4 id="exTitulo">—</h4>
+              <p id="exDesc">—</p>
+              <button class="sb-btn ghost" id="exDicaBtn" style="max-width:140px">💡 Ver dica</button>
+              <p id="exDica" style="display:none">—</p>
+            </div>
+
+            <div class="term-card">
+              <div class="term-top">
+                <span class="term-dot" style="background:#ef4444"></span>
+                <span class="term-dot" style="background:#f59e0b"></span>
+                <span class="term-dot" style="background:#22c55e"></span>
+                <span style="color:#94a3b8;font-size:0.8rem;margin-left:8px;font-family:'JetBrains Mono',monospace">aluno@cloudtrilhas</span>
+              </div>
+              <div id="terminal">
+                <div id="termBody"></div>
+                <div class="term-inputline">
+                  <span class="ps" id="termPs">aluno@cloudtrilhas:~$ </span>
+                  <input id="termInput" spellcheck="false" autocapitalize="off" autocomplete="off" autofocus />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top:24px">
+          <strong>💡 Dica:</strong> este terminal é uma simulação para prática — reconhece os principais comandos (ls, cd, cat, mkdir, touch, rm, cp, mv, chmod, grep, head, tail, wc). Nada é enviado a servidores.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="aws.html">AWS</a><a href="cloud-practitioner.html">Cloud Practitioner</a><a href="ai-practitioner.html">AI Practitioner</a><a href="developer.html">Developer</a><a href="solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="linux.html">Linux</a><a href="docker.html">Docker &amp; K8s</a><a href="terraform.html">Terraform</a><a href="python.html">Python</a><a href="redes.html">Redes</a><a href="github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="about.html">Sobre</a><a href="contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/ricardosiminesscopim/" target="_blank" rel="noopener">LinkedIn</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script src="trail-gate.js"></script>
+  <script src="config.js"></script>
+  <script src="sandbox-linux.js"></script>
+</body>
+</html>

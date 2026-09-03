@@ -533,6 +533,23 @@ resource "aws_s3_object" "sandbox_js" {
   etag         = filemd5("${path.root}/../../static_site/sandbox.js")
 }
 
+# Sandbox Linux (terminal simulado, client-side)
+resource "aws_s3_object" "sandbox_linux_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandbox-linux.html"
+  source       = "${path.root}/../../static_site/sandbox-linux.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/sandbox-linux.html")
+}
+
+resource "aws_s3_object" "sandbox_linux_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandbox-linux.js"
+  source       = "${path.root}/../../static_site/sandbox-linux.js"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.root}/../../static_site/sandbox-linux.js")
+}
+
 # Dashboard do aluno (progresso + simulados)
 resource "aws_s3_object" "dashboard_page" {
   bucket       = aws_s3_bucket.this.id
