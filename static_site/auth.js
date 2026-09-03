@@ -123,6 +123,22 @@ window.CloudTrilhasAuth = (function () {
     });
   }
 
+  // ===== Cookie de sessão (lido pela CloudFront Function no edge) =====
+  // Marca presença de sessão para o gate no edge. Não guarda o token em si.
+  function setSessionCookie(maxAgeSeconds) {
+    try {
+      var secure = location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = 'ct_session=1; Path=/; Max-Age=' + maxAgeSeconds +
+        '; SameSite=Lax' + secure;
+    } catch (e) {}
+  }
+
+  function clearSessionCookie() {
+    try {
+      document.cookie = 'ct_session=; Path=/; Max-Age=0; SameSite=Lax';
+    } catch (e) {}
+  }
+
   // ===== Tokens =====
   function saveTokens(authResult, email) {
     var tokens = {
@@ -139,6 +155,8 @@ window.CloudTrilhasAuth = (function () {
       if (prev && prev.email) tokens.email = tokens.email || prev.email;
     }
     localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
+    // Cookie de sessão para o gate no edge (validade alinhada ao refresh token)
+    setSessionCookie(30 * 24 * 3600);
   }
 
   function getTokens() {
@@ -168,9 +186,14 @@ window.CloudTrilhasAuth = (function () {
   // Sessão válida? (renova se expirou)
   async function isAuthenticated() {
     var tokens = getTokens();
-    if (!tokens || !tokens.accessToken) return false;
-    if (Date.now() < tokens.expiresAt - 60000) return true; // ainda válido
-    return await refreshSession();  // tenta renovar
+    if (!tokens || !tokens.accessToken) { clearSessionCookie(); return false; }
+    if (Date.now() < tokens.expiresAt - 60000) {
+      setSessionCookie(30 * 24 * 3600); // mantém o cookie de sessão vivo
+      return true;
+    }
+    var renovado = await refreshSession(); // tenta renovar
+    if (!renovado) clearSessionCookie();
+    return renovado;
   }
 
   function currentUserEmail() {
@@ -180,6 +203,7 @@ window.CloudTrilhasAuth = (function () {
 
   function logout() {
     localStorage.removeItem(TOKENS_KEY);
+    clearSessionCookie();
   }
 
   return {

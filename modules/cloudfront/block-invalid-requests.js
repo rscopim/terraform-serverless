@@ -90,6 +90,50 @@ function handler(event) {
       };
     }
   }
-  
+
+  // ==========================================================================
+  // 8. GATE DE AUTENTICACAO (bloqueio REAL no edge)
+  //    Conteudo de trilha/sandbox so e servido se houver cookie de sessao.
+  //    Sem cookie -> redireciona 302 para o login (nao entrega o HTML).
+  //    Isso bloqueia mesmo com JS desligado ou acesso direto pela URL.
+  // ==========================================================================
+
+  // Rotas/prefixos que exigem login (conteudo protegido)
+  var protectedPrefixes = [
+    '/python/', '/linux/', '/docker/', '/terraform/', '/redes/', '/github/',
+    '/ai-practitioner/', '/cloud-practitioner/', '/developer/',
+    '/solutions-architect/', '/solutions-architect-pro/'
+  ];
+  var protectedPages = ['/sandbox.html', '/dashboard.html'];
+
+  var isProtected = false;
+  for (var i = 0; i < protectedPrefixes.length; i++) {
+    if (uri.indexOf(protectedPrefixes[i]) === 0) { isProtected = true; break; }
+  }
+  if (!isProtected) {
+    for (var j = 0; j < protectedPages.length; j++) {
+      if (uri === protectedPages[j]) { isProtected = true; break; }
+    }
+  }
+
+  if (isProtected) {
+    // Verifica cookie de sessao 'ct_session' (setado pelo auth.js apos login)
+    var hasSession = false;
+    if (headers.cookie) {
+      hasSession = headers.cookie.value.indexOf('ct_session=') !== -1;
+    }
+    if (!hasSession) {
+      var redirectTo = '/login.html?redirect=' + encodeURIComponent(uri);
+      return {
+        statusCode: 302,
+        statusDescription: 'Found',
+        headers: {
+          'location': { value: redirectTo },
+          'cache-control': { value: 'no-store' }
+        }
+      };
+    }
+  }
+
   return request;
 }
