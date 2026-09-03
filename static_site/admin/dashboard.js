@@ -657,12 +657,55 @@
             }
         }
 
+        function renderAlarms(alarms) {
+            const okEl = document.getElementById('alarmsOk');
+            const inAlarmEl = document.getElementById('alarmsInAlarm');
+            const noDataEl = document.getElementById('alarmsNoData');
+            const tableEl = document.getElementById('alarmsTable');
+            if (!tableEl) return;
+
+            if (!alarms || !alarms.summary) {
+                if (okEl) okEl.textContent = '—';
+                if (inAlarmEl) inAlarmEl.textContent = '—';
+                if (noDataEl) noDataEl.textContent = '—';
+                tableEl.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Alarmes indisponíveis</td></tr>';
+                return;
+            }
+
+            const s = alarms.summary;
+            if (okEl) okEl.textContent = formatNumber(s.ok || 0);
+            if (inAlarmEl) inAlarmEl.textContent = formatNumber(s.in_alarm || 0);
+            if (noDataEl) noDataEl.textContent = formatNumber(s.insufficient_data || 0);
+
+            const lista = alarms.alarms || [];
+            tableEl.innerHTML = lista.map(a => {
+                let badge;
+                if (a.state === 'ALARM') {
+                    badge = '<span class="badge badge-red">🔴 Em alarme</span>';
+                } else if (a.state === 'OK') {
+                    badge = '<span class="badge badge-green">🟢 OK</span>';
+                } else {
+                    badge = '<span class="badge" style="background:rgba(148,163,184,0.2);color:#cbd5e1;">⏳ Sem dados</span>';
+                }
+                return `
+                    <tr>
+                        <td>${escapeHtml(a.name)}</td>
+                        <td>${escapeHtml(a.metric || '—')}</td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Nenhum alarme configurado</td></tr>';
+        }
+
         function renderGovernance(governance) {
             const totalEl = document.getElementById('governanceTotal');
             const compliantEl = document.getElementById('governanceCompliant');
             const pendingEl = document.getElementById('governancePending');
             const tableEl = document.getElementById('governanceTable');
             const metaEl = document.getElementById('governanceMeta');
+
+            // Alarmes vem no mesmo payload de /governance
+            renderAlarms(governance ? governance.alarms : null);
 
             if (!governance || !governance.summary) {
                 totalEl.textContent = '—';
