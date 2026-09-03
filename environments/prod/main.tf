@@ -279,12 +279,31 @@ module "admin_auth" {
   allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }
 
+# Lambda de Post Confirmation do Cognito — grava lead na tabela de leads
+# quando um aluno confirma o cadastro.
+module "cognito_post_confirmation" {
+  source = "../../modules/cognito_post_confirmation"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_source_file = "${path.root}/../../lambda_src/cognito_post_confirmation/app.py"
+  lambda_output_path = "${path.root}/cognito_post_confirmation.zip"
+
+  leads_table_name = module.dynamodb_leads.table_name
+  leads_table_arn  = module.dynamodb_leads.table_arn
+  sns_topic_arn    = module.sns.topic_arn
+}
+
 # Autenticação de alunos via Amazon Cognito (login/senha, self sign-up)
 module "cognito" {
   source = "../../modules/cognito"
 
   project_name = var.project_name
   environment  = var.environment
+
+  # Trigger que grava o lead no cadastro (alimenta a tabela de leads via Cognito)
+  post_confirmation_lambda_arn = module.cognito_post_confirmation.lambda_function_arn
 
   # Garante que a policy da role do GitHub Actions (com permissão cognito-idp)
   # seja atualizada ANTES de tentar criar o User Pool, evitando AccessDenied.
