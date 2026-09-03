@@ -33,6 +33,9 @@
     .loader { color:#fbbf24; }
     .status-pill { font-size:0.75rem; padding:3px 10px; border-radius:999px; background:rgba(251,191,36,0.15); color:#fbbf24; }
     .status-pill.ready { background:rgba(34,197,94,0.15); color:#4ade80; }
+    .ex-nivel { color:#fbbf24; font-size:0.74rem; font-weight:700; margin:10px 0 6px; text-transform:uppercase; letter-spacing:.5px; }
+    .ex-item { display:block; width:100%; text-align:left; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1; padding:8px 10px; border-radius:8px; margin-bottom:6px; cursor:pointer; font-size:0.82rem; }
+    .ex-item:hover { background:rgba(99,102,241,0.15); }
   </style>
 </head>
 <body>
@@ -42,6 +45,7 @@
       <div class="nav-actions">
         <a href="index.html" class="nav-link">Início</a>
         <a href="python.html" class="nav-link">Python</a>
+        <a href="sandbox-linux.html" class="nav-link">🐧 Sandbox Linux</a>
         <a href="index.html#trilhas" class="nav-link">Trilhas</a>
         <a href="index.html" class="nav-button">Voltar</a>
         <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
@@ -62,9 +66,9 @@
   <main>
     <section class="training-hero">
       <div class="container training-hero-content">
-        <span class="pill">🧪 Sandbox de Prática</span>
+        <span class="pill">🐍 Sandbox Python</span>
         <h1>Treine Python no Navegador</h1>
-        <p>Um ambiente Python completo que roda 100% no seu navegador — sem instalar nada, sem cadastro, sem custo. Escreva código, execute e veja o resultado na hora. Ideal para praticar o que você aprende na trilha de Python.</p>
+        <p>Um ambiente Python completo que roda 100% no seu navegador — sem instalar nada, sem custo. Pratique com <strong>exercícios guiados por categoria</strong> (Fundamentos, Intermediário, Avançado, AWS e IA) ou escreva código livre. O interpretador é o CPython real (Pyodide). Procurando Linux? <a href="sandbox-linux.html" style="color:#818cf8">Abra o Sandbox Linux</a>.</p>
       </div>
     </section>
 
@@ -78,6 +82,9 @@
 
         <div class="sandbox-wrap">
           <aside class="sandbox-sidebar">
+            <button class="btn-run" id="pyModoLivreBtn" style="width:100%;margin-bottom:12px">🎮 Modo Livre</button>
+            <h3>🎯 Exercícios</h3>
+            <div id="pyExList" style="margin-bottom:16px"></div>
             <h3>📚 Exemplos</h3>
             <button class="example-btn" data-ex="ola">👋 Olá, mundo</button>
             <button class="example-btn" data-ex="variaveis">🔢 Variáveis e tipos</button>
@@ -90,6 +97,13 @@
           </aside>
 
           <div>
+            <div id="pyExPainel" style="display:none;background:#0b1120;border:1px solid rgba(99,102,241,0.4);border-radius:12px;padding:16px;margin-bottom:14px">
+              <span style="display:inline-block;background:rgba(251,191,36,0.15);color:#fbbf24;padding:2px 10px;border-radius:999px;font-size:0.72rem;font-weight:700" id="pyExCat">Fundamentos</span>
+              <h4 style="color:#fff;margin:8px 0 4px" id="pyExTitulo">—</h4>
+              <p style="color:#cbd5e1;font-size:0.86rem;margin:0" id="pyExDesc">—</p>
+              <div id="pyExFeedback" style="display:none;margin-top:10px"></div>
+            </div>
+
             <div class="editor-card">
               <div class="editor-toolbar">
                 <span class="lang-tag">🐍 main.py</span>
