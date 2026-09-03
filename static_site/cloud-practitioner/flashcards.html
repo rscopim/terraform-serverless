@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudTrilhas — Cloud Practitioner: Flash Cards</title>
+  <meta name="description" content="Flash cards dos serviços AWS do exame Cloud Practitioner (CLF-C02) com palavras-chave para memorização rápida." />
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../linux-training.css" />
+  <style>
+    .fc-controls { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:24px 0; }
+    .fc-controls select { padding:10px 14px; border-radius:10px; border:1px solid var(--gray-200,#e2e8f0); font-size:0.9rem; background:#fff; min-width:220px; }
+    .fc-btn { background:#6366f1; color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem; }
+    .fc-btn.ghost { background:transparent; border:1px solid var(--gray-300,#cbd5e1); color:var(--gray-600,#475569); }
+    .fc-counter { margin-left:auto; color:var(--gray-500,#64748b); font-size:0.9rem; font-weight:600; }
+
+    .fc-stage { perspective:1400px; max-width:640px; margin:0 auto; }
+    .fc-card { position:relative; width:100%; min-height:320px; cursor:pointer; transform-style:preserve-3d; transition:transform .5s; }
+    .fc-card.flipped { transform:rotateY(180deg); }
+    .fc-face { position:absolute; inset:0; backface-visibility:hidden; border-radius:20px; padding:34px; display:flex; flex-direction:column; justify-content:center; box-shadow:0 12px 40px rgba(15,23,42,0.12); }
+    .fc-front { background:linear-gradient(140deg,#0f172a,#312e81); color:#fff; }
+    .fc-back { background:linear-gradient(140deg,#065f46,#0f766e); color:#fff; transform:rotateY(180deg); }
+    .fc-cat { font-size:0.72rem; letter-spacing:.6px; text-transform:uppercase; font-weight:700; padding:4px 12px; border-radius:999px; background:rgba(255,255,255,0.15); align-self:flex-start; margin-bottom:16px; }
+    .fc-service { font-size:1.55rem; font-weight:800; line-height:1.2; margin:0 0 14px; }
+    .fc-desc { font-size:1rem; line-height:1.55; color:rgba(255,255,255,0.9); margin:0; }
+    .fc-back .fc-label { font-size:0.8rem; text-transform:uppercase; letter-spacing:.6px; opacity:.8; margin:0 0 8px; }
+    .fc-key { font-size:1.5rem; font-weight:800; line-height:1.3; margin:0; }
+    .fc-nokey { font-size:1.05rem; opacity:.85; }
+    .fc-hint { text-align:center; color:var(--gray-500,#64748b); font-size:0.82rem; margin-top:14px; }
+
+    .fc-nav { display:flex; justify-content:center; gap:12px; margin-top:22px; }
+    .fc-nav button { background:#fff; border:1px solid var(--gray-300,#cbd5e1); color:var(--gray-700,#334155); padding:10px 22px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.9rem; }
+    .fc-nav button:disabled { opacity:.4; cursor:not-allowed; }
+    .fc-empty { text-align:center; color:var(--gray-500,#64748b); padding:60px 0; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav container">
+      <a href="../index.html" class="brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /></a>
+      <div class="nav-actions">
+        <a href="../cloud-practitioner.html" class="nav-link">← Voltar ao Curso</a>
+        <a href="simulado.html" class="nav-link">Simulado</a>
+        <a href="../index.html" class="nav-button">Início</a>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-mobile').classList.toggle('active')">☰</button>
+      </div>
+    </nav>
+    <div class="nav-mobile">
+      <a href="../index.html">Início</a>
+      <a href="../cloud-practitioner.html">Cloud Practitioner</a>
+      <a href="dominio-01.html">Domínio 01</a>
+      <a href="dominio-02.html">Domínio 02</a>
+      <a href="dominio-03.html">Domínio 03</a>
+      <a href="dominio-04.html">Domínio 04</a>
+      <a href="simulado.html">Simulado</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="training-hero">
+      <div class="container training-hero-content">
+        <span class="pill">☁️ Cloud Practitioner (CLF-C02)</span>
+        <h1>Flash Cards dos Serviços AWS</h1>
+        <p>Memorize os serviços cobrados no exame com o padrão que funciona na prova: veja o serviço e o que ele faz na frente, vire a carta e confira a <strong>palavra-chave</strong> que identifica o serviço na questão.</p>
+      </div>
+    </section>
+
+    <section class="module-section">
+      <div class="container">
+        <div class="fc-controls">
+          <select id="fcCategoria" aria-label="Filtrar por categoria"></select>
+          <button class="fc-btn ghost" id="fcShuffle">🔀 Embaralhar</button>
+          <button class="fc-btn ghost" id="fcReset">↺ Reiniciar</button>
+          <span class="fc-counter" id="fcCounter">—</span>
+        </div>
+
+        <div id="fcArea">
+          <div class="fc-stage">
+            <div class="fc-card" id="fcCard">
+              <div class="fc-face fc-front">
+                <span class="fc-cat" id="fcCat">—</span>
+                <h2 class="fc-service" id="fcService">—</h2>
+                <p class="fc-desc" id="fcDesc">—</p>
+              </div>
+              <div class="fc-face fc-back">
+                <p class="fc-label">🔑 Palavra-chave</p>
+                <p class="fc-key" id="fcKey">—</p>
+              </div>
+            </div>
+          </div>
+          <p class="fc-hint">Clique na carta (ou pressione Espaço) para virar. Use ← → para navegar.</p>
+
+          <div class="fc-nav">
+            <button id="fcPrev">← Anterior</button>
+            <button id="fcNext">Próximo →</button>
+          </div>
+        </div>
+
+        <div class="fc-empty" id="fcEmpty" style="display:none">Nenhum card nesta categoria.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand"><img src="../assets/logo/cloudtrilhas-logo.svg" alt="CloudTrilhas" /><p>Trilhas e materiais práticos para evolução em Cloud, DevOps e Arquitetura.</p></div>
+      <div class="footer-column"><h2>Cloud</h2><a href="../aws.html">AWS</a><a href="../cloud-practitioner.html">Cloud Practitioner</a><a href="../ai-practitioner.html">AI Practitioner</a><a href="../developer.html">Developer</a><a href="../solutions-architect.html">Solutions Architect</a></div>
+      <div class="footer-column"><h2>DevOps</h2><a href="../linux.html">Linux</a><a href="../docker.html">Docker &amp; K8s</a><a href="../terraform.html">Terraform</a><a href="../python.html">Python</a><a href="../redes.html">Redes</a><a href="../github.html">GitHub</a></div>
+      <div class="footer-column"><h2>Projeto</h2><a href="../about.html">Sobre</a><a href="../contact.html">Contato</a><a href="https://github.com/rscopim" target="_blank" rel="noopener">GitHub</a></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 CloudTrilhas. Projeto educacional por Ricardo Simines Scopim.</p></div>
+  </footer>
+
+  <script src="../trail-gate.js"></script>
+  <script src="../config.js"></script>
+  <script src="flashcards-data.js"></script>
+  <script src="flashcards.js"></script>
+</body>
+</html>

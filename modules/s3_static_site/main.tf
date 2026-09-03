@@ -404,6 +404,23 @@ resource "aws_s3_object" "cloud_practitioner_modules" {
   etag = filemd5("${path.root}/../../static_site/cloud-practitioner/${each.value}")
 }
 
+# Scripts JS da trilha Cloud Practitioner (flash cards).
+# Obs.: questoes.js é enviado manualmente ao S3 (está no .gitignore) e por isso
+# fica de fora deste fileset para manter consistência entre local e CI.
+resource "aws_s3_object" "cloud_practitioner_js" {
+  for_each = toset([
+    for f in fileset("${path.root}/../../static_site/cloud-practitioner", "*.js") : f
+    if f != "questoes.js"
+  ])
+
+  bucket       = aws_s3_bucket.this.id
+  key          = "cloud-practitioner/${each.value}"
+  source       = "${path.root}/../../static_site/cloud-practitioner/${each.value}"
+  content_type = "application/javascript"
+
+  etag = filemd5("${path.root}/../../static_site/cloud-practitioner/${each.value}")
+}
+
 resource "aws_s3_object" "solutions_architect_modules" {
   for_each = fileset("${path.root}/../../static_site/solutions-architect", "*.html")
 
