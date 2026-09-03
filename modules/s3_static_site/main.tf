@@ -550,6 +550,23 @@ resource "aws_s3_object" "sandbox_linux_js" {
   etag         = filemd5("${path.root}/../../static_site/sandbox-linux.js")
 }
 
+# Sandbox Redes (calculadora subnet/CIDR, roteamento, OSI, client-side)
+resource "aws_s3_object" "sandbox_redes_page" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandbox-redes.html"
+  source       = "${path.root}/../../static_site/sandbox-redes.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.root}/../../static_site/sandbox-redes.html")
+}
+
+resource "aws_s3_object" "sandbox_redes_js" {
+  bucket       = aws_s3_bucket.this.id
+  key          = "sandbox-redes.js"
+  source       = "${path.root}/../../static_site/sandbox-redes.js"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.root}/../../static_site/sandbox-redes.js")
+}
+
 # Dashboard do aluno (progresso + simulados)
 resource "aws_s3_object" "dashboard_page" {
   bucket       = aws_s3_bucket.this.id
