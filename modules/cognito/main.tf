@@ -87,6 +87,14 @@ resource "aws_cognito_user_group" "student" {
   user_pool_id = aws_cognito_user_pool.this.id
 }
 
+# Grupo de administradores (acesso ao dashboard de analytics)
+resource "aws_cognito_user_group" "admin" {
+  name         = "admin"
+  description  = "Administradores com acesso ao dashboard de analytics/custos/governança"
+  user_pool_id = aws_cognito_user_pool.this.id
+  precedence   = 1
+}
+
 # Client web público (SPA) — sem client secret
 resource "aws_cognito_user_pool_client" "web" {
   name         = "${var.project_name}-${var.environment}-web"

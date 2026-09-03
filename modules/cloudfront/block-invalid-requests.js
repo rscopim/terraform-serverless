@@ -102,7 +102,7 @@ function handler(event) {
   var protectedPrefixes = [
     '/python/', '/linux/', '/docker/', '/terraform/', '/redes/', '/github/',
     '/ai-practitioner/', '/cloud-practitioner/', '/developer/',
-    '/solutions-architect/', '/solutions-architect-pro/'
+    '/solutions-architect/', '/solutions-architect-pro/', '/admin/'
   ];
   var protectedPages = ['/sandbox.html', '/dashboard.html'];
 

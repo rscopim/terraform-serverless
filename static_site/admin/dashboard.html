@@ -13,11 +13,29 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-box">
             <h2>🔒 CloudTrilhas Admin</h2>
-            <p style="color:#94a3b8;margin-bottom:1.5rem;">Entre com seu usuário administrativo</p>
-            <input type="text" id="authUsername" placeholder="Usuário" autocomplete="username">
+            <p style="color:#94a3b8;margin-bottom:1.5rem;">Entre com seu e-mail e senha (Cognito)</p>
+            <input type="email" id="authUsername" placeholder="E-mail" autocomplete="email">
             <input type="password" id="authPassword" placeholder="Senha" autocomplete="current-password">
             <button id="loginButton" onclick="authenticate()">Entrar</button>
-            <p class="auth-error" id="authError">Usuário ou senha inválidos.</p>
+            <p class="auth-error" id="authError">E-mail ou senha inválidos.</p>
+            <p style="margin-top:1rem"><a href="#" id="forgotLink" style="color:#818cf8;font-size:0.85rem;text-decoration:none">Esqueci minha senha</a></p>
+        </div>
+    </div>
+
+    <!-- Recuperar Senha Overlay -->
+    <div class="auth-overlay hidden" id="recoverOverlay">
+        <div class="auth-box">
+            <h2>🔑 Recuperar senha</h2>
+            <p style="color:#94a3b8;margin-bottom:1rem;">Enviaremos um código ao seu e-mail.</p>
+            <input type="email" id="recEmail" placeholder="E-mail" autocomplete="email">
+            <button id="recSendBtn" onclick="recoverSend()">Enviar código</button>
+            <div id="recStep2" class="hidden" style="margin-top:0.75rem">
+                <input type="text" id="recCode" placeholder="Código recebido" inputmode="numeric">
+                <input type="password" id="recNewPass" placeholder="Nova senha" autocomplete="new-password">
+                <button id="recResetBtn" onclick="recoverConfirm()">Redefinir senha</button>
+            </div>
+            <p class="auth-error" id="recMsg" style="display:none"></p>
+            <p style="margin-top:1rem"><a href="#" id="backToLoginLink" style="color:#818cf8;font-size:0.85rem;text-decoration:none">← Voltar ao login</a></p>
         </div>
     </div>
 
@@ -301,6 +319,8 @@
 
     </div>
 
-        <script src="dashboard.js" defer></script>
+    <script src="../config.js"></script>
+    <script src="../auth.js"></script>
+    <script src="dashboard.js" defer></script>
 </body>
 </html>

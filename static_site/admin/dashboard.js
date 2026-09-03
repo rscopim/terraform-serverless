@@ -17,33 +17,34 @@
         let sourcesChart = null;
         let currentPeriod = 7;
 
-        // === Authentication ===
+        // === Authentication (Amazon Cognito) ===
         function getAuthToken() {
-            return sessionStorage.getItem(SESSION_TOKEN_KEY) || '';
+            var t = window.CloudTrilhasAuth && window.CloudTrilhasAuth.getTokens();
+            return t ? t.accessToken : '';
         }
 
         function getAuthenticatedUser() {
-            const storedUser = sessionStorage.getItem(SESSION_USER_KEY);
-
-            if (!storedUser) return null;
-
-            try {
-                return JSON.parse(storedUser);
-            } catch (error) {
-                console.error('Usuário da sessão inválido:', error);
-                return null;
-            }
+            if (!window.CloudTrilhasAuth) return null;
+            var email = window.CloudTrilhasAuth.currentUserEmail();
+            if (!email) return null;
+            return {
+                username: email,
+                name: email,
+                email: email,
+                role: window.CloudTrilhasAuth.isAdmin() ? 'ADMIN' : 'VIEWER'
+            };
         }
 
         function isAdminUser() {
-            return getAuthenticatedUser()?.role === 'ADMIN';
+            return window.CloudTrilhasAuth && window.CloudTrilhasAuth.isAdmin();
         }
 
         function configureAccessByRole() {
+            // A gestão de usuários agora é feita no console do Amazon Cognito
+            // (grupo 'admin'). A seção antiga de admin_auth fica oculta.
             const adminUsersSection = document.getElementById('adminUsersSection');
-
             if (adminUsersSection) {
-                adminUsersSection.classList.toggle('hidden', !isAdminUser());
+                adminUsersSection.classList.add('hidden');
             }
         }
 
@@ -58,9 +59,7 @@
         }
 
         function clearSession() {
-            sessionStorage.removeItem(SESSION_TOKEN_KEY);
-            sessionStorage.removeItem(SESSION_USER_KEY);
-            sessionStorage.removeItem(SESSION_EXPIRES_KEY);
+            if (window.CloudTrilhasAuth) window.CloudTrilhasAuth.logout();
         }
 
         function showLogin(message = '') {
@@ -86,15 +85,15 @@
         }
 
         async function authenticate() {
-            const username = document.getElementById('authUsername').value.trim().toLowerCase();
+            const email = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value;
             const errorEl = document.getElementById('authError');
             const button = document.getElementById('loginButton');
 
             errorEl.style.display = 'none';
 
-            if (!username || !password) {
-                errorEl.textContent = 'Informe o usuário e a senha.';
+            if (!email || !password) {
+                errorEl.textContent = 'Informe o e-mail e a senha.';
                 errorEl.style.display = 'block';
                 return;
             }
@@ -103,28 +102,19 @@
             button.textContent = 'Entrando...';
 
             try {
-                const response = await fetch(AUTH_LOGIN_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
+                await window.CloudTrilhasAuth.signIn(email, password);
 
-                const result = await response.json().catch(() => ({}));
-
-                if (!response.ok || !result.token) {
-                    throw new Error(result.message || 'Falha na autenticação.');
+                // Só administradores (grupo 'admin' no Cognito) acessam o dashboard
+                if (!window.CloudTrilhasAuth.isAdmin()) {
+                    window.CloudTrilhasAuth.logout();
+                    throw new Error('Acesso restrito a administradores.');
                 }
 
-                sessionStorage.setItem(SESSION_TOKEN_KEY, result.token);
-                sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(result.user || {}));
-                sessionStorage.setItem(SESSION_EXPIRES_KEY, result.expires_at || '');
-
-                showDashboard(result.user || { username });
+                showDashboard(getAuthenticatedUser());
                 await loadData();
             } catch (error) {
                 console.error('Erro de autenticação:', error);
-                clearSession();
-                errorEl.textContent = 'Usuário ou senha inválidos.';
+                errorEl.textContent = error.message || 'E-mail ou senha inválidos.';
                 errorEl.style.display = 'block';
                 document.getElementById('authPassword').value = '';
                 document.getElementById('authPassword').focus();
@@ -135,19 +125,52 @@
         }
 
         async function logout() {
-            const token = getAuthToken();
+            if (window.CloudTrilhasAuth) window.CloudTrilhasAuth.logout();
+            showLogin();
+        }
 
+        // === Recuperação de senha (Cognito) ===
+        function showRecover() {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('recoverOverlay').classList.remove('hidden');
+        }
+        function backToLogin() {
+            document.getElementById('recoverOverlay').classList.add('hidden');
+            document.getElementById('authOverlay').classList.remove('hidden');
+        }
+        async function recoverSend() {
+            const email = document.getElementById('recEmail').value.trim();
+            const msg = document.getElementById('recMsg');
+            msg.style.display = 'none';
+            if (!email) { msg.textContent = 'Informe o e-mail.'; msg.style.display = 'block'; return; }
             try {
-                if (token) {
-                    await fetch(AUTH_LOGOUT_URL, {
-                        method: 'POST',
-                        headers: getAuthHeaders()
-                    });
-                }
-            } catch (error) {
-                console.error('Erro ao encerrar sessão:', error);
-            } finally {
-                showLogin();
+                await window.CloudTrilhasAuth.forgotPassword(email);
+                document.getElementById('recStep2').classList.remove('hidden');
+                msg.style.color = '#4ade80';
+                msg.textContent = 'Código enviado! Verifique seu e-mail.';
+                msg.style.display = 'block';
+            } catch (e) {
+                msg.style.color = '#f87171';
+                msg.textContent = e.message || 'Falha ao enviar código.';
+                msg.style.display = 'block';
+            }
+        }
+        async function recoverConfirm() {
+            const email = document.getElementById('recEmail').value.trim();
+            const code = document.getElementById('recCode').value.trim();
+            const novo = document.getElementById('recNewPass').value;
+            const msg = document.getElementById('recMsg');
+            msg.style.display = 'none';
+            try {
+                await window.CloudTrilhasAuth.confirmForgotPassword(email, code, novo);
+                msg.style.color = '#4ade80';
+                msg.textContent = 'Senha redefinida! Você já pode entrar.';
+                msg.style.display = 'block';
+                setTimeout(backToLogin, 1500);
+            } catch (e) {
+                msg.style.color = '#f87171';
+                msg.textContent = e.message || 'Falha ao redefinir senha.';
+                msg.style.display = 'block';
             }
         }
 
@@ -181,33 +204,31 @@
         });
 
         async function restoreSession() {
-            const token = getAuthToken();
-            const storedUser = sessionStorage.getItem(SESSION_USER_KEY);
-            const expiresAt = sessionStorage.getItem(SESSION_EXPIRES_KEY);
+            if (!window.CloudTrilhasAuth) { showLogin(); return; }
 
-            if (!token || !storedUser) {
-                showLogin();
+            var logado = false;
+            try { logado = await window.CloudTrilhasAuth.isAuthenticated(); } catch (e) { logado = false; }
+
+            if (!logado) { showLogin(); return; }
+
+            // Sessão Cognito válida — exige grupo admin para o dashboard
+            if (!window.CloudTrilhasAuth.isAdmin()) {
+                showLogin('Acesso restrito a administradores.');
                 return;
             }
 
-            if (expiresAt) {
-                const expiration = new Date(expiresAt);
-
-                if (!Number.isNaN(expiration.getTime()) && expiration <= new Date()) {
-                    showLogin('Sua sessão expirou. Entre novamente.');
-                    return;
-                }
-            }
-
             try {
-                const user = JSON.parse(storedUser);
-                showDashboard(user);
+                showDashboard(getAuthenticatedUser());
                 await loadData();
             } catch (error) {
                 console.error('Erro ao restaurar sessão:', error);
                 showLogin('Não foi possível restaurar a sessão. Entre novamente.');
             }
         }
+
+        // Liga os links de recuperação de senha
+        document.getElementById('forgotLink').addEventListener('click', function (e) { e.preventDefault(); showRecover(); });
+        document.getElementById('backToLoginLink').addEventListener('click', function (e) { e.preventDefault(); backToLogin(); });
 
         restoreSession();
 
