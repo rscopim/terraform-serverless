@@ -51,30 +51,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan -out=tfplan
-
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan
-          path: environments/prod/tfplan
-
-      - name: Upload Lambda ZIP files
-        uses: actions/upload-artifact@v4
-        with:
-          name: lambda-zips
-          path: |
-            environments/prod/hello_lambda.zip
-            environments/prod/register_lead.zip
-            environments/prod/download_metrics.zip
-            environments/prod/analytics.zip
-            environments/prod/visitor_counter.zip
-            environments/prod/costs.zip
-            environments/prod/governance.zip
-            environments/prod/admin_login.zip
-            environments/prod/admin_users.zip
-            environments/prod/student_progress.zip
-            
+        run: terraform plan
 
   terraform-apply:
     name: Terraform Apply
@@ -105,22 +82,14 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan
-          path: environments/prod
-
-      - name: Download Lambda ZIP files
-        uses: actions/download-artifact@v4
-        with:
-          name: lambda-zips
-          path: environments/prod
-          
-
+      # O apply regenera os ZIPs das Lambdas localmente via archive_file
+      # (o código-fonte está no checkout deste job) e reconcilia com o state
+      # ATUAL. Isso torna o pipeline resiliente: qualquer Lambda nova é
+      # empacotada automaticamente, sem depender de upload/download de artifacts
+      # nem de um plan salvo que pode ficar obsoleto ("stale plan").
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
 
       - name: Invalidate CloudFront Cache
         run: |
