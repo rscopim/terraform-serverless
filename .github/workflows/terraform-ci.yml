@@ -73,6 +73,7 @@ jobs:
             environments/prod/governance.zip
             environments/prod/admin_login.zip
             environments/prod/admin_users.zip
+            environments/prod/student_progress.zip
             
 
   terraform-apply:
