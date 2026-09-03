@@ -122,6 +122,7 @@ def aggregate_metrics(items: list, days: int) -> dict:
     total_simulado_access = 0
     total_simulado_results = 0
     total_downloads = 0
+    total_cadastros = 0
 
     # Agregações por categoria
     trails_count = defaultdict(int)
@@ -175,6 +176,10 @@ def aggregate_metrics(items: list, days: int) -> dict:
             # Leads são registros de captura (downloads/formulários)
             total_downloads += 1
 
+        elif record_type == "cadastro":
+            # Cadastros de alunos vindos do Cognito (Post Confirmation)
+            total_cadastros += 1
+
         # Fonte (source) - conta para todos os tipos
         if source:
             sources_count[source] += 1
@@ -194,10 +199,14 @@ def aggregate_metrics(items: list, days: int) -> dict:
 
         # Registros recentes (para lista de usuários)
         if name and created_at:
+            # Para cadastros do Cognito, mostra um rótulo amigável na coluna "página"
+            page_label = page
+            if not page_label and record_type == "cadastro":
+                page_label = "Cadastro (Cognito)"
             recent_records.append({
                 "name": name,
                 "email": mask_email(email) if email else "",
-                "page": page,
+                "page": page_label,
                 "date": created_at[:10] if len(created_at) >= 10 else created_at,
                 "created_at_raw": created_at,
             })
@@ -250,6 +259,7 @@ def aggregate_metrics(items: list, days: int) -> dict:
             "total_simulado_access": total_simulado_access,
             "total_simulado_results": total_simulado_results,
             "total_downloads": total_downloads,
+            "total_cadastros": total_cadastros,
         },
         "trails": trails_sorted,
         "sources": sources_sorted,
@@ -278,6 +288,7 @@ def build_report_text(metrics: dict) -> str:
         f"  Acessos a simulados: {summary['total_simulado_access']}",
         f"  Resultados de simulados: {summary['total_simulado_results']}",
         f"  Downloads/Leads: {summary['total_downloads']}",
+        f"  Cadastros (Cognito): {summary.get('total_cadastros', 0)}",
         "",
     ]
 

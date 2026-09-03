@@ -319,6 +319,8 @@
             // Summary Cards
             const s = data.summary || {};
             document.getElementById('totalUsers').textContent = formatNumber(s.unique_users || 0);
+            var cadEl = document.getElementById('totalCadastros');
+            if (cadEl) cadEl.textContent = formatNumber(s.total_cadastros || 0);
             document.getElementById('trailAccess').textContent = formatNumber(s.total_trail_access || 0);
             document.getElementById('totalSimulados').textContent = formatNumber(s.total_simulado_access || 0);
             document.getElementById('totalDownloads').textContent = formatNumber(s.total_downloads || 0);
