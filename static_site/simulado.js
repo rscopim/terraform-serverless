@@ -305,15 +305,31 @@ function trackSimuladoResult(scoreVal, totalVal) {
 // ===== FIM TRACKING =====
 
 // ===== INICIALIZAÇÃO =====
-// Se já tem dados salvos, pula o formulário
-if (checkSavedUser()) {
-  // Já identificado — inicia normalmente
-  var qc = document.getElementById('quizContainer');
-  if (qc && qc.style.display !== 'none') {
+// A identificação agora vem do Cognito (o aluno já está logado para acessar
+// a trilha). Não pedimos mais nome/e-mail — usamos a sessão automaticamente.
+(function iniciarSimulado() {
+  // Preenche identidade a partir da sessão Cognito, se disponível
+  try {
+    if (window.CloudTrilhasAuth) {
+      var email = window.CloudTrilhasAuth.currentUserEmail();
+      if (email) {
+        quizUserEmail = email;
+        quizUserName = email.split('@')[0];
+      }
+    }
+  } catch (e) {}
+
+  // Fallback: reaproveita dados locais antigos, se houver
+  if (!quizUserEmail) { checkSavedUser(); }
+
+  // Mostra o seletor de tamanho (quizSetup) ou inicia direto (quizContainer),
+  // sem exigir formulário de identificação.
+  var quizSetup = document.getElementById('quizSetup');
+  var quizContainer = document.getElementById('quizContainer');
+  if (quizSetup) {
+    quizSetup.style.display = 'block';
+  } else if (quizContainer && quizContainer.style.display !== 'none') {
     initQuiz();
   }
-} else {
-  // Precisa preencher formulário
-  createUserForm();
-}
+})();
 // ===== FIM INICIALIZAÇÃO =====

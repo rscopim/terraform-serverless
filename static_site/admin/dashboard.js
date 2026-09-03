@@ -211,11 +211,23 @@
 
             if (!logado) { showLogin(); return; }
 
-            // Sessão Cognito válida — exige grupo admin para o dashboard
+            // Sessão Cognito válida — exige grupo admin para o dashboard.
+            // Se o token nao tem o grupo admin, pode ser um token antigo (o
+            // grupo so entra no token em um login novo). Forcamos um re-login
+            // uma unica vez para atualizar as permissoes automaticamente.
             if (!window.CloudTrilhasAuth.isAdmin()) {
-                showLogin('Acesso restrito a administradores. Se você foi adicionado ao grupo admin recentemente, saia e entre novamente para atualizar suas permissões.');
+                var jaTentou = sessionStorage.getItem('ct_admin_relogin');
+                if (!jaTentou) {
+                    sessionStorage.setItem('ct_admin_relogin', '1');
+                    window.CloudTrilhasAuth.logout();
+                    window.location.replace('../login.html?redirect=/admin/dashboard.html');
+                    return;
+                }
+                sessionStorage.removeItem('ct_admin_relogin');
+                showLogin('Acesso restrito a administradores. Sua conta não está no grupo de administradores.');
                 return;
             }
+            sessionStorage.removeItem('ct_admin_relogin');
 
             try {
                 showDashboard(getAuthenticatedUser());
