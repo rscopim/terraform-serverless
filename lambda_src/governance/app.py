@@ -4,6 +4,7 @@ import os
 import boto3
 
 tagging = boto3.client("resourcegroupstaggingapi")
+cloudwatch = boto3.client("cloudwatch")
 
 ALLOWED_ORIGINS = os.environ.get(
     "ALLOWED_ORIGINS",
@@ -71,6 +72,46 @@ def get_resources():
     return resources
 
 
+def get_alarms():
+    """Resumo dos alarmes CloudWatch do projeto (saude operacional).
+
+    Estados possiveis por alarme: OK, ALARM, INSUFFICIENT_DATA.
+    Retorna a lista e um resumo agregado para o painel administrativo.
+    """
+    alarms = []
+    paginator = cloudwatch.get_paginator("describe_alarms")
+
+    for page in paginator.paginate(AlarmTypes=["MetricAlarm", "CompositeAlarm"]):
+        for item in page.get("MetricAlarms", []) + page.get("CompositeAlarms", []):
+            name = item.get("AlarmName", "")
+            # Considera apenas alarmes do projeto (por prefixo de nome)
+            if PROJECT_TAG_VALUE.lower() not in name.lower():
+                continue
+            alarms.append({
+                "name": name,
+                "state": item.get("StateValue", "INSUFFICIENT_DATA"),
+                "reason": item.get("StateReason", ""),
+                "metric": item.get("MetricName", ""),
+            })
+
+    alarms.sort(key=lambda a: (a["state"] != "ALARM", a["name"]))
+
+    in_alarm = sum(1 for a in alarms if a["state"] == "ALARM")
+    ok = sum(1 for a in alarms if a["state"] == "OK")
+    no_data = sum(1 for a in alarms if a["state"] == "INSUFFICIENT_DATA")
+
+    return {
+        "summary": {
+            "total": len(alarms),
+            "ok": ok,
+            "in_alarm": in_alarm,
+            "insufficient_data": no_data,
+            "healthy": in_alarm == 0,
+        },
+        "alarms": alarms,
+    }
+
+
 def lambda_handler(event, context):
     method = event.get("requestContext", {}).get("http", {}).get("method", "")
 
@@ -91,6 +132,14 @@ def lambda_handler(event, context):
     compliant = sum(1 for resource in resources if resource["compliant"])
     non_compliant = len(resources) - compliant
 
+    # Saude operacional (alarmes CloudWatch). Falha aqui nao derruba a
+    # governanca — retorna alarms=None e o painel mostra "indisponivel".
+    try:
+        alarms = get_alarms()
+    except Exception as error:  # noqa: BLE001
+        print(f"Erro ao consultar alarmes CloudWatch: {error}")
+        alarms = None
+
     return response(
         200,
         {
@@ -101,7 +150,8 @@ def lambda_handler(event, context):
                 "required_tags": REQUIRED_TAGS,
                 "project": PROJECT_TAG_VALUE
             },
-            "resources": resources
+            "resources": resources,
+            "alarms": alarms
         },
         origin,
     )

@@ -278,40 +278,56 @@
         </div>
 
 
-        <!-- Admin Users: exibido somente para perfil ADMIN -->
-        <div class="charts-grid hidden" id="adminUsersSection">
+        <!-- Status dos Serviços -->
+        <div class="charts-grid">
             <div class="card">
-                <h2>👤 Administração de Usuários</h2>
-
-                <div class="user-form-grid">
-                    <input type="text" id="newUsername" placeholder="Usuário (minúsculo)">
-                    <input type="text" id="newUserName" placeholder="Nome completo">
-                    <input type="email" id="newUserEmail" placeholder="E-mail">
-                    <input type="password" id="newUserPassword" placeholder="Senha inicial">
-                    <select id="newUserRole">
-                        <option value="VIEWER">Viewer</option>
-                        <option value="EDITOR">Editor</option>
-                        <option value="ADMIN">Admin</option>
-                    </select>
-                    <button class="btn-refresh" type="button" onclick="createAdminUser()">➕ Criar usuário</button>
-                </div>
-
-                <p class="form-message" id="usersMessage"></p>
-
+                <h2>🩺 Status dos Serviços</h2>
+                <p style="color:#94a3b8;font-size:0.85rem;margin:0 0 1rem">Verificação em tempo real das APIs do CloudTrilhas. Atualiza a cada carregamento do painel.</p>
                 <div class="scrollable-table">
                     <table>
                         <thead>
                             <tr>
-                                <th>Usuário</th>
-                                <th>Nome</th>
-                                <th>E-mail</th>
-                                <th>Perfil</th>
+                                <th>Serviço</th>
+                                <th>Endpoint</th>
                                 <th>Status</th>
-                                <th>Último login</th>
-                                <th>Ações</th>
+                                <th>Latência</th>
                             </tr>
                         </thead>
-                        <tbody id="adminUsersTable"></tbody>
+                        <tbody id="statusTable">
+                            <tr><td colspan="4" style="text-align:center;color:#94a3b8;">Verificando serviços...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="color:#64748b;font-size:0.8rem;margin-top:0.75rem" id="statusMeta">—</p>
+
+                <h2 style="margin-top:1.75rem">🔔 Saúde Operacional (Alarmes CloudWatch)</h2>
+                <p style="color:#94a3b8;font-size:0.85rem;margin:0 0 1rem">Alarmes do projeto monitorados pelo CloudWatch. Em ALARM indica um serviço com problema.</p>
+                <div class="summary-grid" style="margin-bottom:1rem">
+                    <div class="card summary-card" style="box-shadow:none">
+                        <div class="summary-icon trails">✅</div>
+                        <div class="summary-info"><h3 id="alarmsOk">—</h3><p>OK</p></div>
+                    </div>
+                    <div class="card summary-card" style="box-shadow:none">
+                        <div class="summary-icon" style="background:rgba(239,68,68,0.15);color:#f87171">🔴</div>
+                        <div class="summary-info"><h3 id="alarmsInAlarm">—</h3><p>Em Alarme</p></div>
+                    </div>
+                    <div class="card summary-card" style="box-shadow:none">
+                        <div class="summary-icon simulados">⏳</div>
+                        <div class="summary-info"><h3 id="alarmsNoData">—</h3><p>Sem Dados</p></div>
+                    </div>
+                </div>
+                <div class="scrollable-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Alarme</th>
+                                <th>Métrica</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alarmsTable">
+                            <tr><td colspan="3" style="text-align:center;color:#94a3b8;">Carregando alarmes...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>

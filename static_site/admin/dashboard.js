@@ -4,13 +4,6 @@
         const VISITOR_COUNTER_URL = `${API_BASE_URL}/counter`;
         const COSTS_API_URL = `${API_BASE_URL}/costs`;
         const GOVERNANCE_API_URL = `${API_BASE_URL}/governance`;
-        const AUTH_LOGIN_URL = `${API_BASE_URL}/auth/login`;
-        const AUTH_LOGOUT_URL = `${API_BASE_URL}/auth/logout`;
-        const AUTH_USERS_URL = `${API_BASE_URL}/auth/users`;
-
-        const SESSION_TOKEN_KEY = 'ct_admin_token';
-        const SESSION_USER_KEY = 'ct_admin_user';
-        const SESSION_EXPIRES_KEY = 'ct_admin_expires_at';
 
         let timelineChart = null;
         let trailsChart = null;
@@ -40,12 +33,8 @@
         }
 
         function configureAccessByRole() {
-            // A gestão de usuários agora é feita no console do Amazon Cognito
-            // (grupo 'admin'). A seção antiga de admin_auth fica oculta.
-            const adminUsersSection = document.getElementById('adminUsersSection');
-            if (adminUsersSection) {
-                adminUsersSection.classList.add('hidden');
-            }
+            // A gestão de usuários é feita diretamente no console do Amazon
+            // Cognito (grupo 'admin'). O painel é somente de leitura/monitoramento.
         }
 
         function getAuthHeaders(includeJson = false) {
@@ -269,10 +258,7 @@
                 await loadVisitorCounter();
                 await loadCosts();
                 await loadGovernance();
-
-                if (isAdminUser()) {
-                    await loadAdminUsers();
-                }
+                await loadServiceStatus();
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 document.getElementById('errorMessage').textContent = 
@@ -671,12 +657,55 @@
             }
         }
 
+        function renderAlarms(alarms) {
+            const okEl = document.getElementById('alarmsOk');
+            const inAlarmEl = document.getElementById('alarmsInAlarm');
+            const noDataEl = document.getElementById('alarmsNoData');
+            const tableEl = document.getElementById('alarmsTable');
+            if (!tableEl) return;
+
+            if (!alarms || !alarms.summary) {
+                if (okEl) okEl.textContent = '—';
+                if (inAlarmEl) inAlarmEl.textContent = '—';
+                if (noDataEl) noDataEl.textContent = '—';
+                tableEl.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Alarmes indisponíveis</td></tr>';
+                return;
+            }
+
+            const s = alarms.summary;
+            if (okEl) okEl.textContent = formatNumber(s.ok || 0);
+            if (inAlarmEl) inAlarmEl.textContent = formatNumber(s.in_alarm || 0);
+            if (noDataEl) noDataEl.textContent = formatNumber(s.insufficient_data || 0);
+
+            const lista = alarms.alarms || [];
+            tableEl.innerHTML = lista.map(a => {
+                let badge;
+                if (a.state === 'ALARM') {
+                    badge = '<span class="badge badge-red">🔴 Em alarme</span>';
+                } else if (a.state === 'OK') {
+                    badge = '<span class="badge badge-green">🟢 OK</span>';
+                } else {
+                    badge = '<span class="badge" style="background:rgba(148,163,184,0.2);color:#cbd5e1;">⏳ Sem dados</span>';
+                }
+                return `
+                    <tr>
+                        <td>${escapeHtml(a.name)}</td>
+                        <td>${escapeHtml(a.metric || '—')}</td>
+                        <td>${badge}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Nenhum alarme configurado</td></tr>';
+        }
+
         function renderGovernance(governance) {
             const totalEl = document.getElementById('governanceTotal');
             const compliantEl = document.getElementById('governanceCompliant');
             const pendingEl = document.getElementById('governancePending');
             const tableEl = document.getElementById('governanceTable');
             const metaEl = document.getElementById('governanceMeta');
+
+            // Alarmes vem no mesmo payload de /governance
+            renderAlarms(governance ? governance.alarms : null);
 
             if (!governance || !governance.summary) {
                 totalEl.textContent = '—';
@@ -748,157 +777,11 @@
         }
 
         // ======================================================
-        // Admin Users
+        // Status dos Serviços
+        // Faz um health-check leve (HEAD/GET autenticado) em cada API do
+        // CloudTrilhas e mostra se esta operacional, com a latencia. Nao cria
+        // backend novo — reutiliza os endpoints existentes (custo zero).
         // ======================================================
-        function setUsersMessage(message, isError = false) {
-            const element = document.getElementById('usersMessage');
-            element.textContent = message;
-            element.style.color = isError ? '#fca5a5' : '#6ee7b7';
-        }
-
-        async function loadAdminUsers() {
-            if (!isAdminUser()) return;
-
-            const table = document.getElementById('adminUsersTable');
-
-            try {
-                const response = await authenticatedFetch(AUTH_USERS_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                const data = await response.json();
-                const users = data.users || [];
-
-                table.innerHTML = users.map(user => {
-                    const statusClass = user.status === 'ACTIVE'
-                        ? 'badge-green'
-                        : user.status === 'BLOCKED' ? 'badge-red' : 'badge-amber';
-                    const nextStatus = user.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
-                    const statusAction = user.status === 'ACTIVE' ? 'Desativar' : 'Ativar';
-
-                    return `
-                        <tr>
-                            <td>${escapeHtml(user.username)}</td>
-                            <td>${escapeHtml(user.name || '—')}</td>
-                            <td>${escapeHtml(user.email || '—')}</td>
-                            <td><span class="badge badge-purple">${escapeHtml(user.role || 'VIEWER')}</span></td>
-                            <td><span class="badge ${statusClass}">${escapeHtml(user.status || 'DISABLED')}</span></td>
-                            <td>${formatDateTime(user.last_login)}</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="action-btn" onclick="changeUserStatus('${escapeJs(user.username)}','${nextStatus}')">${statusAction}</button>
-                                    <button class="action-btn" onclick="changeUserRole('${escapeJs(user.username)}','${escapeJs(user.role || 'VIEWER')}')">Perfil</button>
-                                    <button class="action-btn" onclick="resetUserPassword('${escapeJs(user.username)}')">Senha</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('') || '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">Nenhum usuário encontrado</td></tr>';
-            } catch (error) {
-                console.error('Erro ao carregar usuários administrativos:', error);
-                table.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#fca5a5;">Não foi possível carregar os usuários</td></tr>';
-            }
-        }
-
-        async function createAdminUser() {
-            const payload = {
-                username: document.getElementById('newUsername').value.trim().toLowerCase(),
-                name: document.getElementById('newUserName').value.trim(),
-                email: document.getElementById('newUserEmail').value.trim().toLowerCase(),
-                password: document.getElementById('newUserPassword').value,
-                role: document.getElementById('newUserRole').value
-            };
-
-            if (!payload.username || !payload.password) {
-                setUsersMessage('Usuário e senha são obrigatórios.', true);
-                return;
-            }
-
-            try {
-                const response = await authenticatedFetch(AUTH_USERS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json().catch(() => ({}));
-
-                if (!response.ok) throw new Error(result.message || 'Falha ao criar usuário.');
-
-                document.getElementById('newUsername').value = '';
-                document.getElementById('newUserName').value = '';
-                document.getElementById('newUserEmail').value = '';
-                document.getElementById('newUserPassword').value = '';
-                document.getElementById('newUserRole').value = 'VIEWER';
-                setUsersMessage('Usuário criado com sucesso.');
-                await loadAdminUsers();
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
-            }
-        }
-
-        async function updateAdminUser(username, payload) {
-            const response = await authenticatedFetch(`${AUTH_USERS_URL}/${encodeURIComponent(username)}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json().catch(() => ({}));
-
-            if (!response.ok) throw new Error(result.message || 'Falha ao atualizar usuário.');
-            return result;
-        }
-
-        async function changeUserStatus(username, status) {
-            if (!confirm(`Confirma alterar ${username} para ${status}?`)) return;
-
-            try {
-                await updateAdminUser(username, { status });
-                setUsersMessage('Status atualizado com sucesso.');
-                await loadAdminUsers();
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
-            }
-        }
-
-        async function changeUserRole(username, currentRole) {
-            const role = prompt('Novo perfil: ADMIN, EDITOR ou VIEWER', currentRole);
-            if (!role) return;
-
-            try {
-                await updateAdminUser(username, { role: role.trim().toUpperCase() });
-                setUsersMessage('Perfil atualizado com sucesso.');
-                await loadAdminUsers();
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
-            }
-        }
-
-        async function resetUserPassword(username) {
-            const password = prompt(`Nova senha para ${username}:`);
-            if (!password) return;
-
-            try {
-                await updateAdminUser(username, { password });
-                setUsersMessage('Senha atualizada com sucesso.');
-            } catch (error) {
-                setUsersMessage(translateAuthError(error.message), true);
-            }
-        }
-
-        function translateAuthError(message) {
-            const translations = {
-                'user already exists': 'O usuário já existe.',
-                'invalid role': 'Perfil inválido.',
-                'invalid status': 'Status inválido.',
-                'unauthorized': 'Sessão inválida ou expirada.',
-                'admin role required': 'Esta operação exige perfil ADMIN.',
-                'Você não possui permissão para esta operação.': 'Esta operação exige perfil ADMIN.',
-                'password must have at least 10 characters, uppercase, lowercase and number':
-                    'A senha deve ter ao menos 10 caracteres, maiúscula, minúscula e número.'
-            };
-
-            return translations[message] || message || 'Não foi possível concluir a operação.';
-        }
-
         function formatDateTime(value) {
             if (!value) return '—';
             const date = new Date(value);
@@ -906,10 +789,67 @@
             return date.toLocaleString('pt-BR');
         }
 
-        function escapeJs(value) {
-            return String(value || '')
-                .replace(/\\/g, '\\\\')
-                .replace(/'/g, "\\'")
-                .replace(/\r/g, '')
-                .replace(/\n/g, '');
+        async function checkService(nome, url, endpointLabel) {
+            const started = performance.now();
+            try {
+                const response = await authenticatedFetch(url);
+                const latency = Math.round(performance.now() - started);
+                // 2xx = OK; 401/403 tratados como sessao (nao como falha do servico)
+                const ok = response.ok;
+                return {
+                    nome,
+                    endpoint: endpointLabel,
+                    ok,
+                    code: response.status,
+                    latency
+                };
+            } catch (error) {
+                const latency = Math.round(performance.now() - started);
+                return {
+                    nome,
+                    endpoint: endpointLabel,
+                    ok: false,
+                    code: error.status || 0,
+                    latency,
+                    error: error.message
+                };
+            }
+        }
+
+        async function loadServiceStatus() {
+            const tbody = document.getElementById('statusTable');
+            const meta = document.getElementById('statusMeta');
+            if (!tbody) return;
+
+            const servicos = [
+                { nome: 'API — Analytics', url: `${API_URL}?period=1`, label: '/analytics' },
+                { nome: 'API — Contador de Visitas', url: VISITOR_COUNTER_URL, label: '/counter' },
+                { nome: 'API — Custos (FinOps)', url: COSTS_API_URL, label: '/costs' },
+                { nome: 'API — Governança', url: GOVERNANCE_API_URL, label: '/governance' }
+            ];
+
+            const resultados = await Promise.all(
+                servicos.map(s => checkService(s.nome, s.url, s.label))
+            );
+
+            const online = resultados.filter(r => r.ok).length;
+
+            tbody.innerHTML = resultados.map(r => {
+                const badge = r.ok
+                    ? '<span class="badge badge-green">🟢 Operacional</span>'
+                    : '<span class="badge badge-red">🔴 Indisponível</span>';
+                const latencia = r.ok ? `${r.latency} ms` : '—';
+                return `
+                    <tr>
+                        <td>${escapeHtml(r.nome)}</td>
+                        <td><code>${escapeHtml(r.endpoint)}</code></td>
+                        <td>${badge}</td>
+                        <td>${latencia}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const todosOk = online === resultados.length;
+            meta.textContent = `${online}/${resultados.length} serviços operacionais · verificado em ${new Date().toLocaleTimeString('pt-BR')}`;
+            meta.style.color = todosOk ? '#6ee7b7' : '#fbbf24';
         }

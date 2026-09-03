@@ -42,6 +42,14 @@ resource "aws_iam_policy" "lambda_policy" {
         Resource = "*"
       },
       {
+        # Resumo de saude operacional: leitura dos alarmes CloudWatch do projeto.
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:DescribeAlarms"
+        ]
+        Resource = "*"
+      },
+      {
         Effect = "Allow"
         Action = [
           "logs:CreateLogGroup",
