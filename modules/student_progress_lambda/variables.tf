@@ -28,6 +28,18 @@ variable "dynamodb_table_arn" {
   type        = string
 }
 
+variable "leads_table_name" {
+  description = "Nome da tabela de leads (para gravar a origem do aluno)"
+  type        = string
+  default     = ""
+}
+
+variable "leads_table_arn" {
+  description = "ARN da tabela de leads (para permissão de PutItem)"
+  type        = string
+  default     = ""
+}
+
 variable "cognito_user_pool_arn" {
   description = "ARN do Cognito User Pool (para validar o access token via GetUser)"
   type        = string

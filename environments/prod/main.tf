@@ -331,5 +331,9 @@ module "student_progress_lambda" {
   dynamodb_table_arn    = module.student_progress_dynamodb.table_arn
   cognito_user_pool_arn = module.cognito.user_pool_arn
 
+  # Tabela de leads: grava a "origem" respondida pelo aluno (alimenta analytics)
+  leads_table_name = module.dynamodb_leads.table_name
+  leads_table_arn  = module.dynamodb_leads.table_arn
+
   allowed_origins = "https://www.cloudtrilhas.com.br,https://cloudtrilhas.com.br"
 }

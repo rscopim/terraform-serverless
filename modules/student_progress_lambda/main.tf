@@ -38,7 +38,7 @@ resource "aws_iam_policy" "lambda_policy" {
           "dynamodb:GetItem",
           "dynamodb:PutItem"
         ]
-        Resource = var.dynamodb_table_arn
+        Resource = compact([var.dynamodb_table_arn, var.leads_table_arn])
       },
       {
         # GetUser valida o access token do Cognito e identifica o aluno
@@ -78,8 +78,9 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      TABLE_NAME      = var.dynamodb_table_name
-      ALLOWED_ORIGINS = var.allowed_origins
+      TABLE_NAME       = var.dynamodb_table_name
+      LEADS_TABLE_NAME = var.leads_table_name
+      ALLOWED_ORIGINS  = var.allowed_origins
     }
   }
 

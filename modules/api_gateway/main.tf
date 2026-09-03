@@ -233,6 +233,18 @@ resource "aws_apigatewayv2_route" "progress_quiz_post" {
   target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
 }
 
+resource "aws_apigatewayv2_route" "progress_origin_post" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "POST /progress/origin"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "progress_origin_options" {
+  api_id    = aws_apigatewayv2_api.this.id
+  route_key = "OPTIONS /progress/origin"
+  target    = "integrations/${aws_apigatewayv2_integration.student_progress_lambda.id}"
+}
+
 resource "aws_apigatewayv2_route" "progress_options" {
   api_id    = aws_apigatewayv2_api.this.id
   route_key = "OPTIONS /progress"
