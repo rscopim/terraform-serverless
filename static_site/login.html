@@ -105,10 +105,26 @@
       var params = new URLSearchParams(location.search);
       var redirect = params.get('redirect') || 'index.html';
 
-      // Se já está logado, vai direto
-      CloudTrilhasAuth.isAuthenticated().then(function (ok) {
-        if (ok) location.href = redirect;
-      });
+      // Evita não deixar digitar: o formulário fica sempre visível de imediato.
+      // Só auto-redireciona se realmente autenticado E sem risco de loop.
+      // Proteção anti-loop: conta quantas vezes voltamos ao login em sequência.
+      try {
+        var n = parseInt(sessionStorage.getItem('ct_login_bounces') || '0', 10) + 1;
+        sessionStorage.setItem('ct_login_bounces', String(n));
+        // Se já batemos no login 2+ vezes seguidas, para de redirecionar:
+        // limpa a sessão inconsistente e deixa o usuário logar do zero.
+        if (n >= 2) {
+          if (window.CloudTrilhasAuth) CloudTrilhasAuth.logout();
+          sessionStorage.removeItem('ct_login_bounces');
+        } else {
+          CloudTrilhasAuth.isAuthenticated().then(function (ok) {
+            if (ok) {
+              sessionStorage.removeItem('ct_login_bounces');
+              location.href = redirect;
+            }
+          });
+        }
+      } catch (e) {}
 
       var loginForm = document.getElementById('loginForm');
       var loginMsg = document.getElementById('loginMsg');
@@ -124,6 +140,7 @@
             document.getElementById('loginEmail').value.trim(),
             document.getElementById('loginPass').value
           );
+          try { sessionStorage.removeItem('ct_login_bounces'); } catch (e) {}
           location.href = redirect;
         } catch (err) {
           if (err.code === 'UserNotConfirmedException') {

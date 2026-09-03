@@ -213,7 +213,7 @@
 
             // Sessão Cognito válida — exige grupo admin para o dashboard
             if (!window.CloudTrilhasAuth.isAdmin()) {
-                showLogin('Acesso restrito a administradores.');
+                showLogin('Acesso restrito a administradores. Se você foi adicionado ao grupo admin recentemente, saia e entre novamente para atualizar suas permissões.');
                 return;
             }
 
