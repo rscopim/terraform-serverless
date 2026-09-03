@@ -125,17 +125,28 @@ window.CloudTrilhasAuth = (function () {
 
   // ===== Cookie de sessão (lido pela CloudFront Function no edge) =====
   // Marca presença de sessão para o gate no edge. Não guarda o token em si.
+  // Determina o domínio do cookie: usa o domínio pai (.cloudtrilhas.com.br)
+  // para que o cookie valha tanto no apex quanto no www. Em localhost/preview,
+  // não define Domain (cookie do host atual).
+  function cookieDomain() {
+    var h = location.hostname || '';
+    if (h.indexOf('cloudtrilhas.com.br') !== -1) {
+      return '; Domain=.cloudtrilhas.com.br';
+    }
+    return '';
+  }
+
   function setSessionCookie(maxAgeSeconds) {
     try {
       var secure = location.protocol === 'https:' ? '; Secure' : '';
       document.cookie = 'ct_session=1; Path=/; Max-Age=' + maxAgeSeconds +
-        '; SameSite=Lax' + secure;
+        '; SameSite=Lax' + cookieDomain() + secure;
     } catch (e) {}
   }
 
   function clearSessionCookie() {
     try {
-      document.cookie = 'ct_session=; Path=/; Max-Age=0; SameSite=Lax';
+      document.cookie = 'ct_session=; Path=/; Max-Age=0; SameSite=Lax' + cookieDomain();
     } catch (e) {}
   }
 
