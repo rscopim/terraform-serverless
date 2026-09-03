@@ -18,6 +18,15 @@ resource "aws_cognito_user_pool" "this" {
     allow_admin_create_user_only = false
   }
 
+  # Trigger executado quando o aluno confirma o cadastro — grava o lead
+  # na tabela de leads. Só é ativado se o ARN da Lambda for fornecido.
+  dynamic "lambda_config" {
+    for_each = var.post_confirmation_lambda_arn != "" ? [1] : []
+    content {
+      post_confirmation = var.post_confirmation_lambda_arn
+    }
+  }
+
   password_policy {
     minimum_length                   = 8
     require_lowercase                = true

@@ -19,3 +19,9 @@ variable "ses_from_email" {
   type        = string
   default     = ""
 }
+
+variable "post_confirmation_lambda_arn" {
+  description = "ARN da Lambda de Post Confirmation (grava lead no cadastro). Vazio = sem trigger."
+  type        = string
+  default     = ""
+}
