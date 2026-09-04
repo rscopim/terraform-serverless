@@ -88,15 +88,9 @@
             <button class="btn-run" id="pyModoLivreBtn" style="width:100%;margin-bottom:12px">🎮 Modo Livre</button>
             <h3>🎯 Exercícios</h3>
             <div id="pyExList" style="margin-bottom:16px"></div>
-            <h3>📚 Exemplos</h3>
-            <button class="example-btn" data-ex="ola">👋 Olá, mundo</button>
-            <button class="example-btn" data-ex="variaveis">🔢 Variáveis e tipos</button>
-            <button class="example-btn" data-ex="loops">🔁 Laços e listas</button>
-            <button class="example-btn" data-ex="funcoes">⚙️ Funções</button>
-            <button class="example-btn" data-ex="dict">🗂️ Dicionários</button>
-            <button class="example-btn" data-ex="classes">🏗️ Classes (POO)</button>
-            <button class="example-btn" data-ex="excecoes">🛡️ Exceções</button>
-            <button class="example-btn" data-ex="comprehension">✨ List comprehension</button>
+            <h3>📚 Exemplos por tema</h3>
+            <p style="color:#64748b;font-size:0.76rem;margin:0 0 8px">Clique num tema para expandir e escolher um exemplo.</p>
+            <div id="exemplosLista"></div>
           </aside>
 
           <div>
@@ -131,6 +125,55 @@ print(f"Bem-vindo(a), {nome}!")</textarea>
 
         <div class="info-box" style="margin-top:24px">
           <strong>💡 Dica:</strong> tudo roda localmente no seu navegador — nada é enviado para servidores. Você pode fechar a aba e nada é salvo. Use este espaço para experimentar à vontade, sem medo de quebrar nada.
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULADOR DE CÓDIGO DE IA (AWS e IA) -->
+    <section class="module-section alt-bg">
+      <div class="container">
+        <div class="module-header">
+          <span class="module-badge">🤖 AWS e IA</span>
+          <h2>Simulador de Código de IA (Amazon Bedrock)</h2>
+          <p>Monte uma chamada a um modelo de IA generativa como se fosse no Amazon Bedrock. O simulador gera o código Python (boto3) e mostra uma resposta simulada do modelo — sem usar a AWS real, custo zero.</p>
+        </div>
+
+        <div class="sandbox-wrap">
+          <div>
+            <div class="editor-card" style="padding:18px">
+              <div class="tool-row" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+                <label style="color:#cbd5e1;font-size:0.82rem;min-width:70px">Modelo</label>
+                <select id="iaModelo" style="flex:1;min-width:180px;padding:9px;border-radius:8px;background:#04070d;color:#e2e8f0;border:1px solid rgba(255,255,255,0.15)"></select>
+              </div>
+              <div class="tool-row" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+                <label style="color:#cbd5e1;font-size:0.82rem;min-width:70px">Tarefa</label>
+                <select id="iaTarefa" style="flex:1;min-width:180px;padding:9px;border-radius:8px;background:#04070d;color:#e2e8f0;border:1px solid rgba(255,255,255,0.15)">
+                  <option value="resumir">Resumir texto</option>
+                  <option value="traduzir">Traduzir para inglês</option>
+                  <option value="sentimento">Análise de sentimento</option>
+                  <option value="chatbot">Chatbot / assistente</option>
+                  <option value="codigo">Gerar código</option>
+                </select>
+              </div>
+              <label style="color:#cbd5e1;font-size:0.82rem;display:block;margin-bottom:6px">Prompt (o que pedir ao modelo)</label>
+              <textarea id="iaPrompt" spellcheck="false" style="width:100%;min-height:80px;background:#04070d;color:#e2e8f0;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;box-sizing:border-box" placeholder="Ex.: Explique o que é computação em nuvem para iniciantes.">Explique o que é computação em nuvem para iniciantes.</textarea>
+              <div style="display:flex;gap:8px;margin-top:12px">
+                <button class="btn-run" id="iaGerarBtn">🤖 Gerar e simular</button>
+                <button class="btn-clear" id="iaUsarNoEditor">Usar no editor ↑</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="output-card" style="margin-top:0">
+              <div class="output-header">Código Python gerado (boto3 / Bedrock)</div>
+              <pre id="iaCodigo" style="padding:16px;margin:0;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.82rem;white-space:pre-wrap;min-height:60px">Escolha o modelo, a tarefa e o prompt, depois clique em "Gerar e simular".</pre>
+            </div>
+            <div class="output-card" style="margin-top:16px">
+              <div class="output-header">🤖 Resposta simulada do modelo</div>
+              <pre id="iaResposta" style="padding:16px;margin:0;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:0.86rem;white-space:pre-wrap;min-height:60px">—</pre>
+            </div>
+          </div>
         </div>
       </div>
     </section>

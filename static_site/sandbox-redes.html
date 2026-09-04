@@ -158,8 +158,38 @@
             <!-- 3. Modelo OSI / TCP-IP -->
             <div class="tool-card">
               <h3>📶 Modelo OSI / TCP-IP</h3>
-              <p class="tool-sub">Clique em uma camada para selecioná-la. Cada camada mostra a correspondência TCP/IP, a PDU e exemplos de protocolos.</p>
+              <p class="tool-sub">Clique em uma camada para ver os detalhes: papel, equivalente TCP/IP, PDU, protocolos e dispositivos típicos.</p>
               <div id="osiStack"></div>
+              <div class="tool-out" id="osiDetalhe" style="display:none;margin-top:14px"></div>
+            </div>
+
+            <!-- 4. Montar Rede (topologia + roteamento) -->
+            <div class="tool-card">
+              <h3>🖧 Montar Rede + Roteamento</h3>
+              <p class="tool-sub">Escolha o tamanho da rede. O simulador cria as sub-redes (LANs) ligadas a um roteador central (R1). Sua missão: criar as rotas até todas as LANs se comunicarem.</p>
+              <div class="tool-row">
+                <label for="redeTamanho">Dispositivos</label>
+                <select class="tool-input" id="redeTamanho" style="max-width:120px;flex:none">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                </select>
+                <button class="tool-btn" id="redeGerarBtn">Gerar rede</button>
+              </div>
+              <div class="tool-out" id="redeMapa"></div>
+              <div class="tool-row" style="margin-top:12px">
+                <label for="redeRotaDe">Rota de</label>
+                <select class="tool-input" id="redeRotaDe" style="flex:1"></select>
+                <label for="redeRotaPara" style="min-width:auto">para</label>
+                <select class="tool-input" id="redeRotaPara" style="flex:1"></select>
+                <button class="tool-btn" id="redeAddRotaBtn">Adicionar rota</button>
+              </div>
+              <div class="rt-msg" id="redeMsg"></div>
+              <div class="tool-row" style="margin-top:8px">
+                <button class="tool-btn" id="redeTestBtn">Testar conectividade</button>
+              </div>
+              <div class="tool-out" id="redeResult"></div>
             </div>
           </div>
         </div>

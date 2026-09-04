@@ -144,13 +144,13 @@
 
   // ===================== 3. VISUALIZADOR OSI / TCP-IP =====================
   var CAMADAS = [
-    { n: 7, nome: 'Aplicação', tcpip: 'Aplicação', ex: 'HTTP, DNS, SSH, FTP', pdu: 'Dados' },
-    { n: 6, nome: 'Apresentação', tcpip: 'Aplicação', ex: 'TLS, SSL, JPEG, ASCII', pdu: 'Dados' },
-    { n: 5, nome: 'Sessão', tcpip: 'Aplicação', ex: 'Sockets, RPC, NetBIOS', pdu: 'Dados' },
-    { n: 4, nome: 'Transporte', tcpip: 'Transporte', ex: 'TCP, UDP (portas)', pdu: 'Segmento' },
-    { n: 3, nome: 'Rede', tcpip: 'Internet', ex: 'IP, ICMP, roteadores', pdu: 'Pacote' },
-    { n: 2, nome: 'Enlace', tcpip: 'Acesso à Rede', ex: 'Ethernet, MAC, switches', pdu: 'Quadro (Frame)' },
-    { n: 1, nome: 'Física', tcpip: 'Acesso à Rede', ex: 'Cabos, sinais, hubs', pdu: 'Bits' }
+    { n: 7, nome: 'Aplicação', tcpip: 'Aplicação', ex: 'HTTP, HTTPS, DNS, SSH, FTP, SMTP', pdu: 'Dados', papel: 'Interface com o usuário e as aplicações de rede. É onde vivem os protocolos que você usa no dia a dia (navegador, e-mail, etc.).', dispositivo: 'Gateways de aplicação, proxies' },
+    { n: 6, nome: 'Apresentação', tcpip: 'Aplicação', ex: 'TLS, SSL, JPEG, ASCII, UTF-8', pdu: 'Dados', papel: 'Traduz, criptografa e comprime os dados para um formato que a aplicação entende. Responsável por codificação e segurança (TLS).', dispositivo: '—' },
+    { n: 5, nome: 'Sessão', tcpip: 'Aplicação', ex: 'Sockets, RPC, NetBIOS', pdu: 'Dados', papel: 'Abre, mantém e encerra as sessões (diálogos) entre duas máquinas. Controla quem fala e quando.', dispositivo: '—' },
+    { n: 4, nome: 'Transporte', tcpip: 'Transporte', ex: 'TCP, UDP (portas 80, 443, 22...)', pdu: 'Segmento', papel: 'Entrega fim-a-fim entre processos. TCP garante entrega e ordem; UDP é rápido e sem garantia. Usa portas para identificar aplicações.', dispositivo: 'Firewalls (camada 4)' },
+    { n: 3, nome: 'Rede', tcpip: 'Internet', ex: 'IP, ICMP, roteamento', pdu: 'Pacote', papel: 'Endereçamento lógico (IP) e roteamento entre redes diferentes. Decide o melhor caminho de uma rede a outra.', dispositivo: 'Roteadores' },
+    { n: 2, nome: 'Enlace', tcpip: 'Acesso à Rede', ex: 'Ethernet, MAC, ARP, VLAN', pdu: 'Quadro (Frame)', papel: 'Comunicação dentro da mesma rede local usando endereços físicos (MAC). Detecta erros de transmissão.', dispositivo: 'Switches, bridges' },
+    { n: 1, nome: 'Física', tcpip: 'Acesso à Rede', ex: 'Cabos, fibra, sinais, Wi-Fi (rádio)', pdu: 'Bits', papel: 'Transmissão dos bits crus pelo meio físico (elétrico, óptico ou rádio). Define conectores, voltagem e taxa.', dispositivo: 'Hubs, repetidores, cabos' }
   ];
   function renderOSI() {
     var cont = document.getElementById('osiStack');
@@ -159,8 +159,131 @@
       return '<div class="osi-layer" data-n="' + c.n + '">' +
         '<div class="osi-num">' + c.n + '</div>' +
         '<div class="osi-info"><strong>' + c.nome + '</strong>' +
-        '<small>TCP/IP: ' + c.tcpip + ' · PDU: ' + c.pdu + ' · ' + c.ex + '</small></div></div>';
+        '<small>TCP/IP: ' + c.tcpip + ' · PDU: ' + c.pdu + '</small></div></div>';
     }).join('');
+  }
+  function mostrarDetalheOSI(n) {
+    var det = document.getElementById('osiDetalhe');
+    if (!det) return;
+    var c = null;
+    for (var i = 0; i < CAMADAS.length; i++) { if (CAMADAS[i].n === n) { c = CAMADAS[i]; break; } }
+    if (!c) { det.style.display = 'none'; return; }
+    det.style.display = 'block';
+    det.innerHTML =
+      '<h4 style="margin:0 0 6px;color:#fff">Camada ' + c.n + ' — ' + c.nome + '</h4>' +
+      '<p style="margin:0 0 10px;color:#cbd5e1;font-size:0.88rem">' + c.papel + '</p>' +
+      linha('Equivalente TCP/IP', c.tcpip) +
+      linha('PDU (unidade de dados)', c.pdu) +
+      linha('Protocolos/exemplos', c.ex) +
+      linha('Dispositivos típicos', c.dispositivo);
+  }
+
+  // ===================== 4. MONTAR REDE (topologia + roteamento) =====================
+  // O aluno escolhe 5/10/15/20 dispositivos, o simulador gera sub-redes e o
+  // aluno cria as rotas entre elas. Valida se todas as sub-redes ficam
+  // alcançáveis a partir do roteador principal.
+  var _rede = null; // { tamanho, subnets:[{nome,cidr,rede,prefix}], enlaces:[] }
+
+  function gerarRede(tamanho) {
+    // Distribui os dispositivos em N sub-redes /24 dentro de 10.0.x.0/24
+    var nSubnets;
+    if (tamanho <= 5) nSubnets = 2;
+    else if (tamanho <= 10) nSubnets = 3;
+    else if (tamanho <= 15) nSubnets = 4;
+    else nSubnets = 5;
+
+    var subnets = [];
+    for (var i = 0; i < nSubnets; i++) {
+      subnets.push({
+        nome: 'LAN-' + (i + 1),
+        cidr: '10.0.' + i + '.0/24',
+        rede: '10.0.' + i + '.0',
+        prefix: 24,
+        gw: '10.0.' + i + '.1'
+      });
+    }
+    var porSubnet = Math.floor(tamanho / nSubnets);
+    var resto = tamanho % nSubnets;
+    for (var j = 0; j < subnets.length; j++) {
+      subnets[j].hosts = porSubnet + (j < resto ? 1 : 0);
+    }
+    _rede = { tamanho: tamanho, nSubnets: nSubnets, subnets: subnets, rotas: [] };
+    renderRede();
+  }
+
+  function renderRede() {
+    var cont = document.getElementById('redeMapa');
+    var sel = document.getElementById('redeRotaDe');
+    var sel2 = document.getElementById('redeRotaPara');
+    if (!cont) return;
+    if (!_rede) { cont.innerHTML = '<div class="rslin"><span>Escolha um tamanho e clique em "Gerar rede".</span></div>'; return; }
+
+    var html = '<div class="rslin"><span><strong>Roteador central (R1)</strong></span><strong>gateway de todas as LANs</strong></div>';
+    _rede.subnets.forEach(function (s) {
+      html += '<div class="rslin"><span>🖧 ' + s.nome + ' — ' + s.cidr + '</span><strong>' + s.hosts + ' dispositivo(s) · GW ' + s.gw + '</strong></div>';
+    });
+    // rotas já criadas
+    if (_rede.rotas.length) {
+      html += '<div style="margin-top:10px;color:#94a3b8;font-size:0.8rem">Rotas criadas:</div>';
+      _rede.rotas.forEach(function (r) {
+        html += '<div class="rslin"><span>' + r.de + ' → ' + r.para + '</span><strong>via R1</strong></div>';
+      });
+    }
+    cont.innerHTML = html;
+
+    // popular selects
+    if (sel && sel2) {
+      var opts = _rede.subnets.map(function (s) { return '<option value="' + s.nome + '">' + s.nome + '</option>'; }).join('');
+      sel.innerHTML = opts;
+      sel2.innerHTML = opts;
+    }
+  }
+
+  function addRotaRede() {
+    var msg = document.getElementById('redeMsg');
+    if (!_rede) { if (msg) msg.textContent = 'Gere uma rede primeiro.'; return; }
+    var de = document.getElementById('redeRotaDe').value;
+    var para = document.getElementById('redeRotaPara').value;
+    if (msg) msg.textContent = '';
+    if (de === para) { if (msg) msg.textContent = 'Escolha duas LANs diferentes.'; return; }
+    // evita duplicata (rota é bidirecional via R1)
+    var existe = _rede.rotas.some(function (r) {
+      return (r.de === de && r.para === para) || (r.de === para && r.para === de);
+    });
+    if (existe) { if (msg) msg.textContent = 'Essa rota já existe.'; return; }
+    _rede.rotas.push({ de: de, para: para });
+    renderRede();
+    verificar();
+  }
+
+  function redeConectividade() {
+    // Conta quantos pares de LANs estão conectados (direto ou via cadeia por R1).
+    // Como todas passam por R1, basta cada LAN ter ao menos uma rota para ser "roteável".
+    if (!_rede) return { total: 0, conectadas: 0, completo: false };
+    var grafo = {};
+    _rede.subnets.forEach(function (s) { grafo[s.nome] = []; });
+    _rede.rotas.forEach(function (r) { grafo[r.de].push(r.para); grafo[r.para].push(r.de); });
+    // BFS a partir da primeira LAN
+    var inicio = _rede.subnets[0].nome;
+    var visitados = {}; var fila = [inicio]; visitados[inicio] = true;
+    while (fila.length) {
+      var atual = fila.shift();
+      grafo[atual].forEach(function (v) { if (!visitados[v]) { visitados[v] = true; fila.push(v); } });
+    }
+    var conectadas = Object.keys(visitados).length;
+    return { total: _rede.subnets.length, conectadas: conectadas, completo: conectadas === _rede.subnets.length };
+  }
+
+  function testarRede() {
+    var out = document.getElementById('redeResult');
+    if (!_rede) { if (out) out.innerHTML = '<span class="err">Gere uma rede primeiro.</span>'; return; }
+    var c = redeConectividade();
+    if (c.completo) {
+      out.innerHTML = '✅ Todas as ' + c.total + ' LANs estão conectadas! A rede tem roteamento completo (todas alcançáveis via R1).';
+    } else {
+      out.innerHTML = '<span class="err">⚠️ ' + c.conectadas + '/' + c.total + ' LANs conectadas. Crie mais rotas até todas se comunicarem.</span>';
+    }
+    verificar();
   }
 
   // ===================== BANCO DE EXERCÍCIOS =====================
@@ -177,9 +300,18 @@
     // Avançado
     { nivel: 'Avançado', titulo: 'Rota padrão', desc: 'Adicione uma rota padrão (0.0.0.0/0) via 10.0.0.254 e teste o destino 8.8.8.8 — deve usar a rota padrão.', dica: 'Destino 0.0.0.0 prefixo 0; depois teste 8.8.8.8', check: function () { return _ultimaRota && _ultimaRota.prefix === 0; } },
     { nivel: 'Avançado', titulo: 'Longest-prefix match', desc: 'Tendo 10.0.0.0/8 e 10.1.0.0/16 na tabela, teste 10.1.2.3 — a rota mais específica (/16) deve vencer.', dica: 'Adicione as duas rotas e teste 10.1.2.3', check: function () { return _ultimaRota && _ultimaRota.prefix === 16 && intToIp(_ultimaRota.dest) === '10.1.0.0'; } },
+    { nivel: 'Intermediário', titulo: 'Camada do switch', desc: 'No visualizador OSI, clique na camada em que um switch opera (camada 2 — Enlace).', dica: 'Switch usa MAC → camada 2 (Enlace)', check: function () { return _osiSelecionada === 2; } },
+    { nivel: 'Intermediário', titulo: 'Rede pequena (5 dispositivos)', desc: 'No simulador "Montar Rede", gere uma rede de 5 dispositivos.', dica: 'Escolha 5 e clique em Gerar rede', check: function () { return _rede && _rede.tamanho === 5; } },
+    // Avançado
+    { nivel: 'Avançado', titulo: 'Rota padrão', desc: 'Adicione uma rota padrão (0.0.0.0/0) via 10.0.0.254 e teste o destino 8.8.8.8 — deve usar a rota padrão.', dica: 'Destino 0.0.0.0 prefixo 0; depois teste 8.8.8.8', check: function () { return _ultimaRota && _ultimaRota.prefix === 0; } },
+    { nivel: 'Avançado', titulo: 'Longest-prefix match', desc: 'Tendo 10.0.0.0/8 e 10.1.0.0/16 na tabela, teste 10.1.2.3 — a rota mais específica (/16) deve vencer.', dica: 'Adicione as duas rotas e teste 10.1.2.3', check: function () { return _ultimaRota && _ultimaRota.prefix === 16 && intToIp(_ultimaRota.dest) === '10.1.0.0'; } },
+    { nivel: 'Avançado', titulo: 'Rede de 10 dispositivos', desc: 'No simulador "Montar Rede", gere uma rede de 10 dispositivos e conecte TODAS as LANs (roteamento completo).', dica: 'Gere com 10, crie rotas entre as LANs e clique em Testar conectividade', check: function () { return _rede && _rede.tamanho === 10 && redeConectividade().completo; } },
+    { nivel: 'Avançado', titulo: 'Rede de 15 dispositivos', desc: 'Monte uma rede de 15 dispositivos e obtenha roteamento completo entre todas as LANs.', dica: 'Gere com 15; conecte cada LAN à rede', check: function () { return _rede && _rede.tamanho === 15 && redeConectividade().completo; } },
     // Profissional
     { nivel: 'Profissional', titulo: 'Camada do roteador', desc: 'No visualizador OSI, identifique: um roteador opera na camada 3. Clique na camada Rede (nº 3).', dica: 'Camada 3 = Rede (IP)', check: function () { return _osiSelecionada === 3; } },
-    { nivel: 'Profissional', titulo: 'PDU do transporte', desc: 'Identifique a PDU da camada de Transporte clicando nela (camada 4). A PDU é "Segmento".', dica: 'Camada 4 = Transporte = Segmento', check: function () { return _osiSelecionada === 4; } }
+    { nivel: 'Profissional', titulo: 'PDU do transporte', desc: 'Identifique a PDU da camada de Transporte clicando nela (camada 4). A PDU é "Segmento".', dica: 'Camada 4 = Transporte = Segmento', check: function () { return _osiSelecionada === 4; } },
+    { nivel: 'Profissional', titulo: 'Data center: rede de 20 dispositivos', desc: 'Monte a maior rede (20 dispositivos) e garanta roteamento completo entre todas as sub-redes.', dica: 'Gere com 20; conecte todas as LANs e teste a conectividade', check: function () { return _rede && _rede.tamanho === 20 && redeConectividade().completo; } },
+    { nivel: 'Profissional', titulo: 'Segmentação /26', desc: 'Na calculadora, planeje uma sub-rede /26 para 60 hosts (ex.: 192.168.1.0/26).', dica: '/26 = 62 hosts utilizáveis', check: function () { return _ultimoSubnet && _ultimoSubnet.prefixo === 26; } }
   ];
   var _osiSelecionada = null;
   var exAtual = null, concluidos = {}, modoLivre = true;
@@ -264,6 +396,19 @@
       rotas = []; renderRotas(); document.getElementById('rtResult').innerHTML = '';
     });
 
+    // Simulador Montar Rede
+    var redeGerarBtn = document.getElementById('redeGerarBtn');
+    if (redeGerarBtn) {
+      redeGerarBtn.addEventListener('click', function () {
+        var tam = parseInt(document.getElementById('redeTamanho').value, 10);
+        gerarRede(tam);
+        verificar();
+      });
+      document.getElementById('redeAddRotaBtn').addEventListener('click', function () { addRotaRede(); });
+      document.getElementById('redeTestBtn').addEventListener('click', function () { testarRede(); });
+      renderRede();
+    }
+
     // Clique nas camadas OSI
     document.getElementById('osiStack').addEventListener('click', function (e) {
       var layer = e.target.closest ? e.target.closest('.osi-layer') : null;
@@ -272,6 +417,7 @@
       var all = document.querySelectorAll('.osi-layer');
       for (var i = 0; i < all.length; i++) all[i].classList.remove('sel');
       layer.classList.add('sel');
+      mostrarDetalheOSI(_osiSelecionada);
       verificar();
     });
   }
